@@ -90,8 +90,8 @@ void Frame::show_result(const audiohole::Result& result) {
     technical_->SetLabel(text(result.detail));
     technical_->Wrap(std::max(500, GetClientSize().x - 35));
     if (!result.ok && !smoke_)
-        wxMessageBox(text(result.detail), "AudioHole — action unavailable", wxOK | wxICON_WARNING,
-                     this);
+        wxMessageBox(text(result.detail), wxS("AudioHole — action unavailable"),
+                     wxOK | wxICON_WARNING, this);
 }
 bool Frame::discard() {
     if (!dirty_)
@@ -199,7 +199,7 @@ void Frame::refresh() {
                 (e.type == "error" ||
                  (notifications_->GetSelection() == 1 &&
                   (e.type == "reconnected" || e.type == "disconnected" || e.type == "stopped")))) {
-                tray_->ShowBalloon("AudioHole — SIMULATION", text(e.detail),
+                tray_->ShowBalloon(wxS("AudioHole — SIMULATION"), text(e.detail),
                                    e.type == "error" ? wxICON_WARNING : wxICON_INFORMATION, 3000);
             }
         }
@@ -212,6 +212,8 @@ bool Frame::smoke(const wxString& directory) {
                 throw std::runtime_error(detail);
         };
         require(notebook_->GetPageCount() == 4, "Expected four native GUI pages");
+        require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
+                "UTF-8 control copy changed under the Windows locale");
         select_profile("profile-duplex");
         wxCommandEvent start(wxEVT_BUTTON, start_->GetId());
         start_->GetEventHandler()->ProcessEvent(start);

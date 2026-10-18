@@ -58,7 +58,7 @@ void Frame::build_settings() {
           "synchronization,\nand O-006 storage roots remain Open. This build establishes no "
           "production compatibility contract.");
     auto* unavailable = new wxButton(
-        page, wxID_ANY, "Production persistence / synchronization policy — unavailable");
+        page, wxID_ANY, wxS("Production persistence / synchronization policy — unavailable"));
     unavailable->Disable();
     root->Add(unavailable, 0, wxALL, 4);
     auto* advanced = new wxStaticBoxSizer(wxVERTICAL, page, "Advanced");
@@ -78,7 +78,7 @@ void Frame::introduction() {
                  "Activate.\n5. Use Devices and simulated failures to test recovery.\n\nSIMULATION "
                  "ONLY: no audio or real device access. Test Beep emits NO SOUND.\nClose hides to "
                  "tray; Exit terminates. Rerunning this introduction preserves your session.",
-                 "AudioHole — Introduction", wxOK | wxICON_INFORMATION, this);
+                 wxS("AudioHole — Introduction"), wxOK | wxICON_INFORMATION, this);
 }
 
 } // namespace audiohole::gui

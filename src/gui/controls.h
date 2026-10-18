@@ -1,5 +1,7 @@
 #pragma once
 #include <functional>
+#include <string>
+#include <utility>
 #include <wx/wx.h>
 
 namespace audiohole::gui {
@@ -41,6 +43,23 @@ inline wxChoice* choices(wxWindow* parent, wxSizer* layout, const wxString& titl
         control->SetSelection(0);
     layout->Add(control, 0, wxEXPAND | wxALL, 3);
     return control;
+}
+
+// Source copy is UTF-8, independent of the user's Windows ANSI code page.
+// Literal overloads convert before a wxString constructor can use wxConvLibc.
+inline wxStaticText* label(wxWindow* parent, wxSizer* layout, const char* value) {
+    return label(parent, layout, wxString::FromUTF8(value));
+}
+inline wxButton* button(wxWindow* parent, wxSizer* layout, const char* title,
+                        std::function<void()> action) {
+    return button(parent, layout, wxString::FromUTF8(title), std::move(action));
+}
+inline wxTextCtrl* field(wxWindow* parent, wxSizer* layout, const char* title, long style = 0) {
+    return field(parent, layout, wxString::FromUTF8(title), style);
+}
+inline wxChoice* choices(wxWindow* parent, wxSizer* layout, const char* title,
+                         std::initializer_list<const char*> values) {
+    return choices(parent, layout, wxString::FromUTF8(title), values);
 }
 
 } // namespace audiohole::gui

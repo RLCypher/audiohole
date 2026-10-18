@@ -34,7 +34,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
           "above.\nSynchronization: provisional Automatic; actual processing: none.\nDirect "
           "controls unavailable: D-034 / O-005 remain Open. No bit-perfect guarantee.");
     auto* fallback = new wxChoice(pane, wxID_ANY);
-    fallback->Append("Fallback device / channel mapping — unavailable pending O-004");
+    fallback->Append(wxS("Fallback device / channel mapping — unavailable pending O-004"));
     fallback->SetSelection(0);
     fallback->Disable();
     inner->Add(fallback, 0, wxEXPAND | wxALL, 3);
@@ -245,8 +245,9 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.formats = r.compatible;
     w.format->Clear();
     w.format->Append(r.compatible.empty()
-                         ? "Automatic — unverified compatibility"
-                         : "Recommended — " + text(r.compatible.front().label()) + " [SIMULATED]");
+                         ? wxS("Automatic — unverified compatibility")
+                         : wxS("Recommended — ") + text(r.compatible.front().label()) +
+                               " [SIMULATED]");
     int selection = 0;
     for (const auto& f : r.compatible) {
         w.format->Append(text(f.label()) + " [fixture-reported]");
@@ -388,7 +389,7 @@ namespace audiohole::gui {
 // needs an explicit destination and remains a no-sound simulation in this build.
 void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     auto* observation =
-        new wxStaticBoxSizer(wxVERTICAL, parent, "Temporary setup diagnostics — SIMULATED");
+        new wxStaticBoxSizer(wxVERTICAL, parent, wxS("Temporary setup diagnostics — SIMULATED"));
     auto* box = observation->GetStaticBox();
     layout->Add(observation, 0, wxEXPAND | wxALL, 4);
     activity_direction_ = choices(box, observation, "Source direction to observe temporarily",
