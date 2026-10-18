@@ -96,7 +96,15 @@
       "Did that fix it?",
       "That should do it.",
       "Oughtta do the trick.",
-      "A remarkably uneventful button."
+      "A remarkably uneventful button.",
+      "Try it now.",
+      "How's that?",
+      "Better? Thought so.",
+      "That's the adjustment you were looking for.",
+      "I've moved it a very professional amount.",
+      "The placebo is now correctly aligned.",
+      "I'll leave it there, then.",
+      "Exactly as much improvement as before."
     ],
     "cancelled": [
       "Changed your mind. Fair.",
@@ -123,8 +131,7 @@
       "That inspection needs another look."
     ],
     "dfa_minimum": [
-      "All the way down. Still doing nothing.",
-      "Less than nothing. Excellent."
+      "It does nothing now."
     ],
     "dfa_nice": [
       "NICE!"

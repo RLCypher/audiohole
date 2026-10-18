@@ -421,7 +421,7 @@ no response. On settling at a special value, use the selected personality's pool
 
 | Value | Normal base response / event |
 |---|---|
-| −11.00 | All the way down. Still doing nothing. / `dfa_minimum` |
+| −11.00 | It does nothing now. / `dfa_minimum` |
 | 0.69 and 6.90 | NICE! / `dfa_nice` |
 | 4.20 | DANK! / `dfa_dank` |
 | 6.66 | That's metal af. / `dfa_metal` |
