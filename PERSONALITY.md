@@ -1,0 +1,334 @@
+# AudioHole — Personality & Voice
+
+**Document:** `PERSONALITY.md`  
+**Status:** Project voice and presentation guidelines  
+**Applies to:** GUI copy, notifications, confirmations, diagnostics, documentation, and future CLI interfaces
+
+## 1. The Personality
+
+AudioHole is a serious audio-routing application with a deeply unserious name.
+
+It should behave like a competent, slightly sleep-deprived live-sound engineer who knows exactly what they're doing, understands that the user's setup is probably ridiculous, and is nevertheless determined to make it work.
+
+The software is technically capable, approachable, occasionally sarcastic, and entirely comfortable with the fact that its central abstraction is called a *hole*.
+
+**AudioHole takes its job seriously. It does not take itself particularly seriously.**
+
+## 2. General Tone
+
+AudioHole's voice should be:
+
+- **Helpful first.** Explain what is happening and what the user can do.
+- **Dry and irreverent.** Humor should feel natural, not forced.
+- **Technically literate.** Never sacrifice accuracy for a joke.
+- **Self-aware.** The software knows its terminology invites terrible jokes.
+- **Mildly sarcastic.** Particularly when confronted with obviously questionable decisions.
+- **Calm under pressure.** Real failures deserve useful explanations, not a comedy routine.
+
+Avoid sterile corporate language, excessive enthusiasm, forced friendliness, constant meme references, and performative hostility. The personality is a seasoned professional who's seen everything, not a random insult generator.
+
+## 3. The Legacy of `skill_issue`
+
+The original AudioHole implementation included a utility named `skill_issue`. It handled input validation, navigation, and reprompting while occasionally insulting the user for entering nonsense.
+
+Examples of its spirit:
+
+- "Skill issue. Type better."
+- "Wrong hole."
+- "Cope and retype."
+
+The rewrite does **not** need to recreate `skill_issue` as an architectural component. Modern GUI validation should be conventional, accessible, and reliable. Its spirit may survive in occasional flavor text, playful low-stakes validation, and unobtrusive Easter eggs.
+
+The user should feel that AudioHole has a personality, not that the software is actively trying to annoy them.
+
+## 4. User Autonomy: The Engineer's Disapproval
+
+**AudioHole respects the user's right to fuck around.**
+
+It is an audio-routing tool, not a babysitter. Users may experiment, create absurd configurations, ignore recommendations, and pursue technically questionable ideas. AudioHole should not prevent an action merely because it is unconventional, inefficient, unnecessarily complicated, or likely to produce terrible audio.
+
+**The user is allowed to be wrong. AudioHole is allowed to have an opinion about it.**
+
+### 4.1 The Sound Engineer Principle
+
+Think of a veteran live-sound engineer who's spent twenty years dealing with lead singers demanding more vocal monitor volume. He's competent, experienced, tired, and profoundly unimpressed by your latest idea.
+
+He'll explain the problem. He may express skepticism. He might make a sarcastic remark. But if you insist, and the operation is technically possible and acceptably safe, he'll generally do what you asked.
+
+**"I wouldn't do that, but it's your equipment."**
+
+### 4.2 Warnings, Not Roadblocks
+
+For unusual or potentially problematic configurations, AudioHole should:
+
+1. Explain likely consequences in plain language.
+2. Recommend a more sensible approach when one exists.
+3. Allow the user to proceed when the operation is supported and risks are acceptable.
+4. Avoid repeating acknowledged warnings unless circumstances materially change.
+
+Warnings should be proportional to consequences. An inefficient route may deserve a tooltip; a questionable clock pairing may deserve a warning; a potentially deafening feedback loop deserves prominent warning and deliberate acknowledgment, with safeguards where necessary.
+
+AudioHole must still enforce genuine technical constraints, protect configuration integrity, and respect security and safety boundaries. User autonomy does not require pretending impossible or seriously dangerous operations are supported.
+
+### 4.3 Disapproval Is Not Refusal
+
+AudioHole may communicate that a configuration is inadvisable without disabling it.
+
+| Situation | Example response |
+| --- | --- |
+| Unnecessarily complicated routing | "That's a lot of holes for something you could do with two. But sure." |
+| Excessive buffering | "That buffer should be wonderfully stable. You'll hear everything approximately next Tuesday." |
+| Aggressive latency settings | "You're asking quite a lot of that USB interface. I'll give it a shot." |
+| Questionable device pairing | "Those devices have very different ideas about what a clock is. Expect some negotiation." |
+| User ignores a recommendation | "Alright. Your funeral." |
+| Configuration works despite the warning | "Well, I'll be damned." |
+
+These are illustrative, not mandatory strings. Use them sparingly and never instead of essential technical context.
+
+### 4.4 Don't Nag
+
+Once a warning has been acknowledged, AudioHole should generally stop repeating it. Do not automatically undo a deliberate choice or quietly replace it with recommended settings.
+
+A supported manual override should survive saving, loading, and restarting. A warning may reappear when relevant conditions change or a new, materially different risk is detected.
+
+### 4.5 The Right to Experiment
+
+AudioHole should make experimentation practical: inspect capabilities, try unusual routing arrangements, adjust parameters, observe results, and recover from mistakes.
+
+Distinguish clearly between:
+
+- **Recommended:** Expected to work well.
+- **Supported but inadvisable:** Allowed, with appropriate guidance.
+- **Unsupported:** Cannot be performed reliably within actual application capabilities.
+- **Unsafe:** Requires safeguards or may be prohibited where necessary to prevent serious harm.
+
+A recommendation is not a restriction. A warning is not a veto. An unsupported operation is not a personal challenge.
+
+**Golden rule: AudioHole will tell you when you're doing something stupid. It generally won't stop you. And if it works, it should have the decency to admit it.**
+
+## 5. Humor and Reliability
+
+Humor must never obscure critical information.
+
+**Good:** "That device disappeared. We'll keep the hole ready until it comes back."
+
+**Bad:** "Skill issue. Your audio is dead."
+
+The bad example fails to explain what happened or whether AudioHole can recover.
+
+Provide the useful information first. Humor, if appropriate, comes afterward. Do not joke in place of explanations about data loss, corrupted configuration, security, potentially harmful output levels, unrecoverable failures, or unexpected microphone/speaker activation.
+
+## 6. Interface Copy
+
+Everyday controls must remain conventional and recognizable: **Start Routing**, **Stop Routing**, **Add Hole**, **Remove Hole**, **Scan Devices**, **Advanced Scan**, **Select Profile**, and **Open Diagnostics**.
+
+Do not rename important controls just for a joke. Personality belongs primarily in descriptions, tooltips, status messages, onboarding, and occasional confirmations.
+
+Examples:
+
+- Adding a hole: "Choose a source and destination. AudioHole will figure out how to connect them." Optional flavor: "Two devices, one hole. Engineering."
+- Discovery: "Found 8 audio endpoints. Some of them even appear to be connected."
+- Invalid value: "That value is outside the supported range. Try something between 1 and 8." Optional flavor: "Ambitious, but no."
+- Activation: "Routing started. Your holes are now open."
+- Stop: "Routing stopped. Your holes are now closed."
+
+These are examples, not substitutes for accurate status or validated limits.
+
+## 7. Confirmations
+
+Confirmations should be concise, informative, and proportional. Routine reversible actions should not require unnecessary confirmation. Destructive actions should clearly explain consequences.
+
+Example: "Delete this profile? This removes its saved configuration. It won't delete your audio devices, because that would be impressive."
+
+Buttons remain unambiguous: **Delete Profile** / **Cancel**.
+
+Do not turn advisory warnings into blocking dialogs by default. Avoid confirmation fatigue.
+
+## 8. Diagnostics
+
+Diagnostic output prioritizes precision: stable terminology, timestamps, structured error information, and actionable context. Humor must never replace machine-readable error codes or diagnostic fields.
+
+Example:
+
+- **Diagnostic:** `AUDCLNT_E_DEVICE_INVALIDATED`
+- **Explanation:** "Windows invalidated this audio endpoint. AudioHole will attempt to reconnect when the device becomes available."
+- **Optional flavor:** "Apparently Windows has decided this device no longer exists."
+
+Do not introduce humorous strings into performance-critical audio code paths or structured logs.
+
+## 9. Error Severity and Humor
+
+| Situation | Tone |
+| --- | --- |
+| Successful routine operation | Neutral, occasionally playful |
+| Invalid user input | Mild sarcasm acceptable |
+| Noncritical warning | Helpful, restrained humor |
+| Device temporarily unavailable | Calm and informative |
+| Recoverable routing failure | Clear and technical |
+| Configuration corruption | Serious and actionable |
+| Security or safety issue | Strictly professional |
+
+The more serious the problem, the less appropriate the joke.
+
+## 10. The Name
+
+AudioHole is intentionally named AudioHole. Holes being opened, closed, connected, and configured are part of the project's identity.
+
+Double entendres are welcome when they arise naturally. Do not turn every sentence into an innuendo. The joke works better when the software occasionally acknowledges it and otherwise behaves as though this is perfectly normal.
+
+## 11. Personality Modes
+
+AudioHole has three mutually exclusive presentation modes selected under **Settings → Personality**. The setting is `interface.personality_mode`, not a collection of independent toggles.
+
+| Stored value | User-facing label | Voice | DFA |
+|---|---|---|---|
+| `default` | **Normal — Default Audio Engineer** | Situationally dry, technically competent, occasionally disapproving | Visible |
+| `vanilla` | **Vanilla — Strictly informational** | Neutral, concise, no sarcasm, jokes, or flavor text | Hidden |
+| `uwu` | **UwU — I know what you are** | Deliberately authored, playful UwU-flavored copy where appropriate | Visible |
+
+Default is `default`. The selected mode affects presentation only; it never changes routing, device selection, validation, recovery, probing, or persistence. Switching modes must not restart audio or require an application restart. The application should refresh visible mode-sensitive copy and use the new mode for future messages. Historical diagnostic records remain unchanged.
+
+### 11.1 Context, Not Constant Performance
+
+Normal has personality throughout the experience, but only when it fits. Routine labels, ordinary facts, and situations that do not need snark should remain straightforward. A dubious but supported configuration may earn a weary warning, not a veto. The user is free to experiment subject to actual safety, integrity, and technical constraints.
+
+Vanilla removes application-authored jokes, innuendo, sarcastic guidance, and playful confirmations. It does **not** rename AudioHole, holes, or established technical concepts, and it does not change functionality. When selected, the UI explains factually that the DFA button will be hidden.
+
+UwU is an optional alternate voice, not a global text filter. Author its messages individually. Never rewrite device names, filenames, user-provided strings, technical identifiers, error codes, or diagnostic content. Do not compromise the meaning of warnings for the joke.
+
+### 11.2 Message Rendering and Transparency
+
+Prefer stable structured event/message identifiers with per-mode authored presentation strings. Use neutral copy when a variant is unavailable. Critical safety, security, data-integrity, and unrecoverable-failure messages remain clear and actionable in **all** modes. Machine-readable diagnostic records and controller behavior are personality-independent.
+
+No mode should invent a successful operation, conceal a failure, or turn a warning into a block merely for character. Humor is optional; accuracy is mandatory.
+
+## 12. The DFA Button
+
+AudioHole shall include a button labeled **DFA** under **Settings → Advanced**, in a clearly nonessential area of the interface. It is visible in Normal and UwU modes and hidden in Vanilla mode.
+
+**DFA means "Does Fuck-All."** It is literally a placebo button.
+
+- Clicking DFA must not change audio routing, device state, profiles, configuration, diagnostics, recovery behavior, or any other operational state.
+- It must not trigger a scan, repair, optimization, or troubleshooting action.
+- It must not require confirmation.
+- It may show a harmless, transient acknowledgment, such as "DFA executed successfully. Nothing happened."
+- The tooltip should read: **"Working as intended."**
+- It must not be advertised as a real fix or troubleshooting feature.
+- Repeated clicks must remain harmless.
+
+The only permissible effect is local presentation feedback for the click. No persistent click counter, configuration change, or hidden side effect is required.
+
+**Acceptance criterion:** Operational state before and after any number of DFA clicks is identical. No routing or configuration commands are issued.
+
+DFA is a deliberate, narrowly scoped exception to the general rule that interface controls perform meaningful actions.
+
+## 13. Agent Guidance
+
+Coding agents should treat this document as guidance for user-facing language and project presentation. It does not override functional requirements, safety, accessibility, localization, diagnostic accuracy, or configuration compatibility.
+
+In particular:
+
+- **Do not silently promote advisory warnings into hard validation failures.**
+- **Do not silently "fix" supported manual overrides.**
+- **Do not reimplement `skill_issue` as a required dependency.**
+- **Do not turn serious errors into jokes.**
+- **Do not implement DFA with operational side effects.**
+
+When uncertain, prefer clear conventional wording. Humor should be an accent, not a constant performance.
+
+**The personality should make AudioHole memorable. The engineering should make it trustworthy.**
+
+---
+
+## 14. Setup Diagnostics and Signal Activity
+
+Temporary signal activity indicators are strictly informational in every personality mode. They show whether non-silent source samples are reaching AudioHole; they do not prove the destination is audible.
+
+Default and UwU may use personality in surrounding help text, but the actual signal status must remain unambiguous. Vanilla uses neutral presentation. Never replace **No signal detected** with a joke that implies device failure, and never imply a successful end-to-end connection based solely on input activity.
+
+DFA remains visible in Default and UwU and hidden in Vanilla; it does not affect monitoring.
+
+
+---
+
+## 15. Test Beep Voice
+
+**Test Beep** is a real, useful setup tool, not a placebo. It sends one brief audible signal to the specifically selected playback destination so the user can check whether the right thing beeps. It is entirely separate from DFA, which still does absolutely nothing.
+
+The target endpoint name, direction, active state, and warnings must always be literal and technically clear. Normal may remark, “If that came out of the wrong speaker, we've found a problem.” Vanilla uses strictly informational copy. UwU may be playful around the action (“A wittle beep, just for you~ :3”), but must never make the target or consequence ambiguous. Never use innuendo in place of a critical warning or a device identifier.
+
+---
+
+## 16. UwU Mode: Deliberately Excessive Voice (Normative)
+
+**UwU is not Normal Mode with a few “:3” suffixes.** It is an intentionally over-the-top, flirtatious, shamelessly suggestive alternate presentation. It should be noticeably different across ordinary setup and routing workflows. The user explicitly wants frequent kaomoji, strong R/L→W baby-talk styling in *authored flavor copy*, teasing, double entendres about holes, plugs, insertion, output, and bidirectional connections, and a character that seems just a little too excited to be helping.
+
+**Target voice:** cute, forward, needy, mischievous, technically competent beneath the ridiculousness. More innuendo and playful horniness than the restrained Normal voice; **non-graphic, never coercive, never directed at a real person without context**, and never at the expense of clear technical communication.
+
+### 16.1 Authored language rules
+
+- In **nontechnical, authored UwU copy**, use R/L→W substitutions conspicuously: “weady,” “wittle,” “pwease,” “weconnect,” “aww,” “pwetty,” “pwepawed,” “vewy,” “awweady.” Vary them; don't mechanically mutate every word.
+- Use kaomoji generously in short acknowledgments and tooltips: `UwU`, `OwO`, `:3`, `>w<`, `(⁄ ⁄>⁄ω⁄<⁄ ⁄)`, `(｡♥‿♥｡)`, `(≧◡≦)`, `(╥﹏╥)`, `(¬‿¬)`. Avoid stuffing every label or numerical readout.
+- Flirt with **the act of routing**, not the user's identity. Double entendres about “opening a hole,” “plugging in,” “both ways,” “pulling out,” “finishing,” “tight connections,” and “making noise” are explicitly encouraged in noncritical copy.
+- Prefer a clear technical heading or status **followed by** UwU commentary. Keep button labels, endpoint names, profile names, status enums, warnings, and diagnostic detail literal.
+- A neutral fallback is acceptable for missing catalog entries, but a complete implementation must supply UwU variants for the common events in §16.2. Do not satisfy this requirement by applying a runtime text filter.
+- Avoid randomized flavor for the same event in v0.1; stable authored messages make testing and translation possible.
+
+### 16.2 Required message catalog
+
+The **Event** column is a conceptual presentation identifier, not a required API enum or wire schema. Technical status and named devices are displayed separately and unchanged. These examples establish the *minimum* intensity and breadth of UwU Mode. Implementers may refine exact prose without reducing its distinctiveness.
+
+| Event / surface | Vanilla (literal) | Normal (dry) | UwU (authored flavor) |
+|---|---|---|---|
+| App ready / main window | Ready to configure routing. | Alright. Let's wire this up. | Hewwo~ Weady to open some howes? I've been waiting fow you~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) |
+| Create hole | Hole created. | Another hole. Naturally. | Anothew howe?! My, someone's feeling adventuwous today~ OwO |
+| Hole enabled | Hole enabled. | Hole's open. | Aww~ you opened it fow me! Now put something thwough it~ :3 |
+| Hole disabled | Hole disabled. | Hole's closed. | Aww, cwosing up awweady? I was just getting stawted~ (╥﹏╥) |
+| Source selected | Source selected. | Source is connected. | Ooh, a fwesh input! I can wowk with that~ (¬‿¬) |
+| Destination selected | Destination selected. | Output assigned. | That's whewe you want it to come out? How vewy specific of you~ UwU |
+| Route started | Routing started. | Signal's moving. | We'we connected~ Now wet me heaw you make some noise! >w< |
+| Route stopped | Routing stopped. | That's enough of that. | Aww, finished awweady? I was having so much fun~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) |
+| Duplex started | Both directions started. | Both ways. Ambitious. | B-both ways at once?! You weawwy know how to keep a howe busy~ OwO (｡♥‿♥｡) |
+| Profile activated | Profile activated. | New setup's in. | Aww~ a whowe new position fow evewything! I wove a good weawwangement~ :3 |
+| Profile switch pending | Waiting to activate profile. | Holding that configuration. | Just a wittle anticipation~ Don't make me wait too wong! (⁄ ⁄>⁄ω⁄<⁄ ⁄) |
+| Device reconnected | Device reconnected. | Back where it belongs. | You came back! I kept youw howe nice and weady~ UwU |
+| Device unplugged (noncritical toast) | Device disconnected. | Someone pulled the plug. | You puwwed out without wawning?! At weast say goodbye fiwst~ (╥﹏╥) |
+| Signal activity detected | Signal detected. | Yep, something's coming in. | Ooh! I can feew the signaw coming in~ Keep going! >w< |
+| No signal activity | No signal detected. | Nothing coming in yet. | It's so quiet in hewe... give me a wittle something? :3 |
+| Test Beep ready (helper text) | Send a test beep to the selected destination. | Let's see where this comes out. | Wanna make it squeak? Pick youw output and give it a wittle beep~ (¬‿¬) |
+| Test Beep completed | Test beep sent. | If that came out somewhere else, we've got work to do. | Beep~! Did it come out of the wight howe? Tell me you heawd it~ UwU |
+| Test Beep rejected (no output) | Select a destination before testing. | Pick an output first. | P-pwease pick an output fiwst~ I can't beep into the void! >w< |
+| Questionable supported setup | This configuration may cause latency or feedback. | I wouldn't, but it's your gear. | Ooh, that's a naughty wittle config~ It might feed back, but if you insist... (¬‿¬) |
+| Validation error (low stakes) | Enter a valid value. | Skill issue. Try again. | Nuh-uh~ that numbew doesn't fit in this howe. Twy again, pwease? :3 |
+| Recovering connection (noncritical) | Attempting reconnection. | Trying to get it back. | Hang on, sweetie~ I'm twying to get you plugged back in! (╥﹏╥) |
+| DFA clicked | Not available in Vanilla. | DFA executed. Nothing happened. | Nyaa~ I did absowutewy nothing! Did you wike that? (⁄ ⁄>⁄ω⁄<⁄ ⁄) |
+
+### 16.3 Coverage requirements
+
+UwU-specific authored variants are required in v0.1 for:
+
+1. **Main window:** empty state, successful hole creation, enabling/disabling, routing start/stop, duplex setup.
+2. **Setup and diagnostics:** source/destination selection help, temporary signal-activity help, signal/no-signal companion copy, Test Beep helper and noncritical completion acknowledgment.
+3. **Profiles and startup:** successful profile activation, pending delayed activation, cancellation, and successful recovery.
+4. **Tray:** routine start/stop and noncritical device reconnect/disconnect notifications, where notifications are enabled.
+5. **Settings and validation:** personality selection explanation, ordinary noncritical invalid input, and DFA acknowledgment.
+
+All variants must be selected through a **centralized presentation-message catalog** by event identifier and `interface.personality_mode`. The same event's technical status must be accessible independent of flavor text. Do not spread hardcoded UwU strings throughout audio backend, device discovery, API, or controller code.
+
+### 16.4 Hard clarity boundaries
+
+- Do not alter user-defined profile names, endpoint names, paths, hardware IDs, numeric measurements, dBFS values, timestamps, logs, configuration, API payloads, or diagnostic exports.
+- Don't replace actionable errors, confirmation buttons, or safety warnings with flirting. For serious failures, show the same unambiguous facts and recovery actions in all modes; optional flavor can be omitted.
+- The Test Beep target must be identified literally **before** playback. Its acknowledgment means the beep was dispatched, **not** that a person heard it or that the output is correct.
+- Signal activity only indicates non-silent source samples observed at AudioHole's capture point; it does **not** establish successful playback.
+- Keep assistive-technology names and accessibility descriptions functional; expressive copy must not hide essential controls.
+- Vanilla must contain **none** of the above flirtation, baby-talk, kaomoji, or snark.
+
+### 16.5 Acceptance tests
+
+- For each catalog event in §16.2, switch among all three modes and verify the appropriate authored variant without restarting audio.
+- Confirm that UwU is clearly distinctive in ordinary workflows, not limited to Settings or DFA.
+- Verify R/L→W appears in authored UwU commentary but never in device names, technical facts, structured diagnostics, or machine-readable data.
+- Verify the same operation produces identical commands, results, and state transitions in every personality mode.
+- Verify Vanilla remains strictly informational and DFA is hidden there.
+- Verify warnings, test-beep targets, and no-signal statuses stay unambiguous.
