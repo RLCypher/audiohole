@@ -441,3 +441,16 @@ Scan start, completion, cancellation, and failure are presentation events too.
 Show stable, simulation-labeled facts in the top operations area, with eligible
 authored commentary. Progress updates may update factual progress without choosing
 new commentary; serious failures retain precise diagnostic/recovery information.
+
+### Tester refinements: acknowledgment and committed buffer edits
+
+The stable top heading for the DFA button and special slider responses is
+**DFA Acknowledged**; optional personality commentary remains below it. This is
+presentation feedback only, never an operational result.
+
+A committed buffer edit (spin, Enter, or focus loss after typing) emits the
+`buffer_changed` presentation event. Duplicate notifications for the same value,
+programmatic editor loading, and unchanged refreshes do not select new commentary.
+The stable information states that the edit still requires Save / Apply and no
+audio is processed. Normal/UwU supply authored commentary; Vanilla stays neutral.
+This does not change buffer policy, configuration units, or live routing.

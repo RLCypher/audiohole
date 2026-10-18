@@ -157,6 +157,10 @@
     ],
     "dfa_maximum": [
       "It goes louder now."
+    ],
+    "buffer_changed": [
+      "Buffer adjusted. Still only turning simulated knobs.",
+      "A little room to breathe. Apply when ready."
     ]
   }
 }

@@ -46,3 +46,23 @@ CI attempts BMP screenshots of each page for human review; an available image is
 - [ ] Start/complete/cancel scans and trigger a selected-device scan without a valid
   selection: the top operations area reports each lifecycle event. Progress updates
   do not regenerate commentary. All results remain explicitly simulated.
+
+## Artifact identity and tester regression checks
+
+- [ ] Compare the **build** identifier in the window title with the first 12
+  characters of the commit in the extracted `build-info.json`. Use a newly
+  extracted package, not an executable retained from a previous download.
+- [ ] Verify the button reads exactly **DFA**, the top heading becomes
+  **DFA Acknowledged**, and the slider/numeric entry reaches every defined
+  threshold with the appropriate personality response.
+- [ ] Start a scan: both top information and personality commentary change.
+  Wait for completion: both change again. Progress polling must not reroll text.
+- [ ] Change each directional buffer using arrows, typed Enter, and focus loss.
+  Confirm one callout per committed changed value, no callout for unchanged
+  values, and no changes to active routing until Apply. Vanilla has facts only.
+
+Buffer controls remain in milliseconds as specified in GUI §8.6. The eventual
+backend represents frame counts at a particular sample rate; for example, 6 ms
+corresponds to 288 frames at 48 kHz or 576 frames at 96 kHz. These are arithmetic
+examples, not negotiated endpoint capacities or measured end-to-end latency.
+Production buffer/queue policy remains unresolved.

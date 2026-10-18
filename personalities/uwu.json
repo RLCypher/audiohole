@@ -160,6 +160,10 @@
     "dfa_maximum": [
       "It goes louder now.",
       "It goes louder now~ Aww, all the way to eweven! >w<"
+    ],
+    "buffer_changed": [
+      "Buffer tweaked~ comfy little sample cushions! :3",
+      "A tiny timing tune-up~ still just pretend! ^w^"
     ]
   }
 }

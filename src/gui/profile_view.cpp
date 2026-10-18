@@ -20,8 +20,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.evidence->Wrap(560);
     label(box, w.group,
           "Buffer (ms) — 6 ms is an unverified simulation default, not a latency measurement");
-    w.buffer = new wxSpinCtrl(box, wxID_ANY, "6", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS,
-                              1, 100, 6);
+    w.buffer = new wxSpinCtrl(box, wxID_ANY, "6", wxDefaultPosition, wxDefaultSize,
+                              wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 1, 100, 6);
     w.group->Add(w.buffer, 0, wxALL, 3);
     auto* advanced = new wxCollapsiblePane(box, wxID_ANY, "Advanced directional settings");
     w.group->Add(advanced, 0, wxEXPAND | wxALL, 3);
@@ -66,14 +66,28 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (!loading_)
             dirty_ = true;
     });
-    w.buffer->Bind(wxEVT_SPINCTRL, [this](wxSpinEvent&) {
-        if (!loading_)
-            dirty_ = true;
+    w.buffer->Bind(wxEVT_SPINCTRL, [this, &w](wxSpinEvent&) { acknowledge_buffer(w); });
+    w.buffer->Bind(wxEVT_TEXT_ENTER, [this, &w](wxCommandEvent&) { acknowledge_buffer(w); });
+    w.buffer->Bind(wxEVT_KILL_FOCUS, [this, &w](wxFocusEvent& event) {
+        acknowledge_buffer(w);
+        event.Skip();
     });
     w.buffer->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
         if (!loading_)
             dirty_ = true;
     });
+}
+// Spin, Enter, and focus loss can describe the same edit. Compare the settled value
+// so polling, loading, and duplicate native notifications never consume commentary.
+void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
+    if (loading_ || hole_index_ < 0)
+        return;
+    const int value = widgets.buffer->GetValue();
+    if (value == widgets.acknowledged_buffer_ms)
+        return;
+    widgets.acknowledged_buffer_ms = value;
+    dirty_ = true;
+    present(presentation::Message::BufferChanged);
 }
 void Frame::build_profiles() {
     auto* page = new wxPanel(notebook_);
@@ -264,6 +278,7 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.evidence->SetLabel(text(r.explanation));
     w.evidence->Wrap(570);
     w.buffer->SetValue(d.settings.buffer_ms);
+    w.acknowledged_buffer_ms = d.settings.buffer_ms;
     w.mode->SetStringSelection(text(d.settings.mode));
     loading_ = old_loading;
 }

@@ -1,4 +1,17 @@
+# The title identifies the executable itself, even if an older artifact is extracted
+# beside newer personality files. CI configures afresh for each checked-out revision.
+find_package(Git QUIET)
+set(audiohole_build_commit "unknown")
+if(Git_FOUND)
+  execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" OUTPUT_VARIABLE audiohole_build_commit
+    OUTPUT_STRIP_TRAILING_WHITESPACE RESULT_VARIABLE audiohole_git_result)
+  if(NOT audiohole_git_result EQUAL 0)
+    set(audiohole_build_commit "unknown")
+  endif()
+endif()
 add_executable(audiohole WIN32 appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp)
+target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
 target_link_libraries(audiohole PRIVATE audiohole_model audiohole_windows wx::core wx::base dwmapi advapi32)
 if(MSVC)
   target_compile_definitions(audiohole PRIVATE AUDIOHOLE_MSVC_MANIFEST)

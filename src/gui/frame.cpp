@@ -7,6 +7,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     : wxFrame(nullptr, wxID_ANY, wxS("AudioHole — Simulated routing"), wxDefaultPosition,
               wxSize(1240, 900)),
       controller_(std::move(controller)), timer_(this), smoke_(smoke) {
+    SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
     SetMinSize(wxSize(980, 740));
     personalities_directory_ =
         std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
@@ -288,6 +289,19 @@ bool Frame::smoke(const wxString& directory) {
         }
         require(controller_->snapshot().revision == before, "DFA slider changed controller state");
         require(dfa_->GetLabel() == "DFA", "DFA label changed");
+        require(technical_->GetLabel() == "DFA Acknowledged", "DFA heading changed");
+        forward_.buffer->SetValue(forward_.buffer->GetValue() + 1);
+        const auto buffer_before = controller_->snapshot().revision;
+        wxSpinEvent buffer_change(wxEVT_SPINCTRL, forward_.buffer->GetId());
+        forward_.buffer->GetEventHandler()->ProcessEvent(buffer_change);
+        require(last_message_ == presentation::Message::BufferChanged,
+                "Buffer edit missing top callout");
+        const auto buffer_occurrence = occurrence_;
+        forward_.buffer->GetEventHandler()->ProcessEvent(buffer_change);
+        require(occurrence_ == buffer_occurrence,
+                "Duplicate buffer notification repeated commentary");
+        require(controller_->snapshot().revision == buffer_before && dirty_,
+                "Buffer acknowledgment changed live state or lost staged edit");
         for (int i = 0; i < 3; ++i) {
             personality_choice_->SetSelection(i);
             wxCommandEvent change(wxEVT_CHOICE, personality_choice_->GetId());
@@ -320,6 +334,8 @@ bool Frame::smoke(const wxString& directory) {
         scan_start_->GetEventHandler()->ProcessEvent(scan);
         require(last_message_ == presentation::Message::ScanStarted,
                 "Scan start missing top callout");
+        require(!commentary_->GetLabel().empty(), "Scan start lacks personality commentary");
+        const auto scan_heading = technical_->GetLabel();
         const auto commentary_before = commentary_->GetLabel();
         controller_->advance(100);
         refresh();
@@ -334,6 +350,8 @@ bool Frame::smoke(const wxString& directory) {
         refresh();
         require(last_message_ == presentation::Message::ScanCompleted,
                 "Scan completion missing top callout");
+        require(technical_->GetLabel() != scan_heading && !commentary_->GetLabel().empty(),
+                "Scan completion did not update information and commentary");
         controller_->monitor(true);
         notebook_->SetSelection(1);
         require(!controller_->snapshot().monitoring, "Monitor survived panel closure");

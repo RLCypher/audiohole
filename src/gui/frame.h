@@ -45,6 +45,7 @@ struct DirectionWidgets {
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{};
     wxSpinCtrl* buffer{};
+    int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
     wxStaticText* evidence{};
     std::vector<std::string> sources, destinations;
     std::vector<audiohole::Format> formats;
@@ -154,6 +155,8 @@ class Frame final : public wxFrame {
     // Rebuilds evidence while retaining explicit unsupported overrides for correction.
     void populate_direction(DirectionWidgets&, const audiohole::Direction&);
     void read_direction(DirectionWidgets&, audiohole::Direction&);
+    // Acknowledge a committed editor change once; never changes controller/live state.
+    void acknowledge_buffer(DirectionWidgets&);
     void select_profile(const std::string&);
     void load_holes();
     void load_hole(int);

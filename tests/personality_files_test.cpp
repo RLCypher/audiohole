@@ -206,3 +206,21 @@ TEST_F(PersonalityFiles, FailedExplicitReloadInvalidatesTheSameFileAndIdEditsDro
     EXPECT_FALSE(messages.available("custom"));
     EXPECT_TRUE(messages.available("renamed"));
 }
+
+TEST_F(PersonalityFiles, EditorAndScanCalloutsKeepFactsStableAcrossPersonalities) {
+    presentation::Messages messages(42);
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    for (auto event : {presentation::Message::BufferChanged, presentation::Message::ScanStarted,
+                       presentation::Message::ScanCompleted}) {
+        for (const auto* id : {"default", "uwu"}) {
+            const auto first = messages.show(event, id, 1);
+            EXPECT_FALSE(first.commentary.empty());
+            EXPECT_EQ(messages.show(event, id, 1).commentary, first.commentary);
+            EXPECT_NE(messages.show(event, id, 2).commentary, first.commentary);
+            EXPECT_EQ(first.technical, presentation::technical(event));
+        }
+        EXPECT_TRUE(messages.show(event, "vanilla", 1).commentary.empty());
+    }
+    for (int value : {-1100, 69, 420, 666, 670, 690, 1100, 0})
+        EXPECT_EQ(presentation::technical(presentation::dfa_event(value)), "DFA Acknowledged");
+}

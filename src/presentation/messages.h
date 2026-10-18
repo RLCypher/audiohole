@@ -47,6 +47,7 @@ enum class Message {
     DfaMetal,
     DfaSixSeven,
     DfaMaximum,
+    BufferChanged,
     Count
 };
 struct Variant {
