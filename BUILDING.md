@@ -1,9 +1,9 @@
-# Building the Milestone 0 development foundation
+# Building the AudioHole GUI evaluation
 
-This milestone provides a Windows x64 console development harness and a small
-thread-bound COM initialization library. It does not capture, render, enumerate
-audio endpoints, or implement a product CLI or GUI. D-030, D-034, and all six
-owner decisions remain Open.
+Milestone 0.2 provides a native wxWidgets GUI backed by a deterministic, in-memory
+simulated controller. It never enumerates real endpoints, captures/renders audio,
+or writes production configuration. D-030, D-031, D-034, and all six owner decisions
+remain Open. See [MANUAL_GUI_CHECKLIST.md](MANUAL_GUI_CHECKLIST.md) for evaluation.
 
 ## Windows prerequisites
 
@@ -13,7 +13,7 @@ owner decisions remain Open.
 - CMake 3.25 or newer, including CTest, available on `PATH`.
 - Git for Windows on `PATH` (also used to identify packaged source revisions).
 - Windows PowerShell 5.1 or PowerShell 7 for the helper scripts.
-- HTTPS access to `codeload.github.com` for the first test configuration.
+- HTTPS access to `github.com`, release download destinations, and `codeload.github.com` for pinned dependencies.
 
 The preset selects the Visual Studio 2022 generator and x64 target, so ordinary
 PowerShell is sufficient when the installed compiler/SDK can be found by CMake.
@@ -47,7 +47,7 @@ The shortest build/test commands are:
 ```
 
 These verify prerequisites, configure the existing preset, build, and run CTest
-with exit-code checks. `-Launch` runs the console developer harness;
+with exit-code checks. `-Launch` opens the native simulated GUI;
 `-Package` stages only the CMake Runtime component and creates a revision-named
 ZIP in `build/packages`. Release is the preferred configuration for manual
 evaluation. Without those switches no package or additional launch is requested.
@@ -58,27 +58,24 @@ cmake --version
 cmake --preset windows-msvc
 cmake --build --preset windows-debug --parallel 2
 ctest --preset windows-debug
-& .\build\windows-msvc\bin\Debug\audiohole_dev.exe
-if ($LASTEXITCODE -ne 0) { throw "Debug harness failed" }
+& .\build\windows-msvc\bin\Debug\audiohole.exe
+if ($LASTEXITCODE -ne 0) { throw "Debug GUI failed" }
 
 cmake --build --preset windows-release --parallel 2
 ctest --preset windows-release
-& .\build\windows-msvc\bin\Release\audiohole_dev.exe
-if ($LASTEXITCODE -ne 0) { throw "Release harness failed" }
+& .\build\windows-msvc\bin\Release\audiohole.exe
+if ($LASTEXITCODE -ne 0) { throw "Release GUI failed" }
 ```
 
-Stop if any configure/build/test command fails. Successful harness execution
-prints `AudioHole development foundation: COM initialized. Audio routing is not
-implemented.` and exits with code 0. COM failure prints the original hexadecimal
-HRESULT to standard error and exits with code 1. It opens no audio streams and
-does not require an audio device.
+Stop if any configure/build/test command fails. `audiohole.exe` opens the GUI;
+close hides to tray, while **Exit AudioHole** stops and terminates the process.
+`audiohole_dev.exe` remains a non-distributed COM developer harness.
 
-CTest discovers four GoogleTest cases covering MTA initialization and release,
-nested `S_FALSE` balancing, apartment-mode conflict without uninitializing the
-existing apartment, and cleanup during exception unwinding. Each uses a fresh
-thread and real Windows COM calls. A fifth CTest test launches the harness and
-checks its exit status. Both presets fail if no tests are discovered.
-Tests require no administrator privileges or device access.
+CTest covers real Windows COM lifetime, portable simulator/presentation logic,
+and native GUI smoke interactions. GUI smoke uses internal developer arguments
+`--smoke-test --screenshot-dir <path>` and exits with evidence. These are not a
+public product CLI. Tests require no administrator privileges or audio devices.
+Both presets fail if no tests are discovered.
 
 For a clean repeat, remove only the generated preset directory and rerun the
 commands above (check for local work before deleting anything). For example:
@@ -91,7 +88,7 @@ cmake --preset windows-msvc
 Rebuilding after a normal edit needs only the relevant build and test commands.
 CTest does not build targets. `.github/workflows/windows.yml` runs these presets
 on Windows Server 2022 with Visual Studio 2022 in separate Debug/Release jobs;
-it checks build and COM behavior, not consumer audio hardware compatibility.
+it checks builds, COM, simulator logic, GUI smoke, and packaging, not consumer audio hardware compatibility.
 Successful jobs then package and audit runtime imports, extract and launch the
 package in a temporary directory outside the source/build tree, and upload its
 contents as a GitHub Actions ZIP artifact. Upload is skipped on build, test,
@@ -103,9 +100,8 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
    **Windows builds and evaluation packages** run for the intended revision.
 2. Download **AudioHole-Windows-x64-release-&lt;full-tested-commit&gt;** under Artifacts.
 3. Extract the downloaded ZIP and open its single AudioHole package directory.
-4. Read `README.txt` and `build-info.json`, then launch `audiohole_dev.exe` from
-   a terminal. It prints a COM initialization diagnostic and exits. This is not
-   the GUI milestone yet.
+4. Read `README.txt` and `build-info.json`, then double-click `audiohole.exe`.
+   Follow the included manual checklist; every device and operation is simulated.
 
 Debug is uploaded separately for development investigations. Both packages are
 x64, use the static MSVC CRT, and require normal Windows system DLLs but no
@@ -131,8 +127,8 @@ For a local package after building/testing, or to audit it on Windows:
 ```
 
 Packaging refuses to overwrite an existing ZIP: move it aside or choose another
-`-OutputDirectory`. Only `audiohole_dev.exe`, `README.txt`, and `build-info.json`
-are included. Tests, source trees, symbols, SDKs, and GoogleTest are excluded.
+`-OutputDirectory`. Only `audiohole.exe`, the manual GUI checklist, wxWidgets license/LGPL texts,
+`README.txt`, and `build-info.json` are included. Tests, source trees, symbols, SDKs, and GoogleTest are excluded.
 The native smoke-test script requires clean metadata and a VS installation for
 the import audit; end users need neither to launch the executable. GitHub creates
 the downloadable ZIP from the already-tested package contents, avoiding a
@@ -146,7 +142,7 @@ application behavior.
 
 ## Dependencies and reproducibility
 
-The only third-party source dependency is **GoogleTest v1.16.0**, BSD-3-Clause,
+The test-only third-party source dependency is **GoogleTest v1.16.0**, BSD-3-Clause,
 used by tests only:
 
 - Tag commit: `6910c9d9165801d8827d628cb72eb7ea9dd538c5`.
@@ -165,19 +161,18 @@ copy of that exact verified source using CMake's
 When using a local source override, verify the archive hash before extraction;
 FetchContent does not verify overridden source trees. A fresh uncached build
 with tests enabled otherwise needs the download. `-DBUILD_TESTING=OFF` omits
-GoogleTest and builds only the developer harness; it does not validate tests.
+GoogleTest but builds the GUI and developer harness; it does not validate tests.
 
 C++20 is required with compiler extensions disabled. The reference build uses
 MSVC's static CRT (`/MTd` in Debug, `/MT` in Release) consistently across project
 and test targets, avoiding a separate VC runtime DLL deployment requirement for
-this harness. Normal Windows system libraries, including `ole32`, remain
+the packaged GUI. Normal Windows system libraries, including `ole32`, remain
 required. The MSVC executable manifest explicitly requests `asInvoker`; the
 application installs no service, driver, or startup registration.
 
 These commands pin dependency sources and build configuration, not the entire
 host installation or byte-identical output. Record CMake, MSVC, Windows SDK,
-OS, and configuration with each validation run. No JSON, logging, GUI, or audio
-dependency is added merely because it is a future candidate. AudioHole's own
+OS, and configuration with each validation run. No JSON, logging, DSP, or audio backend dependency is integrated. AudioHole's own
 project license remains an owner decision before distribution.
 
 ## Source boundaries
@@ -190,9 +185,26 @@ project license remains an owner decision before distribution.
 on the same thread, after that scope's COM objects have been released. It
 balances both `S_OK` and `S_FALSE` with `CoUninitialize`; failed initialization
 owns no count. Future WASAPI worker threads must initialize their own apartments.
-No controller, audio engine, or GUI placeholder classes are introduced. Later
-targets can depend on this platform library without importing application or
-presentation code.
+- `src/model`: GUI-independent controller interface, typed session model, deterministic fixtures.
+- `src/presentation`: authored technical/commentary catalog and reproducible selection.
+- `src/gui`: native views, tray, and process lifecycle. wx owns widgets; Frame owns the controller.
+
+wxWidgets **3.2.6** is integrated provisionally for GUI evaluation (D-031 remains Open),
+statically linked with its wxWindows Library Licence 3.1 exception. Source archive
+SHA-256: `939e5b77ddc5b6092d1d7d29491fe67010a2433cf9b9c0d841ee4d04acb9dce7`.
+The license and referenced LGPL text are retained under `third_party/licenses/`
+and included in runtime packages. Image codecs, XML, regex, network/web/media,
+and optional rich editor libraries are disabled; no extra bundled libraries are needed.
+For offline source, verify that archive before extracting and set
+`-DFETCHCONTENT_SOURCE_DIR_WXWIDGETS=C:/path/to/wxWidgets-3.2.6`.
+
+Portable model-only developer checks (not a Linux product/GUI) can run with:
+
+```sh
+cmake -S . -B build/model -DAUDIOHOLE_MODEL_ONLY=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/model --parallel 2
+ctest --test-dir build/model --output-on-failure
+```
 
 ## Validation status
 

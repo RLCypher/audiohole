@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 
 project(AudioHole VERSION 0.1.0 LANGUAGES CXX)
 
-if(NOT WIN32)
+option(AUDIOHOLE_MODEL_ONLY "Build portable simulator tests only (no application)" OFF)
+
+if(NOT WIN32 AND NOT AUDIOHOLE_MODEL_ONLY)
   message(FATAL_ERROR "AudioHole requires a Windows x64 toolchain. See BUILDING.md.")
 endif()
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -21,8 +23,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 include(CTest)
-add_subdirectory(src/platform/windows)
-add_subdirectory(src/app)
+add_subdirectory(src/model)
+if(NOT AUDIOHOLE_MODEL_ONLY)
+  add_subdirectory(src/platform/windows)
+  add_subdirectory(src/app)
+  include(cmake/WxWidgets.cmake)
+  add_subdirectory(src/gui)
+endif()
 
 if(BUILD_TESTING)
   include(FetchContent)

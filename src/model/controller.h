@@ -1,0 +1,167 @@
+#pragma once
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace audiohole {
+// D-019 public states. Resolving is internal to Starting, never a ninth state.
+enum class State { Stopped, Ready, Starting, Running, Degraded, Recovering, Failed, Stopping };
+const char* name(State state);
+enum class Availability { Available, Unavailable, Ambiguous, Untested };
+const char* name(Availability availability);
+// Complete fixture format tuple. Channel layout/mask is deliberately not inferred
+// from the channel count; production negotiation belongs to Milestone 1+.
+struct Format {
+    int rate = 48000, channels = 2;
+    std::string representation = "float32";
+    bool operator==(const Format&) const = default;
+    std::string label() const;
+};
+struct Endpoint {
+    std::string id, display_name, windows_name, notes;
+    bool capture = false;
+    Availability availability = Availability::Available;
+    std::vector<Format> formats;
+};
+struct Settings {
+    bool automatic = true;
+    Format format;
+    int buffer_ms = 6;
+    std::string mode = "Automatic";
+};
+struct Direction {
+    std::string source, destination;
+    Settings settings;
+};
+struct Hole {
+    std::string id, display_name, notes;
+    bool enabled = true, duplex = false;
+    Direction forward, reverse;
+};
+struct Profile {
+    std::string id, display_name, notes;
+    std::vector<Hole> holes;
+};
+struct PathStatus {
+    std::string hole_id;
+    bool reverse = false;
+    State state = State::Stopped;
+    std::string detail;
+};
+struct Event {
+    std::uint64_t sequence;
+    std::string type, detail;
+};
+// Read-only view owned by the controller. References/pointers into its vectors
+// must not survive a mutating command. No audio buffers or measured telemetry.
+enum class ScanScope { Update, Full, Selected };
+
+struct Snapshot {
+    std::vector<Endpoint> endpoints;
+    std::vector<Profile> profiles;
+    std::string active_profile, pending_profile;
+    State state = State::Stopped;
+    bool armed = false, monitoring = false, scanning = false;
+    int pending_ms = 0, scan_percent = 0;
+    std::string beep_destination;
+    std::vector<PathStatus> paths;
+    std::vector<Event> events;
+    std::uint64_t revision = 0;
+};
+struct Result {
+    bool ok;
+    std::string detail;
+};
+struct Recommendation {
+    std::vector<Format> compatible;
+    std::string explanation;
+};
+const Endpoint* endpoint(const Snapshot&, const std::string& id);
+const Profile* profile(const Snapshot&, const std::string& id);
+Recommendation recommend(const Snapshot&, const Direction&);
+Result validate(const Snapshot&, const Profile&);
+// Internal, in-process GUI seam; not API.md's final public schema/transport.
+// All calls and snapshots currently belong to the GUI thread. There are no worker
+// threads or locks. A real backend must marshal commands/events at this boundary;
+// it must not run audio callbacks on the GUI thread or expose their buffers here.
+// Commands return explicit failures rather than silently substituting endpoints.
+class Controller {
+  public:
+    virtual ~Controller() = default;
+    // Borrowed until the next mutation; reading never advances simulated time.
+    virtual const Snapshot& snapshot() const = 0;
+    // Save changes only session records. Apply validates and requests activation;
+    // failure preserves live routing. Unconfigured drafts can be saved without Apply.
+    virtual Result save(Profile, bool apply) = 0;
+    // Creates fresh logical IDs, including every duplicated hole. No disk writes.
+    virtual std::string create_profile(const std::string& name,
+                                       const std::string& copy_from = {}) = 0;
+    // Rejects deletion of an active or pending profile; callers confirm user intent.
+    virtual Result remove_profile(const std::string&) = 0;
+    // Returns a new unconfigured editor value; does not arm or save it.
+    virtual Hole make_hole() = 0;
+    // Validates before replacing the live plan. An unavailable replacement retains
+    // the old session unless the user explicitly asks to arm waiting resources.
+    // This conservative simulator behavior does not resolve O-002.
+    virtual Result activate(const std::string&, bool arm_waiting = false) = 0;
+    // Disarms immediately and cancels every pending operation. Transition to
+    // Stopped completes on advance(); no stale work can rearm the session.
+    virtual void stop() = 0;
+    // Replaces the pending startup deadline. No OS startup registration occurs.
+    virtual Result schedule(const std::string&, int milliseconds) = 0;
+    // Advances deterministic logical time, never wall-clock measurements.
+    // Nonpositive durations are ignored. No sleeping or blocking work occurs.
+    virtual void advance(int milliseconds) = 0;
+    // Edits display name, notes and simulated availability only; identity and
+    // windows_name are immutable. Availability changes reevaluate live directions.
+    virtual Result update_endpoint(const Endpoint&) = 0;
+    // Simulation controls. Failure is directional; recovery never arms a stopped session.
+    virtual void fail_path(const std::string& hole, bool reverse) = 0;
+    virtual void recover() = 0;
+    // Temporary observation flag only; caller clears it on panel/window closure.
+    virtual void monitor(bool enabled) = 0;
+    // Simulates a bounded interval for one explicit playback endpoint. Rejects
+    // missing/ambiguous/capture endpoints and exclusive conflicts. Emits NO SOUND.
+    virtual Result beep(const std::string& destination) = 0;
+    virtual void cancel_beep() = 0;
+    // Simulated progress only. Advanced consent and scope are presentation concerns;
+    // no fixture capability is promoted to experimental/verified hardware evidence.
+    virtual void scan(bool enabled, bool advanced = false, ScanScope scope = ScanScope::Update,
+                      const std::string& selected_device = {}) = 0;
+};
+// Owns all session data and a copied live plan, so saved edits cannot mutate
+// active routing. Only advance() completes pending transitions. This deterministic
+// single-threaded fixture is replaceable and implements no Windows audio APIs.
+class SimulatedController final : public Controller {
+  public:
+    SimulatedController();
+    const Snapshot& snapshot() const override {
+        return state_;
+    }
+    Result save(Profile, bool apply) override;
+    std::string create_profile(const std::string&, const std::string& copy_from = {}) override;
+    Result remove_profile(const std::string&) override;
+    Hole make_hole() override;
+    Result activate(const std::string&, bool arm_waiting = false) override;
+    void stop() override;
+    Result schedule(const std::string&, int) override;
+    void advance(int) override;
+    Result update_endpoint(const Endpoint&) override;
+    void fail_path(const std::string&, bool) override;
+    void recover() override;
+    void monitor(bool) override;
+    Result beep(const std::string&) override;
+    void cancel_beep() override;
+    void scan(bool, bool advanced = false, ScanScope scope = ScanScope::Update,
+              const std::string& selected_device = {}) override;
+
+  private:
+    Snapshot state_;
+    Profile live_;
+    std::vector<std::string> failures_;
+    std::uint64_t next_id_ = 10, sequence_ = 0;
+    int transition_ms_ = 0, beep_ms_ = 0, scan_ms_ = 0;
+    void event(std::string type, std::string detail);
+    void refresh_paths(bool reconnecting = false);
+};
+} // namespace audiohole

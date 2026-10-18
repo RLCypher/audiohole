@@ -1,0 +1,152 @@
+#pragma once
+#include "model/controller.h"
+#include "platform/windows/com_apartment.h"
+#include "presentation/messages.h"
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <stdexcept>
+#include <windows.h>
+#include <wx/clipbrd.h>
+#include <wx/collpane.h>
+#include <wx/dcclient.h>
+#include <wx/dcmemory.h>
+#include <wx/filedlg.h>
+#include <wx/filename.h>
+#include <wx/notebook.h>
+#include <wx/scrolwin.h>
+#include <wx/snglinst.h>
+#include <wx/spinctrl.h>
+#include <wx/taskbar.h>
+#include <wx/wx.h>
+
+namespace audiohole::gui {
+class Frame;
+// Owns the shell icon. Frame outlives this object; every action uses the same controller.
+class Tray final : public wxTaskBarIcon {
+  public:
+    explicit Tray(Frame& frame);
+    wxMenu* CreatePopupMenu() override;
+    void update(const audiohole::Snapshot&);
+
+  private:
+    Frame& frame_;
+    audiohole::State last_ = audiohole::State::Stopped;
+    std::string tooltip_;
+};
+// Non-owning widget handles. wx parent/child ownership destroys controls with Frame.
+// ID and format vectors map visible selections to typed controller values.
+struct DirectionWidgets {
+    wxStaticBoxSizer* group{};
+    wxComboBox *source{}, *destination{};
+    wxChoice *format{}, *mode{};
+    wxSpinCtrl* buffer{};
+    wxStaticText* evidence{};
+    std::vector<std::string> sources, destinations;
+    std::vector<audiohole::Format> formats;
+};
+// Native view/controller adapter. Owns the controller and tray; wx owns child widgets.
+// Editor drafts are separate from saved session records and the copied live plan.
+// Timers advance deterministic fixture time only; no I/O or audio work is done here.
+class Frame final : public wxFrame {
+  public:
+    // Takes exclusive controller ownership. All widgets and commands are GUI-thread only.
+    explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke);
+    ~Frame() override {
+        timer_.Stop();
+        if (tray_)
+            tray_->RemoveIcon();
+    }
+    audiohole::Controller& controller() {
+        return *controller_;
+    }
+    void open() {
+        Show();
+        Iconize(false);
+        Raise();
+        SetFocus();
+    }
+    void exit() {
+        timer_.Stop();
+        controller_->stop();
+        end_observation();
+        if (tray_)
+            tray_->RemoveIcon();
+        Destroy();
+    }
+    void show_introduction() {
+        introduction();
+    }
+    void tray_activate(const std::string& id) {
+        show_result(controller_->activate(id));
+        refresh();
+    }
+    void tray_start() {
+        if (!controller_->snapshot().active_profile.empty())
+            tray_activate(controller_->snapshot().active_profile);
+        else
+            activate(false);
+    }
+    // Reads one controller snapshot; changes commentary only for new event occurrences.
+    void refresh();
+    // Internal developer check; dispatches native events and writes explicit evidence.
+    bool smoke(const wxString& directory);
+
+  private:
+    std::unique_ptr<audiohole::Controller> controller_;
+    std::unique_ptr<Tray> tray_;
+    wxTimer timer_;
+    bool smoke_ = false, loading_ = false, dirty_ = false;
+    audiohole::Profile draft_;
+    int hole_index_ = -1;
+    std::string viewed_, device_id_;
+    std::uint64_t seen_event_ = 0, occurrence_ = 0;
+    presentation::Mode personality_ = presentation::Mode::Normal;
+    presentation::Messages messages_;
+    wxNotebook* notebook_{};
+    wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
+        *activity_{}, *device_detail_{};
+    wxButton *start_{}, *stop_{}, *dfa_{};
+    wxListBox *profiles_{}, *holes_{}, *devices_{};
+    wxTextCtrl *profile_name_{}, *profile_notes_{}, *hole_name_{}, *hole_notes_{}, *device_name_{},
+        *device_notes_{}, *device_search_{}, *console_{}, *log_search_{};
+    wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
+    wxChoice *activity_direction_{}, *personality_choice_{}, *destination_test_{}, *scan_mode_{},
+        *scan_scope_{}, *severity_{}, *startup_{}, *startup_target_{}, *notifications_{};
+    wxSpinCtrl* delay_{};
+    wxGauge* scan_progress_{};
+    DirectionWidgets forward_, reverse_;
+    std::vector<std::string> profile_ids_, device_ids_, beep_ids_;
+    std::string last_log_;
+    // Builders only construct widgets/bind events; they never issue routing commands.
+    void build_profiles();
+    void build_hole_diagnostics(wxWindow* parent, wxSizer* layout);
+    void build_devices();
+    void build_scan();
+    void build_settings();
+    void build_direction(wxWindow*, wxSizer*, DirectionWidgets&, const wxString&);
+    // Rebuilds evidence while retaining explicit unsupported overrides for correction.
+    void populate_direction(DirectionWidgets&, const audiohole::Direction&);
+    void read_direction(DirectionWidgets&, audiohole::Direction&);
+    void select_profile(const std::string&);
+    void load_holes();
+    void load_hole(int);
+    void update_beep_destinations();
+    // Copies editor fields into draft_ only, never into the active plan.
+    void capture_draft();
+    // Confirms a potentially destructive editor navigation; does not mutate state.
+    bool discard();
+    void save(bool);
+    void activate(bool);
+    void populate_devices();
+    void load_device();
+    // Called on page change, hide/minimize, Stop, and shutdown. No sample ownership.
+    void end_observation();
+    void present(presentation::Message);
+    void show_result(const audiohole::Result&);
+    void introduction();
+    void export_log();
+};
+
+} // namespace audiohole::gui

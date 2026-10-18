@@ -1421,3 +1421,35 @@ on Linux: script parsing, temporary-fixture ZIP content/metadata checks,
 existing-archive protection, unexpected-runtime rejection and staging cleanup,
 and explicit refusal of unsupported native validation. These are tooling checks,
 not Windows application execution or confirmation of Actions artifact uploads.
+
+## Milestone 0.2 — Owner-authorized simulated GUI evaluation
+
+The owner's implementation assignment advances GUI evaluation ahead of real audio
+routing. The code provides native Profiles, Devices, Scanning/Diagnostics, Settings,
+and tray surfaces using provisional wxWidgets 3.2.6. A GUI-independent typed
+controller seam and deterministic fixture backend supply session-only profile/hole
+editing, independent duplex status, startup preview, hotplug/failure/recovery,
+format evidence, temporary source observation, and destination-specific simulated
+Test Beep. No capture/render, real probing, production persistence, or synchronization
+algorithm is implemented. All capability/activity/diagnostic evidence is labeled
+simulated; the beep emits no sound.
+
+Normal/UwU commentary uses the approved authored catalog; Vanilla and technical
+facts remain deterministic. Event occurrence caching prevents polling variation.
+The readability amendment is recorded in ENGINEERING.md; existing COM and package
+contracts have been reviewed and clarified without changing their ownership model.
+D-030, D-031, D-034, and O-001 through O-006 remain Open.
+
+Validation: 19 portable simulator/presentation tests pass in local Debug and Release
+builds; distribution-tool safeguard tests pass under PowerShell 7.4.6. Linux cannot
+execute native Windows GUI/COM checks. The complete Windows x64 cross-build/link also passes with MinGW-w64 GCC 14;
+this is a separate compiler/link check, not evidence of MSVC runtime behavior. The Windows workflow
+builds/tests both configurations, runs native GUI smoke interactions, attempts BMP
+screenshots, and audits/launches the extracted package before uploading artifacts.
+Native Windows results for this new milestone must be confirmed from its Actions
+run; the earlier accepted 764e048 run validates Milestone 0.1 only.
+
+[MANUAL_GUI_CHECKLIST.md](MANUAL_GUI_CHECKLIST.md) covers hands-on acceptance;
+visual layout, accessibility, high DPI, Explorer restart, notifications, second-launch
+focus, and consumer-PC packaging remain manual checks. Milestone 1 audio routing
+requires a separate authorization after this evaluation.

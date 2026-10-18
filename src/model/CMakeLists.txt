@@ -1,0 +1,7 @@
+add_library(audiohole_model STATIC controller.cpp ../presentation/messages.cpp)
+target_include_directories(audiohole_model PUBLIC "${PROJECT_SOURCE_DIR}/src")
+if(MSVC)
+  target_compile_options(audiohole_model PRIVATE /W4 /permissive- /utf-8)
+else()
+  target_compile_options(audiohole_model PRIVATE -Wall -Wextra -Wpedantic)
+endif()

@@ -23,8 +23,8 @@ try {
         & "$PSScriptRoot/Package.ps1" -Configuration $Configuration
     }
     if ($Launch) {
-        & (Join-Path $repoRoot "build/windows-msvc/bin/$Configuration/audiohole_dev.exe")
-        if ($LASTEXITCODE -ne 0) { throw 'Developer harness failed.' }
+        & (Join-Path $repoRoot "build/windows-msvc/bin/$Configuration/audiohole.exe")
+        if ($LASTEXITCODE -ne 0) { throw 'AudioHole GUI failed.' }
     }
 } finally {
     Pop-Location

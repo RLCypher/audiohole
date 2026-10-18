@@ -104,8 +104,10 @@ See [BUILDING.md](BUILDING.md) for prerequisites, Debug/Release build and test c
 For a private CI evaluation build, open **Actions**, select a successful
 **Windows builds and evaluation packages** run, download its **release** artifact,
 extract it, and follow the included README. No development tools are required
-to launch that package. Milestone 0.1 still packages the console development
-foundation, not a GUI or working audio router.
+to launch that package. Milestone 0.2 packages `audiohole.exe`, a native GUI
+with deterministic simulated endpoints and routing behavior. No real audio is
+processed, Test Beep emits no sound, and edits last only for the current session.
+See [the GUI manual checklist](MANUAL_GUI_CHECKLIST.md) for evaluation workflows.
 
 ## Contributing
 

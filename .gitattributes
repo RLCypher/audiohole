@@ -1,0 +1,2 @@
+# Keep vendor notices verbatim; their formatting is not project source style.
+third_party/licenses/*.txt -whitespace

@@ -14,12 +14,12 @@ try {
     if ($roots.Count -ne 1) { throw 'Expected one package root.' }
     $root = $roots[0].FullName
     $files = @(Get-ChildItem -LiteralPath $root -File -Recurse)
-    if ((($files.Name | Sort-Object) -join ',') -ne 'audiohole_dev.exe,build-info.json,README.txt') {
+    if ((($files.Name | Sort-Object) -join ',') -ne 'audiohole.exe,build-info.json,MANUAL_GUI_CHECKLIST.md,README.txt,wxWidgets-LGPL.txt,wxWidgets-LICENSE.txt') {
         throw 'Package contains missing or unexpected files.'
     }
     $metadata = Get-Content (Join-Path $root 'build-info.json') -Raw | ConvertFrom-Json
     if ($metadata.commit -notmatch '^[0-9a-f]{40}$' -or $metadata.source_dirty) { throw 'Invalid or dirty package metadata.' }
-    $exe = Join-Path $root 'audiohole_dev.exe'
+    $exe = Join-Path $root 'audiohole.exe'
     # The runner has VS installed: inspect imports so that cannot mask a missing
     # redistributable/debug CRT dependency during the isolated launch test.
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
@@ -32,14 +32,16 @@ try {
     if (($imports -join "`n") -match '(?i)\b(?:msvcp\d+\w*|vcruntime\w*|ucrtbased|libstdc\+\+[^\s]*|libgcc[^\s]*)\.dll') {
         throw 'Package unexpectedly imports a non-system compiler runtime DLL.'
     }
-    $stdout = Join-Path $temporary 'stdout.txt'
-    $stderr = Join-Path $temporary 'stderr.txt'
-    $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
-    if (-not $process.WaitForExit(15000)) { throw 'Extracted application did not finish within 15 seconds.' }
+    # Run the GUI's internal smoke mode from the extracted tree. It dispatches
+    # native widget events and writes evidence; stdout is not a GUI contract.
+    $evidence = Join-Path $temporary 'gui-evidence'
+    $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -ArgumentList @('--smoke-test', '--screenshot-dir', "`"$evidence`"")
+    if (-not $process.WaitForExit(45000)) { throw 'Extracted GUI did not finish within 45 seconds.' }
     $process.WaitForExit()
-    if ($process.ExitCode -ne 0) { throw "Extracted application failed: $(Get-Content $stderr -Raw)" }
-    if ((Get-Content $stdout -Raw) -notmatch 'COM initialized\. Audio routing is not implemented\.') {
-        throw 'Extracted application did not report expected initialization.'
+    if ($process.ExitCode -ne 0) { throw "Extracted GUI smoke failed with exit code $($process.ExitCode)." }
+    $result = Join-Path $evidence 'smoke-result.txt'
+    if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
+        throw 'Extracted GUI did not produce successful smoke evidence.'
     }
     Write-Host "PASS: isolated package launch and runtime import audit ($($metadata.configuration), $($metadata.commit))."
 } finally {

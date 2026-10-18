@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-test:
     runs-on: windows-2022
-    timeout-minutes: 20
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -26,7 +26,7 @@ jobs:
         run: cmake --preset windows-msvc
       - name: Build
         run: cmake --build --preset windows-${{ matrix.configuration }} --parallel 2
-      - name: Test COM lifetime and launch developer harness
+      - name: Test COM, simulator, presentation, and native GUI smoke
         run: ctest --preset windows-${{ matrix.configuration }}
       - name: Package only the runtime component
         shell: pwsh
@@ -49,3 +49,11 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+      - name: Upload GUI smoke screenshots and evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AudioHole-GUI-evidence-${{ matrix.configuration }}-${{ github.sha }}
+          path: build/windows-msvc/gui-smoke/
+          if-no-files-found: warn
+          retention-days: 14

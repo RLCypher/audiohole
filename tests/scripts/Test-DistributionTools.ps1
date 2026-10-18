@@ -5,11 +5,14 @@ $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('AudioHole-distribution-tests-' + [guid]::NewGuid())
 try {
     New-Item -ItemType Directory -Path "$fixture/source" -Force | Out-Null
-    'Packaging fixture only; not an executable.' | Set-Content "$fixture/source/audiohole_dev.exe"
+    'Packaging fixture only; not an executable.' | Set-Content "$fixture/source/audiohole.exe"
+    foreach ($name in @('MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt')) {
+        'Inert packaging fixture' | Set-Content "$fixture/source/$name"
+    }
     @(
         'cmake_minimum_required(VERSION 3.25)'
         'project(PackageFixture NONE)'
-        'install(FILES audiohole_dev.exe DESTINATION . COMPONENT Runtime)'
+        'install(FILES audiohole.exe MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt DESTINATION . COMPONENT Runtime)'
     ) | Set-Content "$fixture/source/CMakeLists.txt"
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Fixture configure failed' }
@@ -19,7 +22,7 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @((Get-ChildItem $root.FullName -Recurse -File).Name | Sort-Object)
-    if (($names -join ',') -ne 'audiohole_dev.exe,build-info.json,README.txt') { throw "Wrong contents: $names" }
+    if (($names -join ',') -ne 'audiohole.exe,build-info.json,MANUAL_GUI_CHECKLIST.md,README.txt,wxWidgets-LGPL.txt,wxWidgets-LICENSE.txt') { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD
     if ($LASTEXITCODE -ne 0) { throw 'Cannot read expected commit' }

@@ -1,0 +1,7 @@
+// Standard native resources. MSVC merges the same manifest through /MANIFESTINPUT;
+// other toolchains embed it here, avoiding duplicate manifest resources.
+#ifndef AUDIOHOLE_MSVC_MANIFEST
+#define wxUSE_RC_MANIFEST 1
+#define wxUSE_DPI_AWARE_MANIFEST 2
+#endif
+#include "wx/msw/wx.rc"

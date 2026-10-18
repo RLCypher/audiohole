@@ -15,6 +15,9 @@ enum class ApartmentModel { multi_threaded, single_threaded };
 // objects. S_FALSE also owns an initialization count; failed calls do not.
 class ComApartment final {
 public:
+    // Records the original HRESULT without throwing. RPC_E_CHANGED_MODE means
+    // the thread already has an incompatible apartment; the caller must abort
+    // COM-dependent work, not uninitialize somebody else's apartment.
     explicit ComApartment(
         ApartmentModel model = ApartmentModel::multi_threaded) noexcept;
     ~ComApartment() noexcept;
@@ -24,6 +27,8 @@ public:
     ComApartment(ComApartment&&) = delete;
     ComApartment& operator=(ComApartment&&) = delete;
 
+    // S_OK and S_FALSE both own a count balanced by this scope's destructor.
+    // Inspect result() for the original failure; initialized() never retries.
     [[nodiscard]] HRESULT result() const noexcept { return result_; }
     [[nodiscard]] bool initialized() const noexcept { return SUCCEEDED(result_); }
 

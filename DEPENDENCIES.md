@@ -481,7 +481,20 @@ project and test targets. See [BUILDING.md](BUILDING.md) for source pins,
 commands, offline-source handling, and limitations of reproducibility across
 different compiler/SDK installations.
 
-JSON, logging, resampling, GUI libraries, and audio backends are not integrated
+JSON, logging, resampling, and audio backends are not integrated
 in Milestone 0. Existing provisional/open selections and the unresolved project
 license remain unchanged; no distribution license is chosen by adding a test
 dependency.
+
+### Milestone 0.2 GUI evaluation dependency
+
+wxWidgets 3.2.6 is provisionally integrated for the authorized native GUI evaluation;
+D-031 is not finalized. `cmake/WxWidgets.cmake` pins its official release archive to
+SHA-256 `939e5b77ddc5b6092d1d7d29491fe67010a2433cf9b9c0d841ee4d04acb9dce7`.
+It is statically linked, using the same static MSVC CRT as the application.
+The wxWindows Library Licence 3.1 exception and referenced LGPL text are retained
+in `third_party/licenses/wxWidgets-LICENSE.txt` and `wxWidgets-LGPL.txt`, and shipped
+with the runtime package. Optional codecs, NanoSVG, networking, web/media,
+XML/regex, and rich editor components are disabled to avoid additional libraries.
+No dependency is introduced into the GUI-independent controller or an audio thread.
+See BUILDING.md for source overrides and ENGINEERING.md for review obligations.
