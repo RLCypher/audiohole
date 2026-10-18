@@ -244,8 +244,9 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     const auto r = audiohole::recommend(controller_->snapshot(), d);
     w.formats = r.compatible;
     w.format->Clear();
+    // Keep the literal branch a wxString too; mixed types are ambiguous on MSVC.
     w.format->Append(r.compatible.empty()
-                         ? wxS("Automatic — unverified compatibility")
+                         ? wxString(wxS("Automatic — unverified compatibility"))
                          : wxS("Recommended — ") + text(r.compatible.front().label()) +
                                " [SIMULATED]");
     int selection = 0;

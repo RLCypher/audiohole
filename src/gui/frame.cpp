@@ -143,11 +143,13 @@ void Frame::refresh() {
             ? (running ? "SIMULATED source activity detected. Destination audibility is untested."
                        : "No simulated source activity. Silence does not establish disconnection.")
             : "Observation off. No real samples are inspected or stored.");
-    beep_status_->SetLabel(
-        s.beep_destination.empty()
-            ? "Test Beep inactive. NO SOUND. No audibility or end-to-end result is established."
-            : text("SIMULATED Test Beep active: " + s.beep_destination +
-                   ". NO SOUND. Cancel immediately if needed."));
+    // MSVC requires both branches to be wxString: its pointer conversions make
+    // a mixed literal/wxString conditional ambiguous.
+    beep_status_->SetLabel(s.beep_destination.empty()
+                               ? wxString(wxS("Test Beep inactive. NO SOUND. No audibility or "
+                                              "end-to-end result is established."))
+                               : text("SIMULATED Test Beep active: " + s.beep_destination +
+                                      ". NO SOUND. Cancel immediately if needed."));
     scan_progress_->SetValue(s.scan_percent);
     const auto query = log_search_->GetValue().Lower();
     std::string logs = "SIMULATED technical diagnostics — no hardware measurements\n";
