@@ -1453,3 +1453,20 @@ run; the earlier accepted 764e048 run validates Milestone 0.1 only.
 visual layout, accessibility, high DPI, Explorer restart, notifications, second-launch
 focus, and consumer-PC packaging remain manual checks. Milestone 1 audio routing
 requires a separate authorization after this evaluation.
+
+### Owner-credited Milestone 0.1 presentation testing progress
+
+The owner approved external/custom commentary catalogs with compiled-in Vanilla
+fallback, the inert exact-value DFA slider, scan lifecycle callouts, clearer selected
+navigation, and Light/Dark/Follow System palettes. This refines the existing simulated
+GUI evaluation; it does not begin Milestone 1 routing or retroactively assert that
+pending native MSVC/package gates passed. See the accepted D-056 amendment and
+expanded manual checklist. Runtime packages include editable catalogs and their
+format guide. Native Debug/Release, GUI smoke, extracted-package launch, artifact
+upload, and hands-on testing remain required for the new revision.
+
+Local validation for this refinement: all 29 portable simulator/personality tests pass
+in Debug and Release; Windows x64 cross-build/link, package safeguard tests, source
+formatting, and document cross-reference checks pass. These are not native MSVC or
+GUI execution results. The new native smoke assertions and extracted-package launch
+must pass on Windows CI before the new artifact is considered validated.

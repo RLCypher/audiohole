@@ -1556,3 +1556,26 @@ This owner-approved evaluation direction refines O-005 without accepting a synch
 - Retain the conditional 10 ms attributable-latency objective. Compare minimum/typical latency, variation over time, FIFO/converter delay, measured end-to-end latency, quality, CPU, stability, compatibility, and observability. Derive proposed objective quality/delay criteria from comparative evidence, not arbitrary limits.
 
 No further product decision is needed to begin a separately authorized narrow simplex prototype. Final algorithms, bypass eligibility, estimator/transition thresholds, ratio limits, converter selection, and quantitative acceptance limits can follow experimental evidence. Public strict-preservation exposure, Automatic emergency-recovery permissions, final D-034/O-005 commitments, and production persistence/API contracts still require review. See `ROADMAP.md` → Expanded synchronization experiments. Other owner decisions and previously deferred features are unchanged.
+
+### Owner-approved presentation testing amendment — D-056 extension
+
+**Status:** Accepted by the owner for this presentation iteration, credited as
+Milestone 0.1 progress. The earlier D-056 record above is retained as decision history.
+
+Vanilla alone remains compiled in as the deterministic technical fallback; Normal
+is still the default, provided as an external authored commentary catalog alongside
+UwU. Valid custom JSON catalogs are selectable. Unavailable/invalid selected files
+fall back entirely; missing events in valid catalogs fall back individually. The
+versioned presentation format, validation limits, explicit loading, and no-script
+boundary are documented in PERSONALITY.md §17 and personalities/README.md.
+
+Approve the label DFA, its inert hundredths slider and exact entry, approved
+special-value events, placebo acknowledgment pools, scan lifecycle callouts, stronger
+selected-tab differentiation, and Light/Dark/Follow System options. Dark is the interim
+testing default; Follow System is the final-build default. Respect high contrast and
+retain identical operational behavior. Native Windows-owned dialogs remain system
+styled in the current toolkit implementation, pending hands-on evaluation.
+
+This amendment introduces no audio engine, production routing/configuration schema,
+controller effect, or new synchronization policy. D-030, D-031, D-034 and O-001 through
+O-006 remain Open. Native Windows build/test/package acceptance gates remain in force.

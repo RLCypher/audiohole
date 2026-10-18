@@ -1202,9 +1202,9 @@ The implementation should remain understandable to both its maintainers and its 
 
 ## Personality and User-Facing Copy
 
-Read `PERSONALITY.md` before writing user-facing copy. The application has one `interface.personality_mode` setting with three mutually exclusive values: `default` (Normal — Default Audio Engineer), `vanilla` (Vanilla — Strictly informational), and `uwu` (UwU — I know what you are). Do not implement a separate Vanilla boolean.
+Read `PERSONALITY.md` before writing user-facing copy. The application has one `interface.personality_mode` setting with one mutually exclusive selection. Standard IDs are `default` (Normal — Default Audio Engineer), `vanilla` (Vanilla — Strictly informational), and `uwu` (UwU — I know what you are). User-authored personality IDs are approved under PERSONALITY.md §17. Vanilla is the only compiled-in personality; Normal remains the default optional file. Do not implement a separate Vanilla boolean.
 
-Use centralized, intentionally authored message variants, with neutral fallback; never rewrite user input, endpoint names, technical identifiers, paths, or structured diagnostics. Personality never overrides safety, transparency, accessibility, or functional requirements. Changing modes must not affect routing. The intentionally inert DFA (Does Fuck-All) button appears in Settings → Advanced in Normal and UwU, and is hidden in Vanilla. It must not invoke controller commands or change persistent state.
+Use centralized, intentionally authored message variants, with neutral fallback; never rewrite user input, endpoint names, technical identifiers, paths, or structured diagnostics. Personality never overrides safety, transparency, accessibility, or functional requirements. Changing modes must not affect routing. The intentionally inert button labeled DFA and its −11.00 to +11.00 slider appear in Settings → Advanced for non-Vanilla personalities and are hidden in Vanilla. See PERSONALITY.md §17 for the approved special values. It must not invoke controller commands or change persistent state.
 
 ---
 
@@ -1252,3 +1252,15 @@ Keep preference, actual processing, observed health, and endpoint mode distinct.
 Document significant interfaces and nontrivial behavior: intent, inputs/results, failures, side effects, ownership/lifetime, thread affinity, timing, invariants, constraints, and deliberate limitations. Explain non-obvious decisions and reference architecture/decision records where applicable. Keep comments accurate; specific actionable TODOs only. Avoid redundant line-by-line comments.
 
 For audio work, explicitly document execution threads, real-time restrictions, buffer ownership and frame/layout representation, timestamp interpretation, synchronization, underrun/overrun handling, invalidation, and recovery. Distinguish measured behavior from inference and unverified assumptions. Readability, accurate comments, and auditable resource/thread contracts are milestone acceptance criteria alongside tests. Improve existing unclear contracts without cosmetic rewrites.
+
+## Owner-approved presentation testing refinements
+
+The owner approved external commentary catalogs, per-event Vanilla fallback, custom
+personality loading, the inert DFA slider, scan callouts, stronger navigation contrast,
+and Light/Dark/Follow System appearance. See PERSONALITY.md §17 and GUI.md's
+approved refinement section. Dark is the interim testing default; Follow System is
+the final-build default. Respect Windows high contrast. Keep stable technical copy
+compiled in, validate whole catalogs before activation, and keep all presentation
+selection/history/slider state outside the controller and persistence. No scripts,
+automatic text filters, runtime content retrieval, audio routing, or implicit production
+configuration changes are authorized by this presentation amendment.

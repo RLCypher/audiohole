@@ -178,7 +178,7 @@ Double entendres are welcome when they arise naturally. Do not turn every senten
 
 ## 11. Personality Modes
 
-AudioHole has three mutually exclusive presentation modes selected under **Settings → Personality**. The setting is `interface.personality_mode`, not a collection of independent toggles.
+AudioHole has one mutually exclusive personality selection, with the three standard IDs below and optional user-authored catalogs, selected under **Settings → Personality**. The setting is `interface.personality_mode`, not a collection of independent toggles.
 
 | Stored value | User-facing label | Voice | DFA |
 |---|---|---|---|
@@ -204,7 +204,7 @@ No mode should invent a successful operation, conceal a failure, or turn a warni
 
 ## 12. The DFA Button
 
-AudioHole shall include a button labeled **DFA** under **Settings → Advanced**, in a clearly nonessential area of the interface. It is visible in Normal and UwU modes and hidden in Vanilla mode.
+AudioHole shall include a button labeled **DFA** under **Settings → Advanced**, in a clearly nonessential area of the interface. It and its companion slider are visible for non-Vanilla personalities and hidden in Vanilla mode (including whole-personality fallback).
 
 **DFA means "Does Fuck-All."** It is literally a placebo button.
 
@@ -387,3 +387,56 @@ Additional acceptance checks for §16.5 and the GUI milestone:
   persistent data are identical across seeds and personality choices.
 - Repeated DFA clicks can vary only local acknowledgment text; assert no
   controller calls, diagnostic events, persistent counters, or state writes.
+
+## 17. Approved external catalogs, DFA controls, and scan events
+
+This owner-approved testing refinement extends D-056 while retaining its history.
+Vanilla is the **only compiled-in personality**: stable technical, operational,
+warning, diagnostic, accessibility, control, and recovery messages remain in code.
+Normal remains the default selection, supplied in `personalities/default.json`;
+UwU is supplied in `personalities/uwu.json`. Additional user-authored or externally
+generated JSON catalogs may be selected. Generation happens outside AudioHole;
+there is no script execution, automatic text transformation, or content retrieval.
+
+Catalogs supply optional commentary only. Validate the entire bounded UTF-8 JSON
+file before activation; reject malformed, oversized, duplicate-key, duplicate-ID,
+or invalidly weighted data. A missing or malformed selected file falls back
+entirely to Vanilla with a concise explanation. A valid catalog missing a new
+or existing event uses Vanilla **for that event only**, retaining the selected
+personality elsewhere until its file is updated. File deletion/editing takes effect
+on explicit Reload (or next launch), not during telemetry or repaint. Vanilla is
+always available and cannot be replaced by a file. See the versioned format and
+limits in [personalities/README.md](personalities/README.md).
+
+Authored pools retain repetition avoidance, optional weighting, reproducible tests,
+and occurrence caching. Single-entry pools are valid. No new personality-controlled
+operational facts or recovery guidance are introduced. Custom catalog IDs extend
+the presentation selector; production routing/profile serialization remains Open.
+
+The button reads **DFA** with tooltip **Working as intended.** Beside it, a movable
+slider and exact numeric entry represent −11.00 through +11.00 in hundredths.
+They are placebo controls: no controller calls, routing changes, scan/repair work,
+logs, configuration writes, or persistent counters. Ordinary slider positions need
+no response. On settling at a special value, use the selected personality's pool:
+
+| Value | Normal base response / event |
+|---|---|
+| −11.00 | All the way down. Still doing nothing. / `dfa_minimum` |
+| 0.69 and 6.90 | NICE! / `dfa_nice` |
+| 4.20 | DANK! / `dfa_dank` |
+| 6.66 | That's metal af. / `dfa_metal` |
+| 6.70 | SIX SEVEN! / `dfa_six_seven` |
+| 11.00 | It goes louder now. / `dfa_maximum` |
+
+Personality files may flavor these responses. The supplied 6.70 pool reads exactly
+“SIX SEVEN!” in both Normal and UwU. Button acknowledgments also include placebo
+affirmations such as “Did that fix it?”, “That should do it,” and “Oughtta do the
+trick,” with authored UwU counterparts. Do not use these affirmations for real
+repairs or diagnostics. Debounce duplicate release/change notifications at the same
+settled position; dragging and polling must not emit continuous flavor text.
+All DFA controls are hidden in Vanilla.
+
+Scan start, completion, cancellation, and failure are presentation events too.
+Show stable, simulation-labeled facts in the top operations area, with eligible
+authored commentary. Progress updates may update factual progress without choosing
+new commentary; serious failures retain precise diagnostic/recovery information.

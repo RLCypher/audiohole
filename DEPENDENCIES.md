@@ -481,8 +481,7 @@ project and test targets. See [BUILDING.md](BUILDING.md) for source pins,
 commands, offline-source handling, and limitations of reproducibility across
 different compiler/SDK installations.
 
-JSON, logging, resampling, and audio backends are not integrated
-in Milestone 0. Existing provisional/open selections and the unresolved project
+The original Milestone 0 foundation did not integrate JSON, logging, resampling, or audio backends; see the later approved personality integration below. Existing provisional/open selections and the unresolved project
 license remain unchanged; no distribution license is chosen by adding a test
 dependency.
 
@@ -498,3 +497,16 @@ with the runtime package. Optional codecs, NanoSVG, networking, web/media,
 XML/regex, and rich editor components are disabled to avoid additional libraries.
 No dependency is introduced into the GUI-independent controller or an audio thread.
 See BUILDING.md for source overrides and ENGINEERING.md for review obligations.
+
+### Approved personality-file JSON parser
+
+nlohmann/json **3.11.3** (MIT) is integrated solely to validate authored personality
+files on the GUI thread. It is header-only, adds no runtime DLL, and remains outside
+controller commands and any future audio callback. `cmake/Json.cmake` pins the official
+source archive SHA-256 to
+`0d8ef5af7f9794e3263480193c491549b2ba6cc74bb018906202ada498a79406`.
+The notice is retained and packaged as `third_party/licenses/nlohmann-json-LICENSE.txt`.
+Its own tests/install targets are disabled; AudioHole tests validate the bounded,
+transactional loader and fallbacks. wxWidgets stays pinned at 3.2.6; application
+palettes use its existing controls and Windows system libraries `dwmapi`/`advapi32`.
+No new theme library, script interpreter, or runtime external service is added.

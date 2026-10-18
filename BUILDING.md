@@ -127,8 +127,9 @@ For a local package after building/testing, or to audit it on Windows:
 ```
 
 Packaging refuses to overwrite an existing ZIP: move it aside or choose another
-`-OutputDirectory`. Only `audiohole.exe`, the manual GUI checklist, wxWidgets license/LGPL texts,
-`README.txt`, and `build-info.json` are included. Tests, source trees, symbols, SDKs, and GoogleTest are excluded.
+`-OutputDirectory`. Only `audiohole.exe`, the manual GUI checklist, wxWidgets and nlohmann/json license
+texts, `personalities/default.json`, `personalities/uwu.json`, the personality format
+guide, `README.txt`, and `build-info.json` are included. Tests, source trees, symbols, SDKs, and GoogleTest are excluded.
 The native smoke-test script requires clean metadata and a VS installation for
 the import audit; end users need neither to launch the executable. GitHub creates
 the downloadable ZIP from the already-tested package contents, avoiding a
@@ -172,7 +173,7 @@ application installs no service, driver, or startup registration.
 
 These commands pin dependency sources and build configuration, not the entire
 host installation or byte-identical output. Record CMake, MSVC, Windows SDK,
-OS, and configuration with each validation run. No JSON, logging, DSP, or audio backend dependency is integrated. AudioHole's own
+OS, and configuration with each validation run. No logging, DSP, or audio backend dependency is integrated. nlohmann/json is used only for approved personality-file validation. AudioHole's own
 project license remains an owner decision before distribution.
 
 ## Source boundaries
@@ -215,3 +216,22 @@ See the current Milestone 0 entry in [ROADMAP.md](ROADMAP.md) for actual results
 and outstanding validation. Milestone 1 routing remains outside this milestone.
 
 Implementation changes must also pass the human readability and contract review in [ENGINEERING.md](ENGINEERING.md); build and test success alone does not establish milestone acceptance.
+
+## Approved presentation testing iteration
+
+Normal/UwU are staged beside the built executable in `personalities/` on every
+build and included in runtime packages. Vanilla is compiled in and remains usable
+if that directory is removed. See [personalities/README.md](personalities/README.md)
+for editing/custom catalogs, validation limits, and explicit reload behavior.
+The JSON parser is nlohmann/json 3.11.3 (MIT), pinned in `cmake/Json.cmake`; its
+notice is shipped with the GUI. An offline build may set
+`-DFETCHCONTENT_SOURCE_DIR_NLOHMANN_JSON=C:/path/to/json-3.11.3` after verifying the
+archive SHA-256 recorded in DEPENDENCIES.md. As with other overrides, CMake does not
+verify an already unpacked tree. No DLL or interpreter is added by this parser.
+
+Dark is the interim testing default. Settings offers Light and Follow System;
+Windows high contrast overrides the palette. Windows-owned dialogs and menus keep
+system styling. This evaluation retains session-only presentation preferences.
+Native smoke tests cover file availability, DFA slider inertness/visibility, scan
+callouts, theme changes preserving controller revision, and selected navigation.
+Screenshots and the manual checklist are still required for visual acceptance.

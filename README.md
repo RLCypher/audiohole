@@ -108,6 +108,8 @@ to launch that package. Milestone 0.2 packages `audiohole.exe`, a native GUI
 with deterministic simulated endpoints and routing behavior. No real audio is
 processed, Test Beep emits no sound, and edits last only for the current session.
 See [the GUI manual checklist](MANUAL_GUI_CHECKLIST.md) for evaluation workflows.
+The presentation testing iteration adds editable [personality files](personalities/README.md),
+a placebo DFA slider, scan callouts, clearer navigation, and Light/Dark/System palettes.
 
 ## Contributing
 

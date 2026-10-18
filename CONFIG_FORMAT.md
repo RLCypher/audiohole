@@ -1175,13 +1175,13 @@ Example:
 
 ### 14.0.1 Personality Presentation Preference
 
-`interface.personality_mode` is a single, mutually exclusive presentation setting. Valid string values are `default`, `vanilla`, and `uwu`; the default is `default`.
+`interface.personality_mode` is a single, mutually exclusive presentation setting. Standard IDs are `default`, `vanilla`, and `uwu`; the default is `default`. The owner-approved presentation refinement also permits a valid user-authored catalog ID; see PERSONALITY.md §17. The GUI evaluation keeps this selection session-only and does not finalize production settings serialization.
 
 - `default`: **Normal — Default Audio Engineer**. Contextual personality; DFA visible.
 - `vanilla`: **Vanilla — Strictly informational**. Neutral application-authored language; DFA hidden.
 - `uwu`: **UwU — I know what you are**. Intentionally authored playful messages; DFA visible.
 
-This setting controls presentation only. It must not alter routing, device probing, recovery, profile contents, structured diagnostics, error codes, endpoint identifiers, file paths, or user-provided text. Changes take effect without restarting routing. Invalid values must be reported; the application may render using a safe neutral fallback without silently rewriting the file. Missing values use `default` for backward compatibility. Do not add a separate `vanilla_mode` boolean.
+This setting controls presentation only. It must not alter routing, device probing, recovery, profile contents, structured diagnostics, error codes, endpoint identifiers, file paths, or user-provided text. Changes take effect without restarting routing. Unavailable or invalid selected personality files must be reported and rendered using built-in Vanilla without silently rewriting files. A valid catalog missing an event uses Vanilla for that event alone. Missing values use `default` for backward compatibility. Do not add a separate `vanilla_mode` boolean.
 
 ### 14.1 Startup Profile Selection
 
@@ -1822,3 +1822,12 @@ D-034 and O-005 remain Open, and O-004 still gates production persistence detail
 Selected preference, actual processing, observed synchronization health, and endpoint mode are distinct concepts. Actual processing may be unchanged transfer, application-managed adaptive resampling, or Windows-managed rate adjustment; these descriptions are not accepted wire/persistence identifiers. Runtime mismatch/confidence, occupancy, ratio, transitions, discontinuities/recovery, and measured/estimated latency must remain distinguishable without inventing fields here. Retain standardized information states for unavailable/unknown observations.
 
 Strict preservation is internal/experimental, not a required public v0.1 setting. Its candidate behavior rejects incompatible formats, forbids intentional resampling or frame alteration/insertion/duplication/dropping, and requires reporting plus explicit restart/rebuffer instead of silent compensation. No third public correction policy or finalized synchronization schema is introduced. See `DECISIONS.md` O-005 and `ROADMAP.md` → Expanded synchronization experiments.
+
+### Approved personality data boundary
+
+Optional commentary files use the dedicated presentation-only format documented in
+[personalities/README.md](personalities/README.md). They do not replace portable
+profile/device JSON, machine-local bindings, or production settings. The companion
+`personalities/` directory is relative to the executable for this GUI testing build;
+this does not resolve O-006 storage roots for production routing configuration.
+Theme selection and DFA slider/history remain local session presentation state.
