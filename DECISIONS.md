@@ -1439,6 +1439,8 @@ Do not quietly rewrite the project's intended behavior to accommodate a dependen
 
 **Consequences:** Presentation strings are intentionally authored and selected centrally. Personality does not alter routing, validation, probing, diagnostics, or persistence. Critical information remains clear in every mode. DFA is available in Normal and UwU, hidden in Vanilla, and never has operational side effects. The selector replaces a proposed Vanilla boolean toggle.
 
+**Approved presentation-only refinement:** The earlier prohibition on randomized same-event flavor is replaced by controlled selection from deliberately authored commentary pools under `PERSONALITY.md` §16.6. Normal/UwU may vary noncritical commentary with no immediate repeats and optional weights; Vanilla and technical/status/warning/control/accessibility/recovery messages remain deterministic. Tests use injected or seeded selection. Polling and unchanged refreshes do not reselect commentary. DFA may have a larger acknowledgment pool but stays operationally inert. Variation adds no controller behavior, configuration schema, persistent state, runtime text generation/filter, or runtime external retrieval. Other Open decisions are unchanged.
+
 **Related:** `PERSONALITY.md`, `CONFIG_FORMAT.md`, `GUI.md`, `ARCHITECTURE.md`, `AGENTS.md`.
 
 ---

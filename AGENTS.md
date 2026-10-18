@@ -1223,7 +1223,7 @@ The beep must be a brief, quiet, bounded signal (default approximately 1 kHz, -3
 
 ## Personality coverage directive
 
-Implement `PERSONALITY.md` §16 as normative v0.1 UI copy coverage, not merely an optional tone example. Use a centralized, authored three-mode presentation catalog with the specified common events and tests. UwU is intentionally strongly flirtatious and innuendo-heavy in noncritical UI copy, with frequent deliberate R/L→W styling and kaomoji; preserve technical strings and safety clarity. Do not apply runtime mutation to arbitrary text.
+Implement `PERSONALITY.md` §16 as normative v0.1 UI copy coverage, not merely an optional tone example. Use a centralized, authored three-mode presentation catalog with the specified common events and tests. UwU is intentionally strongly flirtatious and innuendo-heavy in noncritical UI copy, with frequent deliberate R/L→W styling and kaomoji; preserve technical strings and safety clarity. Do not apply runtime mutation to arbitrary text. The approved §16.6 refinement permits controlled authored Normal/UwU commentary pools with transient repetition avoidance, optional weights, and reproducible injected/seeded tests. Vanilla and all technical/operational/warning/control/accessibility/recovery messages stay deterministic; polling or unchanged refreshes do not produce new commentary. Variation never changes commands, diagnostics, configuration, persistence, or DFA inertness.
 
 ---
 

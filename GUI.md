@@ -1595,3 +1595,23 @@ All established personality coverage and safety/accessibility boundaries remain 
 Keep ordinary operation straightforward: Automatic is the proposed prototype default, not a new required public selector. Strict preservation is internal diagnostic/experimental work; public exposure requires later review. Do not add a third public mode for frame corrections or a production preference schema.
 
 Advanced diagnostics distinguish selected preference, actual processing, observed synchronization health, and endpoint shared/exclusive mode. Present meaningful mismatch/confidence, buffer occupancy/trend, effective ratio, transitions/reasons, discontinuities/recovery, and latency evidence without exposing tuning internals to ordinary users. A route may currently copy unchanged under Automatic; that observation is not an end-to-end bit-perfect guarantee. Keep automatic-setting explanations concise, visible, and grounded in applicable evidence. Personality modes continue to alter presentation only. See `DECISIONS.md` O-005; no new controls or payloads are specified here.
+
+
+### Controlled personality commentary acceptance
+
+Apply `PERSONALITY.md` §16.6 in the existing presentation-message catalog. Normal
+and UwU may vary deliberately authored optional commentary for common
+noncritical event occurrences; Vanilla and all technical facts, status, warnings,
+control labels, accessibility text, and recovery instructions stay deterministic.
+No generated text, runtime UwU filter, or external content retrieval is added.
+
+GUI/controller-facing tests must cover seeded/injected reproducibility,
+no immediate repeats when alternatives exist, single/missing-entry fallback,
+and optional weights without mandatory weighting on every event. Verify Vanilla
+remains deterministic and strictly informational. Repeated
+polls, telemetry updates, and unchanged refreshes retain the selected commentary
+rather than emitting new flavor. Assert that variation changes no controller
+commands, routing behavior, configuration, diagnostic records, or persistent
+state. The DFA pool may be larger while every click remains presentation-only
+and Vanilla still hides it. Manual acceptance includes checking these behaviors
+while switching modes, refreshing views, and replaying simulated scenarios.

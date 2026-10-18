@@ -272,7 +272,7 @@ The target endpoint name, direction, active state, and warnings must always be l
 - Flirt with **the act of routing**, not the user's identity. Double entendres about “opening a hole,” “plugging in,” “both ways,” “pulling out,” “finishing,” “tight connections,” and “making noise” are explicitly encouraged in noncritical copy.
 - Prefer a clear technical heading or status **followed by** UwU commentary. Keep button labels, endpoint names, profile names, status enums, warnings, and diagnostic detail literal.
 - A neutral fallback is acceptable for missing catalog entries, but a complete implementation must supply UwU variants for the common events in §16.2. Do not satisfy this requirement by applying a runtime text filter.
-- Avoid randomized flavor for the same event in v0.1; stable authored messages make testing and translation possible.
+- Normal and UwU may select among multiple deliberately authored variants for common, noncritical commentary under §16.6. Stable technical messages and Vanilla remain deterministic. This approved refinement replaces the earlier blanket prohibition on randomized flavor for the same event.
 
 ### 16.2 Required message catalog
 
@@ -332,3 +332,58 @@ All variants must be selected through a **centralized presentation-message catal
 - Verify the same operation produces identical commands, results, and state transitions in every personality mode.
 - Verify Vanilla remains strictly informational and DFA is hidden there.
 - Verify warnings, test-beep targets, and no-signal statuses stay unambiguous.
+
+
+### 16.6 Controlled authored personality variation
+
+This is an approved presentation-only refinement, not a new product feature or
+an operational policy. Keep stable technical messages separate from optional
+variable commentary. Normal (`default`) and UwU may have multiple reviewed catalog entries
+for common noncritical event commentary; Vanilla remains strictly informational
+and deterministic. Every choice must remain relevant to the same event and
+preserve the information conveyed. Do not randomize or alter technical status, operational
+facts, diagnostics, warnings, control labels, accessibility information, recovery
+instructions, or literal user/device/profile content.
+
+Use the existing centralized presentation-message catalog and stable event
+identifiers. Every final line is deliberately authored and reviewed for
+consistency with this document. Do not generate prose at runtime, transform text
+through an automatic UwU filter, or retrieve external content at runtime.
+Internet references may inform tone, vocabulary, kaomoji, and cultural
+conventions during authoring, but do not copy substantial passages from them.
+
+Select commentary on a distinct eligible event occurrence, not every polling
+cycle, telemetry update, repaint, or unchanged state refresh. Retain the chosen
+commentary for that occurrence as the view refreshes. Avoid immediately
+repeating the same variant for an event/mode when eligible alternatives exist.
+A single available variant or neutral fallback remains valid. Optional weights
+may make some responses rare; equal weighting is sufficient for ordinary pools.
+Weights apply among eligible choices after repetition avoidance; they do not
+promise exact frequencies, particularly for small pools.
+
+Selection must be reproducible in automated tests through an injected selector
+or seed. Presentation-local choice/history is transient only: it must not alter
+routing, controller commands, configuration, diagnostics, or persistent state.
+Mode selection retains its existing semantics; variation adds no settings or
+production schema. Missing variants retain the neutral fallback behavior.
+
+DFA may have a larger pool of authored playful acknowledgments in Normal/UwU.
+Its only effect remains transient local presentation feedback; no controller,
+scan, diagnostic, persistence, or repair action, hidden counter, or operational
+side effect is permitted. It remains hidden in Vanilla.
+
+Additional acceptance checks for §16.5 and the GUI milestone:
+
+- Replaying the same event sequence and seed/injected choices reproduces the
+  commentary sequence; tests do not depend on uncontrolled randomness.
+- Eligible multi-variant pools avoid immediate repeats. Test single-entry and
+  missing-entry fallback behavior, plus optional weighted selection using
+  deterministic inputs; do not rely on flaky statistical frequency assertions.
+- Repaint, telemetry, and unchanged snapshots retain commentary and do not
+  consume a new selection. A new eligible event can select another authored line.
+- Stable technical/status/warning/control/accessibility/recovery content is
+  identical across commentary choices. Vanilla remains deterministic and neutral.
+- Controller commands, operation results, routing state, configuration, and
+  persistent data are identical across seeds and personality choices.
+- Repeated DFA clicks can vary only local acknowledgment text; assert no
+  controller calls, diagnostic events, persistent counters, or state writes.
