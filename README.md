@@ -101,6 +101,12 @@ The Milestone 0 foundation contains a Windows x64 developer executable, COM init
 
 See [BUILDING.md](BUILDING.md) for prerequisites, Debug/Release build and test commands, dependency pins, and validation limitations.
 
+For a private CI evaluation build, open **Actions**, select a successful
+**Windows builds and evaluation packages** run, download its **release** artifact,
+extract it, and follow the included README. No development tools are required
+to launch that package. Milestone 0.1 still packages the console development
+foundation, not a GUI or working audio router.
+
 ## Contributing
 
 AudioHole is currently in early development. Contribution guidelines will be added as the project matures.

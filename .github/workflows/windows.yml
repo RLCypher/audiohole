@@ -1,4 +1,4 @@
-name: Windows foundation
+name: Windows builds and evaluation packages
 
 on:
   push:
@@ -11,15 +11,41 @@ permissions:
 jobs:
   build-and-test:
     runs-on: windows-2022
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         configuration: [debug, release]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Verify Windows prerequisites (read-only)
+        run: ./scripts/Verify-Environment.ps1
+      - name: Test distribution-tool safeguards
+        run: ./tests/scripts/Test-DistributionTools.ps1
       - name: Configure Windows x64
         run: cmake --preset windows-msvc
       - name: Build
         run: cmake --build --preset windows-${{ matrix.configuration }} --parallel 2
       - name: Test COM lifetime and launch developer harness
         run: ctest --preset windows-${{ matrix.configuration }}
+      - name: Package only the runtime component
+        shell: pwsh
+        run: |
+          $configuration = '${{ matrix.configuration }}'
+          $configuration = $configuration.Substring(0,1).ToUpperInvariant() + $configuration.Substring(1)
+          ./scripts/Package.ps1 -Configuration $configuration
+      - name: Launch the extracted package outside the build tree
+        shell: pwsh
+        run: |
+          $zip = @(Get-ChildItem build/packages/*.zip)
+          if ($zip.Count -ne 1) { throw 'Expected exactly one package.' }
+          ./scripts/Test-Package.ps1 -Archive $zip[0].FullName
+          Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/artifact
+      - name: Upload tested package contents (downloaded as a ZIP)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AudioHole-Windows-x64-${{ matrix.configuration }}-${{ github.sha }}
+          path: build/artifact/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0

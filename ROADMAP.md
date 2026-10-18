@@ -1349,8 +1349,10 @@ v0.1 acceptance includes the authored event coverage and three-mode tests in `PE
 
 ## Milestone 0 implementation and validation record
 
-**Status:** Foundation implemented; native Windows/MSVC acceptance remains pending.
-This record does not mark Milestone 0 complete or authorize Milestone 1.
+**Status at initial implementation:** Foundation implemented; native Windows/MSVC
+acceptance was pending in this local record. The owner subsequently reported
+Milestone 0.0 Windows CI passing (see Milestone 0.1 below). This historical
+record does not authorize Milestone 1.
 
 The implementation adds C++20 CMake targets for a Windows COM initialization
 library, a temporary developer executable, four GoogleTest COM lifetime cases,
@@ -1384,3 +1386,38 @@ and five CTest results in both configurations before claiming native readiness.
 The COM helper supplies thread-bound initialization/cleanup for future WASAPI
 workers without selecting an audio backend or synchronization algorithm. Keep
 subsequent planning proportional to the next authorized build/test step.
+
+## Milestone 0.1 — Development checks and private evaluation packages
+
+This owner-authorized infrastructure milestone builds on Milestone 0.0; it does
+not implement audio routing or replace the earlier phase inventory. The owner
+reported native Windows/MSVC Debug/Release builds and tests passing for the
+Milestone 0.0 baseline, with PR #1 open against `main`.
+
+Milestone 0.1 adds a read-only PowerShell prerequisite verifier, a build/test/
+launch/package helper, explicit CMake Runtime installation, and separate
+revision-identified Debug/Release Actions artifacts. Packages exclude tests and
+third-party source. CI tests the exact package outside the source/build tree
+and audits compiler-runtime imports before upload; Release is preferred for
+ordinary manual evaluation. See [BUILDING.md](BUILDING.md).
+
+Validation must distinguish local script/fixture checks from native CI builds,
+package execution, and upload. GitHub API access in the current environment
+returns `Forbidden`; the private Actions page is also unavailable through the
+available unauthenticated web route. Git transport remains available. These
+observations do not establish a Windows build or workflow failure. Confirm the
+new commit's Windows CI and artifact upload before treating 0.1 as validated.
+
+The next owner-authorized milestone is 0.2: a native Windows GUI backed by an
+explicit deterministic simulator, before actual routing. This revises the
+immediate execution order: 0.1 must pass Windows CI before 0.2 begins. The
+simulator must not claim real device observations, finalize Open policies or
+production schemas, or implement WASAPI capture/render. Keep 0.1 and 0.2 in
+separate commits on `work`, preserve PR #1, and do not merge or create Releases.
+
+
+Local Milestone 0.1 checks passed using PowerShell 7.4.6 and CMake 3.31.6
+on Linux: script parsing, temporary-fixture ZIP content/metadata checks,
+existing-archive protection, unexpected-runtime rejection and staging cleanup,
+and explicit refusal of unsupported native validation. These are tooling checks,
+not Windows application execution or confirmation of Actions artifact uploads.
