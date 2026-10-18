@@ -1343,3 +1343,44 @@ The roadmap should remain adaptable as testing reveals real constraints, without
 ## Personality catalog acceptance
 
 v0.1 acceptance includes the authored event coverage and three-mode tests in `PERSONALITY.md` §16, including distinct UwU text in main GUI, setup diagnostics, profiles, tray, Test Beep, and DFA; no technical-string mutation; and identical operational behavior across modes.
+
+
+---
+
+## Milestone 0 implementation and validation record
+
+**Status:** Foundation implemented; native Windows/MSVC acceptance remains pending.
+This record does not mark Milestone 0 complete or authorize Milestone 1.
+
+The implementation adds C++20 CMake targets for a Windows COM initialization
+library, a temporary developer executable, four GoogleTest COM lifetime cases,
+and a CTest harness-launch check. Visual Studio 2022 x64 Debug/Release presets,
+build instructions, build-artifact ignore rules, a pinned test-only GoogleTest
+source/notice, and a Windows build/test workflow accompany the code. No audio
+streams, GUI/tray, device discovery/probing, profiles, persistence, controller
+scaffolding, or public CLI are implemented. D-030, D-034, O-005, and other open
+decisions remain Open. Project license selection remains pending before
+public distribution.
+
+Actual validation in the Linux onboarding environment:
+
+| Check | Outcome |
+|---|---|
+| Windows x64 Debug and Release cross-configure/build/link | Passed using MinGW-w64 GCC 14 (Debian 14.2.0-19+27+b1), CMake 3.31.6, Ninja 1.11.1; both application and test executables produced. This is not MSVC validation. |
+| Preset syntax / unsupported host | CMake parses the presets; native Linux configuration rejects the unsupported target with an actionable message. |
+| Native MSVC Debug/Release builds | Not run: no MSVC/Windows SDK installation is available on this host. |
+| Application launch and four COM tests / CTest launch test | Not run on Windows. A supplemental Wine 10 runtime attempt could not initialize Wine's Windows runtime; it established no application/test result. |
+| Windows workflow | Added, not remotely executed during this task. It builds/tests both configurations; CTest also launches the harness. |
+
+Validation tools and temporary cross-build outputs are outside tracked source;
+no generated binaries, dependencies, or build directories are committed.
+The MinGW validation tools and Wine are not application dependencies. Cross-build
+MinGW runtime DLLs used only for the attempted Wine check do not describe the
+reference MSVC static-CRT deployment.
+
+Run the documented commands in [BUILDING.md](BUILDING.md) on Windows with
+Visual Studio 2022 and record the compiler/SDK versions, executable exit status,
+and five CTest results in both configurations before claiming native readiness.
+The COM helper supplies thread-bound initialization/cleanup for future WASAPI
+workers without selecting an audio backend or synchronization algorithm. Keep
+subsequent planning proportional to the next authorized build/test step.

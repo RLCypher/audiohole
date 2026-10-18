@@ -464,3 +464,24 @@ Integration boundaries remain strict: JSON parsing/serialization and validation 
 Keep D-034/O-005 Open. Compare unchanged transfer, application-managed adaptive resampling using an established candidate such as SpeexDSP, and Windows-managed shared-render adjustment through `AUDCLNT_STREAMFLAGS_RATEADJUST` / `IAudioClockAdjustment::SetSampleRate`. No resampler, dependency version, processing location, or algorithm is selected; Windows-managed adjustment does not imply sample identity or conversion-free operation, and application-managed conversion is not presumed superior.
 
 Investigate initialization/flag compatibility across shared rendering, event-driven operation, `IAudioClient3`, and low-period configurations; exclusive streams do not support this rate-adjustment interface. Keep adjustment calls and diagnostic formatting outside real-time processing. Compare quality, latency/variation, FIFO/converter delay, CPU, stability, compatibility, and observability under equivalent supported conditions, recording unavoidable differences. `ROADMAP.md` defines the expanded experiments; evidence precedes proposed quantitative quality/delay acceptance limits.
+
+## Milestone 0 integrated dependency inventory
+
+The foundation adds only GoogleTest v1.16.0 (BSD-3-Clause), for automated tests.
+It is pinned to tag commit `6910c9d9165801d8827d628cb72eb7ea9dd538c5` and a
+SHA-256-verified source archive in `CMakeLists.txt`. Its notice is retained at
+`third_party/licenses/googletest-LICENSE.txt`. GoogleMock is disabled. GoogleTest
+does not enter the developer executable or future audio processing paths.
+
+The reference build uses C++20, MSVC 2022/v143, a Windows SDK, and CMake/CTest
+3.25 or newer. These are build prerequisites, not bundled application libraries;
+their license terms remain those of the tool vendors. `ole32` is a Windows
+system library. The reference MSVC build uses a consistent static CRT across
+project and test targets. See [BUILDING.md](BUILDING.md) for source pins,
+commands, offline-source handling, and limitations of reproducibility across
+different compiler/SDK installations.
+
+JSON, logging, resampling, GUI libraries, and audio backends are not integrated
+in Milestone 0. Existing provisional/open selections and the unresolved project
+license remain unchanged; no distribution license is chosen by adding a test
+dependency.

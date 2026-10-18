@@ -1,0 +1,25 @@
+name: Windows foundation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [debug, release]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Configure Windows x64
+        run: cmake --preset windows-msvc
+      - name: Build
+        run: cmake --build --preset windows-${{ matrix.configuration }} --parallel 2
+      - name: Test COM lifetime and launch developer harness
+        run: ctest --preset windows-${{ matrix.configuration }}

@@ -97,7 +97,9 @@ There are no stable releases available yet.
 
 ## Building
 
-Build instructions will be provided once the initial CMake project and required dependencies are established.
+The Milestone 0 foundation contains a Windows x64 developer executable, COM initialization support, and GoogleTest/CTest targets. It does not route audio yet.
+
+See [BUILDING.md](BUILDING.md) for prerequisites, Debug/Release build and test commands, dependency pins, and validation limitations.
 
 ## Contributing
 
