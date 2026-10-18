@@ -1579,3 +1579,26 @@ styled in the current toolkit implementation, pending hands-on evaluation.
 This amendment introduces no audio engine, production routing/configuration schema,
 controller effect, or new synchronization policy. D-030, D-031, D-034 and O-001 through
 O-006 remain Open. Native Windows build/test/package acceptance gates remain in force.
+
+### Owner-approved production GUI preview refinement
+
+**Status:** Accepted for the presentation testing iteration. This extends the
+D-056 amendment without erasing its earlier negative DFA minimum, interim Dark
+default, or simulation-label history.
+
+- Use 0.00–11.00 for DFA, moving the minimum response to zero. Enter commits the
+  visible text to both numeric entry and slider. Keep all other thresholds, 23
+  ordinary responses per supplied personality, and complete operational inertness.
+- Default to Follow System now; keep Light/Dark choices and high-contrast precedence.
+- Add explanatory hover/F1 button help, readable dark blue-gray button hot states,
+  and a color-coded status dot beside canonical state text.
+- Preview production-style interface and authored personality language. Replace
+  repeated simulation/developer notes with a startup disclosure on every interactive
+  launch and via Introduction, explicitly including silent Test Beep, no real device
+  access/audio, simulated status, and session-only edits. Retain simulator provenance
+  in package metadata, exports, and engineering documentation. Unknown measurements
+  remain unavailable; no hardware or bit-perfect guarantee is introduced.
+
+This does not authorize audio routing, production storage schemas, new capabilities,
+or a synchronization decision. D-030, D-031, D-034 and O-001 through O-006 remain Open.
+Native Windows build/test/package and hands-on visual acceptance remain required.

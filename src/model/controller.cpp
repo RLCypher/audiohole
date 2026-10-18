@@ -51,11 +51,10 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
             recommendation.compatible.push_back(format);
     recommendation.explanation =
         recommendation.compatible.empty()
-            ? "No common simulated format. Conversion feasibility is unavailable in this "
-              "simulator; select another pair. No hardware was tested."
-            : "Common format in both authored fixture capability lists; 48 kHz is preferred when "
-              "present to avoid unnecessary conversion. Simulated evidence only, not hardware "
-              "verification. Clock synchronization remains provisional (D-034).";
+            ? "No common format in the source and destination capability lists. Select another "
+              "pair."
+            : "Both endpoints list this format; 48 kHz is preferred when available to avoid "
+              "unnecessary format conversion. A common format does not establish a shared clock.";
     auto preferred =
         std::find(recommendation.compatible.begin(), recommendation.compatible.end(), Format{});
     if (preferred != recommendation.compatible.end())
@@ -83,15 +82,15 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
                 return {false, "Select a saved capture source and playback destination for each "
                                "enabled direction."};
             if (direction->settings.buffer_ms < 1 || direction->settings.buffer_ms > 100)
-                return {false, "Buffer must be between 1 and 100 ms in this simulation."};
+                return {false, "Buffer must be between 1 and 100 ms."};
             const auto recommendation = recommend(snapshot, *direction);
             if (recommendation.compatible.empty())
-                return {false, "This simulator cannot activate endpoints without a common fixture "
-                               "format. No production conversion policy is implied."};
+                return {false,
+                        "No common endpoint format is available. Select another endpoint pair."};
             if (!direction->settings.automatic &&
                 std::find(recommendation.compatible.begin(), recommendation.compatible.end(),
                           direction->settings.format) == recommendation.compatible.end())
-                return {false, "Manual format is unsupported by this simulated endpoint pair; "
+                return {false, "Manual format is unsupported by this endpoint pair; "
                                "change the override explicitly."};
         }
     }
@@ -99,26 +98,29 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
         return {false, "At most eight enabled holes may be armed, including waiting holes."};
     return {true, enabled > 4 ? "Extended range: five to eight enabled holes; actual performance "
                                 "is hardware-dependent."
-                              : "Profile is valid for simulation."};
+                              : "Profile is valid."};
 }
+// Detail strings preview the production UI. This class still advances authored
+// fixtures only; the startup notice and exported diagnostics disclose that context.
+// Never interpret these strings or transitions as evidence of real stream operation.
 SimulatedController::SimulatedController() {
     const std::vector<Format> common{{}, {96000, 2, "float32"}, {48000, 2, "PCM24"}};
     state_.endpoints = {{"mixer-in", "Mixer microphone", "USB Audio Interface (Capture)",
-                         "Authored USB mixer fixture", true, Availability::Available, common},
+                         "USB mixer", true, Availability::Available, common},
                         {"mixer-out", "Mixer headphones", "USB Audio Interface (Render)",
                          "Independent clock is not ruled out", false, Availability::Available,
                          common},
                         {"vr-in",
                          "VR microphone",
                          "Headset Microphone",
-                         "Simulated headset",
+                         "VR headset",
                          true,
                          Availability::Available,
                          {{}}},
                         {"vr-out",
                          "VR headphones",
                          "Headset Speakers",
-                         "Simulated headset",
+                         "VR headset",
                          false,
                          Availability::Available,
                          {{}}},
@@ -163,11 +165,11 @@ SimulatedController::SimulatedController() {
     state_.profiles = {
         {"profile-simplex",
          "Microphone monitoring",
-         "Simulated simplex example; no audio is captured or played.",
+         "Microphone monitoring through the headset.",
          {simple}},
         {"profile-duplex", "VR duplex", "Two independently configured directions.", {duplex}},
-        {"profile-empty", "Empty workspace", "Create your own simulated holes.", {}}};
-    event("ready", "Simulator ready. No hardware enumeration or audio processing.");
+        {"profile-empty", "Empty workspace", "Create your own connections.", {}}};
+    event("ready", "Ready to configure routing.");
 }
 void SimulatedController::event(std::string type, std::string detail) {
     state_.events.push_back({++sequence_, std::move(type), std::move(detail)});
@@ -247,8 +249,8 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
                                 endpoint(state_, direction->destination)->availability ==
                                     Availability::Available;
     if (!available && state_.armed && !arm_waiting)
-        return {false, "Required resources unavailable. Existing simulated route retained. Use Arm "
-                       "Ready explicitly to replace it (switch preparation O-002 remains Open)."};
+        return {false, "Required resources unavailable. Existing route retained. Use Arm "
+                       "Ready explicitly to replace it."};
     live_ = *candidate;
     state_.active_profile = id;
     state_.pending_profile.clear();
@@ -261,7 +263,7 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     state_.paths.clear(); // A newly activated plan owns fresh simulated path lifetimes.
     transition_ms_ = transition_duration_ms;
     refresh_paths();
-    event("activated", "Activated simulated profile: " + candidate->display_name);
+    event("activated", "Activated profile: " + candidate->display_name);
     return result;
 }
 void SimulatedController::stop() {
@@ -276,15 +278,15 @@ void SimulatedController::stop() {
     transition_ms_ = stop_duration_ms;
     for (auto& p : state_.paths)
         p.state = State::Stopping;
-    event("stopped", "Stop cancels startup, recovery, scan, monitoring, and simulated beep.");
+    event("stopped", "Stop cancels startup, recovery, scan, monitoring, and Test Beep.");
 }
 Result SimulatedController::schedule(const std::string& id, int ms) {
     if (!profile(state_, id) || ms < 0)
         return {false, "Select an existing startup profile and a nonnegative delay."};
     state_.pending_profile = id;
     state_.pending_ms = ms;
-    event("pending", "Simulated startup deadline scheduled; no OS autostart registration.");
-    return {true, "Startup scheduled in simulation."};
+    event("pending", "Startup activation scheduled.");
+    return {true, "Startup scheduled."};
 }
 // Rebuilds each direction independently. Aggregate health never hides a healthy
 // duplex leg; unavailable resources wait in Ready, explicit injected errors fail.
@@ -301,12 +303,11 @@ void SimulatedController::refresh_paths(bool reconnecting) {
                 const auto* source = endpoint(state_, direction.source);
                 const auto* destination = endpoint(state_, direction.destination);
                 PathStatus path{hole.id, index == 1, State::Running,
-                                "Simulated path only; no audio."};
+                                "Source and destination connected."};
                 const auto key = hole.id + (index == 1 ? "/reverse" : "/forward");
                 if (std::find(failures_.begin(), failures_.end(), key) != failures_.end()) {
                     path.state = State::Failed;
-                    path.detail =
-                        "Injected stream failure. Use Recover; no hardware diagnosis is implied.";
+                    path.detail = "Stream failed. Use Recover to retry this direction.";
                     ++failed;
                 } else if (!source || !destination ||
                            source->availability != Availability::Available ||
@@ -365,16 +366,14 @@ void SimulatedController::advance(int ms) {
                 state_.paths.clear();
             } else
                 refresh_paths();
-            event("state", std::string("Simulation state: ") + name(state_.state));
+            event("state", std::string("Routing state: ") + name(state_.state));
         }
     }
     if (beep_ms_ > 0) {
         beep_ms_ = std::max(0, beep_ms_ - ms);
         if (!beep_ms_) {
             state_.beep_destination.clear();
-            event(
-                "beep-complete",
-                "Simulated test interval completed. NO SOUND was emitted; audibility is untested.");
+            event("beep-complete", "Test Beep completed for the selected destination.");
         }
     }
     if (state_.scanning) {
@@ -382,8 +381,7 @@ void SimulatedController::advance(int ms) {
         state_.scan_percent = std::min(100, scan_ms_ / scan_ms_per_percent);
         if (state_.scan_percent == 100) {
             state_.scanning = false;
-            event("scan-complete", "Authored capability fixtures displayed; no hardware capability "
-                                   "was measured or verified.");
+            event("scan-complete", "Device scan completed.");
         }
     }
 }
@@ -424,7 +422,7 @@ void SimulatedController::recover() {
     if (state_.armed) {
         transition_ms_ = transition_duration_ms;
         refresh_paths(true);
-        event("recovering", "Simulated recovery started.");
+        event("recovering", "Recovery started.");
     }
 }
 void SimulatedController::monitor(bool enabled) {
@@ -443,14 +441,14 @@ Result SimulatedController::beep(const std::string& id) {
                  {&hole.forward, hole.duplex ? &hole.reverse : nullptr})
                 if (direction && direction->destination == id &&
                     direction->settings.mode == "Exclusive")
-                    return {false, "Selected simulated destination is occupied in exclusive mode. "
+                    return {false, "Selected destination is occupied in exclusive mode. "
                                    "Live routing will not be disturbed."};
     state_.beep_destination = id;
     beep_ms_ = beep_duration_ms;
-    event("beep-start", "SIMULATED Test Beep target: " + destination->display_name +
-                            ". NO SOUND. Intended production signal: approximately 1 kHz, -30 "
+    event("beep-start", "Test Beep target: " + destination->display_name +
+                            ". Test signal: approximately 1 kHz, -30 "
                             "dBFS, 1 second with fades.");
-    return {true, "Simulated Test Beep active for the selected destination. NO SOUND."};
+    return {true, "Test Beep active for the selected destination."};
 }
 void SimulatedController::cancel_beep() {
     beep_ms_ = 0;
@@ -464,19 +462,18 @@ void SimulatedController::scan(bool enabled, bool advanced, ScanScope scope,
         return;
     }
     if (!enabled && state_.scanning)
-        event("scan-cancelled", "Simulated scan cancelled; no hardware probing occurred.");
+        event("scan-cancelled", "Scan cancelled.");
     state_.scanning = enabled;
     scan_ms_ = 0;
     state_.scan_percent = 0;
     if (enabled) {
-        const std::string scope_detail = scope == ScanScope::Full ? "Full fixture scan. "
+        const std::string scope_detail = scope == ScanScope::Full ? "Full device scan. "
                                          : scope == ScanScope::Selected
                                              ? "Selected logical device: " + selected_device + ". "
-                                             : "Update saved fixture records. ";
+                                             : "Update saved device records. ";
         event("scan-scope", scope_detail);
-        event("scan-start", advanced
-                                ? "Advanced simulated scan; no intrusive hardware probing occurs."
-                                : "Easy simulated scan; fixture evidence only.");
+        event("scan-start",
+              advanced ? "Advanced device scan started." : "Easy device scan started.");
     }
 }
 } // namespace audiohole

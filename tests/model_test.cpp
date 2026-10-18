@@ -117,8 +117,10 @@ TEST(Simulator, ManualOverrideIsRetainedAndUnsupportedTupleRejected) {
               96000);
     direction.destination = "mixer-out";
     EXPECT_TRUE(validate(controller.snapshot(), draft).ok);
-    EXPECT_NE(recommend(controller.snapshot(), direction).explanation.find("Simulated"),
-              std::string::npos);
+    const auto evidence = recommend(controller.snapshot(), direction).explanation;
+    EXPECT_NE(evidence.find("Both endpoints list this format"), std::string::npos);
+    EXPECT_NE(evidence.find("48 kHz"), std::string::npos);
+    EXPECT_NE(evidence.find("does not establish a shared clock"), std::string::npos);
 }
 TEST(Simulator, IdentityAndWindowsNameSurviveDisplayNameEditing) {
     SimulatedController controller;

@@ -6,16 +6,16 @@ void Frame::build_devices() {
     auto* page = new wxPanel(notebook_);
     auto* root = new wxBoxSizer(wxHORIZONTAL);
     auto* left = new wxBoxSizer(wxVERTICAL);
-    device_search_ = field(page, left, "Search saved simulated devices (name, Windows name, ID)");
+    device_search_ = field(page, left, "Search devices");
     devices_ = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(350, 360));
     left->Add(devices_, 1, wxEXPAND | wxALL, 4);
     root->Add(left, 0, wxEXPAND);
     auto* right = new wxBoxSizer(wxVERTICAL);
     root->Add(right, 1, wxEXPAND | wxALL, 6);
-    device_name_ = field(page, right, "User-assigned display_name");
+    device_name_ = field(page, right, "Display name");
     device_notes_ = field(page, right, "User-editable notes", wxTE_MULTILINE);
     device_detail_ = label(page, right, "Select a device.");
-    button(page, right, "Save device name and notes (session only)", [this] {
+    button(page, right, "Save device", [this] {
         if (const auto* e = audiohole::endpoint(controller_->snapshot(), device_id_)) {
             auto edit = *e;
             edit.display_name = utf8(device_name_->GetValue());
@@ -24,11 +24,11 @@ void Frame::build_devices() {
             populate_devices();
         }
     });
-    button(page, right, "Simulate arrival / removal", [this] {
+    button(page, right, "Toggle availability", [this] {
         if (const auto* e = audiohole::endpoint(controller_->snapshot(), device_id_)) {
             if (e->availability == audiohole::Availability::Ambiguous) {
                 show_result({false, "Ambiguous identities are not automatically resolved. Explicit "
-                                    "binding UI awaits real discovery evidence."});
+                                    "binding is required."});
                 return;
             }
             auto edit = *e;
@@ -40,11 +40,6 @@ void Frame::build_devices() {
             refresh();
         }
     });
-    label(page, right,
-          "All identity, driver, format, and availability records on this page are authored "
-          "fixtures.\nWindows endpoint IDs and real hardware fingerprints are not "
-          "collected.\nDisconnected records remain selectable. Ambiguous identities are never "
-          "auto-bound.");
     page->SetSizer(root);
     notebook_->AddPage(page, "Devices");
     devices_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
@@ -85,13 +80,12 @@ void Frame::load_device() {
                           "\nLogical ID: " + e->id +
                           "\nDirection: " + (e->capture ? "Capture" : "Playback") +
                           "\nAvailability: " + audiohole::name(e->availability) +
-                          "\nDriver: simulated USB audio fixture; no version queried\nCapabilities "
-                          "(SIMULATED, fixture-reported):\n";
+                          "\nDriver version: unavailable\nSupported formats:\n";
     for (const auto& f : e->formats)
         details += "  " + f.label() + "\n";
     if (e->formats.empty())
         details += "  Unknown / untested. No verified recommendation.\n";
-    details += "Physical clock relationship: unknown. No bit-perfect or latency guarantee.";
+    details += "Clock relationship: unknown.";
     device_detail_->SetLabel(text(details));
     device_detail_->Wrap(650);
 }

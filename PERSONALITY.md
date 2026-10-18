@@ -414,14 +414,14 @@ operational facts or recovery guidance are introduced. Custom catalog IDs extend
 the presentation selector; production routing/profile serialization remains Open.
 
 The button reads **DFA** with tooltip **Working as intended.** Beside it, a movable
-slider and exact numeric entry represent −11.00 through +11.00 in hundredths.
+slider and exact numeric entry represent 0.00 through 11.00 in hundredths.
 They are placebo controls: no controller calls, routing changes, scan/repair work,
 logs, configuration writes, or persistent counters. Ordinary slider positions need
 no response. On settling at a special value, use the selected personality's pool:
 
 | Value | Normal base response / event |
 |---|---|
-| −11.00 | It does nothing now. / `dfa_minimum` |
+| 0.00 | It does nothing now. / `dfa_minimum` |
 | 0.69 and 6.90 | NICE! / `dfa_nice` |
 | 4.20 | DANK! / `dfa_dank` |
 | 6.66 | That's metal af. / `dfa_metal` |
@@ -451,6 +451,15 @@ presentation feedback only, never an operational result.
 A committed buffer edit (spin, Enter, or focus loss after typing) emits the
 `buffer_changed` presentation event. Duplicate notifications for the same value,
 programmatic editor loading, and unchanged refreshes do not select new commentary.
-The stable information states that the edit still requires Save / Apply and no
-audio is processed. Normal/UwU supply authored commentary; Vanilla stays neutral.
+The stable information states that the edit still requires Save / Apply. Normal/UwU supply authored commentary; Vanilla stays neutral.
 This does not change buffer policy, configuration units, or live routing.
+
+### Owner-approved production-language preview
+
+The subsequent testing amendment moves simulation disclosures into the startup
+notice and Introduction. Stable operation messages and authored Normal/UwU lines
+now preview production language; this does not make simulated states hardware
+measurements. Keep technical/status text deterministic and maintain per-event Vanilla
+fallback. Remove imaginary/pretend/simulated qualifications from commentary for actual
+operation events. DFA remains an inert joke, with its minimum now 0.00; the historical
+negative minimum is superseded. Retain the 23-response pools and other thresholds.

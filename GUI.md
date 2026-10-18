@@ -1626,7 +1626,7 @@ beginning Milestone 1 audio routing or waiving native Windows acceptance gates.
   Settings supports explicit Reload and custom-file loading. Explain whole-file
   fallback and per-event fallback as specified in PERSONALITY.md §17. File reads
   never occur on polling or audio callbacks. Existing session edits remain intact.
-- The Advanced button reads DFA, with a −11.00 to +11.00 slider and two-decimal
+- The Advanced button reads DFA, with a 0.00 to 11.00 slider and two-decimal
   exact entry. Apply the approved special-value responses on settlement; no flavor
   per drag tick. Hide the complete control group in Vanilla. All effects are local
   and transient, including across repeated clicks and personality switches.
@@ -1635,8 +1635,8 @@ beginning Milestone 1 audio routing or waiving native Windows acceptance gates.
 - Distinguish active/inactive navigation with stronger backgrounds, bold selected
   text and an explicit selected marker, not color alone. Retain keyboard focus,
   arrow/Home/End navigation and Ctrl+Tab page cycling.
-- Offer Dark, Light, and Follow System. Dark is the interim evaluation default;
-  Follow System is the final-build default. Changes preserve controller state and
+- Offer Dark, Light, and Follow System. Follow System is now the evaluation and
+  final-build default (superseding the earlier Dark testing default). Changes preserve controller state and
   editor contents. Windows high-contrast settings override the application palette.
 
 The current wxWidgets 3.2.6 implementation applies live application-control palettes
@@ -1644,3 +1644,30 @@ and optional supported title-bar coloring. Windows-owned dialogs and menus retai
 system styling; high-DPI, native subcontrol contrast, focus cues, and high-contrast
 behavior require manual Windows inspection. No runtime toolkit upgrade or production
 preference-persistence schema is established. Evaluation preferences remain session-only.
+
+### Owner-approved production presentation preview
+
+For this testing iteration the owner requested production-style wording throughout
+controls, status, diagnostics, and authored personality commentary. Replace repeated
+simulation/development notes with a neutral startup notice on every interactive
+launch. That notice must explicitly cover simulated devices, capabilities, routing,
+scans, monitoring/recovery, silent Test Beep, and session-only edits/preferences.
+It must state that no real audio/device access occurs and displayed state is not
+hardware evidence. Introduction can show it again. Package metadata and engineering
+documentation continue to identify the simulator; unavailable measurements remain
+unavailable. This presentation amendment does not authorize real audio or persistence.
+
+Follow System is now the initial appearance selection. All action buttons have
+explanatory hover help and equivalent F1 help; preserve native keyboard operation,
+focus indicators, disabled states, and high contrast. Application-painted dark hot
+states use a dark blue-gray surface and readable foreground. State is preceded by
+a small color-coded dot: Running green, Failed red, Degraded amber, Ready blue,
+transitions yellow, Stopped gray. Always retain the canonical textual state beside it;
+Windows high contrast may replace the dot color with a system color.
+
+DFA remains operationally inert and hidden in Vanilla. Its range is now 0.00–11.00;
+0.00 takes the former minimum response. Keep the other thresholds and 23 ordinary
+button responses per supplied personality. Parse the visible numeric entry on Enter,
+set the slider and numeric value together, and trigger at most one threshold response
+per settled change. Do not display persistent placebo/developer explanations beside
+these controls. Keep their documented meaning and ownership in engineering material.

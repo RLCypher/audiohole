@@ -68,8 +68,8 @@
       "A wittle beep, just fow that howe~ :3"
     ],
     "beep_complete": [
-      "Beep~! A pwetend squeak fow youw chosen howe~ UwU",
-      "Aww~ the imaginary tickwe is finished! >w<"
+      "Beep~! A wittle squeak fow youw chosen howe~ UwU",
+      "Aww~ the wittle tickwe is finished! >w<"
     ],
     "beep_rejected": [
       "P-pwease pick an output fiwst~ I can't beep into the void! >w<",
@@ -125,7 +125,7 @@
     ],
     "scan_started": [
       "Ooh~ time to inspect those pwetty wittle connections! OwO",
-      "A wittle peek at the howes~ No touching the weal devices! :3"
+      "A wittle peek at those connections~ :3"
     ],
     "scan_completed": [
       "Aww~ all inspected and weady fow you! UwU",
@@ -163,7 +163,7 @@
     ],
     "buffer_changed": [
       "Buffer tweaked~ comfy little sample cushions! :3",
-      "A tiny timing tune-up~ still just pretend! ^w^"
+      "A tiny timing tune-up~ weady when you awe! ^w^"
     ]
   }
 }

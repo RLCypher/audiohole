@@ -44,3 +44,24 @@ system appearance. Navigation uses native toggle buttons and wxSimplebook so the
 selected surface, bold label and selected marker can be styled consistently; keyboard
 page changes still send the same book events that stop temporary observation. No
 appearance operation issues controller commands or writes OS/configuration settings.
+
+The current production-style preview moves simulation disclosures to the startup
+notice on every interactive launch (also accessible through Introduction). The
+controller remains deterministic, session-only, and incapable of real device/audio
+access. Stable production-style state/detail strings are preview copy, not measured
+hardware results. Exports retain an explicit simulator header for provenance.
+
+`controls.cpp` paints application buttons to avoid wx 3.2's unreadable themed hot
+state on Windows. Native controls still own keyboard, command, focus, and accessibility
+behavior; high contrast delegates painting back to wx/Windows. Paint callbacks borrow
+the supplied HDC/font, restore DC state, and release temporary GDI brushes before
+returning. No paint path calls the controller. Tooltips and F1 share authored technical
+explanations. The routing dot supplements state text, with a high-contrast override.
+
+DFA Enter parses the actual spin edit text because wx's cached numeric value may
+lag behind typed input. Both controls normalize to integer hundredths in 0–1100;
+duplicate notifications do not consume another response. Its zero minimum supersedes
+the older negative range. Follow System is now the initial session appearance.
+
+A stable native window property identifies the existing instance independently of
+its build-labelled title. The frame removes that property before window destruction.

@@ -38,7 +38,7 @@ Use the existing key names, not translations of them. DFA-specific keys:
 | Key | Value / action |
 |---|---|
 | `dfa` | Button click |
-| `dfa_minimum` | −11.00 |
+| `dfa_minimum` | 0.00 |
 | `dfa_nice` | 0.69 or 6.90 |
 | `dfa_dank` | 4.20 |
 | `dfa_metal` | 6.66 |

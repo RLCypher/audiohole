@@ -123,12 +123,13 @@ TEST_F(PersonalityFiles, AuthoredPoolsCoverAllEventsAndDfaPositionsExactly) {
     presentation::Messages messages;
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
     for (const auto& id : {"default", "uwu"}) {
+        EXPECT_EQ(messages.variants(presentation::Message::Dfa, id).size(), 23u);
         for (int index = 0; index < static_cast<int>(presentation::Message::Count); ++index)
             EXPECT_FALSE(messages.variants(static_cast<presentation::Message>(index), id).empty())
                 << id << ": " << index;
     }
     for (auto [value, event] : std::vector<std::pair<int, presentation::Message>>{
-             {-1100, presentation::Message::DfaMinimum},
+             {0, presentation::Message::DfaMinimum},
              {69, presentation::Message::DfaNice},
              {420, presentation::Message::DfaDank},
              {666, presentation::Message::DfaMetal},
@@ -137,6 +138,7 @@ TEST_F(PersonalityFiles, AuthoredPoolsCoverAllEventsAndDfaPositionsExactly) {
              {1100, presentation::Message::DfaMaximum}})
         EXPECT_EQ(presentation::dfa_event(value), event);
     EXPECT_EQ(presentation::dfa_event(669), presentation::Message::Dfa);
+    EXPECT_EQ(presentation::dfa_event(-1100), presentation::Message::Dfa);
     EXPECT_EQ(messages.show(presentation::dfa_event(670), "uwu", 1).commentary, "SIX SEVEN!");
     EXPECT_EQ(messages.show(presentation::dfa_event(420), "default", 1).commentary, "DANK!");
     EXPECT_EQ(messages.show(presentation::dfa_event(1100), "default", 1).commentary,
@@ -149,9 +151,9 @@ TEST_F(PersonalityFiles, EveryDfaResponseLeavesOperationalStateUnchanged) {
     const auto before = controller.snapshot();
     presentation::Messages messages;
     messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
-    for (int value = -1100; value <= 1100; ++value)
+    for (int value = 0; value <= 1100; ++value)
         (void)messages.show(presentation::dfa_event(value), "uwu",
-                            static_cast<std::uint64_t>(value + 1101));
+                            static_cast<std::uint64_t>(value + 1));
     EXPECT_EQ(controller.snapshot().revision, before.revision);
     EXPECT_EQ(controller.snapshot().events.size(), before.events.size());
     EXPECT_EQ(controller.snapshot().state, before.state);
@@ -221,6 +223,6 @@ TEST_F(PersonalityFiles, EditorAndScanCalloutsKeepFactsStableAcrossPersonalities
         }
         EXPECT_TRUE(messages.show(event, "vanilla", 1).commentary.empty());
     }
-    for (int value : {-1100, 69, 420, 666, 670, 690, 1100, 0})
+    for (int value : {0, 69, 420, 666, 670, 690, 1100})
         EXPECT_EQ(presentation::technical(presentation::dfa_event(value)), "DFA Acknowledged");
 }

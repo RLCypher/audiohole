@@ -1204,7 +1204,7 @@ The implementation should remain understandable to both its maintainers and its 
 
 Read `PERSONALITY.md` before writing user-facing copy. The application has one `interface.personality_mode` setting with one mutually exclusive selection. Standard IDs are `default` (Normal — Default Audio Engineer), `vanilla` (Vanilla — Strictly informational), and `uwu` (UwU — I know what you are). User-authored personality IDs are approved under PERSONALITY.md §17. Vanilla is the only compiled-in personality; Normal remains the default optional file. Do not implement a separate Vanilla boolean.
 
-Use centralized, intentionally authored message variants, with neutral fallback; never rewrite user input, endpoint names, technical identifiers, paths, or structured diagnostics. Personality never overrides safety, transparency, accessibility, or functional requirements. Changing modes must not affect routing. The intentionally inert button labeled DFA and its −11.00 to +11.00 slider appear in Settings → Advanced for non-Vanilla personalities and are hidden in Vanilla. See PERSONALITY.md §17 for the approved special values. It must not invoke controller commands or change persistent state.
+Use centralized, intentionally authored message variants, with neutral fallback; never rewrite user input, endpoint names, technical identifiers, paths, or structured diagnostics. Personality never overrides safety, transparency, accessibility, or functional requirements. Changing modes must not affect routing. The intentionally inert button labeled DFA and its 0.00 to 11.00 slider appear in Settings → Advanced for non-Vanilla personalities and are hidden in Vanilla. See PERSONALITY.md §17 for the approved special values. It must not invoke controller commands or change persistent state.
 
 ---
 
@@ -1258,9 +1258,20 @@ For audio work, explicitly document execution threads, real-time restrictions, b
 The owner approved external commentary catalogs, per-event Vanilla fallback, custom
 personality loading, the inert DFA slider, scan callouts, stronger navigation contrast,
 and Light/Dark/Follow System appearance. See PERSONALITY.md §17 and GUI.md's
-approved refinement section. Dark is the interim testing default; Follow System is
-the final-build default. Respect Windows high contrast. Keep stable technical copy
+approved refinement section. Follow System is now the evaluation and final-build default. Respect Windows high contrast. Keep stable technical copy
 compiled in, validate whole catalogs before activation, and keep all presentation
 selection/history/slider state outside the controller and persistence. No scripts,
 automatic text filters, runtime content retrieval, audio routing, or implicit production
 configuration changes are authorized by this presentation amendment.
+
+### Subsequent owner-approved GUI preview amendment
+
+GUI.md's production presentation preview supersedes repeated on-screen simulation
+labels: disclose all simulated operations and silent Test Beep in the startup notice
+on each interactive launch, with Introduction available to repeat it. Use production
+language in interface/status/commentary, while keeping unavailable measurements
+unavailable and simulator provenance explicit in engineering/package evidence.
+No real routing or persistence is authorized. Follow System is now the default;
+DFA spans 0.00–11.00 with minimum response at zero. Keep its ownership and inertness
+contracts. Explanatory hover/F1 help, readable dark hover states, and an accessible
+routing-state dot are acceptance requirements for this iteration.

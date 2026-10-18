@@ -15,42 +15,41 @@ struct NeutralEntry {
 // Only stable Vanilla information is compiled in. Optional voice files cannot
 // replace these facts, warning text, endpoint names, or accessibility labels.
 constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neutral{{
-    {"ready", "Ready to configure simulated routing."},
+    {"ready", "Ready to configure routing."},
     {"created", "Hole created in the editor."},
     {"enabled", "Hole enabled in the editor."},
     {"disabled", "Hole disabled in the editor."},
     {"source", "Source selected in the editor."},
     {"destination", "Destination selected in the editor."},
-    {"started", "Simulated routing is Running. No audio is processed."},
-    {"stopped", "Simulated routing stopped."},
+    {"started", "Routing is Running."},
+    {"stopped", "Routing stopped."},
     {"duplex", "Duplex selected. Each direction has independent settings."},
-    {"activated", "Simulated profile activated."},
-    {"pending", "Simulated startup activation is pending."},
-    {"reconnected", "Simulated device reconnected."},
-    {"disconnected", "Simulated device disconnected."},
-    {"signal", "Simulated source activity detected. Destination audibility is untested."},
-    {"no_signal", "No simulated source activity. Silence does not establish disconnection."},
-    {"beep_ready", "Select a destination for simulated Test Beep. NO SOUND will be emitted."},
-    {"beep_complete", "Simulated Test Beep interval completed. NO SOUND was emitted."},
+    {"activated", "Profile activated."},
+    {"pending", "Startup activation is pending."},
+    {"reconnected", "Device reconnected."},
+    {"disconnected", "Device disconnected."},
+    {"signal", "Source activity detected. Destination audibility is untested."},
+    {"no_signal", "No source activity. Silence does not establish disconnection."},
+    {"beep_ready", "Select a destination for Test Beep."},
+    {"beep_complete", "Test Beep completed."},
     {"beep_rejected", "Select an available playback destination before testing."},
     {"questionable", "This setup may introduce latency or feedback. Review the settings."},
     {"invalid", "Enter a valid value; review the detailed validation message."},
-    {"recovering", "Simulated recovery is in progress."},
+    {"recovering", "Recovery is in progress."},
     {"dfa", "DFA Acknowledged"},
-    {"cancelled", "Pending simulated operation cancelled."},
+    {"cancelled", "Pending operation cancelled."},
     {"personality", "Presentation mode changed. Operational behavior is unchanged."},
-    {"scan_started", "Simulated scan started. No hardware is being probed."},
-    {"scan_completed", "Simulated scan completed. Fixture data is not hardware verification."},
-    {"scan_cancelled", "Simulated scan cancelled."},
-    {"scan_failed", "Simulated scan failed. Review the technical diagnostics."},
+    {"scan_started", "Scan started."},
+    {"scan_completed", "Scan completed."},
+    {"scan_cancelled", "Scan cancelled."},
+    {"scan_failed", "Scan failed. Review the technical diagnostics."},
     {"dfa_minimum", "DFA Acknowledged"},
     {"dfa_nice", "DFA Acknowledged"},
     {"dfa_dank", "DFA Acknowledged"},
     {"dfa_metal", "DFA Acknowledged"},
     {"dfa_six_seven", "DFA Acknowledged"},
     {"dfa_maximum", "DFA Acknowledged"},
-    {"buffer_changed",
-     "Buffer changed in the editor. Save / Apply is required; no audio is processed."},
+    {"buffer_changed", "Buffer changed in the editor. Save / Apply is required."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;
@@ -97,7 +96,7 @@ std::string event_id(Message event) {
 }
 Message dfa_event(int value) {
     switch (value) {
-    case -1100:
+    case 0:
         return Message::DfaMinimum;
     case 69:
     case 690:

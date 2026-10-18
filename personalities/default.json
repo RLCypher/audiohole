@@ -28,8 +28,8 @@
       "That's the other end sorted."
     ],
     "started": [
-      "Signal's moving. In theory.",
-      "The imaginary cable is connected."
+      "Signal's moving.",
+      "The cable is connected."
     ],
     "stopped": [
       "That's enough of that.",
@@ -57,23 +57,23 @@
     ],
     "signal": [
       "Yep, something's coming in.",
-      "The pretend input is busy."
+      "The input is busy."
     ],
     "no_signal": [
       "Nothing coming in yet.",
       "Quiet at the input."
     ],
     "beep_ready": [
-      "Let's see where this would come out.",
-      "Pick the output, then test the idea."
+      "Let's check that output.",
+      "Pick the output, then give it a beep."
     ],
     "beep_complete": [
-      "That was a theoretical beep.",
-      "Audibility still requires real hardware testing."
+      "That's the beep done.",
+      "Did you hear that?"
     ],
     "beep_rejected": [
       "Pick an output first.",
-      "Even a pretend beep needs somewhere to go."
+      "Even a beep needs somewhere to go."
     ],
     "questionable": [
       "I wouldn't, but it's your gear.",
@@ -124,12 +124,12 @@
       "The cables didn't notice."
     ],
     "scan_started": [
-      "Let’s inspect the imaginary wiring.",
-      "Taking inventory of the pretend plugs."
+      "Let’s inspect the wiring.",
+      "Taking inventory of the plugs."
     ],
     "scan_completed": [
-      "Inspection complete. The cables remain imaginary.",
-      "That should cover the pretend patch bay."
+      "Inspection complete. Clipboard down.",
+      "That should cover the patch bay."
     ],
     "scan_cancelled": [
       "Clipboard down.",
@@ -159,7 +159,7 @@
       "It goes louder now."
     ],
     "buffer_changed": [
-      "Buffer adjusted. Still only turning simulated knobs.",
+      "A little timing adjustment. Apply when ready.",
       "A little room to breathe. Apply when ready."
     ]
   }

@@ -1,27 +1,43 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include <cmath>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
-    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole — Simulated routing"), wxDefaultPosition,
-              wxSize(1240, 900)),
+    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1240, 900)),
       controller_(std::move(controller)), timer_(this), smoke_(smoke) {
     SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
+    // A stable window property supports second-launch focus across build titles.
+    // It is removed before the native window is destroyed (see the destructor).
+    SetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow", reinterpret_cast<HANDLE>(1));
     SetMinSize(wxSize(980, 740));
     personalities_directory_ =
         std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
             .parent_path() /
         "personalities";
     auto* root = new wxBoxSizer(wxVERTICAL);
-    auto* banner = label(this, root,
-                         "SIMULATION ONLY — authored devices and capabilities; NO AUDIO "
-                         "capture or playback. Edits last for this session only.");
-    banner->SetBackgroundColour(wxColour(255, 237, 177));
-    status_ = label(this, root, "Stopped");
+    auto* heading = label(this, root, "AudioHole");
+    heading->SetFont(wxFont(wxFontInfo(20).Bold()));
+    auto* status_row = new wxBoxSizer(wxHORIZONTAL);
+    status_dot_ = new wxPanel(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(22, 22)));
+    status_dot_->SetMinSize(FromDIP(wxSize(22, 22)));
+    status_dot_->SetBackgroundStyle(wxBG_STYLE_PAINT);
+    status_dot_->Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
+        wxPaintDC dc(status_dot_);
+        dc.SetBackground(wxBrush(status_dot_->GetBackgroundColour()));
+        dc.Clear();
+        dc.SetPen(wxPen(status_dot_->GetForegroundColour()));
+        dc.SetBrush(wxBrush(status_dot_->GetForegroundColour()));
+        const auto size = status_dot_->GetClientSize();
+        dc.DrawCircle(size.x / 2, size.y / 2, status_dot_->FromDIP(5));
+    });
+    status_row->Add(status_dot_, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(6));
+    status_ = label(this, status_row, "Stopped");
+    root->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
-    start_ = button(this, actions, "Start / Activate viewed profile", [this] { activate(false); });
-    button(this, actions, "Arm Ready explicitly", [this] { activate(true); });
+    start_ = button(this, actions, "Start Routing", [this] { activate(false); });
+    button(this, actions, "Arm Ready", [this] { activate(true); });
     stop_ = button(this, actions, "Stop Routing", [this] {
         controller_->stop();
         refresh();
@@ -29,11 +45,12 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     button(this, actions, "Exit AudioHole", [this] { exit(); });
     root->Add(actions, 0, wxEXPAND);
     technical_ = label(this, root, "");
+    technical_->SetFont(GetFont().Bold());
     commentary_ = label(this, root, "");
     fallback_notice_ = label(this, root, "");
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
     for (std::size_t index = 0; index < 4; ++index) {
-        auto* tab = new wxToggleButton(this, wxID_ANY, "");
+        auto* tab = new NavigationButton(this);
         tab->SetMinSize(wxSize(190, 36));
         navigation_.push_back(tab);
         navigation_row->Add(tab, 1, wxEXPAND | wxALL, 3);
@@ -153,7 +170,7 @@ void Frame::end_observation() {
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
     const auto* active = audiohole::profile(s, s.active_profile);
-    std::string status = std::string("SIMULATED state: ") + audiohole::name(s.state) +
+    std::string status = std::string{} + audiohole::name(s.state) +
                          " | Active: " + (active ? active->display_name : "none") +
                          " | Viewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
     if (!s.pending_profile.empty())
@@ -166,13 +183,14 @@ void Frame::refresh() {
     if (enabled_holes.size() > 4)
         status += " | Extended-range advisory: 5–8 enabled holes; hardware performance unverified.";
     if (s.scanning)
-        status += " | Simulated scan: " + std::to_string(s.scan_percent) + "%";
+        status += " | Scan: " + std::to_string(s.scan_percent) + "%";
     status_->SetLabel(text(status));
+    update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)
         paths += p.hole_id + (p.reverse ? " reverse: " : " forward: ") + audiohole::name(p.state) +
                  " — " + p.detail + "\n";
-    path_status_->SetLabel(text(paths.empty() ? "No active simulated directions." : paths));
+    path_status_->SetLabel(text(paths.empty() ? "No active directions." : paths));
     path_status_->Wrap(620);
     const std::string observed_hole =
         hole_index_ >= 0 ? draft_.holes.at(static_cast<std::size_t>(hole_index_)).id : "";
@@ -183,20 +201,18 @@ void Frame::refresh() {
     });
     monitor_->SetValue(s.monitoring);
     activity_->SetLabel(
-        s.monitoring
-            ? (running ? "SIMULATED source activity detected. Destination audibility is untested."
-                       : "No simulated source activity. Silence does not establish disconnection.")
-            : "Observation off. No real samples are inspected or stored.");
+        s.monitoring ? (running ? "Source activity detected. Destination audibility is untested."
+                                : "No source activity. Silence does not establish disconnection.")
+                     : "Observation off.");
     // MSVC requires both branches to be wxString: its pointer conversions make
     // a mixed literal/wxString conditional ambiguous.
-    beep_status_->SetLabel(s.beep_destination.empty()
-                               ? wxString(wxS("Test Beep inactive. NO SOUND. No audibility or "
-                                              "end-to-end result is established."))
-                               : text("SIMULATED Test Beep active: " + s.beep_destination +
-                                      ". NO SOUND. Cancel immediately if needed."));
+    beep_status_->SetLabel(
+        s.beep_destination.empty()
+            ? wxString(wxS("Test Beep inactive."))
+            : text("Test Beep active: " + s.beep_destination + ". Cancel immediately if needed."));
     scan_progress_->SetValue(s.scan_percent);
     const auto query = log_search_->GetValue().Lower();
-    std::string logs = "SIMULATED technical diagnostics — no hardware measurements\n";
+    std::string logs = "Technical diagnostics\n";
     for (const auto& e : s.events) {
         if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed")
             continue;
@@ -253,7 +269,7 @@ void Frame::refresh() {
                 (e.type == "error" ||
                  (notifications_->GetSelection() == 1 &&
                   (e.type == "reconnected" || e.type == "disconnected" || e.type == "stopped")))) {
-                tray_->ShowBalloon(wxS("AudioHole — SIMULATION"), text(e.detail),
+                tray_->ShowBalloon(wxS("AudioHole"), text(e.detail),
                                    e.type == "error" ? wxICON_WARNING : wxICON_INFORMATION, 3000);
             }
         }
@@ -265,6 +281,18 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
+            if (dynamic_cast<wxButton*>(window) || dynamic_cast<wxToggleButton*>(window))
+                require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
+                        "An action or navigation button lacks explanatory hover help");
+            for (auto* child : window->GetChildren())
+                self(self, child);
+        };
+        check_button_help(check_button_help, this);
+        require(GetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow") != nullptr,
+                "Stable second-launch window identity missing");
+        require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
+        require(status_dot_->IsShown(), "Routing status indicator missing");
         require(notebook_->GetPageCount() == 4, "Expected four native GUI pages");
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");
@@ -283,13 +311,32 @@ bool Frame::smoke(const wxString& directory) {
         dfa_->GetEventHandler()->ProcessEvent(dfa);
         dfa_->GetEventHandler()->ProcessEvent(dfa);
         require(controller_->snapshot().revision == before, "DFA changed controller state");
-        for (int value : {-1100, 69, 420, 666, 670, 690, 1100}) {
+        for (int value : {0, 69, 420, 666, 670, 690, 1100}) {
             settle_dfa(value);
             require(dfa_slider_->GetValue() == value, "DFA slider/value mismatch");
         }
         require(controller_->snapshot().revision == before, "DFA slider changed controller state");
         require(dfa_->GetLabel() == "DFA", "DFA label changed");
+        require(dfa_slider_->GetMin() == 0 && dfa_slider_->GetMax() == 1100,
+                "DFA range must be zero to eleven");
+        // Change only the edit field, reproducing typed input with a stale
+        // spin-control cache; dispatch Enter through the actual child control.
+        dfa_value_->GetText()->ChangeValue(wxS("6.70"));
+        wxCommandEvent enter(wxEVT_TEXT_ENTER, dfa_value_->GetText()->GetId());
+        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
+        require(dfa_slider_->GetValue() == 670 &&
+                    last_message_ == presentation::Message::DfaSixSeven,
+                "Typed DFA Enter did not commit the text and move the slider");
         require(technical_->GetLabel() == "DFA Acknowledged", "DFA heading changed");
+        dfa_value_->GetText()->ChangeValue(wxS("5.55"));
+        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
+        require(dfa_slider_->GetValue() == 555, "Ordinary typed DFA value did not move the slider");
+        const auto dfa_occurrence = occurrence_;
+        dfa_value_->GetText()->ChangeValue(wxS("12.00"));
+        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
+        require(dfa_slider_->GetValue() == 555 && std::abs(dfa_value_->GetValue() - 5.55) < 0.005 &&
+                    occurrence_ == dfa_occurrence && controller_->snapshot().revision == before,
+                "Out-of-range DFA input changed the controls, commentary or controller");
         forward_.buffer->SetValue(forward_.buffer->GetValue() + 1);
         const auto buffer_before = controller_->snapshot().revision;
         wxSpinEvent buffer_change(wxEVT_SPINCTRL, forward_.buffer->GetId());

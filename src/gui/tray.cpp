@@ -8,8 +8,7 @@ Tray::Tray(Frame& frame) : frame_(frame) {
 // wxTaskBarIcon handles TaskbarCreated when Explorer restarts. Textual state
 // accompanies the icon so color is never the sole health indicator.
 void Tray::update(const audiohole::Snapshot& s) {
-    const std::string tip = std::string("AudioHole [SIMULATED] — ") + audiohole::name(s.state) +
-                            " | " +
+    const std::string tip = std::string("AudioHole — ") + audiohole::name(s.state) + " | " +
                             (s.active_profile.empty() ? "No active profile" : s.active_profile);
     if (IsIconInstalled() && tooltip_ == tip && last_ == s.state)
         return;
@@ -36,8 +35,7 @@ void Tray::update(const audiohole::Snapshot& s) {
 wxMenu* Tray::CreatePopupMenu() {
     const auto& s = frame_.controller().snapshot();
     auto* menu = new wxMenu;
-    menu->Append(wxID_ANY, text(std::string("SIMULATED — ") + audiohole::name(s.state)))
-        ->Enable(false);
+    menu->Append(wxID_ANY, text(std::string{} + audiohole::name(s.state)))->Enable(false);
     auto add = [menu](const wxString& title, std::function<void()> action) {
         const int id = wxWindow::NewControlId();
         menu->Append(id, title);

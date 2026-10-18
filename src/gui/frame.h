@@ -58,6 +58,7 @@ class Frame final : public wxFrame {
     // Takes exclusive controller ownership. All widgets and commands are GUI-thread only.
     explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke);
     ~Frame() override {
+        RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
         if (tray_)
             tray_->RemoveIcon();
@@ -121,6 +122,7 @@ class Frame final : public wxFrame {
     wxSpinCtrlDouble* dfa_value_{};
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
+    wxPanel* status_dot_{};
     wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
         *activity_{}, *device_detail_{};
     wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
@@ -146,6 +148,8 @@ class Frame final : public wxFrame {
     void select_personality(const std::string& id);
     void sync_personality_choices();
     void settle_dfa(int hundredths);
+    void commit_dfa_text();
+    void update_status_indicator();
     // Appearance touches only native view resources; no controller commands.
     void apply_appearance();
     void select_page(std::size_t page, bool focus = false);

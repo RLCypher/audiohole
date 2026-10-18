@@ -7,34 +7,38 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.group = new wxStaticBoxSizer(wxVERTICAL, parent, title);
     sizer->Add(w.group, 0, wxEXPAND | wxALL, 4);
     auto* box = w.group->GetStaticBox();
-    label(box, w.group, "Source (capture) — type to search, select a saved logical device");
+    label(box, w.group, "Source (capture)");
     w.source = new wxComboBox(box, wxID_ANY);
     w.group->Add(w.source, 0, wxEXPAND | wxALL, 3);
-    label(box, w.group, "Destination (playback) — type to search, select a saved logical device");
+    label(box, w.group, "Destination (playback)");
     w.destination = new wxComboBox(box, wxID_ANY);
     w.group->Add(w.destination, 0, wxEXPAND | wxALL, 3);
     label(box, w.group, "Audio format");
     w.format = new wxChoice(box, wxID_ANY);
     w.group->Add(w.format, 0, wxEXPAND | wxALL, 3);
-    w.evidence = label(box, w.group, "Select endpoints for a simulated recommendation.");
+    w.evidence = label(box, w.group, "Select endpoints to see a format recommendation.");
     w.evidence->Wrap(560);
-    label(box, w.group,
-          "Buffer (ms) — 6 ms is an unverified simulation default, not a latency measurement");
+    label(box, w.group, "Buffer (ms)");
     w.buffer = new wxSpinCtrl(box, wxID_ANY, "6", wxDefaultPosition, wxDefaultSize,
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 1, 100, 6);
     w.group->Add(w.buffer, 0, wxALL, 3);
+    w.buffer->SetToolTip("Buffer duration in milliseconds. Smaller values can reduce latency but "
+                         "increase dropout risk. Changes are staged until Apply.");
+    w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
+                         "evidence below explains the recommendation.");
+    w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
+                         "listed device to bind it.");
+    w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
+                              "is shown for the selected device.");
     auto* advanced = new wxCollapsiblePane(box, wxID_ANY, "Advanced directional settings");
     w.group->Add(advanced, 0, wxEXPAND | wxALL, 3);
     auto* pane = advanced->GetPane();
     auto* inner = new wxBoxSizer(wxVERTICAL);
-    w.mode = choices(pane, inner, "Endpoint operating preference (simulated)",
-                     {"Automatic", "Shared", "Exclusive"});
-    label(pane, inner,
-          "Channels and sample representation are part of the complete format tuple "
-          "above.\nSynchronization: provisional Automatic; actual processing: none.\nDirect "
-          "controls unavailable: D-034 / O-005 remain Open. No bit-perfect guarantee.");
+    w.mode = choices(pane, inner, "Operating mode", {"Automatic", "Shared", "Exclusive"});
+    w.mode->SetToolTip("Automatic chooses an operating preference. Shared cooperates with other "
+                       "applications; Exclusive can reserve the endpoint. Changes wait for Apply.");
     auto* fallback = new wxChoice(pane, wxID_ANY);
-    fallback->Append(wxS("Fallback device / channel mapping — unavailable pending O-004"));
+    fallback->Append(wxS("Fallback device / channel mapping — unavailable"));
     fallback->SetSelection(0);
     fallback->Disable();
     inner->Add(fallback, 0, wxEXPAND | wxALL, 3);
@@ -94,8 +98,10 @@ void Frame::build_profiles() {
     auto* horizontal = new wxBoxSizer(wxHORIZONTAL);
     auto* left = new wxBoxSizer(wxVERTICAL);
     horizontal->Add(left, 0, wxEXPAND | wxALL, 4);
-    label(page, left, "Viewed profile (selection does not activate)");
+    label(page, left, "Profile");
     profiles_ = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(260, 135));
+    profiles_->SetToolTip("Open a profile for editing. Selection alone does not change active "
+                          "routing; use Start Routing or Apply.");
     left->Add(profiles_, 0, wxEXPAND | wxALL, 3);
     auto* row = new wxBoxSizer(wxHORIZONTAL);
     button(page, row, "New", [this] {
@@ -125,7 +131,7 @@ void Frame::build_profiles() {
     profile_name_ = field(page, left, "Profile display name");
     profile_notes_ = field(page, left, "Profile notes", wxTE_MULTILINE);
     profile_notes_->SetMinSize(wxSize(250, 65));
-    label(page, left, "Holes — disabled holes remain saved");
+    label(page, left, "Holes");
     holes_ = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(260, 145));
     left->Add(holes_, 1, wxEXPAND | wxALL, 3);
     button(page, left, "+ Add Hole", [this] {
@@ -150,17 +156,13 @@ void Frame::build_profiles() {
         load_hole(draft_.holes.empty() ? -1 : 0);
     });
     auto* saves = new wxBoxSizer(wxHORIZONTAL);
-    button(page, saves, "Save session", [this] { save(false); });
+    button(page, saves, "Save", [this] { save(false); });
     button(page, saves, "Apply", [this] { save(true); });
     button(page, saves, "Revert", [this] {
         if (discard())
             select_profile(viewed_);
     });
     left->Add(saves);
-    label(
-        page, left,
-        "Save changes the in-memory draft store.\nApply also activates after validation.\nNo JSON "
-        "files are written (O-004 / O-006).\nFive–eight enabled holes: advisory; limit eight.");
     auto* editor = new wxScrolledWindow(page);
     editor->SetScrollRate(0, 16);
     auto* right = new wxBoxSizer(wxVERTICAL);
@@ -261,11 +263,10 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     // Keep the literal branch a wxString too; mixed types are ambiguous on MSVC.
     w.format->Append(r.compatible.empty()
                          ? wxString(wxS("Automatic — unverified compatibility"))
-                         : wxS("Recommended — ") + text(r.compatible.front().label()) +
-                               " [SIMULATED]");
+                         : wxS("Recommended — ") + text(r.compatible.front().label()) + "");
     int selection = 0;
     for (const auto& f : r.compatible) {
-        w.format->Append(text(f.label()) + " [fixture-reported]");
+        w.format->Append(text(f.label()) + "");
         if (!d.settings.automatic && f == d.settings.format)
             selection = static_cast<int>(w.format->GetCount()) - 1;
     }
@@ -404,29 +405,28 @@ namespace audiohole::gui {
 // Temporary tools are independent from passive monitoring: the beep always
 // needs an explicit destination and remains a no-sound simulation in this build.
 void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
-    auto* observation =
-        new wxStaticBoxSizer(wxVERTICAL, parent, wxS("Temporary setup diagnostics — SIMULATED"));
+    auto* observation = new wxStaticBoxSizer(wxVERTICAL, parent, wxS("Setup tools"));
     auto* box = observation->GetStaticBox();
     layout->Add(observation, 0, wxEXPAND | wxALL, 4);
-    activity_direction_ = choices(box, observation, "Source direction to observe temporarily",
+    activity_direction_ = choices(box, observation, "Monitor direction",
                                   {"Forward source", "Reverse source (duplex only)"});
     activity_direction_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         end_observation();
         refresh();
     });
-    monitor_ = new wxCheckBox(box, wxID_ANY,
-                              "Observe source activity temporarily (off when this panel closes)");
+    monitor_ = new wxCheckBox(box, wxID_ANY, "Monitor source activity");
+    monitor_->SetToolTip(
+        "Observe source activity temporarily. Leaving this page or hiding the window turns "
+        "monitoring off; source activity does not prove destination audibility.");
     observation->Add(monitor_, 0, wxALL, 4);
-    activity_ =
-        label(box, observation, "Observation off. No real samples are inspected or stored.");
-    label(box, observation,
-          "Test Beep — explicitly selected destination; SIMULATION ONLY, NO SOUND");
+    activity_ = label(box, observation, "Observation off.");
+    label(box, observation, "Test Beep destination");
     destination_test_ = new wxChoice(box, wxID_ANY);
     observation->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
     destination_test_->Bind(wxEVT_CHOICE,
                             [this](wxCommandEvent&) { present(presentation::Message::BeepReady); });
     auto* beep = new wxBoxSizer(wxHORIZONTAL);
-    button(box, beep, "Test Beep (simulate)", [this] {
+    button(box, beep, "Test Beep", [this] {
         const int index = destination_test_->GetSelection();
         show_result(
             controller_->beep(index >= 0 && static_cast<std::size_t>(index) < beep_ids_.size()
@@ -439,21 +439,16 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
         refresh();
     });
     observation->Add(beep);
-    beep_status_ =
-        label(box, observation,
-              "Inactive. Intended signal: approximately 1 kHz, -30 dBFS, one second, with fades.");
-    label(
-        box, observation,
-        "Latency / FIFO occupancy / clock drift / CPU: unavailable. No hardware measurements.\nNo "
-        "sample processing, resampling, discrete corrections, or rate adjustment occurs.");
+    beep_status_ = label(box, observation, "Test Beep inactive.");
+    label(box, observation, "Latency / buffer occupancy / clock drift / CPU: unavailable.");
     auto* failures = new wxBoxSizer(wxHORIZONTAL);
-    button(box, failures, "Simulate forward failure", [this] {
+    button(box, failures, "Forward failure", [this] {
         if (hole_index_ >= 0)
             controller_->fail_path(draft_.holes.at(static_cast<std::size_t>(hole_index_)).id,
                                    false);
         refresh();
     });
-    button(box, failures, "Simulate reverse failure", [this] {
+    button(box, failures, "Reverse failure", [this] {
         if (hole_index_ >= 0 && draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex)
             controller_->fail_path(draft_.holes.at(static_cast<std::size_t>(hole_index_)).id, true);
         refresh();

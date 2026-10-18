@@ -28,6 +28,10 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
     // application controls so their text/background remain a matched pair.
     // High contrast instead uses Windows' own colors and native styles.
     window->SetThemeEnabled(contrast);
+    if (auto* button = dynamic_cast<ActionButton*>(window))
+        button->use_native_colours = contrast;
+    if (auto* button = dynamic_cast<NavigationButton*>(window))
+        button->use_native_colours = contrast;
     const bool editor = dynamic_cast<wxTextCtrl*>(window) || dynamic_cast<wxComboBox*>(window) ||
                         dynamic_cast<wxChoice*>(window) || dynamic_cast<wxListBox*>(window) ||
                         dynamic_cast<wxSpinCtrl*>(window) ||
@@ -59,6 +63,8 @@ void Frame::update_navigation() {
         auto* tab = navigation_[index];
         const bool active = static_cast<int>(index) == selected;
         tab->SetValue(active);
+        tab->SetToolTip(wxS("Open ") + notebook_->GetPageText(index) +
+                        wxS(". Use arrows or Ctrl+Tab to change pages."));
         // Selected wording and bold weight remain identifiable without color.
         tab->SetLabel(notebook_->GetPageText(index) +
                       (active ? wxString(wxS(" [selected]")) : wxString{}));
@@ -95,7 +101,18 @@ void Frame::apply_appearance() {
     (void)DwmSetWindowAttribute(static_cast<HWND>(GetHandle()), immersive_dark_mode, &dark_title,
                                 sizeof(dark_title));
     update_navigation();
+    update_status_indicator();
     Refresh();
+}
+// Color supplements the adjacent canonical state text; it never replaces it.
+// High contrast uses the system text color instead of imposing a color scheme.
+void Frame::update_status_indicator() {
+    const auto state = controller_->snapshot().state;
+    status_dot_->SetForegroundColour(high_contrast()
+                                         ? wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)
+                                         : routing_colour(state));
+    status_dot_->SetToolTip(text(std::string("Routing status: ") + audiohole::name(state)));
+    status_dot_->Refresh();
 }
 WXLRESULT Frame::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
     const auto result = wxFrame::MSWWindowProc(message, wparam, lparam);

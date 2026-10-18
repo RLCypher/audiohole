@@ -1,6 +1,7 @@
 #include "gui/frame.h"
 #include <cstdio>
 #include <cstdlib>
+#include <string_view>
 
 namespace audiohole::gui {
 // Owns process-lifetime COM and the single-instance guard. The STA matches native
@@ -42,10 +43,26 @@ class App final : public wxApp {
             instance_ = std::make_unique<wxSingleInstanceChecker>("AudioHole-simulated-GUI-" +
                                                                   wxGetUserId());
             if (instance_->IsAnotherRunning()) {
-                if (HWND window = FindWindowW(nullptr, L"AudioHole — Simulated routing")) {
-                    ShowWindow(window, SW_SHOW);
-                    ShowWindow(window, SW_RESTORE);
-                    SetForegroundWindow(window);
+                HWND existing = nullptr;
+                // Build identifiers change the title; identify our window by its
+                // stable property instead. Legacy titles support older test builds.
+                EnumWindows(
+                    [](HWND window, LPARAM context) -> BOOL {
+                        wchar_t title[256]{};
+                        GetWindowTextW(window, title, 256);
+                        const std::wstring_view name(title);
+                        const bool legacy = name.starts_with(L"AudioHole — Simulated routing");
+                        if (!GetPropW(window, L"AudioHole.GuiWindow") && !legacy)
+                            return TRUE;
+                        *reinterpret_cast<HWND*>(context) = window;
+                        return FALSE;
+                    },
+                    reinterpret_cast<LPARAM>(&existing));
+
+                if (existing) {
+                    ShowWindow(existing, SW_SHOW);
+                    ShowWindow(existing, SW_RESTORE);
+                    SetForegroundWindow(existing);
                 }
                 return false;
             }

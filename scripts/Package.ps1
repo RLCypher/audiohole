@@ -73,7 +73,9 @@ wxWidgets 3.2.6 is statically linked; license and LGPL text are included.
 The header-only nlohmann/json 3.11.3 MIT notice is included.
 Normal and UwU commentary are editable JSON files in personalities/.
 Vanilla is the built-in fallback. Light/Dark/System choices are in Settings.
-Dark is the interim default. Windows-owned dialogs retain system styling.
+Follow System is the default. Windows-owned dialogs retain system styling.
+The startup notice discloses all simulated functions, including silent Test Beep.
+Interface and commentary wording preview the intended production experience.
 This package is for private evaluation. AudioHole's project license remains undecided.
 The test-only GoogleTest dependency is not part of this package.
 "@ | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8

@@ -1,10 +1,29 @@
 #pragma once
+#include "model/controller.h"
 #include <functional>
 #include <string>
 #include <utility>
+#include <wx/tglbtn.h>
 #include <wx/wx.h>
 
 namespace audiohole::gui {
+// Native buttons retain Windows keyboard, command, and accessibility semantics.
+// Only application-palette painting is replaced; high contrast uses wx/Windows.
+class ActionButton final : public wxButton {
+  public:
+    ActionButton(wxWindow* parent, const wxString& title);
+    bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+    bool use_native_colours = false;
+};
+class NavigationButton final : public wxToggleButton {
+  public:
+    explicit NavigationButton(wxWindow* parent);
+    bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+    bool use_native_colours = false;
+};
+// GUI-thread only. Helpers own no windows or GDI resources beyond a paint call.
+wxString button_help(const wxString& title);
+wxColour routing_colour(audiohole::State state);
 // Small construction helpers keep layout code consistent. Returned widgets are
 // non-owning pointers; wx parent windows own them, including event bindings.
 inline wxString text(const std::string& value) {
@@ -20,7 +39,7 @@ inline wxStaticText* label(wxWindow* parent, wxSizer* layout, const wxString& va
 }
 inline wxButton* button(wxWindow* parent, wxSizer* layout, const wxString& title,
                         std::function<void()> action) {
-    auto* control = new wxButton(parent, wxID_ANY, title);
+    auto* control = new ActionButton(parent, title);
     layout->Add(control, 0, wxALL, 3);
     control->Bind(wxEVT_BUTTON, [action](wxCommandEvent&) { action(); });
     return control;

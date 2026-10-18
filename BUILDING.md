@@ -229,7 +229,7 @@ notice is shipped with the GUI. An offline build may set
 archive SHA-256 recorded in DEPENDENCIES.md. As with other overrides, CMake does not
 verify an already unpacked tree. No DLL or interpreter is added by this parser.
 
-Dark is the interim testing default. Settings offers Light and Follow System;
+Follow System is the default. Settings also offers Light and Dark;
 Windows high contrast overrides the palette. Windows-owned dialogs and menus keep
 system styling. This evaluation retains session-only presentation preferences.
 Native smoke tests cover file availability, DFA slider inertness/visibility, scan
