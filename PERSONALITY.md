@@ -431,7 +431,8 @@ no response. On settling at a special value, use the selected personality's pool
 Personality files may flavor these responses. The supplied 6.70 pool reads exactly
 “SIX SEVEN!” in both Normal and UwU. Button acknowledgments also include placebo
 affirmations such as “Did that fix it?”, “That should do it,” and “Oughtta do the
-trick,” with authored UwU counterparts. Do not use these affirmations for real
+trick,” with authored UwU counterparts. Each supplied Normal/UwU catalog has 23
+DFA button responses, separate from its slider-threshold pools. Do not use these affirmations for real
 repairs or diagnostics. Debounce duplicate release/change notifications at the same
 settled position; dragging and polling must not emit continuous flavor text.
 All DFA controls are hidden in Vanilla.
