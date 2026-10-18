@@ -1,4 +1,5 @@
 add_library(audiohole_model STATIC controller.cpp ../presentation/messages.cpp)
+target_link_libraries(audiohole_model PRIVATE nlohmann_json::nlohmann_json)
 target_include_directories(audiohole_model PUBLIC "${PROJECT_SOURCE_DIR}/src")
 if(MSVC)
   target_compile_options(audiohole_model PRIVATE /W4 /permissive- /utf-8)

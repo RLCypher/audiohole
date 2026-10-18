@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <windows.h>
 #include <wx/clipbrd.h>
@@ -14,11 +15,13 @@
 #include <wx/dcmemory.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
-#include <wx/notebook.h>
 #include <wx/scrolwin.h>
+#include <wx/simplebook.h>
+#include <wx/slider.h>
 #include <wx/snglinst.h>
 #include <wx/spinctrl.h>
 #include <wx/taskbar.h>
+#include <wx/tglbtn.h>
 #include <wx/wx.h>
 
 namespace audiohole::gui {
@@ -102,12 +105,24 @@ class Frame final : public wxFrame {
     int hole_index_ = -1;
     std::string viewed_, device_id_;
     std::uint64_t seen_event_ = 0, occurrence_ = 0;
-    presentation::Mode personality_ = presentation::Mode::Normal;
+    std::string personality_ = "default";
+    std::string personality_fallback_note_;
+    std::filesystem::path personalities_directory_;
+    std::vector<std::string> personality_ids_;
+    presentation::Message last_message_ = presentation::Message::Ready;
     presentation::Messages messages_;
-    wxNotebook* notebook_{};
+    wxSimplebook* notebook_{};
+    std::vector<wxToggleButton*> navigation_;
+    bool dark_appearance_ = true;
+    wxChoice* theme_choice_{};
+    wxStaticText *personality_notice_{}, *fallback_notice_{};
+    wxSlider* dfa_slider_{};
+    wxSpinCtrlDouble* dfa_value_{};
+    std::optional<int> last_dfa_settled_;
+    std::vector<wxWindow*> dfa_controls_;
     wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
         *activity_{}, *device_detail_{};
-    wxButton *start_{}, *stop_{}, *dfa_{};
+    wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
     wxListBox *profiles_{}, *holes_{}, *devices_{};
     wxTextCtrl *profile_name_{}, *profile_notes_{}, *hole_name_{}, *hole_notes_{}, *device_name_{},
         *device_notes_{}, *device_search_{}, *console_{}, *log_search_{};
@@ -125,6 +140,16 @@ class Frame final : public wxFrame {
     void build_devices();
     void build_scan();
     void build_settings();
+    // File I/O occurs only on explicit GUI load/reload, never during polling.
+    void reload_personalities();
+    void select_personality(const std::string& id);
+    void sync_personality_choices();
+    void settle_dfa(int hundredths);
+    // Appearance touches only native view resources; no controller commands.
+    void apply_appearance();
+    void select_page(std::size_t page, bool focus = false);
+    void update_navigation();
+    WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;
     void build_direction(wxWindow*, wxSizer*, DirectionWidgets&, const wxString&);
     // Rebuilds evidence while retaining explicit unsupported overrides for correction.
     void populate_direction(DirectionWidgets&, const audiohole::Direction&);

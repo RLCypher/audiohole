@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "id": "default",
+  "display_name": "Normal — Default Audio Engineer",
+  "events": {
+    "ready": [
+      "Alright. Let's wire this up.",
+      "A cable without the desk clutter."
+    ],
+    "created": [
+      "Another hole. Naturally.",
+      "Room for one more connection."
+    ],
+    "enabled": [
+      "Hole's open.",
+      "Ready for a connection."
+    ],
+    "disabled": [
+      "Hole's closed.",
+      "Taking that one out of the plan."
+    ],
+    "source": [
+      "Source is connected.",
+      "Found the input end."
+    ],
+    "destination": [
+      "Output assigned.",
+      "That's the other end sorted."
+    ],
+    "started": [
+      "Signal's moving. In theory.",
+      "The imaginary cable is connected."
+    ],
+    "stopped": [
+      "That's enough of that.",
+      "Cable put away."
+    ],
+    "duplex": [
+      "Both ways. Ambitious.",
+      "Two directions, one hole."
+    ],
+    "activated": [
+      "New setup's in.",
+      "A different arrangement of cables."
+    ],
+    "pending": [
+      "Holding that configuration.",
+      "Waiting for the appointed moment."
+    ],
+    "reconnected": [
+      "Back where it belongs.",
+      "Plug found its way home."
+    ],
+    "disconnected": [
+      "Someone pulled the plug.",
+      "One end went missing."
+    ],
+    "signal": [
+      "Yep, something's coming in.",
+      "The pretend input is busy."
+    ],
+    "no_signal": [
+      "Nothing coming in yet.",
+      "Quiet at the input."
+    ],
+    "beep_ready": [
+      "Let's see where this would come out.",
+      "Pick the output, then test the idea."
+    ],
+    "beep_complete": [
+      "That was a theoretical beep.",
+      "Audibility still requires real hardware testing."
+    ],
+    "beep_rejected": [
+      "Pick an output first.",
+      "Even a pretend beep needs somewhere to go."
+    ],
+    "questionable": [
+      "I wouldn't, but it's your gear.",
+      "Worth checking that cable loop."
+    ],
+    "invalid": [
+      "Skill issue. Try again.",
+      "That value needs another look."
+    ],
+    "recovering": [
+      "Trying to get it back.",
+      "Working on the missing connection."
+    ],
+    "dfa": [
+      {
+        "text": "DFA executed. Nothing happened.",
+        "weight": 3
+      },
+      "Still doing absolutely nothing.",
+      "Did that fix it?",
+      "That should do it.",
+      "Oughtta do the trick.",
+      "A remarkably uneventful button."
+    ],
+    "cancelled": [
+      "Changed your mind. Fair.",
+      "That's off the list."
+    ],
+    "personality": [
+      "Same engineer, different commentary.",
+      "The cables didn't notice."
+    ],
+    "scan_started": [
+      "Let’s inspect the imaginary wiring.",
+      "Taking inventory of the pretend plugs."
+    ],
+    "scan_completed": [
+      "Inspection complete. The cables remain imaginary.",
+      "That should cover the pretend patch bay."
+    ],
+    "scan_cancelled": [
+      "Clipboard down.",
+      "Leaving that inspection unfinished."
+    ],
+    "scan_failed": [
+      "Inspection did not finish.",
+      "That inspection needs another look."
+    ],
+    "dfa_minimum": [
+      "All the way down. Still doing nothing.",
+      "Less than nothing. Excellent."
+    ],
+    "dfa_nice": [
+      "NICE!"
+    ],
+    "dfa_dank": [
+      "DANK!"
+    ],
+    "dfa_metal": [
+      "That's metal af.",
+      "Heavy metal. Still doing nothing."
+    ],
+    "dfa_six_seven": [
+      "SIX SEVEN!"
+    ],
+    "dfa_maximum": [
+      "It goes louder now."
+    ]
+  }
+}

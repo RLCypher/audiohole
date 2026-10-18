@@ -23,6 +23,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 include(CTest)
+include(cmake/Json.cmake)
 add_subdirectory(src/model)
 if(NOT AUDIOHOLE_MODEL_ONLY)
   add_subdirectory(src/platform/windows)

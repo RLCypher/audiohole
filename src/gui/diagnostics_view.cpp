@@ -15,7 +15,7 @@ void Frame::build_scan() {
         choices(page, options, "Scope", {"Update saved devices", "Full scan", "Selected device"});
     root->Add(options, 0, wxEXPAND);
     auto* row = new wxBoxSizer(wxHORIZONTAL);
-    button(page, row, "Start simulated scan", [this] {
+    scan_start_ = button(page, row, "Start simulated scan", [this] {
         if (scan_mode_->GetSelection() == 1 &&
             wxMessageBox("Production advanced probing may interrupt devices or produce sound. This "
                          "simulation opens no streams. Continue simulated advanced scan?",
@@ -27,9 +27,8 @@ void Frame::build_scan() {
                           device_id_);
         refresh();
     });
-    button(page, row, "Cancel scan", [this] {
+    scan_cancel_ = button(page, row, "Cancel scan", [this] {
         controller_->scan(false);
-        present(presentation::Message::Cancelled);
         refresh();
     });
     root->Add(row);

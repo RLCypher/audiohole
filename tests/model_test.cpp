@@ -175,14 +175,17 @@ TEST(Simulator, DuplicateUsesFreshProfileAndHoleIds) {
 }
 TEST(Presentation, SeededSequenceReplaysWithoutImmediateRepetition) {
     presentation::Messages first(42), second(42);
-    for (int event = 0; event < 24; ++event) {
+    first.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
+    second.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
+    for (int event = 0; event < static_cast<int>(presentation::Message::Count); ++event) {
         for (auto mode : {presentation::Mode::Normal, presentation::Mode::UwU}) {
             std::string previous;
             for (std::uint64_t occurrence = 1; occurrence < 30; ++occurrence) {
                 const auto id = static_cast<presentation::Message>(event);
                 const auto current = first.show(id, mode, occurrence);
                 EXPECT_EQ(current.commentary, second.show(id, mode, occurrence).commentary);
-                EXPECT_NE(current.commentary, previous);
+                if (first.variants(id, presentation::mode_id(mode)).size() > 1)
+                    EXPECT_NE(current.commentary, previous);
                 EXPECT_EQ(current.technical, presentation::technical(id));
                 previous = current.commentary;
             }
@@ -195,6 +198,7 @@ TEST(Presentation, UnchangedRefreshAndVanillaNeverConsumeSelection) {
         ++calls;
         return 0u;
     });
+    messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
     const auto initial = messages.show(presentation::Message::Ready, presentation::Mode::Normal, 1);
     for (int i = 0; i < 100; ++i)
         EXPECT_EQ(
@@ -211,10 +215,10 @@ TEST(Presentation, UnchangedRefreshAndVanillaNeverConsumeSelection) {
 }
 TEST(Presentation, InjectedWeightedSelectionRespectsBoundsAndExcludesPrevious) {
     presentation::Messages messages([](unsigned total) { return total - 1; });
+    messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
     const auto last = messages.show(presentation::Message::Dfa, presentation::Mode::Normal, 1);
-    EXPECT_EQ(
-        last.commentary,
-        presentation::variants(presentation::Message::Dfa, presentation::Mode::Normal).back().text);
+    EXPECT_EQ(last.commentary,
+              messages.variants(presentation::Message::Dfa, "default").back().text);
     EXPECT_NE(messages.show(presentation::Message::Dfa, presentation::Mode::Normal, 2).commentary,
               last.commentary);
 }

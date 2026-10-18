@@ -1,5 +1,6 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include <wx/stdpaths.h>
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
@@ -7,6 +8,10 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
               wxSize(1240, 900)),
       controller_(std::move(controller)), timer_(this), smoke_(smoke) {
     SetMinSize(wxSize(980, 740));
+    personalities_directory_ =
+        std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
+            .parent_path() /
+        "personalities";
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* banner = label(this, root,
                          "SIMULATION ONLY — authored devices and capabilities; NO AUDIO "
@@ -24,7 +29,29 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     root->Add(actions, 0, wxEXPAND);
     technical_ = label(this, root, "");
     commentary_ = label(this, root, "");
-    notebook_ = new wxNotebook(this, wxID_ANY);
+    fallback_notice_ = label(this, root, "");
+    auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
+    for (std::size_t index = 0; index < 4; ++index) {
+        auto* tab = new wxToggleButton(this, wxID_ANY, "");
+        tab->SetMinSize(wxSize(190, 36));
+        navigation_.push_back(tab);
+        navigation_row->Add(tab, 1, wxEXPAND | wxALL, 3);
+        tab->Bind(wxEVT_TOGGLEBUTTON, [this, index](wxCommandEvent&) { select_page(index); });
+        tab->Bind(wxEVT_KEY_DOWN, [this, index](wxKeyEvent& event) {
+            if (event.GetKeyCode() == WXK_LEFT)
+                select_page((index + 3) % 4, true);
+            else if (event.GetKeyCode() == WXK_RIGHT)
+                select_page((index + 1) % 4, true);
+            else if (event.GetKeyCode() == WXK_HOME)
+                select_page(0, true);
+            else if (event.GetKeyCode() == WXK_END)
+                select_page(3, true);
+            else
+                event.Skip();
+        });
+    }
+    root->Add(navigation_row, 0, wxEXPAND | wxLEFT | wxRIGHT, 6);
+    notebook_ = new wxSimplebook(this, wxID_ANY);
     root->Add(notebook_, 1, wxEXPAND | wxALL, 6);
     build_profiles();
     build_devices();
@@ -67,19 +94,33 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
             end_observation();
         e.Skip();
     });
-    notebook_->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, [this](wxBookCtrlEvent& e) {
+    notebook_->Bind(wxEVT_BOOKCTRL_PAGE_CHANGED, [this](wxBookCtrlEvent& e) {
         if (e.GetSelection() != 0)
             end_observation();
+        update_navigation();
         e.Skip();
     });
+    apply_appearance();
     select_profile("profile-simplex");
     populate_devices();
     refresh();
     present(presentation::Message::Ready);
+    Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
+        if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
+            select_page((static_cast<std::size_t>(notebook_->GetSelection()) +
+                         (event.ShiftDown() ? 3 : 1)) %
+                            4,
+                        true);
+        else
+            event.Skip();
+    });
     timer_.Start(100);
 }
 void Frame::present(presentation::Message event) {
+    last_message_ = event;
     const auto c = messages_.show(event, personality_, ++occurrence_);
+    fallback_notice_->SetLabel(
+        text(personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_));
     technical_->SetLabel(text(c.technical));
     commentary_->SetLabel(text(c.commentary));
     technical_->Wrap(std::max(500, GetClientSize().x - 35));
@@ -123,6 +164,8 @@ void Frame::refresh() {
             enabled_holes.push_back(path.hole_id);
     if (enabled_holes.size() > 4)
         status += " | Extended-range advisory: 5–8 enabled holes; hardware performance unverified.";
+    if (s.scanning)
+        status += " | Simulated scan: " + std::to_string(s.scan_percent) + "%";
     status_->SetLabel(text(status));
     std::string paths;
     for (const auto& p : s.paths)
@@ -154,7 +197,7 @@ void Frame::refresh() {
     const auto query = log_search_->GetValue().Lower();
     std::string logs = "SIMULATED technical diagnostics — no hardware measurements\n";
     for (const auto& e : s.events) {
-        if (severity_->GetSelection() == 1 && e.type != "error")
+        if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed")
             continue;
         if (severity_->GetSelection() == 2 && e.type != "state" && e.type != "activated" &&
             e.type != "stopped")
@@ -173,7 +216,15 @@ void Frame::refresh() {
             seen_event_ = e.sequence;
             bool routine = true;
             presentation::Message message = presentation::Message::Ready;
-            if (e.type == "activated")
+            if (e.type == "scan-start")
+                message = presentation::Message::ScanStarted;
+            else if (e.type == "scan-complete")
+                message = presentation::Message::ScanCompleted;
+            else if (e.type == "scan-cancelled")
+                message = presentation::Message::ScanCancelled;
+            else if (e.type == "scan-failed")
+                message = presentation::Message::ScanFailed;
+            else if (e.type == "activated")
                 message = presentation::Message::Activated;
             else if (e.type == "stopped")
                 message = presentation::Message::Stopped;
@@ -193,7 +244,7 @@ void Frame::refresh() {
                 routine = false;
             if (routine)
                 present(message);
-            if (e.type == "error") {
+            if (e.type == "error" || e.type == "scan-failed") {
                 technical_->SetLabel(text(e.detail));
                 commentary_->SetLabel("");
             }
@@ -224,20 +275,65 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().state == audiohole::State::Running,
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
+        require(messages_.available("default") && messages_.available("uwu"),
+                "Packaged personality files unavailable or invalid");
         const auto before = controller_->snapshot().revision;
         wxCommandEvent dfa(wxEVT_BUTTON, dfa_->GetId());
         dfa_->GetEventHandler()->ProcessEvent(dfa);
         dfa_->GetEventHandler()->ProcessEvent(dfa);
         require(controller_->snapshot().revision == before, "DFA changed controller state");
+        for (int value : {-1100, 69, 420, 666, 670, 690, 1100}) {
+            settle_dfa(value);
+            require(dfa_slider_->GetValue() == value, "DFA slider/value mismatch");
+        }
+        require(controller_->snapshot().revision == before, "DFA slider changed controller state");
+        require(dfa_->GetLabel() == "DFA", "DFA label changed");
         for (int i = 0; i < 3; ++i) {
             personality_choice_->SetSelection(i);
             wxCommandEvent change(wxEVT_CHOICE, personality_choice_->GetId());
             personality_choice_->GetEventHandler()->ProcessEvent(change);
-            require(dfa_->IsShown() == (i != 1), "DFA visibility mismatch");
+            require(dfa_->IsShown() == (i != 1) && dfa_slider_->IsShown() == (i != 1),
+                    "DFA visibility mismatch");
         }
-        personality_choice_->SetSelection(0);
-        personality_ = presentation::Mode::Normal;
-        dfa_->Show();
+        select_personality("missing-catalog");
+        require(personality_ == "vanilla" && !dfa_->IsShown() && !dfa_slider_->IsShown(),
+                "Unavailable catalog did not fall back to Vanilla");
+        require(!fallback_notice_->GetLabel().empty(),
+                "Whole-personality fallback lacks explanation");
+        select_personality("default");
+        const auto appearance_before = controller_->snapshot().revision;
+        for (int theme = 0; theme < 3; ++theme) {
+            theme_choice_->SetSelection(theme);
+            wxCommandEvent changed(wxEVT_CHOICE, theme_choice_->GetId());
+            theme_choice_->GetEventHandler()->ProcessEvent(changed);
+            require(controller_->snapshot().revision == appearance_before,
+                    "Appearance changed controller state");
+        }
+        theme_choice_->SetSelection(0);
+        apply_appearance();
+        select_page(0);
+        require(navigation_[0]->GetValue() && !navigation_[1]->GetValue(),
+                "Selected navigation state mismatch");
+        require(navigation_[0]->GetLabel().Contains("[selected]"),
+                "Selected tab lacks textual distinction");
+        wxCommandEvent scan(wxEVT_BUTTON, scan_start_->GetId());
+        scan_start_->GetEventHandler()->ProcessEvent(scan);
+        require(last_message_ == presentation::Message::ScanStarted,
+                "Scan start missing top callout");
+        const auto commentary_before = commentary_->GetLabel();
+        controller_->advance(100);
+        refresh();
+        require(commentary_->GetLabel() == commentary_before,
+                "Scan polling regenerated commentary");
+        wxCommandEvent cancel(wxEVT_BUTTON, scan_cancel_->GetId());
+        scan_cancel_->GetEventHandler()->ProcessEvent(cancel);
+        require(last_message_ == presentation::Message::ScanCancelled,
+                "Scan cancel missing top callout");
+        scan_start_->GetEventHandler()->ProcessEvent(scan);
+        controller_->advance(3000);
+        refresh();
+        require(last_message_ == presentation::Message::ScanCompleted,
+                "Scan completion missing top callout");
         controller_->monitor(true);
         notebook_->SetSelection(1);
         require(!controller_->snapshot().monitoring, "Monitor survived panel closure");

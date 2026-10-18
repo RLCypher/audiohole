@@ -1,5 +1,6 @@
 include(GoogleTest)
-add_executable(audiohole_model_tests model_test.cpp)
+add_executable(audiohole_model_tests model_test.cpp personality_files_test.cpp)
+target_compile_definitions(audiohole_model_tests PRIVATE AUDIOHOLE_TEST_PERSONALITIES_DIR="${PROJECT_SOURCE_DIR}/personalities")
 target_link_libraries(audiohole_model_tests PRIVATE audiohole_model GTest::gtest_main)
 if(MSVC)
   target_compile_options(audiohole_model_tests PRIVATE /W4 /permissive- /utf-8)

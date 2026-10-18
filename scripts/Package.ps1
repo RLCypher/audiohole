@@ -29,7 +29,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Runtime installation failed; build and test this configuration first.' }
     $files = @(Get-ChildItem -LiteralPath $stage -File -Recurse)
     # Explicit runtime allowlist: never copy a build tree, tests, or sources.
-    if ((($files.Name | Sort-Object) -join ',') -ne 'audiohole.exe,MANUAL_GUI_CHECKLIST.md,wxWidgets-LGPL.txt,wxWidgets-LICENSE.txt') {
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md')
+    $relative = @($files | ForEach-Object { $_.FullName.Substring($stage.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
+    if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Unexpected Runtime component contents; audit the package allowlist before distributing.'
     }
     $runUrl = if ($env:GITHUB_ACTIONS -eq 'true') {
@@ -68,6 +70,10 @@ Known limitations: all devices, scans, activity, failures, and Test Beep are sim
 Test Beep emits NO SOUND. Profiles and settings last only for this session.
 Synchronization algorithms, production schemas, and storage roots remain unresolved.
 wxWidgets 3.2.6 is statically linked; license and LGPL text are included.
+The header-only nlohmann/json 3.11.3 MIT notice is included.
+Normal and UwU commentary are editable JSON files in personalities/.
+Vanilla is the built-in fallback. Light/Dark/System choices are in Settings.
+Dark is the interim default. Windows-owned dialogs retain system styling.
 This package is for private evaluation. AudioHole's project license remains undecided.
 The test-only GoogleTest dependency is not part of this package.
 "@ | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8

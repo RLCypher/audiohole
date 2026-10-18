@@ -1,126 +1,116 @@
 #include "presentation/messages.h"
+#include <algorithm>
 #include <array>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <set>
 #include <stdexcept>
+
 namespace audiohole::presentation {
 namespace {
-struct Entry {
-    const char* technical;
-    const char* normal;
-    const char* normal2;
-    const char* uwu;
-    const char* uwu2;
+struct NeutralEntry {
+    const char* id;
+    const char* text;
 };
-constexpr std::array<Entry, 24> catalog{
-    {{"Ready to configure simulated routing.", "Alright. Let's wire this up.",
-      "A cable without the desk clutter.",
-      "Hewwo~ Weady to open some howes? I've been waiting fow you~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
-      "Aww~ so many pwetty howes, so many ways to connect~ OwO"},
-     {"Hole created in the editor.", "Another hole. Naturally.", "Room for one more connection.",
-      "Anothew howe?! My, someone's feeling adventuwous today~ OwO",
-      "A fwesh wittle opening~ Pwease choose whewe it goes! :3"},
-     {"Hole enabled in the editor.", "Hole's open.", "Ready for a connection.",
-      "Aww~ you opened it fow me! Now put something thwough it~ :3",
-      "Weady and waiting to be fiwwed with signaw~ >w<"},
-     {"Hole disabled in the editor.", "Hole's closed.", "Taking that one out of the plan.",
-      "Aww, cwosing up awweady? I was just getting stawted~ (╥﹏╥)",
-      "A wittle west fow that howe~ I'll be hewe when you need it! :3"},
-     {"Source selected in the editor.", "Source is connected.", "Found the input end.",
-      "Ooh, a fwesh input! I can wowk with that~ (¬‿¬)",
-      "That's a pwetty input~ Pwease put it wight hewe~ UwU"},
-     {"Destination selected in the editor.", "Output assigned.", "That's the other end sorted.",
-      "That's whewe you want it to come out? How vewy specific of you~ UwU",
-      "Mmm~ a pwace fow all that output! (｡♥‿♥｡)"},
-     {"Simulated routing is Running. No audio is processed.", "Signal's moving. In theory.",
-      "The imaginary cable is connected.",
-      "We'we connected~ Now wet me heaw you make some noise! >w<",
-      "Ooh~ a nice tight connection, just how I wike it~ :3"},
-     {"Simulated routing stopped.", "That's enough of that.", "Cable put away.",
-      "Aww, finished awweady? I was having so much fun~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
-      "Puwwing out fow now? I'll keep youw howes weady~ UwU"},
-     {"Duplex selected. Each direction has independent settings.", "Both ways. Ambitious.",
-      "Two directions, one hole.",
-      "B-both ways at once?! You weawwy know how to keep a howe busy~ OwO (｡♥‿♥｡)",
-      "Fwont and back~ Oh my, that's a vewy busy connection! >w<"},
-     {"Simulated profile activated.", "New setup's in.", "A different arrangement of cables.",
-      "Aww~ a whowe new position fow evewything! I wove a good weawwangement~ :3",
-      "A fwesh way to get evewything plugged in~ (¬‿¬)"},
-     {"Simulated startup activation is pending.", "Holding that configuration.",
-      "Waiting for the appointed moment.",
-      "Just a wittle anticipation~ Don't make me wait too wong! (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
-      "I'll be weady when it's time to swip it in~ OwO"},
-     {"Simulated device reconnected.", "Back where it belongs.", "Plug found its way home.",
-      "You came back! I kept youw howe nice and weady~ UwU",
-      "Ooh~ swiding back in wike you nevew weft! :3"},
-     {"Simulated device disconnected.", "Someone pulled the plug.", "One end went missing.",
-      "You puwwed out without wawning?! At weast say goodbye fiwst~ (╥﹏╥)",
-      "Aww~ an empty howe again? Come back soon~ >w<"},
-     {"Simulated source activity detected. Destination audibility is untested.",
-      "Yep, something's coming in.", "The pretend input is busy.",
-      "Ooh! I can feew the signaw coming in~ Keep going! >w<",
-      "A wittle signaw tickwe~ Just what this howe needed! :3"},
-     {"No simulated source activity. Silence does not establish disconnection.",
-      "Nothing coming in yet.", "Quiet at the input.",
-      "It's so quiet in hewe... give me a wittle something? :3",
-      "Aww~ this howe's waiting fow a tiny tickwe~ UwU"},
-     {"Select a destination for simulated Test Beep. NO SOUND will be emitted.",
-      "Let's see where this would come out.", "Pick the output, then test the idea.",
-      "Wanna make it squeak? Pick youw output and give it a wittle beep~ (¬‿¬)",
-      "A wittle beep, just fow that howe~ :3"},
-     {"Simulated Test Beep interval completed. NO SOUND was emitted.",
-      "That was a theoretical beep.", "Audibility still requires real hardware testing.",
-      "Beep~! A pwetend squeak fow youw chosen howe~ UwU",
-      "Aww~ the imaginary tickwe is finished! >w<"},
-     {"Select an available playback destination before testing.", "Pick an output first.",
-      "Even a pretend beep needs somewhere to go.",
-      "P-pwease pick an output fiwst~ I can't beep into the void! >w<",
-      "A wittle destination pwease~ Which howe gets the beep? :3"},
-     {"This setup may introduce latency or feedback. Review the settings.",
-      "I wouldn't, but it's your gear.", "Worth checking that cable loop.",
-      "Ooh, that's a naughty wittle config~ It might feed back, but if you insist... (¬‿¬)",
-      "That connection's getting adventuwous~ Pwease check the detaiws! OwO"},
-     {"Enter a valid value; review the detailed validation message.", "Skill issue. Try again.",
-      "That value needs another look.",
-      "Nuh-uh~ that numbew doesn't fit in this howe. Twy again, pwease? :3",
-      "A wittle adjustment pwease~ That one's not weady to swip in! >w<"},
-     {"Simulated recovery is in progress.", "Trying to get it back.",
-      "Working on the missing connection.",
-      "Hang on, sweetie~ I'm twying to get you plugged back in! (╥﹏╥)",
-      "I'll get that wittle connection weady again~ UwU"},
-     {"DFA acknowledgment only. No operation performed.", "DFA executed. Nothing happened.",
-      "Still doing absolutely nothing.",
-      "Nyaa~ I did absowutewy nothing! Did you wike that? (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
-      "Aww~ all that clicking and not a singwe thing done~ :3"},
-     {"Pending simulated operation cancelled.", "Changed your mind. Fair.", "That's off the list.",
-      "Aww~ stopping the anticipation? I'll wait fow you~ UwU",
-      "No mowe teasing that connection fow now~ :3"},
-     {"Presentation mode changed. Operational behavior is unchanged.",
-      "Same engineer, different commentary.", "The cables didn't notice.",
-      "Ooh~ a new wittle voice, same pwetty howes! OwO",
-      "Dwessing up the commentary~ The connections stay exactwy whewe they awe! :3"}}};
-} // namespace
-std::string technical(Message event) {
-    return catalog.at(static_cast<std::size_t>(event)).technical;
+// Only stable Vanilla information is compiled in. Optional voice files cannot
+// replace these facts, warning text, endpoint names, or accessibility labels.
+constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neutral{{
+    {"ready", "Ready to configure simulated routing."},
+    {"created", "Hole created in the editor."},
+    {"enabled", "Hole enabled in the editor."},
+    {"disabled", "Hole disabled in the editor."},
+    {"source", "Source selected in the editor."},
+    {"destination", "Destination selected in the editor."},
+    {"started", "Simulated routing is Running. No audio is processed."},
+    {"stopped", "Simulated routing stopped."},
+    {"duplex", "Duplex selected. Each direction has independent settings."},
+    {"activated", "Simulated profile activated."},
+    {"pending", "Simulated startup activation is pending."},
+    {"reconnected", "Simulated device reconnected."},
+    {"disconnected", "Simulated device disconnected."},
+    {"signal", "Simulated source activity detected. Destination audibility is untested."},
+    {"no_signal", "No simulated source activity. Silence does not establish disconnection."},
+    {"beep_ready", "Select a destination for simulated Test Beep. NO SOUND will be emitted."},
+    {"beep_complete", "Simulated Test Beep interval completed. NO SOUND was emitted."},
+    {"beep_rejected", "Select an available playback destination before testing."},
+    {"questionable", "This setup may introduce latency or feedback. Review the settings."},
+    {"invalid", "Enter a valid value; review the detailed validation message."},
+    {"recovering", "Simulated recovery is in progress."},
+    {"dfa", "DFA acknowledgment only. No operation performed."},
+    {"cancelled", "Pending simulated operation cancelled."},
+    {"personality", "Presentation mode changed. Operational behavior is unchanged."},
+    {"scan_started", "Simulated scan started. No hardware is being probed."},
+    {"scan_completed", "Simulated scan completed. Fixture data is not hardware verification."},
+    {"scan_cancelled", "Simulated scan cancelled."},
+    {"scan_failed", "Simulated scan failed. Review the technical diagnostics."},
+    {"dfa_minimum", "DFA acknowledgment only. No operation performed."},
+    {"dfa_nice", "DFA acknowledgment only. No operation performed."},
+    {"dfa_dank", "DFA acknowledgment only. No operation performed."},
+    {"dfa_metal", "DFA acknowledgment only. No operation performed."},
+    {"dfa_six_seven", "DFA acknowledgment only. No operation performed."},
+    {"dfa_maximum", "DFA acknowledgment only. No operation performed."},
+}};
+constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
+constexpr std::size_t maximum_catalogs = 32;
+constexpr std::size_t maximum_identifier_bytes = 64;
+constexpr std::size_t maximum_display_name_bytes = 128;
+constexpr std::size_t maximum_event_pools = 128;
+constexpr std::size_t maximum_variants_per_pool = 32;
+constexpr std::size_t maximum_variant_bytes = 2048;
+constexpr std::int64_t maximum_variant_weight = 100;
+constexpr int maximum_json_depth = 12;
+bool identifier(const std::string& value) {
+    return !value.empty() && value.size() <= maximum_identifier_bytes &&
+           std::all_of(value.begin(), value.end(), [](unsigned char c) {
+               return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '-';
+           });
 }
-std::vector<Variant> variants(Message event, Mode mode) {
-    if (mode == Mode::Vanilla)
-        return {};
-    const auto& e = catalog.at(static_cast<std::size_t>(event));
-    std::vector<Variant> result = mode == Mode::Normal
-                                      ? std::vector<Variant>{{e.normal}, {e.normal2}}
-                                      : std::vector<Variant>{{e.uwu}, {e.uwu2}};
-    if (event == Message::Dfa) {
-        if (mode == Mode::Normal) {
-            result.push_back({"No drivers were harmed in the making of this nothing."});
-            result.push_back({"A remarkably uneventful button."});
-            result.push_back({"Task failed successfully at doing nothing.", 1});
-        } else {
-            result.push_back({"Ooh~ you pwessed my button! And I did nothing at all~ >w<"});
-            result.push_back({"So much anticipation, so wittle action~ (¬‿¬)"});
-            result.push_back({"A wawe wittle nothing, just fow you~ (｡♥‿♥｡)", 1});
-        }
-        result.front().weight = 3;
+bool presentation_text(const std::string& value, std::size_t limit) {
+    // No embedded terminal/control sequences. UTF-8 validity is checked by dump()
+    // after parsing, before publication; text is displayed literally, never executed.
+    return !value.empty() && value.size() <= limit &&
+           std::none_of(value.begin(), value.end(),
+                        [](unsigned char c) { return c < 32 || c == 127; });
+}
+void require_valid_catalog(bool condition) {
+    if (!condition)
+        throw std::invalid_argument("Invalid personality structure");
+}
+} // namespace
+std::string mode_id(Mode mode) {
+    switch (mode) {
+    case Mode::Normal:
+        return "default";
+    case Mode::UwU:
+        return "uwu";
+    default:
+        return "vanilla";
     }
-    return result;
+}
+std::string technical(Message event) {
+    return neutral.at(static_cast<std::size_t>(event)).text;
+}
+std::string event_id(Message event) {
+    return neutral.at(static_cast<std::size_t>(event)).id;
+}
+Message dfa_event(int value) {
+    switch (value) {
+    case -1100:
+        return Message::DfaMinimum;
+    case 69:
+    case 690:
+        return Message::DfaNice;
+    case 420:
+        return Message::DfaDank;
+    case 666:
+        return Message::DfaMetal;
+    case 670:
+        return Message::DfaSixSeven;
+    case 1100:
+        return Message::DfaMaximum;
+    default:
+        return Message::Dfa;
+    }
 }
 Messages::Messages(std::uint32_t seed) : random_(seed) {
     choose_ = [this](unsigned total) {
@@ -128,34 +118,188 @@ Messages::Messages(std::uint32_t seed) : random_(seed) {
     };
 }
 Messages::Messages(std::function<unsigned(unsigned)> choose) : choose_(std::move(choose)) {}
-Copy Messages::show(Message event, Mode mode, std::uint64_t occurrence) {
-    auto& h = history_[{event, mode}];
-    if (h.valid && h.occurrence == occurrence)
-        return h.copy;
-    Copy result{technical(event), {}};
-    const auto pool = variants(event, mode);
+LoadResult Messages::load_file(const std::filesystem::path& path) {
+    try {
+        require_valid_catalog(std::filesystem::is_regular_file(path) &&
+                              std::filesystem::file_size(path) <= maximum_file_bytes);
+        // Bound the actual read too: a file can grow after the size check.
+        std::ifstream input(path, std::ios::binary);
+        std::string bytes(static_cast<std::size_t>(maximum_file_bytes) + 1, '\0');
+        input.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+        require_valid_catalog(input.eof() && !input.bad());
+        bytes.resize(static_cast<std::size_t>(input.gcount()));
+        require_valid_catalog(bytes.size() <= maximum_file_bytes);
+        // Reject excessive nesting before JSON parsing can exhaust the stack.
+        // Duplicate object keys are rejected rather than silently taking the last.
+        std::vector<std::set<std::string>> object_keys;
+        const auto root = nlohmann::json::parse(bytes, [&](int depth,
+                                                           nlohmann::json::parse_event_t event,
+                                                           nlohmann::json& value) {
+            require_valid_catalog(depth <= maximum_json_depth);
+            if (event == nlohmann::json::parse_event_t::object_start)
+                object_keys.emplace_back();
+            else if (event == nlohmann::json::parse_event_t::object_end)
+                object_keys.pop_back();
+            else if (event == nlohmann::json::parse_event_t::key)
+                require_valid_catalog(object_keys.back().insert(value.get<std::string>()).second);
+            return true;
+        });
+        (void)root.dump(); // Reject invalid UTF-8, including inside otherwise unused future events.
+        require_valid_catalog(root.is_object() && root.size() == 4 &&
+                              root.at("schema_version") == 1);
+        Personality candidate;
+        candidate.id = root.at("id").get<std::string>();
+        candidate.display_name = root.at("display_name").get<std::string>();
+        require_valid_catalog(
+            identifier(candidate.id) && candidate.id != "vanilla" &&
+            presentation_text(candidate.display_name, maximum_display_name_bytes));
+        const auto& events = root.at("events");
+        require_valid_catalog(events.is_object() && events.size() <= maximum_event_pools);
+        for (const auto& [key, pool] : events.items()) {
+            require_valid_catalog(identifier(key) && pool.is_array() && !pool.empty() &&
+                                  pool.size() <= maximum_variants_per_pool);
+            for (const auto& entry : pool) {
+                Variant variant;
+                if (entry.is_string())
+                    variant.text = entry.get<std::string>();
+                else {
+                    require_valid_catalog(entry.is_object() && entry.contains("text") &&
+                                          entry.size() <= 2);
+                    variant.text = entry.at("text").get<std::string>();
+                    if (entry.contains("weight")) {
+                        require_valid_catalog(entry.at("weight").is_number_integer());
+                        const auto weight = entry.at("weight").get<std::int64_t>();
+                        require_valid_catalog(weight >= 1 && weight <= maximum_variant_weight);
+                        variant.weight = static_cast<unsigned>(weight);
+                    } else
+                        require_valid_catalog(entry.size() == 1);
+                }
+                require_valid_catalog(presentation_text(variant.text, maximum_variant_bytes));
+                auto& variants = candidate.events[key];
+                require_valid_catalog(
+                    std::none_of(variants.begin(), variants.end(), [&](const auto& previous) {
+                        return previous.text == variant.text;
+                    }));
+                variants.push_back(std::move(variant));
+            }
+        }
+        require_valid_catalog(catalogs_.contains(candidate.id) ||
+                              catalogs_.size() < maximum_catalogs);
+        const auto id = candidate.id;
+        // A file whose ID was edited must not leave its previous identity active.
+        for (auto previous = catalog_sources_.begin(); previous != catalog_sources_.end();) {
+            if (previous->second == path.lexically_normal() && previous->first != id) {
+                catalogs_.erase(previous->first);
+                previous = catalog_sources_.erase(previous);
+            } else
+                ++previous;
+        }
+        catalogs_[id] = std::move(candidate);
+        catalog_sources_[id] = path.lexically_normal();
+        history_.clear();
+        return {true, id,
+                "Personality loaded. Technical messages remain built-in Vanilla information."};
+    } catch (const std::exception&) {
+        for (auto previous = catalog_sources_.begin(); previous != catalog_sources_.end();) {
+            if (previous->second == path.lexically_normal()) {
+                catalogs_.erase(previous->first);
+                previous = catalog_sources_.erase(previous);
+            } else
+                ++previous;
+        }
+        history_.clear();
+        return {false,
+                {},
+                "Personality file unavailable or invalid. Use UTF-8 JSON schema version 1 with "
+                "valid commentary pools; Vanilla remains available."};
+    }
+}
+std::vector<std::string> Messages::load_directory(const std::filesystem::path& directory) {
+    catalogs_.clear();
+    catalog_sources_.clear();
+    history_.clear();
+    std::vector<std::string> warnings;
+    std::error_code error;
+    std::vector<std::filesystem::path> files;
+    for (std::filesystem::directory_iterator iterator(directory, error), end;
+         !error && iterator != end; iterator.increment(error)) {
+        if (iterator->path().extension() == ".json")
+            files.push_back(iterator->path());
+        if (files.size() > maximum_catalogs) {
+            warnings.push_back("Too many personality files; keep at most 32. Vanilla is available "
+                               "until the directory is corrected.");
+            return warnings;
+        }
+    }
+    if (error) {
+        warnings.push_back("Personality directory unavailable. Vanilla is the safe fallback.");
+        return warnings;
+    }
+    std::sort(files.begin(), files.end());
+    if (files.size() > maximum_catalogs)
+        files.resize(maximum_catalogs);
+    std::set<std::string> seen_ids;
+    for (const auto& file : files) {
+        auto result = load_file(file);
+        if (!result.ok)
+            warnings.push_back(result.detail);
+        else if (!seen_ids.insert(result.id).second) {
+            catalogs_.erase(result.id);
+            catalog_sources_.erase(result.id);
+            warnings.push_back("Duplicate personality ID: " + result.id +
+                               ". Use unique IDs; that personality is unavailable.");
+        }
+    }
+    return warnings;
+}
+std::vector<Personality> Messages::personalities() const {
+    std::vector<Personality> result;
+    for (const auto& [id, catalog] : catalogs_)
+        result.push_back(catalog);
+    return result;
+}
+bool Messages::available(const std::string& id) const {
+    return id == "vanilla" || catalogs_.contains(id);
+}
+std::vector<Variant> Messages::variants(Message event, const std::string& id) const {
+    auto catalog = catalogs_.find(id);
+    if (catalog == catalogs_.end())
+        return {};
+    auto pool = catalog->second.events.find(event_id(event));
+    return pool == catalog->second.events.end() ? std::vector<Variant>{} : pool->second;
+}
+Copy Messages::show(Message event, const std::string& id, std::uint64_t occurrence) {
+    auto& history = history_[{event, id}];
+    if (history.valid && history.occurrence == occurrence)
+        return history.copy;
+    Copy result{technical(event), {}, {}};
+    const auto pool = variants(event, id);
+    if (id != "vanilla" && pool.empty())
+        result.fallback_detail =
+            available(id) ? "No commentary for this event; Vanilla information shown."
+                          : "Selected personality unavailable; Vanilla information shown.";
     unsigned total = 0;
-    for (std::size_t i = 0; i < pool.size(); ++i)
-        if (pool.size() == 1 || static_cast<int>(i) != h.last)
-            total += pool[i].weight;
+    for (std::size_t index = 0; index < pool.size(); ++index)
+        if (pool.size() == 1 || static_cast<int>(index) != history.last)
+            total += pool[index].weight;
     if (total) {
         unsigned choice = choose_(total);
         if (choice >= total)
             throw std::out_of_range("Injected presentation selector exceeded its bound");
-        for (std::size_t i = 0; i < pool.size(); ++i) {
-            if (pool.size() != 1 && static_cast<int>(i) == h.last)
+        for (std::size_t index = 0; index < pool.size(); ++index) {
+            if (pool.size() != 1 && static_cast<int>(index) == history.last)
                 continue;
-            if (choice < pool[i].weight) {
-                result.commentary = pool[i].text;
-                h.last = static_cast<int>(i);
+            if (choice < pool[index].weight) {
+                result.commentary = pool[index].text;
+                history.last = static_cast<int>(index);
                 break;
             }
-            choice -= pool[i].weight;
+            choice -= pool[index].weight;
         }
     }
-    h.copy = result;
-    h.occurrence = occurrence;
-    h.valid = true;
+    history.copy = result;
+    history.occurrence = occurrence;
+    history.valid = true;
     return result;
 }
 } // namespace audiohole::presentation

@@ -459,9 +459,12 @@ void SimulatedController::cancel_beep() {
 void SimulatedController::scan(bool enabled, bool advanced, ScanScope scope,
                                const std::string& selected_device) {
     if (enabled && scope == ScanScope::Selected && !endpoint(state_, selected_device)) {
-        event("error", "Select a saved device on the Devices page before a selected-device scan.");
+        event("scan-failed", "Select a saved device on the Devices page before a selected-device "
+                             "scan. No scan started.");
         return;
     }
+    if (!enabled && state_.scanning)
+        event("scan-cancelled", "Simulated scan cancelled; no hardware probing occurred.");
     state_.scanning = enabled;
     scan_ms_ = 0;
     state_.scan_percent = 0;

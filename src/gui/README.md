@@ -31,3 +31,16 @@ are not asserted by those checks. See the root manual checklist and ENGINEERING.
 Unattended smoke mode sends wx errors/assertions to stderr and terminates on an
 assertion, preventing a modal debug dialog from hanging CI. Normal interactive
 sessions retain the framework diagnostics. This does not suppress failed checks.
+
+The approved presentation testing iteration adds bounded external commentary files,
+explicit reload/custom loading and compiled-in Vanilla fallback. See
+`personalities/README.md`. The JSON parser is never called by refresh/polling.
+DFA button/slider/numeric entry and their hundredths-keyed events are presentation
+only. Scan lifecycle events are mapped to the same top operations area.
+
+`appearance.cpp` owns live application palettes, read-only Windows theme/high-contrast
+queries and optional title-bar coloring. Windows-owned dialogs/menus retain their
+system appearance. Navigation uses native toggle buttons and wxSimplebook so the
+selected surface, bold label and selected marker can be styled consistently; keyboard
+page changes still send the same book events that stop temporary observation. No
+appearance operation issues controller commands or writes OS/configuration settings.
