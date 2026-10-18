@@ -201,3 +201,5 @@ A Windows-target cross-build does not execute Windows COM, confirm the MSVC
 manifest/CRT options, or establish successful Windows launch/test behavior.
 See the current Milestone 0 entry in [ROADMAP.md](ROADMAP.md) for actual results
 and outstanding validation. Milestone 1 routing remains outside this milestone.
+
+Implementation changes must also pass the human readability and contract review in [ENGINEERING.md](ENGINEERING.md); build and test success alone does not establish milestone acceptance.
