@@ -1451,3 +1451,9 @@ O-004 leaves exact coupled-duplex policy and persistence fields open. Preserve t
 All asynchronous session operations use generation-based cancellation and stale-result protection. Stop disarms the session and takes precedence over startup, recovery, failover, and pending scan work; obsolete completions cannot restart streams. This does not imply unsafe termination of a blocked driver call. Recovery remains bounded/backed off and event-aware rather than abandoning armed intent after a fixed hardware-wait timeout.
 
 Device matching is conservative and explainable. Local bindings remain subject to current identity evidence, and ambiguous returning endpoints require confirmation. No silence-based failure inference, guessed reverse route, or silent substitution is permitted.
+
+### Provisional directional synchronization preferences
+
+One engine resolves synchronization independently for each direction, preserving D-053's shared-default inheritance and explicit overrides. Automatic is the proposed prototype default, not a finalized algorithm. Compare unchanged transfer, application-managed compensation, and Windows-managed shared-render adjustment where available. A processing change in one direction must respect existing healthy-direction isolation; no new coupled-failure values are defined.
+
+Strict preservation remains internal/experimental, not a required public profile feature. Its candidate semantics reject incompatible formats and prohibit intentional modification, insertion, duplication, dropping, or resampling of captured PCM frames. Inability to continue is reported; restart/rebuffer is explicit, never silent compensation. Emergency recovery and upstream discontinuities cannot be hidden as preservation. O-004/O-005 remain Open: no new profile fields, enums, defaults in persisted files, or public actions are finalized. Concrete experimental controls do not become production configuration by implication.

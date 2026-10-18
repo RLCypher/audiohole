@@ -859,6 +859,7 @@ It should address:
 - Dedicated resampling library.
 - Custom limited conversion pipeline.
 - Hybrid conversion strategy.
+- Windows-managed shared-render rate adjustment using `AUDCLNT_STREAMFLAGS_RATEADJUST` and `IAudioClockAdjustment::SetSampleRate` where supported.
 
 ### Evaluation
 
@@ -871,7 +872,7 @@ Measure:
 - Behavior during buffer underruns.
 - Implementation complexity.
 
-**Current position:** Destination-paced operation, bounded FIFOs, and adaptive synchronization are accepted architectural constraints. SpeexDSP or another established resampler is a candidate; no production converter or resampler is selected. Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. Direct-transfer eligibility, instability detection, and response policy remain open under O-005 below.
+**Current position:** Destination-paced operation, bounded FIFOs, and adaptive synchronization are accepted architectural constraints. SpeexDSP or another established resampler is a candidate; no production converter or resampler is selected. Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. Direct-transfer eligibility, instability detection, and final response policy remain open under O-005 below. Automatic is the proposed prototype default, not an accepted algorithm; see the provisional synchronization direction below and the expanded experiments in `ROADMAP.md`.
 
 ---
 
@@ -1527,9 +1528,11 @@ This reconciliation records owner guidance following the initial architecture re
 
 1. **Eligibility:** Can this route transfer samples unchanged given endpoint representations, nominal rates, channel layouts, operating modes, timing evidence, and buffering constraints? Matching nominal rates alone does not establish a shared clock. Prior stability is evidence, not a permanent guarantee. Endpoint/Windows processing may prevent an end-to-end bit-perfect claim even when AudioHole copies samples unchanged.
 2. **Detection:** Observe sustained FIFO occupancy trends, clock/timing evidence where available, underruns/overruns, stalls, and discontinuities. Distinguish drift from jitter and report uncertainty. Thresholds, observation windows, and proof sufficient to establish eligibility remain undecided.
-3. **Response:** Alternatives include adaptive resampling, a controlled restart/rebuffer, a user-selected direct-only mode that reports inability to continue, or explicit sample insertion/removal with acknowledged artifacts. No strategy, automatic transition, default, user control, or threshold is selected. Any sample insertion/removal or resampling is alteration and cannot be called bit-perfect. Larger buffers only defer sustained drift failure.
+3. **Response:** The provisional direction now evaluates Automatic as the prototype default, allowing proactive compensation when evidence supports its need rather than waiting for instability. Compare stable strategy selection at initialization with dynamic transitions; no final algorithm, engagement threshold, or transition mechanism is selected. Adaptive resampling, Windows-managed rate adjustment, and unchanged transfer are comparison candidates. Discrete insertion/duplication/dropping remains experimental, not routine synchronization or a third public mode. Emergency buffer dropping or stream reinitialization is separately diagnosed recovery, not concealed clock compensation. Larger buffers only defer sustained drift failure.
 
-Recommendation for evaluation: preserve unchanged transfer where evidence supports it and evaluate controlled compensation when continuous operation otherwise becomes unstable. Whether compensation is automatic, requires consent, or is constrained by an explicit preference remains open. A direct-only preference is an alternative, not an approved new feature. Report requested versus actual processing and changes honestly. Final policy requires owner approval informed by prototypes.
+Strict preservation remains an internal diagnostic/experimental candidate, not a required public v0.1 feature. Its candidate contract forbids intentional resampling, insertion, duplication, dropping, or other modification of captured PCM frames. Reject incompatible endpoint formats rather than silently convert. If preservation cannot continue, report the condition and permit explicit restart/rebuffer; never silently fall back to compensation. This scoped preservation claim does not establish end-to-end bit-perfect audio.
+
+Final policy requires owner approval informed by prototypes. Automatic's proactive permission is provisional; its algorithm and emergency recovery permissions are not finalized. Do not introduce public policy controls, production field names/enums, or fixed thresholds on this basis. Earlier alternatives remain part of the decision history, not approved public features.
 
 #### O-006 — Storage and portable deployment details
 
@@ -1538,3 +1541,16 @@ Recommendation for evaluation: preserve unchanged transfer where evidence suppor
 ### Other unresolved questions and later gates
 
 The six decisions above remain owner decisions; technical evidence does not silently resolve them. Existing open questions also remain: D-035 scoring, D-041 probe matrix and verification durations, D-042 custom delay limits, D-043 retention, D-044 packaging, project license, exact startup registration mechanism, and dependency versions/licenses. Backend, GUI, DSP, matching evidence, and probe isolation need prototype results before final commitment. Minor visual choices may be resolved during their authorized implementation milestone without redefining established behavior.
+
+### Provisional synchronization direction — D-034 / O-005 remain Open
+
+This owner-approved evaluation direction refines O-005 without accepting a synchronization algorithm or authorizing implementation in this documentation assignment. O-001 through O-006 all remain Open.
+
+- Use one routing engine with independently resolved directional synchronization preferences under D-053, not separate policy engines or backends. Consider continuity/reliability, low consistent end-to-end latency, practical fidelity, and minimal processing together; the priorities do not license excessive latency or degradation.
+- Automatic is the proposed default for prototype evaluation. Favor unchanged transfer where appropriate, and permit proactive compensation based on evidence. Avoid unnecessary bypass/compensation switching; evaluate initialization-time selection against dynamic switching for artifacts, delay changes, and discontinuities.
+- Keep strict preservation internal and experimental with the candidate semantics in O-005. Do not require public GUI/API exposure, add a third public mode for discrete corrections, or call correction-based transfer unchanged.
+- Compare unchanged transfer, application-managed adaptive resampling, and Windows-managed shared-render rate adjustment under equivalent supported conditions. Neither compensation location is assumed superior or sample-preserving.
+- Selected preference, actual processing, observed synchronization health, and endpoint shared/exclusive mode are independent concepts. Record sample loss, corrections, processing transitions, discontinuities, and recovery honestly. Preserve concise evidence-grounded explanations.
+- Retain the conditional 10 ms attributable-latency objective. Compare minimum/typical latency, variation over time, FIFO/converter delay, measured end-to-end latency, quality, CPU, stability, compatibility, and observability. Derive proposed objective quality/delay criteria from comparative evidence, not arbitrary limits.
+
+No further product decision is needed to begin a separately authorized narrow simplex prototype. Final algorithms, bypass eligibility, estimator/transition thresholds, ratio limits, converter selection, and quantitative acceptance limits can follow experimental evidence. Public strict-preservation exposure, Automatic emergency-recovery permissions, final D-034/O-005 commitments, and production persistence/API contracts still require review. See `ROADMAP.md` → Expanded synchronization experiments. Other owner decisions and previously deferred features are unchanged.
