@@ -446,3 +446,15 @@ The rewrite should build upon that experience without being constrained by it.
 The objective is not to minimize the number of dependencies at any cost, nor to maximize the amount of custom code.
 
 The objective is to produce a reliable, efficient, transparent, maintainable audio-routing application that behaves as closely as practical to a physical duplex audio cable.
+
+---
+
+## Owner-authorized provisional evaluation direction
+
+C++ and CMake remain accepted foundations. C++20, MSVC, nlohmann/json, spdlog for non-real-time diagnostics, and GoogleTest/CTest are provisionally approved. Before integration, record exact versions/commits, licenses/notices, reproducible acquisition, and build metadata. No dependency is installed or version experimentally validated by this documentation update. Project licensing and distribution remain unresolved.
+
+Native event-driven WASAPI leads D-030's equivalent-condition comparison against miniaudio. Compare actual formats, periods, conversion/compensation, hardware, CPU, latency, exclusive behavior, and recovery; do not maintain two production streaming backends without demonstrated benefit. wxWidgets leads D-031's interface prototype, including accessibility and personality coverage. Neither candidate is finalized.
+
+Destination pacing, bounded FIFOs, and adaptive synchronization are the accepted baseline. Evaluate SpeexDSP or another suitable established resampler for quality, variable-rate behavior, CPU, buffering/delay, and bounded real-time use; no production DSP choice is finalized. Preserve unchanged samples when feasible without sacrificing reliable continuous operation. O-005 leaves eligibility and response policy open.
+
+Integration boundaries remain strict: JSON parsing/serialization and validation run outside audio processing; spdlog calls, formatting, disk sinks, and UI operations do not enter real-time paths. An asynchronous logger is not itself evidence of allocation-free/nonblocking audio behavior. GoogleTest/CTest cover deterministic logic and simulated failures; real Windows endpoints remain necessary for hardware claims. No additional framework, service, general mixer, or public transport is selected.

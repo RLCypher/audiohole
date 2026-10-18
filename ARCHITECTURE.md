@@ -402,7 +402,7 @@ A hole consumes one capacity slot whether it is simplex or duplex.
 
 Mirrored outputs consume additional logical hole slots even when they share an underlying capture stream.
 
-The limit applies to active holes, not saved profiles or inactive definitions.
+Capacity is reserved for enabled holes in the armed plan, including holes waiting for devices or recovery. Saved definitions outside that plan and disabled holes do not count. The eight-hole policy is not a guarantee that every hardware configuration can run eight concurrent holes.
 
 The supervisor should separately monitor actual endpoint stream count, since stream count may differ from logical hole count.
 
@@ -700,10 +700,10 @@ The probe manager should preserve historical results and avoid unnecessary retes
 
 The supervisor should use explicit states rather than relying on loosely related boolean flags.
 
-Suggested hole states:
+Canonical public routing states (D-019):
 
 - `stopped`
-- `resolving`
+- `ready`
 - `starting`
 - `running`
 - `degraded`
@@ -711,7 +711,7 @@ Suggested hole states:
 - `failed`
 - `stopping`
 
-Individual directional paths and endpoint streams may have their own states.
+Resolving is an internal phase of Starting, not a replacement for Ready or an additional public routing state. Individual directional paths and endpoint streams may have their own internal states; public aggregation uses the canonical states.
 
 ### 14.1 State Transitions
 
@@ -1371,7 +1371,7 @@ Runtime configuration and device records should live in a separate, clearly docu
 - Test sleep/resume and Windows startup.
 - Resolve critical reliability defects.
 
-These phases may overlap where appropriate.
+These phases remain a scope grouping and may overlap where appropriate. Execution follows the reconciled working sequence in `ROADMAP.md`: foundation, simplex, independent clocks/latency, backend/exclusive comparison, recovery/identity, then duplex. Minimum controller/status/diagnostics begin early; complete Advanced Scan and GUI follow the audio proof. This documentation reconciliation does not authorize prototypes or implementation.
 
 ---
 
@@ -1436,3 +1436,43 @@ Suggested default: a one-second 1 kHz sine beep at -30 dBFS with short click-fre
 If the destination is already part of active routing, the engine may use an existing safe playback path only if it does not disrupt program audio or compromise real-time guarantees; otherwise report the conflict. When stopped, a temporary playback client may be used, released immediately afterward. Exclusive-mode contention must be surfaced rather than worked around by opening a different device. Tone synthesis and command/status coordination must not allocate, block, or take locks on the real-time callback.
 
 Expose transient test state (idle/playing/unavailable/failure and exact target) to the GUI. Success means that the test stream rendered to the selected endpoint, not that a human heard it or that normal routing is verified. Keep device identity, errors, and target information mode-neutral.
+
+---
+
+## Reconciled engineering boundaries and remaining contracts
+
+### Requirements versus candidates
+
+The owner-approved separation in Sections 3–4 remains the baseline. Native event-driven WASAPI and wxWidgets are leading candidates, not selected production backends/frameworks. D-030 and D-031 retain their prototype gates. The initial tested platform baseline is Windows 10 22H2 and supported Windows 11 releases; runtime feature detection, rather than assumed universal low-period support, governs API use. This is a planned validation baseline, not completed testing.
+
+### Sample transfer, synchronization, and fidelity
+
+Destination-paced operation, bounded FIFOs, and adaptive synchronization are accepted. Distinguish:
+
+- **Direct sample transfer:** AudioHole forwards sample values without conversion or clock correction, where technically feasible.
+- **Clock-compensated transfer:** independent clocks require correction, potentially altering samples even at equal nominal sample rates.
+- **Format conversion:** incompatible rate, representation, or channel requirements require transformation. Conversion and clock compensation may coexist.
+
+Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. O-005 in `DECISIONS.md` deliberately leaves the final policy open. Evaluate eligibility separately from instability detection and the selected response. Matching nominal formats is insufficient proof of common clocks; bounded buffers alone cannot absorb sustained drift indefinitely. Observe occupancy trends, timing evidence, discontinuities, underruns/overruns, and stalls while distinguishing jitter from drift. Candidate responses include adaptive resampling, controlled restart/rebuffer, direct-only failure reporting, and explicit insertion/removal with artifacts. None is an approved default or automatic transition policy.
+
+Evaluate SpeexDSP or another established resampler before production selection. Report actual conversion and compensation; never claim bit-perfect operation while samples are altered. Copying samples unchanged inside AudioHole also does not prove an unchanged end-to-end path through Windows, drivers, or transports.
+
+Latency evidence must state measurement boundaries: capture delivery, application queue occupancy, converter delay, and render buffering versus external device/driver/transport contributions. Distinguish periods, endpoint buffer capacities, and application queue depths. The conditional 10 ms objective and 5 ms stretch goal remain unchanged; estimates and external loopback measurements are not automatically isolated AudioHole measurements.
+
+### Resource ownership and asynchronous control
+
+Compatible capture sharing is accepted with independent bounded destination queues and synchronization. Compatibility depends on actual endpoint binding, mode, format, and relevant stream constraints, not friendly names. Shared resources must outlive their consumers; one destination must not backpressure unrelated destinations. General application mixing is outside v0.1. Many-to-one behavior, render-sharing details, and concrete preference fields must not be invented to fill O-004. Exclusive conflicts produce actionable errors. Preserve component boundaries for future mixing/endpoint types without adding a general graph framework.
+
+Control commands are coordinated outside real-time processing. Potentially slow stream/device operations must not block GUI/tray interaction. Apply generation-based cancellation to opens, retries, failover, profile transitions, scans, beep operations, and startup timers. Stop invalidates pending work; stale completions cannot commit resources or restart routing. Cancellation does not imply every synchronous driver call can be interrupted immediately.
+
+COM initialization, interface threading requirements, callback lifetime, and stream release ownership must be explicit in the implementation. Device notifications enqueue work rather than enumerate or open streams inline. Audio processing uses bounded preallocated buffers and telemetry. Formatting, logger calls, serialization, disk writes, and UI work stay outside audio processing; an asynchronous logger alone does not provide real-time safety. Overflow behavior and operation completion must remain observable without stalling audio.
+
+### Provisional intrusive-probe isolation
+
+Normal routing retains the single-process baseline. An Advanced Scan helper process is a provisional narrow exception, not an adopted requirement. Compared with in-process workers, it can contain a stalled user-mode test and permit a watchdog to abandon the helper, at the cost of IPC, lifecycle, consent, and resource coordination. A thread timeout cannot safely terminate arbitrary driver calls; a process watchdog cannot guarantee recovery of a defective driver or OS audio stack. Evaluate both approaches before adoption. No process/thread termination guarantee may be presented as successful driver cleanup.
+
+### Owner decisions and setup tools
+
+O-001 (fallback health), O-002 (switch preparation threshold), O-003 (close/tray preferences), O-004 (persistence), O-005 (direct transfer), and O-006 (storage roots) remain Open. Existing working-routing preservation, explicit Ready activation, close-to-tray defaults, and safe configuration behavior remain binding. Recommendations do not settle these contracts.
+
+Activity observation uses existing source samples and ends with the panel subscription; it never opens another capture stream. Test Beep remains a separate exact-destination operation. A shared render path is usable only when safe and non-disruptive; otherwise report the conflict. Cancellation stops further test production promptly, but already queued endpoint samples can delay acoustic silence. No universal acoustic cancellation bound or new active-route mixing policy is introduced.

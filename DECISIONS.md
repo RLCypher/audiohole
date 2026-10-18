@@ -212,7 +212,7 @@ More than eight simultaneously active holes are unsupported in v0.1.
 
 - Profiles may contain additional disabled holes.
 - Mirrored destinations use separate holes.
-- The routing supervisor must enforce the active-hole limit.
+- The routing supervisor must enforce the active-hole limit. Capacity counts enabled holes in the armed plan, including waiting/recovering holes; eight is a policy ceiling rather than a universal hardware performance guarantee.
 
 ---
 
@@ -701,7 +701,7 @@ A prototype should demonstrate:
 - Measurable buffering and latency.
 - Meaningful Windows error reporting.
 
-**Current position:** No backend is accepted until a representative prototype validates its behavior.
+**Current position:** Native event-driven WASAPI is the owner-approved leading candidate, not a finalized selection. Compare miniaudio under equivalent format, period, conversion, and hardware conditions for latency, CPU overhead, compatibility, negotiation, exclusive access, and recovery. Maintain two production backends only if evidence demonstrates a meaningful advantage. No backend is accepted until a representative prototype validates its behavior.
 
 ---
 
@@ -787,7 +787,7 @@ Build a small interface prototype containing:
 - Scrolling diagnostic console.
 - Tray icon and menu.
 
-**Current position:** No framework selected.
+**Current position:** wxWidgets is the owner-approved leading candidate, subject to the required interface prototype, accessibility, device selectors, diagnostic console, and authored personality-mode evaluation. No framework is finalized.
 
 ---
 
@@ -795,7 +795,7 @@ Build a small interface prototype containing:
 
 **Status:** Provisional
 
-**Preferred candidate:** nlohmann/json.
+**Preferred candidate:** nlohmann/json, provisionally approved by the owner. C++20, MSVC, spdlog for non-real-time diagnostics, and GoogleTest/CTest are also provisionally approved; C++ and CMake remain accepted foundations. Record versions, licenses, and integration boundaries before adding dependencies. No tested release versions are selected by this reconciliation.
 
 **Rationale:**
 
@@ -871,7 +871,7 @@ Measure:
 - Behavior during buffer underruns.
 - Implementation complexity.
 
-**Current position:** No conversion implementation selected.
+**Current position:** Destination-paced operation, bounded FIFOs, and adaptive synchronization are accepted architectural constraints. SpeexDSP or another established resampler is a candidate; no production converter or resampler is selected. Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. Direct-transfer eligibility, instability detection, and response policy remain open under O-005 below.
 
 ---
 
@@ -963,7 +963,7 @@ Test matching across:
 - Device replacement.
 - Configuration transfer to another computer.
 
-**Current position:** Identity architecture is accepted; matching weights and confirmation thresholds remain open.
+**Current position:** Identity architecture and conservative, explainable matching are accepted; ambiguous bindings require confirmation. Specific rules, weights, and confirmation thresholds remain open and require representative evidence. Driver metadata is diagnostic context, not a permanent identity requirement.
 
 ---
 
@@ -1007,7 +1007,7 @@ Test matching across:
 - Event subscriptions.
 - Dependency footprint.
 
-**Current position:** Internal controller abstraction is accepted; external transport selection remains provisional.
+**Current position:** Internal controller abstraction is accepted; external transport selection remains provisional. Public transport implementation is deferred until core routing is proven. Named pipes remain a candidate, not an adopted transport.
 
 ---
 
@@ -1154,7 +1154,7 @@ Test matching across:
 - Loopback capture where applicable.
 - Device-driver differences.
 
-**Current position:** Windows 10/11 x64 is accepted; exact API baseline requires technical validation.
+**Current position:** Windows 10 22H2 and supported Windows 11 releases are the approved initial tested baseline. This is not evidence of completed compatibility tests or a blanket rejection of older Windows 10 releases. Prefer runtime feature detection over unnecessary version restrictions. Exact low-latency API fallback and device capability behavior still require validation.
 
 ---
 
@@ -1476,3 +1476,65 @@ Uncertainty should be documented and investigated rather than hidden behind assu
 ## Personality intensity clarification
 
 **Decision:** UwU Mode is deliberately pronounced, not a subtle variant. Common noncritical UI events require authored flirtatious, innuendo-heavy, kaomoji-rich copy with frequent R/L→W substitutions in flavor text, as cataloged in `PERSONALITY.md` §16. Technical facts and serious warnings remain clear; Vanilla remains strictly neutral. This affects presentation only.
+
+---
+
+## Specification reconciliation — owner-authorized direction
+
+This reconciliation records owner guidance following the initial architecture review. It authorizes documentation changes only; it does not authorize application implementation, prototypes, or dependency installation. Earlier decision history and deferred features remain intact. Recommendations in O-001 through O-006 are explicitly **not accepted requirements**.
+
+### Confirmed requirements and architectural constraints
+
+- Preserve controller, routing supervisor, engine, device, configuration, diagnostics, and presentation boundaries. GUI and personality do not enter the routing engine.
+- Use destination-paced operation, bounded FIFOs, and adaptive synchronization as the baseline. Distinguish direct transfer, clock compensation, and format conversion; avoid unnecessary processing without sacrificing reliable continuous operation.
+- Share compatible capture streams with independent destination queues. No general application mixer in v0.1. Preserve modular boundaries for future endpoint types and many-to-one capabilities without implementing them.
+- Preserve D-019's eight public states. Count enabled holes in the armed plan, including waiting/recovering holes. The capacity ceiling is separate from measured performance.
+- Separate experimental eligibility from evidence-based recommendation ranking. Keep intrusive probing permission-gated and explanations visible; shared-mode compatibility does not prove native hardware support.
+- Match devices conservatively and explainably; ambiguous bindings require confirmation. Use generation-based cancellation and stale-result protection across asynchronous operations. Stop takes precedence over pending recovery, scan work, and startup; it prevents stale work from authorizing routing.
+- Windows 10 22H2 and supported Windows 11 releases form the initial tested baseline, with runtime capability detection. No test results are implied.
+- Use per-user configuration with portable deployment support and ordinary-user operation. Defer public external transport until core routing is proven; preserve the internal interface and named-pipe candidacy.
+
+### Provisional engineering choices and evidence gates
+
+- D-030 remains Open: native event-driven WASAPI leads the equivalent-condition comparison with miniaudio.
+- D-031 remains Open: wxWidgets leads the documented GUI prototype evaluation.
+- C++20, MSVC, CMake, nlohmann/json, spdlog outside real-time processing, and GoogleTest/CTest are provisionally approved. C++ and CMake remain accepted foundations; versions, licenses, reproducible acquisition, and integration details must be documented before integration. This reconciliation does not select untested releases.
+- D-034 remains Open for converter/resampler selection and direct-transfer policy. Evaluate established DSP rather than prematurely implementing custom production DSP.
+- An Advanced Scan helper process is provisional: compare fault containment, lifecycle/IPC complexity, consent, cancellation, resource cleanup, and driver limitations with in-process probing. It may become a narrow exception to the single-process design only after evaluation; it is not an accepted mandatory component.
+- No hardware, latency, quality, compatibility, or eight-hole performance claim is established by documentation approval.
+
+### Outstanding owner decisions — all Open
+
+#### O-001 — Fallback health classification
+
+**Status:** Open. Decide whether fully functional configured fallback operation is Running with a separate fallback indication, or Degraded because the preferred endpoint is absent. Recommendation: Running plus a fallback indication when all configured routing obligations are met. Alternative: Degraded throughout fallback. Consequences affect status aggregation, notifications, tray examples, and API snapshots. Neither interpretation is adopted by this reconciliation.
+
+#### O-002 — Profile-switch preparation threshold
+
+**Status:** Open. Define which required destination paths must be prepared before an ordinary switch commits, including partial destinations and coupled duplex policy. Recommendation: prepare all enabled required paths before ordinary commit; retain deliberate activation into Ready. Alternatives include explicitly authorized partial commits. Preserve D-022's working-routing safeguards and best-effort rollback; do not infer an all-path threshold from this recommendation.
+
+#### O-003 — Close and tray preferences
+
+**Status:** Open. Define false values and interaction of `interface.close_to_tray` and `notifications.tray_status_enabled`, including control accessibility if tray creation fails. Alternatives include closing as Exit, preserving a visible control window, or disabling only optional status decoration. Preserve established close-to-tray defaults, explicit Stop/Exit, and accessible operational controls; no alternative is selected.
+
+#### O-004 — Production persistence details
+
+**Status:** Open. Approve endpoint-specific requested formats/modes/periods, application queue preferences, channel mapping, incomplete-hole representation, coupled-duplex values, and failover placement before production serialization. Recommendation: distinguish requests from negotiated runtime values; preserve inheritance and existing standardized status objects. Alternatives include path-level preferences expanded into endpoint requests or explicit per-endpoint preferences. Their UI and compatibility consequences require review. Illustrative fields do not constitute finalized new schemas.
+
+#### O-005 — Direct-transfer eligibility and response policy
+
+**Status:** Open. Preserving unmodified samples whenever technically feasible is a core objective; reliable continuous operation must not be sacrificed. Separate three questions:
+
+1. **Eligibility:** Can this route transfer samples unchanged given endpoint representations, nominal rates, channel layouts, operating modes, timing evidence, and buffering constraints? Matching nominal rates alone does not establish a shared clock. Prior stability is evidence, not a permanent guarantee. Endpoint/Windows processing may prevent an end-to-end bit-perfect claim even when AudioHole copies samples unchanged.
+2. **Detection:** Observe sustained FIFO occupancy trends, clock/timing evidence where available, underruns/overruns, stalls, and discontinuities. Distinguish drift from jitter and report uncertainty. Thresholds, observation windows, and proof sufficient to establish eligibility remain undecided.
+3. **Response:** Alternatives include adaptive resampling, a controlled restart/rebuffer, a user-selected direct-only mode that reports inability to continue, or explicit sample insertion/removal with acknowledged artifacts. No strategy, automatic transition, default, user control, or threshold is selected. Any sample insertion/removal or resampling is alteration and cannot be called bit-perfect. Larger buffers only defer sustained drift failure.
+
+Recommendation for evaluation: preserve unchanged transfer where evidence supports it and evaluate controlled compensation when continuous operation otherwise becomes unstable. Whether compensation is automatic, requires consent, or is constrained by an explicit preference remains open. A direct-only preference is an alternative, not an approved new feature. Report requested versus actual processing and changes honestly. Final policy requires owner approval informed by prototypes.
+
+#### O-006 — Storage and portable deployment details
+
+**Status:** Open. Define actual per-user roots, root-selection precedence, portable-mode activation, and behavior when a chosen root is unwritable. Recommendation: clearly separated portable configuration and machine-local bindings with an explicit writable-root choice. Alternatives include a portable marker or command-line root selection. No exact directory, switch, marker, or precedence is adopted.
+
+### Other unresolved questions and later gates
+
+The six decisions above remain owner decisions; technical evidence does not silently resolve them. Existing open questions also remain: D-035 scoring, D-041 probe matrix and verification durations, D-042 custom delay limits, D-043 retention, D-044 packaging, project license, exact startup registration mechanism, and dependency versions/licenses. Backend, GUI, DSP, matching evidence, and probe isolation need prototype results before final commitment. Minor visual choices may be resolved during their authorized implementation milestone without redefining established behavior.

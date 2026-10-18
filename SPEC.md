@@ -213,7 +213,7 @@ AudioHole v0.1 supports:
 
 A hole consumes one capacity slot regardless of whether it is simplex or duplex.
 
-Inactive holes and saved profile definitions do not count toward the limit.
+Capacity is reserved for enabled holes in the armed plan, including holes waiting for devices or recovery. Saved definitions outside that plan and disabled holes do not count. The eight-hole policy is not a guarantee that every hardware configuration can run eight concurrent holes.
 
 The application should not impose a corresponding limit on the number of saved profiles or inactive hole definitions.
 
@@ -933,3 +933,19 @@ AudioHole shall provide a **Test Beep** button in hole setup/troubleshooting for
 The beep is manual, short, conservative in level (default approximately 1 kHz at -30 dBFS for one second, with brief fades), visibly indicated while active, and cancelable. It must not start automatically, change system/device volume, rewrite profile settings, inject into capture/microphone endpoints, or fan out to unspecified outputs. If output cannot be safely opened, report the reason rather than reroute. Playback testing alone does not establish that normal source-to-destination routing works.
 
 The existing real-time routing pipeline must remain unaffected. The implementation may use the existing playback path when safe, or a temporary playback session when routing is stopped; conflicts with exclusive access require explicit handling. All resources must be released after the beep.
+
+---
+
+## Reconciled technical interpretation and open decisions
+
+The original objective remains low-latency, high-fidelity bidirectional routing between arbitrary **compatible capture and render endpoints**, with minimal unnecessary processing and reliable consumer-hardware operation. Existing virtual endpoints may be used; AudioHole does not create missing virtual devices or automatically make a render endpoint a capture source. Loopback support is not newly mandated by this reconciliation.
+
+The initial tested baseline is Windows 10 22H2 and supported Windows 11 releases. Detect available APIs and endpoint capabilities at runtime; do not assume universal low-period support. This documents intended validation coverage, not successful compatibility tests or an automatic exclusion of older releases.
+
+Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. Distinguish direct transfer, clock-compensated transfer, and format conversion, including cases where compensation and conversion coexist. Destination pacing, bounded queues, and adaptive synchronization are the architectural baseline; direct-transfer eligibility, instability detection thresholds, and response policy remain explicitly Open under O-005 in `DECISIONS.md`. Matching nominal formats alone does not prove stable unchanged transfer. Never claim bit-perfect operation when samples are altered.
+
+The conditional 10 ms attributable-latency target and 5 ms stretch objective remain. State measurement boundaries and distinguish capture cadence, application buffering, converter delay, and render buffering from external latency. Eight-hole capacity is a policy ceiling for enabled holes in an armed plan, not universally demonstrated performance.
+
+D-019's eight states are canonical. Experimental eligibility is separate from recommendation ranking; use applicable compatibility/stability/fidelity/latency evidence and visible explanations. Shared-mode acceptance does not establish native hardware format support. Stop takes precedence over pending startup, recovery, and scan work through generation-based cancellation.
+
+All six owner decisions remain Open: O-001 fallback health, O-002 switch preparation threshold, O-003 close/tray preferences, O-004 production persistence details, O-005 direct-transfer policy, and O-006 storage/portable activation. Their recommendations do not amend accepted behavior. Personality modes, portable identity, notes, temporary activity observation, exact-destination Test Beep, and deferred features remain unchanged.

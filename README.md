@@ -54,7 +54,7 @@ AudioHole supports multiple independent connections running simultaneously, allo
 
 ## Platform and Requirements
 
-- Windows 10 or Windows 11
+- Windows 10 or Windows 11 (initial tested baseline planned: Windows 10 22H2 and supported Windows 11 releases; capabilities detected at runtime)
 - 64-bit (x64)
 - Native C++ application
 - CMake build system
@@ -88,8 +88,8 @@ There are no stable releases available yet.
 
 1. Establish the application architecture and build system.
 2. Implement basic simplex audio routing.
-3. Add duplex routing and multiple simultaneous connections.
-4. Implement persistent device identification and automatic recovery.
+3. Validate independent-clock synchronization, latency, backend comparison, and exclusive-mode behavior.
+4. Establish recovery and portable device identity, then expand to duplex and multiple holes.
 5. Add profiles and configurable startup behavior.
 6. Develop the graphical interface and system tray integration.
 7. Implement signal activity monitoring and output test beeps.

@@ -25,7 +25,30 @@ The roadmap prioritizes:
 9. Performance validation.
 10. Release readiness.
 
-The roadmap is organized by dependencies and validation gates rather than calendar deadlines.
+The roadmap is organized by dependencies and validation gates rather than calendar deadlines. The reconciled working sequence below governs ordering; the existing numbered phases remain the deliverable inventory and retain their history. Documentation approval does not authorize implementation or prototypes.
+
+## Reconciled Working Sequence
+
+This sequence incorporates owner guidance without dropping existing v0.1 requirements. Acceptance criteria below are outcomes to demonstrate, not claims of completed tests. Exact soak durations, drift bounds, quality tolerances, and performance thresholds must be documented with the prototype plan; review suggestions such as eight-hour runs or ±200 ppm were not approved as fixed requirements.
+
+| Order | Scope and existing milestone mapping | Buildable/testable result and acceptance gate |
+|---|---|---|
+| 1 | Reproducible foundation (0.1–0.2); minimum controller, status, diagnostics, and test harness from 2.1/8.1/8.2 | Clean documented Windows x64 build; nonzero tests execute; ordinary-user application shell launches; provisional dependency versions/licenses recorded before integration. |
+| 2 | One reliable simplex path (narrow 1.1/3.1) | Explicit capture-to-render routing transfers known input to the selected output; repeated Start/Stop cleans up; requested/effective format, buffering, and errors are recorded. A developer harness is not a required public CLI. |
+| 3 | Independent-clock synchronization and latency (1.3, relevant 3.2/9.1) | Bounded FIFO behavior under simulated and real independent clocks; distinguish direct transfer, compensation, and conversion; document fidelity, drift/jitter evidence, instability, and latency boundaries. Evaluate established resamplers. No final O-005 response policy is implied by a prototype. |
+| 4 | Backend comparison and exclusive behavior (1.1, D-030) | Equivalent native WASAPI/miniaudio conditions compared for latency, CPU, negotiation, compatibility, exclusive conflicts, cleanup, and recovery observations. Record limitations; selection remains gated on representative evidence, including later duplex. |
+| 5 | Recovery and device identity (1.4, minimum 2.2/2.3, 4.1/4.2, Easy Scan subset) | Explainable portable matching; ambiguous matches require confirmation; disconnect/reconnect and Stop-during-open/retry tests reject stale results; Ready and armed recovery remain correct. Do not invent unresolved persistence schemas. |
+| 6 | Duplex operation (1.2/3.3) | Both independently configured directions transfer known signals; partial failure preserves the healthy direction under the existing default; duplex counts once; resources cleanly stop. Complete representative D-030 evidence before production commitment. |
+| 7 | Multiple holes and mirroring (3.4) | Compatible capture sharing with independent destination queues; failure/slow consumers do not unnecessarily stall unrelated paths; 1–4 and 5–8 policy/advisory and ninth-hole rejection tested. Measure actual achievable hardware performance separately. |
+| 8 | Complete profiles, persistence, transitions, and failover (2.2/2.4, 4.3–4.5) | Approved schemas preserve inheritance, notes, IDs, and edits; invalid/conflicting files remain intact; switches preserve working routes where possible; only configured fallback candidates activate. Resolve O-001/O-002/O-004 before implementing their material policies. |
+| 9 | GUI/tray and personality (6.1–6.6, 7.1–7.2) | D-031 prototype meets documented selectors, accessibility/DPI, diagnostics, and personality requirements before final framework selection; four tabs, Apply/Revert, shared status, close-to-tray, inert DFA, and identical mode behavior validated. O-003 remains a gate for nondefault close/tray semantics. |
+| 10 | Complete setup tools and evidence (5.1–5.3, setup acceptance below) | Easy Scan stays nonintrusive; Advanced Scan consent, stage evidence, cancellation, and partial results work; provisional process isolation evaluated; activity opens no extra capture; Test Beep is bounded, exact-target, cancelable, and non-disruptive. |
+| 11 | Startup and notifications (7.3–7.4) | Shared monotonic deadline, retarget/bypass/cancel races, and stale callbacks tested; missing hardware leads to Ready; no duplicate activation; notifications obey preferences and deduplication. |
+| 12 | Release validation (9.1–10.3) | Representative hardware endurance, latency, fidelity, resource use, sleep/resume, audio-service interruption, portable restoration, and identity ambiguity documented; no known critical data-loss or routing-state defect. Packaging/licensing decisions resolved before distribution. |
+
+The internal command/status boundary, minimal canonical state machine, generation-based cancellation, real-time telemetry, and safe configuration handling begin early and expand with each milestone. Their later numbered sections describe completion scope, not permission to postpone essential foundations. Full Advanced Scan and the complete GUI must not delay the initial simplex proof.
+
+Public transport implementation (8.3) is deferred until core routing is proven and separately authorized; named pipes remain a candidate. O-001 through O-006 in `DECISIONS.md` remain owner decisions, not implementation defaults. The approved Windows 10 22H2 / supported Windows 11 baseline describes intended tests, not universal endpoint capability or completed validation.
 
 ---
 
@@ -1223,7 +1246,9 @@ A demonstration that works once is not sufficient evidence of completion.
 
 ---
 
-## 13. Implementation Sequence Summary
+## 13. Original Phase Inventory
+
+These phase labels preserve the original scope and references. Use the Reconciled Working Sequence above for execution order.
 
 | Phase | Primary Outcome |
 |---|---|
@@ -1246,13 +1271,11 @@ A demonstration that works once is not sufficient evidence of completion.
 
 Before beginning implementation:
 
-1. Reconcile `AGENTS.md` against the finalized specifications.
-2. Establish the repository and build environment.
-3. Evaluate the audio backend candidates.
-4. Prototype simplex and duplex routing.
-5. Validate drift compensation and device identity.
-6. Record the resulting technical decisions.
-7. Begin the production architecture.
+1. Review this documentation reconciliation and keep O-001 through O-006 explicitly Open until owner resolution.
+2. Obtain implementation/prototype authorization; none is granted by this documentation update.
+3. Follow the Reconciled Working Sequence: foundation, simplex, independent clocks/latency, backend/exclusive comparison, recovery/identity, then duplex.
+4. Record measured evidence and limitations before final backend, GUI, DSP, or probe-isolation commitment.
+5. Resolve material schema/product choices before their production implementation; continue only independent authorized work around unresolved decisions.
 
 ---
 

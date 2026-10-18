@@ -1345,3 +1345,15 @@ Determine how to handle large profile collections without creating excessively t
 ## Personality-aware tray copy
 
 Routine noncritical tray notifications use the authored Normal/Vanilla/UwU variants in `PERSONALITY.md` §16. Keep endpoint names and actionable error content literal. Switching personality changes future notification copy immediately without changing tray actions or routing state.
+
+---
+
+## Reconciled status and unresolved preferences
+
+The eight public states follow D-019, including Stopping. Capacity counts enabled holes in the armed plan, not only currently operating holes, and does not guarantee eight-hole hardware performance. GUI, tray, and internal status consume the same authoritative observations.
+
+O-001 in `DECISIONS.md` leaves fallback health classification Open. The Degraded fallback tooltip in Section 17.2 is illustrative, not a decision that every successful fallback is degraded. Running plus a separate fallback indication is a recommendation only. Actual endpoint information remains required under either choice.
+
+O-002 leaves ordinary switch preparation thresholds Open; preserve D-022's transactional safeguards and deliberate Ready activation. O-003 leaves nondefault close/tray settings Open. Do not infer that `tray_status_enabled: false` removes the sole operational interface or that `close_to_tray: false` authorizes a new exit behavior. Existing close-to-tray defaults, accessible Start/Stop/Open/Exit, and tray-failure handling remain unchanged.
+
+Stop invalidates pending recovery, failover, scan work, and startup operations. Stale completions cannot rearm routing. Tray/UI remain responsive while slow driver operations finish or are contained; cancellation is not a guarantee of immediate driver-call interruption. All established personality-aware notifications and deferred hole-toggle restrictions remain intact.

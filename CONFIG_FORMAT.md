@@ -1352,7 +1352,7 @@ The active-hole limit is:
 
 A simplex hole and a duplex hole each count as one logical hole.
 
-Saved inactive holes may exceed the active capacity limit.
+Saved inactive holes may exceed the active capacity limit. Capacity counts enabled holes in the armed plan, including waiting or recovering holes; a duplex hole counts once. This policy does not establish a universally achievable hardware performance level.
 
 ---
 
@@ -1798,3 +1798,19 @@ The GUI and diagnostics should be able to explain why a device was matched autom
 13. **Never silently destroy user-authored configuration.**
 
 **AudioHole's configuration should be understandable to someone who has never read its source code, and portable enough that moving to another computer does not mean rebuilding the entire audio setup.**
+
+---
+
+## Reconciliation notes — unresolved production schemas
+
+The examples above retain their documented illustrative status. Owner approval of architectural direction does not finalize concrete fields that were previously left open. O-004 in `DECISIONS.md` must be resolved before production serialization of endpoint-specific format/mode/period requests, application queues, channel maps, incomplete holes, coupled duplex values, or failover placement. Do not infer new enums, defaults, or field locations from prose recommendations.
+
+Preserve `audio_defaults` inheritance and explicit directional overrides. A direction can negotiate different source and destination formats or periods; requested preferences and effective runtime values must be distinguishable. The current one-direction preference examples do not prove identical endpoint parameters. Reported lists of rates, formats, and channels do not establish support for their Cartesian product. Evidence concerns a complete configuration in its recorded mode and environment.
+
+Preserve standard JSON, explicit standardized information states, notes, stable logical IDs, unknown-field handling, and filename/display-name synchronization. An omitted inheritable override is different from an unavailable capability. Draft unconfigured holes remain permitted; their final field representation belongs to O-004.
+
+Per-user configuration, portable deployment support, and separation from machine-local bindings are accepted. Exact directories, root selection, portable activation, and unwritable-root behavior remain Open under O-006. O-003 leaves the nondefault meaning of `close_to_tray` and `tray_status_enabled` unresolved; their illustrative presence does not authorize changing established close-to-tray behavior or hiding operational controls.
+
+Capability provenance and verification remain separate. Store actual test context and preserve stale history without treating it as a current guarantee. Current fallback and processing observations belong to runtime status; they do not silently rewrite preferred endpoint requests or invent a persistent direct-transfer policy (O-001/O-005). Pending operations and countdowns are not reconstructed as authorization to resume routing.
+
+Single-file atomic replacement does not imply a cross-file transaction. Preserve originals on failed renames and detect external-write conflicts. Case-insensitive collisions, reserved Windows names, case-only renames, and duplicate logical IDs require validation under existing naming rules. Summaries remain derived from validated authoritative records, never a source that overwrites those records. Exact implementation and backup policies remain subject to the existing integrity requirements.

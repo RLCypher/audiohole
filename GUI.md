@@ -341,11 +341,9 @@ The recommendation should consider:
 
 ### 7.2 Recommendation Priority
 
-The general preference should be:
+First determine eligibility: honor explicit requirements and technical constraints; experimental capability use requires the permission described in `DEVICE_PROBING.md` Section 8.5. Consent to intrusive testing and permission to use experimental results are distinct.
 
-1. A verified, compatible configuration with favorable latency and stability characteristics.
-2. A compatible configuration supported by reliable reported capabilities.
-3. A conservative fallback when capability evidence is incomplete.
+Then rank eligible configurations using applicable evidence of compatibility, verified stability, fidelity, latency, and unnecessary processing. A reported configuration may also have runtime verification; these are not mutually exclusive categories. A verified experimental result does not bypass permission or automatically outrank a reported configuration. Use a clearly labeled conservative default when evidence is incomplete. Exact scoring remains open under D-035 and Section 25.3.
 
 The recommendation must not assume that the highest sample rate or bit depth is automatically the best choice.
 
@@ -414,7 +412,7 @@ Audio Format                  ⓘ
 │ 48 kHz · Stereo · float32 (Recommended)  ▼ │
 └────────────────────────────────────────────┘
 ✓ Verified on both endpoints.
-  No sample-rate conversion required.
+  No nominal-rate conversion required; clock compensation may still be needed.
 ```
 
 This example assumes the relevant configuration has actually been verified.
@@ -427,7 +425,7 @@ Other possible explanations include:
 
 **Recommended**
 
-"Verified during Advanced Scan. Avoids unnecessary sample-rate conversion."
+"Verified under the recorded Advanced Scan conditions. Avoids nominal-rate conversion; independent clocks may still require compensation."
 
 **Default**
 
@@ -1128,6 +1126,7 @@ The GUI must use the profile state model established in `PROFILES.md`.
 - Degraded.
 - Recovering.
 - Failed.
+- Stopping.
 
 ### 17.2 Ready
 
@@ -1574,3 +1573,19 @@ This is a **destination audibility check**, distinct from the passive source sig
 ## Personality message coverage
 
 All common main-window, setup, diagnostics, profile, settings, and Test Beep user-facing messages must use the authored mode variants specified in `PERSONALITY.md` §16. UwU Mode must be conspicuous in routine workflows, not confined to its Settings label. Technical controls, endpoint names, warning content, and accessibility labels remain intelligible and unmodified.
+
+---
+
+## Reconciled interface contracts and open policy
+
+D-019's eight canonical states include Stopping; resolving is internal to Starting. Capacity displays count enabled holes in the armed plan, including those waiting/recovering, while actual operating paths and measured performance remain separately visible. Eight holes is not a hardware guarantee.
+
+wxWidgets is the leading candidate only. The D-031 prototype must demonstrate the existing four tabs, searchable selectors, recommendations, diagnostics, accessibility/DPI behavior, tray integration, and authored Normal/Vanilla/UwU modes before final selection.
+
+A direction's single format/buffer control does not establish identical effective capture and render parameters. Show actual conversion/compensation and evidence limitations; exact endpoint-specific controls depend on O-004. Nominal-rate compatibility does not prove conversion-free or bit-perfect operation. O-005 leaves direct-transfer eligibility, instability thresholds, automatic compensation, and user controls undecided; do not expose an invented preference or silently promise unchanged samples.
+
+O-001 leaves fallback health aggregation open; show the actual fallback regardless. O-002 leaves switch-preparation thresholds open while preserving working-routing safeguards. O-003 leaves nondefault close/tray preference behavior open; keep established defaults and explicit Stop/Exit. O-006 leaves exact portable-root selection open. Recommendations in the decision register do not authorize interface changes.
+
+Pending worker results use generation-based stale-result rejection. Stop takes precedence over pending recovery, scans, and startup. Driver-call cancellation is not universally immediate. Test Beep cancellation stops further sample production promptly, but queued endpoint audio may remain briefly audible. Preserve exact destination selection and reject unsafe active-route conflicts rather than introducing unapproved mixing. Activity observation remains passive, temporary, source-only, and off by default.
+
+All established personality coverage and safety/accessibility boundaries remain unchanged; no runtime text rewriting or operational difference among modes is introduced.

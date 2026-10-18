@@ -524,6 +524,7 @@ Supported profile runtime states:
 - `degraded`
 - `recovering`
 - `failed`
+- `stopping`
 
 ### 10.1 Example Status Response
 
@@ -980,3 +981,15 @@ This feature does not add a required external API endpoint, audio-streaming endp
 The internal controller shall support a GUI-initiated **Test Beep** command specifying exactly one resolved playback destination endpoint (and hole/direction where relevant), plus a cancellation command and transient status. The operation is explicitly initiated and bounded; it is not a profile setting or an automatic recovery action. Report the exact target and whether the test is idle, playing, unavailable, or failed. An acknowledgment is not proof of audibility.
 
 No external transport or public test-beep API is required for v0.1. If exposed later, it must retain the same safety, target selection, and nonpersistent semantics. The test-beep command is distinct from passive source activity observation.
+
+---
+
+## Reconciled internal control boundary
+
+The internal command/status boundary is required early; public external transport implementation is deferred until core routing is proven. Named pipes remain a candidate, not a selected or enabled transport. Exploratory external JSON examples are not new persistent schemas.
+
+Public routing status follows all eight D-019 states, including Stopping; resolving remains internal. Report armed-plan enabled-hole capacity separately from running paths and hardware performance. Requested and actual endpoints/processing must remain distinguishable; exact new payload fields are not finalized here.
+
+Use generation-based cancellation across asynchronous opens, retries, profile operations, scans, startup, and Test Beep. Stop takes precedence and stale results cannot commit routing. Keep acknowledgment, operation completion, and demonstrated stream operation distinct; no API consumer may infer audibility from acceptance or stream progress.
+
+O-001 leaves fallback aggregation Open, O-002 leaves switch preparation thresholds Open, and O-004 leaves concrete production persistence fields Open. O-005 leaves direct-transfer policy Open: status must accurately explain any actual conversion/clock correction without promising bit-perfect output, but no direct-only command or preference is approved. O-003/O-006 retain close/tray and storage decisions for owner review. Internal UI adapters share these unresolved boundaries rather than independently selecting policy.

@@ -445,16 +445,9 @@ When devices support matching configurations, those configurations should receiv
 
 ### 8.2 Selection Priorities
 
-Automatic format selection shall consider:
+First establish eligibility using user requirements, technical constraints, current availability, and permission for experimental capability use (Section 8.5). Authorization to run intrusive tests does not itself authorize automatic use of experimental results.
 
-1. Operational stability and actual device availability.
-2. User-specified requirements.
-3. Windows-reported supported configurations.
-4. Verified experimental configurations.
-5. Compatibility between source and destination.
-6. Required resampling or format conversion.
-7. Buffering and latency characteristics.
-8. Processing overhead.
+Then rank eligible configurations using applicable evidence of compatibility, verified stability, fidelity, latency, and unnecessary processing. Reported provenance and runtime verification can coexist. Reported configurations retain preference over experimental alternatives merely offering more desirable nominal specifications; neither provenance nor a short verification test establishes unconditional stability. Exact scoring remains open under D-035 and `GUI.md` Section 25.3.
 
 Experimental formats must not automatically outrank reported formats merely because they appear to offer a more desirable specification.
 
@@ -829,3 +822,19 @@ The device discovery and capability probing subsystem is complete for v0.1 when:
 - All results include sufficient evidence to explain their classification.
 
 **The objective is not to discover the largest number of formats a driver will accept. It is to discover which configurations can actually be used reliably, then select the configuration that connects devices with the least unnecessary processing.**
+
+---
+
+## Reconciled evidence and probe execution boundaries
+
+Windows does not expose a universal exhaustive list of native hardware formats. `GetMixFormat` describes the shared engine mix format; format-query and initialization results describe the requested mode/API conditions. Shared-mode acceptance may involve conversion and never proves native hardware support. Easy Scan may legitimately report unavailable capability information rather than fabricate lists. Separate rate/format/channel lists do not prove every combination works.
+
+Record stage outcomes separately from the overall conclusion. A failed startup stage may leave the overall compatibility conclusion inconclusive because access was busy, a device disappeared, or evidence was insufficient. Preserve the successful stages and original errors. Runtime verification is scoped to its duration, operating mode, actual format/period, and environment; it is not proof of audibility or long-term stability. Exact evidence field schemas and default durations remain open under O-004 and D-041.
+
+Eligibility precedes ranking as in Section 8.2 and `GUI.md` Section 7.2. Applicable evidence of compatibility, verified stability, fidelity, latency, and processing cost guides recommendations. Experimental permissions and evidence limitations remain visible; no fixed buffer-position rule or automatic experimental preference is introduced.
+
+Generation-based cancellation prevents stale results from authorizing further work or changing current routing. Stop takes precedence over pending scan operations; completed evidence may still be preserved. Stop/cancel cannot guarantee immediate interruption of every synchronous driver call. Workers and timeouts must keep the UI responsive without unsafe thread termination.
+
+A dedicated Advanced Scan helper process remains provisional, not required. Evaluate improved user-mode fault containment against IPC/lifecycle complexity and in-process workers. A helper watchdog cannot guarantee release of a wedged driver or recovery of the OS audio stack. Adoption would be a narrowly scoped exception to normal single-process routing and must follow the recorded evaluation gate.
+
+Test Beep is separately authorized, exact-destination playback, not implicit signal verification for a probe. Stream progress, silence, and endpoint presence cannot prove external transport activity or human audibility. Keep its existing cancellation, level, and target constraints unchanged.

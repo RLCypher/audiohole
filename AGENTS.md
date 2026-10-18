@@ -1224,3 +1224,15 @@ The beep must be a brief, quiet, bounded signal (default approximately 1 kHz, -3
 ## Personality coverage directive
 
 Implement `PERSONALITY.md` §16 as normative v0.1 UI copy coverage, not merely an optional tone example. Use a centralized, authored three-mode presentation catalog with the specified common events and tests. UwU is intentionally strongly flirtatious and innuendo-heavy in noncritical UI copy, with frequent deliberate R/L→W styling and kaomoji; preserve technical strings and safety clarity. Do not apply runtime mutation to arbitrary text.
+
+---
+
+## Specification reconciliation guardrail
+
+Follow the owner-authorized reconciliation in `DECISIONS.md`. D-019's eight public states are canonical; resolving is internal to Starting. Capacity counts enabled holes in the armed plan, including waiting/recovering holes, and does not guarantee hardware performance.
+
+Native event-driven WASAPI and wxWidgets are leading candidates, not finalized selections. Toolchain/library approvals are provisional; no implementation or prototype is authorized by the documentation reconciliation itself. Public transport remains deferred until core routing is proven.
+
+Preserve unmodified samples whenever technically feasible without sacrificing reliable continuous operation. Destination pacing, bounded FIFOs, and adaptive synchronization are the baseline. O-005 keeps direct-transfer eligibility, instability thresholds, and response policy Open; do not invent automatic resampling transitions, direct-only preferences, or bit-perfect guarantees.
+
+O-001 through O-006 remain unresolved owner decisions. Recommendations about fallback health, switch preparation, close/tray preferences, production schemas, direct transfer, and storage roots are not accepted requirements. Preserve prior behavior while flagging material choices. Stop takes precedence over pending asynchronous routing, scan, and startup work through generation-based stale-result rejection. Respect all existing real-time, configuration, personality, activity-observation, and Test Beep guardrails.

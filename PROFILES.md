@@ -350,7 +350,7 @@ A mirrored destination implemented through another hole counts as another hole.
 
 Profiles may contain more than eight saved holes.
 
-Disabled holes do not count toward the active capacity limit.
+Disabled holes do not count toward the active capacity limit. Enabled holes in the armed plan reserve capacity even while waiting for hardware or recovery. Eight holes is a policy ceiling, not a guarantee of achievable performance on every endpoint combination.
 
 ### 7.3 Performance Advisory
 
@@ -410,6 +410,7 @@ The user-facing runtime statuses are:
 | `degraded` | Some requested paths are operating; others are unavailable or failed |
 | `recovering` | Previously established routing was interrupted and recovery is underway |
 | `failed` | A routing error prevents all requested paths from operating |
+| `stopping` | Shutdown of routing resources is in progress |
 
 ### 8.4 Ready Is Not Failure
 
@@ -1434,3 +1435,19 @@ These questions do not change the established profile lifecycle or failure-recov
 16. **Profile files must remain human-readable, manually editable, and portable.**
 
 **A profile should behave like a saved patchbay: load it, arm it, and AudioHole establishes the intended connections whenever the equipment is ready, without requiring the user to rebuild the wiring or manually restart a failed route.**
+
+---
+
+## Reconciled activation and unresolved owner policy
+
+The canonical public states are D-019's Stopped, Ready, Starting, Running, Degraded, Recovering, Failed, and Stopping. Resolving is an internal Starting phase. Enabled holes in the armed plan reserve capacity even when unavailable or recovering; eight is a capacity policy, not a universal throughput guarantee.
+
+O-001 remains Open: successful configured fallback could be Running with an explicit fallback indication or remain Degraded. The recommendation is the former when all routing obligations are satisfied, but neither policy is accepted. The tray's fallback example is illustrative and must not settle aggregation. Always distinguish preferred and actual endpoints.
+
+O-002 remains Open: “sufficiently prepared” in Section 11.1 does not yet define an all-path versus authorized-partial commit threshold. Preparing all enabled required paths is a recommendation, not an accepted rule. Existing D-022 safeguards remain: preserve previous working routing where technically possible, warn about disruptive exclusive transitions, retain best-effort rollback, and require deliberate activation into Ready rather than silently replacing working routing. Initial activation with missing hardware and switching away from working routing are distinct cases.
+
+O-004 leaves exact coupled-duplex policy and persistence fields open. Preserve the existing `keep_healthy_direction` default. O-005 leaves direct-transfer eligibility and instability response open; nominal format matching never guarantees perpetual unchanged transfer. O-003/O-006 leave nondefault close/tray behavior and storage-root selection open.
+
+All asynchronous session operations use generation-based cancellation and stale-result protection. Stop disarms the session and takes precedence over startup, recovery, failover, and pending scan work; obsolete completions cannot restart streams. This does not imply unsafe termination of a blocked driver call. Recovery remains bounded/backed off and event-aware rather than abandoning armed intent after a fixed hardware-wait timeout.
+
+Device matching is conservative and explainable. Local bindings remain subject to current identity evidence, and ambiguous returning endpoints require confirmation. No silence-based failure inference, guessed reverse route, or silent substitution is permitted.
