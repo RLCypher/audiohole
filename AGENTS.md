@@ -1268,7 +1268,8 @@ configuration changes are authorized by this presentation amendment.
 
 GUI.md's production presentation preview supersedes repeated on-screen simulation
 labels: disclose all simulated operations and silent Test Beep in the startup notice
-on each interactive launch, with Introduction available to repeat it. Use production
+on each interactive launch. Replay Tutorial is a separate Settings action that
+currently displays the owner-approved tutorial placeholder, not this notice. Use production
 language in interface/status/commentary, while keeping unavailable measurements
 unavailable and simulator provenance explicit in engineering/package evidence.
 No real routing or persistence is authorized. Follow System is now the default;

@@ -68,7 +68,10 @@ void Frame::build_settings() {
         refresh();
     });
     root->Add(row);
-    button(page, root, "Introduction", [this] { introduction(); });
+    button(page, root, "Replay Tutorial", [this] {
+        wxMessageBox("Tutorial not yet implemented, please enjoy this placeholder message.",
+                     wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
+    });
     auto* advanced = new wxStaticBoxSizer(wxVERTICAL, page, "Advanced");
     auto* box = advanced->GetStaticBox();
     dfa_ = button(box, advanced, "DFA", [this] { present(presentation::Message::Dfa); });
@@ -108,7 +111,7 @@ void Frame::build_settings() {
     notebook_->AddPage(page, "Settings");
     reload_personalities();
 }
-void Frame::introduction() {
+void Frame::testing_notice() {
     wxMessageBox(
         "AudioHole testing build\n\n"
         "All devices, capabilities, routing, scans, activity and recovery in this version "

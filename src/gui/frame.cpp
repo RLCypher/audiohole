@@ -386,7 +386,8 @@ bool Frame::smoke(const wxString& directory) {
         select_page(0);
         require(navigation_[0]->GetValue() && !navigation_[1]->GetValue(),
                 "Selected navigation state mismatch");
-        require(navigation_[0]->GetLabel().Contains("[selected]"),
+        require(navigation_[0]->GetLabel() == wxS("[Profiles]") &&
+                    navigation_[1]->GetLabel() == notebook_->GetPageText(1),
                 "Selected tab lacks textual distinction");
         wxCommandEvent scan(wxEVT_BUTTON, scan_start_->GetId());
         scan_start_->GetEventHandler()->ProcessEvent(scan);

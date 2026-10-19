@@ -80,8 +80,8 @@ class Frame final : public wxFrame {
             tray_->RemoveIcon();
         Destroy();
     }
-    void show_introduction() {
-        introduction();
+    void show_testing_notice() {
+        testing_notice();
     }
     void tray_activate(const std::string& id) {
         show_result(controller_->activate(id));
@@ -177,7 +177,7 @@ class Frame final : public wxFrame {
     void end_observation();
     void present(presentation::Message);
     void show_result(const audiohole::Result&);
-    void introduction();
+    void testing_notice();
     void export_log();
 };
 

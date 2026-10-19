@@ -65,9 +65,9 @@ void Frame::update_navigation() {
         tab->SetValue(active);
         tab->SetToolTip(wxS("Open ") + notebook_->GetPageText(index) +
                         wxS(". Use arrows or Ctrl+Tab to change pages."));
-        // Selected wording and bold weight remain identifiable without color.
-        tab->SetLabel(notebook_->GetPageText(index) +
-                      (active ? wxString(wxS(" [selected]")) : wxString{}));
+        // Brackets and bold weight identify selection without adding a status suffix.
+        const auto title = notebook_->GetPageText(index);
+        tab->SetLabel(active ? wxS("[") + title + wxS("]") : title);
         auto font = tab->GetFont();
         font.SetWeight(active ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
         tab->SetFont(font);

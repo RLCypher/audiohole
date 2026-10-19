@@ -71,7 +71,7 @@ class App final : public wxApp {
         SetTopWindow(frame);
         frame->Show();
         if (!smoke)
-            CallAfter([frame] { frame->show_introduction(); });
+            CallAfter([frame] { frame->show_testing_notice(); });
         if (smoke)
             CallAfter([this, frame, screenshot_dir] {
                 result_ = frame->smoke(screenshot_dir) ? 0 : 1;

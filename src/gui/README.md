@@ -46,7 +46,8 @@ page changes still send the same book events that stop temporary observation. No
 appearance operation issues controller commands or writes OS/configuration settings.
 
 The current production-style preview moves simulation disclosures to the startup
-notice on every interactive launch (also accessible through Introduction). The
+notice on every interactive launch. The separate Replay Tutorial Settings action
+currently displays a warning placeholder without changing session/controller state. The
 controller remains deterministic, session-only, and incapable of real device/audio
 access. Stable production-style state/detail strings are preview copy, not measured
 hardware results. Exports retain an explicit simulator header for provenance.

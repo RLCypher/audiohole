@@ -13,7 +13,7 @@ Use the **Release** artifact for the exact commit under review. Extract the ZIP,
 - [ ] Run Easy and Advanced simulated scans, inspect consent, progress, cancellation, technical console filters, search, copy, and explicit diagnostic export. No hardware testing or experimental-use permission is implied.
 - [ ] Preview immediate/delayed startup; countdown does not reset on refresh. Start bypasses delay for its pending target; Stop cancels pending work. No OS startup entry is created.
 - [ ] Switch Normal, Vanilla, and UwU during an active simulation. Operational facts, labels, warnings, names, and diagnostics stay literal. Normal/UwU commentary varies only on distinct events and avoids immediate repetition; Vanilla stays neutral/constant. Repaint/polling does not regenerate commentary.
-- [ ] In Settings → Advanced click DFA repeatedly: only its local acknowledgment changes. Vanilla hides DFA. Routing and diagnostic history remain unchanged. Rerun Introduction without losing session data.
+- [ ] In Settings → Advanced click DFA repeatedly: only its local acknowledgment changes. Vanilla hides DFA. Routing and diagnostic history remain unchanged. Replay Tutorial shows the warning placeholder without losing session data.
 - [ ] Close hides to tray; reopen without restarting the simulation. Tray shows state/profile, Start/Stop, profile activation, read-only directional states, Open, Exit. Minimize behaves normally. Verify Windows Explorer restart recovery, notifications/preferences, and second-launch focus on an interactive desktop.
 - [ ] Exit stops and terminates, removing the tray icon. Relaunch shows fresh authored fixtures, with no previous edits saved.
 
@@ -71,7 +71,7 @@ Production buffer/queue policy remains unresolved.
 
 - [ ] On every fresh interactive launch, acknowledge the notice covering all
   simulated functions, silent Test Beep, no real audio/device access, and
-  session-only settings. Introduction repeats it. Check that operation panels,
+  session-only settings. Replay Tutorial instead shows its separate placeholder. Check that operation panels,
   top status, tray, and Normal/UwU commentary use production-style language.
 - [ ] Hover every action button; verify an explanation, readable text, and a
   dark blue-gray hot state in Dark. Press F1 on a focused button to read its help.
@@ -103,3 +103,9 @@ alone do not establish these visual/desktop behaviors.
   notifications at the same settled value do not reroll commentary. At 0.00 verify
   “Done fucking around.” in Normal and its authored UwU counterpart. Other special
   thresholds still select their own responses; controller/diagnostic state is unchanged.
+
+- [ ] Selected tabs read `[Profiles]`, `[Devices]`, etc.; inactive tabs have no
+  brackets or `[selected]` suffix. Retain bold/high-contrast selection and keyboard
+  navigation. In Settings, **Replay Tutorial** shows the requested warning placeholder
+  rather than the startup simulation notice. Dismiss it and confirm edits and active
+  routing state are retained.

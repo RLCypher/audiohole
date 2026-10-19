@@ -168,7 +168,7 @@ Users must not be forced to perform a scan before accessing the application.
 
 Settings must include:
 
-**Run Introduction Again**
+**Replay Tutorial**
 
 Rerunning the introduction must not delete existing profiles or reset settings.
 
@@ -1063,7 +1063,7 @@ External control should be disabled by default unless a later security review ch
 
 Settings must include:
 
-**Run Introduction Again**
+**Replay Tutorial**
 
 ### 15.7 Advanced Settings
 
@@ -1653,7 +1653,8 @@ simulation/development notes with a neutral startup notice on every interactive
 launch. That notice must explicitly cover simulated devices, capabilities, routing,
 scans, monitoring/recovery, silent Test Beep, and session-only edits/preferences.
 It must state that no real audio/device access occurs and displayed state is not
-hardware evidence. Introduction can show it again. Package metadata and engineering
+hardware evidence. The separate Replay Tutorial action currently shows a tutorial
+placeholder, not this notice. Package metadata and engineering
 documentation continue to identify the simulator; unavailable measurements remain
 unavailable. This presentation amendment does not authorize real audio or persistence.
 
@@ -1676,3 +1677,12 @@ Changed, settled DFA values without a dedicated threshold response now acknowled
 through the existing button-response pool. Threshold pools take precedence; dragging
 still updates the value without repeated commentary, and duplicate settlement events
 remain suppressed. This owner-approved correction changes presentation only.
+
+### Minor navigation and tutorial presentation correction
+
+Selected navigation labels use brackets around the page name, such as `[Profiles]`,
+with the existing bold/color/native selected state; inactive labels stay unbracketed.
+Settings uses **Replay Tutorial**, independently of the startup testing disclosure.
+Until the tutorial is implemented, this action shows a warning dialog reading:
+“Tutorial not yet implemented, please enjoy this placeholder message.” It changes
+no session/controller state. The simulation disclosure still appears on each launch.

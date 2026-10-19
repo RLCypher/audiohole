@@ -138,7 +138,8 @@ wxString button_help(const wxString& title) {
          "Exercise immediate or delayed profile activation without registering Windows startup."},
         {"Cancel pending activation",
          "Cancel the startup countdown and disarm pending activation."},
-        {"Introduction", "Show the setup guide and this testing build's limitations."},
+        {"Replay Tutorial", "Reopen the setup tutorial. This build displays a placeholder; your "
+                            "session is unchanged."},
         {"DFA", "Working as intended."},
         {"Test Beep", "Test only the explicitly selected playback destination. Cancel stops the "
                       "test immediately."},
