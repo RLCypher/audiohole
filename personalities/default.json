@@ -161,6 +161,34 @@
     "buffer_changed": [
       "A little timing adjustment. Apply when ready.",
       "A little room to breathe. Apply when ready."
+    ],
+    "simplex": [
+      "One way it is.",
+      "Keeping this connection pointed in one direction."
+    ],
+    "device_saved": [
+      "Name on the patch sheet. Sorted.",
+      "Noted. Same device, clearer label."
+    ],
+    "scan_level_changed": [
+      "Choosing how closely to inspect the wiring.",
+      "Inspection depth set. Clipboard ready."
+    ],
+    "scan_scope_changed": [
+      "That's the patch bay we're checking.",
+      "Inspection boundaries set."
+    ],
+    "diagnostics_copied": [
+      "Clipboard loaded. The other kind.",
+      "A little paperwork to take with you."
+    ],
+    "diagnostics_exported": [
+      "Paper trail filed.",
+      "Evidence packed and ready."
+    ],
+    "diagnostics_cleared": [
+      "Clean slate. Same cables.",
+      "Fresh page in the logbook."
     ]
   }
 }

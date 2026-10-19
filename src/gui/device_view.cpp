@@ -20,8 +20,14 @@ void Frame::build_devices() {
             auto edit = *e;
             edit.display_name = utf8(device_name_->GetValue());
             edit.notes = utf8(device_notes_->GetValue());
-            show_result(controller_->update_endpoint(edit));
+            const auto result = controller_->update_endpoint(edit);
+            if (!result.ok) {
+                show_result(result);
+                return;
+            }
             populate_devices();
+            refresh();
+            present(presentation::Message::DeviceSaved);
         }
     });
     button(page, right, "Toggle availability", [this] {

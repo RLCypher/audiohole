@@ -217,8 +217,8 @@ void Frame::build_profiles() {
         reverse_.group->ShowItems(duplex_->GetValue());
         editor->FitInside();
         editor->Layout();
-        if (duplex_->GetValue())
-            present(presentation::Message::Duplex);
+        present(duplex_->GetValue() ? presentation::Message::Duplex
+                                    : presentation::Message::Simplex);
     });
     monitor_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
         controller_->monitor(monitor_->GetValue());

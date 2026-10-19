@@ -50,6 +50,13 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"dfa_six_seven", "DFA Acknowledged"},
     {"dfa_maximum", "DFA Acknowledged"},
     {"buffer_changed", "Buffer changed in the editor. Save / Apply is required."},
+    {"simplex", "Simplex selected. Save / Apply is required to change active routing."},
+    {"device_saved", "Device saved. Windows name and logical identity are unchanged."},
+    {"scan_level_changed", "Testing level changed. Applies to the next scan."},
+    {"scan_scope_changed", "Scan scope changed. Applies to the next scan."},
+    {"diagnostics_copied", "Visible diagnostics copied to the clipboard."},
+    {"diagnostics_exported", "Visible diagnostics exported."},
+    {"diagnostics_cleared", "Diagnostics log cleared. Routing and settings are unchanged."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;

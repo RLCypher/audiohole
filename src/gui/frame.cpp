@@ -212,7 +212,7 @@ void Frame::refresh() {
             : text("Test Beep active: " + s.beep_destination + ". Cancel immediately if needed."));
     scan_progress_->SetValue(s.scan_percent);
     const auto query = log_search_->GetValue().Lower();
-    std::string logs = "Technical diagnostics\n";
+    std::string logs;
     for (const auto& e : s.events) {
         if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed")
             continue;
@@ -304,6 +304,21 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().state == audiohole::State::Running,
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
+        duplex_->SetValue(false);
+        wxCommandEvent duplex_change(wxEVT_CHECKBOX, duplex_->GetId());
+        duplex_->GetEventHandler()->ProcessEvent(duplex_change);
+        require(last_message_ == presentation::Message::Simplex &&
+                    !commentary_->GetLabel().empty() && controller_->snapshot().paths.size() == 2,
+                "Unchecking Duplex lacks acknowledgment or changed the live plan");
+        duplex_->SetValue(true);
+        duplex_->GetEventHandler()->ProcessEvent(duplex_change);
+        auto* save_device = wxWindow::FindWindowByLabel("Save device", this);
+        require(save_device != nullptr, "Save device action missing");
+        wxCommandEvent device_save(wxEVT_BUTTON, save_device->GetId());
+        save_device->GetEventHandler()->ProcessEvent(device_save);
+        require(last_message_ == presentation::Message::DeviceSaved &&
+                    !commentary_->GetLabel().empty(),
+                "Save device acknowledgment missing");
         require(messages_.available("default") && messages_.available("uwu"),
                 "Packaged personality files unavailable or invalid");
         const auto before = controller_->snapshot().revision;
@@ -389,6 +404,19 @@ bool Frame::smoke(const wxString& directory) {
         require(navigation_[0]->GetLabel() == wxS("[Profiles]") &&
                     navigation_[1]->GetLabel() == notebook_->GetPageText(1),
                 "Selected tab lacks textual distinction");
+        const auto scan_options_revision = controller_->snapshot().revision;
+        scan_mode_->SetSelection(1);
+        wxCommandEvent level_change(wxEVT_CHOICE, scan_mode_->GetId());
+        scan_mode_->GetEventHandler()->ProcessEvent(level_change);
+        require(last_message_ == presentation::Message::ScanLevelChanged,
+                "Testing level acknowledgment missing");
+        scan_mode_->SetSelection(0); // Avoid consent dialogs in unattended smoke.
+        scan_scope_->SetSelection(1);
+        wxCommandEvent scope_change(wxEVT_CHOICE, scan_scope_->GetId());
+        scan_scope_->GetEventHandler()->ProcessEvent(scope_change);
+        require(last_message_ == presentation::Message::ScanScopeChanged &&
+                    controller_->snapshot().revision == scan_options_revision,
+                "Scan scope acknowledgment missing or options started controller work");
         wxCommandEvent scan(wxEVT_BUTTON, scan_start_->GetId());
         scan_start_->GetEventHandler()->ProcessEvent(scan);
         require(last_message_ == presentation::Message::ScanStarted,
@@ -411,6 +439,24 @@ bool Frame::smoke(const wxString& directory) {
                 "Scan completion missing top callout");
         require(technical_->GetLabel() != scan_heading && !commentary_->GetLabel().empty(),
                 "Scan completion did not update information and commentary");
+        auto* clear_log = wxWindow::FindWindowByLabel("Clear diagnostics log", this);
+        require(clear_log != nullptr, "Clear diagnostics action missing");
+        wxCommandEvent clear(wxEVT_BUTTON, clear_log->GetId());
+        clear_log->GetEventHandler()->ProcessEvent(clear);
+        require(controller_->snapshot().events.empty() && console_->GetValue().empty() &&
+                    last_message_ == presentation::Message::DiagnosticsCleared &&
+                    controller_->snapshot().state == audiohole::State::Running,
+                "Clear diagnostics failed or interrupted routing");
+        refresh();
+        require(console_->GetValue().empty() &&
+                    last_message_ == presentation::Message::DiagnosticsCleared,
+                "Cleared diagnostics reappeared on refresh");
+        scan_start_->GetEventHandler()->ProcessEvent(scan);
+        controller_->advance(3000);
+        refresh();
+        require(last_message_ == presentation::Message::ScanCompleted &&
+                    !console_->GetValue().empty(),
+                "New events missing after diagnostics clear");
         controller_->monitor(true);
         notebook_->SetSelection(1);
         require(!controller_->snapshot().monitoring, "Monitor survived panel closure");

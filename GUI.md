@@ -1686,3 +1686,19 @@ Settings uses **Replay Tutorial**, independently of the startup testing disclosu
 Until the tutorial is implemented, this action shows a warning dialog reading:
 “Tutorial not yet implemented, please enjoy this placeholder message.” It changes
 no session/controller state. The simulation disclosure still appears on each launch.
+
+### Editing and diagnostics acknowledgments
+
+Unchecking Duplex acknowledges simplex selection without applying editor changes.
+Save Device acknowledges only a successful update. Testing Level and Scope changes
+acknowledge selection for the next scan without starting or changing an active scan.
+Copy/Export Visible Diagnostics acknowledge only successful clipboard/file completion;
+cancelled dialogs and failed writes must not display a success acknowledgment.
+
+Scanning / Diagnostics includes **Clear diagnostics log**. This clears all retained
+in-memory session events, including entries hidden by current filters, and refreshes
+the console immediately. Keep filters, routing, profiles, device data, scan progress,
+startup, monitoring and Test Beep state intact. Do not delete exported files or add
+a replacement log entry. Future events continue to appear normally; unchanged
+refreshes do not restore cleared entries. A concise technical acknowledgment and
+eligible authored commentary confirm the action. Tooltips explain the clear scope.

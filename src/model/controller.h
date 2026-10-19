@@ -124,6 +124,10 @@ class Controller {
     // missing/ambiguous/capture endpoints and exclusive conflicts. Emits NO SOUND.
     virtual Result beep(const std::string& destination) = 0;
     virtual void cancel_beep() = 0;
+    // GUI-thread command: clears all retained session diagnostics, including hidden
+    // filtered entries. Preserves event sequence monotonicity and all routing,
+    // profile, device, scan, startup and observation state; no disk files touched.
+    virtual void clear_diagnostics() = 0;
     // Simulated progress only. Advanced consent and scope are presentation concerns;
     // no fixture capability is promoted to experimental/verified hardware evidence.
     virtual void scan(bool enabled, bool advanced = false, ScanScope scope = ScanScope::Update,
@@ -152,6 +156,7 @@ class SimulatedController final : public Controller {
     void monitor(bool) override;
     Result beep(const std::string&) override;
     void cancel_beep() override;
+    void clear_diagnostics() override;
     void scan(bool, bool advanced = false, ScanScope scope = ScanScope::Update,
               const std::string& selected_device = {}) override;
 

@@ -274,3 +274,46 @@ TEST(Simulator, HotplugRecoveryDoesNotRestartHealthyDuplexLeg) {
     controller.advance(300);
     EXPECT_EQ(controller.snapshot().state, State::Running);
 }
+
+TEST(Simulator, ClearingDiagnosticsPreservesOperationsAndFutureEventOrdering) {
+    SimulatedController controller;
+    ASSERT_TRUE(controller.activate("profile-duplex").ok);
+    controller.advance(300);
+    controller.scan(true);
+    controller.monitor(true);
+    ASSERT_TRUE(controller.beep("mixer-out").ok);
+    ASSERT_TRUE(controller.schedule("profile-simplex", 5000).ok);
+    const auto before = controller.snapshot();
+    ASSERT_FALSE(before.events.empty());
+    const auto sequence = before.events.back().sequence;
+    controller.clear_diagnostics();
+    const auto& after = controller.snapshot();
+    EXPECT_TRUE(after.events.empty());
+    EXPECT_EQ(after.revision, before.revision + 1);
+    EXPECT_EQ(after.state, before.state);
+    EXPECT_EQ(after.armed, before.armed);
+    EXPECT_EQ(after.active_profile, before.active_profile);
+    EXPECT_EQ(after.pending_profile, before.pending_profile);
+    EXPECT_EQ(after.pending_ms, before.pending_ms);
+    EXPECT_EQ(after.scanning, before.scanning);
+    EXPECT_EQ(after.scan_percent, before.scan_percent);
+    EXPECT_EQ(after.monitoring, before.monitoring);
+    EXPECT_EQ(after.beep_destination, before.beep_destination);
+    EXPECT_EQ(after.profiles.size(), before.profiles.size());
+    EXPECT_EQ(after.endpoints.size(), before.endpoints.size());
+    ASSERT_EQ(after.paths.size(), before.paths.size());
+    for (std::size_t index = 0; index < after.paths.size(); ++index) {
+        EXPECT_EQ(after.paths[index].state, before.paths[index].state);
+        EXPECT_EQ(after.paths[index].hole_id, before.paths[index].hole_id);
+        EXPECT_EQ(after.paths[index].reverse, before.paths[index].reverse);
+    }
+    controller.clear_diagnostics();
+    EXPECT_TRUE(controller.snapshot().events.empty());
+    controller.advance(3000);
+    ASSERT_FALSE(controller.snapshot().events.empty());
+    EXPECT_GT(controller.snapshot().events.front().sequence, sequence);
+    EXPECT_EQ(controller.snapshot().events.back().type, "scan-complete");
+    EXPECT_FALSE(controller.snapshot().scanning);
+    EXPECT_TRUE(controller.snapshot().beep_destination.empty());
+    EXPECT_EQ(controller.snapshot().pending_ms, 2000);
+}

@@ -164,6 +164,34 @@
     "buffer_changed": [
       "Buffer tweaked~ comfy little sample cushions! :3",
       "A tiny timing tune-up~ weady when you awe! ^w^"
+    ],
+    "simplex": [
+      "Just one way~ I'll keep that howe focused! :3",
+      "A wittle one-way connection~ UwU"
+    ],
+    "device_saved": [
+      "Youw device has its pwetty name tag~ :3",
+      "Aww~ notes tucked away, same wittle device! UwU"
+    ],
+    "scan_level_changed": [
+      "How cwosely awe we peeking~? OwO",
+      "A wittle inspection adjustment~ :3"
+    ],
+    "scan_scope_changed": [
+      "Those awe the howes we'we checking~ UwU",
+      "Picking whewe to peek~ OwO"
+    ],
+    "diagnostics_copied": [
+      "Detaiws on youw cwipboard~ handwe with cawe! :3",
+      "A wittle bundle of notes, just fow you~ UwU"
+    ],
+    "diagnostics_exported": [
+      "Aww~ youw notes awe all packed up! :3",
+      "Detaiws tucked into a pwetty wittle file~ UwU"
+    ],
+    "diagnostics_cleared": [
+      "A fwesh wittle page~ same pwetty connections! :3",
+      "Cweaned the wogbook~ weady fow mowe! UwU"
     ]
   }
 }

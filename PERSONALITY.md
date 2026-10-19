@@ -470,3 +470,12 @@ Zero now uses “Done fucking around.” in Normal and an authored UwU counterpa
 Threshold-specific pools take precedence; duplicate settlement notifications and
 unchanged refreshes still produce no new acknowledgment. Vanilla and controller
 inertness are unchanged.
+
+The following editor/diagnostic events now have optional Normal/UwU authored pools:
+`simplex`, `device_saved`, `scan_level_changed`, `scan_scope_changed`,
+`diagnostics_copied`, `diagnostics_exported`, and `diagnostics_cleared`.
+Use the same centralized catalog, deterministic testing, no-repeat, and per-event
+Vanilla fallback rules. Keep facts separate: clearing diagnostics affects only
+in-memory history; Save Device/Copy/Export acknowledgments require actual success
+of their session/clipboard/file action. Precise failures remain technical messages,
+not playful success claims. No new persistence or storage-root policy is introduced.

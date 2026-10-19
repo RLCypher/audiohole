@@ -109,3 +109,23 @@ alone do not establish these visual/desktop behaviors.
   navigation. In Settings, **Replay Tutorial** shows the requested warning placeholder
   rather than the startup simulation notice. Dismiss it and confirm edits and active
   routing state are retained.
+
+- [ ] Uncheck Duplex: acknowledge simplex selection in both Normal and UwU; the
+  active duplex plan remains intact until Apply. Vanilla displays stable facts.
+- [ ] Save Device: acknowledge success, preserving Windows name and logical ID.
+  Empty display names show a validation error, not a success acknowledgment.
+- [ ] Change Testing Level and Scope: each selection acknowledges the change for
+  the next scan without starting work or altering a currently running scan.
+- [ ] Copy Visible Diagnostics: acknowledge only a successful copy; pasted output
+  contains only visible events plus the simulation provenance header. Test clipboard
+  contention where possible. Export: acknowledge after a successful file close;
+  cancel and unwritable destinations must not show success.
+- [ ] Clear Diagnostics Log while routing/scanning: the console empties immediately,
+  including filtered history. Clear search/filter afterward: old events stay gone.
+  Routing, profiles, devices, scan progress, startup, monitoring and Test Beep are
+  unaffected. New events appear normally and exported files remain untouched.
+  Verify the Clear tooltip and Vanilla's deterministic acknowledgment.
+
+Clipboard availability, file dialogs/cancellation/errors and desktop interaction
+require native Windows/manual checks; the portable suite verifies controller clear
+semantics and authored catalog coverage, not operating-system clipboard behavior.

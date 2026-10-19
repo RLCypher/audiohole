@@ -48,6 +48,13 @@ enum class Message {
     DfaSixSeven,
     DfaMaximum,
     BufferChanged,
+    Simplex,
+    DeviceSaved,
+    ScanLevelChanged,
+    ScanScopeChanged,
+    DiagnosticsCopied,
+    DiagnosticsExported,
+    DiagnosticsCleared,
     Count
 };
 struct Variant {

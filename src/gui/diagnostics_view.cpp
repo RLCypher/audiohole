@@ -10,6 +10,11 @@ void Frame::build_scan() {
     scan_mode_ = choices(page, options, "Testing level", {"Easy", "Advanced"});
     scan_scope_ =
         choices(page, options, "Scope", {"Update saved devices", "Full scan", "Selected device"});
+    scan_mode_->Bind(wxEVT_CHOICE,
+                     [this](wxCommandEvent&) { present(presentation::Message::ScanLevelChanged); });
+    scan_scope_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        present(presentation::Message::ScanScopeChanged);
+    });
     root->Add(options, 0, wxEXPAND);
     auto* row = new wxBoxSizer(wxHORIZONTAL);
     scan_start_ = button(page, row, "Start scan", [this] {
@@ -38,14 +43,29 @@ void Frame::build_scan() {
     root->Add(console_, 1, wxEXPAND | wxALL, 4);
     auto* export_row = new wxBoxSizer(wxHORIZONTAL);
     button(page, export_row, "Copy visible diagnostics", [this] {
-        if (wxTheClipboard->Open()) {
-            wxTheClipboard->SetData(new wxTextDataObject(
-                wxS("AudioHole GUI testing build — SIMULATED data; no hardware measurements.\n\n") +
-                console_->GetValue()));
-            wxTheClipboard->Close();
+        if (!wxTheClipboard->Open()) {
+            show_result(
+                {false,
+                 "Could not open the clipboard. Another application may be using it. Try again."});
+            return;
         }
+        // wxClipboard owns the supplied data object. Close on either SetData
+        // outcome; never announce success when the clipboard rejects the data.
+        const bool copied = wxTheClipboard->SetData(new wxTextDataObject(
+            wxS("AudioHole GUI testing build — SIMULATED data; no hardware measurements.\n\n") +
+            console_->GetValue()));
+        wxTheClipboard->Close();
+        if (copied)
+            present(presentation::Message::DiagnosticsCopied);
+        else
+            show_result({false, "Could not copy diagnostics to the clipboard. Try again."});
     });
     button(page, export_row, "Export visible diagnostics…", [this] { export_log(); });
+    button(page, export_row, "Clear diagnostics log", [this] {
+        controller_->clear_diagnostics();
+        refresh();
+        present(presentation::Message::DiagnosticsCleared);
+    });
     root->Add(export_row);
     console_->SetToolTip(
         "The most recent 500 technical events. Copy and export include only the visible filtered "
@@ -69,6 +89,8 @@ void Frame::export_log() {
         !output.Close())
         show_result({false, "Could not write diagnostics to the selected file. Check permissions "
                             "and available space."});
+    else
+        present(presentation::Message::DiagnosticsExported);
 }
 
 } // namespace audiohole::gui

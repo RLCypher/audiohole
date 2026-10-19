@@ -130,6 +130,9 @@ wxString button_help(const wxString& title) {
          "Copy the currently filtered technical events to the clipboard."},
         {"Export visible diagnostics…",
          "Save the currently filtered technical events to a text file."},
+        {"Clear diagnostics log",
+         "Clear all in-memory diagnostic events, including filtered entries. Routing, profiles and "
+         "settings are unchanged; no files are deleted."},
         {"Reload personality files",
          "Reload optional commentary from the personalities folder beside this executable."},
         {"Load custom personality…", "Validate and select a local JSON commentary catalog. Invalid "

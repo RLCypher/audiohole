@@ -450,6 +450,12 @@ Result SimulatedController::beep(const std::string& id) {
                             "dBFS, 1 second with fades.");
     return {true, "Test Beep active for the selected destination."};
 }
+void SimulatedController::clear_diagnostics() {
+    state_.events.clear();
+    ++state_.revision;
+    // Do not reset sequence_ or emit a replacement event: clearing must leave an
+    // empty log, and future events must remain newer than consumers' cursors.
+}
 void SimulatedController::cancel_beep() {
     beep_ms_ = 0;
     state_.beep_destination.clear();

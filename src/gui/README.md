@@ -66,3 +66,11 @@ the older negative range. Follow System is now the initial session appearance.
 
 A stable native window property identifies the existing instance independently of
 its build-labelled title. The frame removes that property before window destruction.
+
+Diagnostic clearing is a GUI-thread controller command that removes only the retained
+session event vector. It leaves the event sequence monotonic so Frame's event cursor
+continues to detect future events, and emits no replacement diagnostic entry. It
+never changes routing/scan/profile state or deletes files. The GUI clears its cached
+console through the normal snapshot refresh, retaining search/severity preferences.
+Copy/Export acknowledgments occur only after clipboard success or a completed file
+write/close. These view actions do not enter the routing engine or log commentary.
