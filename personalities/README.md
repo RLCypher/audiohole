@@ -46,7 +46,8 @@ Use the existing key names, not translations of them. DFA-specific keys:
 | `dfa_maximum` | 11.00 |
 
 These acknowledgments are placebo commentary only. DFA controls are hidden when
-Vanilla is active. Ordinary slider positions only change the local displayed value.
+Vanilla is active. Changed, settled ordinary slider/numeric values select from the same `dfa` pool
+as button clicks. Threshold-specific pools take precedence.
 
 UTF-8 JSON only. Limits: 256 KiB per file; at most 32 optional catalogs per session;
 128 event pools per file; 32 distinct variants per pool; 2048 UTF-8 bytes per variant.

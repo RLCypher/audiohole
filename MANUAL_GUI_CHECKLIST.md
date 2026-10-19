@@ -97,3 +97,9 @@ Production buffer/queue policy remains unresolved.
 Native Windows hover rendering, F1, typed input, popup visibility, theme transitions,
 DPI and tray behavior require hands-on validation. Portable tests and cross-builds
 alone do not establish these visual/desktop behaviors.
+
+- [ ] Change DFA to ordinary values such as 5.55 and 5.56: each settled adjustment
+  selects a response from the button pool, avoiding immediate repetition. Repeated
+  notifications at the same settled value do not reroll commentary. At 0.00 verify
+  “Done fucking around.” in Normal and its authored UwU counterpart. Other special
+  thresholds still select their own responses; controller/diagnostic state is unchanged.

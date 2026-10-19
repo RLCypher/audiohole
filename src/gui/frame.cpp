@@ -331,7 +331,18 @@ bool Frame::smoke(const wxString& directory) {
         dfa_value_->GetText()->ChangeValue(wxS("5.55"));
         dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
         require(dfa_slider_->GetValue() == 555, "Ordinary typed DFA value did not move the slider");
+        require(last_message_ == presentation::Message::Dfa && !commentary_->GetLabel().empty(),
+                "Ordinary DFA adjustment lacks a pool acknowledgment");
+        const auto ordinary_commentary = commentary_->GetLabel();
+        settle_dfa(556);
+        require(last_message_ == presentation::Message::Dfa &&
+                    commentary_->GetLabel() != ordinary_commentary &&
+                    controller_->snapshot().revision == before,
+                "Ordinary DFA adjustments repeat commentary or affect controller state");
+        settle_dfa(555);
         const auto dfa_occurrence = occurrence_;
+        settle_dfa(555);
+        require(occurrence_ == dfa_occurrence, "Duplicate DFA settlement repeated acknowledgment");
         dfa_value_->GetText()->ChangeValue(wxS("12.00"));
         dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
         require(dfa_slider_->GetValue() == 555 && std::abs(dfa_value_->GetValue() - 5.55) < 0.005 &&

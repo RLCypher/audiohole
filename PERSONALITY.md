@@ -416,12 +416,12 @@ the presentation selector; production routing/profile serialization remains Open
 The button reads **DFA** with tooltip **Working as intended.** Beside it, a movable
 slider and exact numeric entry represent 0.00 through 11.00 in hundredths.
 They are placebo controls: no controller calls, routing changes, scan/repair work,
-logs, configuration writes, or persistent counters. Ordinary slider positions need
-no response. On settling at a special value, use the selected personality's pool:
+logs, configuration writes, or persistent counters. Every changed, settled ordinary value selects from the same `dfa` pool as the
+button. On settling at a special value, use the selected personality's dedicated pool:
 
 | Value | Normal base response / event |
 |---|---|
-| 0.00 | It does nothing now. / `dfa_minimum` |
+| 0.00 | Done fucking around. / `dfa_minimum` |
 | 0.69 and 6.90 | NICE! / `dfa_nice` |
 | 4.20 | DANK! / `dfa_dank` |
 | 6.66 | That's metal af. / `dfa_metal` |
@@ -463,3 +463,10 @@ measurements. Keep technical/status text deterministic and maintain per-event Va
 fallback. Remove imaginary/pretend/simulated qualifications from commentary for actual
 operation events. DFA remains an inert joke, with its minimum now 0.00; the historical
 negative minimum is superseded. Retain the 23-response pools and other thresholds.
+
+The owner-approved follow-up makes ordinary DFA slider/numeric adjustments use the
+existing 23-response `dfa` pool, retaining repetition avoidance and optional weighting.
+Zero now uses “Done fucking around.” in Normal and an authored UwU counterpart.
+Threshold-specific pools take precedence; duplicate settlement notifications and
+unchanged refreshes still produce no new acknowledgment. Vanilla and controller
+inertness are unchanged.

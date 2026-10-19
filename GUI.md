@@ -1666,8 +1666,13 @@ transitions yellow, Stopped gray. Always retain the canonical textual state besi
 Windows high contrast may replace the dot color with a system color.
 
 DFA remains operationally inert and hidden in Vanilla. Its range is now 0.00–11.00;
-0.00 takes the former minimum response. Keep the other thresholds and 23 ordinary
+0.00 uses “Done fucking around.” (with an authored personality counterpart). Keep the other thresholds and 23 ordinary
 button responses per supplied personality. Parse the visible numeric entry on Enter,
 set the slider and numeric value together, and trigger at most one threshold response
 per settled change. Do not display persistent placebo/developer explanations beside
 these controls. Keep their documented meaning and ownership in engineering material.
+
+Changed, settled DFA values without a dedicated threshold response now acknowledge
+through the existing button-response pool. Threshold pools take precedence; dragging
+still updates the value without repeated commentary, and duplicate settlement events
+remain suppressed. This owner-approved correction changes presentation only.

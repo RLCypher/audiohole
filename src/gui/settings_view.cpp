@@ -87,7 +87,7 @@ void Frame::build_settings() {
     dfa_value_->SetToolTip("Enter a value from 0.00 to 11.00 and press Enter to set the slider.");
     dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_};
     // Tracking updates the visible number only. A release/keyboard settlement
-    // selects at most one special acknowledgment, never one per drag tick.
+    // selects at most one acknowledgment, never one per drag tick.
     dfa_slider_->Bind(wxEVT_SCROLL_THUMBTRACK, [this](wxScrollEvent&) {
         dfa_value_->SetValue(static_cast<double>(dfa_slider_->GetValue()) / 100.0);
     });
@@ -196,8 +196,8 @@ void Frame::settle_dfa(int hundredths) {
     if (last_dfa_settled_ == hundredths)
         return;
     last_dfa_settled_ = hundredths;
-    const auto event = presentation::dfa_event(hundredths);
-    if (event != presentation::Message::Dfa)
-        present(event);
+    // Thresholds have authored dedicated pools; every other settled adjustment
+    // shares the button pool, including its repetition avoidance and weighting.
+    present(presentation::dfa_event(hundredths));
 }
 } // namespace audiohole::gui

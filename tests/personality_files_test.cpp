@@ -139,6 +139,10 @@ TEST_F(PersonalityFiles, AuthoredPoolsCoverAllEventsAndDfaPositionsExactly) {
         EXPECT_EQ(presentation::dfa_event(value), event);
     EXPECT_EQ(presentation::dfa_event(669), presentation::Message::Dfa);
     EXPECT_EQ(presentation::dfa_event(-1100), presentation::Message::Dfa);
+    EXPECT_EQ(messages.show(presentation::dfa_event(0), "default", 1).commentary,
+              "Done fucking around.");
+    EXPECT_EQ(messages.show(presentation::dfa_event(0), "uwu", 1).commentary,
+              "Done fucking awound~ :3");
     EXPECT_EQ(messages.show(presentation::dfa_event(670), "uwu", 1).commentary, "SIX SEVEN!");
     EXPECT_EQ(messages.show(presentation::dfa_event(420), "default", 1).commentary, "DANK!");
     EXPECT_EQ(messages.show(presentation::dfa_event(1100), "default", 1).commentary,
