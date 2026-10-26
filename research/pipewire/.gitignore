@@ -1,0 +1,6 @@
+# Local downloaded references and scratch/build artifacts; never publish.
+/upstream/pipewire/
+/upstream/windows/
+/work/
+/experiments/build/
+/experiments/__pycache__/
