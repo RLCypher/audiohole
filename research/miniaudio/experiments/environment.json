@@ -1,0 +1,15 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "compiler": "gcc (Debian 14.2.0-19) 14.2.0",
+  "upstream_commit": "9634bedb5b5a2ca38c1ee7108a9358a4e233f14d",
+  "hardware_audio_tests": false,
+  "flags_normal": [
+    "-std=c99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Wno-unused-function"
+  ],
+  "note": "No Windows I/O or hardware tests; warning suppression is for unused upstream threading helpers in processing-only build."
+}

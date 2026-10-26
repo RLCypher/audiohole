@@ -1,0 +1,33 @@
+{
+  "repository": "https://github.com/mackron/miniaudio",
+  "commit": "9634bedb5b5a2ca38c1ee7108a9358a4e233f14d",
+  "version": "0.11.25",
+  "research_date_client": "2026-10-25",
+  "files": {
+    "miniaudio.h": {
+      "bytes": 4108168,
+      "sha256": "ac7af4de748b7e26b777f37e01cee313a308a7296a3eb080e2906b320cc55c89",
+      "git_blob": "c6d493ee81f553b8dd584e402453f130c20e0546"
+    },
+    "README.md": {
+      "bytes": 6253,
+      "sha256": "3189aa9039ba073fab747948435e0fa5e279a32384c311ac87e9ff970eef037e",
+      "git_blob": "7d885375388c6d27507962d828f6dacd727dab70"
+    },
+    "CHANGES.md": {
+      "bytes": 76072,
+      "sha256": "cf5626e8e48d6ac9b4730ed679431d4baaf7fc9ee1339b4a624503ba88bbdde4",
+      "git_blob": "2386d7d8ed3db7242ce906279041b3a01c3560f3"
+    },
+    "LICENSE": {
+      "bytes": 2597,
+      "sha256": "457f1b500e0adf6bc059edddfa78a2f62012e7c3bb43476c20e0bd23b25ba0eb",
+      "git_blob": "2f9423addfe68aa01449ba885d56d832f04b5e8e"
+    },
+    "extras/stb_vorbis.c": {
+      "bytes": 192790,
+      "sha256": "4c7cb2ff1f7011e9d67950446b7eb9ca044f2e464d76bfbb0b84dd2e23e65636",
+      "git_blob": "3e5c2504c08f76b9d04e4adfbce80818631e835e"
+    }
+  }
+}

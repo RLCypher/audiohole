@@ -1,0 +1,11 @@
+version=0.11.25; pointer_bits=64
+requested=1.000100017 generic=1000/1000 effective=1.000000000 linear=10001/10000 effective=1.000100000
+requested=0.999899983 generic=999/1000 effective=0.999000000 linear=9999/10000 effective=0.999900000
+requested=1.000000954 generic=1000/1000 effective=1.000000000 linear=1/1 effective=1.000000000
+phase_change old_frac=10000 old_den=1000000 new_den=1000000 expected_u64=10000 actual=1410 in=10000 out=10000
+static_equal_rate has_resampler=0 passthrough=1 set_rate_result=-3
+dynamic_equal_rate has_resampler=1 passthrough=0 set_rate_result=0 lpf_order=1
+duplex_helper_equal capacity_frames=2400 initial_readable_frames=960
+duplex_helper_48k_client_44k1_capture capacity_frames=2400 initial_readable_frames=882
+s24_shuffle logical_output_bytes=6 guarded_storage_bytes=12 actual=04 00 06 01 00 03 aa aa 00 aa aa aa
+All source-behavior witnesses completed; no hardware measurements.
