@@ -31,6 +31,8 @@ class SurfacePanel final : public wxPanel {
   public:
     SurfacePanel(wxWindow* parent, const wxString& role);
     bool use_system_colours = false;
+    // Keep native children outside the rounded stroke, including at scaled DPI.
+    void set_content_sizer(wxSizer* contents);
 };
 // Small construction helpers keep layout code consistent. Returned widgets are
 // non-owning pointers; wx parent windows own them, including event bindings.

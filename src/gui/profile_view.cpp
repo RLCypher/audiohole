@@ -17,13 +17,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.source->SetMinSize(FromDIP(wxSize(120, -1)));
     source_layout->Add(w.source, 0, wxEXPAND | wxALL, FromDIP(8));
     w.source_detail = label(capture, source_layout, "Select a source");
-    capture->SetSizer(source_layout);
+    capture->set_content_sizer(source_layout);
     label(playback, destination_layout, "Destination (Playback)")->SetFont(GetFont().Bold());
     w.destination = new wxComboBox(playback, wxID_ANY);
     w.destination->SetMinSize(FromDIP(wxSize(120, -1)));
     destination_layout->Add(w.destination, 0, wxEXPAND | wxALL, FromDIP(8));
     w.destination_detail = label(playback, destination_layout, "Select a destination");
-    playback->SetSizer(destination_layout);
+    playback->set_content_sizer(destination_layout);
     endpoints->Add(capture, 1, wxEXPAND | wxALL, FromDIP(5));
     label(box, endpoints, "→");
     endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));

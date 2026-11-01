@@ -29,7 +29,8 @@ output is committed; neither CMake nor the application rewrites the source image
 ## Runtime architecture
 
 - `app.rc` embeds the original PNG as RCDATA and the ICO as the primary application
-  icon. Numeric icon resource 1 precedes framework stock icons. CMake explicitly
+  icon. The named `AAA_AUDIOHOLE` icon group precedes framework stock groups for shell
+  extraction; explicit numeric resource 1 remains the window-icon ID. CMake explicitly
   tracks both assets as RC dependencies. Window/taskbar/Alt+Tab icons use the ICO
   bundle. Current packaging creates no shortcuts; no new shortcut system is added.
 - `gui/branding.cpp` decodes the PNG once on the existing GUI STA with Windows
@@ -86,3 +87,9 @@ Portable tests and renderer previews do not establish native Windows visual qual
 Check the taskbar, Alt+Tab, Explorer, tray at 16/32 pixels on light/dark taskbars,
 monitor/DPI changes, high contrast, window resize, and Explorer restart on Windows.
 No claim of actual audio health follows from the simulated controller's status.
+
+The executable audit now parses the PE resource directory, verifies the first
+RT_GROUP_ICON is AAA_AUDIOHOLE, and checks all seven referenced RT_ICON payloads
+against the canonical ICO. This catches stock-icon ordering even when the correct
+logo is also embedded elsewhere. Explorer can retain an older cached file icon;
+review the newly extracted artifact before attributing a cached icon to the resource.

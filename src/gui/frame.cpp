@@ -20,6 +20,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* header = new wxBoxSizer(wxHORIZONTAL);
     auto* information = new wxBoxSizer(wxVERTICAL);
+    information->SetMinSize(FromDIP(wxSize(300, -1)));
     header->Add(information, 0, wxEXPAND | wxALL, FromDIP(10));
     auto* brand_row = new wxBoxSizer(wxHORIZONTAL);
     auto* brand_logo = new AgentDisplay(this, wxSize(64, 64));
@@ -42,8 +43,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
         const auto size = status_dot_->GetClientSize();
         dc.DrawCircle(size.x / 2, size.y / 2, status_dot_->FromDIP(5));
     });
-    status_row->Add(status_dot_, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(6));
-    status_ = label(this, status_row, "Stopped");
+    status_row->Add(status_dot_, 0, wxALIGN_TOP | wxLEFT, FromDIP(4));
+    // Neither label length nor wrapping may change the branding-column width.
+    // Six reserved lines cover routing, profiles, startup, advisory and scan.
+    status_ = new wxStaticText(this, wxID_ANY, "Routing: Stopped", wxDefaultPosition,
+                               FromDIP(wxSize(280, 120)), wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+    status_->SetMinSize(FromDIP(wxSize(280, 120)));
+    status_row->Add(status_, 0, wxALL, FromDIP(4));
     information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* middle = new wxBoxSizer(wxVERTICAL);
     header->Add(middle, 1, wxEXPAND | wxALL, FromDIP(8));
@@ -57,24 +63,26 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     button(this, actions, "Exit AudioHole", [this] { exit(); });
     middle->Add(actions, 0, wxEXPAND);
     auto* comment_surface = new SurfacePanel(this, "commentary-card");
-    middle->Add(comment_surface, 1, wxEXPAND | wxTOP, FromDIP(8));
+    comment_surface_ = comment_surface;
+    comment_surface->SetMinSize(FromDIP(wxSize(220, 156)));
+    middle->Add(comment_surface, 0, wxEXPAND | wxTOP, FromDIP(8));
     auto* comment_layout = new wxBoxSizer(wxVERTICAL);
     personality_heading_ = label(comment_surface, comment_layout, "Norm");
     personality_heading_->SetFont(GetFont().Bold());
     commentary_panel_ = new wxScrolledWindow(comment_surface);
     commentary_panel_->SetScrollRate(0, FromDIP(12));
-    commentary_panel_->SetMinSize(FromDIP(wxSize(220, 100)));
+    commentary_panel_->SetMinSize(FromDIP(wxSize(220, 64)));
     comment_layout->Add(commentary_panel_, 1, wxEXPAND | wxALL, FromDIP(10));
     auto* messages = new wxBoxSizer(wxVERTICAL);
     commentary_panel_->SetSizer(messages);
-    comment_surface->SetSizer(comment_layout);
+    comment_surface->set_content_sizer(comment_layout);
     technical_ = label(commentary_panel_, messages, "");
     technical_->SetFont(GetFont().Bold());
     commentary_ = label(commentary_panel_, messages, "");
     fallback_notice_ = label(commentary_panel_, messages, "");
     // Existing commentary remains to the left of the replaceable agent image;
     // no speech-bubble or animation system is introduced.
-    agent_display_ = new AgentDisplay(this, wxSize(200, 220));
+    agent_display_ = new AgentDisplay(this, wxSize(144, 216));
     agent_display_->set_image(placeholder_avatar());
     header->Add(agent_display_, 0, wxALIGN_TOP | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
@@ -108,7 +116,16 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     CreateStatusBar();
     SetSizer(root);
     Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
-        layout_header();
+        // Coalesce native resize notifications; wxFrame first settles its client
+        // and status-bar bounds. Never recursively resize while processing WM_SIZE.
+        if (!header_layout_pending_) {
+            header_layout_pending_ = true;
+            CallAfter([this] {
+                header_layout_pending_ = false;
+                if (!IsBeingDeleted())
+                    layout_header();
+            });
+        }
         event.Skip();
     });
     Centre();
@@ -185,14 +202,15 @@ void Frame::present(presentation::Message event) {
 }
 void Frame::layout_header() {
     const bool compact = GetClientSize().x < FromDIP(1250);
-    agent_display_->set_presentation_size(compact ? wxSize(120, 132) : wxSize(200, 220));
-    const int width = std::max(180, commentary_panel_->GetClientSize().x - FromDIP(24));
+    agent_display_->set_presentation_size(compact ? wxSize(96, 144) : wxSize(144, 216));
+    Layout(); // Allocate fixed branding/avatar regions before measuring text space.
+    const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
         control->SetLabel(text(copy));
         control->Wrap(width);
     };
     status_->SetLabel(text(status_copy_));
-    status_->Wrap(FromDIP(265));
+    status_->SetToolTip(text(status_copy_));
     wrap(technical_, technical_copy_);
     wrap(commentary_, commentary_copy_);
     wrap(fallback_notice_, fallback_copy_);
@@ -234,20 +252,20 @@ void Frame::refresh() {
         update_direction_details(reverse_, reverse);
     }
     const auto* active = audiohole::profile(s, s.active_profile);
-    std::string status = std::string{} + audiohole::name(s.state) +
-                         " | Active: " + (active ? active->display_name : "none") +
-                         " | Viewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
+    std::string status = std::string("Routing: ") + audiohole::name(s.state) +
+                         "\nActive: " + (active ? active->display_name : "none") +
+                         "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
     if (!s.pending_profile.empty())
-        status += " | Startup pending: " + std::to_string((s.pending_ms + 999) / 1000) + " s";
+        status += "\nStartup pending: " + std::to_string((s.pending_ms + 999) / 1000) + " s";
     std::vector<std::string> enabled_holes;
     for (const auto& path : s.paths)
         if (std::find(enabled_holes.begin(), enabled_holes.end(), path.hole_id) ==
             enabled_holes.end())
             enabled_holes.push_back(path.hole_id);
     if (enabled_holes.size() > 4)
-        status += " | Extended-range advisory: 5–8 enabled holes; hardware performance unverified.";
+        status += "\nExtended-range advisory: 5–8 enabled holes; hardware performance unverified.";
     if (s.scanning)
-        status += " | Scan: " + std::to_string(s.scan_percent) + "%";
+        status += "\nScan: " + std::to_string(s.scan_percent) + "%";
     if (status_copy_ != status) {
         status_copy_ = status;
         layout_header();
@@ -373,6 +391,33 @@ bool Frame::smoke(const wxString& directory) {
                     personality_choice_->GetString(2) == wxS("UwU"),
                 "Canonical personality labels changed");
         require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
+        // Exercise the real sizers: changing status text must never resize or
+        // move the commentary card, while resizing may choose a compact avatar.
+        const auto initial_client = GetClientSize();
+        const auto initial_status = status_copy_;
+        const auto resize_occurrence = occurrence_;
+        for (const auto size : {wxSize(980, 740), wxSize(1250, 850), wxSize(1536, 1024)}) {
+            SetClientSize(size);
+            status_copy_ = "Routing: Stopped\nActive: none\nViewed: short";
+            layout_header();
+            const auto card = comment_surface_->GetRect();
+            status_copy_ = "Routing: Recovering\nActive: " + std::string(250, 'A') +
+                           "\nViewed: " + std::string(250, 'V') + "\nScan: 95%";
+            layout_header();
+            require(comment_surface_->GetRect() == card,
+                    "Status changes move or resize the personality card");
+            require(card.GetHeight() == FromDIP(156), "Commentary card height is not bounded");
+            require(card.GetRight() <= agent_display_->GetPosition().x &&
+                        agent_display_->GetRect().GetBottom() < navigation_[0]->GetPosition().y,
+                    "Header regions overlap or avatar reaches navigation");
+            require(personality_heading_->GetPosition().x >= FromDIP(12) &&
+                        personality_heading_->GetPosition().y >= FromDIP(12),
+                    "Personality heading covers the rounded corner");
+        }
+        status_copy_ = initial_status;
+        SetClientSize(initial_client);
+        layout_header();
+        require(occurrence_ == resize_occurrence, "Resizing reselected personality commentary");
         require(status_dot_->IsShown(), "Routing status indicator missing");
         require(agent_display_->has_image() && canonical_logo().HasAlpha(),
                 "Agent logo or transparency missing");

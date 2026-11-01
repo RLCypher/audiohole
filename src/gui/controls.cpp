@@ -84,6 +84,11 @@ SurfacePanel::SurfacePanel(wxWindow* parent, const wxString& role) : wxPanel(par
         dc.DrawRoundedRectangle(GetClientRect().Deflate(1), FromDIP(10));
     });
 }
+void SurfacePanel::set_content_sizer(wxSizer* contents) {
+    auto* inset = new wxBoxSizer(wxVERTICAL);
+    inset->Add(contents, 1, wxEXPAND | wxALL, FromDIP(12));
+    SetSizer(inset);
+}
 ActionButton::ActionButton(wxWindow* parent, const wxString& title)
     : wxButton(parent, wxID_ANY, title) {
     SetToolTip(button_help(title));

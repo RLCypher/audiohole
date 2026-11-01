@@ -1,4 +1,7 @@
 #include "branding_resources.h"
+// Named groups precede integer IDs in PE resource enumeration. Explorer's first
+// group must precede wxICON_AAA, independently of the window's explicit ID 1.
+AAA_AUDIOHOLE ICON "assets/branding/audiohole.ico"
 AUDIOHOLE_APP_ICON ICON "assets/branding/audiohole.ico"
 AUDIOHOLE_LOGO_PNG RCDATA "assets/branding/audiohole-logo.png"
 

@@ -192,3 +192,20 @@ require Windows execution; portable tests validate arithmetic/catalog semantics.
   Clear diagnostics updates errors; no static mockup counts or active format claims.
 - [ ] Check Light, Follow System and high contrast, keyboard focus and all tooltips.
   Session-only preferences/persistence limitations remain as before.
+
+## Tester resize/icon regression
+
+- [ ] Routing, Active and Viewed occupy separate lines. Switch profiles, pending
+  startup, scan progress and long names: the branding width and commentary-card
+  size remain fixed. Full ellipsized status information is available by hover.
+- [ ] Drag continuously between minimum and desktop sizes at 100/125/150/200% DPI.
+  No header oscillation, stale partial paint, avatar/navigation overlap or commentary
+  rerolls. The card stays compact and scrolls overflow. Its heading and all endpoint
+  content stay inside the rounded strokes with clear padding on each side.
+- [ ] The future avatar region is 2:3; the current source remains uncropped and
+  proportionate. No stretching to fake final artwork dimensions.
+- [ ] Inspect a freshly extracted executable in Explorer at several icon sizes,
+  plus taskbar/window/Alt+Tab. The file icon uses AudioHole rather than wx stock
+  artwork. Windows CI independently audits the first PE icon group and image data.
+
+Native Windows rendering and shell-cache behavior remain manual validation tasks.

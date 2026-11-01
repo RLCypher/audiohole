@@ -12,7 +12,7 @@ comparison remains a Windows acceptance task.
 
 The existing WIC loader embeds/decodes this PNG once. AgentDisplay accepts a
 preferred logical size and caches by full client bounds; normal/compact avatar
-regions are 200×220 / 120×132 logical pixels. The original image stays immutable.
+regions are 144×216 / 96×144 logical pixels. The original image stays immutable.
 Vanilla retains the canonical logo. Other personalities share this temporary static
 placeholder; no permanently bound Norm asset system, animation, mood logic, new
 messages, schema, or separately developed personality-module code is introduced.
@@ -31,3 +31,19 @@ No device discovery, synchronization, buffer policy, routing or persistence logi
 was changed. Windows rendering/DPI/shell behavior must be reviewed manually; a
 cross-build is not proof of visual fidelity. Native screenshots continue to be
 produced by the existing Windows GUI smoke workflow when that environment permits.
+
+## Resize correction
+
+Routing, Active and Viewed each have their own line in a fixed 280×120 logical
+status region; longer names are ellipsized with full text available in its tooltip.
+The branding column reserves 300 logical pixels, independently of status content.
+Commentary is a nonstretching 156-logical-pixel card with scrolling overflow.
+Native resize notifications are coalesced after wxFrame settles its client bounds;
+wrapping is measured only after layout. Neither resizing nor status updates select
+new commentary. Rounded surfaces inset content by 12 logical pixels so native child
+backgrounds cannot erase the curved stroke. Header geometry smoke checks exercise
+minimum, intermediate and desktop widths with long status names.
+
+Avatar presentation regions use 2:3 proportions for future 512×768 artwork. The
+current 1201×1310 source is still rendered proportionally and unchanged, so it has
+more empty space in that region until the final portrait asset arrives.

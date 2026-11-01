@@ -1,5 +1,5 @@
 #pragma once
-// Numeric icon ID sorts before framework stock icons in Explorer resource lookup.
+// Stable explicit window-icon ID. app.rc also defines the first named shell group.
 #define AUDIOHOLE_APP_ICON 1
 #define AUDIOHOLE_LOGO_PNG 102
 

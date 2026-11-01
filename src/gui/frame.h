@@ -132,6 +132,8 @@ class Frame final : public wxFrame {
     std::vector<wxWindow*> dfa_controls_;
     AgentDisplay* agent_display_{};
     wxScrolledWindow* commentary_panel_{};
+    wxPanel* comment_surface_{};
+    bool header_layout_pending_ = false;
     wxStaticText* personality_heading_{};
     wxPanel* status_dot_{};
     wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
