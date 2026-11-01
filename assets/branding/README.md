@@ -10,7 +10,10 @@ output/speakers and pink represents microphone input; the wireframe conduit conn
 them. Transparency and the original proportions/artwork are intentional.
 
 `audiohole.ico` is a generated multi-resolution derivative containing transparent
-32-bit DIB entries at 16, 24, 32, 48, 64, 128 and 256 pixels. It has no status color.
+32-bit DIB entries at 16, 24, 32, 48, 64, 128 and 256 pixels. Each includes both BGRA
+pixels and a DWORD-aligned AND transparency mask for Windows shell/legacy consumers.
+The masks mark only fully transparent pixels; all color/alpha pixels remain intact.
+It has no status color.
 Maintainer regeneration only (ordinary builds do **not** require these tools):
 
 ```powershell
@@ -21,8 +24,9 @@ python scripts/branding/verify_assets.py
 
 Pillow 12.3.0 uses the MIT-CMU license and is a conversion-only development tool,
 not linked, bundled, or required at runtime. Its ICO writer uses high-quality
-resizing from the canonical image. `verify_assets.py` uses Python's standard library
-only; CI checks the original hash/PNG CRCs, ICO sizes/alpha storage, and exact
+resizing from the canonical image. The maintainer writer includes the AND masks
+that Pillow's 32-bit ICO writer omits. `verify_assets.py` uses Python's standard library
+only; CI checks the original hash/PNG CRCs, ICO sizes/alpha/mask storage, and exact
 PNG/DIB payloads in each built executable. Generated
 output is committed; neither CMake nor the application rewrites the source image.
 
@@ -88,8 +92,13 @@ Check the taskbar, Alt+Tab, Explorer, tray at 16/32 pixels on light/dark taskbar
 monitor/DPI changes, high contrast, window resize, and Explorer restart on Windows.
 No claim of actual audio health follows from the simulated controller's status.
 
-The executable audit now parses the PE resource directory, verifies the first
+The executable audit parses the PE resource directory, verifies the first
 RT_GROUP_ICON is AAA_AUDIOHOLE, and checks all seven referenced RT_ICON payloads
-against the canonical ICO. This catches stock-icon ordering even when the correct
-logo is also embedded elsewhere. Explorer can retain an older cached file icon;
-review the newly extracted artifact before attributing a cached icon to the resource.
+against the canonical ICO for both that group and numeric window-icon resource 1,
+including their language variants. On Windows, windows_icon_check.py additionally
+uses ExtractIconExW at index zero and SHGetFileInfoW for large/small associated file
+icons, comparing rendered pixels to explicit canonical resource 1. No shell cache,
+file association or OS setting is changed. GUI smoke checks WM_GETICON's actual
+small/big handles against the canonical window bundle. These native checks run in
+Windows CI; cross-builds cannot execute them. Explorer and Task Manager appearance
+still require human review of the newly extracted artifact.

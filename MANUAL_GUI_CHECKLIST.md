@@ -211,7 +211,9 @@ require Windows execution; portable tests validate arithmetic/catalog semantics.
   rendering. The current source remains uncropped and proportionate, with enough
   width to avoid shrinking its height. Future 512×768 artwork will use a 2:3 region.
 - [ ] Inspect a freshly extracted executable in Explorer at several icon sizes,
-  plus taskbar/window/Alt+Tab. The file icon uses AudioHole rather than wx stock
-  artwork. Windows CI independently audits the first PE icon group and image data.
+  plus Task Manager, taskbar/window/Alt+Tab. Every application identity uses the
+  canonical AudioHole logo, rather than wx stock artwork or a generic executable.
+  Windows CI audits both PE application icon groups, actual large/small shell
+  extraction and associated file icons; GUI smoke checks the window's icon handles.
 
 Native Windows rendering and shell-cache behavior remain manual validation tasks.

@@ -3,6 +3,7 @@ import argparse
 import hashlib
 from pathlib import Path
 import struct
+import sys
 import zlib
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -43,9 +44,18 @@ for index in range(7):
     alpha = icon[offset + 43:offset + 40 + width * height * 4:4]
     if len(alpha) != width * height or not any(a == 0 for a in alpha) or not any(a > 0 for a in alpha):
         raise ValueError('Icon alpha is missing or flattened')
+    mask_stride = ((width + 31) // 32) * 4
+    mask_start = offset + 40 + width * height * 4
+    if length != 40 + width * height * 4 + mask_stride * height:
+        raise ValueError('ICO DIB is missing its DWORD-aligned AND transparency mask')
+    for y in range(height):
+        for x in range(width):
+            transparent = bool(icon[mask_start + y * mask_stride + x // 8] & (0x80 >> (x % 8)))
+            if transparent != (alpha[y * width + x] == 0):
+                raise ValueError('ICO AND mask disagrees with the canonical alpha channel')
 if sizes != [16, 24, 32, 48, 64, 128, 256]:
     raise ValueError('Unexpected icon sizes')
-print('PASS: original PNG hash/CRC/RGBA dimensions and seven transparent ICO sizes')
+print('PASS: original PNG hash/CRC/RGBA dimensions and seven transparent ICO sizes with AND masks')
 
 if args.executable:
     binary = args.executable.read_bytes()
@@ -96,16 +106,26 @@ if args.executable:
         return binary[offset:offset + size]
 
     types = dict(entries(0))
-    first_name, first_group = entries(types[14])[0]  # RT_GROUP_ICON
+    groups = entries(types[14])  # RT_GROUP_ICON
+    first_name, first_group = groups[0]
     if first_name != 'AAA_AUDIOHOLE':
         raise ValueError(f'First executable icon group is {first_name!r}, not AudioHole')
-    group = data(entries(first_group)[0][1])
-    if struct.unpack_from('<HHH', group) != (0, 1, 7):
-        raise ValueError('First shell icon group does not contain seven sizes')
     icon_entries = dict(entries(types[3]))  # RT_ICON
-    for index, expected_payload in enumerate(payloads):
-        identifier = struct.unpack_from('<H', group, 6 + index * 14 + 12)[0]
-        actual = data(entries(icon_entries[identifier])[0][1])
-        if actual != expected_payload:
-            raise ValueError('First shell icon group references noncanonical artwork')
-    print('PASS: first shell icon group is AudioHole, with all seven canonical images')
+    if 1 not in dict(groups):
+        raise ValueError('Explicit window icon resource 1 is missing')
+    for name, directory in [(first_name, first_group), (1, dict(groups)[1])]:
+        for _, language in entries(directory):
+            group = data(language)
+            if struct.unpack_from('<HHH', group) != (0, 1, 7):
+                raise ValueError(f'Application icon group {name!r} does not contain seven sizes')
+            for index, expected_payload in enumerate(payloads):
+                identifier = struct.unpack_from('<H', group, 6 + index * 14 + 12)[0]
+                for _, image in entries(icon_entries[identifier]):
+                    if data(image) != expected_payload:
+                        raise ValueError(f'Application icon group {name!r} references noncanonical artwork')
+    print('PASS: first shell icon and explicit window icon 1 contain all seven canonical images')
+    if sys.platform == 'win32':
+        from windows_icon_check import verify_shell_icons
+        verify_shell_icons(args.executable.resolve())
+    else:
+        print('SKIP: Windows shell extraction requires native Windows')
