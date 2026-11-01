@@ -5,12 +5,13 @@ import zipfile
 
 from PIL import Image, ImageDraw, ImageFont
 
-from avatar_assets import ROOT
+from avatar_assets import ROOT, read_json
 
 
 def build():
     directory = ROOT/'review/idle-sequences'
     identities = ['default', 'uwu', 'vanilla']
+    approval_label='APPROVED IDLE' if (ROOT/'provenance/idle-approval.json').exists() else 'UNAPPROVED'
     sheets = [Image.open(directory/f'{pid}-all-frames.png').convert('RGB') for pid in identities]
     combined = Image.new('RGB', (sheets[0].width, sum(im.height for im in sheets)), '#151923')
     y = 0
@@ -49,11 +50,11 @@ def build():
 main{display:flex;gap:28px;flex-wrap:wrap}section{padding:20px;background:#242c3c;border-radius:12px}
 img{background:#e0e3e9;max-width:100%;object-fit:contain}
 a{color:#a2f6d2}summary{cursor:pointer}h2{margin-top:0}</style>
-<h1>AudioHole · Three initial IDLE loops</h1><p>UNAPPROVED · 12 authored frames per loop · 5.0 s · 100 ms timebase with exposure holds</p>
+<h1>AudioHole · Three initial IDLE loops</h1><p>__APPROVAL__ · 12 authored frames per loop · 5.0 s · 100 ms timebase with exposure holds</p>
 <p>This page contains its three animated GIFs. It needs no scripts, server, network, or neighboring files.
 The checkerboard belongs only to these review copies. Operating frames remain transparent 512 × 768 RGBA PNGs.</p>
 <p>Native APNGs, labeled frame sheets and the report are supplied separately in the review folder.</p><main>'''
-    (directory/'index.html').write_text(html+'\n'.join(cards)+'</main></html>\n', encoding='utf-8')
+    (directory/'index.html').write_text(html.replace('__APPROVAL__',approval_label)+'\n'.join(cards)+'</main></html>\n', encoding='utf-8')
     with zipfile.ZipFile(directory/'idle-previews.zip','w',zipfile.ZIP_DEFLATED) as archive:
         for name in ['index.html','all-personalities-all-frames.png',*[f'{pid}-review.gif' for pid in identities]]:
             archive.write(directory/name, name)

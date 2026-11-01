@@ -270,7 +270,8 @@
         "transition": {
           "enum": [
             "cut",
-            "finish_then_idle"
+            "finish_then_idle",
+            "finish_then_persistent"
           ]
         }
       },
@@ -380,6 +381,13 @@
         "fallback": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -427,6 +435,60 @@
           "additionalProperties": {
             "$ref": "#/$defs/state"
           }
+        }
+      }
+    },
+    "behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "mode",
+        "priority",
+        "interruptible",
+        "cooldown_ms",
+        "static_hold_ms",
+        "return_to",
+        "reduced_motion"
+      ],
+      "properties": {
+        "category": {
+          "enum": [
+            "ambient",
+            "expressive",
+            "theatrical",
+            "status"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "persistent",
+            "finite"
+          ]
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "interruptible": {
+          "type": "boolean"
+        },
+        "cooldown_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600000
+        },
+        "static_hold_ms": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 60000
+        },
+        "return_to": {
+          "const": "persistent"
+        },
+        "reduced_motion": {
+          "const": "static"
         }
       }
     }

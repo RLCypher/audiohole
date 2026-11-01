@@ -1,0 +1,263 @@
+{
+  "personality_id": "uwu",
+  "state": "concerned",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "UwU/Intermediate/core-a-source.png",
+    "source_sha256": "1f98fd2b34853b98899d981697b65538b871823cf360298bdaa1edc0bef7ee30",
+    "grid": [
+      2,
+      3
+    ],
+    "cell_index": 5,
+    "face_box": [
+      188,
+      155,
+      364,
+      331
+    ],
+    "registration_translation": [
+      -2.678221288515374,
+      -4.053571428571445
+    ],
+    "face_polygon": [
+      [
+        210,
+        171
+      ],
+      [
+        280,
+        170
+      ],
+      [
+        299,
+        186
+      ],
+      [
+        320,
+        190
+      ],
+      [
+        343,
+        201
+      ],
+      [
+        346,
+        245
+      ],
+      [
+        332,
+        269
+      ],
+      [
+        309,
+        292
+      ],
+      [
+        282,
+        302
+      ],
+      [
+        251,
+        290
+      ],
+      [
+        218,
+        271
+      ],
+      [
+        205,
+        237
+      ]
+    ],
+    "nose_preserved_box": [
+      289,
+      250,
+      312,
+      266
+    ],
+    "key_sha256": "05f8063afb097311fa67cfc752c91405f2c8784e5afaff799ebc91589d8df93c"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/concerned.png",
+    "sha256": "5b938f3f387d80d1f24124ca3681f334a130ce164ceddc3940084ef42929ee53",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/concerned/0000.png",
+        "sha256": "5c33429da19ca552e11ef430bc442412615d13fdc6fcc21e01847592a58895bd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0001.png",
+        "sha256": "f9a919ff4273feb667ffbcda019fa5f81c5dc45b4592330ba0a6426bcf6e63b2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0002.png",
+        "sha256": "d6c47ff052292bcdfadb2fd2672b59f7e9267494218dd63e501bf9e8c8408545",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0003.png",
+        "sha256": "a0a575fd7aa96db3b2732c3c6a35308444182f89fdaea9834a6aabe1abf68c33",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0004.png",
+        "sha256": "7feec37f414b961eb1b1de3190786e5a0e3fb1d156ecc10973b8bc3860483b94",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0005.png",
+        "sha256": "4dd7fe5fb9ec633e4002af54955d5d7e49891ef7e25c22001f33cd612b4bb6f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0006.png",
+        "sha256": "21be2dce7dd8d79058cd51d2faa3d0c47015a5b07b4a8af782c9a637ed800003",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0007.png",
+        "sha256": "7efdc1eee8d9b179ef8a83a523149b8a025108ce6525433529b361f88926c806",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0008.png",
+        "sha256": "c3e3214de03121e85fda55b17770f35c3ce7620ad76c1eac9a69142f638bfcb4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0009.png",
+        "sha256": "b6515a8f110e1e54f0ceaecee0d12e99aabafe4061d11e5f47980e44e3830846",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0010.png",
+        "sha256": "634dcde127d9f8426c5b2ce76f8d9dcdf55a223741f871dc9c7bed2d9df0d878",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0011.png",
+        "sha256": "0206078760f588c058bbc45659acd3208c5e6ad69a45d56c4d2d2fa74304c04c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0012.png",
+        "sha256": "178f5f40ec2a26c8b98ef7a28f4dc16d656f35169b1489c76c0731f4da04c063",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0013.png",
+        "sha256": "068f3c6e682f61838a553db14e7418f900894aa4162e88845421d45b5c5b76da",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0014.png",
+        "sha256": "b304353a5050fc9efe228c6899ba9b58634f03b0a701156cd1984c7487171f2a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/concerned/0015.png",
+        "sha256": "5c33429da19ca552e11ef430bc442412615d13fdc6fcc21e01847592a58895bd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": true,
+    "priority": 45,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "transition": "cut"
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "persistent",
+    "priority": 45,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "static_hold_ms": 3200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

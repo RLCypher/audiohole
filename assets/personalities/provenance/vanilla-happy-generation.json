@@ -1,0 +1,155 @@
+{
+  "personality_id": "vanilla",
+  "state": "happy",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/logo/happy.png",
+    "sha256": "a358ec697d16e9f7e9c3f64f5bc096d23b2394c9a023d61109f0d189fc123a08",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/logo/happy/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0001.png",
+        "sha256": "59b0f094e8493b4dd0d5e4ea36d38e4445f27f215c849b8152e9251d9bd3757c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0002.png",
+        "sha256": "446311a1eb4bff538449bbb365f0a82a4a972d8b9b1216de22c724ed57c10be7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0003.png",
+        "sha256": "959e1cffff3cbd1e5ca8b06836b2751f1f77ba1abc4f2fd44d397e174a1dadbb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0004.png",
+        "sha256": "0b22624fd69cfe6a7a2840be224faa2935894ed69c947f9ee03cb4c94d77e3bb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0005.png",
+        "sha256": "822afae280cccf25acd218e6414e18d59385fd33eaac905a55dc888a4ece5ed1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0006.png",
+        "sha256": "1f4f37ff14bcce72a4ebc60089b064a82ca2562a9ffbd498dc63f28824cb8dae",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 260
+      },
+      {
+        "path": "Generated/logo/happy/0007.png",
+        "sha256": "e32276edccce072731eeb78010d2441a4be8401848731933a4026c1b6ce3a0ae",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/logo/happy/0008.png",
+        "sha256": "36a117186c2dbc5cd7e9bc465eae25ca972915858469948aa3534f01ef727e84",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0009.png",
+        "sha256": "58ed197d993f1f2346b1b3518e14f785988a25eeb6006ddb4362b48365524984",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0010.png",
+        "sha256": "b17c49c0c1da34cbee57769010be0fa69f09eede3806a9374bc885c472851aff",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/happy/0011.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      }
+    ],
+    "loop": false,
+    "priority": 30,
+    "interruptible": true,
+    "cooldown_ms": 2500,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 30,
+    "interruptible": true,
+    "cooldown_ms": 2500,
+    "static_hold_ms": 1400,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

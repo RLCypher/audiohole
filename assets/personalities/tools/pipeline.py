@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from avatar_assets import (ROOT, AssetError, Resolver, digest, inspect_png,
+from avatar_assets import (ROOT, AssetError, Resolver, checked_frames, digest, inspect_png,
                            load_pack, owned_path, read_json, validate_pack)
 
 
@@ -130,17 +130,43 @@ def export_idle(identity, source: Path, replace=False):
     return provenance
 
 
-def review():
+def review(only_states=None, only_personalities=None, output_path=None, initial_state='idle', summary=True):
     """Self-contained offline snapshot, using the same validated resolver as tests."""
     sheets, snapshot, reports = [], {}, []
     image_urls = {}
     for identity, manifest in packs():
+        if only_personalities is not None and identity not in only_personalities:
+            continue
         data = load_pack(manifest, identity)
-        reports.append(validate_pack(manifest, identity))
+        if summary:
+            reports.append(validate_pack(manifest, identity))
         snapshot[identity] = {}
         for style, info in data['styles'].items():
             snapshot[identity][style] = {}
-            for state in [*info['states'], '__unknown__']:
+            selected = only_states if only_states is not None else {'idle'}
+            for state in [*(s for s in info['states'] if s in selected), '__unknown__']:
+                def encode_path(path):
+                    if path not in image_urls:
+                        encoded=BytesIO()
+                        with Image.open(path) as display_image:
+                            display_image.save(encoded,format='WEBP',quality=85,method=4)
+                        image_urls[path]='data:image/webp;base64,'+base64.b64encode(encoded.getvalue()).decode()
+                    return image_urls[path]
+
+                def static_entry(approved_only):
+                    diagnostics=[]
+                    if not info['enabled']:
+                        return {'source':'hide','resolved_state':state,'frames':[],'durations_ms':[],'loop':False,'diagnostics':['style disabled'],'status':'unavailable'}
+                    for target in [state,'idle']:
+                        asset=info['states'].get(target,{}).get('static')
+                        if asset is None:continue
+                        try:
+                            frames=checked_frames(manifest.parent,asset,approved_only)
+                            return {'source':'reduced_motion_static','resolved_state':target,'frames':[encode_path(frames[0][0])],
+                                    'durations_ms':[],'loop':False,'diagnostics':diagnostics,'status':asset['status']}
+                        except AssetError as error:diagnostics.append(str(error))
+                    return {'source':'hide','resolved_state':state,'frames':[],'durations_ms':[],'loop':False,'diagnostics':diagnostics,'status':'unavailable'}
+
                 def resolved_entry(approved_only):
                     selection = Resolver(approved_only=approved_only).resolve(manifest, identity, style, state)
                     entry = {'source': selection.source, 'resolved_state': selection.state,
@@ -149,14 +175,8 @@ def review():
                              'status': info['states'].get(selection.state, {}).get(
                                  'animation' if selection.durations_ms else 'static', {}).get('status', 'unavailable')}
                     for path in selection.paths:
-                        if path not in image_urls:
-                            # Display-only compression keeps the self-contained
-                            # inspector small enough for constrained HTML viewers.
-                            encoded = BytesIO()
-                            with Image.open(path) as display_image:
-                                display_image.save(encoded,format='WEBP',quality=85,method=4)
-                            image_urls[path] = 'data:image/webp;base64,' + base64.b64encode(encoded.getvalue()).decode()
-                        entry['frames'].append(image_urls[path])
+                        entry['frames'].append(encode_path(path))
+                    entry['reduced_motion']=static_entry(approved_only)
                     return entry
                 entry = resolved_entry(False)
                 entry['production'] = resolved_entry(True)
@@ -170,23 +190,25 @@ def review():
     for styles in snapshot.values():
         for states in styles.values():
             for entry in states.values():
-                for selection in [entry, entry['production']]:
+                for selection in [entry, entry['production'], entry['reduced_motion'], entry['production']['reduced_motion']]:
                     indices = []
                     for url in selection['frames']:
                         if url not in urls:
                             urls[url] = len(urls)
                         indices.append(urls[url])
                     selection['frames'] = indices
-    payload = json.dumps({'packs': snapshot, 'images': list(urls)}, separators=(',', ':')).replace('<', '\\u003c')
+    payload = json.dumps({'packs': snapshot, 'images': list(urls),'initial_state':initial_state}, separators=(',', ':')).replace('<', '\\u003c')
     template = (ROOT / 'tools/preview.html').read_text(encoding='utf-8')
-    (ROOT / 'review/preview.html').write_text(template.replace('/*__SNAPSHOT__*/', payload), encoding='utf-8')
-    make_sheet(sheets)
+    (output_path or ROOT / 'review/preview.html').write_text(template.replace('/*__SNAPSHOT__*/', payload), encoding='utf-8')
+    if summary:
+        make_sheet(sheets)
     result = {'approval': 'pending human review', 'packs': reports,
               'references': inventory(), 'visual_review_required': [
                   'character identity, accessories, anatomy, and lettering',
                   'dark/light background halos and alignment',
                   'Vanilla logo geometry and exact colors']}
-    write_json(ROOT / 'review/validation.json', result)
+    if summary:
+        write_json(ROOT / 'review/validation.json', result)
     return result
 
 
@@ -199,7 +221,7 @@ def make_sheet(entries):
     for index, (identity, style, path, status) in enumerate(entries):
         left = index * width
         draw.text((left + 16, 14), f'{identity} / {style} / idle', font=title, fill='white')
-        draw.text((left + 16, 43), f'{status} - UNAPPROVED', font=small, fill='#f0bf65')
+        draw.text((left + 16, 43), f'{status} - {"APPROVED" if status=="approved" else "UNAPPROVED"}', font=small, fill='#a0f7d6' if status=='approved' else '#f0bf65')
         for x in range(0, 288, 16):
             for y in range(0, 432, 16):
                 fill = '#e8e8ed' if (x // 16 + y // 16) % 2 == 0 else '#c5c7ce'
@@ -210,7 +232,7 @@ def make_sheet(entries):
                 out.paste(sprite, (left + 16, 76), sprite)
         else:
             draw.text((left + 30, 270), 'Missing idle artwork', fill='black', font=small)
-        draw.text((left + 16, 523), '512 x 768 RGBA | human review pending', fill='#b8c0cd', font=small)
+        draw.text((left + 16, 523), '512 x 768 RGBA | '+('IDLE accepted' if status=='approved' else 'review pending'), fill='#b8c0cd', font=small)
     out.save(ROOT / 'review/idle-contact-sheet.png')
 
 

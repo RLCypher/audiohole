@@ -1,0 +1,209 @@
+{
+  "personality_id": "vanilla",
+  "state": "error",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/logo/error.png",
+    "sha256": "d11873467042e2c11b181117044da5ce1eb0adaaa631fc6e9781d478ab18f535",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/logo/error/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0001.png",
+        "sha256": "02a86731e1aee5aaff98d2e663cde962509c3124e4b9d6dfe007ef47804f887d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0002.png",
+        "sha256": "98b58c6ff5960550b48026e1be5eaa53efd6ca8a56c7ad34b42a0b5b97fcbec7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0003.png",
+        "sha256": "f4d77ceb8f5d4b9e0bd769fc0d91db20de0dc8f48547b53985bd7b6814f59c8d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0004.png",
+        "sha256": "83d26e0837397d0573ff850980ad6348f4fc278bd4784d6261b8eea08f7afbf0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0005.png",
+        "sha256": "86d43218df03ccc5d2827809e5d678937e26269a4ce251ec7e78da22680007e9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0006.png",
+        "sha256": "8d80df1b2ec3ab5f016186fd3a9c09c53b9fd86f75fbba8dd9388ee842c364c0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0007.png",
+        "sha256": "983babef7054b4f1f4739d71e9f24aaec204b3352b36e60c9f82dd8e127b7036",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0008.png",
+        "sha256": "7ab4b586357aa2acce39ca30109c922bdd9458cb285bdcf1024c6fa205607afa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0009.png",
+        "sha256": "a1015108c15df313e837b7e1e60c3c227ebfd0e916697437c800f2ccf4c74109",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/logo/error/0010.png",
+        "sha256": "b3ff958274f94c3e62198ec2552124ef58aca7281ea156dd131751bd50c29fff",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/logo/error/0011.png",
+        "sha256": "078ab8fe610369c5f60175991989451ba57e0ce71375e2ae70a192bfec87e024",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0012.png",
+        "sha256": "1831a1c7ae6a0796dfff204719d340a478ba517a5d6a6e4fa3ee4e122e1af685",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0013.png",
+        "sha256": "f39512d825e735bd769591ece825c52b170bebf9579d624c6f9bddaedc9a0988",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0014.png",
+        "sha256": "0d78ac76682eba5935118ae5b3c1b38c5c904a2bfb97ea0a55763558bb16733e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0015.png",
+        "sha256": "fa661d2f91820e9f431c0b50f627375148b782b517a9067453d5316c61991085",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0016.png",
+        "sha256": "bcc55007ea51a7ee7c4aae8dd71e90b66194eea3324b1d9832051cd02ceb46c5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/error/0017.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 95,
+    "interruptible": true,
+    "cooldown_ms": 6000,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 95,
+    "interruptible": true,
+    "cooldown_ms": 6000,
+    "static_hold_ms": 2000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

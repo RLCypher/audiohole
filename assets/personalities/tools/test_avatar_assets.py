@@ -25,6 +25,7 @@ class AvatarContractTests(unittest.TestCase):
         for style in self.data['styles'].values():
             for entry in style['states'].values():
                 entry['animation'] = {'status': 'not_generated'}
+                entry['static'] = {'status': 'not_generated'}
         self.frame('Generated/chibi/idle.png')
         self.data['styles']['chibi']['states']['idle']['static'] = self.static('idle')
         self.save()

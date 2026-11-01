@@ -1,0 +1,262 @@
+{
+  "personality_id": "default",
+  "state": "sleeping",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/core-b-source.png",
+    "source_sha256": "1ba1a93198b46f53bd31e554e469d804fbe34382170499797a99fe4fa7a5296b",
+    "grid": [
+      2,
+      3
+    ],
+    "cell_index": 4,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      -2.2303030303029914,
+      1.4627705627705723
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "29d5d491df4e37b09c13905bc70214852fcff98ffaa0fd74ab7c992b33a00e21"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/sleeping.png",
+    "sha256": "a817a5cb15b6be264f83c42f331f99dd635f035c58f59176e1b3b51e2769df58",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/sleeping/0000.png",
+        "sha256": "60e1b1af56978b7dd42fb4d105ace90f6ecc0c4170ee06e3d784ac1738b23133",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0001.png",
+        "sha256": "dc7187a074648ebe70a0f44c41085bb463c374e70ac9b3daa7c1573135f6221d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0002.png",
+        "sha256": "b42c8aa5a430230a59b9c85ae6c1061126418626d2fd395c07a9ecf8a6678213",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0003.png",
+        "sha256": "1b3a8a2ee80d812e9550faa8b723f00c98b2b723d1f7b721316e7139f9c94c54",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0004.png",
+        "sha256": "1945494cfcf30174a4ec15ed0d2700b67e3cade598585c649b670453288302f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0005.png",
+        "sha256": "8aeb63b7a9b652ad76f35927f4ba09422a669f98c2f14b42817eb8a6b5c7ce0f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0006.png",
+        "sha256": "fe51b5ca1ec15d6346ca0e86fc012155631680ba1f79f7770c75008f756f51f8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0007.png",
+        "sha256": "7d26549a29c520e84cea5b2db00ee471dd0f011a12a2116628732ed8698a4174",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0008.png",
+        "sha256": "b5dcb5c15383f02fdf269e80f68c8d4c62e6e8f136c770a7be729ad20a3df166",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0009.png",
+        "sha256": "140467c650a4400050d631b0c5baa931e92733350d748d50ff54f3733f0d6e95",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0010.png",
+        "sha256": "1b5409b233a3af2f5c48ba934cb6157a348f03b1c42c57c05f81d648e043fc77",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0011.png",
+        "sha256": "94deae9d2c6e8deff52a6f5cf021a6bacd94e11f3d514eed312ede1df06fae8e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0012.png",
+        "sha256": "e7f48409a72778dab3831bc80b75fce97ddd6beac3e536e5832e6d52c013ed3a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0013.png",
+        "sha256": "b9d452511129e992ee67cf1fcf050105c06abc0b98e77a5e455dcc33dd258ac2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0014.png",
+        "sha256": "72e1cfbbd62884a99cd685e7b3a2e9be20b627ba6cc82830ec872cbfc2d17825",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/sleeping/0015.png",
+        "sha256": "60e1b1af56978b7dd42fb4d105ace90f6ecc0c4170ee06e3d784ac1738b23133",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      }
+    ],
+    "loop": true,
+    "priority": 5,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "transition": "cut"
+  },
+  "behavior": {
+    "category": "ambient",
+    "mode": "persistent",
+    "priority": 5,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "static_hold_ms": 4000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "38face4849fd79f0d9ce378e91f4308fb182729532e4839932c68a9854cf2815",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

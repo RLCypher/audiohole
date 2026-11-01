@@ -101,10 +101,8 @@ def audit():
                 preview_checks[tag] = {'size': list(apng.size), 'frames': apng.n_frames,
                                        'duration_ms': sum(actual), 'rgba_frames_match': True,
                                        'sha256': digest(path)}
-        for states in data['styles'].values():
-            for state, entry in states['states'].items():
-                if state != 'idle' and any(entry[k]['status'] not in {'not_generated', 'unavailable'} for k in ['static', 'animation']):
-                    errors.append('non-IDLE asset generated outside this milestone')
+        # Full generation is now authorized. This audit protects the accepted
+        # IDLE baseline and does not reject separately generated state assets.
         report['packs'][identity] = {'errors': errors, 'warnings': sorted(set(validation['warnings'])),
                                      'frame_count': len(frames), 'alignment': metrics, 'previews': preview_checks,
                                      'master_sha256': digest(master_path), 'manifest_integrity': 'pass' if not validation['errors'] else 'fail'}

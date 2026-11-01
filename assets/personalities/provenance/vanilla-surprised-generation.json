@@ -1,0 +1,173 @@
+{
+  "personality_id": "vanilla",
+  "state": "surprised",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/logo/surprised.png",
+    "sha256": "8c16b3716f66e4218d4115c340c5d79aa279eda9acf3ceb5b651e5634685662a",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/logo/surprised/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0001.png",
+        "sha256": "7aa20c7c23791671524fa81bed58426d3eeff1fc70a4e357aaa48a34974f4522",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0002.png",
+        "sha256": "227b9b5ff748c829bf77098588e5a0a17de0354f2e307907c9a1010895ed41c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0003.png",
+        "sha256": "44d29a1bf51be5b6ea4e2e95cbba6d4c351ad8af89f82fa5ff14d4a762be5dfe",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0004.png",
+        "sha256": "43b318a591f143b49bf2fe35d458b756faf0c67c2c7d378eb5b6cdad006fed52",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0005.png",
+        "sha256": "20e09b48eceae39559b92076a8a2b65990e0e872cbbe04a175dc0597b0927405",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0006.png",
+        "sha256": "7e6590ed0d851316777791f253e15841a1d502d9f9e17c26e9d443a51fdf208c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0007.png",
+        "sha256": "01abbb7390c0c4ce8d105bf29e24d32028f413c1226a614c1c387c6db072e533",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/logo/surprised/0008.png",
+        "sha256": "04de5435a8dabacfa8f69c467de63b5ce22d60b107b5a1add3208fe1e8d5b1bb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 170
+      },
+      {
+        "path": "Generated/logo/surprised/0009.png",
+        "sha256": "286079d1f6fdce72c958c2280ca6fb3b66336754aef478b255798bff55d584bb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0010.png",
+        "sha256": "fae932f9a941d1238904492831a7f8be2162c8f77aa155e9b681660c733395f1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0011.png",
+        "sha256": "0738a689b5e2cc6aec05c0f1c3cf2b921546b4dd15f1dace5a21a8aaaa42171d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0012.png",
+        "sha256": "fc809685445bd88ec2f4833250d40b981c08d8028b48ecf69a9c162a8b181d56",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/logo/surprised/0013.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 1500,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

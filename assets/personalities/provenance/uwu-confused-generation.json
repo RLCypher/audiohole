@@ -1,0 +1,245 @@
+{
+  "personality_id": "uwu",
+  "state": "confused",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "UwU/Intermediate/core-a-source.png",
+    "source_sha256": "1f98fd2b34853b98899d981697b65538b871823cf360298bdaa1edc0bef7ee30",
+    "grid": [
+      2,
+      3
+    ],
+    "cell_index": 4,
+    "face_box": [
+      188,
+      155,
+      364,
+      331
+    ],
+    "registration_translation": [
+      -3.125902992776048,
+      -3.368421052631561
+    ],
+    "face_polygon": [
+      [
+        210,
+        171
+      ],
+      [
+        280,
+        170
+      ],
+      [
+        299,
+        186
+      ],
+      [
+        320,
+        190
+      ],
+      [
+        343,
+        201
+      ],
+      [
+        346,
+        245
+      ],
+      [
+        332,
+        269
+      ],
+      [
+        309,
+        292
+      ],
+      [
+        282,
+        302
+      ],
+      [
+        251,
+        290
+      ],
+      [
+        218,
+        271
+      ],
+      [
+        205,
+        237
+      ]
+    ],
+    "nose_preserved_box": [
+      289,
+      250,
+      312,
+      266
+    ],
+    "key_sha256": "0fe622bc60d0ab3bba14d2948cf4e76bafc28edc6064aea7aa00898e5281744a"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/confused.png",
+    "sha256": "7d052f15c78d00531a2024e04c6366988f0742e4e5db87fd13347a7f8658c0e8",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/confused/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0001.png",
+        "sha256": "e51bc5d9f575cc2d0e8f599089682c2f8c1fff274835478cb5e2c4f90731e47e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0002.png",
+        "sha256": "4d6cb0931da6ceaacbf22222c43113b2c86eb2ba8451f6b971165919d3d70091",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0003.png",
+        "sha256": "05a2ecb65c08876d8aec4a36e675d75be414809a923e9a15e09473dabd7b0f41",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0004.png",
+        "sha256": "8e7796e906911fb6d3df5174ad49ae3adfc5366b6e2bf203cf37ea970c12cfcc",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0005.png",
+        "sha256": "233720056cabe0653ec5b97df9806a54fbafa580fdaf7550aa520e1463a211e9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0006.png",
+        "sha256": "9a8e5dd69656699a82dda5e030ff053da27711b644e4c33a6bfbd707f457337b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0007.png",
+        "sha256": "82016cef9b1debf67d957708bf9ee53889e9ed6510d5e6f71d491ba5a0e5d6e1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 300
+      },
+      {
+        "path": "Generated/chibi/confused/0008.png",
+        "sha256": "3df384bc2669109f876f6fb2508ad1e44db1e26c57518f01983937ff1b30e824",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/confused/0009.png",
+        "sha256": "64d914f95ef00f4534b2cbcf33b4edd84238bfdbdf314e9f187f61440070d4c0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0010.png",
+        "sha256": "380e7dfe6fda5b3e1d87c9525280fce1d802200f1dd3c17af5ad306e8696c601",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0011.png",
+        "sha256": "361e758d7a6ece86a5b5ef530ed3faab94e477ccb95c73fa8269e3049aa36516",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0012.png",
+        "sha256": "501e47bb5dc53f22ec831ee35b2aff8ba684d73d1ed9e37ebbb8f636253d01e6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/confused/0013.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 3000,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 3000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

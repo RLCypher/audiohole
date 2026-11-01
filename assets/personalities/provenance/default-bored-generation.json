@@ -1,0 +1,226 @@
+{
+  "personality_id": "default",
+  "state": "bored",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/optional-b-source.png",
+    "source_sha256": "96be7dfac287ad22af3c58dfa8d123b150c452e2c9a10d212b91899cfe1d6fc8",
+    "grid": [
+      2,
+      2
+    ],
+    "cell_index": 1,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      4.677777777777806,
+      7.1476190476190595
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "3dff7b25d03e8f7df78a2ae317fe35a8ab94b03e3388e47efa87af6d467c7800"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/bored.png",
+    "sha256": "3dff7b25d03e8f7df78a2ae317fe35a8ab94b03e3388e47efa87af6d467c7800",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/bored/0000.png",
+        "sha256": "3dff7b25d03e8f7df78a2ae317fe35a8ab94b03e3388e47efa87af6d467c7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0001.png",
+        "sha256": "57c312d33d98278bedc12ca88f581a05b77ffc263293592dd9f4945f3a9944d1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0002.png",
+        "sha256": "919899cc9f7a1d56a68496b225a6b139affff4b509c0375b4cbc28d413f469ff",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0003.png",
+        "sha256": "7fd297cf58680d0c652d0bc505367eb44e354e7505169b2a2dd26a8038adaaf8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0004.png",
+        "sha256": "9324061ba976174db9698533af0d467e7a33cae988ff3421555c761b17e9499f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0005.png",
+        "sha256": "b82491b4a360240c4820d1293d815c9589634beaeb64b2b16f22236fbed76d71",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0006.png",
+        "sha256": "d4ea131c43074fbf94059bb55de19679c18d7c6df05d9e89d7f10b97c25f7b50",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0007.png",
+        "sha256": "51b986afc07ef9450b5c39394e137c1c8b03c74c284aaad016dba9cf02ff7e1f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0008.png",
+        "sha256": "c9df634f364674c808c810ef64f1b8280624e63fe4cd2a779d266dd58cc42bfa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0009.png",
+        "sha256": "bd4fbf2341282c17acbc477f56e324f4d5a9d0a1df9822c9bded5a3fd9114c24",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0010.png",
+        "sha256": "7deedf211aaf0068cf42103efae1f4d78520c28e89766f21f2b756f272514748",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 330
+      },
+      {
+        "path": "Generated/chibi/bored/0011.png",
+        "sha256": "3dff7b25d03e8f7df78a2ae317fe35a8ab94b03e3388e47efa87af6d467c7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 370
+      }
+    ],
+    "loop": true,
+    "priority": 5,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "transition": "cut"
+  },
+  "behavior": {
+    "category": "ambient",
+    "mode": "persistent",
+    "priority": 5,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "static_hold_ms": 4000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

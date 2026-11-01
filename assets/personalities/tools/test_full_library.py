@@ -1,0 +1,103 @@
+"""Acceptance tests for the complete generated library and real playback policy."""
+from bisect import bisect_right
+import unittest
+from pathlib import Path
+
+from PIL import Image
+
+from avatar_assets import ROOT, digest, read_json
+from avatar_player import AvatarPlayer
+from audit_library import audit, difference
+from pipeline import packs
+
+
+class FullLibraryTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.report=audit()
+
+    def test_complete_catalog_and_all_operating_images_pass(self):
+        self.assertEqual(self.report['errors'],[])
+        self.assertEqual(self.report['totals'],{'static_assets':52,'animation_sequences':49,'animation_frames':744,'operating_pngs':796})
+        self.assertTrue(all(pack['core_complete'] for pack in self.report['packs'].values()))
+
+    def test_accepted_idle_files_are_immutable_and_only_idle_is_approved(self):
+        for relative,sha in read_json(ROOT/'provenance/idle-approval.json')['assets'].items():
+            self.assertEqual(digest(ROOT/relative),sha,relative)
+        for identity,path in packs():
+            data=read_json(path);states=data['styles'][data['default_style']]['states']
+            self.assertEqual(states['idle']['static']['status'],'approved')
+            self.assertEqual(states['idle']['animation']['status'],'approved')
+            for state,entry in states.items():
+                if state!='idle':
+                    self.assertNotEqual(entry['static']['status'],'approved')
+                    self.assertNotEqual(entry['animation']['status'],'approved')
+
+    def test_theatrical_uwu_reactions_have_real_finite_animation_and_cooldowns(self):
+        states=self.report['packs']['uwu']['states']
+        for state in ['error','angry','surprised','celebrating','panicking']:
+            with self.subTest(state=state):
+                self.assertGreaterEqual(states[state]['frame_count'],14)
+                self.assertEqual(states[state]['behavior']['mode'],'finite')
+                self.assertGreaterEqual(states[state]['behavior']['cooldown_ms'],5000)
+                self.assertEqual(states[state]['loop_endpoint_max_rgba_delta'],0)
+
+    def test_static_clothing_case_and_shoes_keep_the_accepted_artwork(self):
+        for identity,path in packs():
+            if identity=='vanilla':continue
+            data=read_json(path);style=data['default_style'];master=Image.open(path.parent/f'Generated/{style}/idle.png')
+            boxes=[(90,500,220,600),(70,630,430,704)] if identity=='default' else [(88,520,211,615),(210,630,380,704)]
+            for state,entry in data['styles'][style]['states'].items():
+                if entry['static']['status'] not in {'validated','approved'}:continue
+                image=Image.open(path.parent/entry['static']['path'])
+                for box in boxes:self.assertEqual(difference(master.crop(box),image.crop(box)),0,(identity,state,box))
+
+    def test_native_preview_samples_are_the_actual_operating_frames(self):
+        for identity,path in packs():
+            data=read_json(path);style=data['default_style'];states=data['styles'][style]['states']
+            for state in ['talking','error','celebrating']:
+                meta=states[state]['animation']['frames'];times=[f['duration_ms'] for f in meta]
+                with Image.open(ROOT/f'review/full/{identity}/{state}-native.png') as preview:
+                    decoded=[];exposures=[]
+                    for frame in range(preview.n_frames):
+                        preview.seek(frame);preview.load();decoded.append(preview.convert('RGBA').copy());exposures.append(round(preview.info['duration']))
+                    for selected in [0,len(meta)//2,len(meta)-1]:
+                        target_time=sum(times[:selected]);elapsed=0
+                        for frame,duration in enumerate(exposures):
+                            if elapsed+duration>target_time:break
+                            elapsed+=duration
+                        expected=Image.open(path.parent/meta[selected]['path'])
+                        self.assertEqual(decoded[frame].tobytes(),expected.tobytes(),(identity,state,selected))
+
+    def test_real_finite_reaction_returns_to_current_persistent_state(self):
+        player=AvatarPlayer(approved_only=False);manifest=ROOT/'UwU/manifest.json'
+        player.request(manifest,'uwu','chibi','working',0)
+        self.assertTrue(player.request(manifest,'uwu','chibi','error',100).accepted)
+        self.assertEqual(player.request(manifest,'uwu','chibi','concerned',200).reason,'persistent_context_updated')
+        self.assertEqual(player.frame_at(2099).state,'error')
+        self.assertEqual(player.frame_at(2100).state,'concerned')
+
+    def test_reduced_motion_and_production_approval_use_owned_static_fallback(self):
+        player=AvatarPlayer(approved_only=False);manifest=ROOT/'UwU/manifest.json'
+        player.request(manifest,'uwu','chibi','surprised',0,reduced_motion=True)
+        frame=player.frame_at(1)
+        self.assertEqual(frame.source,'reduced_motion_static')
+        self.assertEqual(frame.path.name,'surprised.png')
+        production=AvatarPlayer()
+        production.request(manifest,'uwu','chibi','surprised',0,reduced_motion=True)
+        self.assertEqual(production.frame_at(1).path.name,'idle.png')
+
+    def test_intentional_static_states_and_logo_optional_fallbacks_are_explicit(self):
+        for pid in ['default','uwu']:
+            state=self.report['packs'][pid]['states']['deadpan']
+            self.assertEqual(state['frame_count'],0)
+            self.assertEqual(state['behavior']['mode'],'finite')
+            self.assertTrue(state['note'])
+        logo=self.report['packs']['vanilla']['states']
+        self.assertEqual(logo['sleeping']['frame_count'],0)
+        for state in read_json(ROOT/'states.json')['optional']:
+            self.assertEqual(logo[state]['static_status'],'unavailable')
+            self.assertEqual(logo[state]['fallback'],'idle')
+
+
+if __name__=='__main__':unittest.main()

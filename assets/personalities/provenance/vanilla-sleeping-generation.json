@@ -1,0 +1,40 @@
+{
+  "personality_id": "vanilla",
+  "state": "sleeping",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/logo/sleeping.png",
+    "sha256": "204d22e9df977c83ef1f1538f7528f752f8d70782f006678a6311958b4455086",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "not_generated"
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "persistent",
+    "priority": 5,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "static_hold_ms": 4000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

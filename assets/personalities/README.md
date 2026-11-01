@@ -1,12 +1,14 @@
 # AudioHole avatar pipeline
 
-The three initial IDLE masters and three 12-frame IDLE sequences are technically
-validated and **unapproved**. Other expressions, bulk animation, and application
-integration are pending. See [the IDLE sequence report](review/idle-sequences/REPORT.md)
-for current deliverables, timing, validation, limitations, and review decisions.
-The original repository audit is in [RECONNAISSANCE.md](RECONNAISSANCE.md).
+The revised IDLE milestone is **approved**. The full library now contains 52
+static expressions, 49 sequences and 744 animation frames across Norm, UwU and
+Vanilla. New artwork is technically validated and remains pending human review.
 
-## Review the masters
+Start with the [full catalog](review/full/index.html), [all-state sheet](review/full/all-states-contact-sheet.png),
+[inventory](review/full/INVENTORY.md), and [integration handoff](review/full/HANDOFF.md).
+The original repository audit remains in [RECONNAISSANCE.md](RECONNAISSANCE.md).
+
+## Review the library and accepted baseline
 
 - Open `review/preview.html` in a browser. It is a self-contained offline snapshot.
 - Inspect `review/idle-contact-sheet.png` and `review/validation.json`.
@@ -37,11 +39,13 @@ The original repository audit is in [RECONNAISSANCE.md](RECONNAISSANCE.md).
 - Vanilla's entire canonical 512-square RGBA image is preserved at `(0, 128)`.
   Its floating logo is intentionally above the character ground guide.
 
-The user's follow-up explicitly authorized these three initial IDLE sequences,
-superseding the earlier master-only checkpoint for this limited batch. The new
-checkpoint is **“Stop after completing these three IDLE sequences and their
-previews. Await human review and approval before proceeding further.”** Do not
-mark the candidates approved or expand the artwork batch until that review.
+The latest user authorization accepts IDLE and permits full generation without
+routine batch approvals. All 39 accepted IDLE image hashes are frozen in
+`provenance/idle-approval.json`. New static and animated reactions are separate
+candidates; generation authorization does not grant their artistic approval.
+See `review/full/` for per-personality review ZIPs and one small inspector per
+performance. Norm/UwU deadpan and Vanilla sleeping are intentionally static;
+Vanilla optional emotional labels explicitly use its own IDLE.
 
 ## Run the tools
 
@@ -59,11 +63,13 @@ python assets/personalities/tools/pipeline.py validate
 python assets/personalities/tools/pipeline.py validate --approved-only
 python assets/personalities/tools/pipeline.py review
 python assets/personalities/tools/validate_idle.py
+python assets/personalities/tools/audit_library.py
+python assets/personalities/tools/build_review_library.py
 python -m unittest discover -s assets/personalities/tools -p 'test_*.py' -v
 ```
 
 `validate` is read-only and exits 1 on errors. Warnings require visual inspection.
-`--approved-only` is expected to fail for these unapproved candidates. The
+`--approved-only` reports the remaining unapproved generated reactions; accepted IDLE remains usable in production-filtered fallback. The
 optional browser smoke check uses an already installed Playwright and Chromium:
 
 ```sh
@@ -112,7 +118,7 @@ crop, resampling size, and placement. No implicit resizing occurs in validation.
 | `AGENTS.md`, `AVATAR_ASSETS.md`, `*/CHARACTER.md` | Supplied baseline, preserved verbatim |
 | `*/References/` | Five immutable canonical inputs, original names and sizes |
 | `*/Intermediate/` | Raw backend outputs; never runtime assets |
-| `*/Generated/<style>/idle.png` | Operating masters pending approval |
+| `*/Generated/<style>/idle.png` | Accepted IDLE masters; separate reaction candidates |
 | `*/manifest.json` | Editable per-personality states, assets, anchors, statuses |
 | `registry.json` | Existing application mode IDs mapped to personality manifests |
 | `states.json` | Shared required and optional state catalog, fallback order |
@@ -169,9 +175,9 @@ away from audio callbacks, key caches by personality/style/path/hash, pass
 structured presentation requests from the personality layer, and keep rendering
 failures inside the GUI. Avoid repeated decoding in production. This offline
 reference intentionally revalidates on resolution and is not a performance
-benchmark. Priority arbitration, interruption, cooldowns, and debouncing are
-metadata contracts awaiting the approved-artwork animation milestone; the
-preview's simple frame timer does not implement the application scheduler.
+benchmark. Priority arbitration, interruption, cooldowns and duplicate suppression now
+have an independent reference implementation in `avatar_player.py`; the frame
+inspector remains a manual inspection tool rather than the main application scheduler.
 
 To add a personality, add its own references and definition, create a manifest
 with a unique ID and enabled default style, produce and review its own IDLE, and
@@ -179,3 +185,20 @@ add its path to the registry. Custom state/style names are supported without
 changing the renderer. A new application personality mode still belongs to the
 primary application's configuration workflow. Do not change routing, dialogue,
 DFA, persistent settings, or shared GUI code from this workspace.
+
+
+## Full-generation playback policy
+
+`avatar_player.py` now implements priority, interruption, cooldowns, redundant
+event suppression, persistent return context and reduced-motion selection as
+an independent reference policy. It preflights during requests and performs no
+filesystem/decode work during timer ticks. New state behavior and performance
+metadata are validated against manifest schema v1. Per-state inspectors and
+portable replay pages are generated by `build_review_library.py`.
+
+The historical IDLE export/revision commands above describe its provenance.
+They intentionally refuse approved masters/sequences and must not be used to
+regenerate the accepted baseline. Rebuild new states with `generate_states.py`
+and retained face keys, then run the full audit and review builder. Detailed
+commands, limitations, cache guidance, checks and remaining approval items are
+in the full handoff. No production C++ integration is claimed.

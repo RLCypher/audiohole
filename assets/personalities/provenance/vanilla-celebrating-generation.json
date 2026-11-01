@@ -1,0 +1,245 @@
+{
+  "personality_id": "vanilla",
+  "state": "celebrating",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/logo/celebrating.png",
+    "sha256": "b65828424c46fd2011873e56e3aa52819d7ce66f29b9554157193de985e1a0d6",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/logo/celebrating/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0001.png",
+        "sha256": "772380955ef5f437f5c41bd79b01ad7a8b84ddaf55e5a496c50af31175ddb504",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0002.png",
+        "sha256": "407f62ca819fcddfb69a0c85ae0a8adc783079d0044fcc0816ae3b10f5a353f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0003.png",
+        "sha256": "780a803253109454b92bf6b67212c0c6aa89167cdf63d67c6b7f83bb1f5fbcd8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0004.png",
+        "sha256": "cdc653aaf39db599f719836e5276b6186bc9aaa2968eb34db1d7ef22e4293873",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0005.png",
+        "sha256": "cab1a5d09f32c8aa41336c231a9cbb01a1a935c4e0e0356936832af09bc06e68",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0006.png",
+        "sha256": "150e3cebc8a5d4dcd72962530301a6ffa4262e3d85886b59e099d59f28a9fab0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0007.png",
+        "sha256": "11973873a26032ddb55547c85f533cceae4112cd2369c49ab0165cc65d35065b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0008.png",
+        "sha256": "2a7314dd8a9489c3c5d980982f4413b86364ec1a4f941982e605740fe952553e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0009.png",
+        "sha256": "59e4b6b8e6265961e7f5cc290a8259430e84de40d367f461cf8f98c4dd1f22e9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0010.png",
+        "sha256": "895e692aeaf506659ab49e6d0245cbc33e498c37cc8fc147a72cd57f0b3c6ab6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0011.png",
+        "sha256": "c0a33e1924562b95a2b2fea10d2c1735e98c96fd1c389784afcb349b360bf975",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 280
+      },
+      {
+        "path": "Generated/logo/celebrating/0012.png",
+        "sha256": "8befaf30e7aa9cc354e9108bd795ec32d39e32b4ca0a05b2ff933fb2e25a60b9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/logo/celebrating/0013.png",
+        "sha256": "be2c23054612a076ffc8357a20861be3c05ab5ba8ef7e3ead4d6ede91dceceaa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0014.png",
+        "sha256": "87bc2ad9fcefe1cb6745ec612ec4930ae7d36300813c14b7679496f8c8a1059d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0015.png",
+        "sha256": "a50deeefc481a1d7e147439148fb940e753775d526c426be116e6302484fc9a0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0016.png",
+        "sha256": "b3a43bb7c3aba2a4584fc7e1a419529d741349247901d99a7c1f8442944938c5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0017.png",
+        "sha256": "3830e65511d041682abad9eab9687a20ea6cba2dc6f124c03da4b623acd0e065",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0018.png",
+        "sha256": "ee8ef054190752e5b042dff4e6ce3ad9a109daa9cd964f56c72e77f8af0fe5b6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0019.png",
+        "sha256": "a2ab133dc454d43ffe3dce4d78009db2541916084e53b10f26aae52ee95a2a62",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0020.png",
+        "sha256": "2d0712eb0ce67a796bf9ff6c41712b21405380f435828ad7e54439ac9fb65242",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/celebrating/0021.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 230
+      }
+    ],
+    "loop": false,
+    "priority": 55,
+    "interruptible": true,
+    "cooldown_ms": 8000,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 55,
+    "interruptible": true,
+    "cooldown_ms": 8000,
+    "static_hold_ms": 2400,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}

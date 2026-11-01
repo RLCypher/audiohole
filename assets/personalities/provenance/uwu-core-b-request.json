@@ -1,0 +1,26 @@
+{
+  "folder": "UwU",
+  "batch": "core-b",
+  "states": [
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping"
+  ],
+  "direction": "1 ERROR: extreme anime malfunction shock, blank white eyes and jagged horrified open mouth. 2 ANGRY: anime puffed cheeks, very narrow blue eyes, angry pout. 3 SURPRISED: enormously widened blank white anime eyes, giant O mouth, sudden comedic shock. 4 CELEBRATING: blue starry eyes and excited huge delighted fang grin. 5 SLEEPING: fully closed relaxed eyelids and little closed mouth, completely peaceful. 6 NEUTRAL: the original half-lidded blue eyes and closed-mouth knowing smile, used only for registration. Facial anime/manga shorthand is mandatory; intentional extreme simplification is allowed, while hair and feline identity stay the same.",
+  "personality_id": "uwu",
+  "face_box": [
+    188,
+    155,
+    364,
+    331
+  ],
+  "grid": [
+    2,
+    3
+  ],
+  "backend": "image_gen.imagegen",
+  "prompt": "Generate exactly SIX equally sized square FACE CROP panels, 2 columns by 3 rows, portrait 1024x1536 if supported. No margins, gaps, lines, labels or text. The first supplied square face crop is the exact composition template for EVERY CELL: reproduce that exact crop to all four edges, same face scale, same three-quarter orientation, same position of the nose, hair, cheeks, jaw and headphones. Do NOT recenter, add padding, zoom, draw the whole body, or create floating head portraits. The second supplied image establishes full character identity. Only brows, eyes and mouth vary. Preserve UwU as the same adult white feline, white/lavender fur, pink nose and cheeks, blue eyes except deliberate white-eye shorthand, fluffy hair and distinctive forelock. Keep headphones/hair clips where the crop includes them. Read cells left to right, top to bottom: 1 ERROR: extreme anime malfunction shock, blank white eyes and jagged horrified open mouth. 2 ANGRY: anime puffed cheeks, very narrow blue eyes, angry pout. 3 SURPRISED: enormously widened blank white anime eyes, giant O mouth, sudden comedic shock. 4 CELEBRATING: blue starry eyes and excited huge delighted fang grin. 5 SLEEPING: fully closed relaxed eyelids and little closed mouth, completely peaceful. 6 NEUTRAL: the original half-lidded blue eyes and closed-mouth knowing smile, used only for registration. Facial anime/manga shorthand is mandatory; intentional extreme simplification is allowed, while hair and feline identity stay the same. Keep canonical colors, clean illustrated linework matching the crop, and true transparency where the crop is transparent. Do not add effects outside the face; those are layered later. These are consistent animation keys of ONE character.",
+  "approval": "pending human review"
+}

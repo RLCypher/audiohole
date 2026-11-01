@@ -1,0 +1,26 @@
+{
+  "folder": "Norm",
+  "batch": "core-b",
+  "states": [
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping"
+  ],
+  "direction": "1 ERROR: strained disbelieving eyes, weary teeth-grit grimace. 2 ANGRY: narrowed eyes, irritated furrowed brows, understated gritted frown. 3 SURPRISED: a rare theatrical shock, dramatically widened eyes and open mouth, still exactly this adult bearded Norm. 4 CELEBRATING: pleased triumphant grin and raised eyebrows, composed rather than hyperactive. 5 SLEEPING: completely closed relaxed eyelids, small closed resting mouth. 6 NEUTRAL: exact original dry half-lidded smirk, used only as a registration check.",
+  "personality_id": "default",
+  "face_box": [
+    236,
+    134,
+    364,
+    262
+  ],
+  "grid": [
+    2,
+    3
+  ],
+  "backend": "image_gen.imagegen",
+  "prompt": "Generate exactly SIX equally sized square FACE CROP panels, 2 columns by 3 rows, portrait 1024x1536 if supported. No margins, gaps, lines, labels or text. The first supplied square face crop is the exact composition template for EVERY CELL: reproduce that exact crop to all four edges, same face scale, same three-quarter orientation, same position of the nose, hair, cheeks, jaw and headphones. Do NOT recenter, add padding, zoom, draw the whole body, or create floating head portraits. The second supplied image establishes full character identity. Only brows, eyes and mouth vary. Preserve the adult male Norm, brown scruffy hair and beard, sturdy face, dark cap and headphones, dry competent personality. Keep his facial hair, skin colors and established shading. Read cells left to right, top to bottom: 1 ERROR: strained disbelieving eyes, weary teeth-grit grimace. 2 ANGRY: narrowed eyes, irritated furrowed brows, understated gritted frown. 3 SURPRISED: a rare theatrical shock, dramatically widened eyes and open mouth, still exactly this adult bearded Norm. 4 CELEBRATING: pleased triumphant grin and raised eyebrows, composed rather than hyperactive. 5 SLEEPING: completely closed relaxed eyelids, small closed resting mouth. 6 NEUTRAL: exact original dry half-lidded smirk, used only as a registration check. Keep canonical colors, clean illustrated linework matching the crop, and true transparency where the crop is transparent. Do not add effects outside the face; those are layered later. These are consistent animation keys of ONE character.",
+  "approval": "pending human review"
+}

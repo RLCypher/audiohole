@@ -184,7 +184,8 @@ def validate_pack(manifest: Path, expected_personality=None, approved_only=False
         if info['enabled']:
             # Idle can be a static or fully valid animation, and is mandatory per style.
             idle_errors = []
-            for asset in info['states']['idle'].values():
+            for kind in ['animation','static']:
+                asset=info['states']['idle'][kind]
                 if isinstance(asset, dict):
                     try:
                         checked_frames(manifest.parent, asset, approved_only)

@@ -1,0 +1,111 @@
+{
+  "personality_id": "default",
+  "state": "deadpan",
+  "status": "validated",
+  "approval": "pending human review",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/optional-b-source.png",
+    "source_sha256": "96be7dfac287ad22af3c58dfa8d123b150c452e2c9a10d212b91899cfe1d6fc8",
+    "grid": [
+      2,
+      2
+    ],
+    "cell_index": 3,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      4.588888888888903,
+      7.225396825396842
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "e28c659a62565704d490fdfe3d2b346725b41dc0fcb4977b25925cda8d5038ea"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/deadpan.png",
+    "sha256": "e28c659a62565704d490fdfe3d2b346725b41dc0fcb4977b25925cda8d5038ea",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "not_generated"
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "static_hold_ms": 1600,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  }
+}
