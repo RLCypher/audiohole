@@ -119,6 +119,8 @@ a placebo DFA slider, scan callouts, clearer navigation, and Light/Dark/System p
 
 AudioHole is currently in early development. Contribution guidelines will be added as the project matures.
 
+See our [AI Disclosure](AI_DISCLOSURE.md) for the official statement on AI assistance and human responsibility.
+
 ## License
 
 A license will be selected before the project's public release.

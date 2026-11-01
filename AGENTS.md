@@ -44,6 +44,7 @@ The repository documentation is the authoritative design reference.
 | `TRAY.md` | Background operation, tray controls, and notifications |
 | `DECISIONS.md` | Accepted, provisional, open, and deferred decisions |
 | `ROADMAP.md` | Development milestones and validation gates |
+| [AI_DISCLOSURE.md](AI_DISCLOSURE.md) | Official project disclosure of AI assistance |
 
 Do not attempt to infer a feature's complete behavior from this file alone.
 
