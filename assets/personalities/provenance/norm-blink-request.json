@@ -1,0 +1,9 @@
+{
+  "backend": "image_gen.imagegen",
+  "reference": "Norm/Generated/chibi/idle.png",
+  "transparent_background": true,
+  "prompt": "Edit this exact supplied AudioHole Norm chibi IDLE master into a CLOSED-EYES BLINK keyframe. This is one frame of an animation: ONLY close both eyes into relaxed thin downward-curved eyelid lines; retain the original eyebrows, nose, mouth, face, head, hair and everything else in exactly the same shape and pixel positions. No smile change, no squint expression, no additional eyelashes. Keep original adult character proportions, all clothing, headphones, accessories, equipment case and coffee mug exactly unchanged. Preserve original camera, complete silhouette, framing and scale; do not enlarge, recenter, crop, relight or redraw the body. Real transparent alpha background, no glow or shadow. Exact same 512 by 768 portrait canvas and position if supported; if output is larger, preserve the exact normalized coordinates. Return one full transparent sprite, not a sheet. Both eyes fully closed is the only edit. Preserve brown beard and hair, purple cap and headphones, dry relaxed smirk, face and hoodie.",
+  "seed": "not exposed",
+  "scope": "idle blink keyframe only",
+  "approval": "pending human review"
+}

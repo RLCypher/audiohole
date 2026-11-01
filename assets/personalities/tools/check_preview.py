@@ -30,7 +30,7 @@ def main():
         for identity in ['default', 'uwu', 'vanilla']:
             page.select_option('#personality', identity)
             page.select_option('#state', '__unknown__')
-            assert 'idle_static' in page.locator('#summary').inner_text()
+            assert 'idle_animation' in page.locator('#summary').inner_text()
             assert identity in page.locator('#summary').inner_text()
         checks.append('unknown state falls back within each personality')
         page.check('#missing')
@@ -55,23 +55,32 @@ def main():
         page.check('#guides')
         assert 'guides' in page.locator('#stage').get_attribute('class')
         checks.append('all backgrounds and guide toggle')
-        # Repeat a static frame as a synthetic timing fixture; no animation artwork.
-        page.evaluate("active={...active,frames:[active.frames[0],active.frames[0]],durations_ms:[1000,1000],loop:true};index=0;render();play()")
-        page.wait_for_function('index === 1')
-        page.evaluate('stop()')
-        assert 'Frame 2 / 2' in page.locator('#frame').inner_text()
+        page.select_option('#display', '128')
+        assert page.locator('#avatar').bounding_box()['width'] == 128
+        page.select_option('#display', '512')
+        assert page.locator('#avatar').bounding_box()['width'] == 512
+        checks.append('native 512x768 and compact 128x192 display selectors')
+        assert page.evaluate('active.frames.length') == 12
+        assert page.evaluate('active.durations_ms.reduce((a,b)=>a+b,0)') == 5000
+        page.evaluate('index=4;render();play()')
+        page.wait_for_function('() => { if(index === 5) { stop(); return true; } return false; }')
+        assert 'Frame 6 / 12' in page.locator('#frame').inner_text()
+        page.click('#pause')
         page.click('#step')
-        assert 'Frame 1 / 2' in page.locator('#frame').inner_text()
-        page.evaluate('active.loop=false;active.durations_ms=[16,16];index=1;play()')
-        page.wait_for_function('document.getElementById("state").value === "idle" && active.frames.length === 1')
-        checks.append('synthetic loop, pause, step, one-shot completion returns to idle')
+        assert 'Frame 7 / 12' in page.locator('#frame').inner_text()
+        page.evaluate('index=11;play()')
+        page.wait_for_function('() => { if(index === 0) { stop(); return true; } return false; }')
+        checks.append('actual 12-frame playback, blink frame, pause, step and loop wrap')
+        page.evaluate('active.loop=false;index=11;play()')
+        page.wait_for_function('document.getElementById("state").value === "idle" && index === 0')
+        checks.append('one-shot timer returns to idle')
         page.select_option('#personality', 'uwu')
         page.screenshot(path=str(ROOT / 'review/preview-screenshot.png'), full_page=True)
         assert not errors, errors
         checks.append('no browser JavaScript errors')
         browser.close()
     result = {'browser': 'local Chromium via Playwright', 'passed': checks, 'errors': errors,
-              'note': 'Playback checked with duplicate static-frame references only; no animation artwork generated.'}
+              'note': 'Playback checked against the actual 12-frame IDLE sequences and 5000ms timing.'}
     (ROOT / 'review/browser-checks.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

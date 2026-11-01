@@ -1,0 +1,406 @@
+{
+  "approval": "pending human review",
+  "errors": [],
+  "operating_asset_count": 39,
+  "native_size": [
+    512,
+    768
+  ],
+  "compact_preview_size": [
+    128,
+    192
+  ],
+  "timing": {
+    "timebase_ms": 100,
+    "authored_frames": 12,
+    "loop_duration_ms": 5000,
+    "note": "Integer exposure holds on a 10 Hz timebase; not 10 unique drawings per second."
+  },
+  "packs": {
+    "default": {
+      "errors": [],
+      "warnings": [
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+      ],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.5,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": 0,
+        "alpha_bbox_per_frame": [
+          [
+            65,
+            64,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            64,
+            448,
+            704
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "blink_keyframe_outside_eye_mask_max_rgba_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          0.63017,
+          1.23709,
+          2.07053,
+          2.58202,
+          2.95047,
+          2.91654,
+          2.35999,
+          1.72093,
+          1.07433,
+          0.50715,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "afb164cdb17aac2630a2bd3630054811b87bdfaf52f82a3ce0bd6bf1eee566a5"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "0f9a49be654f2d804766ffc3915932ca7e25688d7d24ba3e697e1580ae48aa8c"
+        }
+      },
+      "master_sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+      "manifest_integrity": "pass"
+    },
+    "vanilla": {
+      "errors": [],
+      "warnings": [],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.0,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": null,
+        "alpha_bbox_per_frame": [
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "outside_wormhole_max_rgba_delta": 0,
+        "whole_image_alpha_max_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          0.13052,
+          0.26443,
+          0.37884,
+          0.47021,
+          0.53818,
+          0.53792,
+          0.4659,
+          0.37189,
+          0.2624,
+          0.13045,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "551c9e2cbc17c66b96eb19b92d4670639757334c6193da6a9935a4359beb2cb2"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "8d232788181fee24fce1dfd043f215da348221036ef0302f5d57c8cedac47339"
+        }
+      },
+      "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "manifest_integrity": "pass"
+    },
+    "uwu": {
+      "errors": [],
+      "warnings": [
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+      ],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.5,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": 0,
+        "alpha_bbox_per_frame": [
+          [
+            44,
+            64,
+            469,
+            704
+          ],
+          [
+            44,
+            63,
+            470,
+            704
+          ],
+          [
+            44,
+            63,
+            470,
+            704
+          ],
+          [
+            44,
+            63,
+            470,
+            704
+          ],
+          [
+            44,
+            63,
+            470,
+            704
+          ],
+          [
+            44,
+            63,
+            470,
+            704
+          ],
+          [
+            44,
+            63,
+            469,
+            704
+          ],
+          [
+            44,
+            63,
+            469,
+            704
+          ],
+          [
+            44,
+            63,
+            468,
+            704
+          ],
+          [
+            44,
+            63,
+            468,
+            704
+          ],
+          [
+            44,
+            63,
+            469,
+            704
+          ],
+          [
+            44,
+            64,
+            469,
+            704
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "blink_keyframe_outside_eye_mask_max_rgba_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          1.47949,
+          2.76553,
+          3.88407,
+          4.66254,
+          5.23606,
+          5.05482,
+          3.98629,
+          3.30642,
+          2.41315,
+          1.25317,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "a749935f6935c6868f2851a149846a2b4713e0c8fa2205f19d45c178e95b4919"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "55376051e700c4f803a32093e7dd4549d4c550885c5ffc42e9b99fce1f8becef"
+        }
+      },
+      "master_sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+      "manifest_integrity": "pass"
+    }
+  }
+}

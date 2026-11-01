@@ -22,6 +22,9 @@ class AvatarContractTests(unittest.TestCase):
         self.manifest = self.pack / 'manifest.json'
         self.data = copy.deepcopy(read_json(ROOT / 'Norm/manifest.json'))
         # No production art is copied into test fixtures.
+        for style in self.data['styles'].values():
+            for entry in style['states'].values():
+                entry['animation'] = {'status': 'not_generated'}
         self.frame('Generated/chibi/idle.png')
         self.data['styles']['chibi']['states']['idle']['static'] = self.static('idle')
         self.save()

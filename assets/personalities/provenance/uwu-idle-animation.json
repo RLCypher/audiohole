@@ -1,0 +1,198 @@
+{
+  "source": "UwU/Intermediate/blink-source.png",
+  "source_sha256": "665aa6370e7b57d9a92cc927fe31eadaf2795d0ddbb6740095e28399dac083ae",
+  "keyframe_sha256": "a9483e554b29d4abb4a633a23f713b1c3bcc31c6b99e692c9a1c8ff73cc137ff",
+  "eye_mask_bbox": [
+    202,
+    195,
+    349,
+    264
+  ],
+  "normalized_registration_size": [
+    512,
+    768
+  ],
+  "patches": [
+    {
+      "polygon": [
+        [
+          205,
+          198
+        ],
+        [
+          275,
+          211
+        ],
+        [
+          282,
+          233
+        ],
+        [
+          265,
+          247
+        ],
+        [
+          233,
+          247
+        ],
+        [
+          213,
+          234
+        ]
+      ],
+      "source_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "polygon": [
+        [
+          295,
+          221
+        ],
+        [
+          341,
+          230
+        ],
+        [
+          345,
+          251
+        ],
+        [
+          332,
+          260
+        ],
+        [
+          305,
+          253
+        ],
+        [
+          290,
+          242
+        ]
+      ],
+      "source_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "personality_id": "uwu",
+  "method": "fixed-master 2D limited-motion compositor",
+  "approval": "pending human review",
+  "master_sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+  "motion_config_sha256": "bd185754b880b9e26a6497acdcab2a73b99a491e635b2b10413c6ca679d7822e",
+  "rig_config_sha256": "3620a652d13d4a70a82a4f4bd92b146246d11ac2e84569fae578a403779b4026",
+  "compositor_sha256": "ecc908a3a6a3200ecbb72ddb38ae55cfbcbc4606f70a08f9b7a2e56692a716bb",
+  "frames": [
+    {
+      "path": "Generated/chibi/idle/0000.png",
+      "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 1400
+    },
+    {
+      "path": "Generated/chibi/idle/0001.png",
+      "sha256": "eb8d607d1f94c71220223dc38a94055286d5ffe3a898ed527154b28341258ce4",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/chibi/idle/0002.png",
+      "sha256": "afd079c6dd781b2002344ab7340f1115a5644424931d9667048e000cff7ae11d",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/chibi/idle/0003.png",
+      "sha256": "fb971a8b821d52b0200e94f4b73505e57fdbb7badb491682e6596a4566103996",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 300
+    },
+    {
+      "path": "Generated/chibi/idle/0004.png",
+      "sha256": "a324e8c1f54ded4db366ee58f15c92dbfb222f0294ba219f2c171eabbebb2391",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 100
+    },
+    {
+      "path": "Generated/chibi/idle/0005.png",
+      "sha256": "353d009469679cbd385f828239ceb80a1214462c3d48290734238dbfcfa32e65",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 100
+    },
+    {
+      "path": "Generated/chibi/idle/0006.png",
+      "sha256": "05fe93d9bd3977c80eb88e739ca762aa072c739e4d7d235d4f2625f1418ca750",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 100
+    },
+    {
+      "path": "Generated/chibi/idle/0007.png",
+      "sha256": "7879ddb30aae9d43fbd5194bc04a2ae2327e29c16b7c1083a6b9d07880ea755e",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 300
+    },
+    {
+      "path": "Generated/chibi/idle/0008.png",
+      "sha256": "84883e644509e5d5e4bea34bd3c90c80feee82e91d7ee0df68eaf07d7149cb12",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/chibi/idle/0009.png",
+      "sha256": "4ecbdad39e7c60ad585932026be1c8778b713baeb8bed7f03ea01e5962655b5c",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/chibi/idle/0010.png",
+      "sha256": "163e57ccb20a00a275791b3d9f97e98334dbef0d12016234d4994fdcd7bb75d7",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/chibi/idle/0011.png",
+      "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 700
+    }
+  ]
+}

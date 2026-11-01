@@ -7,9 +7,11 @@
     "production approval gate hides candidates",
     "disabled regular style cannot borrow chibi art",
     "all backgrounds and guide toggle",
-    "synthetic loop, pause, step, one-shot completion returns to idle",
+    "native 512x768 and compact 128x192 display selectors",
+    "actual 12-frame playback, blink frame, pause, step and loop wrap",
+    "one-shot timer returns to idle",
     "no browser JavaScript errors"
   ],
   "errors": [],
-  "note": "Playback checked with duplicate static-frame references only; no animation artwork generated."
+  "note": "Playback checked against the actual 12-frame IDLE sequences and 5000ms timing."
 }

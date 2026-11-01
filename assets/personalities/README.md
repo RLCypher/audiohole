@@ -1,14 +1,20 @@
 # AudioHole avatar pipeline
 
-Milestones 1–3 are ready for master-artwork review. Three IDLE candidates are
-technically validated and **unapproved**. Bulk expressions, character animation,
-and application integration are pending. See [RECONNAISSANCE.md](RECONNAISSANCE.md)
-for the repository audit, capabilities, conflicts, and next milestones.
+The three initial IDLE masters and three 12-frame IDLE sequences are technically
+validated and **unapproved**. Other expressions, bulk animation, and application
+integration are pending. See [the IDLE sequence report](review/idle-sequences/REPORT.md)
+for current deliverables, timing, validation, limitations, and review decisions.
+The original repository audit is in [RECONNAISSANCE.md](RECONNAISSANCE.md).
 
 ## Review the masters
 
 - Open `review/preview.html` in a browser. It is a self-contained offline snapshot.
 - Inspect `review/idle-contact-sheet.png` and `review/validation.json`.
+- Inspect all 36 frames in `review/idle-sequences/all-personalities-all-frames.png`.
+  Each personality also has a labeled `*-all-frames.png` sheet and transparent
+  animated PNG previews at `*-native.png` and `*-compact.png` in that directory.
+  Compact 128 × 192 is a representative review size; no production GUI size has
+  been selected. The HTML preview supports native/compact sizing and frame stepping.
 - Norm and UwU use reference-guided generated chibi illustrations. Vanilla is the
   original logo pasted pixel-for-pixel onto a transparent portrait canvas.
 - Check Norm's facial hair, cap, headphones, fingers, coffee mug, clothing, cables,
@@ -23,10 +29,11 @@ for the repository audit, capabilities, conflicts, and next milestones.
 - Vanilla's entire canonical 512-square RGBA image is preserved at `(0, 128)`.
   Its floating logo is intentionally above the character ground guide.
 
-The review checkpoint comes directly from the user's request: **“Stop for human
-review before proceeding to bulk expression or animation generation.”** It also
-appears under Generation Workflow in the supplied `AGENTS.md`. Do not mark these
-candidates approved or expand the artwork batch until the user reviews them.
+The user's follow-up explicitly authorized these three initial IDLE sequences,
+superseding the earlier master-only checkpoint for this limited batch. The new
+checkpoint is **“Stop after completing these three IDLE sequences and their
+previews. Await human review and approval before proceeding further.”** Do not
+mark the candidates approved or expand the artwork batch until that review.
 
 ## Run the tools
 
@@ -43,6 +50,7 @@ python assets/personalities/tools/pipeline.py inventory
 python assets/personalities/tools/pipeline.py validate
 python assets/personalities/tools/pipeline.py validate --approved-only
 python assets/personalities/tools/pipeline.py review
+python assets/personalities/tools/validate_idle.py
 python -m unittest discover -s assets/personalities/tools -p 'test_*.py' -v
 ```
 
@@ -104,8 +112,10 @@ Static paths are `Generated/<style>/<state>.png`. Animation paths are
 images are 512 × 768, PNG color type 6, bit depth 8. Each frame carries a hash and
 the style's exact anchor. Animation metadata includes ordered frame durations
 (16–60000 ms), loop, priority, interruptibility, cooldown, and a cut or
-finish-then-idle transition. A sequence is capped at 240 frames. No character
-animation sequences have been generated.
+finish-then-idle transition. A sequence is capped at 240 frames. Each initial
+IDLE sequence has 12 frames over five seconds: a common 100 ms timebase, authored
+integer exposure holds, a brief blink, and long quiet poses. This is limited
+animation, not a claim of ten unique smooth drawings per second.
 
 The manifest uses `not_generated`, `generated`, `validated`, `approved`, `invalid`,
 `unavailable`, and `missing`. Validation also diagnoses files that go missing or

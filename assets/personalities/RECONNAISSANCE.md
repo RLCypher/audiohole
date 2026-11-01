@@ -2,6 +2,11 @@
 
 Audit date: 2026-11-01. Branch: `avatar/asset-pipeline`.
 
+This is the historical initial audit. The user subsequently authorized three
+initial 12-frame IDLE sequences. Current results and review status are in
+[the sequence report](review/idle-sequences/REPORT.md); the initial capability
+observations below describe the starting point, not the completed sequence work.
+
 ## Existing infrastructure
 
 The checked-out AudioHole repository initially contained 14 Markdown files and

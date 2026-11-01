@@ -120,6 +120,7 @@ def export_idle(identity, source: Path, replace=False):
 def review():
     """Self-contained offline snapshot, using the same validated resolver as tests."""
     sheets, snapshot, reports = [], {}, []
+    image_urls = {}
     for identity, manifest in packs():
         data = load_pack(manifest, identity)
         reports.append(validate_pack(manifest, identity))
@@ -135,7 +136,9 @@ def review():
                              'status': info['states'].get(selection.state, {}).get(
                                  'animation' if selection.durations_ms else 'static', {}).get('status', 'unavailable')}
                     for path in selection.paths:
-                        entry['frames'].append('data:image/png;base64,' + base64.b64encode(path.read_bytes()).decode())
+                        if path not in image_urls:
+                            image_urls[path] = 'data:image/png;base64,' + base64.b64encode(path.read_bytes()).decode()
+                        entry['frames'].append(image_urls[path])
                     return entry
                 entry = resolved_entry(False)
                 entry['production'] = resolved_entry(True)

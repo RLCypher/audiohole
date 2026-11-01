@@ -8,7 +8,7 @@
   body { max-width: 1120px; margin: 32px auto; padding: 0 24px; }
   h1 { font-size: 28px; margin-bottom: 4px; }
   .pending { color: #efbf70; }
-  main { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 32px; margin-top: 26px; }
+  main { display: grid; grid-template-columns: minmax(280px, 512px) 1fr; gap: 32px; margin-top: 26px; }
   .stage { aspect-ratio: 2 / 3; position: relative; overflow: hidden; border: 1px solid #586075;
     background: conic-gradient(#e4e5ea 25%, #c2c4cc 0 50%, #e4e5ea 0 75%, #c2c4cc 0) 0 0 / 32px 32px; }
   .stage.dark { background: #171b25; } .stage.light { background: #fff; }
@@ -22,12 +22,13 @@
   @media(max-width:700px) { main { grid-template-columns: 1fr; } .stage { max-width: 360px; } }
 </style>
 <h1>AudioHole · Avatar review</h1>
-<p class="pending">IDLE candidates · Human approval pending</p>
-<p class="muted">Offline snapshot. No audio engine connection. Other states currently show the selected personality’s fallback.</p>
+<p class="pending">IDLE masters and 12-frame sequences · Human approval pending</p>
+<p class="muted">Offline snapshot. Five-second IDLE loops use a shared 100 ms timebase with authored holds. Other states use the selected personality’s fallback.</p>
 <main>
   <section>
     <div class="stage" id="stage"><img id="avatar" alt="Selected avatar candidate" hidden></div>
     <p id="summary" role="status" aria-live="polite"></p>
+    <label>Display size<select id="display"><option value="512">512 × 768 (native)</option><option value="128">128 × 192 (compact candidate)</option></select></label>
     <button id="background">Background: checkerboard</button>
     <label><input type="checkbox" id="guides"> Show ground guide at y = 704</label>
   </section>
@@ -77,6 +78,7 @@ $('approved').onchange = select; $('missing').onchange = select;
 $('play').onclick = play; $('pause').onclick = stop;
 $('step').onclick = () => { stop(); if (active.frames.length) index = (index + 1) % active.frames.length; render(); };
 $('guides').onchange = () => $('stage').classList.toggle('guides', $('guides').checked);
+$('display').onchange = () => { $('stage').style.width = $('display').value + 'px'; $('stage').style.maxWidth = '100%'; };
 $('background').onclick = () => { background = (background + 1) % 3; $('stage').classList.remove('dark', 'light'); if (background) $('stage').classList.add(background === 1 ? 'dark' : 'light'); $('background').textContent = 'Background: ' + ['checkerboard','dark','light'][background]; };
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
 options($('personality'), Object.keys(snapshot.packs)); styles();

@@ -5,11 +5,263 @@
       "manifest": "/workspace/audiohole/assets/personalities/Norm/manifest.json",
       "errors": [],
       "warnings": [
-        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants"
       ],
       "assets": [
         {
           "path": "Generated/chibi/idle.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            64,
+            448,
+            704
+          ],
+          "transparent_pixels": 217870,
+          "sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0000.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            64,
+            448,
+            704
+          ],
+          "transparent_pixels": 217870,
+          "sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0001.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            449,
+            704
+          ],
+          "transparent_pixels": 217832,
+          "sha256": "c043c319ad3f048a91f1de70e24a44d707a86c800fadf83ab4928b548009eedd",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0002.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            449,
+            704
+          ],
+          "transparent_pixels": 217887,
+          "sha256": "e7ba3cf93f664e07f8199ab591b60022ec31f49dd3ea4777e6657a3f935ef743",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0003.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            449,
+            704
+          ],
+          "transparent_pixels": 217684,
+          "sha256": "ef03f6f0aadb1929a7c2f29f163208e0178a479dc4821238e6e43100a6688f1a",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0004.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            449,
+            704
+          ],
+          "transparent_pixels": 217895,
+          "sha256": "b6ee39fe4fd6100c6089f0d4b550f8ae71f05b151a95c03e50ea4d5d96032a32",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0005.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            449,
+            704
+          ],
+          "transparent_pixels": 217879,
+          "sha256": "75ece3a665cfbe68d30593c21e2c9e123acf2e72a8cbc259185a68526bd9e4cc",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0006.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            448,
+            704
+          ],
+          "transparent_pixels": 217917,
+          "sha256": "f9041ac0a7814002f708f39b8c6d08276038e4419af3fe50ee87314d870615af",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0007.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            448,
+            704
+          ],
+          "transparent_pixels": 217922,
+          "sha256": "afd166a9eb645b3e5619d151b95e04e8a9646a180039ce7b39c9e4acb9dcd299",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0008.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            448,
+            704
+          ],
+          "transparent_pixels": 217818,
+          "sha256": "2f81453adc397c3d060d3296b59b491577102a9241add17cf06c392d2d7b6e4f",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0009.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            448,
+            704
+          ],
+          "transparent_pixels": 217921,
+          "sha256": "c7740b7eea3ac2eaed5031f25186c657db650c4a68d4e6cf6ae7bf04135e02f4",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0010.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            63,
+            448,
+            704
+          ],
+          "transparent_pixels": 217842,
+          "sha256": "9d3e4826c9f078b8a001a504443f0d6391289b2342fba7b0cfcb7d13b32d91f0",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0011.png",
           "size": [
             512,
             768
@@ -52,6 +304,222 @@
           "transparent_pixels": 265971,
           "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
           "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0000.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0001.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "89e2201dd1640e0ec22b059430e9d2a202c8a76a919059db1795e474b2b1dc46",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0002.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "1ac71c49e8211a0b273d88328cfaefab4a8d68726a2e160e0e074731330e535b",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0003.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "6509dfedbd8064e824cbff6b8f6df0e17f1645901aebb8074e1c25592e98cb86",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0004.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "dc7c442ac00d59cd3b7c180a4b156bb6ad64836307bb6f29d16aaf27886341ca",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0005.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "9adae362a1291f8bf4e990258e7d9c29676b507e7d773b3e500f1a91634717ac",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0006.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "e8bbbbed73dd0445aaba96bba4edba69cff1bd6b94624a932c39c7e6eb37e7c1",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0007.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "cc956e154a8c23cf432340d847c99d4c0f2634b32e37512fac3ef3576d00deae",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0008.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "84346788cc2d510761eee7b528e2656e272346e2e1db7fc4b3d37da513b79c6a",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0009.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "3ff40908a7018525d7b52cc3311356f1f154ea309c367148cfa2668137349b68",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0010.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "2c11fd44f3a3645a65094a8f77375003d5c6a29c86ad1ed36f8e73d871cc4a5f",
+          "warnings": []
+        },
+        {
+          "path": "Generated/logo/idle/0011.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+          "warnings": []
         }
       ]
     },
@@ -59,11 +527,263 @@
       "manifest": "/workspace/audiohole/assets/personalities/UwU/manifest.json",
       "errors": [],
       "warnings": [
-        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants"
       ],
       "assets": [
         {
           "path": "Generated/chibi/idle.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            64,
+            469,
+            704
+          ],
+          "transparent_pixels": 201001,
+          "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0000.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            64,
+            469,
+            704
+          ],
+          "transparent_pixels": 201001,
+          "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0001.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            470,
+            704
+          ],
+          "transparent_pixels": 201197,
+          "sha256": "eb8d607d1f94c71220223dc38a94055286d5ffe3a898ed527154b28341258ce4",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0002.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            470,
+            704
+          ],
+          "transparent_pixels": 201119,
+          "sha256": "afd079c6dd781b2002344ab7340f1115a5644424931d9667048e000cff7ae11d",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0003.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            470,
+            704
+          ],
+          "transparent_pixels": 200939,
+          "sha256": "fb971a8b821d52b0200e94f4b73505e57fdbb7badb491682e6596a4566103996",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0004.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            470,
+            704
+          ],
+          "transparent_pixels": 200904,
+          "sha256": "a324e8c1f54ded4db366ee58f15c92dbfb222f0294ba219f2c171eabbebb2391",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0005.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            470,
+            704
+          ],
+          "transparent_pixels": 201061,
+          "sha256": "353d009469679cbd385f828239ceb80a1214462c3d48290734238dbfcfa32e65",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0006.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            469,
+            704
+          ],
+          "transparent_pixels": 201137,
+          "sha256": "05fe93d9bd3977c80eb88e739ca762aa072c739e4d7d235d4f2625f1418ca750",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0007.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            469,
+            704
+          ],
+          "transparent_pixels": 201113,
+          "sha256": "7879ddb30aae9d43fbd5194bc04a2ae2327e29c16b7c1083a6b9d07880ea755e",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0008.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            468,
+            704
+          ],
+          "transparent_pixels": 201525,
+          "sha256": "84883e644509e5d5e4bea34bd3c90c80feee82e91d7ee0df68eaf07d7149cb12",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0009.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            468,
+            704
+          ],
+          "transparent_pixels": 201529,
+          "sha256": "4ecbdad39e7c60ad585932026be1c8778b713baeb8bed7f03ea01e5962655b5c",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0010.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            63,
+            469,
+            704
+          ],
+          "transparent_pixels": 201220,
+          "sha256": "163e57ccb20a00a275791b3d9f97e98334dbef0d12016234d4994fdcd7bb75d7",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        },
+        {
+          "path": "Generated/chibi/idle/0011.png",
           "size": [
             512,
             768
