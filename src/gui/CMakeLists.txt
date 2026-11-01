@@ -10,9 +10,10 @@ if(Git_FOUND)
     set(audiohole_build_commit "unknown")
   endif()
 endif()
-add_executable(audiohole WIN32 controls.cpp appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp)
+add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp)
+target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
-target_link_libraries(audiohole PRIVATE audiohole_model audiohole_windows wx::core wx::base dwmapi advapi32)
+target_link_libraries(audiohole PRIVATE audiohole_model audiohole_windows wx::core wx::base dwmapi advapi32 windowscodecs shlwapi)
 if(MSVC)
   target_compile_definitions(audiohole PRIVATE AUDIOHOLE_MSVC_MANIFEST)
   target_compile_options(audiohole PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:/W4;/permissive-;/utf-8>")
@@ -35,3 +36,12 @@ install(FILES "${PROJECT_SOURCE_DIR}/personalities/default.json"
   "${PROJECT_SOURCE_DIR}/personalities/uwu.json" "${PROJECT_SOURCE_DIR}/personalities/README.md"
   DESTINATION personalities COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION . COMPONENT Runtime)
+
+# Original and ICO are embedded for offline/isolated launch; copies in the ZIP
+# make the canonical artwork and its provenance available to maintainers/users.
+install(FILES "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png"
+  "${PROJECT_SOURCE_DIR}/assets/branding/audiohole.ico"
+  DESTINATION assets/branding COMPONENT Runtime)
+
+set_source_files_properties(app.rc PROPERTIES OBJECT_DEPENDS
+  "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png;${PROJECT_SOURCE_DIR}/assets/branding/audiohole.ico")

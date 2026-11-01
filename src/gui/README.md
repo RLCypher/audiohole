@@ -74,3 +74,9 @@ never changes routing/scan/profile state or deletes files. The GUI clears its ca
 console through the normal snapshot refresh, retaining search/severity preferences.
 Copy/Export acknowledgments occur only after clipboard success or a completed file
 write/close. These view actions do not enter the routing engine or log commentary.
+
+Branding is isolated in `branding.cpp` / `AgentDisplay`, with a portable exterior
+outline utility under presentation/. Resource ownership, cache boundaries, immutable
+source hash, status mapping and manual validation are documented in
+[assets/branding/README.md](../../assets/branding/README.md). Existing tray/controller
+interfaces, personality dialogue, runtime semantics and real-audio scope are unchanged.

@@ -14,13 +14,16 @@ try {
     if ($roots.Count -ne 1) { throw 'Expected one package root.' }
     $root = $roots[0].FullName
     $files = @(Get-ChildItem -LiteralPath $root -File -Recurse)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'build-info.json', 'README.txt')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'build-info.json', 'README.txt')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($root.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Package contains missing or unexpected files.'
     }
     $metadata = Get-Content (Join-Path $root 'build-info.json') -Raw | ConvertFrom-Json
     if ($metadata.commit -notmatch '^[0-9a-f]{40}$' -or $metadata.source_dirty) { throw 'Invalid or dirty package metadata.' }
+    # The embedded logo/icon must work even without the reference artwork copies.
+    # This disposable extraction is distinct from the ZIP uploaded as the artifact.
+    Move-Item -LiteralPath (Join-Path $root 'assets') -Destination (Join-Path $temporary 'reference-assets')
     $exe = Join-Path $root 'audiohole.exe'
     # The runner has VS installed: inspect imports so that cannot mask a missing
     # redistributable/debug CRT dependency during the isolated launch test.

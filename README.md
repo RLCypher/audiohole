@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/branding/audiohole-logo.png" width="224" alt="AudioHole logo: mint output and pink microphone surfaces joined by a wireframe audio conduit">
+</p>
+
 # audiohole
 
 AudioHole is an open-source Windows audio routing utility that connects audio devices through configurable simplex and duplex paths. Lightweight, portable, and built for people who just want their holes to work.

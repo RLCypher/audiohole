@@ -1702,3 +1702,12 @@ startup, monitoring and Test Beep state intact. Do not delete exported files or 
 a replacement log entry. Future events continue to appear normally; unchanged
 refreshes do not restore cleared entries. A concise technical acknowledgment and
 eligible authored commentary confirm the action. Tooltips explain the clear scope.
+
+### Owner-approved unified logo and agent placeholder
+
+Use the immutable `assets/branding/audiohole-logo.png` in an approximately 128×128
+logical-pixel upper-right `AgentDisplay`. Preserve aspect ratio and alpha; cache
+scaled images, keep commentary to the left, and retain current window dimensions.
+All personalities display the logo for now. The component can replace its image
+later; animation, sprites, moods and speech bubbles are not implemented. See
+[branding architecture](assets/branding/README.md) for resource/ownership contracts.

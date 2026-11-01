@@ -510,3 +510,13 @@ Its own tests/install targets are disabled; AudioHole tests validate the bounded
 transactional loader and fallbacks. wxWidgets stays pinned at 3.2.6; application
 palettes use its existing controls and Windows system libraries `dwmapi`/`advapi32`.
 No new theme library, script interpreter, or runtime external service is added.
+
+### Branding integration tools
+
+Logo decoding uses Windows Imaging Component (`windowscodecs`) and an in-memory
+stream from `shlwapi`, with existing GUI STA COM initialization. These are built-in
+Windows 10/11 components, not redistributed codecs. No new runtime third-party
+dependency is added; libpng/zlib remain disabled in wx. Pillow **12.3.0**, **MIT-CMU**,
+is an optional maintainer-only ICO regeneration tool; generated icons are committed.
+Python's standard library verifies assets in CI. Ordinary CMake builds and runtime
+branding need neither Pillow nor external PNG files. See assets/branding/README.md.

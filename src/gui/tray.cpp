@@ -10,25 +10,14 @@ Tray::Tray(Frame& frame) : frame_(frame) {
 void Tray::update(const audiohole::Snapshot& s) {
     const std::string tip = std::string("AudioHole — ") + audiohole::name(s.state) + " | " +
                             (s.active_profile.empty() ? "No active profile" : s.active_profile);
-    if (IsIconInstalled() && tooltip_ == tip && last_ == s.state)
+    // The tray host can be on a different monitor; use the window's effective DPI
+    // as a practical size hint and let Explorer select its final notification size.
+    const int size = GetSystemMetricsForDpi(SM_CXSMICON, static_cast<UINT>(frame_.GetDPI().x));
+    if (IsIconInstalled() && tooltip_ == tip && last_ == s.state && icon_size_ == size)
         return;
-    wxBitmap bitmap(32, 32);
-    wxMemoryDC dc(bitmap);
-    dc.SetBackground(*wxWHITE_BRUSH);
-    dc.Clear();
-    const wxColour colour = s.state == audiohole::State::Running  ? wxColour(28, 132, 75)
-                            : s.state == audiohole::State::Failed ? wxColour(180, 45, 45)
-                                                                  : wxColour(115, 95, 40);
-    dc.SetBrush(wxBrush(colour));
-    dc.SetPen(*wxTRANSPARENT_PEN);
-    dc.DrawCircle(16, 16, 15);
-    dc.SetTextForeground(*wxWHITE);
-    dc.SetFont(wxFont(wxFontInfo(16).Bold()));
-    dc.DrawText(text(std::string(1, audiohole::name(s.state)[0])), 8, 3);
-    dc.SelectObject(wxNullBitmap);
-    wxIcon icon;
-    icon.CopyFromBitmap(bitmap);
-    SetIcon(icon, text(tip));
+    if (!SetIcon(icons_.get(size, s.state), text(tip)))
+        return; // Retry through the existing refresh path if Explorer is unavailable.
+    icon_size_ = size;
     last_ = s.state;
     tooltip_ = tip;
 }

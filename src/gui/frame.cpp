@@ -12,12 +12,16 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     // It is removed before the native window is destroyed (see the destructor).
     SetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow", reinterpret_cast<HANDLE>(1));
     SetMinSize(wxSize(980, 740));
+    SetIcons(application_icons());
     personalities_directory_ =
         std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
             .parent_path() /
         "personalities";
     auto* root = new wxBoxSizer(wxVERTICAL);
-    auto* heading = label(this, root, "AudioHole");
+    auto* header = new wxBoxSizer(wxHORIZONTAL);
+    auto* information = new wxBoxSizer(wxVERTICAL);
+    header->Add(information, 1, wxEXPAND);
+    auto* heading = label(this, information, "AudioHole");
     heading->SetFont(wxFont(wxFontInfo(20).Bold()));
     auto* status_row = new wxBoxSizer(wxHORIZONTAL);
     status_dot_ = new wxPanel(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(22, 22)));
@@ -34,7 +38,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     });
     status_row->Add(status_dot_, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(6));
     status_ = label(this, status_row, "Stopped");
-    root->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
+    information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
     button(this, actions, "Arm Ready", [this] { activate(true); });
@@ -43,11 +47,16 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
         refresh();
     });
     button(this, actions, "Exit AudioHole", [this] { exit(); });
-    root->Add(actions, 0, wxEXPAND);
-    technical_ = label(this, root, "");
+    information->Add(actions, 0, wxEXPAND);
+    technical_ = label(this, information, "");
     technical_->SetFont(GetFont().Bold());
-    commentary_ = label(this, root, "");
-    fallback_notice_ = label(this, root, "");
+    commentary_ = label(this, information, "");
+    fallback_notice_ = label(this, information, "");
+    // Existing commentary remains to the left of the replaceable agent image;
+    // no speech-bubble or animation system is introduced.
+    agent_display_ = new AgentDisplay(this);
+    header->Add(agent_display_, 0, wxALIGN_TOP | wxALL, FromDIP(6));
+    root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
     for (std::size_t index = 0; index < 4; ++index) {
         auto* tab = new NavigationButton(this);
@@ -76,6 +85,10 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     build_scan();
     build_settings();
     SetSizer(root);
+    Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
+        layout_header();
+        event.Skip();
+    });
     Centre();
     tray_ = std::make_unique<Tray>(*this);
     Bind(
@@ -137,17 +150,27 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
 void Frame::present(presentation::Message event) {
     last_message_ = event;
     const auto c = messages_.show(event, personality_, ++occurrence_);
-    fallback_notice_->SetLabel(
-        text(personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_));
-    technical_->SetLabel(text(c.technical));
-    commentary_->SetLabel(text(c.commentary));
-    technical_->Wrap(std::max(500, GetClientSize().x - 35));
-    commentary_->Wrap(std::max(500, GetClientSize().x - 35));
+    fallback_copy_ =
+        personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_;
+    technical_copy_ = c.technical;
+    commentary_copy_ = c.commentary;
+    layout_header();
+}
+void Frame::layout_header() {
+    const int width = std::max(240, GetClientSize().x - FromDIP(180));
+    auto wrap = [width](wxStaticText* control, const std::string& copy) {
+        control->SetLabel(text(copy));
+        control->Wrap(width);
+    };
+    wrap(status_, status_copy_);
+    wrap(technical_, technical_copy_);
+    wrap(commentary_, commentary_copy_);
+    wrap(fallback_notice_, fallback_copy_);
     Layout();
 }
 void Frame::show_result(const audiohole::Result& result) {
-    technical_->SetLabel(text(result.detail));
-    technical_->Wrap(std::max(500, GetClientSize().x - 35));
+    technical_copy_ = result.detail;
+    layout_header();
     if (!result.ok && !smoke_)
         wxMessageBox(text(result.detail), wxS("AudioHole — action unavailable"),
                      wxOK | wxICON_WARNING, this);
@@ -184,7 +207,10 @@ void Frame::refresh() {
         status += " | Extended-range advisory: 5–8 enabled holes; hardware performance unverified.";
     if (s.scanning)
         status += " | Scan: " + std::to_string(s.scan_percent) + "%";
-    status_->SetLabel(text(status));
+    if (status_copy_ != status) {
+        status_copy_ = status;
+        layout_header();
+    }
     update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)
@@ -262,8 +288,9 @@ void Frame::refresh() {
             if (routine)
                 present(message);
             if (e.type == "error" || e.type == "scan-failed") {
-                technical_->SetLabel(text(e.detail));
-                commentary_->SetLabel("");
+                technical_copy_ = e.detail;
+                commentary_copy_.clear();
+                layout_header();
             }
             if (!smoke_ && tray_->IsIconInstalled() && notifications_->GetSelection() != 2 &&
                 (e.type == "error" ||
@@ -293,6 +320,25 @@ bool Frame::smoke(const wxString& directory) {
                 "Stable second-launch window identity missing");
         require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
         require(status_dot_->IsShown(), "Routing status indicator missing");
+        require(agent_display_->has_image() && canonical_logo().HasAlpha(),
+                "Agent logo or transparency missing");
+        // Exact samples from the immutable source verify WIC channel order and
+        // alpha without claiming that a desktop screenshot has been reviewed.
+        const auto& logo = canonical_logo();
+        require(logo.GetAlpha(0, 0) == 0 && logo.GetRed(256, 128) == 158 &&
+                    logo.GetGreen(256, 128) == 251 && logo.GetBlue(256, 128) == 212 &&
+                    logo.GetRed(256, 256) == 238 && logo.GetGreen(256, 256) == 158 &&
+                    logo.GetBlue(256, 256) == 251,
+                "Logo source colors or alpha changed during decoding");
+        require(GetIcon().IsOk(), "Window application icon missing");
+        TrayIconCache icon_cache;
+        for (int size : {16, 32, 48})
+            for (auto state : {State::Stopped, State::Ready, State::Running, State::Degraded,
+                               State::Failed, State::Starting, State::Recovering, State::Stopping})
+                require(icon_cache.get(size, state).IsOk(), "Tray logo render failed");
+        const auto cached = icon_cache.size();
+        (void)icon_cache.get(32, State::Running);
+        require(icon_cache.size() == cached, "Unchanged tray state regenerated an icon");
         require(notebook_->GetPageCount() == 4, "Expected four native GUI pages");
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");

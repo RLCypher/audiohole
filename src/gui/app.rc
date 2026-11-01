@@ -1,3 +1,7 @@
+#include "branding_resources.h"
+AUDIOHOLE_APP_ICON ICON "assets/branding/audiohole.ico"
+AUDIOHOLE_LOGO_PNG RCDATA "assets/branding/audiohole-logo.png"
+
 // Standard native resources. MSVC merges the same manifest through /MANIFESTINPUT;
 // other toolchains embed it here, avoiding duplicate manifest resources.
 #ifndef AUDIOHOLE_MSVC_MANIFEST

@@ -129,3 +129,27 @@ alone do not establish these visual/desktop behaviors.
 Clipboard availability, file dialogs/cancellation/errors and desktop interaction
 require native Windows/manual checks; the portable suite verifies controller clear
 semantics and authored catalog coverage, not operating-system clipboard behavior.
+
+## Unified branding acceptance
+
+- [ ] Header logo is upper-right, approximately 128 logical pixels, with original
+  mint/pink colors, transparent surroundings, and preserved proportions. Resize at
+  100/150/200% DPI: no controls overlap, clipping or unexpected window enlargement.
+  Vanilla/Normal/UwU keep the same logo and their existing commentary behavior.
+- [ ] Explorer executable, window title bar, taskbar and Alt+Tab use the original
+  unoutlined logo. No stock/generic application icon remains at common sizes.
+- [ ] Tray uses the same logo: gray Stopped/Ready, green Running, amber Degraded,
+  red Failed, blue transitions. The thin stroke follows the exterior silhouette,
+  not the internal opening or a rectangular background. Inspect 16/32px on light
+  and dark taskbars, high contrast, and after moving between DPI-scaled monitors.
+- [ ] Tooltip/menu preserve canonical state text and Start/Stop/profiles/Open/Exit
+  behavior. Reopening/Explorer restart retains one tray icon. Idle icons do not
+  blink or continuously regenerate. Status remains simulated in this build.
+- [ ] Extract away from the repository, disconnect networking, and verify branding
+  remains available. The package contains original PNG/ICO reference copies; native
+  isolated-package smoke additionally runs after removing those copies.
+- [ ] README logo loads through its repository-relative path. Social preview remains
+  separately configured; follow assets/branding/README.md only with owner approval.
+
+Windows shell/GUI appearance is pending native execution and human review; portable
+image tests, resource compilation and enlarged renderer previews are not substitutes.

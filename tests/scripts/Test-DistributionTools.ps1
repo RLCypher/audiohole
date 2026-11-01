@@ -13,11 +13,15 @@ try {
     foreach ($name in @('default.json', 'uwu.json', 'README.md')) {
         'Inert packaging fixture' | Set-Content "$fixture/source/personalities/$name"
     }
+    New-Item -ItemType Directory -Path "$fixture/source/assets/branding" -Force | Out-Null
+    foreach ($name in @('audiohole-logo.png', 'audiohole.ico')) {
+        'Inert packaging fixture' | Set-Content "$fixture/source/assets/branding/$name"
+    }
     @(
         'cmake_minimum_required(VERSION 3.25)'
         'project(PackageFixture NONE)'
         'install(FILES audiohole.exe MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt nlohmann-json-LICENSE.txt DESTINATION . COMPONENT Runtime)'
-        'install(DIRECTORY personalities DESTINATION . COMPONENT Runtime)'
+        'install(DIRECTORY personalities assets DESTINATION . COMPONENT Runtime)'
     ) | Set-Content "$fixture/source/CMakeLists.txt"
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Fixture configure failed' }
@@ -27,7 +31,7 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'build-info.json', 'README.txt')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD

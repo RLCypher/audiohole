@@ -1,4 +1,5 @@
 #pragma once
+#include "gui/branding.h"
 #include "model/controller.h"
 #include "platform/windows/com_apartment.h"
 #include "presentation/messages.h"
@@ -37,6 +38,8 @@ class Tray final : public wxTaskBarIcon {
     Frame& frame_;
     audiohole::State last_ = audiohole::State::Stopped;
     std::string tooltip_;
+    int icon_size_ = 0;
+    TrayIconCache icons_;
 };
 // Non-owning widget handles. wx parent/child ownership destroys controls with Frame.
 // ID and format vectors map visible selections to typed controller values.
@@ -122,6 +125,7 @@ class Frame final : public wxFrame {
     wxSpinCtrlDouble* dfa_value_{};
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
+    AgentDisplay* agent_display_{};
     wxPanel* status_dot_{};
     wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
         *activity_{}, *device_detail_{};
@@ -137,6 +141,10 @@ class Frame final : public wxFrame {
     DirectionWidgets forward_, reverse_;
     std::vector<std::string> profile_ids_, device_ids_, beep_ids_;
     std::string last_log_;
+    // Retain unwrapped copy so resizing never rerolls commentary or accumulates
+    // line breaks. These are transient view strings, not controller state.
+    std::string status_copy_ = "Stopped", technical_copy_, commentary_copy_, fallback_copy_;
+    void layout_header();
     // Builders only construct widgets/bind events; they never issue routing commands.
     void build_profiles();
     void build_hole_diagnostics(wxWindow* parent, wxSizer* layout);

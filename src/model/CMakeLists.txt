@@ -1,4 +1,4 @@
-add_library(audiohole_model STATIC controller.cpp ../presentation/messages.cpp)
+add_library(audiohole_model STATIC controller.cpp ../presentation/messages.cpp ../presentation/icon_outline.cpp)
 target_link_libraries(audiohole_model PRIVATE nlohmann_json::nlohmann_json)
 target_include_directories(audiohole_model PUBLIC "${PROJECT_SOURCE_DIR}/src")
 if(MSVC)

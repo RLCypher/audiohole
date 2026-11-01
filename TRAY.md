@@ -1357,3 +1357,14 @@ O-001 in `DECISIONS.md` leaves fallback health classification Open. The Degraded
 O-002 leaves ordinary switch preparation thresholds Open; preserve D-022's transactional safeguards and deliberate Ready activation. O-003 leaves nondefault close/tray settings Open. Do not infer that `tray_status_enabled: false` removes the sole operational interface or that `close_to_tray: false` authorizes a new exit behavior. Existing close-to-tray defaults, accessible Start/Stop/Open/Exit, and tray-failure handling remain unchanged.
 
 Stop invalidates pending recovery, failover, scan work, and startup operations. Stale completions cannot rearm routing. Tray/UI remain responsive while slow driver operations finish or are contained; cancellation is not a guarantee of immediate driver-call interruption. All established personality-aware notifications and deferred hole-toggle restrictions remain intact.
+
+## Owner-approved canonical logo status outline
+
+The existing single tray icon now uses the unchanged mint/pink logo with a separate
+thin exterior-silhouette stroke. Do not trace the inner hole/wireframe, tint the
+artwork, or introduce a background. Stopped/Ready are gray, Running green, Degraded
+amber, Failed red, and Starting/Stopping/Recovering blue, mapped from the existing
+authoritative aggregate state. Unknown is neutral; no health inference or new
+engine state is added. Canonical state text remains in the tooltip/menu. Cache by
+size/color and do not repaint an unchanged icon. All existing menu/lifecycle behavior
+is retained. See [branding architecture](assets/branding/README.md).
