@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 from avatar_assets import ROOT, digest, inspect_png, load_pack, read_json, validate_pack
+from avatar_assets import personality_name, review_key
 from pipeline import inventory, packs, write_json
 
 
@@ -23,7 +24,10 @@ def audit():
     for relative,sha in accepted['assets'].items():
         if not (ROOT/relative).is_file() or digest(ROOT/relative)!=sha:
             errors.append(f'accepted IDLE changed: {relative}')
-    result={'approval':'IDLE accepted; all other artwork pending human review',
+    for relative,sha in read_json(ROOT/'provenance/accepted-assets.json')['assets'].items():
+        if not (ROOT/relative).is_file() or digest(ROOT/relative)!=sha:
+            errors.append(f'approved artwork changed: {relative}')
+    result={'approval':'Norm and Vanilla approved; UwU IDLE approved; non-IDLE body revision candidates pending review',
             'errors':errors,'packs':{},'totals':{'static_assets':0,'animation_sequences':0,'animation_frames':0,'operating_pngs':0}}
     for identity,manifest in packs():
         data=load_pack(manifest,identity);style=data['default_style'];info=data['styles'][style]
@@ -82,7 +86,7 @@ def audit():
                         if animation[key]!=behavior[key]:pack_errors.append(f'{state}: conflicting {key}')
                 if state!='idle':
                     for tag,size in [('native',(512,768)),('compact',(128,192))]:
-                        preview=ROOT/f'review/full/{identity}/{state}-{tag}.png'
+                        preview=ROOT/f'review/full/{review_key(identity)}/{state}-{tag}.png'
                         with Image.open(preview) as apng:
                             total=0
                             for index in range(apng.n_frames):
@@ -90,14 +94,14 @@ def audit():
                             if apng.size!=size or total!=description['duration_ms']:
                                 pack_errors.append(f'{state}: {tag} preview size/timing mismatch')
                             description[f'{tag}_preview_frames']=apng.n_frames
-                    with Image.open(ROOT/f'review/full/{identity}/{state}.gif') as gif:
+                    with Image.open(ROOT/f'review/full/{review_key(identity)}/{state}.gif') as gif:
                         total=0
                         for index in range(gif.n_frames):gif.seek(index);total+=gif.info['duration']
                         if total!=description['duration_ms']:pack_errors.append(f'{state}: GIF exposure timing mismatch')
                         if behavior.get('mode')=='finite' and 'loop' in gif.info:pack_errors.append(f'{state}: finite GIF repeats')
                         if behavior.get('mode')=='persistent' and gif.info.get('loop')!=0:pack_errors.append(f'{state}: persistent GIF does not loop')
             states[state]=description
-        result['packs'][identity]={'character_id':data['character_id'],'style':style,'core_complete':not any(not states[s]['static_path'] for s in catalog['standard']),
+        result['packs'][identity]={'display_name':personality_name(identity),'character_id':data['character_id'],'style':style,'core_complete':not any(not states[s]['static_path'] for s in catalog['standard']),
                                    'states':states,'errors':pack_errors,'warnings':sorted(set(report['warnings'])),
                                    'disabled_styles':[name for name,s in data['styles'].items() if not s['enabled']]}
         result['errors'].extend(f'{identity}: {error}' for error in pack_errors)
@@ -106,6 +110,14 @@ def audit():
 
 if __name__=='__main__':
     report=audit();write_json(ROOT/'review/full/inventory.json',report)
+    lines=['# Full avatar inventory','','Norm and Vanilla are approved. UwU IDLE is approved; its revised non-IDLE body performances await human review. The `default` machine ID is retained only for application compatibility.','',
+           '| Personality | State | Static | Frames | Duration ms | Playback | Priority | Cooldown ms |',
+           '|---|---|---|---:|---:|---|---:|---:|']
+    for identity,pack in report['packs'].items():
+        for state,entry in pack['states'].items():
+            b=entry['behavior']
+            lines.append(f"| {personality_name(identity)} | {state} | {entry['static_status']} | {entry['frame_count']} | {entry['duration_ms']} | {b.get('mode','fallback')} | {b.get('priority','—')} | {b.get('cooldown_ms','—')} |")
+    (ROOT/'review/full/INVENTORY.md').write_text('\n'.join(lines)+'\n')
     print(report['totals'])
     print('Errors:',report['errors'])
     raise SystemExit(bool(report['errors']))

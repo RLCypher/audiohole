@@ -1,6 +1,6 @@
 # Verification results
 
-- **48 Python tests passed**, including contract validation, real-library
+- **50 Python tests passed**, including contract validation, real-library
   acceptance, playback timing, priority/interruption, cooldowns, reduced motion,
   persistent return context, invalid/missing assets, recovery and personality
   isolation.
@@ -15,20 +15,30 @@
   authorization are recorded in `provenance/idle-approval.json` and
   `provenance/authorizations/`.
 - **All 52 native preview files decode completely.** Native preview samples
-  match their operating images. Preview timing is checked against manifests.
+  match their operating images. All 52 current files were decoded again after
+  the body revision. Preview timing is checked against manifests.
   Finite animations return to exact canonical rest; persistent loops join at
   exact matching endpoints.
 - **Vanilla exterior RGBA and complete alpha remain exact** for every static
-  and frame. Norm/UwU static case and boot regions retain the accepted pixels.
+  and frame. Norm static case and boot regions retain the accepted pixels. UwU non-IDLE
+  body drawings intentionally change these regions; accepted IDLE is unchanged.
 - **Both offline Chromium suites passed.** The IDLE suite reports twelve checks;
-  the full-library suite reports five groups covering all 52 catalog thumbnails,
+  the full-library suite reports six groups covering all 52 catalog thumbnails,
   representative theatrical/static/reduced-motion pages, visible finite replay,
   state inspector controls, approval filtering, missing assets and ZIP links.
 - Browser reports are in `browser-checks.json` and `../browser-checks.json`.
   The Codex embedded visualization host itself is not directly testable from
   this workspace. Self-contained pages, direct GIFs and portable ZIPs are supplied.
 
-Inherited near-opaque alpha and localized facial-edge softness remain artistic
-review warnings, not silently repaired or marked approved. Technical validation
+Norm and Vanilla are now approved. All **501 approved operating PNG hashes**
+remain unchanged; their freeze record is `provenance/accepted-assets.json`. UwU
+'s **19 revised statics and 18 body sequences** remain candidates. Two additional
+tests verify production approval behavior and that operating UwU frames are
+actual distinct body keys/rest holds without added whole-sprite transforms.
+Source/key hashes, 19 revision records and pinned packager hashes were checked.
+See `post-review-checks.json` and `python-tests.txt`.
+
+Near-opaque source alpha and facial-edge softness remain documented. New UwU
+pose/prop/wardrobe variations remain artistic review items. Technical validation
 does not replace human approval. No application C++ build target or Windows audio
 hardware integration exists in this checkout, so no such result is claimed.

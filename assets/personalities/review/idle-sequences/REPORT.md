@@ -13,7 +13,7 @@ No additional emotional state, main GUI, or audio-engine change was made.
 
 | Personality | Master | Individual animation frames | Animated previews |
 |---|---|---|---|
-| Norm (`default`) | `../../Norm/Generated/chibi/idle.png` | `../../Norm/Generated/chibi/idle/0000.png` through `0011.png` | `default-native.png`, `default-compact.png` |
+| Norm (`default`) | `../../Norm/Generated/chibi/idle.png` | `../../Norm/Generated/chibi/idle/0000.png` through `0011.png` | `norm-native.png`, `norm-compact.png` |
 | UwU (`uwu`) | `../../UwU/Generated/chibi/idle.png` | `../../UwU/Generated/chibi/idle/0000.png` through `0011.png` | `uwu-native.png`, `uwu-compact.png` |
 | Vanilla (`vanilla`) | `../../Vanilla/Generated/logo/idle.png` | `../../Vanilla/Generated/logo/idle/0000.png` through `0011.png` | `vanilla-native.png`, `vanilla-compact.png` |
 
@@ -29,7 +29,7 @@ previews are 128 × 192; that is a representative review target, not an approved
 production GUI requirement.
 
 Every frame appears in [the combined contact sheet](all-personalities-all-frames.png).
-Individual `default-all-frames.png`, `uwu-all-frames.png`, and
+Individual `norm-all-frames.png`, `uwu-all-frames.png`, and
 `vanilla-all-frames.png` sheets label frame indices and exposure times. The
 `*-native-compact-inspection.png` panels show open and blink/peak-motion frames
 at exact native pixels alongside compact downscales.

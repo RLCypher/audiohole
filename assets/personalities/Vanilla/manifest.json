@@ -167,16 +167,20 @@
         },
         "happy": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/happy.png",
             "sha256": "a358ec697d16e9f7e9c3f64f5bc096d23b2394c9a023d61109f0d189fc123a08",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/happy/0000.png",
@@ -291,7 +295,11 @@
             "priority": 30,
             "interruptible": true,
             "cooldown_ms": 2500,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -306,16 +314,20 @@
         },
         "thinking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/thinking.png",
             "sha256": "eb05a2b43032dfd6211de6e6759f0166741b825b4965d41235e03a9e2f097ee7",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/thinking/0000.png",
@@ -466,7 +478,11 @@
             "priority": 10,
             "interruptible": true,
             "cooldown_ms": 500,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -481,16 +497,20 @@
         },
         "working": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/working.png",
             "sha256": "50fb4b16dfa411387a194ac55e68262276b0c9b9941c7fb9bf778e19e7760d06",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/working/0000.png",
@@ -641,7 +661,11 @@
             "priority": 15,
             "interruptible": true,
             "cooldown_ms": 500,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -656,16 +680,20 @@
         },
         "talking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/talking.png",
             "sha256": "e3537e69a1fdea4d3958c0c515f887418c8c4506ec360d28ce718713d19fa7ea",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/talking/0000.png",
@@ -780,7 +808,11 @@
             "priority": 20,
             "interruptible": true,
             "cooldown_ms": 300,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -795,16 +827,20 @@
         },
         "confused": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/confused.png",
             "sha256": "fb9cfe7ca8113297b7461936c84d88ea8cc0f8c8b6ee1aae920024923b39c51e",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/confused/0000.png",
@@ -937,7 +973,11 @@
             "priority": 35,
             "interruptible": true,
             "cooldown_ms": 3000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -952,16 +992,20 @@
         },
         "concerned": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/concerned.png",
             "sha256": "ca933c53604e4b3ff74f0fa78da583cd27e44b6260b280ac4dbe449a4cd52b56",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/concerned/0000.png",
@@ -1112,7 +1156,11 @@
             "priority": 45,
             "interruptible": true,
             "cooldown_ms": 1000,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -1127,16 +1175,20 @@
         },
         "error": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/error.png",
             "sha256": "d11873467042e2c11b181117044da5ce1eb0adaaa631fc6e9781d478ab18f535",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/error/0000.png",
@@ -1305,7 +1357,11 @@
             "priority": 95,
             "interruptible": true,
             "cooldown_ms": 6000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -1320,16 +1376,20 @@
         },
         "angry": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/angry.png",
             "sha256": "75553849feb7d9ed102525845be08b9c9c20551f7c89084b0b47ff72bf48ded8",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/angry/0000.png",
@@ -1480,7 +1540,11 @@
             "priority": 65,
             "interruptible": false,
             "cooldown_ms": 6000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -1495,16 +1559,20 @@
         },
         "surprised": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/surprised.png",
             "sha256": "8c16b3716f66e4218d4115c340c5d79aa279eda9acf3ceb5b651e5634685662a",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/surprised/0000.png",
@@ -1637,7 +1705,11 @@
             "priority": 70,
             "interruptible": false,
             "cooldown_ms": 5000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -1652,16 +1724,20 @@
         },
         "celebrating": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/celebrating.png",
             "sha256": "b65828424c46fd2011873e56e3aa52819d7ce66f29b9554157193de985e1a0d6",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/celebrating/0000.png",
@@ -1866,7 +1942,11 @@
             "priority": 55,
             "interruptible": true,
             "cooldown_ms": 8000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "status",
@@ -1881,13 +1961,17 @@
         },
         "sleeping": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/sleeping.png",
             "sha256": "204d22e9df977c83ef1f1538f7528f752f8d70782f006678a6311958b4455086",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
             "status": "not_generated"

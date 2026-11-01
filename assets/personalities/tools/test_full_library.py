@@ -5,9 +5,10 @@ from pathlib import Path
 
 from PIL import Image
 
-from avatar_assets import ROOT, digest, read_json
+from avatar_assets import ROOT, Resolver, digest, read_json
 from avatar_player import AvatarPlayer
 from audit_library import audit, difference
+from avatar_assets import personality_name, review_key
 from pipeline import packs
 
 
@@ -21,7 +22,7 @@ class FullLibraryTests(unittest.TestCase):
         self.assertEqual(self.report['totals'],{'static_assets':52,'animation_sequences':49,'animation_frames':744,'operating_pngs':796})
         self.assertTrue(all(pack['core_complete'] for pack in self.report['packs'].values()))
 
-    def test_accepted_idle_files_are_immutable_and_only_idle_is_approved(self):
+    def test_human_approvals_are_recorded_and_accepted_pixels_are_immutable(self):
         for relative,sha in read_json(ROOT/'provenance/idle-approval.json')['assets'].items():
             self.assertEqual(digest(ROOT/relative),sha,relative)
         for identity,path in packs():
@@ -29,9 +30,14 @@ class FullLibraryTests(unittest.TestCase):
             self.assertEqual(states['idle']['static']['status'],'approved')
             self.assertEqual(states['idle']['animation']['status'],'approved')
             for state,entry in states.items():
-                if state!='idle':
-                    self.assertNotEqual(entry['static']['status'],'approved')
-                    self.assertNotEqual(entry['animation']['status'],'approved')
+                for kind in ['static','animation']:
+                    asset=entry[kind]
+                    if identity in {'default','vanilla'} and asset.get('path',asset.get('frames')):
+                        self.assertEqual(asset['status'],'approved')
+                    elif identity=='uwu' and state!='idle':
+                        self.assertNotEqual(asset['status'],'approved')
+        for relative,sha in read_json(ROOT/'provenance/accepted-assets.json')['assets'].items():
+            self.assertEqual(digest(ROOT/relative),sha,relative)
 
     def test_theatrical_uwu_reactions_have_real_finite_animation_and_cooldowns(self):
         states=self.report['packs']['uwu']['states']
@@ -42,9 +48,9 @@ class FullLibraryTests(unittest.TestCase):
                 self.assertGreaterEqual(states[state]['behavior']['cooldown_ms'],5000)
                 self.assertEqual(states[state]['loop_endpoint_max_rgba_delta'],0)
 
-    def test_static_clothing_case_and_shoes_keep_the_accepted_artwork(self):
+    def test_norm_static_clothing_case_and_shoes_keep_the_accepted_artwork(self):
         for identity,path in packs():
-            if identity=='vanilla':continue
+            if identity!='default':continue
             data=read_json(path);style=data['default_style'];master=Image.open(path.parent/f'Generated/{style}/idle.png')
             boxes=[(90,500,220,600),(70,630,430,704)] if identity=='default' else [(88,520,211,615),(210,630,380,704)]
             for state,entry in data['styles'][style]['states'].items():
@@ -52,12 +58,35 @@ class FullLibraryTests(unittest.TestCase):
                 image=Image.open(path.parent/entry['static']['path'])
                 for box in boxes:self.assertEqual(difference(master.crop(box),image.crop(box)),0,(identity,state,box))
 
+    def test_reviewed_packs_are_usable_and_uwu_candidates_stay_filtered(self):
+        for pid,folder,style,state in [('default','Norm','chibi','happy'),('vanilla','Vanilla','logo','error'),('uwu','UwU','chibi','error')]:
+            selected=Resolver().resolve(ROOT/f'{folder}/manifest.json',pid,style,state)
+            self.assertEqual(selected.state,'idle' if pid=='uwu' else state)
+            self.assertTrue(selected.paths)
+
+    def test_uwu_performances_use_distinct_drawn_body_keys_without_sticker_motion(self):
+        from PIL import ImageChops
+        manifest=read_json(ROOT/'UwU/manifest.json');states=manifest['styles']['chibi']['states']
+        for state,entry in states.items():
+            if state=='idle':continue
+            record=read_json(ROOT/f'provenance/uwu-{state}-body-revision.json')
+            keys=[ROOT/f'UwU/Intermediate/BodyRevision/Keys/{state}/{i:04d}.png' for i in range(record['drawn_pose_count'])]
+            hashes=[digest(path) for path in keys]
+            self.assertEqual(hashes,record['key_sha256'])
+            self.assertEqual(len(set(hashes)),len(keys))
+            a,b=[Image.open(path).convert('RGBA').crop((180,330,496,712)) for path in keys[:2]]
+            changed=ImageChops.difference(a,b)
+            self.assertGreater(sum(any(pixel) for pixel in changed.get_flattened_data()),1000,(state,'no meaningful body change'))
+            for frame,key in zip(entry['animation'].get('frames',[]),record['frame_source_key_indices']):
+                expected=states['idle']['static']['sha256'] if key is None else hashes[key]
+                self.assertEqual(frame['sha256'],expected,(state,frame['path'],'unexpected sprite transform'))
+
     def test_native_preview_samples_are_the_actual_operating_frames(self):
         for identity,path in packs():
             data=read_json(path);style=data['default_style'];states=data['styles'][style]['states']
             for state in ['talking','error','celebrating']:
                 meta=states[state]['animation']['frames'];times=[f['duration_ms'] for f in meta]
-                with Image.open(ROOT/f'review/full/{identity}/{state}-native.png') as preview:
+                with Image.open(ROOT/f'review/full/{review_key(identity)}/{state}-native.png') as preview:
                     decoded=[];exposures=[]
                     for frame in range(preview.n_frames):
                         preview.seek(frame);preview.load();decoded.append(preview.convert('RGBA').copy());exposures.append(round(preview.info['duration']))

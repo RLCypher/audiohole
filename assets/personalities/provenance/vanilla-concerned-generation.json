@@ -1,8 +1,8 @@
 {
   "personality_id": "vanilla",
   "state": "concerned",
-  "status": "validated",
-  "approval": "pending human review",
+  "status": "approved",
+  "approval": "approved by User",
   "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
   "generation": "canonical logo interior-only status composition",
   "provenance": {
@@ -10,16 +10,20 @@
     "protected_exterior": "wormhole mask only"
   },
   "static": {
-    "status": "validated",
+    "status": "approved",
     "path": "Generated/logo/concerned.png",
     "sha256": "ca933c53604e4b3ff74f0fa78da583cd27e44b6260b280ac4dbe449a4cd52b56",
     "anchor": [
       256,
       704
-    ]
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "animation": {
-    "status": "validated",
+    "status": "approved",
     "frames": [
       {
         "path": "Generated/logo/concerned/0000.png",
@@ -170,7 +174,11 @@
     "priority": 45,
     "interruptible": true,
     "cooldown_ms": 1000,
-    "transition": "cut"
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "behavior": {
     "category": "status",
@@ -187,5 +195,6 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "human_review_record": "provenance/accepted-assets.json"
 }

@@ -167,16 +167,20 @@
         },
         "happy": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/happy.png",
             "sha256": "ee4e3b30877f06b63d74109b6275fecefd02f68d3415e382b3f8bfe00b1c8701",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/happy/0000.png",
@@ -291,7 +295,11 @@
             "priority": 30,
             "interruptible": true,
             "cooldown_ms": 2500,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -306,16 +314,20 @@
         },
         "thinking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/thinking.png",
             "sha256": "90507cbaf9ac4171b46ef54eff64276885bd7bb754a2c3a0500dcb9ea18e3247",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/thinking/0000.png",
@@ -466,7 +478,11 @@
             "priority": 10,
             "interruptible": true,
             "cooldown_ms": 500,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -481,16 +497,20 @@
         },
         "working": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/working.png",
             "sha256": "23531a9535258ce55eb61f03666f6dd0c587dff3022e9f07dd7d1452a9ccb46d",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/working/0000.png",
@@ -641,7 +661,11 @@
             "priority": 15,
             "interruptible": true,
             "cooldown_ms": 500,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -656,16 +680,20 @@
         },
         "talking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/talking.png",
             "sha256": "9e20d515d3974f1bbd6bd766e1d354602e4e08695d40af76629a7de2440cfd8f",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/talking/0000.png",
@@ -780,7 +808,11 @@
             "priority": 20,
             "interruptible": true,
             "cooldown_ms": 300,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -795,16 +827,20 @@
         },
         "confused": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/confused.png",
             "sha256": "07f74213c86ff254c8b2b6669bfa6c7c790370cb6a31b07198513785321b629b",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/confused/0000.png",
@@ -937,7 +973,11 @@
             "priority": 35,
             "interruptible": true,
             "cooldown_ms": 3000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -952,16 +992,20 @@
         },
         "concerned": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/concerned.png",
             "sha256": "28fa50f0e492932fc5a9c7f6d8bede7f317dbb31ead70858047e57281aea95ca",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/concerned/0000.png",
@@ -1112,7 +1156,11 @@
             "priority": 45,
             "interruptible": true,
             "cooldown_ms": 1000,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -1127,16 +1175,20 @@
         },
         "error": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/error.png",
             "sha256": "0e1a383fb27a0729dbda73a8e8a18339081d3613591462fff5a9e74bd0f7924a",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/error/0000.png",
@@ -1305,7 +1357,11 @@
             "priority": 95,
             "interruptible": true,
             "cooldown_ms": 6000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1320,16 +1376,20 @@
         },
         "angry": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/angry.png",
             "sha256": "e3f818ed7e34c8f356d9f1f9580575b233c2dbf775d5a2cf61737e5e1917f06e",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/angry/0000.png",
@@ -1480,7 +1540,11 @@
             "priority": 65,
             "interruptible": false,
             "cooldown_ms": 6000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1495,16 +1559,20 @@
         },
         "surprised": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/surprised.png",
             "sha256": "c0a2c19232744ad5a3890c6eafc3163440e444cdf265444b8110d5295b7d4965",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/surprised/0000.png",
@@ -1637,7 +1705,11 @@
             "priority": 70,
             "interruptible": false,
             "cooldown_ms": 5000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1652,16 +1724,20 @@
         },
         "celebrating": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/celebrating.png",
             "sha256": "c51b5c238aa5e66daafb742216f7c04421ef68911308f379742771c94b22aa4d",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/celebrating/0000.png",
@@ -1866,7 +1942,11 @@
             "priority": 55,
             "interruptible": true,
             "cooldown_ms": 8000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1881,16 +1961,20 @@
         },
         "sleeping": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/sleeping.png",
             "sha256": "a817a5cb15b6be264f83c42f331f99dd635f035c58f59176e1b3b51e2769df58",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/sleeping/0000.png",
@@ -2041,7 +2125,11 @@
             "priority": 5,
             "interruptible": true,
             "cooldown_ms": 1000,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -2056,16 +2144,20 @@
         },
         "smug": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/smug.png",
             "sha256": "58978ba46e352fdbfc69a4d8fd7d9ff60da3046979164c78c7c09fd8d01fb9a8",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/smug/0000.png",
@@ -2180,7 +2272,11 @@
             "priority": 30,
             "interruptible": true,
             "cooldown_ms": 4000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2195,16 +2291,20 @@
         },
         "embarrassed": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/embarrassed.png",
             "sha256": "5a0302ba894999a4e171ef699414c94858abd57e7174f8ca124f6bbfcf483336",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/embarrassed/0000.png",
@@ -2355,7 +2455,11 @@
             "priority": 40,
             "interruptible": true,
             "cooldown_ms": 5000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2370,16 +2474,20 @@
         },
         "laughing": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/laughing.png",
             "sha256": "f56abbf0aa70bd79883afbb8a1beae7cab7a4ca64135cfb48dbc25a51b5932a6",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/laughing/0000.png",
@@ -2548,7 +2656,11 @@
             "priority": 40,
             "interruptible": true,
             "cooldown_ms": 5000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2563,16 +2675,20 @@
         },
         "suspicious": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/suspicious.png",
             "sha256": "c6de722c78ce58173abf25ef719bc2789841bf9636d93e1c6a0a9a4621f778b7",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/suspicious/0000.png",
@@ -2687,7 +2803,11 @@
             "priority": 35,
             "interruptible": true,
             "cooldown_ms": 4000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2702,16 +2822,20 @@
         },
         "panicking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/panicking.png",
             "sha256": "9fcac25d2c719871ad07bc15ec4c78400b2f376120dc8b1cc0f41e3d3cb9dcbe",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/panicking/0000.png",
@@ -2898,7 +3022,11 @@
             "priority": 85,
             "interruptible": true,
             "cooldown_ms": 8000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -2913,16 +3041,20 @@
         },
         "bored": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/bored.png",
             "sha256": "3dff7b25d03e8f7df78a2ae317fe35a8ab94b03e3388e47efa87af6d467c7800",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/bored/0000.png",
@@ -3037,7 +3169,11 @@
             "priority": 5,
             "interruptible": true,
             "cooldown_ms": 1000,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -3052,16 +3188,20 @@
         },
         "mischievous": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/mischievous.png",
             "sha256": "a938e08a009a0a372fa17cb0aff26b2b43342437df88eed3c4e3aa73bc7551fe",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/mischievous/0000.png",
@@ -3194,7 +3334,11 @@
             "priority": 35,
             "interruptible": true,
             "cooldown_ms": 5000,
-            "transition": "finish_then_persistent"
+            "transition": "finish_then_persistent",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -3209,13 +3353,17 @@
         },
         "deadpan": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/deadpan.png",
             "sha256": "e28c659a62565704d490fdfe3d2b346725b41dc0fcb4977b25925cda8d5038ea",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T23:04:11.686434Z"
+            }
           },
           "animation": {
             "status": "not_generated"

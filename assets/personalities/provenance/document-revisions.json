@@ -10,10 +10,17 @@
   "UwU/CHARACTER.md": {
     "original_prefix_bytes": 8610,
     "original_sha256": "ac93183aab23f77a066eeedcb25e81a6f44488afb113c4ba96a92b14fc2f7976",
-    "current_sha256": "25bfa321cd0ca9ceebec5e096409343bd34fa781b5e5bff306f85b4e8c22d9cb",
-    "authorization": "provenance/authorizations/idle-acceptance-full-generation.md",
-    "authorization_sha256": "6dfd4ed8be41fcbfffb626647db98255ce888f3e4951673008e5c4ee840216b9",
-    "change": "append accepted creative/technical direction; original contents preserved byte-for-byte"
+    "current_sha256": "c6d9d14205a07ae7c53592c07870d88ca700d01c9ec70f2d4aa1a94bacf1f7eb",
+    "authorization": "provenance/authorizations/norm-vanilla-approval-uwu-body-revision.md",
+    "authorization_sha256": "674e383330f683a5ea8ea68aba48d8e940dd9e5013548caf1911ea97f0822549",
+    "change": "append human-requested full-body performance correction; preserve original document prefix",
+    "previous_revisions": [
+      {
+        "current_sha256": "25bfa321cd0ca9ceebec5e096409343bd34fa781b5e5bff306f85b4e8c22d9cb",
+        "authorization": "provenance/authorizations/idle-acceptance-full-generation.md",
+        "authorization_sha256": "6dfd4ed8be41fcbfffb626647db98255ce888f3e4951673008e5c4ee840216b9"
+      }
+    ]
   },
   "Vanilla/CHARACTER.md": {
     "original_prefix_bytes": 6729,

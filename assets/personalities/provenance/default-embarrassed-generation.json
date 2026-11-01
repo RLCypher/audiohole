@@ -1,8 +1,8 @@
 {
   "personality_id": "default",
   "state": "embarrassed",
-  "status": "validated",
-  "approval": "pending human review",
+  "status": "approved",
+  "approval": "approved by User",
   "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
   "generation": "reference-guided face key plus controlled 2D compositing",
   "provenance": {
@@ -81,16 +81,20 @@
     "key_sha256": "f90e764cec07b08ca3a9490fcdbb6a531a86b5eea343c93a20df2a7818d9d4f5"
   },
   "static": {
-    "status": "validated",
+    "status": "approved",
     "path": "Generated/chibi/embarrassed.png",
     "sha256": "5a0302ba894999a4e171ef699414c94858abd57e7174f8ca124f6bbfcf483336",
     "anchor": [
       256,
       704
-    ]
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "animation": {
-    "status": "validated",
+    "status": "approved",
     "frames": [
       {
         "path": "Generated/chibi/embarrassed/0000.png",
@@ -241,7 +245,11 @@
     "priority": 40,
     "interruptible": true,
     "cooldown_ms": 5000,
-    "transition": "finish_then_persistent"
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "behavior": {
     "category": "expressive",
@@ -258,5 +266,6 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "human_review_record": "provenance/accepted-assets.json"
 }

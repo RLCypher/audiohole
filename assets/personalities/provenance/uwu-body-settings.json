@@ -1,0 +1,70 @@
+{
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py",
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "dependencies": {
+    "tools/generate_states.py": "4d7a1dd3cba3aada490e88349502ad35e7f81de758cd38f61438ccb27be788b3",
+    "tools/avatar_assets.py": "6e178b32ef4a04983f5b4d7aafb5a384ac996c7531c2bf10457f4c8c045fabc3",
+    "tools/pipeline.py": "914f3a4e1931edcec01f9f017ae041bc67f57e77b74e13b00786d41f27db1213",
+    "requirements-tools.txt": "79861a0a87eb63ec3c8a90cf31533d80ba42caa0cc0acab6bb01c9bf4d74721d",
+    "tools/animate_idle.py": "6c68b5fb3f028a59005c63743a56f9e8e450b505b6c34b60b6cad4a14d159708",
+    "tools/build_body_review.py": "f713864639aca3470057f352765d605dc4900867a832582d07743ecceb8d66b3"
+  },
+  "sources": {
+    "quiet-g-source.png": "c4d7d856238e98135024d544a322a12f9fff019686d71b5c3da3907c744e0d55",
+    "quiet-c-source.png": "54db95faa2d82f3ea00b9057b92c90e214d093e62b03579c36e81cfff84389a7",
+    "panicking-source.png": "d98d889c661b4a8b9a7bce3cf85167ef0f46be495e68517091d2a07a7f38a907",
+    "angry-source.png": "065613134357c42c068b22aaa8dfab8a314c89e0f69d22a70224b3515e7009b1",
+    "quiet-b-source.png": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def",
+    "quiet-a-source.png": "c7f3c3ccf0eee49336895cf377e66c9b459df4017976703d767304c4a070a27b",
+    "celebrating-source.png": "8c43aa7c460dd7c8080d8bdab4971d4c1ff392f51c4d50f9b0ac805f70ba4fbe",
+    "error-source.png": "a7219314c38d01335fd3e0489442fc11b20fca1322426c106ad8592aa89c87d1",
+    "quiet-f-source.png": "e2a222fa68c3005cc5405e4fd480e427d90b0111b174ae9856d52cff8e70a6ca",
+    "quiet-e-source.png": "fb64a3deb8ff46ea7065487a2e11b4aefb885bb20cac8b2af4dccdb76c1e4ca0",
+    "quiet-d-source.png": "044b315c95d3bb4d9001a24f5aa26a2ce1faf4597f31369273e69c9ee0103346",
+    "surprised-source.png": "b0c0f583880474df30d14d7c3043fc16e3afd23cc4c2f3e3b3e5b9261ce09857"
+  },
+  "prompts": "provenance/uwu-body-prompts.json",
+  "prompts_sha256": "b77a4ec673c8360507f9cd24d7874d51eabe584582ed3191482ebceb9a709d55",
+  "rejected_sources": {
+    "celebrating-rejected-clipped.png": "Uneven cell spacing in first pilot; superseded by a fresh canonical-reference sheet. Full source retained.",
+    "quiet-g-rejected-anatomy.png": "Torso/neckline drift; never used for operating assets."
+  },
+  "art_approval": "pending human review",
+  "seed_or_model_version": "backend does not expose a replay seed or model version",
+  "reference_guides": {
+    "quiet-e-guide.png": "5ef93b481a9f205a1085be45dacbc5e79b51060169a38754292b0dcab91fa3e7",
+    "error-guide.png": "606d21188b5c7efb8003cb3fe7fc513f1a9b90a2c5b9d6bc6990cf438c1546e0",
+    "quiet-f-guide.png": "c8af37eb711ddd2b9371d8dac8b4aea7d390c6c4219bdec4eb2b6c7817a4fa98",
+    "panicking-guide.png": "cf85a50a230f03ec96d2edb89016b84ae4b0805b2bad910b18de5a5e8babbdc7",
+    "celebrating-guide.png": "fea933d2b8a54bb651f9b5902562e88247cf870389d81667f27a8922b39ad1f4",
+    "quiet-d-guide.png": "cad276941c27e057bbc92afc164a13e95f6f23d537c96bed880e0f7e24eba83c",
+    "quiet-b-guide.png": "f4f4685a5dcf106b6f9cdd99db0453a1c847021183556661e7ef5157b0616a99",
+    "angry-guide.png": "98d10ee4fb03ea10b1716ef05a8fa18ca654e9968d87e357febb13593ee60496",
+    "quiet-c-guide.png": "c633fabc8192c391e77e596b936ce7f4e5fd28e8cfbdb0569eaf2d4a98ceb3c8",
+    "quiet-a-guide.png": "8b6f3b8d43c85a704083cccf2503a83fff18108635a3de0bce802b961ce768e0",
+    "quiet-g-guide.png": "6b153d1c683faeae5069b6b23c5aa5fa1d9864104d43693bd8d9da4c44702e7d",
+    "surprised-guide.png": "513cea09fd6fded02d93dbc4821b95160269fcfddeb5b86903dedfcf2d528583"
+  },
+  "face_design_reference_sha256": {
+    "surprised.png": "e2b38a6b6b77f8ae22bae217d5c89810698c96b4ac59bec594a499230c4bd103",
+    "celebrating.png": "84a64f3aa9c905f8eff4579f486bac54d65ec21f310503585fa2ad0bbed744c7",
+    "confused.png": "0fe622bc60d0ab3bba14d2948cf4e76bafc28edc6064aea7aa00898e5281744a",
+    "sleeping.png": "2477d16911586dec72f00aa0a85a162a09460aef0bc881dbbc91f1e8f151ec7b",
+    "laughing.png": "5187057b75c5699fedb884373a710f4c391fd91cfd2e5df33f6fdb6889d47b3e",
+    "embarrassed.png": "9b0015aba983d17f7ca857c03c348e5dbc7046aca1827219e9f10ca65f4f1215",
+    "deadpan.png": "fe7d022d6df73137af3a0a474aefc5aeb12f5306e943c80995f31b960d87a0e7",
+    "concerned.png": "05f8063afb097311fa67cfc752c91405f2c8784e5afaff799ebc91589d8df93c",
+    "panicking.png": "12a0564f989b8fbec1f7ecc466c56c51eb6b438599719806e1d3c7e060c8423e",
+    "suspicious.png": "99930512dec5ed50c460ac252571e4f02113251f7f6fb14db92f248a05d6b8ba",
+    "talking.png": "d614604047ce0aef1e35cb7a37ea2095412f55b9429d69d2547790c809b6f85b",
+    "happy.png": "fa0c9945471bdbcecab5a74a0d958794a36da8681ce198488b4108dae776289f",
+    "thinking.png": "a0d7aa1173e8d1f266a23d1ca163676e782f1a6b92efe033a27aeeddb5da5eed",
+    "bored.png": "ce59a8e476c66b1999c21acd1837e29fcdf0f13ce1da6e4f2fafb559b64263ea",
+    "error.png": "2636ef579f65e4262ee517155dc0cb21510969fb934258742804004f72de4da5",
+    "angry.png": "95248536dfc48393f8ab926239ce82c0b0426db45e625cfc5fe200da1e18fc2c",
+    "mischievous.png": "c280441340e5b7ff7a6023074ea38cddd315c06fd8e9fc3a5c2cd88c9b1229c1",
+    "smug.png": "6b10db867e5fd2dba85f1eb2c459cdd86f992232754dbd7ac671f3c7a2df971e",
+    "working.png": "14ad9d7034e9cb5be304d2ff4620a538969d300a4195b7933c6babb1f060399a"
+  },
+  "face_feedback_scope": "User: faces look great; retain their expression designs as references. This does not approve the newly drawn body/face frames."
+}

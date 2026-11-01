@@ -2,7 +2,7 @@
   "personality_id": "uwu",
   "state": "suspicious",
   "status": "validated",
-  "approval": "pending human review",
+  "approval": "superseded historical candidate; see body revision",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
   "generation": "reference-guided face key plus controlled 2D compositing",
   "provenance": {
@@ -223,5 +223,7 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "superseded_by": "provenance/uwu-suspicious-body-revision.json",
+  "historical_operating_artwork_commit": "ac57857"
 }

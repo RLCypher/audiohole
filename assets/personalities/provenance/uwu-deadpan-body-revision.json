@@ -1,0 +1,75 @@
+{
+  "personality_id": "uwu",
+  "state": "deadpan",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/quiet-g-source.png",
+  "source_sha256": "c4d7d856238e98135024d544a322a12f9fff019686d71b5c3da3907c744e0d55",
+  "source_indices": [
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      31,
+      788,
+      497,
+      1488
+    ],
+    [
+      550,
+      814,
+      989,
+      1490
+    ]
+  ],
+  "common_scale": 0.9443258114548683,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      123.82198952879581,
+      503.19267015706805
+    ],
+    [
+      118.62758620689655,
+      484.348275862069
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 2,
+  "frame_source_key_indices": [],
+  "key_sha256": [
+    "b826e0cb87ff80d2c43d6c26ff5b1fc983e7580255bb792c0e32b4168e71566b",
+    "bd835c260f7d40b2d0ae070a265dfeb9ddf59cf28f2d8f171001e082b1e698b5"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/deadpan.png",
+    "sha256": "b826e0cb87ff80d2c43d6c26ff5b1fc983e7580255bb792c0e32b4168e71566b",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "not_generated"
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "static_hold_ms": 1600,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

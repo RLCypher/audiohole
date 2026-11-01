@@ -4,6 +4,7 @@ from __future__ import annotations
 from PIL import Image, ImageChops, ImageStat
 
 from avatar_assets import ROOT, digest, inspect_png, load_pack, read_json, validate_pack
+from avatar_assets import review_key
 from pipeline import inventory, packs, write_json
 
 
@@ -87,7 +88,7 @@ def audit():
             for frame in composited]
         preview_checks = {}
         for tag, size in [('native', (512, 768)), ('compact', (128, 192))]:
-            path = ROOT/f'review/idle-sequences/{identity}-{tag}.png'
+            path = ROOT/f'review/idle-sequences/{review_key(identity)}-{tag}.png'
             with Image.open(path) as apng:
                 actual = []
                 for index in range(apng.n_frames):

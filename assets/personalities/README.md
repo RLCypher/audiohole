@@ -2,7 +2,10 @@
 
 The revised IDLE milestone is **approved**. The full library now contains 52
 static expressions, 49 sequences and 744 animation frames across Norm, UwU and
-Vanilla. New artwork is technically validated and remains pending human review.
+Vanilla. **Norm and Vanilla are approved.** UwU's accepted facial direction now
+anchors revised full-body pose performances, which remain candidates for review.
+The review name and filenames use **Norm**; `default` is retained only as the
+established application mode compatibility key.
 
 Start with the [full catalog](review/full/index.html), [all-state sheet](review/full/all-states-contact-sheet.png),
 [inventory](review/full/INVENTORY.md), and [integration handoff](review/full/HANDOFF.md).
@@ -41,8 +44,10 @@ The original repository audit remains in [RECONNAISSANCE.md](RECONNAISSANCE.md).
 
 The latest user authorization accepts IDLE and permits full generation without
 routine batch approvals. All 39 accepted IDLE image hashes are frozen in
-`provenance/idle-approval.json`. New static and animated reactions are separate
-candidates; generation authorization does not grant their artistic approval.
+`provenance/idle-approval.json`. Norm and Vanilla approvals freeze 501 operating PNG hashes (including all
+approved IDLE files) in `provenance/accepted-assets.json`. UwU's 19 new statics
+and 18 revised body sequences remain candidates; generation authorization does
+not grant artistic approval.
 See `review/full/` for per-personality review ZIPs and one small inspector per
 performance. Norm/UwU deadpan and Vanilla sleeping are intentionally static;
 Vanilla optional emotional labels explicitly use its own IDLE.
@@ -69,7 +74,7 @@ python -m unittest discover -s assets/personalities/tools -p 'test_*.py' -v
 ```
 
 `validate` is read-only and exits 1 on errors. Warnings require visual inspection.
-`--approved-only` reports the remaining unapproved generated reactions; accepted IDLE remains usable in production-filtered fallback. The
+`--approved-only` reports the remaining unapproved generated reactions; approved Norm/Vanilla states are usable; UwU candidates retain their own approved IDLE fallback. The
 optional browser smoke check uses an already installed Playwright and Chromium:
 
 ```sh
@@ -202,3 +207,11 @@ regenerate the accepted baseline. Rebuild new states with `generate_states.py`
 and retained face keys, then run the full audit and review builder. Detailed
 commands, limitations, cache guidance, checks and remaining approval items are
 in the full handoff. No production C++ integration is claimed.
+
+
+UwU body revisions are packaged with `python assets/personalities/tools/revise_uwu_body.py`.
+The model draws the articulated key poses; the packager extracts complete
+silhouettes along clear sheet gutters, registers them by a case stripe, applies
+a common fit per state, and uses deliberate exposure holds. It adds no whole
+sprite translation/rotation animation. New source sheets, exact prompts, key
+indices and a per-state provenance record are retained.

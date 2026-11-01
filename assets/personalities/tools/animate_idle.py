@@ -12,6 +12,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 from avatar_assets import ROOT, AssetError, digest, inspect_png, load_pack, read_json, validate_pack
 from pipeline import packs, write_json
+from avatar_assets import personality_name, review_key
 
 
 def envelope(value, low, high, feather):
@@ -154,6 +155,7 @@ def checker(size):
 
 
 def previews(identity, frames, durations):
+    label=personality_name(identity);identity=review_key(identity)
     out = ROOT / 'review/idle-sequences'
     out.mkdir(parents=True, exist_ok=True)
     for tag, size in [('native', (512, 768)), ('compact', (128, 192))]:
@@ -168,7 +170,7 @@ def previews(identity, frames, durations):
     sheet = Image.new('RGB', (tile_w*6, tile_h*2+46), '#141923')
     draw = ImageDraw.Draw(sheet)
     font = ImageFont.load_default(size=14)
-    draw.text((12, 10), f'{identity} / IDLE / 12 frames / 5.0 s / UNAPPROVED', fill='white', font=font)
+    draw.text((12, 10), f'{label} / IDLE / 12 frames / 5.0 s / UNAPPROVED', fill='white', font=font)
     for i, im in enumerate(frames):
         x, y = (i % 6)*tile_w, (i//6)*tile_h+46
         canvas = checker((192, 288))

@@ -7,7 +7,7 @@ import json
 from io import BytesIO
 from pathlib import Path
 
-from avatar_assets import ROOT
+from avatar_assets import ROOT, personality_name
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
             page.select_option('#personality', identity)
             page.select_option('#state', '__unknown__')
             assert 'idle_animation' in page.locator('#summary').inner_text()
-            assert identity in page.locator('#summary').inner_text()
+            assert personality_name(identity) in page.locator('#summary').inner_text()
         checks.append('unknown state falls back within each personality')
         page.check('#missing')
         assert page.locator('#avatar').is_hidden()

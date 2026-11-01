@@ -17,6 +17,7 @@ from animate_idle import (checker, compose_character_frame, mesh_warp,
                          vanilla_frame, wormhole_mask)
 from avatar_assets import ROOT, AssetError, digest, inspect_png, load_pack, read_json, validate_pack
 from pipeline import write_json
+from avatar_assets import personality_name, review_key
 
 
 CORE_A = ['happy','thinking','working','talking','confused','concerned']
@@ -348,7 +349,7 @@ def logo_performance(master,state,progress,index,count):
 
 
 def make_previews(identity,state,frames,times,static,behavior):
-    out=ROOT/f'review/full/{identity}'
+    out=ROOT/f'review/full/{review_key(identity)}'
     out.mkdir(parents=True,exist_ok=True)
     images=frames or [static]
     playback_times=times or [behavior['static_hold_ms']]
@@ -370,7 +371,7 @@ def make_previews(identity,state,frames,times,static,behavior):
     thumb=checker((128,192));thumb.alpha_composite(static.resize(thumb.size,Image.Resampling.LANCZOS));thumb.convert('RGB').save(out/f'{state}-static-preview.png')
     cols=min(6,len(images));rows=math.ceil(len(images)/cols)
     sheet=Image.new('RGB',(cols*128,rows*220+36),'#151923');draw=ImageDraw.Draw(sheet);font=ImageFont.load_default(size=12)
-    draw.text((8,8),f'{identity} / {state} / {len(frames)} frames / {sum(times)} ms / UNAPPROVED',font=font,fill='white')
+    draw.text((8,8),f'{personality_name(identity)} / {state} / {len(frames)} frames / {sum(times)} ms / '+'REVIEW PENDING',font=font,fill='white')
     for index,im in enumerate(images):
         x,y=(index%cols)*128,(index//cols)*220+36
         canvas=checker((128,192));canvas.alpha_composite(im.resize(canvas.size,Image.Resampling.LANCZOS));sheet.paste(canvas.convert('RGB'),(x,y))

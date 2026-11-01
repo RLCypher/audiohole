@@ -4,12 +4,13 @@ The accepted IDLE assets now anchor complete core presentations for Norm, UwU,
 and Vanilla. Norm and UwU also have all eight requested optional expressions.
 The batch contains **52 static expressions, 49 animation sequences, 744 animation
 frames, and 796 operating PNGs**. All operating images are exactly 512 × 768,
-8-bit RGBA PNG with genuine alpha transparency. Only IDLE is human-approved;
-the remaining **49 statics and 46 sequences** await artistic approval.
+8-bit RGBA PNG with genuine alpha transparency. **Norm and Vanilla are human-approved**, together with UwU IDLE. The revised
+**19 UwU statics and 18 sequences** await artistic approval. The accepted 501
+operating PNGs are frozen in `provenance/accepted-assets.json`.
 
 | Personality | Enabled style | Statics | Sequences | Frames |
 |---|---|---:|---:|---:|
-| Normal / Norm (`default`) | chibi | 20 | 19 | 288 |
+| Norm (`default` compatibility ID) | chibi | 20 | 19 | 288 |
 | UwU (`uwu`) | chibi | 20 | 19 | 288 |
 | Vanilla (`vanilla`) | logo | 12 | 11 | 168 |
 
@@ -24,7 +25,7 @@ the remaining **49 statics and 46 sequences** await artistic approval.
 - Each personality directory has `states-contact-sheet.png`, `face-details.png`,
   a `*-frames.png` sheet for every sequence, transparent native/compact PNG
   previews, and direct GIF review copies.
-- `default-review.zip`, `uwu-review.zip`, and `vanilla-review.zip` provide portable
+- `norm-review.zip`, `uwu-review.zip`, and `vanilla-review.zip` provide portable
   review pages, GIFs, inspectors and frame sheets. Extract and open `index.html`
   in a regular browser. Their catalog links resolve within each archive. Native
   operating PNGs and large native APNGs stay in the repository rather than the
@@ -56,12 +57,20 @@ backend keys, prompts, registration data, hashes and a pinned reproducer are in
 `provenance/` and `*/Intermediate/`. No defective composite became a generation
 reference, and no IDLE operating image was regenerated.
 
-Body choreography uses controlled 2D motion of the accepted artwork. Some finite
-reactions move the complete cutout, including its equipment case, as a chibi
-sticker performance. This is not a library of newly drawn articulated arm poses
-or curled-body drawings. Additional independent body layers/pose art can be
-reviewed if that degree of articulation is desired. All reactions return to
-canonical rest and remain inside the canvas.
+Norm retains its approved restrained/cutout choreography without pixel changes.
+UwU's non-IDLE body performances have been replaced after human review. They now
+use reference-guided, newly drawn arm, elbow, torso, hip, knee, ear and tail poses:
+head-clutching disbelief, crossed arms and a stomp, recoiling surprise, victory
+fists, alternating panic gestures, conversational hands, shrugs, flustered hands,
+and actual resting/slouching poses. Each animation exposes 2–4 drawings with
+deliberate anime holds. Deadpan is a static limp-arm freeze. No UwU body sequence
+uses whole-sprite rotation/translation. The case stripe supplies a common prop
+registration anchor. All finite reactions return to exact accepted IDLE.
+
+See [UwU body revision](UWU_BODY_REVISION.md), the looping three-state review
+demo, and `uwu-body-keyposes.png`. Original facial designs remain in the source
+guides and expression intermediates; newly drawn faces are reference-guided,
+not pixel-identical copies. New body/face drawings still require approval.
 
 Vanilla retains exact exterior RGBA pixels and the complete alpha silhouette.
 Status changes affect only a protected wormhole interior: perspective/grid
@@ -80,8 +89,10 @@ authorization. All five canonical reference images remain unchanged.
 ## Timing and validation
 
 Ambient performances generally loop; ordinary/theatrical reactions are finite.
-Counts vary from 12 to 22 authored frames for new animated states, with deliberate
-holds and abrupt expression changes. Durations range from 1.2 to 4 seconds, plus
+Counts vary from 12 to 22 operating frames for non-IDLE animated states, with deliberate
+holds and abrupt expression changes. UwU has 2–4 distinct body drawings per
+sequence, repeated as timed exposures; frame count is not a claim of unique
+drawings or smooth in-between animation. Durations range from 1.2 to 4 seconds, plus
 the accepted five-second IDLE loops. Norm/UwU deadpan are intentional finite
 static holds, not missing animation; Vanilla sleeping is intentionally static.
 No required core state is deferred. Exact exposure lists live in the manifests.
@@ -92,12 +103,14 @@ persistence/loop agreement, metadata consistency, preview timing and decoding,
 and protected Vanilla exterior/alpha. Tests also compare native preview samples
 to operating pixels, preserve the accepted static case/boots, test real finite
 return and reduced-motion fallback, and reject missing/invalid/cross-personality
-resources. Every accepted IDLE hash is checked.
+resources. Every accepted IDLE hash and all 501 currently approved image hashes
+are checked. UwU key/source hashes and key-to-operating-frame membership are tested.
 
 Review includes native face/detail sheets, representative native motion frames,
 compact state/frame sheets, and browser playback. Technical validity does not
-grant artistic approval. Some native facial patch edges remain softer than the
-original illustration, and the source's near-opaque alpha (often 254) continues
+grant artistic approval. Norm's retained native facial patch edges can be softer than the
+original illustration. UwU's new drawings vary slightly in proportions, accessory
+details, case lettering and hand shapes; the body poses use limited key animation, and the source's near-opaque alpha (often 254) continues
 to trigger transparency-review warnings. The accepted IDLE's alpha was not
 silently changed. Some compact case lettering is too small to read comfortably.
 Held/limited animation is intentional; smoother or more articulated motion is a
@@ -133,8 +146,8 @@ frame = player.frame_at(monotonic_ms)
 5. After a finite reaction, restore the latest persistent context, with IDLE as
    the default. Reduced motion selects a same-personality static expression and
    uses its finite hold metadata when applicable. It never swaps personalities.
-6. Production approval filtering defaults on. New candidates therefore fall
-   back to the accepted IDLE until reviewed. Preview tools explicitly allow
+6. Production approval filtering defaults on. Norm and Vanilla's approved states are available. UwU's new body candidates fall
+   back to its own accepted IDLE until reviewed. Preview tools explicitly allow
    validated candidates. A malformed pack hides the avatar with diagnostics;
    image/render failures must remain cosmetic and must not block routing.
 7. Switching personality/style clears presentation caches and cooldown state;
@@ -155,22 +168,26 @@ face settings, policies and dependency hashes. Do not run the historical IDLE
 preparation/generation tools against accepted assets; they refuse approved data.
 
 ```sh
-python assets/personalities/tools/generate_states.py default core-a
-python assets/personalities/tools/generate_states.py default core-b
-python assets/personalities/tools/generate_states.py default optional
-# Repeat those three batches for uwu and vanilla.
+python assets/personalities/tools/pipeline.py inventory
 python assets/personalities/tools/audit_library.py
 python assets/personalities/tools/build_review_library.py
 python -m unittest discover -s assets/personalities/tools -p 'test_*.py'
+# Repackage only unapproved UwU body candidates from the retained model sheets:
+python assets/personalities/tools/revise_uwu_body.py
 ```
+
+The historical face-only generator refuses approved Norm/Vanilla assets. UwU
+body prompts, raw sheets (including rejected examples), source hashes, crop
+registration, common per-state fit, exposure mappings and a pinned packager are
+retained in `provenance/uwu-body-settings.json` and per-state revision records.
 
 Regular styles remain disabled/unproduced, with canonical regular references
 preserved. The separate `despair` example is documented creative vocabulary,
 not an additional requested catalog state. Vanilla's eight optional emotional
 states intentionally fall back to its own IDLE. No core state is left ungenerated.
 
-Human review remains for the 49 new static expressions, 46 new sequences,
-localized facial key quality, motion/effect timing, and the complete-cutout
-choreography choice. IDLE approval and expanded direction are already recorded;
-they do not automatically approve newly generated artwork. Primary GUI
+Human review remains for UwU's 19 revised static expressions and 18 body
+sequences, face/wardrobe/prop consistency and held-pose timing. Norm, Vanilla and
+all IDLE approvals are already recorded; they do not automatically approve newly
+drawn UwU artwork. Primary GUI
 integration and any future regular/articulated pose expansion remain separate.

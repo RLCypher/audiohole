@@ -22,7 +22,7 @@
   @media(max-width:700px) { main { grid-template-columns: 1fr; } .stage { max-width: 360px; } }
 </style>
 <h1>AudioHole · Avatar review</h1>
-<p class="pending">IDLE accepted · New expression and animation candidates await human review</p>
+<p class="pending">Norm and Vanilla approved · UwU faces accepted; body animation revision pending review</p>
 <p class="muted">Self-contained state inspector. Catalog pages provide one inspector per performance to keep files manageable. Frame images use display-only WebP compression; operating PNGs remain exact RGBA.</p>
 <main>
   <section>
@@ -50,7 +50,7 @@ const snapshot = /*__SNAPSHOT__*/;
 const $ = id => document.getElementById(id);
 let active = null, index = 0, timer = null, background = 0;
 function stop() { clearTimeout(timer); timer = null; }
-function options(element, keys) { element.replaceChildren(...keys.map(key => new Option(key, key))); }
+function options(element, keys) { element.replaceChildren(...keys.map(key => new Option(element.id === 'personality' ? (snapshot.names?.[key] || key) : key, key))); }
 function styles() { options($('style'), Object.keys(snapshot.packs[$('personality').value])); states(); }
 function states() { options($('state'), Object.keys(snapshot.packs[$('personality').value][$('style').value])); select(); }
 function select() {
@@ -59,7 +59,7 @@ function select() {
   if ($('approved').checked) active = active.production;
   if ($('reduced').checked) active = active.reduced_motion;
   if ($('missing').checked) active = {...active, frames: [], source: 'hide', diagnostics: [...active.diagnostics, 'Simulated missing pack: no cross-personality fallback.']};
-  $('summary').textContent = `${$('personality').value} / ${$('style').value}: ${active.source} → ${active.resolved_state} (${active.status})`;
+  $('summary').textContent = `${snapshot.names?.[$('personality').value] || $('personality').value} / ${$('style').value}: ${active.source} → ${active.resolved_state} (${active.status})`;
   $('diagnostics').textContent = active.diagnostics.length ? active.diagnostics.join('\n') : 'No fallback diagnostics.';
   render();
 }

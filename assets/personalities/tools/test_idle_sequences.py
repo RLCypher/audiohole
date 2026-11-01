@@ -5,6 +5,7 @@ from PIL import Image
 
 from avatar_assets import ROOT, Resolver, digest, read_json
 from animate_idle import compose_character_frame, steam_frame, vanilla_frame
+from avatar_assets import review_key
 from validate_idle import audit
 
 
@@ -96,7 +97,7 @@ class InitialIdleTests(unittest.TestCase):
     def test_portable_gif_previews_have_twelve_frames_and_matching_timing(self):
         durations = self.report['timing']['frame_durations_ms']
         for identity in ['default','uwu','vanilla']:
-            with Image.open(ROOT/f'review/idle-sequences/{identity}-review.gif') as image:
+            with Image.open(ROOT/f'review/idle-sequences/{review_key(identity)}-review.gif') as image:
                 self.assertEqual(image.n_frames,12)
                 actual=[]
                 for i in range(image.n_frames):

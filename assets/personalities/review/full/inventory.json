@@ -1,8 +1,9 @@
 {
-  "approval": "IDLE accepted; all other artwork pending human review",
+  "approval": "Norm and Vanilla approved; UwU IDLE approved; non-IDLE body revision candidates pending review",
   "errors": [],
   "packs": {
     "default": {
+      "display_name": "Norm",
       "character_id": "norm",
       "style": "chibi",
       "core_complete": true,
@@ -43,8 +44,8 @@
           "max_adjacent_bbox_center_shift_px": 0.5
         },
         "happy": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/happy.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -80,8 +81,8 @@
           "compact_preview_frames": 12
         },
         "thinking": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/thinking.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -121,8 +122,8 @@
           "compact_preview_frames": 16
         },
         "working": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/working.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -162,8 +163,8 @@
           "compact_preview_frames": 16
         },
         "talking": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/talking.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -199,8 +200,8 @@
           "compact_preview_frames": 12
         },
         "confused": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/confused.png",
           "frame_count": 14,
           "frame_durations_ms": [
@@ -238,8 +239,8 @@
           "compact_preview_frames": 14
         },
         "concerned": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/concerned.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -279,8 +280,8 @@
           "compact_preview_frames": 16
         },
         "error": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/error.png",
           "frame_count": 18,
           "frame_durations_ms": [
@@ -322,8 +323,8 @@
           "compact_preview_frames": 18
         },
         "angry": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/angry.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -363,8 +364,8 @@
           "compact_preview_frames": 16
         },
         "surprised": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/surprised.png",
           "frame_count": 14,
           "frame_durations_ms": [
@@ -402,8 +403,8 @@
           "compact_preview_frames": 14
         },
         "celebrating": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/celebrating.png",
           "frame_count": 22,
           "frame_durations_ms": [
@@ -449,8 +450,8 @@
           "compact_preview_frames": 22
         },
         "sleeping": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/sleeping.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -490,8 +491,8 @@
           "compact_preview_frames": 16
         },
         "smug": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/smug.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -527,8 +528,8 @@
           "compact_preview_frames": 12
         },
         "embarrassed": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/embarrassed.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -568,8 +569,8 @@
           "compact_preview_frames": 16
         },
         "laughing": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/laughing.png",
           "frame_count": 18,
           "frame_durations_ms": [
@@ -611,8 +612,8 @@
           "compact_preview_frames": 18
         },
         "suspicious": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/suspicious.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -648,8 +649,8 @@
           "compact_preview_frames": 12
         },
         "panicking": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/panicking.png",
           "frame_count": 20,
           "frame_durations_ms": [
@@ -693,8 +694,8 @@
           "compact_preview_frames": 20
         },
         "bored": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/bored.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -730,8 +731,8 @@
           "compact_preview_frames": 12
         },
         "mischievous": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/chibi/mischievous.png",
           "frame_count": 14,
           "frame_durations_ms": [
@@ -769,7 +770,7 @@
           "compact_preview_frames": 14
         },
         "deadpan": {
-          "static_status": "validated",
+          "static_status": "approved",
           "animation_status": "not_generated",
           "static_path": "Generated/chibi/deadpan.png",
           "frame_count": 0,
@@ -836,6 +837,7 @@
       ]
     },
     "vanilla": {
+      "display_name": "Vanilla",
       "character_id": "audiohole_logo",
       "style": "logo",
       "core_complete": true,
@@ -876,8 +878,8 @@
           "max_adjacent_bbox_center_shift_px": 0.0
         },
         "happy": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/happy.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -913,8 +915,8 @@
           "compact_preview_frames": 12
         },
         "thinking": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/thinking.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -954,8 +956,8 @@
           "compact_preview_frames": 16
         },
         "working": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/working.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -995,8 +997,8 @@
           "compact_preview_frames": 16
         },
         "talking": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/talking.png",
           "frame_count": 12,
           "frame_durations_ms": [
@@ -1032,8 +1034,8 @@
           "compact_preview_frames": 12
         },
         "confused": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/confused.png",
           "frame_count": 14,
           "frame_durations_ms": [
@@ -1071,8 +1073,8 @@
           "compact_preview_frames": 14
         },
         "concerned": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/concerned.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -1112,8 +1114,8 @@
           "compact_preview_frames": 16
         },
         "error": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/error.png",
           "frame_count": 18,
           "frame_durations_ms": [
@@ -1155,8 +1157,8 @@
           "compact_preview_frames": 18
         },
         "angry": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/angry.png",
           "frame_count": 16,
           "frame_durations_ms": [
@@ -1196,8 +1198,8 @@
           "compact_preview_frames": 16
         },
         "surprised": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/surprised.png",
           "frame_count": 14,
           "frame_durations_ms": [
@@ -1235,8 +1237,8 @@
           "compact_preview_frames": 14
         },
         "celebrating": {
-          "static_status": "validated",
-          "animation_status": "validated",
+          "static_status": "approved",
+          "animation_status": "approved",
           "static_path": "Generated/logo/celebrating.png",
           "frame_count": 22,
           "frame_durations_ms": [
@@ -1282,7 +1284,7 @@
           "compact_preview_frames": 22
         },
         "sleeping": {
-          "static_status": "validated",
+          "static_status": "approved",
           "animation_status": "not_generated",
           "static_path": "Generated/logo/sleeping.png",
           "frame_count": 0,
@@ -1395,6 +1397,7 @@
       "disabled_styles": []
     },
     "uwu": {
+      "display_name": "UwU",
       "character_id": "uwu",
       "style": "chibi",
       "core_complete": true,
@@ -1464,12 +1467,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 2.0,
-          "native_preview_frames": 12,
-          "compact_preview_frames": 12
+          "max_adjacent_bbox_center_shift_px": 19.0,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "thinking": {
           "static_status": "validated",
@@ -1505,12 +1508,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 10.5,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "working": {
           "static_status": "validated",
@@ -1546,12 +1549,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 2.0,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "talking": {
           "static_status": "validated",
@@ -1583,12 +1586,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 12,
-          "compact_preview_frames": 12
+          "max_adjacent_bbox_center_shift_px": 10.5,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "confused": {
           "static_status": "validated",
@@ -1622,12 +1625,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 1.5,
-          "native_preview_frames": 14,
-          "compact_preview_frames": 14
+          "max_adjacent_bbox_center_shift_px": 17.0,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "concerned": {
           "static_status": "validated",
@@ -1663,12 +1666,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 5.0,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "error": {
           "static_status": "validated",
@@ -1706,12 +1709,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 4.5,
-          "native_preview_frames": 18,
-          "compact_preview_frames": 18
+          "max_adjacent_bbox_center_shift_px": 21.5,
+          "native_preview_frames": 9,
+          "compact_preview_frames": 9
         },
         "angry": {
           "static_status": "validated",
@@ -1747,12 +1750,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 2.0,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 30.5,
+          "native_preview_frames": 9,
+          "compact_preview_frames": 9
         },
         "surprised": {
           "static_status": "validated",
@@ -1786,12 +1789,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 6.0,
-          "native_preview_frames": 14,
-          "compact_preview_frames": 14
+          "max_adjacent_bbox_center_shift_px": 22.5,
+          "native_preview_frames": 9,
+          "compact_preview_frames": 9
         },
         "celebrating": {
           "static_status": "validated",
@@ -1833,12 +1836,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 4.0,
-          "native_preview_frames": 22,
-          "compact_preview_frames": 22
+          "max_adjacent_bbox_center_shift_px": 32.0,
+          "native_preview_frames": 9,
+          "compact_preview_frames": 9
         },
         "sleeping": {
           "static_status": "validated",
@@ -1874,12 +1877,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 11.0,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "smug": {
           "static_status": "validated",
@@ -1911,12 +1914,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 1.0,
-          "native_preview_frames": 12,
-          "compact_preview_frames": 12
+          "max_adjacent_bbox_center_shift_px": 29.0,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "embarrassed": {
           "static_status": "validated",
@@ -1952,12 +1955,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 2.0,
-          "native_preview_frames": 16,
-          "compact_preview_frames": 16
+          "max_adjacent_bbox_center_shift_px": 14.5,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "laughing": {
           "static_status": "validated",
@@ -1995,12 +1998,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 1.5,
-          "native_preview_frames": 18,
-          "compact_preview_frames": 18
+          "max_adjacent_bbox_center_shift_px": 13.5,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "suspicious": {
           "static_status": "validated",
@@ -2032,12 +2035,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 1.0,
-          "native_preview_frames": 12,
-          "compact_preview_frames": 12
+          "max_adjacent_bbox_center_shift_px": 16.5,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "panicking": {
           "static_status": "validated",
@@ -2077,12 +2080,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 6.5,
-          "native_preview_frames": 20,
-          "compact_preview_frames": 20
+          "max_adjacent_bbox_center_shift_px": 29.5,
+          "native_preview_frames": 9,
+          "compact_preview_frames": 9
         },
         "bored": {
           "static_status": "validated",
@@ -2114,12 +2117,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 0.5,
-          "native_preview_frames": 12,
-          "compact_preview_frames": 12
+          "max_adjacent_bbox_center_shift_px": 5.0,
+          "native_preview_frames": 3,
+          "compact_preview_frames": 3
         },
         "mischievous": {
           "static_status": "validated",
@@ -2153,12 +2156,12 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": null,
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. ",
           "fallback": null,
           "loop_endpoint_max_rgba_delta": 0,
-          "max_adjacent_bbox_center_shift_px": 1.0,
-          "native_preview_frames": 14,
-          "compact_preview_frames": 14
+          "max_adjacent_bbox_center_shift_px": 16.5,
+          "native_preview_frames": 5,
+          "compact_preview_frames": 5
         },
         "deadpan": {
           "static_status": "validated",
@@ -2177,17 +2180,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Intentional static quiet/comedic hold; reduced motion uses the same expression.",
+          "note": "Drawn articulated body poses with deliberate anime holds; no whole-sprite rotation/translation. Facial designs follow accepted expression references. Intentional static deadpan freeze.",
           "fallback": null
         }
       },
       "errors": [],
       "warnings": [
+        "chibi/angry/animation: bounding-box displacement exceeds 24px; inspect motion",
         "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/angry/animation: occupied area changed over 20%; inspect scale",
         "chibi/angry/static: large semitransparent region: inspect halos or background remnants",
         "chibi/bored/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/bored/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/celebrating/animation: bounding-box displacement exceeds 24px; inspect motion",
         "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/celebrating/animation: occupied area changed over 20%; inspect scale",
         "chibi/celebrating/static: large semitransparent region: inspect halos or background remnants",
         "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/concerned/static: large semitransparent region: inspect halos or background remnants",
@@ -2206,10 +2213,12 @@
         "chibi/laughing/static: large semitransparent region: inspect halos or background remnants",
         "chibi/mischievous/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/mischievous/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/panicking/animation: bounding-box displacement exceeds 24px; inspect motion",
         "chibi/panicking/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/panicking/static: large semitransparent region: inspect halos or background remnants",
         "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/sleeping/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/smug/animation: bounding-box displacement exceeds 24px; inspect motion",
         "chibi/smug/animation: large semitransparent region: inspect halos or background remnants",
         "chibi/smug/static: large semitransparent region: inspect halos or background remnants",
         "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",

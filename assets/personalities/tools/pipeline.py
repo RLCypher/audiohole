@@ -10,7 +10,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 from avatar_assets import (ROOT, AssetError, Resolver, checked_frames, digest, inspect_png,
-                           load_pack, owned_path, read_json, validate_pack)
+                           load_pack, owned_path, read_json, validate_pack, personality_name)
 
 
 def write_json(path, data):
@@ -197,7 +197,7 @@ def review(only_states=None, only_personalities=None, output_path=None, initial_
                             urls[url] = len(urls)
                         indices.append(urls[url])
                     selection['frames'] = indices
-    payload = json.dumps({'packs': snapshot, 'images': list(urls),'initial_state':initial_state}, separators=(',', ':')).replace('<', '\\u003c')
+    payload = json.dumps({'packs': snapshot, 'names': {pid: personality_name(pid) for pid in snapshot}, 'images': list(urls),'initial_state':initial_state}, separators=(',', ':')).replace('<', '\\u003c')
     template = (ROOT / 'tools/preview.html').read_text(encoding='utf-8')
     (output_path or ROOT / 'review/preview.html').write_text(template.replace('/*__SNAPSHOT__*/', payload), encoding='utf-8')
     if summary:
@@ -220,7 +220,7 @@ def make_sheet(entries):
     small = ImageFont.load_default(size=14)
     for index, (identity, style, path, status) in enumerate(entries):
         left = index * width
-        draw.text((left + 16, 14), f'{identity} / {style} / idle', font=title, fill='white')
+        draw.text((left + 16, 14), f'{personality_name(identity)} / {style} / idle', font=title, fill='white')
         draw.text((left + 16, 43), f'{status} - {"APPROVED" if status=="approved" else "UNAPPROVED"}', font=small, fill='#a0f7d6' if status=='approved' else '#f0bf65')
         for x in range(0, 288, 16):
             for y in range(0, 432, 16):

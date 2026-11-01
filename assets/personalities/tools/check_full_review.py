@@ -2,12 +2,13 @@
 from html.parser import HTMLParser
 from io import BytesIO
 import json
+import base64
 from pathlib import Path
 import zipfile
 
 from PIL import Image, ImageChops
 
-from avatar_assets import ROOT
+from avatar_assets import ROOT, review_key
 
 
 def main():
@@ -29,7 +30,7 @@ def main():
         selections=[('default','surprised'),('uwu','celebrating'),('uwu','panicking'),('uwu','deadpan'),('vanilla','error'),('vanilla','sleeping')]
         for pid,state in selections:
             page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
-            page.set_content((root/pid/f'{state}-preview.html').read_text(),wait_until='load')
+            page.set_content((root/review_key(pid)/f'{state}-preview.html').read_text(),wait_until='load')
             page.wait_for_function('document.getElementById("animation").complete && document.getElementById("animation").naturalWidth === 192')
             page.check('#reduced');page.wait_for_function('document.getElementById("animation").naturalWidth === 128')
             page.uncheck('#reduced');page.click('#replay')
@@ -46,14 +47,25 @@ def main():
         assert ImageChops.difference(Image.open(BytesIO(rest)).convert('RGB'),Image.open(BytesIO(replay)).convert('RGB')).getbbox(),'Replay did not restart finite GIF'
         results.append('finite UwU celebration visibly advances, returns to rest, and replays')
         page.close()
+        demo=context.new_page()
+        encoded=base64.b64encode((root/'uwu-body-revision-loop.gif').read_bytes()).decode()
+        demo.set_content(f'<img id="demo" src="data:image/gif;base64,{encoded}">',wait_until='load')
+        demo.wait_for_function('document.getElementById("demo").complete')
+        first=demo.locator('#demo').screenshot();demo.wait_for_timeout(750);acting=demo.locator('#demo').screenshot()
+        assert ImageChops.difference(Image.open(BytesIO(first)).convert('RGB'),Image.open(BytesIO(acting)).convert('RGB')).getbbox()
+        demo.close()
+        results.append('standalone three-state body demo decodes and visibly animates offline')
         for pid,state in [('default','talking'),('uwu','error'),('vanilla','working')]:
             page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
-            page.set_content((root/pid/f'{state}-inspector.html').read_text(),wait_until='load')
+            page.set_content((root/review_key(pid)/f'{state}-inspector.html').read_text(),wait_until='load')
             page.wait_for_function('document.getElementById("avatar").complete && document.getElementById("avatar").naturalWidth === 512')
             assert page.locator('#state').input_value()==state
+            if pid=='default':
+                assert page.locator('#personality option').all_text_contents()==['Norm']
+                assert page.locator('#summary').inner_text().startswith('Norm /')
             page.check('#reduced');assert 'reduced_motion_static' in page.locator('#summary').inner_text()
             page.uncheck('#reduced');page.click('#step');assert 'Frame 2 /' in page.locator('#frame').inner_text()
-            page.check('#approved');assert page.evaluate('active.resolved_state')=='idle'
+            page.check('#approved');assert page.evaluate('active.resolved_state') == ('idle' if pid=='uwu' else state)
             page.uncheck('#approved');page.check('#missing');assert page.locator('#avatar').is_hidden()
             page.uncheck('#missing');page.select_option('#display','128');assert page.locator('#avatar').bounding_box()['width']==128
             page.select_option('#display','512');assert page.locator('#avatar').bounding_box()['width']==512
@@ -69,7 +81,7 @@ def main():
             for name,value in attrs:
                 if tag=='a' and name=='href':self.links.append(value)
     for pid in ['default','uwu','vanilla']:
-        with zipfile.ZipFile(root/f'{pid}-review.zip') as archive:
+        with zipfile.ZipFile(root/f'{review_key(pid)}-review.zip') as archive:
             parser=Links();parser.feed(archive.read('index.html').decode())
             names=set(archive.namelist())
             assert all(link in names for link in parser.links),(pid,[link for link in parser.links if link not in names])

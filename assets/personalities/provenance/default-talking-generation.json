@@ -1,8 +1,8 @@
 {
   "personality_id": "default",
   "state": "talking",
-  "status": "validated",
-  "approval": "pending human review",
+  "status": "approved",
+  "approval": "approved by User",
   "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
   "generation": "reference-guided face key plus controlled 2D compositing",
   "provenance": {
@@ -81,16 +81,20 @@
     "key_sha256": "c37feecf35a03bc2c91bbc58311ac308929cc76e34d69c0a0d61391480b9c2fc"
   },
   "static": {
-    "status": "validated",
+    "status": "approved",
     "path": "Generated/chibi/talking.png",
     "sha256": "9e20d515d3974f1bbd6bd766e1d354602e4e08695d40af76629a7de2440cfd8f",
     "anchor": [
       256,
       704
-    ]
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "animation": {
-    "status": "validated",
+    "status": "approved",
     "frames": [
       {
         "path": "Generated/chibi/talking/0000.png",
@@ -205,7 +209,11 @@
     "priority": 20,
     "interruptible": true,
     "cooldown_ms": 300,
-    "transition": "cut"
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "behavior": {
     "category": "ambient",
@@ -222,5 +230,6 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "human_review_record": "provenance/accepted-assets.json"
 }

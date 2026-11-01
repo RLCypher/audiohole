@@ -1,8 +1,8 @@
 {
   "personality_id": "default",
   "state": "laughing",
-  "status": "validated",
-  "approval": "pending human review",
+  "status": "approved",
+  "approval": "approved by User",
   "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
   "generation": "reference-guided face key plus controlled 2D compositing",
   "provenance": {
@@ -81,16 +81,20 @@
     "key_sha256": "16bf60536192932d730477ecc770f3468368937d250ce01a6f7ed37b5903bc65"
   },
   "static": {
-    "status": "validated",
+    "status": "approved",
     "path": "Generated/chibi/laughing.png",
     "sha256": "f56abbf0aa70bd79883afbb8a1beae7cab7a4ca64135cfb48dbc25a51b5932a6",
     "anchor": [
       256,
       704
-    ]
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "animation": {
-    "status": "validated",
+    "status": "approved",
     "frames": [
       {
         "path": "Generated/chibi/laughing/0000.png",
@@ -259,7 +263,11 @@
     "priority": 40,
     "interruptible": true,
     "cooldown_ms": 5000,
-    "transition": "finish_then_persistent"
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "behavior": {
     "category": "expressive",
@@ -276,5 +284,6 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "human_review_record": "provenance/accepted-assets.json"
 }

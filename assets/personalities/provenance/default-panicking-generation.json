@@ -1,8 +1,8 @@
 {
   "personality_id": "default",
   "state": "panicking",
-  "status": "validated",
-  "approval": "pending human review",
+  "status": "approved",
+  "approval": "approved by User",
   "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
   "generation": "reference-guided face key plus controlled 2D compositing",
   "provenance": {
@@ -81,16 +81,20 @@
     "key_sha256": "e6954241e2f240ef96a4c1f60bd9660fbcd7cf671de6ca8c68bad2bca1764e28"
   },
   "static": {
-    "status": "validated",
+    "status": "approved",
     "path": "Generated/chibi/panicking.png",
     "sha256": "9fcac25d2c719871ad07bc15ec4c78400b2f376120dc8b1cc0f41e3d3cb9dcbe",
     "anchor": [
       256,
       704
-    ]
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "animation": {
-    "status": "validated",
+    "status": "approved",
     "frames": [
       {
         "path": "Generated/chibi/panicking/0000.png",
@@ -277,7 +281,11 @@
     "priority": 85,
     "interruptible": true,
     "cooldown_ms": 8000,
-    "transition": "finish_then_persistent"
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
   },
   "behavior": {
     "category": "theatrical",
@@ -294,5 +302,6 @@
     "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
     "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
     "settings": "provenance/full-generation-settings.json"
-  }
+  },
+  "human_review_record": "provenance/accepted-assets.json"
 }

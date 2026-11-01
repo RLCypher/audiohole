@@ -1,0 +1,402 @@
+{
+  "authorization": "provenance/authorizations/norm-vanilla-approval-uwu-body-revision.md",
+  "status": "candidate",
+  "approved_idle_unchanged": true,
+  "method": "Model-drawn articulated key poses, common fit per state, deliberate exposure holds, exact rest endpoints.",
+  "limitations": [
+    "Limited key animation, not fully in-betweened traditional animation.",
+    "Generated clothing/prop details and head proportions may vary; inspect the new drawings before approval.",
+    "Facial expression designs are retained through reference guidance; newly drawn poses are not pixel-identical faces."
+  ],
+  "states": {
+    "error": {
+      "drawn_pose_count": 4,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "a7219314c38d01335fd3e0489442fc11b20fca1322426c106ad8592aa89c87d1"
+    },
+    "angry": {
+      "drawn_pose_count": 4,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        1,
+        2,
+        2,
+        3,
+        3,
+        0,
+        0,
+        null
+      ],
+      "source_sha256": "065613134357c42c068b22aaa8dfab8a314c89e0f69d22a70224b3515e7009b1"
+    },
+    "surprised": {
+      "drawn_pose_count": 4,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        2,
+        2,
+        1,
+        2,
+        2,
+        3,
+        0,
+        0,
+        null
+      ],
+      "source_sha256": "b0c0f583880474df30d14d7c3043fc16e3afd23cc4c2f3e3b3e5b9261ce09857"
+    },
+    "celebrating": {
+      "drawn_pose_count": 4,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        3,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "8c43aa7c460dd7c8080d8bdab4971d4c1ff392f51c4d50f9b0ac805f70ba4fbe"
+    },
+    "panicking": {
+      "drawn_pose_count": 4,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "d98d889c661b4a8b9a7bce3cf85167ef0f46be495e68517091d2a07a7f38a907"
+    },
+    "happy": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "c7f3c3ccf0eee49336895cf377e66c9b459df4017976703d767304c4a070a27b"
+    },
+    "thinking": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "c7f3c3ccf0eee49336895cf377e66c9b459df4017976703d767304c4a070a27b"
+    },
+    "working": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def"
+    },
+    "talking": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def"
+    },
+    "confused": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "54db95faa2d82f3ea00b9057b92c90e214d093e62b03579c36e81cfff84389a7"
+    },
+    "concerned": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "54db95faa2d82f3ea00b9057b92c90e214d093e62b03579c36e81cfff84389a7"
+    },
+    "sleeping": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "044b315c95d3bb4d9001a24f5aa26a2ce1faf4597f31369273e69c9ee0103346"
+    },
+    "smug": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "044b315c95d3bb4d9001a24f5aa26a2ce1faf4597f31369273e69c9ee0103346"
+    },
+    "embarrassed": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "fb64a3deb8ff46ea7065487a2e11b4aefb885bb20cac8b2af4dccdb76c1e4ca0"
+    },
+    "laughing": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null
+      ],
+      "source_sha256": "fb64a3deb8ff46ea7065487a2e11b4aefb885bb20cac8b2af4dccdb76c1e4ca0"
+    },
+    "suspicious": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "e2a222fa68c3005cc5405e4fd480e427d90b0111b174ae9856d52cff8e70a6ca"
+    },
+    "bored": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_sha256": "e2a222fa68c3005cc5405e4fd480e427d90b0111b174ae9856d52cff8e70a6ca"
+    },
+    "mischievous": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [
+        null,
+        null,
+        null,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        null,
+        null
+      ],
+      "source_sha256": "c4d7d856238e98135024d544a322a12f9fff019686d71b5c3da3907c744e0d55"
+    },
+    "deadpan": {
+      "drawn_pose_count": 2,
+      "frame_source_key_indices": [],
+      "source_sha256": "c4d7d856238e98135024d544a322a12f9fff019686d71b5c3da3907c744e0d55"
+    }
+  }
+}

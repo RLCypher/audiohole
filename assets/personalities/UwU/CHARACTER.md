@@ -214,3 +214,16 @@ mandatory; add drawings when convincing movement needs them. Ambient motion
 remains unobtrusive, expressive motion is noticeable, and major reactions may
 be theatrical. The accepted closed-mouth IDLE and restrained steam are the rest
 baseline, not a limit on open-mouth emotional or talking performances.
+
+
+## Full-body performance revision after human review
+
+The facial expression designs are the accepted creative direction. Body acting
+must carry the same expressiveness: use drawn shoulder, elbow, torso, hip and
+knee changes, with head/ear/tail follow-through. Dramatic reactions need clear
+anticipation, an articulated action pose, and recovery. Translating or rotating
+the entire resting sprite does not meet this requirement. Quieter states use
+restrained authored gestures and genuinely resting/sleeping postures. Deliberate
+anime holds are appropriate; do not claim smooth in-between animation when only
+a few drawings exist. Preserve the canonical slender adult anatomy and costume.
+The accepted closed-mouth IDLE stays unchanged. New body drawings require review.
