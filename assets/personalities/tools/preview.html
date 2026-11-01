@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AudioHole · Avatar review</title>
+<style>
+  :root { color-scheme: dark; font: 15px/1.5 system-ui, sans-serif; background: #11151d; color: #e9edf5; }
+  body { max-width: 1120px; margin: 32px auto; padding: 0 24px; }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  .pending { color: #efbf70; }
+  main { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 32px; margin-top: 26px; }
+  .stage { aspect-ratio: 2 / 3; position: relative; overflow: hidden; border: 1px solid #586075;
+    background: conic-gradient(#e4e5ea 25%, #c2c4cc 0 50%, #e4e5ea 0 75%, #c2c4cc 0) 0 0 / 32px 32px; }
+  .stage.dark { background: #171b25; } .stage.light { background: #fff; }
+  .stage img { width: 100%; height: 100%; object-fit: contain; position: absolute; }
+  .stage.guides::after { content: ''; position: absolute; left: 0; right: 0; top: 91.6667%; border-top: 1px dashed #e64b52; pointer-events: none; }
+  label { display: block; margin-bottom: 14px; }
+  select, button { font: inherit; padding: 7px 12px; background: #202735; color: inherit; border: 1px solid #596275; border-radius: 6px; }
+  select { display: block; width: 100%; } button { cursor: pointer; margin: 0 6px 10px 0; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: #1b2230; font-size: 12px; }
+  .muted { color: #acb6c8; } input { accent-color: #a0f7d6; }
+  @media(max-width:700px) { main { grid-template-columns: 1fr; } .stage { max-width: 360px; } }
+</style>
+<h1>AudioHole · Avatar review</h1>
+<p class="pending">IDLE candidates · Human approval pending</p>
+<p class="muted">Offline snapshot. No audio engine connection. Other states currently show the selected personality’s fallback.</p>
+<main>
+  <section>
+    <div class="stage" id="stage"><img id="avatar" alt="Selected avatar candidate" hidden></div>
+    <p id="summary" role="status" aria-live="polite"></p>
+    <button id="background">Background: checkerboard</button>
+    <label><input type="checkbox" id="guides"> Show ground guide at y = 704</label>
+  </section>
+  <section>
+    <label>Personality<select id="personality"></select></label>
+    <label>Style<select id="style"></select></label>
+    <label>Requested state<select id="state"></select></label>
+    <label><input type="checkbox" id="approved"> Approved assets only (production default)</label>
+    <label><input type="checkbox" id="missing"> Simulate missing selected-personality assets</label>
+    <button id="play">Play</button><button id="pause">Pause</button><button id="step">Next frame</button>
+    <p id="frame"></p>
+    <pre id="diagnostics"></pre>
+    <p class="muted">Inspect ears, tail, hands, lettering, logo geometry, and edges on all three backgrounds. Technical validation does not approve artwork.</p>
+  </section>
+</main>
+<script>
+const snapshot = /*__SNAPSHOT__*/;
+const $ = id => document.getElementById(id);
+let active = null, index = 0, timer = null, background = 0;
+function stop() { clearTimeout(timer); timer = null; }
+function options(element, keys) { element.replaceChildren(...keys.map(key => new Option(key, key))); }
+function styles() { options($('style'), Object.keys(snapshot.packs[$('personality').value])); states(); }
+function states() { options($('state'), Object.keys(snapshot.packs[$('personality').value][$('style').value])); select(); }
+function select() {
+  stop(); index = 0; $('avatar').hidden = true; $('avatar').removeAttribute('src');
+  active = snapshot.packs[$('personality').value][$('style').value][$('state').value];
+  if ($('approved').checked) active = active.production;
+  if ($('missing').checked) active = {...active, frames: [], source: 'hide', diagnostics: [...active.diagnostics, 'Simulated missing pack: no cross-personality fallback.']};
+  $('summary').textContent = `${$('personality').value} / ${$('style').value}: ${active.source} → ${active.resolved_state} (${active.status})`;
+  $('diagnostics').textContent = active.diagnostics.length ? active.diagnostics.join('\n') : 'No fallback diagnostics.';
+  render();
+}
+function render() {
+  $('avatar').hidden = !active.frames.length;
+  if (active.frames.length) $('avatar').src = snapshot.images[active.frames[index]];
+  $('frame').textContent = active.frames.length ? `Frame ${index + 1} / ${active.frames.length}` : 'Avatar hidden';
+}
+function play() {
+  stop(); if (active.frames.length < 2) return;
+  timer = setTimeout(() => {
+    if (index + 1 >= active.frames.length && !active.loop) { stop(); $('state').value = 'idle'; select(); return; }
+    index = (index + 1) % active.frames.length; render(); play();
+  }, active.durations_ms[index]);
+}
+$('personality').onchange = styles; $('style').onchange = states; $('state').onchange = select;
+$('approved').onchange = select; $('missing').onchange = select;
+$('play').onclick = play; $('pause').onclick = stop;
+$('step').onclick = () => { stop(); if (active.frames.length) index = (index + 1) % active.frames.length; render(); };
+$('guides').onchange = () => $('stage').classList.toggle('guides', $('guides').checked);
+$('background').onclick = () => { background = (background + 1) % 3; $('stage').classList.remove('dark', 'light'); if (background) $('stage').classList.add(background === 1 ? 'dark' : 'light'); $('background').textContent = 'Background: ' + ['checkerboard','dark','light'][background]; };
+document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+options($('personality'), Object.keys(snapshot.packs)); styles();
+</script>
+</html>

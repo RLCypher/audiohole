@@ -1,0 +1,163 @@
+{
+  "approval": "pending human review",
+  "packs": [
+    {
+      "manifest": "/workspace/audiohole/assets/personalities/Norm/manifest.json",
+      "errors": [],
+      "warnings": [
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+      ],
+      "assets": [
+        {
+          "path": "Generated/chibi/idle.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            65,
+            64,
+            448,
+            704
+          ],
+          "transparent_pixels": 217870,
+          "sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        }
+      ]
+    },
+    {
+      "manifest": "/workspace/audiohole/assets/personalities/Vanilla/manifest.json",
+      "errors": [],
+      "warnings": [],
+      "assets": [
+        {
+          "path": "Generated/logo/idle.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            55,
+            210,
+            459,
+            557
+          ],
+          "transparent_pixels": 265971,
+          "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+          "warnings": []
+        }
+      ]
+    },
+    {
+      "manifest": "/workspace/audiohole/assets/personalities/UwU/manifest.json",
+      "errors": [],
+      "warnings": [
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants"
+      ],
+      "assets": [
+        {
+          "path": "Generated/chibi/idle.png",
+          "size": [
+            512,
+            768
+          ],
+          "mode": "RGBA",
+          "bit_depth": 8,
+          "bbox": [
+            44,
+            64,
+            469,
+            704
+          ],
+          "transparent_pixels": 201001,
+          "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+          "warnings": [
+            "large semitransparent region: inspect halos or background remnants"
+          ]
+        }
+      ]
+    }
+  ],
+  "references": {
+    "references": [
+      {
+        "path": "Norm/References/Norm Chibi Reference.png",
+        "sha256": "a8015877ec785626d2505be362fd78c3f4964ae3c420c2f2f6d8747f1e3e2194",
+        "size": [
+          1199,
+          1312
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      },
+      {
+        "path": "Norm/References/Norm Reference.png",
+        "sha256": "17ae78281b5124e5639da8b3c6ec803fe71e0229f27f4e7082b87650d8c3fead",
+        "size": [
+          1201,
+          1310
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      },
+      {
+        "path": "UwU/References/UwU Chibi Reference.png",
+        "sha256": "3a257e594330402b7dd88917b3e5c61be09e9a6de5b87b2bc6e1b0a12cb7cb6c",
+        "size": [
+          1199,
+          1312
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      },
+      {
+        "path": "UwU/References/UwU Reference.png",
+        "sha256": "14a3be17c1edc691dcb73fef81b0570aa715257faeb84fc1bdec19ee2b220929",
+        "size": [
+          1199,
+          1312
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      },
+      {
+        "path": "Vanilla/References/Vanilla Reference.png",
+        "sha256": "cc3bba6fa536eb00c5d6c4e232c8eecaa683637076b1b82a5396abc5f1b8d655",
+        "size": [
+          512,
+          512
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "visual_review_required": [
+    "character identity, accessories, anatomy, and lettering",
+    "dark/light background halos and alignment",
+    "Vanilla logo geometry and exact colors"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "browser": "local Chromium via Playwright",
+  "passed": [
+    "idle decoded at 512x768",
+    "unknown state falls back within each personality",
+    "missing pack and personality switches hide correctly",
+    "production approval gate hides candidates",
+    "disabled regular style cannot borrow chibi art",
+    "all backgrounds and guide toggle",
+    "synthetic loop, pause, step, one-shot completion returns to idle",
+    "no browser JavaScript errors"
+  ],
+  "errors": [],
+  "note": "Playback checked with duplicate static-frame references only; no animation artwork generated."
+}

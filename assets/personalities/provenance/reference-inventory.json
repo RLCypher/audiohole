@@ -1,0 +1,76 @@
+{
+  "references": [
+    {
+      "path": "Norm/References/Norm Chibi Reference.png",
+      "sha256": "a8015877ec785626d2505be362fd78c3f4964ae3c420c2f2f6d8747f1e3e2194",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "Norm/References/Norm Reference.png",
+      "sha256": "17ae78281b5124e5639da8b3c6ec803fe71e0229f27f4e7082b87650d8c3fead",
+      "size": [
+        1201,
+        1310
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "UwU/References/UwU Chibi Reference.png",
+      "sha256": "3a257e594330402b7dd88917b3e5c61be09e9a6de5b87b2bc6e1b0a12cb7cb6c",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "UwU/References/UwU Reference.png",
+      "sha256": "14a3be17c1edc691dcb73fef81b0570aa715257faeb84fc1bdec19ee2b220929",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "Vanilla/References/Vanilla Reference.png",
+      "sha256": "cc3bba6fa536eb00c5d6c4e232c8eecaa683637076b1b82a5396abc5f1b8d655",
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    }
+  ],
+  "supplied_documents": {
+    "AGENTS.md": "8f60370065e0503bd1ec676f9a5af197ca35767fe85374e2b4864b41c816980d",
+    "AVATAR_ASSETS.md": "c7a352dca3bd01a5ef442570af53ca6419c48ef657319a60a179536495a84d1c",
+    "Vanilla/CHARACTER.md": "1cce6454f5df1dee7f67bf058414b5dc0a29de70794ffd2bed0d1c90984b0329",
+    "UwU/CHARACTER.md": "ac93183aab23f77a066eeedcb25e81a6f44488afb113c4ba96a92b14fc2f7976",
+    "Norm/CHARACTER.md": "d5ff844e3cadff5c34d057ccd5d7e68d47ecc65a1674d70ad77e3b4383c70454"
+  }
+}

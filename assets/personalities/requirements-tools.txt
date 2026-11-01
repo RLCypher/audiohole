@@ -1,0 +1,3 @@
+# Offline development tools only; not dependencies of the C++ application.
+Pillow==12.3.0
+jsonschema==4.26.0

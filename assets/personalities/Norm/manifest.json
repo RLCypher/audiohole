@@ -1,0 +1,397 @@
+{
+  "schema_version": 1,
+  "personality_id": "default",
+  "character_id": "norm",
+  "default_style": "chibi",
+  "technical": {
+    "width": 512,
+    "height": 768,
+    "format": "PNG",
+    "bit_depth": 8,
+    "color_model": "RGBA"
+  },
+  "styles": {
+    "chibi": {
+      "enabled": true,
+      "anchor": [
+        256,
+        704
+      ],
+      "states": {
+        "idle": {
+          "static": {
+            "status": "validated",
+            "path": "Generated/chibi/idle.png",
+            "sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+            "anchor": [
+              256,
+              704
+            ]
+          },
+          "animation": {
+            "status": "not_generated"
+          }
+        },
+        "happy": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "thinking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "working": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "talking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "confused": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "concerned": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "error": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "angry": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "surprised": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "celebrating": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "sleeping": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "smug": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "embarrassed": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "laughing": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "suspicious": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "panicking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "bored": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "mischievous": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "deadpan": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        }
+      }
+    },
+    "regular": {
+      "enabled": false,
+      "anchor": [
+        256,
+        704
+      ],
+      "states": {
+        "idle": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          }
+        },
+        "happy": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "thinking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "working": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "talking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "confused": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "concerned": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "error": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "angry": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "surprised": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "celebrating": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "sleeping": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "smug": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "embarrassed": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "laughing": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "suspicious": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "panicking": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "bored": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "mischievous": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        },
+        "deadpan": {
+          "static": {
+            "status": "not_generated"
+          },
+          "animation": {
+            "status": "not_generated"
+          },
+          "fallback": "idle"
+        }
+      }
+    }
+  }
+}

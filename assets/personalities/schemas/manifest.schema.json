@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:audiohole:avatar-manifest:1",
+  "title": "AudioHole avatar pack v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "personality_id",
+    "character_id",
+    "default_style",
+    "technical",
+    "styles"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "personality_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "character_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "default_style": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "technical": {
+      "const": {
+        "width": 512,
+        "height": 768,
+        "format": "PNG",
+        "bit_depth": 8,
+        "color_model": "RGBA"
+      }
+    },
+    "styles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/style"
+      }
+    }
+  },
+  "$defs": {
+    "static": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "not_generated",
+            "generated",
+            "validated",
+            "approved",
+            "invalid",
+            "unavailable",
+            "missing"
+          ]
+        },
+        "review": {
+          "type": "object",
+          "required": [
+            "reviewer",
+            "reviewed_at"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^Generated/[a-z][a-z0-9_]*/[a-z][a-z0-9_]*\\.png$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "anchor": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 768
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "generated",
+                  "validated",
+                  "approved"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "path",
+              "sha256",
+              "anchor"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_generated",
+                  "unavailable",
+                  "missing"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "path"
+                  ]
+                },
+                {
+                  "required": [
+                    "sha256"
+                  ]
+                },
+                {
+                  "required": [
+                    "anchor"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "approved"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "review"
+            ]
+          }
+        }
+      ]
+    },
+    "animation": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "not_generated",
+            "generated",
+            "validated",
+            "approved",
+            "invalid",
+            "unavailable",
+            "missing"
+          ]
+        },
+        "review": {
+          "type": "object",
+          "required": [
+            "reviewer",
+            "reviewed_at"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 240,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "anchor",
+              "duration_ms"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^Generated/[a-z][a-z0-9_]*/[a-z][a-z0-9_]*/[0-9]{4}\\.png$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "anchor": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 768
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "duration_ms": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 60000
+              }
+            }
+          }
+        },
+        "loop": {
+          "type": "boolean"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "interruptible": {
+          "type": "boolean"
+        },
+        "cooldown_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600000
+        },
+        "transition": {
+          "enum": [
+            "cut",
+            "finish_then_idle"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "generated",
+                  "validated",
+                  "approved"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "frames",
+              "loop",
+              "priority",
+              "interruptible",
+              "cooldown_ms",
+              "transition"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_generated",
+                  "unavailable",
+                  "missing"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "frames"
+                  ]
+                },
+                {
+                  "required": [
+                    "loop"
+                  ]
+                },
+                {
+                  "required": [
+                    "priority"
+                  ]
+                },
+                {
+                  "required": [
+                    "interruptible"
+                  ]
+                },
+                {
+                  "required": [
+                    "cooldown_ms"
+                  ]
+                },
+                {
+                  "required": [
+                    "transition"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "approved"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "review"
+            ]
+          }
+        }
+      ]
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "static",
+        "animation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "static": {
+          "$ref": "#/$defs/static"
+        },
+        "animation": {
+          "$ref": "#/$defs/animation"
+        },
+        "fallback": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "anchor",
+        "states"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "anchor": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 768
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "states": {
+          "type": "object",
+          "required": [
+            "idle",
+            "happy",
+            "thinking",
+            "working",
+            "talking",
+            "confused",
+            "concerned",
+            "error",
+            "angry",
+            "surprised",
+            "celebrating",
+            "sleeping"
+          ],
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/state"
+          }
+        }
+      }
+    }
+  }
+}

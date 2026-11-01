@@ -1,0 +1,48 @@
+{
+  "personality_id": "default",
+  "style": "chibi",
+  "state": "idle",
+  "approval": "pending human review",
+  "source": "Norm/Intermediate/idle-source.png",
+  "source_sha256": "b09dd692733680f03a38d00780baecbf208963cc0e4a33cb18cd8b76b2f344eb",
+  "source_size": [
+    1024,
+    1536
+  ],
+  "operation": "explicit alpha>=4 bounds crop, proportional Lanczos fit to 448x640, anchor placement",
+  "crop_box": [
+    102,
+    105,
+    911,
+    1457
+  ],
+  "resampled_size": [
+    383,
+    640
+  ],
+  "offset": [
+    65,
+    64
+  ],
+  "output_sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+  "output": "Norm/Generated/chibi/idle.png",
+  "technical_validation": {
+    "size": [
+      512,
+      768
+    ],
+    "mode": "RGBA",
+    "bit_depth": 8,
+    "bbox": [
+      65,
+      64,
+      448,
+      704
+    ],
+    "transparent_pixels": 217870,
+    "sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+    "warnings": [
+      "large semitransparent region: inspect halos or background remnants"
+    ]
+  }
+}
