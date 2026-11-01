@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include <windows.h>
+#include <wx/dcbuffer.h>
 
 namespace audiohole::gui {
 namespace {
@@ -67,6 +68,22 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     return true;
 }
 } // namespace
+SurfacePanel::SurfacePanel(wxWindow* parent, const wxString& role) : wxPanel(parent) {
+    SetName(role);
+    SetBackgroundStyle(wxBG_STYLE_PAINT);
+    Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
+        wxAutoBufferedPaintDC dc(this);
+        dc.SetBackground(wxBrush(GetBackgroundColour()));
+        dc.Clear();
+        const auto role = GetName();
+        const auto border = role == "capture-card" || role == "commentary-card" ? palette::magenta()
+                            : role == "playback-card"                           ? palette::mint()
+                                                      : wxColour(81, 108, 120);
+        dc.SetPen(wxPen(use_system_colours ? GetForegroundColour() : border, FromDIP(1)));
+        dc.SetBrush(wxBrush(GetBackgroundColour()));
+        dc.DrawRoundedRectangle(GetClientRect().Deflate(1), FromDIP(10));
+    });
+}
 ActionButton::ActionButton(wxWindow* parent, const wxString& title)
     : wxButton(parent, wxID_ANY, title) {
     SetToolTip(button_help(title));

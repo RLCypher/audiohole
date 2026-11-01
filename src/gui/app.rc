@@ -9,3 +9,5 @@ AUDIOHOLE_LOGO_PNG RCDATA "assets/branding/audiohole-logo.png"
 #define wxUSE_DPI_AWARE_MANIFEST 2
 #endif
 #include "wx/msw/wx.rc"
+
+AUDIOHOLE_PLACEHOLDER_PNG RCDATA "assets/presentation/placeholder-avatar.png"

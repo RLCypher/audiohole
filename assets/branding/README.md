@@ -39,8 +39,9 @@ output is committed; neither CMake nor the application rewrites the source image
 - `AgentDisplay` is a wx-owned child in the upper-right header, approximately
   128×128 logical pixels. It caches aspect-preserving scaled bitmaps and paints
   alpha over the current application surface. Image replacement and DPI/size
-  changes update the cache; normal painting does not decode or resample. All
-  personalities currently display the same logo. Existing commentary sits to its
+  changes update the cache; normal painting does not decode or resample. The visual refinement now uses a separate header branding logo and a static
+  placeholder for non-Vanilla personalities; Vanilla retains the canonical logo.
+  See ../presentation/README.md for actual asset dimensions and compact sizing. Existing commentary sits to its
   left; sprites, animation, expressions and speech bubbles remain unimplemented.
 - The existing tray uses `TrayIconCache`: size/color-keyed native icons, updated only
   when state, tooltip, effective DPI size or tray installation changes. The existing

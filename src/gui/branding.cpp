@@ -22,9 +22,9 @@ void check(HRESULT result) {
     if (FAILED(result))
         throw std::runtime_error("Branding image decode failed, HRESULT " + std::to_string(result));
 }
-wxImage decode_logo() {
+wxImage decode_logo(int resource_id) {
     const auto module = GetModuleHandleW(nullptr);
-    const auto resource = FindResourceW(module, MAKEINTRESOURCEW(AUDIOHOLE_LOGO_PNG), RT_RCDATA);
+    const auto resource = FindResourceW(module, MAKEINTRESOURCEW(resource_id), RT_RCDATA);
     if (!resource)
         throw std::runtime_error("Embedded AudioHole logo resource is missing");
     // Resource bytes are borrowed from the loaded executable for process lifetime;
@@ -52,8 +52,8 @@ wxImage decode_logo() {
     check(result);
     UINT width = 0, height = 0;
     check(frame->GetSize(&width, &height));
-    if (width != 512 || height != 512)
-        throw std::runtime_error("Expected the canonical 512x512 logo");
+    if (!width || !height || width > 4096 || height > 4096)
+        throw std::runtime_error("Invalid embedded presentation image dimensions");
     IWICFormatConverter* raw_converter = nullptr;
     result = factory->CreateFormatConverter(&raw_converter);
     std::unique_ptr<IWICFormatConverter, ReleaseCom> converter(raw_converter);
@@ -72,7 +72,11 @@ wxImage decode_logo() {
 }
 } // namespace
 const wxImage& canonical_logo() {
-    static const wxImage image = decode_logo();
+    static const wxImage image = decode_logo(AUDIOHOLE_LOGO_PNG);
+    return image;
+}
+const wxImage& placeholder_avatar() {
+    static const wxImage image = decode_logo(AUDIOHOLE_PLACEHOLDER_PNG);
     return image;
 }
 wxIconBundle application_icons() {
@@ -115,8 +119,9 @@ const wxIcon& TrayIconCache::get(int physical_size, audiohole::State state) {
     icon.CopyFromBitmap(wxBitmap(scaled));
     return icons_.emplace(key, icon).first->second;
 }
-AgentDisplay::AgentDisplay(wxWindow* parent) : wxPanel(parent) {
-    SetMinSize(FromDIP(wxSize(128, 128)));
+AgentDisplay::AgentDisplay(wxWindow* parent, wxSize logical_size)
+    : wxPanel(parent), logical_size_(logical_size) {
+    SetMinSize(FromDIP(logical_size_));
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     SetName("AudioHole agent display");
     Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
@@ -124,8 +129,8 @@ AgentDisplay::AgentDisplay(wxWindow* parent) : wxPanel(parent) {
         event.Skip();
     });
     Bind(wxEVT_DPI_CHANGED, [this](wxDPIChangedEvent& event) {
-        SetMinSize(FromDIP(wxSize(128, 128)));
-        cached_size_ = 0;
+        SetMinSize(FromDIP(logical_size_));
+        cached_bounds_ = wxSize();
         update_bitmap();
         GetParent()->Layout();
         event.Skip();
@@ -142,24 +147,32 @@ AgentDisplay::AgentDisplay(wxWindow* parent) : wxPanel(parent) {
     });
     set_image(canonical_logo());
 }
+void AgentDisplay::set_presentation_size(wxSize logical_size) {
+    if (logical_size_ == logical_size)
+        return;
+    logical_size_ = logical_size;
+    SetMinSize(FromDIP(logical_size_));
+    cached_bounds_ = wxSize();
+    update_bitmap();
+}
 void AgentDisplay::set_image(const wxImage& image) {
     if (!image.IsOk())
         throw std::invalid_argument("Agent image must be valid");
     source_ = image;
-    cached_size_ = 0;
+    cached_bounds_ = wxSize();
     update_bitmap();
 }
 void AgentDisplay::update_bitmap() {
     const auto size = GetClientSize();
-    const int edge = std::min({size.x, size.y, FromDIP(128)});
-    if (!source_.IsOk() || edge <= 0 || edge == cached_size_)
+    const int edge = std::min(size.x, size.y);
+    if (!source_.IsOk() || edge <= 0 || size == cached_bounds_)
         return;
-    const double scale =
-        static_cast<double>(edge) / std::max(source_.GetWidth(), source_.GetHeight());
+    const double scale = std::min(static_cast<double>(size.x) / source_.GetWidth(),
+                                  static_cast<double>(size.y) / source_.GetHeight());
     bitmap_ = wxBitmap(source_.Scale(std::max(1, static_cast<int>(source_.GetWidth() * scale)),
                                      std::max(1, static_cast<int>(source_.GetHeight() * scale)),
                                      wxIMAGE_QUALITY_HIGH));
-    cached_size_ = edge;
+    cached_bounds_ = size;
     Refresh();
 }
 } // namespace audiohole::gui

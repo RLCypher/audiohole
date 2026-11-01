@@ -45,3 +45,8 @@ install(FILES "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png"
 
 set_source_files_properties(app.rc PROPERTIES OBJECT_DEPENDS
   "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png;${PROJECT_SOURCE_DIR}/assets/branding/audiohole.ico")
+
+install(FILES "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png"
+  DESTINATION assets/presentation COMPONENT Runtime)
+set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS
+  "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png")

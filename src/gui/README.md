@@ -89,3 +89,11 @@ locally beside the DFA controls when necessary to retain that warning. It issues
 no controller commands, writes no diagnostics/configuration, and processes no DFA
 input in Vanilla. A raw invalid edit never changes the last normalized value; local
 feedback is hidden/reset on personality change. This is not a new persistence system.
+
+The visual-refinement layer uses palette.h and SurfacePanel for application-owned
+colors/borders while retaining native controls and existing handlers. Header text
+has a bounded scrolling surface; a static embedded avatar is independent of the
+commentary. Profiles retains two columns, both scrollable when constrained. Endpoint
+cards and requested-configuration summaries read current controls and snapshots;
+footer totals are view data, not newly inferred engine health. See
+../../assets/presentation/README.md and the visual acceptance checklist.

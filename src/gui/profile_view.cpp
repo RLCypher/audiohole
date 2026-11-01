@@ -7,12 +7,28 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.group = new wxStaticBoxSizer(wxVERTICAL, parent, title);
     sizer->Add(w.group, 0, wxEXPAND | wxALL, 4);
     auto* box = w.group->GetStaticBox();
-    label(box, w.group, "Source (capture)");
-    w.source = new wxComboBox(box, wxID_ANY);
-    w.group->Add(w.source, 0, wxEXPAND | wxALL, 3);
-    label(box, w.group, "Destination (playback)");
-    w.destination = new wxComboBox(box, wxID_ANY);
-    w.group->Add(w.destination, 0, wxEXPAND | wxALL, 3);
+    auto* endpoints = new wxBoxSizer(wxHORIZONTAL);
+    auto* capture = new SurfacePanel(box, "capture-card");
+    auto* playback = new SurfacePanel(box, "playback-card");
+    auto* source_layout = new wxBoxSizer(wxVERTICAL);
+    auto* destination_layout = new wxBoxSizer(wxVERTICAL);
+    label(capture, source_layout, "Source (Capture)")->SetFont(GetFont().Bold());
+    w.source = new wxComboBox(capture, wxID_ANY);
+    w.source->SetMinSize(FromDIP(wxSize(120, -1)));
+    source_layout->Add(w.source, 0, wxEXPAND | wxALL, FromDIP(8));
+    w.source_detail = label(capture, source_layout, "Select a source");
+    capture->SetSizer(source_layout);
+    label(playback, destination_layout, "Destination (Playback)")->SetFont(GetFont().Bold());
+    w.destination = new wxComboBox(playback, wxID_ANY);
+    w.destination->SetMinSize(FromDIP(wxSize(120, -1)));
+    destination_layout->Add(w.destination, 0, wxEXPAND | wxALL, FromDIP(8));
+    w.destination_detail = label(playback, destination_layout, "Select a destination");
+    playback->SetSizer(destination_layout);
+    endpoints->Add(capture, 1, wxEXPAND | wxALL, FromDIP(5));
+    label(box, endpoints, "→");
+    endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));
+    w.group->Add(endpoints, 0, wxEXPAND);
+    w.summary = label(box, w.group, "Configuration");
     label(box, w.group, "Audio format");
     w.format = new wxChoice(box, wxID_ANY);
     w.group->Add(w.format, 0, wxEXPAND | wxALL, 3);
@@ -96,25 +112,29 @@ void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
 void Frame::build_profiles() {
     auto* page = new wxPanel(notebook_);
     auto* horizontal = new wxBoxSizer(wxHORIZONTAL);
+    auto* sidebar = new wxScrolledWindow(page);
+    sidebar->SetScrollRate(FromDIP(12), FromDIP(12));
+    sidebar->SetMinSize(FromDIP(wxSize(290, -1)));
     auto* left = new wxBoxSizer(wxVERTICAL);
-    horizontal->Add(left, 0, wxEXPAND | wxALL, 4);
-    label(page, left, "Profile");
-    profiles_ = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(260, 135));
+    sidebar->SetSizer(left);
+    horizontal->Add(sidebar, 0, wxEXPAND | wxALL, 4);
+    label(sidebar, left, "Profile");
+    profiles_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxSize(260, 135));
     profiles_->SetToolTip("Open a profile for editing. Selection alone does not change active "
                           "routing; use Start Routing or Apply.");
     left->Add(profiles_, 0, wxEXPAND | wxALL, 3);
     auto* row = new wxBoxSizer(wxHORIZONTAL);
-    button(page, row, "New", [this] {
+    button(sidebar, row, "New", [this] {
         if (!discard())
             return;
         select_profile(controller_->create_profile("New profile"));
     });
-    button(page, row, "Duplicate", [this] {
+    button(sidebar, row, "Duplicate", [this] {
         if (!discard())
             return;
         select_profile(controller_->create_profile(draft_.display_name + " copy", viewed_));
     });
-    button(page, row, "Delete", [this] {
+    button(sidebar, row, "Delete", [this] {
         if (wxMessageBox("Delete this saved session profile?", "Confirm profile deletion",
                          wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
             return;
@@ -128,13 +148,13 @@ void Frame::build_profiles() {
         }
     });
     left->Add(row);
-    profile_name_ = field(page, left, "Profile display name");
-    profile_notes_ = field(page, left, "Profile notes", wxTE_MULTILINE);
+    profile_name_ = field(sidebar, left, "Profile display name");
+    profile_notes_ = field(sidebar, left, "Profile notes", wxTE_MULTILINE);
     profile_notes_->SetMinSize(wxSize(250, 65));
-    label(page, left, "Holes");
-    holes_ = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(260, 145));
+    label(sidebar, left, "Holes");
+    holes_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxSize(260, 145));
     left->Add(holes_, 1, wxEXPAND | wxALL, 3);
-    button(page, left, "+ Add Hole", [this] {
+    button(sidebar, left, "+ Add Hole", [this] {
         capture_draft();
         draft_.holes.push_back(controller_->make_hole());
         dirty_ = true;
@@ -142,7 +162,7 @@ void Frame::build_profiles() {
         load_hole(static_cast<int>(draft_.holes.size()) - 1);
         present(presentation::Message::Created);
     });
-    button(page, left, "Remove selected hole", [this] {
+    button(sidebar, left, "Remove selected hole", [this] {
         if (hole_index_ < 0)
             return;
         if (wxMessageBox(
@@ -156,15 +176,15 @@ void Frame::build_profiles() {
         load_hole(draft_.holes.empty() ? -1 : 0);
     });
     auto* saves = new wxBoxSizer(wxHORIZONTAL);
-    button(page, saves, "Save", [this] { save(false); });
-    button(page, saves, "Apply", [this] { save(true); });
-    button(page, saves, "Revert", [this] {
+    button(sidebar, saves, "Save", [this] { save(false); });
+    button(sidebar, saves, "Apply", [this] { save(true); });
+    button(sidebar, saves, "Revert", [this] {
         if (discard())
             select_profile(viewed_);
     });
     left->Add(saves);
     auto* editor = new wxScrolledWindow(page);
-    editor->SetScrollRate(0, 16);
+    editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
     editor->SetSizer(right);
     horizontal->Add(editor, 1, wxEXPAND | wxALL, 3);
@@ -276,12 +296,41 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
         selection = static_cast<int>(w.format->GetCount()) - 1;
     }
     w.format->SetSelection(selection);
+    update_direction_details(w, d);
     w.evidence->SetLabel(text(r.explanation));
     w.evidence->Wrap(570);
     w.buffer->SetValue(d.settings.buffer_ms);
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
     w.mode->SetStringSelection(text(d.settings.mode));
     loading_ = old_loading;
+}
+// Read-only display of requested settings and available endpoint records; never
+// label these as negotiated runtime measurements or verified hardware evidence.
+void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direction& d) {
+    const auto r = audiohole::recommend(controller_->snapshot(), d);
+    const auto selected = !d.settings.automatic   ? d.settings.format
+                          : !r.compatible.empty() ? r.compatible.front()
+                                                  : d.settings.format;
+    const bool known = !d.settings.automatic || !r.compatible.empty();
+    auto detail = [&](const std::string& id) {
+        const auto* device = endpoint(controller_->snapshot(), id);
+        return device ? std::string(name(device->availability)) + " | " +
+                            (known ? "Selected: " + selected.label()
+                                   : std::string("Format unavailable"))
+                      : std::string("No endpoint selected");
+    };
+    w.source_detail->SetLabel(text(detail(d.source)));
+    w.source_detail->Wrap(260);
+    w.destination_detail->SetLabel(text(detail(d.destination)));
+    w.destination_detail->Wrap(260);
+    w.summary->SetLabel(text(
+        std::string(d.settings.automatic ? "Automatic configuration: " : "Manual configuration: ") +
+        selected.label() + " | Mode: " + d.settings.mode + " | Buffer: " +
+        std::to_string(d.settings.buffer_ms) + " ms | Sync: unavailable; processing unavailable"));
+    if (!known)
+        w.summary->SetLabel("Automatic configuration: no compatible format established. Review "
+                            "endpoint selection.");
+    w.summary->Wrap(600);
 }
 // Only an explicit list selection becomes a logical binding. Free text used for
 // searching is never guessed as a device identity; validation reports missing IDs.

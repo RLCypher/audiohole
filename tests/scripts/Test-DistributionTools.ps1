@@ -17,6 +17,8 @@ try {
     foreach ($name in @('audiohole-logo.png', 'audiohole.ico')) {
         'Inert packaging fixture' | Set-Content "$fixture/source/assets/branding/$name"
     }
+    New-Item -ItemType Directory -Path "$fixture/source/assets/presentation" -Force | Out-Null
+    'Inert packaging fixture' | Set-Content "$fixture/source/assets/presentation/placeholder-avatar.png"
     @(
         'cmake_minimum_required(VERSION 3.25)'
         'project(PackageFixture NONE)'
@@ -31,7 +33,7 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'build-info.json', 'README.txt')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png', 'build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD

@@ -1,10 +1,11 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
 #include <wx/stdpaths.h>
+#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
-    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1240, 900)),
+    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1536, 1024)),
       controller_(std::move(controller)), timer_(this), smoke_(smoke) {
     SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
     // A stable window property supports second-launch focus across build titles.
@@ -19,9 +20,15 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* header = new wxBoxSizer(wxHORIZONTAL);
     auto* information = new wxBoxSizer(wxVERTICAL);
-    header->Add(information, 1, wxEXPAND);
-    auto* heading = label(this, information, "AudioHole");
+    header->Add(information, 0, wxEXPAND | wxALL, FromDIP(10));
+    auto* brand_row = new wxBoxSizer(wxHORIZONTAL);
+    auto* brand_logo = new AgentDisplay(this, wxSize(64, 64));
+    brand_row->Add(brand_logo, 0, wxALIGN_CENTER_VERTICAL);
+    information->Add(brand_row, 0, wxEXPAND);
+    auto* heading = label(this, brand_row, "AudioHole");
+    heading->SetName("brand-wordmark");
     heading->SetFont(wxFont(wxFontInfo(20).Bold()));
+    label(this, information, "Put your audio wherever you want.");
     auto* status_row = new wxBoxSizer(wxHORIZONTAL);
     status_dot_ = new wxPanel(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(22, 22)));
     status_dot_->SetMinSize(FromDIP(wxSize(22, 22)));
@@ -38,7 +45,9 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     status_row->Add(status_dot_, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(6));
     status_ = label(this, status_row, "Stopped");
     information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
-    auto* actions = new wxBoxSizer(wxHORIZONTAL);
+    auto* middle = new wxBoxSizer(wxVERTICAL);
+    header->Add(middle, 1, wxEXPAND | wxALL, FromDIP(8));
+    auto* actions = new wxWrapSizer(wxHORIZONTAL);
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
     button(this, actions, "Arm Ready", [this] { activate(true); });
     stop_ = button(this, actions, "Stop Routing", [this] {
@@ -46,14 +55,27 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
         refresh();
     });
     button(this, actions, "Exit AudioHole", [this] { exit(); });
-    information->Add(actions, 0, wxEXPAND);
-    technical_ = label(this, information, "");
+    middle->Add(actions, 0, wxEXPAND);
+    auto* comment_surface = new SurfacePanel(this, "commentary-card");
+    middle->Add(comment_surface, 1, wxEXPAND | wxTOP, FromDIP(8));
+    auto* comment_layout = new wxBoxSizer(wxVERTICAL);
+    personality_heading_ = label(comment_surface, comment_layout, "Norm");
+    personality_heading_->SetFont(GetFont().Bold());
+    commentary_panel_ = new wxScrolledWindow(comment_surface);
+    commentary_panel_->SetScrollRate(0, FromDIP(12));
+    commentary_panel_->SetMinSize(FromDIP(wxSize(220, 100)));
+    comment_layout->Add(commentary_panel_, 1, wxEXPAND | wxALL, FromDIP(10));
+    auto* messages = new wxBoxSizer(wxVERTICAL);
+    commentary_panel_->SetSizer(messages);
+    comment_surface->SetSizer(comment_layout);
+    technical_ = label(commentary_panel_, messages, "");
     technical_->SetFont(GetFont().Bold());
-    commentary_ = label(this, information, "");
-    fallback_notice_ = label(this, information, "");
+    commentary_ = label(commentary_panel_, messages, "");
+    fallback_notice_ = label(commentary_panel_, messages, "");
     // Existing commentary remains to the left of the replaceable agent image;
     // no speech-bubble or animation system is introduced.
-    agent_display_ = new AgentDisplay(this);
+    agent_display_ = new AgentDisplay(this, wxSize(200, 220));
+    agent_display_->set_image(placeholder_avatar());
     header->Add(agent_display_, 0, wxALIGN_TOP | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
@@ -83,6 +105,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     build_devices();
     build_scan();
     build_settings();
+    CreateStatusBar();
     SetSizer(root);
     Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
         layout_header();
@@ -161,15 +184,21 @@ void Frame::present(presentation::Message event) {
     layout_header();
 }
 void Frame::layout_header() {
-    const int width = std::max(240, GetClientSize().x - FromDIP(180));
+    const bool compact = GetClientSize().x < FromDIP(1250);
+    agent_display_->set_presentation_size(compact ? wxSize(120, 132) : wxSize(200, 220));
+    const int width = std::max(180, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
         control->SetLabel(text(copy));
         control->Wrap(width);
     };
-    wrap(status_, status_copy_);
+    status_->SetLabel(text(status_copy_));
+    status_->Wrap(FromDIP(265));
     wrap(technical_, technical_copy_);
     wrap(commentary_, commentary_copy_);
     wrap(fallback_notice_, fallback_copy_);
+    personality_heading_->SetLabel(personality_choice_ ? personality_choice_->GetStringSelection()
+                                                       : wxString("Norm"));
+    commentary_panel_->FitInside();
     Layout();
 }
 void Frame::show_result(const audiohole::Result& result) {
@@ -197,6 +226,13 @@ void Frame::end_observation() {
 // number gates commentary, so repainting/telemetry cannot consume more variants.
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
+    if (hole_index_ >= 0) {
+        Direction forward, reverse;
+        read_direction(forward_, forward);
+        read_direction(reverse_, reverse);
+        update_direction_details(forward_, forward);
+        update_direction_details(reverse_, reverse);
+    }
     const auto* active = audiohole::profile(s, s.active_profile);
     std::string status = std::string{} + audiohole::name(s.state) +
                          " | Active: " + (active ? active->display_name : "none") +
@@ -216,6 +252,15 @@ void Frame::refresh() {
         status_copy_ = status;
         layout_header();
     }
+    const auto errors = std::count_if(s.events.begin(), s.events.end(), [](const auto& event) {
+        return event.type == "error" || event.type == "scan-failed";
+    });
+    const auto holes = draft_.holes.size();
+    SetStatusText(text(std::string("AudioHole | Engine: ") + name(s.state) +
+                       " | Devices: " + std::to_string(s.endpoints.size()) +
+                       " | Profiles: " + std::to_string(s.profiles.size()) +
+                       " | Viewed holes: " + std::to_string(holes) +
+                       " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
     update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)

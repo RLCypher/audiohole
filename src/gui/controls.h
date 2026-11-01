@@ -1,4 +1,5 @@
 #pragma once
+#include "gui/palette.h"
 #include "model/controller.h"
 #include <functional>
 #include <string>
@@ -24,6 +25,13 @@ class NavigationButton final : public wxToggleButton {
 // GUI-thread only. Helpers own no windows or GDI resources beyond a paint call.
 wxString button_help(const wxString& title);
 wxColour routing_colour(audiohole::State state);
+// Native sizer-owned panel with a restrained rounded outline. Children remain
+// ordinary accessible controls; paint has no controller or personality behavior.
+class SurfacePanel final : public wxPanel {
+  public:
+    SurfacePanel(wxWindow* parent, const wxString& role);
+    bool use_system_colours = false;
+};
 // Small construction helpers keep layout code consistent. Returned widgets are
 // non-owning pointers; wx parent windows own them, including event bindings.
 inline wxString text(const std::string& value) {

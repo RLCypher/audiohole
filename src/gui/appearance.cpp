@@ -21,13 +21,15 @@ bool system_dark() {
     return result == ERROR_SUCCESS && light == 0;
 }
 void apply_palette(wxWindow* window, bool dark, bool contrast) {
-    const wxColour surface = dark ? wxColour(24, 27, 33) : wxColour(245, 247, 250);
-    const wxColour input = dark ? wxColour(38, 43, 52) : wxColour(255, 255, 255);
+    const wxColour surface = dark ? palette::charcoal() : wxColour(245, 247, 250);
+    const wxColour input = dark ? palette::input() : wxColour(255, 255, 255);
     const wxColour foreground = dark ? wxColour(237, 240, 246) : wxColour(23, 30, 40);
     // Native visual styles can ignore explicit backgrounds. Disable them on
     // application controls so their text/background remain a matched pair.
     // High contrast instead uses Windows' own colors and native styles.
     window->SetThemeEnabled(contrast);
+    if (auto* panel = dynamic_cast<SurfacePanel*>(window))
+        panel->use_system_colours = contrast;
     if (auto* button = dynamic_cast<ActionButton*>(window))
         button->use_native_colours = contrast;
     if (auto* button = dynamic_cast<NavigationButton*>(window))
@@ -44,6 +46,8 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
         contrast
             ? wxSystemSettings::GetColour(editor ? wxSYS_COLOUR_WINDOWTEXT : wxSYS_COLOUR_BTNTEXT)
             : foreground);
+    if (!contrast && window->GetName() == "brand-wordmark")
+        window->SetForegroundColour(palette::mint());
     for (auto* child : window->GetChildren())
         apply_palette(child, dark, contrast);
 }
@@ -74,14 +78,15 @@ void Frame::update_navigation() {
         tab->SetBackgroundColour(contrast
                                      ? wxSystemSettings::GetColour(active ? wxSYS_COLOUR_HIGHLIGHT
                                                                           : wxSYS_COLOUR_BTNFACE)
-                                 : active           ? wxColour(20, 92, 160)
+                                 : active           ? palette::mint()
                                  : dark_appearance_ ? wxColour(59, 66, 79)
                                                     : wxColour(220, 226, 235));
         tab->SetForegroundColour(
-            contrast ? wxSystemSettings::GetColour(active ? wxSYS_COLOUR_HIGHLIGHTTEXT
-                                                          : wxSYS_COLOUR_BTNTEXT)
-            : active || dark_appearance_ ? *wxWHITE
-                                         : wxColour(20, 28, 40));
+            contrast           ? wxSystemSettings::GetColour(active ? wxSYS_COLOUR_HIGHLIGHTTEXT
+                                                                    : wxSYS_COLOUR_BTNTEXT)
+            : active           ? wxColour(7, 24, 19)
+            : dark_appearance_ ? *wxWHITE
+                               : wxColour(20, 28, 40));
         tab->Refresh();
     }
 }
@@ -94,6 +99,11 @@ void Frame::apply_appearance() {
         !contrast && (theme_choice_->GetSelection() == dark_choice ||
                       (theme_choice_->GetSelection() == system_choice && system_dark()));
     apply_palette(this, dark_appearance_, contrast);
+    if (!contrast) {
+        start_->SetBackgroundColour(palette::mint());
+        start_->SetForegroundColour(wxColour(7, 24, 19));
+        personality_heading_->SetForegroundColour(palette::magenta());
+    }
     // Attribute 20 is DWMWA_USE_IMMERSIVE_DARK_MODE. Older Windows builds can
     // reject it; this optional title-bar enhancement never blocks the GUI.
     constexpr DWORD immersive_dark_mode = 20;

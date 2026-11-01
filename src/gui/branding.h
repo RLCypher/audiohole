@@ -11,6 +11,7 @@ namespace audiohole::gui {
 // Decodes the embedded original once, using Windows' system PNG codec. Borrowed
 // immutable image remains valid for the process. GUI-thread/initialized COM only.
 const wxImage& canonical_logo();
+const wxImage& placeholder_avatar();
 wxIconBundle application_icons();
 // Pure view rendering: scales once per size/state, then strokes the exterior.
 // Cache owns native icons until the tray is destroyed; no audio-thread access.
@@ -29,16 +30,18 @@ class TrayIconCache {
 // animation, text generation, or I/O occurs during paint. All calls are GUI-thread.
 class AgentDisplay final : public wxPanel {
   public:
-    explicit AgentDisplay(wxWindow* parent);
+    explicit AgentDisplay(wxWindow* parent, wxSize logical_size = wxSize(128, 128));
+    void set_presentation_size(wxSize logical_size);
     void set_image(const wxImage& image);
     bool has_image() const {
         return bitmap_.IsOk();
     }
 
   private:
+    wxSize logical_size_;
     wxImage source_;
     wxBitmap bitmap_;
-    int cached_size_ = 0;
+    wxSize cached_bounds_;
     void update_bitmap();
 };
 } // namespace audiohole::gui

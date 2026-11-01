@@ -175,3 +175,20 @@ image tests, resource compilation and enlarged renderer previews are not substit
 
 Native typing, focus/stepper events, Unicode glyph rendering and warning layout
 require Windows execution; portable tests validate arithmetic/catalog semantics.
+
+## Visual refinement acceptance
+
+- [ ] Compare Dark with the supplied style image at 1536×1024: branding/tagline and
+  routing information left, actions/bounded commentary middle, static avatar right,
+  mint navigation, two-column Profiles, accented endpoint cards and compact footer.
+- [ ] Test 100/125/150/200% scaling, minimum window size, resize and long names/copy.
+  Avatar stays within the client area without cropping; commentary scrolls instead
+  of moving navigation. Vanilla shows the logo; other modes use the static placeholder.
+- [ ] Repeat profile/hole Save/Apply/Revert, duplex, device selection/availability,
+  manual formats/mode/buffer overrides, diagnostics and all routing control workflows.
+  Both directional cards remain independent. Confirm summary changes with controls.
+- [ ] Footer device/profile/viewed-hole and retained-log-error counts track real
+  session data. Warnings remain unavailable until supported severity data exists.
+  Clear diagnostics updates errors; no static mockup counts or active format claims.
+- [ ] Check Light, Follow System and high contrast, keyboard focus and all tooltips.
+  Session-only preferences/persistence limitations remain as before.

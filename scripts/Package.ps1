@@ -29,7 +29,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Runtime installation failed; build and test this configuration first.' }
     $files = @(Get-ChildItem -LiteralPath $stage -File -Recurse)
     # Explicit runtime allowlist: never copy a build tree, tests, or sources.
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($stage.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Unexpected Runtime component contents; audit the package allowlist before distributing.'

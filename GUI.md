@@ -1724,3 +1724,13 @@ normalization. See PERSONALITY.md for exact-decimal and out-of-range semantics.
 When an operational warning occupies the header, retain it and show DFA feedback
 locally in Settings; do not hide or replace the warning with an acknowledgment.
 Vanilla hides the field, stepper, slider and local feedback and processes no DFA input.
+
+### Owner-authorized visual refinement iteration
+
+The supplied dark reference guides the native header, mint navigation, rounded
+surfaces, capture/playback accents and status footer. The existing bindings and
+simulated controller remain the functional authority. A static supplied avatar
+occupies the replaceable client-area display (Vanilla retains its logo), with bounded
+scrolling commentary beside it. No personality-module functionality is added.
+See assets/presentation/README.md for actual source dimensions, compact layout,
+truthful selected-configuration/count semantics and native validation limitations.

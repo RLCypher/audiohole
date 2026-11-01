@@ -191,6 +191,8 @@ void Frame::select_personality(const std::string& requested) {
     if (dfa_feedback_)
         dfa_feedback_->SetLabel("");
     personality_ = messages_.available(requested) ? requested : "vanilla";
+    // Presentation-only placeholder policy; future assets still use set_image().
+    agent_display_->set_image(personality_ == "vanilla" ? canonical_logo() : placeholder_avatar());
     personality_fallback_note_ = requested == personality_
                                      ? ""
                                      : "Selected personality file unavailable or invalid. Vanilla "
