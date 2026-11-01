@@ -116,7 +116,7 @@ void require_valid_catalog(bool condition) {
 } // namespace
 std::string mode_id(Mode mode) {
     switch (mode) {
-    case Mode::Normal:
+    case Mode::Norm:
         return "default";
     case Mode::UwU:
         return "uwu";

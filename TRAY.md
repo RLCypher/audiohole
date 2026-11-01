@@ -1344,7 +1344,7 @@ Determine how to handle large profile collections without creating excessively t
 **AudioHole should remain quietly available in the background, communicate meaningful problems when they occur, recover automatically when possible, and give the user immediate control without requiring the main GUI.**
 ## Personality-aware tray copy
 
-Routine noncritical tray notifications use the authored Normal/Vanilla/UwU variants in `PERSONALITY.md` §16. Keep endpoint names and actionable error content literal. Switching personality changes future notification copy immediately without changing tray actions or routing state.
+Routine noncritical tray notifications use the authored Norm/Vanilla/UwU variants in `PERSONALITY.md` §16. Keep endpoint names and actionable error content literal. Switching personality changes future notification copy immediately without changing tray actions or routing state.
 
 ---
 

@@ -324,6 +324,9 @@ bool Frame::smoke(const wxString& directory) {
         check_button_help(check_button_help, this);
         require(GetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow") != nullptr,
                 "Stable second-launch window identity missing");
+        require(personality_choice_->GetString(0) == wxS("Norm") &&
+                    personality_choice_->GetString(2) == wxS("UwU"),
+                "Canonical personality labels changed");
         require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
         require(status_dot_->IsShown(), "Routing status indicator missing");
         require(agent_display_->has_image() && canonical_logo().HasAlpha(),

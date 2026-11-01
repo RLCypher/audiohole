@@ -219,7 +219,7 @@ Implementation changes must also pass the human readability and contract review 
 
 ## Approved presentation testing iteration
 
-Normal/UwU are staged beside the built executable in `personalities/` on every
+Norm/UwU are staged beside the built executable in `personalities/` on every
 build and included in runtime packages. Vanilla is compiled in and remains usable
 if that directory is removed. See [personalities/README.md](personalities/README.md)
 for editing/custom catalogs, validation limits, and explicit reload behavior.

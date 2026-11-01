@@ -180,7 +180,7 @@ TEST(Presentation, SeededSequenceReplaysWithoutImmediateRepetition) {
     first.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
     second.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
     for (int event = 0; event < static_cast<int>(presentation::Message::Count); ++event) {
-        for (auto mode : {presentation::Mode::Normal, presentation::Mode::UwU}) {
+        for (auto mode : {presentation::Mode::Norm, presentation::Mode::UwU}) {
             std::string previous;
             for (std::uint64_t occurrence = 1; occurrence < 30; ++occurrence) {
                 const auto id = static_cast<presentation::Message>(event);
@@ -201,10 +201,10 @@ TEST(Presentation, UnchangedRefreshAndVanillaNeverConsumeSelection) {
         return 0u;
     });
     messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
-    const auto initial = messages.show(presentation::Message::Ready, presentation::Mode::Normal, 1);
+    const auto initial = messages.show(presentation::Message::Ready, presentation::Mode::Norm, 1);
     for (int i = 0; i < 100; ++i)
         EXPECT_EQ(
-            messages.show(presentation::Message::Ready, presentation::Mode::Normal, 1).commentary,
+            messages.show(presentation::Message::Ready, presentation::Mode::Norm, 1).commentary,
             initial.commentary);
     EXPECT_EQ(calls, 1u);
     for (std::uint64_t i = 0; i < 24; ++i) {
@@ -218,10 +218,10 @@ TEST(Presentation, UnchangedRefreshAndVanillaNeverConsumeSelection) {
 TEST(Presentation, InjectedWeightedSelectionRespectsBoundsAndExcludesPrevious) {
     presentation::Messages messages([](unsigned total) { return total - 1; });
     messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR);
-    const auto last = messages.show(presentation::Message::Dfa, presentation::Mode::Normal, 1);
+    const auto last = messages.show(presentation::Message::Dfa, presentation::Mode::Norm, 1);
     EXPECT_EQ(last.commentary,
               messages.variants(presentation::Message::Dfa, "default").back().text);
-    EXPECT_NE(messages.show(presentation::Message::Dfa, presentation::Mode::Normal, 2).commentary,
+    EXPECT_NE(messages.show(presentation::Message::Dfa, presentation::Mode::Norm, 2).commentary,
               last.commentary);
 }
 TEST(Presentation, CommentaryCannotIssueCommandsOrAlterDiagnostics) {

@@ -53,7 +53,7 @@ TEST(DfaDecimal, RejectsMalformedAndNonfiniteInput) {
 }
 struct ApprovedEgg {
     int hundredths;
-    const char* normal;
+    const char* norm;
     const char* uwu;
 };
 const std::array<ApprovedEgg, 26> approved{{
@@ -89,7 +89,7 @@ void PrintTo(const ApprovedEgg& egg, std::ostream* output) {
     *output << dfa_text(egg.hundredths);
 }
 class DfaEgg : public testing::TestWithParam<ApprovedEgg> {};
-TEST_P(DfaEgg, MatchesExactOwnerAuthoredNormalAndUwUText) {
+TEST_P(DfaEgg, MatchesExactOwnerAuthoredNormAndUwUText) {
     Messages messages;
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
     const auto egg = GetParam();
@@ -97,7 +97,7 @@ TEST_P(DfaEgg, MatchesExactOwnerAuthoredNormalAndUwUText) {
     ASSERT_EQ(parsed.status, DfaInputStatus::Valid);
     const auto event = dfa_event(parsed.hundredths);
     EXPECT_NE(event, Message::Dfa);
-    EXPECT_EQ(messages.show(event, "default", 1).commentary, egg.normal);
+    EXPECT_EQ(messages.show(event, "default", 1).commentary, egg.norm);
     EXPECT_EQ(messages.show(event, "uwu", 1).commentary, egg.uwu);
     EXPECT_EQ(technical(event), "DFA Acknowledged");
 }

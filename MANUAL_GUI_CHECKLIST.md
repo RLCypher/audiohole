@@ -12,7 +12,7 @@ Use the **Release** artifact for the exact commit under review. Extract the ZIP,
 - [ ] Select the destination direction explicitly and run **simulated** Test Beep. Confirm target, active indicator, one-second completion, cancellation, removal/Stop/profile-switch cancellation, and exclusive conflict explanation. **No sound is expected.** No output substitution occurs.
 - [ ] Run Easy and Advanced simulated scans, inspect consent, progress, cancellation, technical console filters, search, copy, and explicit diagnostic export. No hardware testing or experimental-use permission is implied.
 - [ ] Preview immediate/delayed startup; countdown does not reset on refresh. Start bypasses delay for its pending target; Stop cancels pending work. No OS startup entry is created.
-- [ ] Switch Normal, Vanilla, and UwU during an active simulation. Operational facts, labels, warnings, names, and diagnostics stay literal. Normal/UwU commentary varies only on distinct events and avoids immediate repetition; Vanilla stays neutral/constant. Repaint/polling does not regenerate commentary.
+- [ ] Switch Norm, Vanilla, and UwU during an active simulation. Operational facts, labels, warnings, names, and diagnostics stay literal. Norm/UwU commentary varies only on distinct events and avoids immediate repetition; Vanilla stays neutral/constant. Repaint/polling does not regenerate commentary.
 - [ ] In Settings → Advanced click DFA repeatedly: only its local acknowledgment changes. Vanilla hides DFA. Routing and diagnostic history remain unchanged. Replay Tutorial shows the warning placeholder without losing session data.
 - [ ] Close hides to tray; reopen without restarting the simulation. Tray shows state/profile, Start/Stop, profile activation, read-only directional states, Open, Exit. Minimize behaves normally. Verify Windows Explorer restart recovery, notifications/preferences, and second-launch focus on an interactive desktop.
 - [ ] Exit stops and terminates, removing the tray icon. Relaunch shows fresh authored fixtures, with no previous edits saved.
@@ -36,7 +36,7 @@ CI attempts BMP screenshots of each page for human review; an available image is
   commentary. Omit `scan_started`: only that event uses Vanilla. Other events keep
   the custom voice. Restore the event and Reload from the companion directory.
 - [ ] Corrupt/remove a selected file and Reload: entire selection becomes Vanilla,
-  shows guidance, and hides DFA. Restore valid files and select Normal/UwU again.
+  shows guidance, and hides DFA. Restore valid files and select Norm/UwU again.
   No catalog can change facts, warnings, endpoint/user names, or controller commands.
 - [ ] Check the button reads DFA and tooltip is Working as intended. Test 0.00,
   0.69, 4.20, 6.66, 6.70, 6.90 and 11.00 through exact numeric entry and the slider.
@@ -72,7 +72,7 @@ Production buffer/queue policy remains unresolved.
 - [ ] On every fresh interactive launch, acknowledge the notice covering all
   simulated functions, silent Test Beep, no real audio/device access, and
   session-only settings. Replay Tutorial instead shows its separate placeholder. Check that operation panels,
-  top status, tray, and Normal/UwU commentary use production-style language.
+  top status, tray, and Norm/UwU commentary use production-style language.
 - [ ] Hover every action button; verify an explanation, readable text, and a
   dark blue-gray hot state in Dark. Press F1 on a focused button to read its help.
   Test pressed/disabled/default/focus states and Windows high contrast. Native
@@ -101,7 +101,7 @@ alone do not establish these visual/desktop behaviors.
 - [ ] Change DFA to ordinary values such as 5.55 and 5.56: each settled adjustment
   selects a response from the button pool, avoiding immediate repetition. Repeated
   notifications at the same settled value do not reroll commentary. At 0.00 verify
-  “Done fucking around.” in Normal and its authored UwU counterpart. Other special
+  “Done fucking around.” in Norm and its authored UwU counterpart. Other special
   thresholds still select their own responses; controller/diagnostic state is unchanged.
 
 - [ ] Selected tabs read `[Profiles]`, `[Devices]`, etc.; inactive tabs have no
@@ -110,7 +110,7 @@ alone do not establish these visual/desktop behaviors.
   rather than the startup simulation notice. Dismiss it and confirm edits and active
   routing state are retained.
 
-- [ ] Uncheck Duplex: acknowledge simplex selection in both Normal and UwU; the
+- [ ] Uncheck Duplex: acknowledge simplex selection in both Norm and UwU; the
   active duplex plan remains intact until Apply. Vanilla displays stable facts.
 - [ ] Save Device: acknowledge success, preserving Windows name and logical ID.
   Empty display names show a validation error, not a success acknowledgment.
@@ -135,7 +135,7 @@ semantics and authored catalog coverage, not operating-system clipboard behavior
 - [ ] Header logo is upper-right, approximately 128 logical pixels, with original
   mint/pink colors, transparent surroundings, and preserved proportions. Resize at
   100/150/200% DPI: no controls overlap, clipping or unexpected window enlargement.
-  Vanilla/Normal/UwU keep the same logo and their existing commentary behavior.
+  Vanilla/Norm/UwU keep the same logo and their existing commentary behavior.
 - [ ] Explorer executable, window title bar, taskbar and Alt+Tab use the original
   unoutlined logo. No stock/generic application icon remains at common sizes.
 - [ ] Tray uses the same logo: gray Stopped/Ready, green Running, amber Degraded,

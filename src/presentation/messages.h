@@ -9,9 +9,9 @@
 #include <vector>
 
 namespace audiohole::presentation {
-// Built-in selection aliases are retained for existing callers/tests; commentary
-// itself is external data. Custom catalogs use their stable string IDs directly.
-enum class Mode { Normal, Vanilla, UwU };
+// Standard selections map to stable catalog IDs; commentary itself is external
+// data. Custom catalogs use their stable string IDs directly.
+enum class Mode { Norm, Vanilla, UwU };
 std::string mode_id(Mode mode);
 enum class Message {
     Ready,

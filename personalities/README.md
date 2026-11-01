@@ -1,6 +1,6 @@
 # AudioHole authored personalities — format version 1
 
-Vanilla's stable informational messages are compiled into AudioHole. Normal
+Vanilla's stable informational messages are compiled into AudioHole. Norm
 (`default.json`, the default selection) and UwU (`uwu.json`) contain optional
 commentary only. Custom files are data, not programs: AudioHole never executes
 scripts, generates prose, filters arbitrary text, or fetches content at runtime.
@@ -67,7 +67,7 @@ custom files previously loaded from outside this directory.
 
 Expanded DFA events use `dfa_<integer hundredths>`: for example, `dfa_134` matches
 1.34, including raw input 1.337 after decimal half-up normalization. The 26 new keys
-and exact owner-authored Normal/UwU strings are in the supplied JSON catalogs.
+and exact owner-authored Norm/UwU strings are in the supplied JSON catalogs.
 `dfa_negative` and `dfa_above_maximum` acknowledge rejected raw numeric input;
 these are not valid values and never replace the last valid session value. Existing
 keys/pools are unchanged. Missing custom-catalog entries still use neutral fallback.

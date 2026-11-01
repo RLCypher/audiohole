@@ -163,9 +163,9 @@ namespace audiohole::gui {
 void Frame::sync_personality_choices() {
     personality_choice_->Clear();
     personality_ids_ = {"default", "vanilla", "uwu"};
-    personality_choice_->Append(wxS("Normal — Default Audio Engineer"));
+    personality_choice_->Append(wxS("Norm"));
     personality_choice_->Append(wxS("Vanilla — Strictly informational"));
-    personality_choice_->Append(wxS("UwU — I know what you are"));
+    personality_choice_->Append(wxS("UwU"));
     for (const auto& item : messages_.personalities()) {
         if (item.id == "default" || item.id == "uwu")
             continue;

@@ -1602,3 +1602,11 @@ default, or simulation-label history.
 This does not authorize audio routing, production storage schemas, new capabilities,
 or a synchronization decision. D-030, D-031, D-034 and O-001 through O-006 remain Open.
 Native Windows build/test/package and hands-on visual acceptance remain required.
+
+### Owner-approved canonical personality names
+
+The canonical display names are now **Norm** (`default`) and **UwU** (`uwu`),
+without subtitles. This supersedes the older displayed names recorded in D-056
+above; that wording is retained as history. Vanilla's name, stable catalog IDs,
+filenames, default selection, authored response pools, behavior and configuration
+conventions are unchanged. This naming refinement resolves no Open owner decision.

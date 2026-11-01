@@ -1337,7 +1337,7 @@ The roadmap should remain adaptable as testing reveals real constraints, without
 - Verify capture-only, missing, and exclusive-busy endpoints receive no beep and produce actionable feedback; no silent fallback to a different device.
 - Verify routing, volume, gain, saved profiles, and device bindings are unchanged before and after testing.
 - Verify cleanup on panel closure, Stop Routing, profile switch, device disappearance, and shutdown.
-- Verify beep availability and precise target/error text in Normal, Vanilla, and UwU modes.
+- Verify beep availability and precise target/error text in Norm, Vanilla, and UwU modes.
 - Verify successful playback submission is not presented as proof of audibility or successful end-to-end routing.
 
 ## Personality catalog acceptance
@@ -1434,7 +1434,7 @@ Test Beep. No capture/render, real probing, production persistence, or synchroni
 algorithm is implemented. All capability/activity/diagnostic evidence is labeled
 simulated; the beep emits no sound.
 
-Normal/UwU commentary uses the approved authored catalog; Vanilla and technical
+Norm/UwU commentary uses the approved authored catalog; Vanilla and technical
 facts remain deterministic. Event occurrence caching prevents polling variation.
 The readability amendment is recorded in ENGINEERING.md; existing COM and package
 contracts have been reviewed and clarified without changing their ownership model.

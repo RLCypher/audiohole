@@ -182,15 +182,15 @@ AudioHole has one mutually exclusive personality selection, with the three stand
 
 | Stored value | User-facing label | Voice | DFA |
 |---|---|---|---|
-| `default` | **Normal — Default Audio Engineer** | Situationally dry, technically competent, occasionally disapproving | Visible |
+| `default` | **Norm** | Situationally dry, technically competent, occasionally disapproving | Visible |
 | `vanilla` | **Vanilla — Strictly informational** | Neutral, concise, no sarcasm, jokes, or flavor text | Hidden |
-| `uwu` | **UwU — I know what you are** | Deliberately authored, playful UwU-flavored copy where appropriate | Visible |
+| `uwu` | **UwU** | Deliberately authored, playful UwU-flavored copy where appropriate | Visible |
 
-Default is `default`. The selected mode affects presentation only; it never changes routing, device selection, validation, recovery, probing, or persistence. Switching modes must not restart audio or require an application restart. The application should refresh visible mode-sensitive copy and use the new mode for future messages. Historical diagnostic records remain unchanged.
+The default personality is Norm (`default`). The selected mode affects presentation only; it never changes routing, device selection, validation, recovery, probing, or persistence. Switching modes must not restart audio or require an application restart. The application should refresh visible mode-sensitive copy and use the new mode for future messages. Historical diagnostic records remain unchanged.
 
 ### 11.1 Context, Not Constant Performance
 
-Normal has personality throughout the experience, but only when it fits. Routine labels, ordinary facts, and situations that do not need snark should remain straightforward. A dubious but supported configuration may earn a weary warning, not a veto. The user is free to experiment subject to actual safety, integrity, and technical constraints.
+Norm has personality throughout the experience, but only when it fits. Routine labels, ordinary facts, and situations that do not need snark should remain straightforward. A dubious but supported configuration may earn a weary warning, not a veto. The user is free to experiment subject to actual safety, integrity, and technical constraints.
 
 Vanilla removes application-authored jokes, innuendo, sarcastic guidance, and playful confirmations. It does **not** rename AudioHole, holes, or established technical concepts, and it does not change functionality. When selected, the UI explains factually that the DFA button will be hidden.
 
@@ -244,9 +244,9 @@ When uncertain, prefer clear conventional wording. Humor should be an accent, no
 
 Temporary signal activity indicators are strictly informational in every personality mode. They show whether non-silent source samples are reaching AudioHole; they do not prove the destination is audible.
 
-Default and UwU may use personality in surrounding help text, but the actual signal status must remain unambiguous. Vanilla uses neutral presentation. Never replace **No signal detected** with a joke that implies device failure, and never imply a successful end-to-end connection based solely on input activity.
+Norm and UwU may use personality in surrounding help text, but the actual signal status must remain unambiguous. Vanilla uses neutral presentation. Never replace **No signal detected** with a joke that implies device failure, and never imply a successful end-to-end connection based solely on input activity.
 
-DFA remains visible in Default and UwU and hidden in Vanilla; it does not affect monitoring.
+DFA remains visible in Norm and UwU and hidden in Vanilla; it does not affect monitoring.
 
 
 ---
@@ -255,15 +255,15 @@ DFA remains visible in Default and UwU and hidden in Vanilla; it does not affect
 
 **Test Beep** is a real, useful setup tool, not a placebo. It sends one brief audible signal to the specifically selected playback destination so the user can check whether the right thing beeps. It is entirely separate from DFA, which still does absolutely nothing.
 
-The target endpoint name, direction, active state, and warnings must always be literal and technically clear. Normal may remark, “If that came out of the wrong speaker, we've found a problem.” Vanilla uses strictly informational copy. UwU may be playful around the action (“A wittle beep, just for you~ :3”), but must never make the target or consequence ambiguous. Never use innuendo in place of a critical warning or a device identifier.
+The target endpoint name, direction, active state, and warnings must always be literal and technically clear. Norm may remark, “If that came out of the wrong speaker, we've found a problem.” Vanilla uses strictly informational copy. UwU may be playful around the action (“A wittle beep, just for you~ :3”), but must never make the target or consequence ambiguous. Never use innuendo in place of a critical warning or a device identifier.
 
 ---
 
 ## 16. UwU Mode: Deliberately Excessive Voice (Normative)
 
-**UwU is not Normal Mode with a few “:3” suffixes.** It is an intentionally over-the-top, flirtatious, shamelessly suggestive alternate presentation. It should be noticeably different across ordinary setup and routing workflows. The user explicitly wants frequent kaomoji, strong R/L→W baby-talk styling in *authored flavor copy*, teasing, double entendres about holes, plugs, insertion, output, and bidirectional connections, and a character that seems just a little too excited to be helping.
+**UwU is not Norm Mode with a few “:3” suffixes.** It is an intentionally over-the-top, flirtatious, shamelessly suggestive alternate presentation. It should be noticeably different across ordinary setup and routing workflows. The user explicitly wants frequent kaomoji, strong R/L→W baby-talk styling in *authored flavor copy*, teasing, double entendres about holes, plugs, insertion, output, and bidirectional connections, and a character that seems just a little too excited to be helping.
 
-**Target voice:** cute, forward, needy, mischievous, technically competent beneath the ridiculousness. More innuendo and playful horniness than the restrained Normal voice; **non-graphic, never coercive, never directed at a real person without context**, and never at the expense of clear technical communication.
+**Target voice:** cute, forward, needy, mischievous, technically competent beneath the ridiculousness. More innuendo and playful horniness than the restrained Norm voice; **non-graphic, never coercive, never directed at a real person without context**, and never at the expense of clear technical communication.
 
 ### 16.1 Authored language rules
 
@@ -272,13 +272,13 @@ The target endpoint name, direction, active state, and warnings must always be l
 - Flirt with **the act of routing**, not the user's identity. Double entendres about “opening a hole,” “plugging in,” “both ways,” “pulling out,” “finishing,” “tight connections,” and “making noise” are explicitly encouraged in noncritical copy.
 - Prefer a clear technical heading or status **followed by** UwU commentary. Keep button labels, endpoint names, profile names, status enums, warnings, and diagnostic detail literal.
 - A neutral fallback is acceptable for missing catalog entries, but a complete implementation must supply UwU variants for the common events in §16.2. Do not satisfy this requirement by applying a runtime text filter.
-- Normal and UwU may select among multiple deliberately authored variants for common, noncritical commentary under §16.6. Stable technical messages and Vanilla remain deterministic. This approved refinement replaces the earlier blanket prohibition on randomized flavor for the same event.
+- Norm and UwU may select among multiple deliberately authored variants for common, noncritical commentary under §16.6. Stable technical messages and Vanilla remain deterministic. This approved refinement replaces the earlier blanket prohibition on randomized flavor for the same event.
 
 ### 16.2 Required message catalog
 
 The **Event** column is a conceptual presentation identifier, not a required API enum or wire schema. Technical status and named devices are displayed separately and unchanged. These examples establish the *minimum* intensity and breadth of UwU Mode. Implementers may refine exact prose without reducing its distinctiveness.
 
-| Event / surface | Vanilla (literal) | Normal (dry) | UwU (authored flavor) |
+| Event / surface | Vanilla (literal) | Norm (dry) | UwU (authored flavor) |
 |---|---|---|---|
 | App ready / main window | Ready to configure routing. | Alright. Let's wire this up. | Hewwo~ Weady to open some howes? I've been waiting fow you~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) |
 | Create hole | Hole created. | Another hole. Naturally. | Anothew howe?! My, someone's feeling adventuwous today~ OwO |
@@ -338,7 +338,7 @@ All variants must be selected through a **centralized presentation-message catal
 
 This is an approved presentation-only refinement, not a new product feature or
 an operational policy. Keep stable technical messages separate from optional
-variable commentary. Normal (`default`) and UwU may have multiple reviewed catalog entries
+variable commentary. Norm (`default`) and UwU may have multiple reviewed catalog entries
 for common noncritical event commentary; Vanilla remains strictly informational
 and deterministic. Every choice must remain relevant to the same event and
 preserve the information conveyed. Do not randomize or alter technical status, operational
@@ -367,7 +367,7 @@ routing, controller commands, configuration, diagnostics, or persistent state.
 Mode selection retains its existing semantics; variation adds no settings or
 production schema. Missing variants retain the neutral fallback behavior.
 
-DFA may have a larger pool of authored playful acknowledgments in Normal/UwU.
+DFA may have a larger pool of authored playful acknowledgments in Norm/UwU.
 Its only effect remains transient local presentation feedback; no controller,
 scan, diagnostic, persistence, or repair action, hidden counter, or operational
 side effect is permitted. It remains hidden in Vanilla.
@@ -393,7 +393,7 @@ Additional acceptance checks for §16.5 and the GUI milestone:
 This owner-approved testing refinement extends D-056 while retaining its history.
 Vanilla is the **only compiled-in personality**: stable technical, operational,
 warning, diagnostic, accessibility, control, and recovery messages remain in code.
-Normal remains the default selection, supplied in `personalities/default.json`;
+Norm remains the default selection, supplied in `personalities/default.json`;
 UwU is supplied in `personalities/uwu.json`. Additional user-authored or externally
 generated JSON catalogs may be selected. Generation happens outside AudioHole;
 there is no script execution, automatic text transformation, or content retrieval.
@@ -419,7 +419,7 @@ They are placebo controls: no controller calls, routing changes, scan/repair wor
 logs, configuration writes, or persistent counters. Every changed, settled ordinary value selects from the same `dfa` pool as the
 button. On settling at a special value, use the selected personality's dedicated pool:
 
-| Value | Normal base response / event |
+| Value | Norm base response / event |
 |---|---|
 | 0.00 | Done fucking around. / `dfa_minimum` |
 | 0.69 and 6.90 | NICE! / `dfa_nice` |
@@ -429,9 +429,9 @@ button. On settling at a special value, use the selected personality's dedicated
 | 11.00 | It goes louder now. / `dfa_maximum` |
 
 Personality files may flavor these responses. The supplied 6.70 pool reads exactly
-“SIX SEVEN!” in both Normal and UwU. Button acknowledgments also include placebo
+“SIX SEVEN!” in both Norm and UwU. Button acknowledgments also include placebo
 affirmations such as “Did that fix it?”, “That should do it,” and “Oughtta do the
-trick,” with authored UwU counterparts. Each supplied Normal/UwU catalog has 23
+trick,” with authored UwU counterparts. Each supplied Norm/UwU catalog has 23
 DFA button responses, separate from its slider-threshold pools. Do not use these affirmations for real
 repairs or diagnostics. Debounce duplicate release/change notifications at the same
 settled position; dragging and polling must not emit continuous flavor text.
@@ -451,13 +451,13 @@ presentation feedback only, never an operational result.
 A committed buffer edit (spin, Enter, or focus loss after typing) emits the
 `buffer_changed` presentation event. Duplicate notifications for the same value,
 programmatic editor loading, and unchanged refreshes do not select new commentary.
-The stable information states that the edit still requires Save / Apply. Normal/UwU supply authored commentary; Vanilla stays neutral.
+The stable information states that the edit still requires Save / Apply. Norm/UwU supply authored commentary; Vanilla stays neutral.
 This does not change buffer policy, configuration units, or live routing.
 
 ### Owner-approved production-language preview
 
 The subsequent testing amendment moves simulation disclosures into the startup
-notice and Introduction. Stable operation messages and authored Normal/UwU lines
+notice and Introduction. Stable operation messages and authored Norm/UwU lines
 now preview production language; this does not make simulated states hardware
 measurements. Keep technical/status text deterministic and maintain per-event Vanilla
 fallback. Remove imaginary/pretend/simulated qualifications from commentary for actual
@@ -466,12 +466,12 @@ negative minimum is superseded. Retain the 23-response pools and other threshold
 
 The owner-approved follow-up makes ordinary DFA slider/numeric adjustments use the
 existing 23-response `dfa` pool, retaining repetition avoidance and optional weighting.
-Zero now uses “Done fucking around.” in Normal and an authored UwU counterpart.
+Zero now uses “Done fucking around.” in Norm and an authored UwU counterpart.
 Threshold-specific pools take precedence; duplicate settlement notifications and
 unchanged refreshes still produce no new acknowledgment. Vanilla and controller
 inertness are unchanged.
 
-The following editor/diagnostic events now have optional Normal/UwU authored pools:
+The following editor/diagnostic events now have optional Norm/UwU authored pools:
 `simplex`, `device_saved`, `scan_level_changed`, `scan_scope_changed`,
 `diagnostics_copied`, `diagnostics_exported`, and `diagnostics_cleared`.
 Use the same centralized catalog, deterministic testing, no-repeat, and per-event
@@ -487,7 +487,7 @@ responses and fallback rules remain unchanged. Added fixed authored pools use
 `dfa_<hundredths>` keys at: 1.01, 1.21, 1.34, 2.22, 2.56, 3.00, 3.14, 3.33, 4.01,
 4.03, 4.04, 4.09, 4.10, 4.13, 4.18, 4.29, 4.51, 5.00, 5.03, 6.21, 7.07, 7.77,
 8.08, 9.09, 9.11 and 10.24. The supplied JSON catalogs contain the owner-authored
-Normal/UwU wording; tests pin all 26 pairs, including exact 3.14 and 6.21 Unicode.
+Norm/UwU wording; tests pin all 26 pairs, including exact 3.14 and 6.21 Unicode.
 
 Accept decimal text with arbitrary fractional precision. Check its raw mathematical
 range before decimal half-up rounding, then display/store/match integer hundredths
@@ -510,3 +510,10 @@ the same message catalog, retaining the complete operational warning in the head
 DFA remains presentation-only: “stored/persisted normalized value” in this iteration
 means its existing transient session state, not a new file or production schema.
 O-004/O-006 are not resolved and no disk persistence is introduced.
+
+### Canonical personality names
+
+Use exactly **Norm** and **UwU** in the selector and supplied catalog display names,
+without subtitles. Stable IDs remain `default` and `uwu`, and filenames remain
+`default.json` and `uwu.json`. Norm is still the default; Vanilla is unchanged.
+This rename does not change any authored response, routing or persistence behavior.

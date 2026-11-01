@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "default",
-  "display_name": "Normal — Default Audio Engineer",
+  "display_name": "Norm",
   "events": {
     "ready": [
       "Alright. Let's wire this up.",
