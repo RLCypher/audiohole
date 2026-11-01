@@ -10,9 +10,11 @@ The style image was supplied inline in the task, not as a file in this archive.
 Its layout and dark mint/magenta palette guide this iteration; exact native visual
 comparison remains a Windows acceptance task.
 
-The existing WIC loader embeds/decodes this PNG once. AgentDisplay accepts a
-preferred logical size and caches by full client bounds; normal/compact avatar
-regions are 144×216 / 96×144 logical pixels. The original image stays immutable.
+The existing WIC loader embeds/decodes this PNG once. AgentDisplay caches by full
+client bounds. The avatar fills the header height at every supported window width,
+with six logical pixels of top/bottom padding. Its proportional width is calculated
+from the actual source dimensions, rather than fitting into a narrower portrait
+box. The original image stays immutable.
 Vanilla retains the canonical logo. Other personalities share this temporary static
 placeholder; no permanently bound Norm asset system, animation, mood logic, new
 messages, schema, or separately developed personality-module code is introduced.
@@ -41,7 +43,8 @@ Commentary is a nonstretching 156-logical-pixel card with scrolling overflow.
 Its width and left/right edges follow the natural width of the complete routing
 and exit button row, rather than expanding with the window. The avatar follows
 the card with a fixed 14-logical-pixel gap; unused width stays to its right. The
-minimum window size is DPI-scaled so the controls remain accessible.
+minimum window size is DPI-scaled and widened as needed for full-height artwork
+so the controls remain accessible; there is no reduced-height compact avatar.
 Native resize notifications are coalesced after wxFrame settles its client bounds;
 wrapping is measured only after layout, then the frame is invalidated for repaint.
 Rounded surfaces request full repaint on resize so their previous curved edges are
@@ -49,8 +52,9 @@ erased, not retained outside newly exposed strips. Neither resizing nor status
 updates select new commentary. Rounded surfaces inset content by 12 logical pixels so native child
 backgrounds cannot erase the curved stroke. Header geometry smoke checks exercise
 minimum, intermediate and desktop widths in both directions with long status names,
-checking button/card edge alignment, constant card size and the avatar gap.
+checking button/card edge alignment, constant card/avatar sizes, full header-height
+coverage, sufficient image width and the avatar gap.
 
-Avatar presentation regions use 2:3 proportions for future 512×768 artwork. The
-current 1201×1310 source is still rendered proportionally and unchanged, so it has
-more empty space in that region until the final portrait asset arrives.
+The current 1201×1310 source renders proportionally at full header height. A future
+512×768 asset will automatically use a narrower 2:3 region at the same height.
+Transparent source margins remain intact; no artwork is cropped or stretched.

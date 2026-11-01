@@ -31,7 +31,9 @@ class TrayIconCache {
 class AgentDisplay final : public wxPanel {
   public:
     explicit AgentDisplay(wxWindow* parent, wxSize logical_size = wxSize(128, 128));
-    void set_presentation_size(wxSize logical_size);
+    // Reserve the source's proportional width for this physical header height.
+    // The parent sizer allocates bounds; neither source pixels nor alpha change.
+    void fit_height(int physical_height);
     void set_image(const wxImage& image);
     bool has_image() const {
         return bitmap_.IsOk();

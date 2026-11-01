@@ -95,7 +95,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     // no speech-bubble or animation system is introduced.
     agent_display_ = new AgentDisplay(this, wxSize(144, 216));
     agent_display_->set_image(placeholder_avatar());
-    header->Add(agent_display_, 0, wxALIGN_TOP | wxALL, FromDIP(6));
+    header->Add(agent_display_, 0, wxEXPAND | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
     for (std::size_t index = 0; index < 4; ++index) {
@@ -216,11 +216,31 @@ void Frame::present(presentation::Message event) {
     layout_header();
 }
 void Frame::layout_header() {
-    const bool compact = GetClientSize().x < FromDIP(1250);
-    agent_display_->set_presentation_size(compact ? wxSize(96, 144) : wxSize(144, 216));
+    // Minimized native bounds are not a layout target; restore triggers layout.
+    if (IsIconized())
+        return;
     // Re-read native button metrics after DPI/font changes. Copy length never
     // participates in the commentary card's horizontal sizing.
     comment_surface_->SetMinSize(wxSize(routing_actions_->GetMinSize().x, FromDIP(156)));
+    // Derive height solely from the branding and operations columns, excluding
+    // the avatar to avoid a feedback loop. Never shrink it at compact widths.
+    auto* header = agent_display_->GetContainingSizer();
+    int header_height = 0;
+    for (auto* item : header->GetChildren()) {
+        if (item->GetWindow() == agent_display_)
+            continue;
+        item->CalcMin();
+        header_height = std::max(header_height, item->GetMinSizeWithBorder().y);
+    }
+    agent_display_->fit_height(header_height - 2 * FromDIP(6));
+    // Full-height artwork needs its real proportional width even at minimum
+    // size. Increase the minimum instead of clipping or reducing the image.
+    auto minimum = FromDIP(wxSize(980, 740));
+    minimum.x = std::max(minimum.x, header->GetMinSize().x + GetSize().x - GetClientSize().x);
+    if (GetMinSize() != minimum)
+        SetMinSize(minimum);
+    if (GetSize().x < minimum.x)
+        SetSize(wxSize(minimum.x, GetSize().y));
     Layout(); // Allocate fixed branding/avatar regions before measuring text space.
     const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
@@ -410,11 +430,12 @@ bool Frame::smoke(const wxString& directory) {
                 "Canonical personality labels changed");
         require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
         // Exercise the real sizers: changing status text must never resize or
-        // move the commentary card, while resizing may choose a compact avatar.
+        // move the commentary card or reduce the full-height avatar.
         const auto initial_client = GetClientSize();
         const auto initial_status = status_copy_;
         const auto resize_occurrence = occurrence_;
         wxSize previous_card_size = wxDefaultSize;
+        wxSize previous_avatar_size = wxDefaultSize;
         for (const auto size : {wxSize(980, 740), wxSize(1250, 850), wxSize(1536, 1024),
                                 wxSize(1250, 850), wxSize(980, 740)}) {
             SetClientSize(FromDIP(size));
@@ -434,6 +455,20 @@ bool Frame::smoke(const wxString& directory) {
             require(previous_card_size == wxDefaultSize || card.GetSize() == previous_card_size,
                     "Window resizing changes the commentary card size");
             previous_card_size = card.GetSize();
+            const auto avatar = agent_display_->GetRect();
+            require(previous_avatar_size == wxDefaultSize ||
+                        avatar.GetSize() == previous_avatar_size,
+                    "Window resizing reduces the full-height avatar");
+            previous_avatar_size = avatar.GetSize();
+            const auto* header = agent_display_->GetContainingSizer();
+            require(avatar.GetTop() == header->GetPosition().y + FromDIP(6) &&
+                        avatar.GetHeight() == header->GetSize().y - 2 * FromDIP(6),
+                    "Avatar does not fill the header height");
+            const auto& source =
+                personality_ == "vanilla" ? canonical_logo() : placeholder_avatar();
+            require(static_cast<long long>(avatar.GetWidth()) * source.GetHeight() >=
+                        static_cast<long long>(avatar.GetHeight()) * source.GetWidth(),
+                    "Avatar width constrains its rendered height");
             require(agent_display_->GetPosition().x - card.GetRight() - 1 ==
                         FromDIP(8) + FromDIP(6),
                     "Avatar no longer follows the commentary card with a fixed gap");

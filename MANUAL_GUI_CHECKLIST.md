@@ -206,8 +206,10 @@ require Windows execution; portable tests validate arithmetic/catalog semantics.
   Its width stays constant as the window grows/shrinks; the avatar follows the card
   with a fixed gap and spare room at the right rather than following the window edge.
   Repeatedly shrink, expand, maximize and restore: no magenta border trails remain.
-- [ ] The future avatar region is 2:3; the current source remains uncropped and
-  proportionate. No stretching to fake final artwork dimensions.
+- [ ] At minimum, intermediate and maximized widths the avatar fills the header
+  height with the same top/bottom inset. It never switches to a shorter compact
+  rendering. The current source remains uncropped and proportionate, with enough
+  width to avoid shrinking its height. Future 512×768 artwork will use a 2:3 region.
 - [ ] Inspect a freshly extracted executable in Explorer at several icon sizes,
   plus taskbar/window/Alt+Tab. The file icon uses AudioHole rather than wx stock
   artwork. Windows CI independently audits the first PE icon group and image data.

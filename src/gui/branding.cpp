@@ -147,13 +147,19 @@ AgentDisplay::AgentDisplay(wxWindow* parent, wxSize logical_size)
     });
     set_image(canonical_logo());
 }
-void AgentDisplay::set_presentation_size(wxSize logical_size) {
-    if (logical_size_ == logical_size)
+void AgentDisplay::fit_height(int physical_height) {
+    if (!source_.IsOk() || physical_height <= 0)
         return;
-    logical_size_ = logical_size;
-    SetMinSize(FromDIP(logical_size_));
-    cached_bounds_ = wxSize();
-    update_bitmap();
+    // Round width upward so fitting the complete image can never reduce height
+    // to satisfy a narrower region (the temporary art is wider than 2:3).
+    const auto width =
+        (static_cast<long long>(physical_height) * source_.GetWidth() + source_.GetHeight() - 1) /
+        source_.GetHeight();
+    const wxSize bounds(static_cast<int>(width), physical_height);
+    if (GetMinSize() == bounds)
+        return;
+    logical_size_ = ToDIP(bounds);
+    SetMinSize(bounds);
 }
 void AgentDisplay::set_image(const wxImage& image) {
     if (!image.IsOk())
