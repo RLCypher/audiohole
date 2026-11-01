@@ -1,5 +1,7 @@
 # Steam, mouth and preview revision
 
+This is a historical generation report. The user has since accepted the revised IDLE milestone; current full-generation status is in [the handoff](../full/HANDOFF.md).
+
 The two coffee plumes now have their own animated alpha layers. The old heavy
 cartoon ribbons were isolated from the prior generated masters, reduced to
 26 × 46 pixels for Norm and 24 × 46 for UwU, and reduced to 38% source opacity.

@@ -4,7 +4,7 @@
     "idle decoded at 512x768",
     "unknown state falls back within each personality",
     "missing pack and personality switches hide correctly",
-    "production approval gate hides candidates",
+    "production approval filter retains the accepted IDLE baseline",
     "disabled regular style cannot borrow chibi art",
     "all backgrounds and guide toggle",
     "native 512x768 and compact 128x192 display selectors",

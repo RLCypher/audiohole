@@ -1,5 +1,7 @@
 # Initial IDLE sequences — review handoff
 
+This is a historical generation report. The user has since accepted the revised IDLE milestone; current full-generation status is in [the handoff](../full/HANDOFF.md).
+
 **Status:** Completed limited batch; all artwork remains **unapproved**.
 
 See [the latest revision](REVISION.md) for the corrected steam, closed mouth,

@@ -1,0 +1,4124 @@
+{
+  "manifest": "/workspace/audiohole/assets/personalities/Norm/manifest.json",
+  "errors": [],
+  "warnings": [
+    "chibi/idle/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/static: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+    "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants"
+  ],
+  "assets": [
+    {
+      "path": "Generated/chibi/idle.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219805,
+      "sha256": "ad58aa466e63a1031158d0af5ea220a5f11f45d8eb560069ce1377818fd204e5",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219814,
+      "sha256": "73f5902aa2e396f046bade738b55c59ee060a4707c34d4dbc065c8fe94b3e37b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219621,
+      "sha256": "21d511989da8f0efa5c891e45db0a95f450587dea1423b486da46c458c8e4291",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219801,
+      "sha256": "07691cf39017921400670996eb27071202ca27c4fa195a49908f427e35b7cfd9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219805,
+      "sha256": "93296f37826f949cd2b1feaca77e529316485ee9571d98b377ff2b4c95ffed94",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219836,
+      "sha256": "e4836b141c2947f6291dbd5abca634a27b6311167a10a9030b0849c042c54047",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219810,
+      "sha256": "25b7804f9c85ecf457fda22bb222fdc2b867c4ccea66076976baeab3472d1c69",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219725,
+      "sha256": "18727727a209a80e1e4135fa7e57fd0e34ccd70fbc004069c02c6252941fb8e1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219849,
+      "sha256": "f709c444889fe5b0c50b7c5a7d9c150e364700d6478c9f7d151f5afb6e6badf1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219798,
+      "sha256": "ed164e4228c086414e4699a1477282b5fc465d2476c833ea44089c8343a8ad27",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/idle/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        64,
+        450,
+        704
+      ],
+      "transparent_pixels": 219726,
+      "sha256": "ee4e3b30877f06b63d74109b6275fecefd02f68d3415e382b3f8bfe00b1c8701",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        63,
+        450,
+        705
+      ],
+      "transparent_pixels": 220866,
+      "sha256": "ee3db8faa2d95e7b06bc03485ea6469410d9390d03d51f4c4a42dea0a498eb7f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        63,
+        451,
+        704
+      ],
+      "transparent_pixels": 220659,
+      "sha256": "7d23f23ac533e347b45dfab6a1fe30196a371442a5fbc41235fa55c5901d98a0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        62,
+        451,
+        704
+      ],
+      "transparent_pixels": 220594,
+      "sha256": "7cb5c47c0bf989658cc263712880c57d41e2e72a7a9c1a4c257ad9b412196664",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        62,
+        450,
+        704
+      ],
+      "transparent_pixels": 220538,
+      "sha256": "ff42e734f2e90a5f0a2c6765ecc33a551b54800d05c61a361ce13565d3041b96",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        62,
+        450,
+        704
+      ],
+      "transparent_pixels": 220454,
+      "sha256": "e895a304389d2d3e7dfcc212ded2698fceb93a7e26b90ad27ac76598e9dd1dbd",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        62,
+        450,
+        704
+      ],
+      "transparent_pixels": 220419,
+      "sha256": "7af35006993bb49e11ec2580800b072c8b9a773341140902363010cca26dc0e7",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        61,
+        450,
+        703
+      ],
+      "transparent_pixels": 220602,
+      "sha256": "5734dd360739c581499145cf1413b15a2635f4174c0db68909804bc6ae4079e7",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        61,
+        450,
+        703
+      ],
+      "transparent_pixels": 220525,
+      "sha256": "4723bae637ed9c8139c776700e1b06dd240b8ea8e250e64c32eb72049aee4ac6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        62,
+        450,
+        703
+      ],
+      "transparent_pixels": 220711,
+      "sha256": "84fbf155d03cb28ee5a3467face447dc0752e75d753e4846258f8933d9ce6df8",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 220844,
+      "sha256": "8a46b2a2367c9d278e5155acc69bb7948774d94b28bae63fc6421ba0f3f1aa2b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/happy/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        454,
+        704
+      ],
+      "transparent_pixels": 219804,
+      "sha256": "90507cbaf9ac4171b46ef54eff64276885bd7bb754a2c3a0500dcb9ea18e3247",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        454,
+        704
+      ],
+      "transparent_pixels": 219804,
+      "sha256": "8d0d7eb9151c5dab62cf7ef91c340c2cac4d1c43273a761dff0631004e876c28",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219617,
+      "sha256": "4a87fc98cbd6fc7ff33a73211ca319b94b798c116b1803f3787b1f3bb42c13db",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219762,
+      "sha256": "e7ea3ba9e85ad041344669cf39dd98b271750eebbf0bdcd1ecc75b60f8e0556b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219725,
+      "sha256": "39da939c07960bce03a30c656fda3567c85a5900da98526ab8c3c68cccd511d2",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219724,
+      "sha256": "68bfa6f161f8b6936685943acbbc1d753796431dd8e0ea894527514108113bc6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219555,
+      "sha256": "d7c7ee30355169b4ad4eb922ffea9fd23e70ae993d141d7c912d4c2c46616b85",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219736,
+      "sha256": "f7a4ba9ee9d8960901229c6d174bb5504c106ed7c8f1a65a243bf9c8f36b7976",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219736,
+      "sha256": "5b2b8a8206412f613a432e499510c51ab9074ec394cbc8938422ed5b504448e2",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219762,
+      "sha256": "513ebfa474a154e77346f638d3de3022259007d25228b3f89ac247986a2f2ed1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219759,
+      "sha256": "2c9ee9e606a84bdeb3e91721f93ec6397b7a89c7b7b0e6d1c37bb510a2b47b65",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219571,
+      "sha256": "e0b1f70754a74eeea39d66d8ed43d9cd471531425315173d292bd52def9f93b6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219764,
+      "sha256": "c8f98b9bb0d4e2de1f2dfe410d8a7798a15f5e3bf1f400c62929e4ac523f1b0e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219776,
+      "sha256": "5a6e21eb870cddc6b89df7acce43cf2f13085c7421b6216adcc47187385bad91",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219825,
+      "sha256": "69a66846e155d5067e960d01795b690970a1aab91d58d7d1e584729fc3dbb605",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        454,
+        704
+      ],
+      "transparent_pixels": 219705,
+      "sha256": "19df700223d23e9f5f230a63017a9f4c1cf8496c15d9ab73e0d07888dfc58eae",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/thinking/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        454,
+        704
+      ],
+      "transparent_pixels": 219804,
+      "sha256": "8d0d7eb9151c5dab62cf7ef91c340c2cac4d1c43273a761dff0631004e876c28",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        463,
+        704
+      ],
+      "transparent_pixels": 219192,
+      "sha256": "23531a9535258ce55eb61f03666f6dd0c587dff3022e9f07dd7d1452a9ccb46d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        463,
+        704
+      ],
+      "transparent_pixels": 219192,
+      "sha256": "ec4f69fae3e558a55900d841cedfb381022cd86842b4f9508cbc542552ddbab6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219029,
+      "sha256": "1054f75eefe3bff570cdb778e6c19bf9b9b93e2d3f695a96a2924b61f7a4e719",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219183,
+      "sha256": "f8bf1e768c9e267db4d14c1206206040fe936e4a8afc4b8eb6685584f2ca8b8d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219147,
+      "sha256": "797ca1b4bc6a6218d4b2b50ef59e9701f2a8d7194854a5f4824d62e0b4b444ce",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219133,
+      "sha256": "94f4450981aea5fe8aba17262a2730350d7a2c7c273a4cd85dfa7beabcafd56d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        463,
+        704
+      ],
+      "transparent_pixels": 218943,
+      "sha256": "07beafda572628b05844803e43eaae070016db5db0fd6f73c409e6a71c8756ea",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219148,
+      "sha256": "2ad12dbb0da1e2010a96e997e7f1a099078c7821226a9de69cf9fdc039a581d9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219157,
+      "sha256": "9d170f0441f912097e0a4b918551f55821e78fa4711a9af1fba62de3081d234b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219184,
+      "sha256": "6a29fbc8847a2f16ab89d785ba29d513d2eda74571c93a9f3b42579cb0a4b9be",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219168,
+      "sha256": "31cb6a532f6933a17db907a2cb225effecc2b4bcbb091b4b003587700689f741",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        463,
+        704
+      ],
+      "transparent_pixels": 218959,
+      "sha256": "f6b80cec703524b463473b3530e12f70ec783986ca101314dbc186a45d3311ea",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219176,
+      "sha256": "3b673244da812022afed1b97b9548ecfdfa494bb57a9a37e833133302142c57f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219197,
+      "sha256": "05e7a5f18b12b43b5636ce34a5aeaf6fda71f0942554d904914e9dfc99d6d818",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219247,
+      "sha256": "4f1eb1b930454c09869c7b3725e9590178db737f41b593ba5c91d5bcb7dfdfd3",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        462,
+        704
+      ],
+      "transparent_pixels": 219114,
+      "sha256": "e1c0e3621c168c4ef14aa0b103deb78ae71a8250528f863796b07514eca0512c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/working/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        463,
+        704
+      ],
+      "transparent_pixels": 219192,
+      "sha256": "ec4f69fae3e558a55900d841cedfb381022cd86842b4f9508cbc542552ddbab6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219676,
+      "sha256": "9e20d515d3974f1bbd6bd766e1d354602e4e08695d40af76629a7de2440cfd8f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219676,
+      "sha256": "95ea9d560a13d805d5d34615a6b0d88a8af903ff1a55f4429dbd1fbf1e22f6d9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219489,
+      "sha256": "cd318f550a90951588fff977a57c741dac93953da65ab678b145b6392ccb76ab",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219594,
+      "sha256": "600f4f92a6a6616890ad7c27dfc2d55ebe0b4dced2c5490d918d2db9d7fba8fa",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219574,
+      "sha256": "86353db722c26337c37f2ff872658a9a25672b70d8c16697651ed78550002f89",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219555,
+      "sha256": "32feaf3de46f6b45a3b57aaeea8d56808700987fdc7b9920005a38d77bbcd844",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219615,
+      "sha256": "d713fc3f41986d770abc7be4d21721e3acb85f777f7502d0bc62295d4377ad1d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219636,
+      "sha256": "9854e4d1faab41c1aac4a2e9a9807fe493e9b61551a5a6868cf41159aaa898e0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219580,
+      "sha256": "f110540beee327c62a05e1ac992ef7f20bef34cac7f4bb3a47ab43b5616635ef",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219602,
+      "sha256": "0657a738ae57ef011d54922250fcbe5f87e6f3bf1330bd86267c3d3bfa317c5d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219652,
+      "sha256": "c035eef6078c9242ee7c67e20b818b761f3e37a8b2fd238ae0fcb2b25d9b6089",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219578,
+      "sha256": "4c3975aca681edc1e3c42c3feb83abb7636621112ac5e7b90ebdc458fe367662",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/talking/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219676,
+      "sha256": "95ea9d560a13d805d5d34615a6b0d88a8af903ff1a55f4429dbd1fbf1e22f6d9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        450,
+        704
+      ],
+      "transparent_pixels": 219453,
+      "sha256": "07f74213c86ff254c8b2b6669bfa6c7c790370cb6a31b07198513785321b629b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        450,
+        705
+      ],
+      "transparent_pixels": 220460,
+      "sha256": "6ae0a67e55f146e7a4e53ddd325d80f31a16846aaf7c90e563425e2a3e449569",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        451,
+        705
+      ],
+      "transparent_pixels": 220455,
+      "sha256": "a5c18799931e951ff8719339acd7193136c5640f9b1f65becde37ca327e8f587",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        452,
+        705
+      ],
+      "transparent_pixels": 220305,
+      "sha256": "b3886d6ee2024710b711cd8ab00dbda898f53971cc5e10397064e28cf3cb5d19",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        452,
+        705
+      ],
+      "transparent_pixels": 220331,
+      "sha256": "1031e4d718ee6ab138d6a0582c4ad29142f0dbd2f52a928066cda8fc8b6b70e9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        63,
+        453,
+        706
+      ],
+      "transparent_pixels": 220234,
+      "sha256": "c194f7d3eb3480dbf5218e5885bd0a7916e122243e2360e592a23ce718d491b4",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        63,
+        453,
+        706
+      ],
+      "transparent_pixels": 220197,
+      "sha256": "941463be4f7adf53592ea30f8b6b3973ab40c01994d0ad752d7c305190d1ea59",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        63,
+        453,
+        706
+      ],
+      "transparent_pixels": 220191,
+      "sha256": "d7b2a9d9d969ac5a11314693adfbf318428e087962cd4bd66ade401eea51139b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        63,
+        453,
+        706
+      ],
+      "transparent_pixels": 220238,
+      "sha256": "adb4eed6c496871c912d1a8163416bd93a55a67c618397f2bbcd881a653faf8f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        452,
+        705
+      ],
+      "transparent_pixels": 220324,
+      "sha256": "cdafd0f0b88638849770990ac8fd6b0fbe77a6a9e83685233c1771651769e904",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        452,
+        705
+      ],
+      "transparent_pixels": 220299,
+      "sha256": "d3598dd12b182573de5acc668dfd4ab91c067390e8741514b6d2d6d4a2a49113",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        63,
+        451,
+        705
+      ],
+      "transparent_pixels": 220427,
+      "sha256": "f794141525daffe87712e1a63fa93211a8e90e064a05f67a8a2f5567c27dda7a",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        450,
+        705
+      ],
+      "transparent_pixels": 220455,
+      "sha256": "f2dfcee9a85b5151cde8a703b71c6ee8e86c409e6140be74e2ee7759e5f4627e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/confused/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219600,
+      "sha256": "28fa50f0e492932fc5a9c7f6d8bede7f317dbb31ead70858047e57281aea95ca",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219600,
+      "sha256": "065fade21efdf743688ac618b60b9af75c95e3e245a4adeb5668defd68b395d0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219413,
+      "sha256": "2b4f8a682e82634c2bd8d491975a3b435b3f4e89d70c04f8ec3cf5d271bbb738",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219558,
+      "sha256": "58812a7230ed428306ff1234cc2950a84f73c8712981754e3d2b149a40e71d8f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219521,
+      "sha256": "e17fe17e6c5f964d21ddba314ee7d41a0e7fa4d95c62b523709db3107e15a25d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219520,
+      "sha256": "e111e398aabab68c9db82996c359852e8d8dd41d8311904a7430f440f26311b0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219351,
+      "sha256": "6ee7a7e77dbf980bc80a12806595ffd33b04bdf67d9cbde7ce06229a608fdb59",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219532,
+      "sha256": "d81a8427c769995e59429d15437b6db8aeb13372662dcebd989653daae21b5a5",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219532,
+      "sha256": "7d028e64788b2fa5878bc9398030d5e130d19bcca6831776142158d13b222792",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219558,
+      "sha256": "449fc18b3359a0f935490d19640b70fe7f20a819129017250257b55e6904eae8",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219555,
+      "sha256": "d4d45f5728ca4b8885c2a68030951ecbe510a1f5ddc0f32e14c31a66cf96b646",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219367,
+      "sha256": "d2dd6a9e59ef26b5d08253fdb966e1d78f4120976f3d1df0dae2a27185b21831",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219560,
+      "sha256": "1e2bfb1c72c8dc9ecd60b328780f9848a77dc8daeda56e7956d13ae95048d712",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219572,
+      "sha256": "428a1b8ad14565541d2888fb01ff5946b8e6457f054bff36b39a8b5ea4955bf1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219621,
+      "sha256": "2c8a509d49a33666b5e61a13aaed1fb3211c9629763ff95d4e033e86f6063f29",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 219501,
+      "sha256": "9a2a18ff6ae2900e411822f755bc36fd8bb96decb8f0a611086f8b112306f214",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/concerned/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219600,
+      "sha256": "065fade21efdf743688ac618b60b9af75c95e3e245a4adeb5668defd68b395d0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 219339,
+      "sha256": "6910487135d216a4564c75315713a500566ede9139980bf5d5c678425a5f4f27",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 220241,
+      "sha256": "e84b21e564f20e948e51752c3df713f8125159a4be8b428d226c3d09781308ce",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 220166,
+      "sha256": "51500035488fb5f81ac2d6dd3a1781f04f0b68e1f84c5e8169134138aedf5560",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 219979,
+      "sha256": "c8a41eabcc8746f1c7091e595a9fe92fcf0ac7bc64805be65da5dc03bad0d873",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 219852,
+      "sha256": "d1d70af0fbfe169c1d1c37676e9a61553cb243f8e52b6464ba8da44460d3947c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 219789,
+      "sha256": "929bb34b99e000d9abc62aadb12b46fb4ab87fda972f59655bf25477c99dee5c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 219688,
+      "sha256": "e53066954b4e03d94d8f85aae5fb689ac1adbcf91aeaf182db9ac66fb1bfde1f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        464,
+        702
+      ],
+      "transparent_pixels": 219631,
+      "sha256": "5dc7136eaa793031510b50dc989fff9c62bc5ff9bde5fcaff1992782a9acab6e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        63,
+        64,
+        464,
+        701
+      ],
+      "transparent_pixels": 219454,
+      "sha256": "f77e3f2e84a29b2ecdd38b2947f2b0785cc3966da5367138e0ebf99c0ce1f6e2",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        62,
+        64,
+        464,
+        701
+      ],
+      "transparent_pixels": 219598,
+      "sha256": "6114bd6ff3585f0bac7625af8a9c31111bcce2d58838234c325987aa007f7ea1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        60,
+        64,
+        464,
+        701
+      ],
+      "transparent_pixels": 219620,
+      "sha256": "b97ccd62ddf91f7b3df7e56d688255b1873c48f6da7c32a74525f329cf878e62",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        64,
+        464,
+        702
+      ],
+      "transparent_pixels": 219703,
+      "sha256": "2934552d3e0b6e6d836b279e7d8c6f31201609f19627af9903ecb4b47d636230",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        63,
+        464,
+        703
+      ],
+      "transparent_pixels": 219785,
+      "sha256": "78067aaf69ba7dabcb5c66b9b9afc1d033642b07710d2008dedada8359283652",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        63,
+        464,
+        703
+      ],
+      "transparent_pixels": 219828,
+      "sha256": "0ea83c4db6d7c53048969c9becb7e29d3ef7b07abbd2cbf778ad9d5bcf6e20c3",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        60,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 219989,
+      "sha256": "324fee6238d0dcd020acaeb51fd68181ebd2d71cafdc3ddd90f9eb9b990649d7",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        61,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 220144,
+      "sha256": "3fd3d95a25719453f7c655d45f96dd02ece78e77570351d2697d6965fccd37cc",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0016.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        63,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 220241,
+      "sha256": "d467b87f1eca2fb74bf0d2743deb5bf16f5791efd113947bd639ff706f1be631",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/error/0017.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219800,
+      "sha256": "a0a320da5804bedad006fb6791ca08c0e0e8989b4e66ebb86ab0db450d88f433",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 220856,
+      "sha256": "75921b1fbda0b278ef2fe9559a04a939f302a8fdf9481d530ce4a6f26e8ddbba",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 220977,
+      "sha256": "01969bbf780573e861df929892ca5001108e1d6d890c0405c7fda8d8df1dc093",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        62,
+        449,
+        704
+      ],
+      "transparent_pixels": 220879,
+      "sha256": "7ec34f3a9b6284ccf1266d2204a8a56ca6581ee13f430b14e1b3bf21ec7047d5",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        62,
+        448,
+        704
+      ],
+      "transparent_pixels": 220644,
+      "sha256": "49f9f7eddaf3fa94dc53ef6eae8c22d773cd10853c78c4ac27f97b4a5947fa4f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        61,
+        448,
+        703
+      ],
+      "transparent_pixels": 220664,
+      "sha256": "a677d811e818a37d6e83eb19e84a6f65d877a1467efee32106ff6c4959f94279",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        61,
+        448,
+        703
+      ],
+      "transparent_pixels": 220728,
+      "sha256": "d2bbe9c4e51e723b8968c757067714486dda5f2d0c09ac4ed955e99a9f2f37a2",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        62,
+        448,
+        704
+      ],
+      "transparent_pixels": 220597,
+      "sha256": "ba7bce3e035a676bb19a62804f10ac082af4fefba6647fe2d83255ee8260937d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        62,
+        449,
+        704
+      ],
+      "transparent_pixels": 220629,
+      "sha256": "5ccdafd19500d641b3adaf482cca2d94574754bc4bf061ad0edf05bd4f0420c8",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        61,
+        449,
+        703
+      ],
+      "transparent_pixels": 220612,
+      "sha256": "3a54ce4d099bad4fce6c58702e43ccdee8aa8c3bf373795161e2e70cf4a9bfb9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        61,
+        449,
+        703
+      ],
+      "transparent_pixels": 220632,
+      "sha256": "d58781edc855906f57b272669acaacdc887bc2d865db2cf3f39e4de2e31e5e5b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        62,
+        449,
+        704
+      ],
+      "transparent_pixels": 220719,
+      "sha256": "96f938ab27a4977fda382f84c20fea2cc699031409a183e06c07a65a0d5df45d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        62,
+        448,
+        704
+      ],
+      "transparent_pixels": 220809,
+      "sha256": "8ef89af7f269a54dbb3e9536beeed5ac616c2dcab4aac66bdfcdf6374d7a7e1c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 220894,
+      "sha256": "566ad73d15c7001a7de562a50159c07f4d5b9eebc8c043af5c06e3f77c0ee40c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        63,
+        448,
+        704
+      ],
+      "transparent_pixels": 220803,
+      "sha256": "b9175c67f476ef7c1703e64eca62f02d453c40839192dda0bb891a20caddaba9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/angry/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 219339,
+      "sha256": "ffabe07a03567e8ffc2e5b76914c04380e9f8b4bdc6e640475315182950d0f9b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 220189,
+      "sha256": "a1206c4c856ac974ae0469f945706640c3940803f4b1e841e343e95b74794d1f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 220048,
+      "sha256": "53b7cab44a902f55d0cf72eee427954db8307f1fa8fc822c9b762b40470519bd",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        704
+      ],
+      "transparent_pixels": 219837,
+      "sha256": "74f0952ea381023467cff9cd0c776e0d1fbf4475ccb7f27567b3bd26e2181cd4",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        67,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 219734,
+      "sha256": "9bcd45c95e004037588c75911fc0592f9170998a0d2791344b782e60fc86232d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        66,
+        64,
+        464,
+        702
+      ],
+      "transparent_pixels": 219635,
+      "sha256": "bb2c0ccac1f3918ea86ba69769f09c2e3a4238e8f71a79e32a32b3c1a7bef51b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        64,
+        64,
+        464,
+        702
+      ],
+      "transparent_pixels": 219710,
+      "sha256": "23012d328ccbe51e6e6b4767336e8f49648a10267f1fb54f1b4c39f7cef0d7bf",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        61,
+        64,
+        464,
+        701
+      ],
+      "transparent_pixels": 219608,
+      "sha256": "ea19aad12ae35f794a32c608acb99e6d3dc396d2df2e598b0e0e5470f5003955",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        64,
+        464,
+        701
+      ],
+      "transparent_pixels": 219620,
+      "sha256": "23081f3f9259347a40872525396af7c4f861721d5965a1e4dd46a2dd31a45ad9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        63,
+        464,
+        702
+      ],
+      "transparent_pixels": 219729,
+      "sha256": "8713285fb3013cf97badaafd283e7b385b409b698e435c215c9dda9cd89bd820",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        59,
+        63,
+        464,
+        703
+      ],
+      "transparent_pixels": 219855,
+      "sha256": "fc669170acdd1c01a91ad05abc4640745419788a1b7b1eecb51a2af941cc1d7d",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        60,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 220008,
+      "sha256": "358ef20ba51be9f8212c6557c49e2c538340f5f5903d989f8fbe35e2a7fdd7ed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        63,
+        64,
+        464,
+        703
+      ],
+      "transparent_pixels": 220277,
+      "sha256": "5f577a37c722566b609b26021fff1f7856021804e20b45de2b7c46cba948b579",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/surprised/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        64,
+        460,
+        704
+      ],
+      "transparent_pixels": 219563,
+      "sha256": "6c2db4da59034ac15cee2fc46ac943095bd10ecd473215909453593b1057b6a6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        63,
+        460,
+        705
+      ],
+      "transparent_pixels": 220637,
+      "sha256": "994fb9d7d16fcc67e98acf7b4089df8bb74590ed4cb39f7001a42d746ca10b51",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        63,
+        460,
+        704
+      ],
+      "transparent_pixels": 220626,
+      "sha256": "0c10d65d2cc291be19bcb472bfb902e5c31c94c2d70e0b598b460d84aac5afd6",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        62,
+        460,
+        704
+      ],
+      "transparent_pixels": 220585,
+      "sha256": "64babf2b74db86722edf1395a5241b50cf122ac18111dc753d4c3ca03592217b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        60,
+        460,
+        703
+      ],
+      "transparent_pixels": 220497,
+      "sha256": "87df12d87e77a6035119fe7580a4ae360c3131f24ca77944c7247be5fe355cc9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        59,
+        460,
+        702
+      ],
+      "transparent_pixels": 220440,
+      "sha256": "587c9b163f3dac2dcbe042208069d224dab42651c62e70eb7c2e85c9c8cf1b7e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        58,
+        460,
+        701
+      ],
+      "transparent_pixels": 220393,
+      "sha256": "d95006852e8e5c9b4bd2b2e1eab0f62b7c1494b34d4e80b6fbef6c59f5a90f1e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        58,
+        460,
+        701
+      ],
+      "transparent_pixels": 220473,
+      "sha256": "558f8637e57dc3c7a921f23a524f412e26ea1e84369ccdeb4f2600e83e0b2a87",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        59,
+        460,
+        702
+      ],
+      "transparent_pixels": 220432,
+      "sha256": "d544b9c110581aa9a4343f600cc0b0028c1e644990210f7fff328c840d947fe3",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        60,
+        460,
+        703
+      ],
+      "transparent_pixels": 220353,
+      "sha256": "d3266353b43d4a751029713a981f510db9771a66d35903a7defa9a43872e94e0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        62,
+        460,
+        704
+      ],
+      "transparent_pixels": 220219,
+      "sha256": "3e0d24aad4adf2cc6b04016d84415a514b859fbc98ab95a389b90a6e923be946",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        62,
+        460,
+        703
+      ],
+      "transparent_pixels": 220129,
+      "sha256": "3433b64198534e0df499896c122a6f983106f1db11fc34ed1a3dbd294939cfbc",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        60,
+        460,
+        702
+      ],
+      "transparent_pixels": 220374,
+      "sha256": "7cbc2b2e397e39a5476f2506052e7e056e8947ca3ab61919f327e14665e94f27",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        59,
+        460,
+        701
+      ],
+      "transparent_pixels": 220355,
+      "sha256": "696ea3adee2055cc0b3af49b4b71c3f13dcbbd7bcad2b92c0be18f102d05b1ff",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        58,
+        460,
+        700
+      ],
+      "transparent_pixels": 220392,
+      "sha256": "4f634b7f0f8d610247f87ea8473e8d001b9a8fe46e980bd16e841152ba8ee1e0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        58,
+        460,
+        701
+      ],
+      "transparent_pixels": 220331,
+      "sha256": "a9f889728ba74b6fb982b4faccdbdaed46563f0632428a2c26e5829105dccd95",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0016.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        58,
+        460,
+        701
+      ],
+      "transparent_pixels": 220415,
+      "sha256": "f097d76b17dfaf8870632aa461461f77c49b20a85d3fea2c6939f031d5e06c10",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0017.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        59,
+        460,
+        702
+      ],
+      "transparent_pixels": 220522,
+      "sha256": "1c81717c72ba53a0efe830a671b84e00cf8f6fcaf31c22ee099cbd3a30c26c37",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0018.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        61,
+        460,
+        703
+      ],
+      "transparent_pixels": 220578,
+      "sha256": "f13dcf2273fb6602dfcb1db3df7afb9430f23574822beb0f8ecf5392e5afe12b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0019.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        62,
+        460,
+        703
+      ],
+      "transparent_pixels": 220569,
+      "sha256": "950774902426e0c9fdc4508f253a4d8c2dc7229c2cb57225c1155fdc2ff11a2e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0020.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        48,
+        63,
+        460,
+        704
+      ],
+      "transparent_pixels": 220606,
+      "sha256": "70172fd06e8186ad05cec2ce9b5081ba6710af81a9097fd7066ef431a0d5bb5f",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/celebrating/0021.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219876,
+      "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        449,
+        704
+      ],
+      "transparent_pixels": 219582,
+      "sha256": "dc2563588b87f72663ac931b85216738f24a17d68dda63d4d9fbda8dc32afeb0",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219582,
+      "sha256": "e2d0be1dd2647958fe195a674bb0944cc40f2d492a92410111b451b3913d9429",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219395,
+      "sha256": "6f57d49efec4e523f382db965cd4f3484137f79c6a5dd457bc387b3ca25e27f9",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219540,
+      "sha256": "174a6ce14ca5359880e79d4caa0a0066859c6a4d5be1eef9c099669ab00dce59",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219503,
+      "sha256": "9e1ceeb26fdef142f0a4a3f7aad57cf46a77546132a570a50ca265e2817715b1",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219502,
+      "sha256": "c730b29520233b90aa41c5d0f5fcf2969ec8614deb0f199da8c4ae349cbb51da",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219333,
+      "sha256": "30caa9be825407d3a3f6c5522558f6dd4ad19703c7f4719a25ca63142495561c",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219514,
+      "sha256": "400157c95559a48935e570dac1b15451e19f16c046054e8e072dcf51a78ebe2e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219514,
+      "sha256": "8fef154f8a0b0e7cb6c1ef2a42ff4b12fd68741f903aa90c39cc6c4c1429fc8b",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        449,
+        704
+      ],
+      "transparent_pixels": 219540,
+      "sha256": "b44ff81963041a3cc382919d99c84a62d153c62e863c79160cf26cc0ee2f565e",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        450,
+        704
+      ],
+      "transparent_pixels": 219537,
+      "sha256": "110d3aa87b551ba84554b32d1b3085256efd214461b55d143393f9f8b9547524",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        450,
+        704
+      ],
+      "transparent_pixels": 219349,
+      "sha256": "44873cc43a0f9a7b710034742b9c8dd6158db8fe22cab71b84154a001c9261ac",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        451,
+        704
+      ],
+      "transparent_pixels": 219542,
+      "sha256": "87f51696eddca8c5bcf6999d1dc7bce78dca5fe16da5147bb5db8912cf0cfcee",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        451,
+        704
+      ],
+      "transparent_pixels": 219554,
+      "sha256": "50186e838ee542b0ea3400948142fecf063dc57fbb6fb19b1674aab84f6d4c56",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        452,
+        704
+      ],
+      "transparent_pixels": 219603,
+      "sha256": "63cea16f41fb26459f478c5ef615dd5d321c8c9e605fb18f4998eb7c10df9283",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        63,
+        452,
+        704
+      ],
+      "transparent_pixels": 219483,
+      "sha256": "d63184d1026ad45a3603aea88d5889c7fc1fefef21038961c6f4bb58cd2383a7",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    },
+    {
+      "path": "Generated/chibi/sleeping/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        65,
+        64,
+        448,
+        704
+      ],
+      "transparent_pixels": 219582,
+      "sha256": "e2d0be1dd2647958fe195a674bb0944cc40f2d492a92410111b451b3913d9429",
+      "warnings": [
+        "large semitransparent region: inspect halos or background remnants"
+      ]
+    }
+  ]
+}
