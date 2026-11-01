@@ -68,8 +68,12 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     return true;
 }
 } // namespace
-SurfacePanel::SurfacePanel(wxWindow* parent, const wxString& role) : wxPanel(parent) {
+SurfacePanel::SurfacePanel(wxWindow* parent, const wxString& role)
+    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+              wxTAB_TRAVERSAL | wxFULL_REPAINT_ON_RESIZE) {
     SetName(role);
+    // A rounded right/bottom edge moves during resizing. Repaint the whole
+    // buffered surface, not only newly exposed strips, to erase its old stroke.
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
         wxAutoBufferedPaintDC dc(this);

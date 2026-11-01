@@ -1,7 +1,6 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
 #include <wx/stdpaths.h>
-#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
@@ -11,7 +10,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     // A stable window property supports second-launch focus across build titles.
     // It is removed before the native window is destroyed (see the destructor).
     SetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow", reinterpret_cast<HANDLE>(1));
-    SetMinSize(wxSize(980, 740));
+    SetMinSize(FromDIP(wxSize(980, 740)));
     SetIcons(application_icons());
     personalities_directory_ =
         std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
@@ -52,8 +51,11 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     status_row->Add(status_, 0, wxALL, FromDIP(4));
     information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* middle = new wxBoxSizer(wxVERTICAL);
-    header->Add(middle, 1, wxEXPAND | wxALL, FromDIP(8));
-    auto* actions = new wxWrapSizer(wxHORIZONTAL);
+    // This column follows the buttons' natural width, not the remaining window
+    // width. The avatar follows this column, leaving spare space at the right.
+    header->Add(middle, 0, wxEXPAND | wxALL, FromDIP(8));
+    auto* actions = new wxBoxSizer(wxHORIZONTAL);
+    routing_actions_ = actions;
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
     button(this, actions, "Arm Ready", [this] { activate(true); });
     stop_ = button(this, actions, "Stop Routing", [this] {
@@ -61,13 +63,22 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
         refresh();
     });
     button(this, actions, "Exit AudioHole", [this] { exit(); });
+    // Align the card with the actual first/last button edges. Keep spacing only
+    // between buttons, with DPI-scaled borders rather than outer side margins.
+    for (auto* item : actions->GetChildren())
+        item->SetBorder(FromDIP(3));
+    actions->GetChildren().front()->SetFlag(wxTOP | wxBOTTOM | wxRIGHT);
+    actions->GetChildren().back()->SetFlag(wxTOP | wxBOTTOM | wxLEFT);
     middle->Add(actions, 0, wxEXPAND);
     auto* comment_surface = new SurfacePanel(this, "commentary-card");
     comment_surface_ = comment_surface;
-    comment_surface->SetMinSize(FromDIP(wxSize(220, 156)));
+    comment_surface->SetMinSize(wxSize(actions->GetMinSize().x, FromDIP(156)));
     middle->Add(comment_surface, 0, wxEXPAND | wxTOP, FromDIP(8));
     auto* comment_layout = new wxBoxSizer(wxVERTICAL);
-    personality_heading_ = label(comment_surface, comment_layout, "Norm");
+    personality_heading_ = new wxStaticText(comment_surface, wxID_ANY, "Norm", wxDefaultPosition,
+                                            wxDefaultSize, wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+    comment_layout->Add(personality_heading_, 0, wxEXPAND | wxALL, FromDIP(4));
+    personality_heading_->SetMinSize(wxSize(0, -1));
     personality_heading_->SetFont(GetFont().Bold());
     commentary_panel_ = new wxScrolledWindow(comment_surface);
     commentary_panel_->SetScrollRate(0, FromDIP(12));
@@ -122,8 +133,12 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
             header_layout_pending_ = true;
             CallAfter([this] {
                 header_layout_pending_ = false;
-                if (!IsBeingDeleted())
+                if (!IsBeingDeleted()) {
                     layout_header();
+                    // Invalidate the old locations as well as newly exposed
+                    // strips after native child moves; let Windows batch paint.
+                    Refresh();
+                }
             });
         }
         event.Skip();
@@ -203,6 +218,9 @@ void Frame::present(presentation::Message event) {
 void Frame::layout_header() {
     const bool compact = GetClientSize().x < FromDIP(1250);
     agent_display_->set_presentation_size(compact ? wxSize(96, 144) : wxSize(144, 216));
+    // Re-read native button metrics after DPI/font changes. Copy length never
+    // participates in the commentary card's horizontal sizing.
+    comment_surface_->SetMinSize(wxSize(routing_actions_->GetMinSize().x, FromDIP(156)));
     Layout(); // Allocate fixed branding/avatar regions before measuring text space.
     const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
@@ -396,8 +414,10 @@ bool Frame::smoke(const wxString& directory) {
         const auto initial_client = GetClientSize();
         const auto initial_status = status_copy_;
         const auto resize_occurrence = occurrence_;
-        for (const auto size : {wxSize(980, 740), wxSize(1250, 850), wxSize(1536, 1024)}) {
-            SetClientSize(size);
+        wxSize previous_card_size = wxDefaultSize;
+        for (const auto size : {wxSize(980, 740), wxSize(1250, 850), wxSize(1536, 1024),
+                                wxSize(1250, 850), wxSize(980, 740)}) {
+            SetClientSize(FromDIP(size));
             status_copy_ = "Routing: Stopped\nActive: none\nViewed: short";
             layout_header();
             const auto card = comment_surface_->GetRect();
@@ -407,7 +427,18 @@ bool Frame::smoke(const wxString& directory) {
             require(comment_surface_->GetRect() == card,
                     "Status changes move or resize the personality card");
             require(card.GetHeight() == FromDIP(156), "Commentary card height is not bounded");
+            const auto* exit_button = routing_actions_->GetChildren().back()->GetWindow();
+            require(card.GetLeft() == start_->GetRect().GetLeft() &&
+                        card.GetRight() == exit_button->GetRect().GetRight(),
+                    "Commentary card does not match the routing button row edges");
+            require(previous_card_size == wxDefaultSize || card.GetSize() == previous_card_size,
+                    "Window resizing changes the commentary card size");
+            previous_card_size = card.GetSize();
+            require(agent_display_->GetPosition().x - card.GetRight() - 1 ==
+                        FromDIP(8) + FromDIP(6),
+                    "Avatar no longer follows the commentary card with a fixed gap");
             require(card.GetRight() <= agent_display_->GetPosition().x &&
+                        agent_display_->GetRect().GetRight() < GetClientSize().x &&
                         agent_display_->GetRect().GetBottom() < navigation_[0]->GetPosition().y,
                     "Header regions overlap or avatar reaches navigation");
             require(personality_heading_->GetPosition().x >= FromDIP(12) &&

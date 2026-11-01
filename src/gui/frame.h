@@ -133,6 +133,7 @@ class Frame final : public wxFrame {
     AgentDisplay* agent_display_{};
     wxScrolledWindow* commentary_panel_{};
     wxPanel* comment_surface_{};
+    wxBoxSizer* routing_actions_{}; // Borrowed; natural button width bounds the commentary card.
     bool header_layout_pending_ = false;
     wxStaticText* personality_heading_{};
     wxPanel* status_dot_{};

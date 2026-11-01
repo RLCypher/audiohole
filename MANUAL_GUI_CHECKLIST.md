@@ -202,6 +202,10 @@ require Windows execution; portable tests validate arithmetic/catalog semantics.
   No header oscillation, stale partial paint, avatar/navigation overlap or commentary
   rerolls. The card stays compact and scrolls overflow. Its heading and all endpoint
   content stay inside the rounded strokes with clear padding on each side.
+- [ ] Commentary left/right edges align with Start Routing and Exit AudioHole.
+  Its width stays constant as the window grows/shrinks; the avatar follows the card
+  with a fixed gap and spare room at the right rather than following the window edge.
+  Repeatedly shrink, expand, maximize and restore: no magenta border trails remain.
 - [ ] The future avatar region is 2:3; the current source remains uncropped and
   proportionate. No stretching to fake final artwork dimensions.
 - [ ] Inspect a freshly extracted executable in Explorer at several icon sizes,

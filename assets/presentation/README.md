@@ -38,11 +38,18 @@ Routing, Active and Viewed each have their own line in a fixed 280×120 logical
 status region; longer names are ellipsized with full text available in its tooltip.
 The branding column reserves 300 logical pixels, independently of status content.
 Commentary is a nonstretching 156-logical-pixel card with scrolling overflow.
+Its width and left/right edges follow the natural width of the complete routing
+and exit button row, rather than expanding with the window. The avatar follows
+the card with a fixed 14-logical-pixel gap; unused width stays to its right. The
+minimum window size is DPI-scaled so the controls remain accessible.
 Native resize notifications are coalesced after wxFrame settles its client bounds;
-wrapping is measured only after layout. Neither resizing nor status updates select
-new commentary. Rounded surfaces inset content by 12 logical pixels so native child
+wrapping is measured only after layout, then the frame is invalidated for repaint.
+Rounded surfaces request full repaint on resize so their previous curved edges are
+erased, not retained outside newly exposed strips. Neither resizing nor status
+updates select new commentary. Rounded surfaces inset content by 12 logical pixels so native child
 backgrounds cannot erase the curved stroke. Header geometry smoke checks exercise
-minimum, intermediate and desktop widths with long status names.
+minimum, intermediate and desktop widths in both directions with long status names,
+checking button/card edge alignment, constant card size and the avatar gap.
 
 Avatar presentation regions use 2:3 proportions for future 512×768 artwork. The
 current 1201×1310 source is still rendered proportionally and unchanged, so it has
