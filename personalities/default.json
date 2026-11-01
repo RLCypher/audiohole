@@ -189,6 +189,90 @@
     "diagnostics_cleared": [
       "Clean slate. Same cables.",
       "Fresh page in the logbook."
+    ],
+    "dfa_101": [
+      "Have you tried reading the documentation?"
+    ],
+    "dfa_121": [
+      "Great Scott! 1.21 gigawatts!"
+    ],
+    "dfa_134": [
+      "Skill issue."
+    ],
+    "dfa_222": [
+      "That's a little too much."
+    ],
+    "dfa_256": [
+      "All 256 possibilities, and you chose this."
+    ],
+    "dfa_300": [
+      "Make up your mind."
+    ],
+    "dfa_314": [
+      "A La Mode Enabled"
+    ],
+    "dfa_333": [
+      "Diet Satan."
+    ],
+    "dfa_401": [
+      "You're not authorized to fuck around."
+    ],
+    "dfa_403": [
+      "Fuck around privileges revoked."
+    ],
+    "dfa_404": [
+      "This is not the DFA you're looking for."
+    ],
+    "dfa_409": [
+      "You have a conflict of interest. And audio devices."
+    ],
+    "dfa_410": [
+      "It was here a minute ago."
+    ],
+    "dfa_413": [
+      "Your hole isn't big enough."
+    ],
+    "dfa_418": [
+      "I'm a teapot."
+    ],
+    "dfa_429": [
+      "You're fucking around too fast."
+    ],
+    "dfa_451": [
+      "It was a pleasure to burn."
+    ],
+    "dfa_500": [
+      "Internal server error. Have you tried turning yourself off and on again?"
+    ],
+    "dfa_503": [
+      "Currently unavailable. Emotionally, mostly."
+    ],
+    "dfa_621": [
+      "I know what you are. (￣︿￣)"
+    ],
+    "dfa_707": [
+      "Drum machine detected."
+    ],
+    "dfa_777": [
+      "Jackpot."
+    ],
+    "dfa_808": [
+      "808s and heartbreak."
+    ],
+    "dfa_909": [
+      "Four on the floor."
+    ],
+    "dfa_911": [
+      "Sir, a second audio stream has hit the buffer."
+    ],
+    "dfa_1024": [
+      "That's a whole kibibyte of fuckery."
+    ],
+    "dfa_negative": [
+      "NEGATIVE FUCK."
+    ],
+    "dfa_above_maximum": [
+      "Too much fucking around."
     ]
   }
 }

@@ -1,6 +1,5 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
-#include <cmath>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
@@ -148,6 +147,11 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     timer_.Start(100);
 }
 void Frame::present(presentation::Message event) {
+    operational_warning_visible_ = event == presentation::Message::ScanFailed ||
+                                   event == presentation::Message::Disconnected ||
+                                   event == presentation::Message::Recovering ||
+                                   event == presentation::Message::Questionable ||
+                                   event == presentation::Message::Invalid;
     last_message_ = event;
     const auto c = messages_.show(event, personality_, ++occurrence_);
     fallback_copy_ =
@@ -169,6 +173,7 @@ void Frame::layout_header() {
     Layout();
 }
 void Frame::show_result(const audiohole::Result& result) {
+    operational_warning_visible_ = !result.ok;
     technical_copy_ = result.detail;
     layout_header();
     if (!result.ok && !smoke_)
@@ -288,6 +293,7 @@ void Frame::refresh() {
             if (routine)
                 present(message);
             if (e.type == "error" || e.type == "scan-failed") {
+                operational_warning_visible_ = true;
                 technical_copy_ = e.detail;
                 commentary_copy_.clear();
                 layout_header();
@@ -382,15 +388,15 @@ bool Frame::smoke(const wxString& directory) {
                 "DFA range must be zero to eleven");
         // Change only the edit field, reproducing typed input with a stale
         // spin-control cache; dispatch Enter through the actual child control.
-        dfa_value_->GetText()->ChangeValue(wxS("6.70"));
-        wxCommandEvent enter(wxEVT_TEXT_ENTER, dfa_value_->GetText()->GetId());
-        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
+        dfa_value_->ChangeValue(wxS("6.70"));
+        wxCommandEvent enter(wxEVT_TEXT_ENTER, dfa_value_->GetId());
+        dfa_value_->GetEventHandler()->ProcessEvent(enter);
         require(dfa_slider_->GetValue() == 670 &&
                     last_message_ == presentation::Message::DfaSixSeven,
                 "Typed DFA Enter did not commit the text and move the slider");
         require(technical_->GetLabel() == "DFA Acknowledged", "DFA heading changed");
-        dfa_value_->GetText()->ChangeValue(wxS("5.55"));
-        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
+        dfa_value_->ChangeValue(wxS("5.55"));
+        dfa_value_->GetEventHandler()->ProcessEvent(enter);
         require(dfa_slider_->GetValue() == 555, "Ordinary typed DFA value did not move the slider");
         require(last_message_ == presentation::Message::Dfa && !commentary_->GetLabel().empty(),
                 "Ordinary DFA adjustment lacks a pool acknowledgment");
@@ -404,11 +410,43 @@ bool Frame::smoke(const wxString& directory) {
         const auto dfa_occurrence = occurrence_;
         settle_dfa(555);
         require(occurrence_ == dfa_occurrence, "Duplicate DFA settlement repeated acknowledgment");
-        dfa_value_->GetText()->ChangeValue(wxS("12.00"));
-        dfa_value_->GetText()->GetEventHandler()->ProcessEvent(enter);
-        require(dfa_slider_->GetValue() == 555 && std::abs(dfa_value_->GetValue() - 5.55) < 0.005 &&
-                    occurrence_ == dfa_occurrence && controller_->snapshot().revision == before,
-                "Out-of-range DFA input changed the controls, commentary or controller");
+        dfa_value_->ChangeValue(wxS("12.00"));
+        dfa_value_->GetEventHandler()->ProcessEvent(enter);
+        require(dfa_slider_->GetValue() == 555 && dfa_value_->GetValue() == wxS("5.55") &&
+                    last_message_ == presentation::Message::DfaAboveMaximum &&
+                    controller_->snapshot().revision == before,
+                "Out-of-range DFA input changed saved state or lacked validation feedback");
+        dfa_value_->ChangeValue(wxS("1.337"));
+        dfa_value_->GetEventHandler()->ProcessEvent(enter);
+        require(dfa_value_->GetValue() == wxS("1.34") && dfa_slider_->GetValue() == 134 &&
+                    last_message_ == presentation::Message::Dfa134,
+                "Extra decimal precision did not normalize before Easter egg matching");
+        for (const auto& invalid : {wxS("-0.001"), wxS("11.001"), wxS("999")}) {
+            dfa_value_->ChangeValue(invalid);
+            dfa_value_->GetEventHandler()->ProcessEvent(enter);
+            require(dfa_hundredths_ == 134 && dfa_slider_->GetValue() == 134 &&
+                        dfa_value_->GetValue() == wxS("1.34") &&
+                        controller_->snapshot().revision == before,
+                    "Rejected raw DFA input changed the previous valid value");
+        }
+        dfa_value_->ChangeValue(wxS("11.001"));
+        wxFocusEvent focus_to_stepper(wxEVT_KILL_FOCUS, dfa_value_->GetId());
+        focus_to_stepper.SetWindow(dfa_stepper_);
+        dfa_value_->GetEventHandler()->ProcessEvent(focus_to_stepper);
+        require(dfa_value_->GetValue() == wxS("11.001"),
+                "Composite focus transition replaced raw input before stepper validation");
+        wxSpinEvent step(wxEVT_SPIN_UP, dfa_stepper_->GetId());
+        dfa_stepper_->GetEventHandler()->ProcessEvent(step);
+        require(dfa_hundredths_ == 134 && last_message_ == presentation::Message::DfaAboveMaximum,
+                "DFA stepper bypassed raw range validation");
+        show_result({false, "Operational warning retained during DFA validation."});
+        const auto warning = technical_copy_;
+        dfa_value_->ChangeValue(wxS("11.001"));
+        dfa_value_->GetEventHandler()->ProcessEvent(enter);
+        require(technical_copy_ == warning && operational_warning_visible_ &&
+                    !dfa_feedback_->GetLabel().empty(),
+                "DFA validation suppressed a warning");
+        present(presentation::Message::Ready);
         forward_.buffer->SetValue(forward_.buffer->GetValue() + 1);
         const auto buffer_before = controller_->snapshot().revision;
         wxSpinEvent buffer_change(wxEVT_SPINCTRL, forward_.buffer->GetId());
@@ -427,6 +465,18 @@ bool Frame::smoke(const wxString& directory) {
             personality_choice_->GetEventHandler()->ProcessEvent(change);
             require(dfa_->IsShown() == (i != 1) && dfa_slider_->IsShown() == (i != 1),
                     "DFA visibility mismatch");
+            require(dfa_value_->IsShown() == (i != 1) && dfa_stepper_->IsShown() == (i != 1) &&
+                        dfa_feedback_->IsShown() == (i != 1),
+                    "DFA numeric controls visible in Vanilla");
+            if (i == 1) {
+                const auto vanilla_occurrence = occurrence_;
+                const int previous = dfa_hundredths_;
+                dfa_value_->ChangeValue(wxS("-0.001"));
+                commit_dfa_text();
+                require(occurrence_ == vanilla_occurrence && dfa_hundredths_ == previous,
+                        "Vanilla accepted DFA input or selected validation commentary");
+                dfa_value_->ChangeValue(text(presentation::dfa_text(previous)));
+            }
         }
         select_personality("missing-catalog");
         require(personality_ == "vanilla" && !dfa_->IsShown() && !dfa_slider_->IsShown(),

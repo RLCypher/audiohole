@@ -153,3 +153,25 @@ semantics and authored catalog coverage, not operating-system clipboard behavior
 
 Windows shell/GUI appearance is pending native execution and human review; portable
 image tests, resource compilation and enlarged renderer previews are not substitutes.
+
+## Expanded DFA precision acceptance
+
+- [ ] Type 1.337 and Enter: display 1.34, move the slider to 1.34 and select its
+  Skill issue/Skiww issue pool. Check halfway values 1.005 → 1.01 and 5.035 → 5.04.
+  Extra digits are accepted during editing; normalized values always show two places.
+- [ ] Exercise all 26 new values in the supplied catalogs, including exact wording
+  and Unicode at 3.14 and 6.21. Existing special-value pools and 23 random button
+  responses remain unchanged; settling an ordinary value still uses the button pool.
+- [ ] With a known valid value, enter -0.001, 11.001, 12 and 999. Reject each with
+  its authored range response while retaining the prior field, slider and session
+  value. Malformed input restores the prior value without an Easter egg response.
+  Enter/focus loss and Up/Down/stepper paths must all validate before changing state.
+- [ ] Test 0.00, 11.00, long decimal tails and repeated unchanged settlement. No
+  polling rerolls or invalid-input clamping. The saved value is session-only here.
+- [ ] Cause a routing/scan warning and then use DFA: retain the warning in the
+  header and display DFA feedback locally. Diagnostics and routing are unchanged.
+- [ ] Vanilla hides all DFA widgets/feedback and produces no DFA validation or
+  commentary. Switching back preserves the prior valid normalized session value.
+
+Native typing, focus/stepper events, Unicode glyph rendering and warning layout
+require Windows execution; portable tests validate arithmetic/catalog semantics.

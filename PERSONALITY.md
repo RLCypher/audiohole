@@ -479,3 +479,34 @@ Vanilla fallback rules. Keep facts separate: clearing diagnostics affects only
 in-memory history; Save Device/Copy/Export acknowledgments require actual success
 of their session/clipboard/file action. Precise failures remain technical messages,
 not playful success claims. No new persistence or storage-root policy is introduced.
+
+### Owner-approved expanded DFA catalog and exact decimal handling
+
+All existing DFA pools (including the 23 button responses), weights, threshold
+responses and fallback rules remain unchanged. Added fixed authored pools use
+`dfa_<hundredths>` keys at: 1.01, 1.21, 1.34, 2.22, 2.56, 3.00, 3.14, 3.33, 4.01,
+4.03, 4.04, 4.09, 4.10, 4.13, 4.18, 4.29, 4.51, 5.00, 5.03, 6.21, 7.07, 7.77,
+8.08, 9.09, 9.11 and 10.24. The supplied JSON catalogs contain the owner-authored
+Normal/UwU wording; tests pin all 26 pairs, including exact 3.14 and 6.21 Unicode.
+
+Accept decimal text with arbitrary fractional precision. Check its raw mathematical
+range before decimal half-up rounding, then display/store/match integer hundredths
+as exactly two fractional digits. Thus 1.337 becomes 1.34; 11.001 is rejected rather
+than becoming 11.00. Strictly negative values, however tiny, are rejected; negative
+zero is zero. Malformed/non-finite input retains the existing neutral restore/tooltip
+behavior. Optional sign, decimal point, exponent and outer whitespace are supported;
+no binary floating-point comparison, precision truncation, or silent clamping occurs.
+
+`dfa_negative` supplies “NEGATIVE FUCK.” / “NYEGATIVE FWUCK?! (╥﹏╥)”.
+`dfa_above_maximum` supplies “Too much fucking around.” /
+“Too much fwucking awound!! (╥﹏╥)”. These are rejected-input acknowledgments, never
+valid Easter egg values. Restore the previous normalized value without changing
+routing, profiles, diagnostics or the last valid DFA state. Existing commentary
+selection machinery is reused; no new randomness or separate Easter egg subsystem.
+
+Vanilla has no DFA controls or DFA-specific input/response behavior. When the header
+holds an operational warning, show DFA feedback locally beside its controls through
+the same message catalog, retaining the complete operational warning in the header.
+DFA remains presentation-only: “stored/persisted normalized value” in this iteration
+means its existing transient session state, not a new file or production schema.
+O-004/O-006 are not resolved and no disk persistence is introduced.

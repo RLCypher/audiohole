@@ -64,3 +64,11 @@ This is a presentation format only; it does not settle production routing/profil
 schemas or the remaining Open owner decisions. Preferences remain session-only
 in this GUI evaluation build. Full reload replaces optional catalogs, including
 custom files previously loaded from outside this directory.
+
+Expanded DFA events use `dfa_<integer hundredths>`: for example, `dfa_134` matches
+1.34, including raw input 1.337 after decimal half-up normalization. The 26 new keys
+and exact owner-authored Normal/UwU strings are in the supplied JSON catalogs.
+`dfa_negative` and `dfa_above_maximum` acknowledge rejected raw numeric input;
+these are not valid values and never replace the last valid session value. Existing
+keys/pools are unchanged. Missing custom-catalog entries still use neutral fallback.
+Vanilla does not expose DFA or process its validation. No new file schema is added.

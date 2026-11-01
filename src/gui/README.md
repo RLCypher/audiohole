@@ -59,8 +59,10 @@ the supplied HDC/font, restore DC state, and release temporary GDI brushes befor
 returning. No paint path calls the controller. Tooltips and F1 share authored technical
 explanations. The routing dot supplements state text, with a high-contrast override.
 
-DFA Enter parses the actual spin edit text because wx's cached numeric value may
-lag behind typed input. Both controls normalize to integer hundredths in 0–1100;
+DFA uses a text-and-stepper composite: a native double spin editor limits decimal
+precision and may clamp before validation. The shared catalog-layer parser checks
+raw decimal range, rounds half-up without binary floating point, and returns integer
+hundredths in 0–1100. The GUI stores only the last valid normalized session value;
 duplicate notifications do not consume another response. Its zero minimum supersedes
 the older negative range. Follow System is now the initial session appearance.
 
@@ -80,3 +82,10 @@ outline utility under presentation/. Resource ownership, cache boundaries, immut
 source hash, status mapping and manual validation are documented in
 [assets/branding/README.md](../../assets/branding/README.md). Existing tray/controller
 interfaces, personality dialogue, runtime semantics and real-audio scope are unchanged.
+
+The header tracks whether its current technical message is an operational warning.
+DFA feedback reuses Messages and its deterministic authored selection, displaying
+locally beside the DFA controls when necessary to retain that warning. It issues
+no controller commands, writes no diagnostics/configuration, and processes no DFA
+input in Vanilla. A raw invalid edit never changes the last normalized value; local
+feedback is hidden/reset on personality change. This is not a new persistence system.

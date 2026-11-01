@@ -1711,3 +1711,16 @@ scaled images, keep commentary to the left, and retain current window dimensions
 All personalities display the logo for now. The component can replace its image
 later; animation, sprites, moods and speech bubbles are not implemented. See
 [branding architecture](assets/branding/README.md) for resource/ownership contracts.
+
+### DFA precision and validation refinement
+
+The exact-value field accepts more than two fractional digits and normalizes on
+Enter, focus loss or explicit stepping. A text-and-stepper control replaces the
+native floating-point spin editor so native precision limits/clamping cannot bypass
+raw range validation. Keep the 0..11 slider in hundredths; retain Up/Down and 0.01
+stepper behavior. All valid stored/displayed values use two places; invalid edits
+restore the previous valid value. Match the expanded authored catalog only after
+normalization. See PERSONALITY.md for exact-decimal and out-of-range semantics.
+When an operational warning occupies the header, retain it and show DFA feedback
+locally in Settings; do not hide or replace the warning with an acknowledgment.
+Vanilla hides the field, stepper, slider and local feedback and processes no DFA input.

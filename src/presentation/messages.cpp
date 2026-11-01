@@ -1,6 +1,7 @@
 #include "presentation/messages.h"
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -57,6 +58,34 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"diagnostics_copied", "Visible diagnostics copied to the clipboard."},
     {"diagnostics_exported", "Visible diagnostics exported."},
     {"diagnostics_cleared", "Diagnostics log cleared. Routing and settings are unchanged."},
+    {"dfa_101", "DFA Acknowledged"},
+    {"dfa_121", "DFA Acknowledged"},
+    {"dfa_134", "DFA Acknowledged"},
+    {"dfa_222", "DFA Acknowledged"},
+    {"dfa_256", "DFA Acknowledged"},
+    {"dfa_300", "DFA Acknowledged"},
+    {"dfa_314", "DFA Acknowledged"},
+    {"dfa_333", "DFA Acknowledged"},
+    {"dfa_401", "DFA Acknowledged"},
+    {"dfa_403", "DFA Acknowledged"},
+    {"dfa_404", "DFA Acknowledged"},
+    {"dfa_409", "DFA Acknowledged"},
+    {"dfa_410", "DFA Acknowledged"},
+    {"dfa_413", "DFA Acknowledged"},
+    {"dfa_418", "DFA Acknowledged"},
+    {"dfa_429", "DFA Acknowledged"},
+    {"dfa_451", "DFA Acknowledged"},
+    {"dfa_500", "DFA Acknowledged"},
+    {"dfa_503", "DFA Acknowledged"},
+    {"dfa_621", "DFA Acknowledged"},
+    {"dfa_707", "DFA Acknowledged"},
+    {"dfa_777", "DFA Acknowledged"},
+    {"dfa_808", "DFA Acknowledged"},
+    {"dfa_909", "DFA Acknowledged"},
+    {"dfa_911", "DFA Acknowledged"},
+    {"dfa_1024", "DFA Acknowledged"},
+    {"dfa_negative", "DFA must be at least 0.00. Previous value retained."},
+    {"dfa_above_maximum", "DFA must be at most 11.00. Previous value retained."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;
@@ -101,8 +130,144 @@ std::string technical(Message event) {
 std::string event_id(Message event) {
     return neutral.at(static_cast<std::size_t>(event)).id;
 }
+DfaInput parse_dfa(std::string_view input) {
+    while (!input.empty() && std::isspace(static_cast<unsigned char>(input.front())))
+        input.remove_prefix(1);
+    while (!input.empty() && std::isspace(static_cast<unsigned char>(input.back())))
+        input.remove_suffix(1);
+    if (input.empty())
+        return {};
+    std::size_t position = 0;
+    const bool negative = input.front() == '-';
+    if (input.front() == '-' || input.front() == '+')
+        ++position;
+    auto digit = [](char value) { return value >= '0' && value <= '9'; };
+    std::string digits;
+    while (position < input.size() && digit(input[position]))
+        digits += input[position++];
+    const auto integer_digits = static_cast<std::int64_t>(digits.size());
+    if (position < input.size() && input[position] == '.') {
+        ++position;
+        while (position < input.size() && digit(input[position]))
+            digits += input[position++];
+    }
+    if (digits.empty())
+        return {};
+    std::int64_t exponent = 0;
+    if (position < input.size() && (input[position] == 'e' || input[position] == 'E')) {
+        ++position;
+        bool exponent_negative = false;
+        if (position < input.size() && (input[position] == '-' || input[position] == '+')) {
+            exponent_negative = input[position] == '-';
+            ++position;
+        }
+        const auto exponent_start = position;
+        // Exponents beyond the entire text length cannot bring any nonzero
+        // mantissa near 0..11. Saturating that magnitude avoids integer overflow
+        // without changing the range/rounding result or limiting decimal precision.
+        const auto limit = static_cast<std::int64_t>(input.size()) + 4;
+        while (position < input.size() && digit(input[position])) {
+            const int next = input[position++] - '0';
+            exponent = exponent > limit / 10 || (exponent == limit / 10 && next > limit % 10)
+                           ? limit
+                           : exponent * 10 + next;
+        }
+        if (position == exponent_start)
+            return {};
+        if (exponent_negative)
+            exponent = -exponent;
+    }
+    if (position != input.size())
+        return {};
+    const auto first = digits.find_first_not_of('0');
+    if (first == std::string::npos)
+        return {DfaInputStatus::Valid, 0};
+    if (negative)
+        return {DfaInputStatus::Negative};
+    // Decimal point position relative to the first significant digit. No binary
+    // float conversion occurs, including when comparing 11.000...001 with 11.
+    const auto point = integer_digits - static_cast<std::int64_t>(first) + exponent;
+    const std::string_view significant(digits.data() + first, digits.size() - first);
+    auto at = [&](std::int64_t index) -> int {
+        return index >= 0 && static_cast<std::uint64_t>(index) < significant.size()
+                   ? significant[static_cast<std::size_t>(index)] - '0'
+                   : 0;
+    };
+    if (point > 2)
+        return {DfaInputStatus::AboveMaximum};
+    if (point == 2) {
+        const int integral = at(0) * 10 + at(1);
+        const bool fraction = significant.size() > 2 && significant.substr(2).find_first_not_of(
+                                                            '0') != std::string_view::npos;
+        if (integral > 11 || (integral == 11 && fraction))
+            return {DfaInputStatus::AboveMaximum};
+    }
+    int hundredths = at(point - 2) * 1000 + at(point - 1) * 100 + at(point) * 10 + at(point + 1);
+    if (at(point + 2) >= 5)
+        ++hundredths;
+    return {DfaInputStatus::Valid, hundredths};
+}
+std::string dfa_text(int hundredths) {
+    if (hundredths < 0 || hundredths > 1100)
+        throw std::invalid_argument("DFA value must be between 0 and 1100 hundredths");
+    const int fraction = hundredths % 100;
+    return std::to_string(hundredths / 100) + "." + (fraction < 10 ? "0" : "") +
+           std::to_string(fraction);
+}
 Message dfa_event(int value) {
     switch (value) {
+    case 101:
+        return Message::Dfa101;
+    case 121:
+        return Message::Dfa121;
+    case 134:
+        return Message::Dfa134;
+    case 222:
+        return Message::Dfa222;
+    case 256:
+        return Message::Dfa256;
+    case 300:
+        return Message::Dfa300;
+    case 314:
+        return Message::Dfa314;
+    case 333:
+        return Message::Dfa333;
+    case 401:
+        return Message::Dfa401;
+    case 403:
+        return Message::Dfa403;
+    case 404:
+        return Message::Dfa404;
+    case 409:
+        return Message::Dfa409;
+    case 410:
+        return Message::Dfa410;
+    case 413:
+        return Message::Dfa413;
+    case 418:
+        return Message::Dfa418;
+    case 429:
+        return Message::Dfa429;
+    case 451:
+        return Message::Dfa451;
+    case 500:
+        return Message::Dfa500;
+    case 503:
+        return Message::Dfa503;
+    case 621:
+        return Message::Dfa621;
+    case 707:
+        return Message::Dfa707;
+    case 777:
+        return Message::Dfa777;
+    case 808:
+        return Message::Dfa808;
+    case 909:
+        return Message::Dfa909;
+    case 911:
+        return Message::Dfa911;
+    case 1024:
+        return Message::Dfa1024;
     case 0:
         return Message::DfaMinimum;
     case 69:

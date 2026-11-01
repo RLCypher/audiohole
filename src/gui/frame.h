@@ -20,6 +20,7 @@
 #include <wx/simplebook.h>
 #include <wx/slider.h>
 #include <wx/snglinst.h>
+#include <wx/spinbutt.h>
 #include <wx/spinctrl.h>
 #include <wx/taskbar.h>
 #include <wx/tglbtn.h>
@@ -122,7 +123,11 @@ class Frame final : public wxFrame {
     wxChoice* theme_choice_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
     wxSlider* dfa_slider_{};
-    wxSpinCtrlDouble* dfa_value_{};
+    wxTextCtrl* dfa_value_{};
+    wxSpinButton* dfa_stepper_{};
+    wxStaticText* dfa_feedback_{};
+    int dfa_hundredths_ = 0; // Last valid normalized transient value; never serialized.
+    bool operational_warning_visible_ = false; // Header-copy protection, not engine health.
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
     AgentDisplay* agent_display_{};
@@ -157,6 +162,10 @@ class Frame final : public wxFrame {
     void sync_personality_choices();
     void settle_dfa(int hundredths);
     void commit_dfa_text();
+    void adjust_dfa(int delta);
+    // Use the existing catalog; preserve an operational header warning by placing
+    // DFA feedback beside its controls instead. No controller commands or logging.
+    void present_dfa(presentation::Message);
     void update_status_indicator();
     // Appearance touches only native view resources; no controller commands.
     void apply_appearance();

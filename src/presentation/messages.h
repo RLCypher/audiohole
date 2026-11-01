@@ -5,6 +5,7 @@
 #include <map>
 #include <random>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace audiohole::presentation {
@@ -55,6 +56,34 @@ enum class Message {
     DiagnosticsCopied,
     DiagnosticsExported,
     DiagnosticsCleared,
+    Dfa101,
+    Dfa121,
+    Dfa134,
+    Dfa222,
+    Dfa256,
+    Dfa300,
+    Dfa314,
+    Dfa333,
+    Dfa401,
+    Dfa403,
+    Dfa404,
+    Dfa409,
+    Dfa410,
+    Dfa413,
+    Dfa418,
+    Dfa429,
+    Dfa451,
+    Dfa500,
+    Dfa503,
+    Dfa621,
+    Dfa707,
+    Dfa777,
+    Dfa808,
+    Dfa909,
+    Dfa911,
+    Dfa1024,
+    DfaNegative,
+    DfaAboveMaximum,
     Count
 };
 struct Variant {
@@ -77,6 +106,19 @@ std::string event_id(Message);
 // Exact hundredths avoid floating point equality. Ordinary positions map to Dfa;
 // callers decide when a value has settled before requesting local commentary.
 Message dfa_event(int hundredths);
+enum class DfaInputStatus { Valid, Invalid, Negative, AboveMaximum };
+struct DfaInput {
+    DfaInputStatus status = DfaInputStatus::Invalid;
+    int hundredths = 0; // Meaningful only for Valid; never an invalid substitute.
+};
+// Parse signed decimal text (optional exponent/outer whitespace), check its raw
+// mathematical range, then round half-up to integer hundredths. No floating point,
+// digit limit, clamping or state mutation; work/storage is linear in input length.
+// Negative zero is zero. Non-finite/malformed input is Invalid.
+DfaInput parse_dfa(std::string_view input);
+// Canonical dot-decimal display, exactly two fractional digits. Throws for invalid
+// integer values; this formats transient presentation state, not a disk schema.
+std::string dfa_text(int hundredths);
 
 // GUI-thread only. Owns validated data and transient repetition history, never
 // controller/configuration state. No file reads occur during show(). Vanilla is

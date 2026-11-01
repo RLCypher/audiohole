@@ -1,6 +1,5 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
-#include <cmath>
 
 namespace audiohole::gui {
 void Frame::build_settings() {
@@ -74,38 +73,70 @@ void Frame::build_settings() {
     });
     auto* advanced = new wxStaticBoxSizer(wxVERTICAL, page, "Advanced");
     auto* box = advanced->GetStaticBox();
-    dfa_ = button(box, advanced, "DFA", [this] { present(presentation::Message::Dfa); });
+    dfa_ = button(box, advanced, "DFA", [this] { present_dfa(presentation::Message::Dfa); });
     dfa_->SetToolTip("Working as intended.");
     auto* slider_label = label(box, advanced, "DFA level");
     dfa_slider_ = new wxSlider(box, wxID_ANY, 0, 0, 1100);
     dfa_slider_->SetName("DFA level, zero to eleven");
-    dfa_value_ = new wxSpinCtrlDouble(box, wxID_ANY, "0.00", wxDefaultPosition, wxDefaultSize,
-                                      wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0.0, 11.0, 0.0, 0.01);
-    dfa_value_->SetDigits(2);
-    dfa_value_->SetName("DFA exact value, two decimal places");
+    // A native floating-point spin editor truncates precision and can clamp raw
+    // input before validation. Keep text and stepping separate so every path uses
+    // the same exact decimal parser before changing the last valid value.
+    auto* numeric = new wxBoxSizer(wxHORIZONTAL);
+    dfa_value_ = new wxTextCtrl(box, wxID_ANY, "0.00", wxDefaultPosition, FromDIP(wxSize(100, -1)),
+                                wxTE_PROCESS_ENTER);
+    dfa_value_->SetName("DFA exact value, normalized to two decimal places");
+    dfa_stepper_ = new wxSpinButton(box, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_VERTICAL);
+    dfa_stepper_->SetRange(-1, 1);
+    dfa_stepper_->SetValue(0);
+    dfa_stepper_->SetName("Adjust DFA by one hundredth");
+    dfa_feedback_ = label(box, advanced, "");
     advanced->Add(dfa_slider_, 0, wxEXPAND | wxALL, 4);
-    advanced->Add(dfa_value_, 0, wxALL, 4);
-    dfa_slider_->SetToolTip(
-        "Adjust DFA from 0 to 11. Special values have their own acknowledgments.");
-    dfa_value_->SetToolTip("Enter a value from 0.00 to 11.00 and press Enter to set the slider.");
-    dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_};
+    numeric->Add(dfa_value_, 0, wxALIGN_CENTER_VERTICAL);
+    numeric->Add(dfa_stepper_, 0, wxALIGN_CENTER_VERTICAL);
+    advanced->Add(numeric, 0, wxALL, 4);
+    dfa_slider_->SetToolTip("Adjust DFA from 0 to 11. Each settled change has an acknowledgment.");
+    dfa_value_->SetToolTip("Use a decimal point. Extra digits round half-up to two places on "
+                           "Enter; raw values must be between 0 and 11.");
+    dfa_stepper_->SetToolTip(
+        "Adjust the normalized DFA value by 0.01. Out-of-range input is rejected.");
+    dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_, dfa_stepper_, dfa_feedback_};
     // Tracking updates the visible number only. A release/keyboard settlement
     // selects at most one acknowledgment, never one per drag tick.
     dfa_slider_->Bind(wxEVT_SCROLL_THUMBTRACK, [this](wxScrollEvent&) {
-        dfa_value_->SetValue(static_cast<double>(dfa_slider_->GetValue()) / 100.0);
+        dfa_value_->ChangeValue(text(presentation::dfa_text(dfa_slider_->GetValue())));
     });
     dfa_slider_->Bind(wxEVT_SCROLL_CHANGED,
                       [this](wxScrollEvent&) { settle_dfa(dfa_slider_->GetValue()); });
     dfa_slider_->Bind(wxEVT_SCROLL_THUMBRELEASE,
                       [this](wxScrollEvent&) { settle_dfa(dfa_slider_->GetValue()); });
-    dfa_value_->Bind(wxEVT_SPINCTRLDOUBLE, [this](wxSpinDoubleEvent&) {
-        settle_dfa(static_cast<int>(std::lround(dfa_value_->GetValue() * 100.0)));
+    dfa_stepper_->Bind(wxEVT_SPIN_UP, [this](wxSpinEvent& event) {
+        adjust_dfa(1);
+        event.Veto();
+    });
+    dfa_stepper_->Bind(wxEVT_SPIN_DOWN, [this](wxSpinEvent& event) {
+        adjust_dfa(-1);
+        event.Veto();
+    });
+    dfa_value_->Bind(wxEVT_KEY_DOWN, [this](wxKeyEvent& event) {
+        if (event.GetKeyCode() == WXK_UP)
+            adjust_dfa(1);
+        else if (event.GetKeyCode() == WXK_DOWN)
+            adjust_dfa(-1);
+        else
+            event.Skip();
     });
     dfa_value_->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent&) { commit_dfa_text(); });
-    dfa_value_->Bind(wxEVT_KILL_FOCUS, [this](wxFocusEvent& event) {
-        commit_dfa_text();
+    // Text and arrows form one edit. Moving focus to the stepper must not first
+    // reject/restore raw text and then accidentally increment the restored value.
+    // The step handler validates the original text; leaving the composite commits.
+    auto leave_numeric = [this](wxFocusEvent& event) {
+        if (!IsBeingDeleted() && event.GetWindow() != dfa_value_ &&
+            event.GetWindow() != dfa_stepper_)
+            commit_dfa_text();
         event.Skip();
-    });
+    };
+    dfa_value_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
+    dfa_stepper_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     root->Add(advanced, 0, wxEXPAND | wxALL, 4);
     page->SetSizer(root);
     notebook_->AddPage(page, "Settings");
@@ -157,6 +188,8 @@ void Frame::reload_personalities() {
     }
 }
 void Frame::select_personality(const std::string& requested) {
+    if (dfa_feedback_)
+        dfa_feedback_->SetLabel("");
     personality_ = messages_.available(requested) ? requested : "vanilla";
     personality_fallback_note_ = requested == personality_
                                      ? ""
@@ -177,30 +210,66 @@ void Frame::select_personality(const std::string& requested) {
     notebook_->GetPage(3)->Layout();
     static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
 }
-// On MSW the spin control's cached numeric value may lag behind its edit field
-// when Enter arrives. Parse the actual text, then normalize both controls together.
-// Invalid/out-of-range input is restored without selecting a random response.
+// The raw decimal is range-checked before half-up rounding. Invalid text restores
+// the previous normalized presentation value; it never reaches the slider/state.
 void Frame::commit_dfa_text() {
-    double value = 0;
-    if (!dfa_value_->GetTextValue().ToDouble(&value) || !std::isfinite(value) || value < 0.0 ||
-        value > 11.0) {
-        dfa_value_->SetValue(static_cast<double>(dfa_slider_->GetValue()) / 100.0);
-        dfa_value_->SetToolTip("Enter a number from 0.00 to 11.00.");
+    if (personality_ == "vanilla")
+        return;
+    const auto input = presentation::parse_dfa(utf8(dfa_value_->GetValue()));
+    if (input.status == presentation::DfaInputStatus::Valid) {
+        settle_dfa(input.hundredths);
         return;
     }
-    settle_dfa(static_cast<int>(std::lround(value * 100.0)));
+    dfa_value_->ChangeValue(text(presentation::dfa_text(dfa_hundredths_)));
+    if (input.status == presentation::DfaInputStatus::Negative)
+        present_dfa(presentation::Message::DfaNegative);
+    else if (input.status == presentation::DfaInputStatus::AboveMaximum)
+        present_dfa(presentation::Message::DfaAboveMaximum);
+    else
+        dfa_value_->SetToolTip("Enter a decimal number from 0.00 to 11.00.");
+}
+void Frame::adjust_dfa(int delta) {
+    if (personality_ == "vanilla")
+        return;
+    const auto input = presentation::parse_dfa(utf8(dfa_value_->GetValue()));
+    if (input.status != presentation::DfaInputStatus::Valid) {
+        commit_dfa_text();
+        return;
+    }
+    settle_dfa(input.hundredths + delta);
 }
 void Frame::settle_dfa(int hundredths) {
     if (personality_ == "vanilla")
         return;
-    hundredths = std::clamp(hundredths, 0, 1100);
+    if (hundredths < 0 || hundredths > 1100) {
+        dfa_value_->ChangeValue(text(presentation::dfa_text(dfa_hundredths_)));
+        present_dfa(hundredths < 0 ? presentation::Message::DfaNegative
+                                   : presentation::Message::DfaAboveMaximum);
+        return;
+    }
+    dfa_hundredths_ = hundredths;
     dfa_slider_->SetValue(hundredths);
-    dfa_value_->SetValue(static_cast<double>(hundredths) / 100.0);
+    dfa_value_->ChangeValue(text(presentation::dfa_text(hundredths)));
     if (last_dfa_settled_ == hundredths)
         return;
     last_dfa_settled_ = hundredths;
-    // Thresholds have authored dedicated pools; every other settled adjustment
-    // shares the button pool, including its repetition avoidance and weighting.
-    present(presentation::dfa_event(hundredths));
+    present_dfa(presentation::dfa_event(hundredths));
+}
+void Frame::present_dfa(presentation::Message event) {
+    if (personality_ == "vanilla")
+        return;
+    if (!operational_warning_visible_) {
+        dfa_feedback_->SetLabel("");
+        present(event);
+        return;
+    }
+    const auto copy = messages_.show(event, personality_, ++occurrence_);
+    // Preserve the warning, its commentary policy and last_message_ in the header.
+    // This local feedback still uses the same authored catalog/selection machinery.
+    dfa_feedback_->SetLabel(
+        text(copy.technical + " " + copy.commentary + " " + copy.fallback_detail));
+    dfa_feedback_->Wrap(700);
+    notebook_->GetPage(3)->Layout();
+    static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
 }
 } // namespace audiohole::gui
