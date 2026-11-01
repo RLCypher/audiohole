@@ -130,3 +130,18 @@ Vanilla is a complete, independent personality presentation, **not a fallback fo
 ---
 
 *Vanilla. No personality. No nonsense. Just holes.*
+
+
+## Accepted expansion — brand-faithful wormhole performance
+
+Vanilla remains the canonical non-anthropomorphic AudioHole logo. Preserve its
+geometry, proportions, silhouette, mint-green and lavender-pink colors, black
+outlines and visual identity. The surrounding logo stays visually stable.
+
+More energetic status effects may occur inside the recessed wormhole: moving
+perspective grids, dimensional shifts, ripples, swirls, and state-specific
+internal patterns. Prefer a fixed canonical logo layer and independent interior
+compositing. Such effects communicate activity or operational status, never
+emotional personality; do not add eyes, mouths or anthropomorphic features.
+
+**The logo is sacred. The wormhole is where we get to fuck around.**

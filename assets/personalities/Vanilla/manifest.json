@@ -20,16 +20,20 @@
       "states": {
         "idle": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/logo/idle.png",
             "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T21:39:05Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/logo/idle/0000.png",
@@ -144,7 +148,11 @@
             "priority": 0,
             "interruptible": true,
             "cooldown_ms": 0,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T21:39:05Z"
+            }
           }
         },
         "happy": {

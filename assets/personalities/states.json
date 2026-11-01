@@ -32,5 +32,5 @@
     "last_valid_frame",
     "hide"
   ],
-  "generation_gate": "Only the three initial IDLE masters and IDLE animation sequences are authorized. Await human review before any other state or bulk animation generation."
+  "generation_gate": "IDLE accepted by user. Full core and meaningful optional generation authorized; new assets remain unapproved until human review."
 }

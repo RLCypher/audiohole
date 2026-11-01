@@ -40,6 +40,18 @@ def inventory():
             errors.append(f'canonical reference changed/missing: {entry["path"]}')
     for rel, expected in baseline['supplied_documents'].items():
         p = ROOT / rel
+        revisions_path = ROOT/'provenance/document-revisions.json'
+        revisions = read_json(revisions_path) if revisions_path.exists() else {}
+        if rel in revisions:
+            revision = revisions[rel]
+            import hashlib
+            raw = p.read_bytes()
+            original = hashlib.sha256(raw[:revision['original_prefix_bytes']]).hexdigest()
+            authority = ROOT/revision['authorization']
+            if (original != expected or digest(p) != revision['current_sha256']
+                    or digest(authority) != revision['authorization_sha256']):
+                errors.append(f'authorized document revision integrity failed: {rel}')
+            continue
         if not p.is_file() or digest(p) != expected:
             errors.append(f'supplied document changed/missing: {rel}')
     return {'references': baseline['references'], 'errors': errors}

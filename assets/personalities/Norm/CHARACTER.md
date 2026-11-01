@@ -220,3 +220,21 @@ The chibi variant may be visually cute, but Norm himself should not behave like 
 
 \*Norm doesn't judge your audio setup. He's just disappointed in it.\*
 
+
+
+## Accepted expansion — restrained expressiveness
+
+Norm remains understated, dry, competent, mildly sarcastic, and usually
+unimpressed. Facial expressions, eyebrow movements, small posture changes,
+coffee-related gestures, and long stares remain his ordinary vocabulary.
+
+Restraint is the default, not a prohibition on expression. Occasional exaggerated
+reactions are encouraged when they create an effective comedic contrast. A rare
+dramatic recoil, emphatic gesture, or celebration should feel significant
+precisely because Norm normally looks like he has seen this bullshit before.
+Avoid sustained hyperactivity or turning the character into an excitable mascot.
+
+Ambient performances remain quiet; ordinary reactions may be visibly expressive;
+rare theatrical reactions may use anticipation, follow-through and a larger
+pose before returning to his canonical resting proportions. Preserve his adult
+appearance, cap, hair, beard, headphones, clothing, equipment and color identity.

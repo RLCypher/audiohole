@@ -1012,3 +1012,29 @@ The initial implementation should prioritize correctness, maintainability, and e
 
 \*AudioHole: Because apparently routing audio wasn't complicated enough, we also needed a tiny animated technician to judge you while doing it.\*
 
+
+
+## Accepted full-generation extension
+
+The revised IDLE milestone is accepted. Its operating images and individual
+frames remain immutable approved baselines; generated reactions remain separate
+candidates until human approval. Full core-state generation is authorized,
+followed by optional states where they add meaningful personality behavior.
+
+Use ambient loops for persistent behavior, expressive performances for ordinary
+reactions, and generally finite theatrical reactions for major events. These
+are artistic categories, not numerical displacement limits. Do not constrain
+new performances to the original IDLE frame-count target. Static expressions
+are also reduced-motion alternatives. A temporary reaction returns to the
+current persistent presentation context, with IDLE as the default.
+
+Manifests may include explicit state behavior (category, persistence, static
+hold time), animation priority, interruptibility, cooldown, loop, transition
+policy and return behavior. Repeated equivalent events must not restart loops
+or spam theatrical reactions. Preview and reference runtime remain outside
+audio callbacks and do not independently infer engine state. Reduced motion
+selects the current personality's static expression, then its own fallback.
+
+Keep all operating images and frames exactly 512 × 768 8-bit RGBA PNG with true
+transparent backgrounds. Maintain explicit provenance, validation and approval
+status, anchors, file hashes, bounded sequences and personality isolation.

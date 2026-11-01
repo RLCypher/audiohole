@@ -167,3 +167,50 @@ The chibi variant should remain recognizably the same adult character rather tha
 ---
 
 *UwU is a highly qualified audio technician who takes their job very seriously. Especially when it involves inserting things into holes. (¬‿¬)*
+
+## Accepted expansion — anime and manga expression language
+
+UwU's primary expression and animation vocabulary **must derive from established
+anime and manga visual conventions**. This is a defining artistic characteristic,
+not an optional influence. Facial performance leads; ears, tail, gestures and
+body language reinforce the face. UwU reacts like an anime character who knows
+they are in an anime and is willing to abuse that privilege.
+
+| Intent | Authored visual vocabulary |
+|---|---|
+| Happy | Closed-eye smiles, sparkling eyes, delighted grins, a little bounce |
+| Smug | Half-lidded eyes, fang grin, knowing smirk, sideways glance |
+| Mischievous | Cheeky wink, sly smile, teasing gesture, exaggerated self-satisfaction |
+| Embarrassed | Strong blush, sweat drop, nervous smile, flustered hands |
+| Confused | Asymmetrical eyes, exaggerated head tilt, question mark or blank stare |
+| Surprised | Widened or blank white eyes, enormous mouth, sudden frozen pose |
+| Angry | Puffed cheeks, narrowed eyes, anger mark, pout or little stomp |
+| Concerned | Shadowed eyes, trembling mouth, anxious sweat, drooping ears |
+| Panicking | Spiral eyes, frantic gestures, theatrical distress |
+| Celebrating | Starry eyes, sparkles, triumphant gesture, excited jump |
+| Sleeping | Relaxed closed eyes, settled or curled posture, optional sleep symbol |
+| Deadpan | Tiny dot eyes, expressionless face, motionless comedic stare |
+| Despair | Waterfall tears, dramatic sobbing, collapsed posture |
+
+These are examples, not a requirement to use every effect in every animation.
+Sweat drops, anger marks, blush lines, sparkles, speed lines, shadowed eyes,
+question marks, and simplified comedic facial features are permitted. Use them
+selectively, with clear silhouettes and compact-size readability. Text is not
+required. Kaomoji and playful audio-related double meanings remain part of the
+existing dialogue direction; animation complements them without replacing facts.
+
+Intentional, reversible chibi deformation, oversized expressions, simplified
+eyes, exaggerated mouths and cartoon physics are permitted. Return to canonical
+resting proportions after the reaction. Preserve the same recognizable adult
+white feline, ears, hair, headphones, clothing, accessories, pink/mint accents,
+colors and silhouette. UwU remains playful, flirtatious, cheeky, mischievous,
+technically competent and occasionally absurdly dramatic.
+
+Anime timing may use abrupt expression changes, held reactions, comedic freezes,
+anticipation followed by exaggerated movement, rapid shifts to simplified faces,
+sudden emotional reversals, independent ear/tail follow-through, deliberate
+pauses, and brief effects that appear and disappear. Uniform smoothness is not
+mandatory; add drawings when convincing movement needs them. Ambient motion
+remains unobtrusive, expressive motion is noticeable, and major reactions may
+be theatrical. The accepted closed-mouth IDLE and restrained steam are the rest
+baseline, not a limit on open-mouth emotional or talking performances.

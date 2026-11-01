@@ -20,16 +20,20 @@
       "states": {
         "idle": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/idle.png",
             "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T21:39:05Z"
+            }
           },
           "animation": {
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/idle/0000.png",
@@ -144,7 +148,11 @@
             "priority": 0,
             "interruptible": true,
             "cooldown_ms": 0,
-            "transition": "cut"
+            "transition": "cut",
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-01T21:39:05Z"
+            }
           }
         },
         "happy": {
