@@ -91,8 +91,6 @@ def character_frame(image, folder, breath, phase, settings):
             coffee = ellipse(x, y, 399, 295, 53, 108)
             dx += .4 * math.sin(phase) * coffee
             dy -= .6 * breath * coffee
-            steam = ellipse(x, y, 406, 240, 40, 39)
-            dx += .7 * math.sin(phase) * steam
         else:
             tail = ellipse(x, y, 410, 518, 66, 91)
             dx += 3.5 * math.sin(phase) * tail
@@ -103,6 +101,27 @@ def character_frame(image, folder, breath, phase, settings):
                 dy -= .7 * breath * ear
         return dx, dy
     return mesh_warp(image, motion)
+
+
+def steam_frame(layer, phase, breath, folder):
+    """Independent plume rise, curl and fade; cup and character are not warped."""
+    wind = math.sin(phase)
+    rise = 4 * (1-math.cos(phase))
+    cup_y = -.6*breath if folder == 'Norm' else -.8*breath
+    def motion(x,y):
+        curl = 1.3*math.sin((y-220)/12 + phase)*wind
+        return 2.5*wind+curl, -rise+cup_y
+    frame = mesh_warp(layer, motion, cell=4)
+    opacity = .8+.2*math.cos(phase)
+    frame.putalpha(frame.getchannel('A').point(lambda value: round(value*opacity)))
+    return frame
+
+
+def compose_character_frame(source, clean_base, steam_layer, folder, breath, phase, settings):
+    steam_support = steam_layer.getchannel('A').point(lambda value: 255 if value else 0)
+    source = Image.composite(clean_base, source, steam_support)
+    frame = character_frame(source, folder, breath, phase, settings)
+    return Image.alpha_composite(frame,steam_frame(steam_layer,phase,breath,folder))
 
 
 def wormhole_mask():
@@ -157,6 +176,26 @@ def previews(identity, frames, durations):
         sheet.paste(canvas.convert('RGB'), (x, y))
         draw.text((x+8, y+293), f'{i:04d} | {durations[i]} ms', fill='white', font=font)
     sheet.save(out/f'{identity}-all-frames.png')
+    # Portable fallback for viewers that cannot display APNG or HTML visualizations.
+    flat = []
+    for image in frames:
+        canvas = checker((256,384))
+        canvas.alpha_composite(image.resize(canvas.size, Image.Resampling.LANCZOS))
+        flat.append(canvas.convert('RGB'))
+    palette_source = Image.new('RGB',(256*4,384*3))
+    for i, image in enumerate(flat):
+        palette_source.paste(image,((i%4)*256,(i//4)*384))
+    palette = palette_source.quantize(colors=256)
+    gif = [image.quantize(palette=palette,dither=Image.Dither.NONE) for image in flat]
+    gif[0].save(out/f'{identity}-review.gif',save_all=True,append_images=gif[1:],
+                duration=durations,loop=0,optimize=True,disposal=1)
+    with Image.open(out/f'{identity}-review.gif') as check:
+        if check.n_frames != len(frames):
+            raise AssetError('GIF encoder merged authored frames; inspect timing')
+        for index,expected in enumerate(gif):
+            check.seek(index)
+            if check.convert('RGB').tobytes() != expected.convert('RGB').tobytes():
+                raise AssetError('GIF delta encoding changed a displayed frame')
 
 
 def generate():
@@ -179,6 +218,9 @@ def generate():
         with Image.open(master_path) as im:
             master = im.copy()
         blink, provenance = (None, {}) if identity == 'vanilla' else blink_keyframe(folder, master, rigs[identity])
+        if identity != 'vanilla':
+            clean_base = Image.open(manifest.parent/'Intermediate/idle-clean-base.png').copy()
+            steam_layer = Image.open(manifest.parent/'Intermediate/idle-steam-layer.png').copy()
         out = manifest.parent/f'Generated/{style}/idle'
         out.mkdir(parents=True, exist_ok=True)
         frames, metadata = [], []
@@ -190,7 +232,7 @@ def generate():
                 frame = vanilla_frame(master, phase)
             else:
                 source = blink if i in config['blink_indices'] else master
-                frame = character_frame(source, folder, breath, phase, rigs[identity])
+                frame = compose_character_frame(source,clean_base,steam_layer,folder,breath,phase,rigs[identity])
             target = out/f'{i:04d}.png'
             frame.save(target)
             checked = inspect_png(target)
@@ -207,6 +249,11 @@ def generate():
                            'motion_config_sha256': digest(ROOT/'provenance/idle-motion.json'),
                            'rig_config_sha256': digest(ROOT/'provenance/idle-rigs.json'),
                            'compositor_sha256': digest(Path(__file__)), 'frames': metadata})
+        if identity != 'vanilla':
+            provenance['revision_provenance_sha256'] = digest(ROOT/f'provenance/{identity}-idle-revision.json')
+            provenance['steam_motion'] = {'method':'separate alpha layer; curl, rise, fade',
+                                         'max_rise_px':8,'max_wind_and_curl_px':3.8,
+                                         'opacity_multiplier_range':[.6,1]}
         if identity == 'vanilla':
             mask_path = manifest.parent/'Intermediate/wormhole-motion-mask.png'
             mask_path.parent.mkdir(exist_ok=True)

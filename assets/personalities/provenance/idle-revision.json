@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "authorization": "User requested subtler animated coffee steam and a closed mouth for UwU's IDLE.",
+  "default": {
+    "original_steam_box": [
+      365,
+      202,
+      439,
+      274
+    ],
+    "plume_size": [
+      26,
+      46
+    ],
+    "base_point": [
+      392,
+      270
+    ],
+    "opacity": 0.38
+  },
+  "uwu": {
+    "original_steam_box": [
+      364,
+      254,
+      430,
+      328
+    ],
+    "plume_size": [
+      24,
+      46
+    ],
+    "base_point": [
+      381,
+      325
+    ],
+    "opacity": 0.38
+  },
+  "uwu_mouth": {
+    "source_offset": [
+      -8.5,
+      -6
+    ],
+    "polygon": [
+      [
+        253,
+        251
+      ],
+      [
+        281,
+        255
+      ],
+      [
+        300,
+        256
+      ],
+      [
+        302,
+        272
+      ],
+      [
+        294,
+        289
+      ],
+      [
+        274,
+        293
+      ],
+      [
+        253,
+        282
+      ]
+    ],
+    "preserve_box": [
+      287,
+      247,
+      314,
+      264
+    ]
+  }
+}

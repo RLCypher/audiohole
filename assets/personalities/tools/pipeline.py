@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+from io import BytesIO
 import json
 from pathlib import Path
 
@@ -137,7 +138,12 @@ def review():
                                  'animation' if selection.durations_ms else 'static', {}).get('status', 'unavailable')}
                     for path in selection.paths:
                         if path not in image_urls:
-                            image_urls[path] = 'data:image/png;base64,' + base64.b64encode(path.read_bytes()).decode()
+                            # Display-only compression keeps the self-contained
+                            # inspector small enough for constrained HTML viewers.
+                            encoded = BytesIO()
+                            with Image.open(path) as display_image:
+                                display_image.save(encoded,format='WEBP',quality=85,method=4)
+                            image_urls[path] = 'data:image/webp;base64,' + base64.b64encode(encoded.getvalue()).decode()
                         entry['frames'].append(image_urls[path])
                     return entry
                 entry = resolved_entry(False)

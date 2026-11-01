@@ -1,7 +1,7 @@
 {
   "source": "UwU/Intermediate/blink-source.png",
   "source_sha256": "665aa6370e7b57d9a92cc927fe31eadaf2795d0ddbb6740095e28399dac083ae",
-  "keyframe_sha256": "a9483e554b29d4abb4a633a23f713b1c3bcc31c6b99e692c9a1c8ff73cc137ff",
+  "keyframe_sha256": "00a9f1cc93c6c2dafcddbae27d37a8e464b62a9d66b41cbc7c92302d4f36a312",
   "eye_mask_bbox": [
     202,
     195,
@@ -81,32 +81,32 @@
   "personality_id": "uwu",
   "method": "fixed-master 2D limited-motion compositor",
   "approval": "pending human review",
-  "master_sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
-  "motion_config_sha256": "bd185754b880b9e26a6497acdcab2a73b99a491e635b2b10413c6ca679d7822e",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "motion_config_sha256": "d0a1bb1fa5e0482e6930b8b5a3dcde0032def9bfb64654909d2bc8f280b98dbc",
   "rig_config_sha256": "3620a652d13d4a70a82a4f4bd92b146246d11ac2e84569fae578a403779b4026",
-  "compositor_sha256": "ecc908a3a6a3200ecbb72ddb38ae55cfbcbc4606f70a08f9b7a2e56692a716bb",
+  "compositor_sha256": "9a4ed6c5abb18bcf425eaa478a0f0d86464881c18a93a6320eea0d9cb5eb8c58",
   "frames": [
     {
       "path": "Generated/chibi/idle/0000.png",
-      "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+      "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 1400
+      "duration_ms": 500
     },
     {
       "path": "Generated/chibi/idle/0001.png",
-      "sha256": "eb8d607d1f94c71220223dc38a94055286d5ffe3a898ed527154b28341258ce4",
+      "sha256": "b3d1f51acbccd61dcefa1c7d45569da3c0cef2a45ad96b586401f4b0ba5ab564",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 400
+      "duration_ms": 500
     },
     {
       "path": "Generated/chibi/idle/0002.png",
-      "sha256": "afd079c6dd781b2002344ab7340f1115a5644424931d9667048e000cff7ae11d",
+      "sha256": "e6a09b3a6247d9b8c573758777d09017a60fc62a20bd4bd3f2cdea4933b7a6d6",
       "anchor": [
         256,
         704
@@ -115,25 +115,25 @@
     },
     {
       "path": "Generated/chibi/idle/0003.png",
-      "sha256": "fb971a8b821d52b0200e94f4b73505e57fdbb7badb491682e6596a4566103996",
+      "sha256": "93da7845d5e4463b789062517f4462c5cfe855d31118642e0c554d46213783a4",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 300
+      "duration_ms": 400
     },
     {
       "path": "Generated/chibi/idle/0004.png",
-      "sha256": "a324e8c1f54ded4db366ee58f15c92dbfb222f0294ba219f2c171eabbebb2391",
+      "sha256": "0b7a1daaaa515fae2205fa7aa617f2204a8015e5f1f25d5cbe849184bd3d675d",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 100
+      "duration_ms": 400
     },
     {
       "path": "Generated/chibi/idle/0005.png",
-      "sha256": "353d009469679cbd385f828239ceb80a1214462c3d48290734238dbfcfa32e65",
+      "sha256": "6c2d41167facb029032e991e01d8a719bc9e77053cfea425d2d14a0b944057c1",
       "anchor": [
         256,
         704
@@ -142,7 +142,7 @@
     },
     {
       "path": "Generated/chibi/idle/0006.png",
-      "sha256": "05fe93d9bd3977c80eb88e739ca762aa072c739e4d7d235d4f2625f1418ca750",
+      "sha256": "d35a236b16eb4adece7936a9c5ea6285c90f0e3db1a6eafff6bd38786b20122b",
       "anchor": [
         256,
         704
@@ -151,48 +151,58 @@
     },
     {
       "path": "Generated/chibi/idle/0007.png",
-      "sha256": "7879ddb30aae9d43fbd5194bc04a2ae2327e29c16b7c1083a6b9d07880ea755e",
+      "sha256": "c2b0a2bb49537444ade17012d8caaf8ad9e834e7e3ae4bf841d1fdd678c2b7df",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 300
+      "duration_ms": 400
     },
     {
       "path": "Generated/chibi/idle/0008.png",
-      "sha256": "84883e644509e5d5e4bea34bd3c90c80feee82e91d7ee0df68eaf07d7149cb12",
+      "sha256": "2e61602ca963e71ba85d00fd5792d07e4c43ab9f23defab1b5fcf593b3c21bfd",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 400
+      "duration_ms": 500
     },
     {
       "path": "Generated/chibi/idle/0009.png",
-      "sha256": "4ecbdad39e7c60ad585932026be1c8778b713baeb8bed7f03ea01e5962655b5c",
+      "sha256": "d5f6f12f3d0a0f85f10bf27c9fce55572bbf01cfdbec61a287a92ba2cf279362",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 400
+      "duration_ms": 500
     },
     {
       "path": "Generated/chibi/idle/0010.png",
-      "sha256": "163e57ccb20a00a275791b3d9f97e98334dbef0d12016234d4994fdcd7bb75d7",
+      "sha256": "76ab87606d2e98baa27166aff541255067c15b7a73471f8cce226ee8f4e93a6a",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 400
+      "duration_ms": 600
     },
     {
       "path": "Generated/chibi/idle/0011.png",
-      "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+      "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
       "anchor": [
         256,
         704
       ],
-      "duration_ms": 700
+      "duration_ms": 600
     }
-  ]
+  ],
+  "revision_provenance_sha256": "4043e2b2eee7da42ef0f977cdd486ce5cc81b267ee90280f073e23214aaeaced",
+  "steam_motion": {
+    "method": "separate alpha layer; curl, rise, fade",
+    "max_rise_px": 8,
+    "max_wind_and_curl_px": 3.8,
+    "opacity_multiplier_range": [
+      0.6,
+      1
+    ]
+  }
 }

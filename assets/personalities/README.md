@@ -15,6 +15,14 @@ The original repository audit is in [RECONNAISSANCE.md](RECONNAISSANCE.md).
   animated PNG previews at `*-native.png` and `*-compact.png` in that directory.
   Compact 128 × 192 is a representative review size; no production GUI size has
   been selected. The HTML preview supports native/compact sizing and frame stepping.
+- The gallery is now self-contained and script-free. Direct `*-review.gif` files
+  and `idle-previews.zip` bypass HTML/APNG viewer compatibility problems. GIFs
+  have a checkerboard review background; operating PNG transparency is unchanged.
+  The frame inspector uses display-only WebP compression to reduce its size;
+  use the native APNG or individual PNGs for exact pixel/edge inspection.
+- The latest authorized revision closes UwU's mouth and replaces both heavy
+  steam plumes with smaller, fainter, independently animated layers. Original
+  generated masters remain archived in `*/Intermediate/idle-before-steam-revision.png`.
 - Norm and UwU use reference-guided generated chibi illustrations. Vanilla is the
   original logo pasted pixel-for-pixel onto a transparent portrait canvas.
 - Check Norm's facial hair, cap, headphones, fingers, coffee mug, clothing, cables,
@@ -83,6 +91,12 @@ python assets/personalities/tools/pipeline.py export-idle uwu assets/personaliti
 python assets/personalities/tools/pipeline.py export-idle vanilla "assets/personalities/Vanilla/References/Vanilla Reference.png" --replace
 python assets/personalities/tools/pipeline.py review
 ```
+
+The export commands above recreate the earlier masters. To rebuild the current
+review after those exports, run `python assets/personalities/tools/prepare_idle_revision.py`
+and then `python assets/personalities/tools/animate_idle.py`. This reapplies the
+closed mouth, separate subtle steam layers, and recorded animation changes. See
+[the revision notes](review/idle-sequences/REVISION.md) for the current review workflow.
 
 Export is explicitly separate from validation: it crops near-invisible source
 padding using alpha ≥ 4 bounds, fits the figure proportionally into 448 × 640,

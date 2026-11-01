@@ -1,0 +1,75 @@
+{
+  "approval": "pending human review",
+  "source": "UwU/Intermediate/idle-before-steam-revision.png",
+  "source_sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+  "changes": [
+    "subtler separate steam layer",
+    "closed-mouth IDLE smile"
+  ],
+  "mouth_source": "UwU/Intermediate/closed-mouth-source.png",
+  "mouth_source_sha256": "8fdad603d044bb79197ce01e7836c54cefd12af7449371d04227c788c33aaca4",
+  "mouth_patch": {
+    "source_offset": [
+      -8.5,
+      -6
+    ],
+    "polygon": [
+      [
+        253,
+        251
+      ],
+      [
+        281,
+        255
+      ],
+      [
+        300,
+        256
+      ],
+      [
+        302,
+        272
+      ],
+      [
+        294,
+        289
+      ],
+      [
+        274,
+        293
+      ],
+      [
+        253,
+        282
+      ]
+    ],
+    "preserve_box": [
+      287,
+      247,
+      314,
+      264
+    ]
+  },
+  "steam": {
+    "original_steam_box": [
+      364,
+      254,
+      430,
+      328
+    ],
+    "plume_size": [
+      24,
+      46
+    ],
+    "base_point": [
+      381,
+      325
+    ],
+    "opacity": 0.38
+  },
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "clean_base_sha256": "c11ab888251eb4ecc9330d7cde9b8f8b5407056060db997a55e37d8dfe87e518",
+  "steam_layer_sha256": "8b6cae6d13630350d01bb39a10c4a12ab25e1dd65c01e9f83164e71168f89e2e",
+  "preparation_sha256": "382b86888d6b1b98924f1b031486633315de31e1d42ec6cda489fad69723296c",
+  "settings_sha256": "1f1ca7679d3186e361d814c5f012472a14e68271835f93462ee9872de9f2265e"
+}

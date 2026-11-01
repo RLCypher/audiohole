@@ -4,6 +4,7 @@ Not a mandatory pipeline dependency; no browser or package downloads are made.
 """
 import argparse
 import json
+from io import BytesIO
 from pathlib import Path
 
 from avatar_assets import ROOT
@@ -78,6 +79,27 @@ def main():
         page.screenshot(path=str(ROOT / 'review/preview-screenshot.png'), full_page=True)
         assert not errors, errors
         checks.append('no browser JavaScript errors')
+        gallery_context = browser.new_context(offline=True,viewport={'width':1180,'height':850})
+        gallery = gallery_context.new_page()
+        requests = []
+        gallery.on('request',lambda request: requests.append(request.url))
+        gallery_errors = []
+        gallery.on('pageerror',lambda error: gallery_errors.append(str(error)))
+        gallery.set_content((ROOT/'review/idle-sequences/index.html').read_text(),wait_until='load')
+        gallery.wait_for_function('document.images.length === 3 && Array.from(document.images).every(image => image.complete && image.naturalWidth === 256)')
+        assert not any(not url.startswith('data:') for url in requests),requests
+        assert not gallery_errors,gallery_errors
+        checks.append('standalone gallery decodes all GIFs offline with no neighboring files or scripts')
+        from PIL import Image, ImageChops
+        before = [image.screenshot() for image in gallery.locator('img').all()]
+        gallery.wait_for_timeout(850)
+        after = [image.screenshot() for image in gallery.locator('img').all()]
+        for a,b in zip(before,after):
+            difference = ImageChops.difference(Image.open(BytesIO(a)).convert('RGB'),Image.open(BytesIO(b)).convert('RGB'))
+            assert difference.getbbox(),'GIF did not visibly advance in the browser'
+        checks.append('all three portable GIF previews visibly advance in Chromium')
+        gallery.screenshot(path=str(ROOT/'review/idle-sequences/gallery-screenshot.png'),full_page=True)
+        gallery_context.close()
         browser.close()
     result = {'browser': 'local Chromium via Playwright', 'passed': checks, 'errors': errors,
               'note': 'Playback checked against the actual 12-frame IDLE sequences and 5000ms timing.'}

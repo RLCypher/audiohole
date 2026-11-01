@@ -22,6 +22,7 @@ def audit():
                          'note': 'Integer exposure holds on a 10 Hz timebase; not 10 unique drawings per second.'},
               'packs': {}}
     durations = [n*100 for n in read_json(ROOT/'provenance/idle-motion.json')['exposure_ticks']]
+    report['timing']['frame_durations_ms'] = durations
     for identity, manifest in packs():
         data = load_pack(manifest, identity)
         style = data['default_style']

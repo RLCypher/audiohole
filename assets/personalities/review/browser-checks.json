@@ -10,7 +10,9 @@
     "native 512x768 and compact 128x192 display selectors",
     "actual 12-frame playback, blink frame, pause, step and loop wrap",
     "one-shot timer returns to idle",
-    "no browser JavaScript errors"
+    "no browser JavaScript errors",
+    "standalone gallery decodes all GIFs offline with no neighboring files or scripts",
+    "all three portable GIF previews visibly advance in Chromium"
   ],
   "errors": [],
   "note": "Playback checked against the actual 12-frame IDLE sequences and 5000ms timing."

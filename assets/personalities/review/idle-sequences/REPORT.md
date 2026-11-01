@@ -1,6 +1,9 @@
 # Initial IDLE sequences — review handoff
 
 **Status:** Completed limited batch; all artwork remains **unapproved**.
+
+See [the latest revision](REVISION.md) for the corrected steam, closed mouth,
+and direct GIF previews that bypass the HTML visualization viewer.
 Only the three IDLE masters and three initial IDLE sequences are delivered.
 No additional emotional state, main GUI, or audio-engine change was made.
 
@@ -13,8 +16,10 @@ No additional emotional state, main GUI, or audio-engine change was made.
 | Vanilla (`vanilla`) | `../../Vanilla/Generated/logo/idle.png` | `../../Vanilla/Generated/logo/idle/0000.png` through `0011.png` | `vanilla-native.png`, `vanilla-compact.png` |
 
 Open [the animated gallery](index.html) or [the frame inspector](../preview.html).
-The three previously generated masters are retained exactly, rather than
-regenerated into a different style. Their SHA-256 values remain unchanged.
+Vanilla's master is unchanged. Norm's master has a smaller, fainter steam plume;
+UwU's has the same steam revision plus the requested closed-mouth smile. All
+other character artwork is retained. The prior masters are archived, and the
+localized changes are recorded in `../../provenance/*-idle-revision.json`.
 All individual operating assets are 512 × 768 PNG, color type 6, 8-bit RGBA,
 with fully transparent background pixels and transparent corners. APNG review
 previews are explicitly separate from single-frame operating assets. Compact
@@ -36,19 +41,21 @@ second. Long neutral holds avoid a conspicuous blink every 1.2 seconds.
 
 | Frame | 0000 | 0001 | 0002 | 0003 | 0004 | 0005 | 0006 | 0007 | 0008 | 0009 | 0010 | 0011 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Hold (ms) | 1400 | 400 | 400 | 300 | 100 | 100 | 100 | 300 | 400 | 400 | 400 | 700 |
+| Hold (ms) | 500 | 500 | 400 | 400 | 400 | 100 | 100 | 400 | 500 | 500 | 600 | 600 |
 
-Norm and UwU close their eyes on frames 0005–0006, at 2.6–2.8 seconds; both eyes
-reopen at 2.8 seconds. Neutral frames 0000 and 0011 are exact master copies,
-giving 2.1 seconds of rest across the loop boundary. There are eleven distinct
+Norm and UwU close their eyes on frames 0005–0006, at 2.2–2.4 seconds; both eyes
+reopen at 2.4 seconds. Neutral frames 0000 and 0011 are exact master copies,
+giving 1.1 seconds of rest across the loop boundary. There are eleven distinct
 frame hashes per sequence because the endpoint intentionally repeats the master.
 
 - **Norm:** restrained 1.4-pixel maximum breathing displacement, a slight mug/hand
-  adjustment of at most 0.6 pixels, and small steam movement. No sip or arm lift
-  was invented. The ground and protected case region are pinned.
+  adjustment of at most 0.6 pixels, and small steam movement. The steam now uses an independent alpha layer, with up to eight pixels of
+  rise, gentle curl, and fading. Its neutral opacity is 38% of the source and
+  its footprint is 26 × 46 pixels. No sip or arm lift was invented. The ground and protected case region are pinned.
 - **UwU:** 1.2-pixel breathing displacement, subtle ear flex around 1.2 pixels,
   and a local tail swish up to 3.5 pixels. The ground and protected case region
-  are pinned. The loop keeps the original relaxed, mischievous idle face.
+  are pinned. The mouth is closed throughout IDLE, including the blink.
+  Coffee steam has its own 24 × 46 alpha layer, gentle rise/curl and fading.
 - **Vanilla:** grid movement is restricted to a conservative interior wormhole
   ellipse, with at most 1.7 pixels horizontal and 2.4 pixels vertical sampling
   displacement. The whole logo alpha and every RGBA pixel outside that mask are
@@ -93,7 +100,7 @@ Results are recorded in [validation.json](validation.json), the broader
 - Native and compact APNGs each decode to twelve frames, loop indefinitely, sum
   to exactly five seconds, and match the operating pixels or documented Lanczos
   downscales frame-for-frame.
-- **24 Python tests passed.** **Ten browser checks passed**, including actual
+- **27 Python tests passed.** **Twelve browser checks passed**, including actual
   frame playback, blink stepping, loop wrap, fallback, approval filtering,
   native/compact display dimensions, backgrounds, and JavaScript error checks.
   The one-shot return path was exercised as a preview-tool check; the delivered
@@ -135,6 +142,7 @@ playback; these checks do not certify fluidity or artistic approval.
 From the repository root:
 
 ```sh
+python assets/personalities/tools/prepare_idle_revision.py
 python assets/personalities/tools/animate_idle.py
 python assets/personalities/tools/pipeline.py review
 python assets/personalities/tools/validate_idle.py

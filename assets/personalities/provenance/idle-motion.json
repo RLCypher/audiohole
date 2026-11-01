@@ -4,18 +4,18 @@
   "approval": "pending human review",
   "timebase_ms": 100,
   "exposure_ticks": [
-    14,
+    5,
+    5,
     4,
     4,
-    3,
+    4,
     1,
     1,
-    1,
-    3,
     4,
-    4,
-    4,
-    7
+    5,
+    5,
+    6,
+    6
   ],
   "breath": [
     0,
@@ -39,5 +39,5 @@
     128,
     192
   ],
-  "notes": "12 authored frames; 10 Hz exposure timebase, variable integer frame holds; 5 second loop. First and last frames exactly neutral. No claim of fluid 10 unique drawings per second."
+  "notes": "12 authored frames on a shared 100 ms timebase; five-second loop. Shorter holds support visible steam motion. Closed eyes at 2.2-2.4 seconds; exact neutral endpoints."
 }
