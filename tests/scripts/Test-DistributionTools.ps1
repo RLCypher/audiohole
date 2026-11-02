@@ -43,19 +43,6 @@ try {
     $expectedDirty = -not [string]::IsNullOrWhiteSpace(($sourceStatus -join "`n"))
     if ($meta.configuration -ne 'Release' -or $meta.source_dirty -ne $expectedDirty -or $meta.commit -ne $expectedCommit) { throw 'Wrong metadata' }
     Write-Host 'PASS: ZIP naming/content and explicit dirty-source metadata.'
-    & "$repo/scripts/Package.ps1" -Configuration Release -Unverified -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/tester-output"
-    $testerZip = @(Get-ChildItem "$fixture/tester-output/*-UNVERIFIED.zip")
-    if ($testerZip.Count -ne 1) { throw 'Expected one explicitly labelled unverified tester ZIP' }
-    Expand-Archive -LiteralPath $testerZip[0].FullName -DestinationPath "$fixture/tester-extracted"
-    $testerRoot = @(Get-ChildItem "$fixture/tester-extracted" -Directory)[0]
-    $testerMeta = Get-Content (Join-Path $testerRoot.FullName 'build-info.json') -Raw | ConvertFrom-Json
-    $testerReadme = Get-Content (Join-Path $testerRoot.FullName 'README.txt') -Raw
-    if ($testerMeta.validation_status -ne 'unverified' -or -not $testerReadme.StartsWith('UNVERIFIED TESTER BUILD')) {
-        throw 'Unverified tester status is missing from metadata or README'
-    }
-    $testerNames = @(Get-ChildItem $testerRoot.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($testerRoot.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    if (Compare-Object ($expected | Sort-Object) $testerNames) { throw 'Tester package differs from the Runtime allowlist' }
-    Write-Host 'PASS: unverified tester name, metadata, README and Runtime allowlist.'
     try {
         & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
         throw 'Expected package overwrite rejection was missing'

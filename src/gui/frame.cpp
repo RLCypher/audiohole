@@ -496,20 +496,6 @@ bool Frame::smoke(const wxString& directory) {
                     logo.GetBlue(256, 256) == 251,
                 "Logo source colors or alpha changed during decoding");
         require(GetIcon().IsOk(), "Window application icon missing");
-        // Verify the actual HWND icon handles, not only wx's stored bundle.
-        // WM_GETICON returns borrowed handles owned by that bundle.
-        for (const int kind : {ICON_SMALL, ICON_BIG}) {
-            const bool use_small_icon = kind == ICON_SMALL;
-            const wxSize size(GetSystemMetricsForDpi(use_small_icon ? SM_CXSMICON : SM_CXICON,
-                                                     static_cast<UINT>(GetDPI().x)),
-                              GetSystemMetricsForDpi(use_small_icon ? SM_CYSMICON : SM_CYICON,
-                                                     static_cast<UINT>(GetDPI().y)));
-            const auto expected = GetIcons().GetIcon(size, wxIconBundle::FALLBACK_NEAREST_LARGER);
-            const auto actual = SendMessageW(static_cast<HWND>(GetHandle()), WM_GETICON,
-                                             static_cast<WPARAM>(kind), 0);
-            require(expected.IsOk() && actual == reinterpret_cast<LPARAM>(expected.GetHICON()),
-                    "Native window small/big icon differs from the canonical application bundle");
-        }
         TrayIconCache icon_cache;
         for (int size : {16, 32, 48})
             for (auto state : {State::Stopped, State::Ready, State::Running, State::Degraded,

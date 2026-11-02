@@ -91,16 +91,8 @@ on Windows Server 2022 with Visual Studio 2022 in separate Debug/Release jobs;
 it checks builds, COM, simulator logic, GUI smoke, and packaging, not consumer audio hardware compatibility.
 Successful jobs then package and audit runtime imports, extract and launch the
 package in a temporary directory outside the source/build tree, and upload its
-contents as a GitHub Actions ZIP artifact. This tested upload is skipped on build,
-test, packaging, or smoke-test failure. Adding these steps is not evidence of a run.
-After a successful Release compile, a separate **UNVERIFIED tester** artifact is
-packaged and uploaded before the remaining validation steps. It remains available
-if those later steps fail. Its name, README and metadata explicitly mark it as
-unverified; validation still fails the job and the tested artifact is withheld.
-Checkout and artifact uploads use pinned Node.js 24 actions, requiring Actions
-Runner 2.327.1 or newer (provided by the GitHub-hosted Windows runner). Node.js is
-only a CI action runtime, not an AudioHole dependency. GUI evidence uploads run
-after failures only when evidence files exist, avoiding secondary missing-file warnings.
+contents as a GitHub Actions ZIP artifact. Upload is skipped on build, test,
+packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 
 ## Download and run a CI build
 
@@ -110,12 +102,6 @@ after failures only when evidence files exist, avoiding secondary missing-file w
 3. Extract the downloaded ZIP and open its single AudioHole package directory.
 4. Read `README.txt` and `build-info.json`, then double-click `audiohole.exe`.
    Follow the included manual checklist; every device and operation is simulated.
-
-If validation is still failing after the Release compile, select that run and use
-**AudioHole-UNVERIFIED-tester-Windows-x64-release-&lt;commit&gt;** for manual testing.
-It has not completed automated validation or the isolated launch/import audit.
-Check the run's failed steps; this artifact is not a verified build or a release.
-An unsuccessful compile cannot produce either download.
 
 Debug is uploaded separately for development investigations. Both packages are
 x64, use the static MSVC CRT, and require normal Windows system DLLs but no

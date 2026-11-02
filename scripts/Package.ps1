@@ -5,8 +5,7 @@
 param(
     [ValidateSet('Debug', 'Release')][string]$Configuration = 'Release',
     [string]$BuildDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/windows-msvc'),
-    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/packages'),
-    [switch]$Unverified
+    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/packages')
 )
 
 Set-StrictMode -Version Latest
@@ -18,7 +17,6 @@ $status = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
 $suffix = if ($dirty) { '-dirty' } else { '' }
-if ($Unverified) { $suffix += '-UNVERIFIED' }
 $name = "AudioHole-Windows-x64-$Configuration-$($commit.Substring(0,12))$suffix"
 $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
@@ -50,9 +48,8 @@ try {
         actions_run = $runUrl
         packaged_at_utc = [DateTime]::UtcNow.ToString('o')
     }
-    if ($Unverified) { $metadata['validation_status'] = 'unverified' }
     $metadata | ConvertTo-Json | Set-Content (Join-Path $stage 'build-info.json') -Encoding UTF8
-    $readme = @"
+    @"
 AudioHole - Windows x64 - $Configuration
 Commit: $commit
 Source has uncommitted changes: $dirty
@@ -74,18 +71,14 @@ Test Beep emits NO SOUND. Profiles and settings last only for this session.
 Synchronization algorithms, production schemas, and storage roots remain unresolved.
 wxWidgets 3.2.6 is statically linked; license and LGPL text are included.
 The header-only nlohmann/json 3.11.3 MIT notice is included.
-Norm and UwU commentary are editable JSON files in personalities/.
+Normal and UwU commentary are editable JSON files in personalities/.
 Vanilla is the built-in fallback. Light/Dark/System choices are in Settings.
 Follow System is the default. Windows-owned dialogs retain system styling.
 The startup notice discloses all simulated functions, including silent Test Beep.
 Interface and commentary wording preview the intended production experience.
 This package is for private evaluation. AudioHole's project license remains undecided.
 The test-only GoogleTest dependency is not part of this package.
-"@
-    if ($Unverified) {
-        $readme = "UNVERIFIED TESTER BUILD`nAutomated validation has not completed. Use for manual GUI testing only.`nCheck the matching Actions run for failures before treating this build as verified.`n`n$readme"
-    }
-    $readme | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8
+"@ | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8
     Compress-Archive -LiteralPath $stage -DestinationPath $archive -CompressionLevel Optimal
     Write-Host "Created $archive"
 } finally {
