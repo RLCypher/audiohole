@@ -125,6 +125,31 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     build_scan();
     build_settings();
     CreateStatusBar();
+    // The native Windows status bar ignores SetForegroundColour for its text.
+    // Paint only its dark presentation; native fields, updates, tooltips and
+    // resize hit testing stay in place. Light/high contrast use native painting.
+    GetStatusBar()->Bind(wxEVT_PAINT, [this](wxPaintEvent& event) {
+        if (!dark_appearance_) {
+            event.Skip();
+            return;
+        }
+        auto* bar = GetStatusBar();
+        wxPaintDC dc(bar);
+        dc.SetBackground(wxBrush(bar->GetBackgroundColour()));
+        dc.Clear();
+        dc.SetFont(bar->GetFont());
+        dc.SetTextForeground(*wxWHITE);
+        for (int field = 0; field < bar->GetFieldsCount(); ++field) {
+            wxRect bounds;
+            if (!bar->GetFieldRect(field, bounds))
+                continue;
+            bounds.Deflate(bar->FromDIP(3), 0);
+            wxDCClipper clip(dc, bounds);
+            const auto value =
+                wxControl::Ellipsize(bar->GetStatusText(field), dc, wxELLIPSIZE_END, bounds.width);
+            dc.DrawText(value, bounds.x, bounds.y + (bounds.height - dc.GetCharHeight()) / 2);
+        }
+    });
     SetSizer(root);
     Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
         // Coalesce native resize notifications; wxFrame first settles its client
