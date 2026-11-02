@@ -3,9 +3,9 @@
   "state": "concerned",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-2-consistency",
+  "revision": "horu-prop-continuity-3",
   "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
-  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
   "source": "UwU/Intermediate/ConsistencyRevision/quiet-c-source.png",
   "source_sha256": "5ec9be3d5e92b1d69b34be672d0c90314c0b9fa83d3e5f88aa1419adaa214ece",
   "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/concerned",
@@ -80,7 +80,12 @@
         }
       ],
       "character_sha256": "0a6b25ee7fe1fcf10833bee5ad2afe887285003ac4707b9a8d1cfed1546c02f7",
-      "key_sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7"
+      "key_sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
     },
     {
       "state": "concerned",
@@ -142,7 +147,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "34c349164f818b1a961df5fe88d5578a4d37ff4f0dd5c81bc26f1dc34cf3a2ae",
-      "key_sha256": "c73b319c1c59169aa05716f536610701975428fdaabad8eb50938bbdfc042da3"
+      "key_sha256": "c73b319c1c59169aa05716f536610701975428fdaabad8eb50938bbdfc042da3",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
     }
   ],
   "drawn_pose_count": 2,
@@ -341,6 +351,10 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
-  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
 }

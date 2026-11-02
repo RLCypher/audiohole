@@ -3,9 +3,9 @@
   "state": "panicking",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-2-consistency",
+  "revision": "horu-prop-continuity-3",
   "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
-  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
   "source": "UwU/Intermediate/ConsistencyRevision/panicking-source.png",
   "source_sha256": "c0a963d291d55d458eb01263aab2ecc1851183a2f604997837ae8dc0ba587a34",
   "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/panicking",
@@ -73,7 +73,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "93a01197a1c8ea25b9c4753145d5b0827fb0c10d66abb084823b08f07d3c84dd",
-      "key_sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9"
+      "key_sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     },
     {
       "state": "panicking",
@@ -135,7 +140,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "eeeb2437fde9f44758d169f3d3ce4b000dc1ea43619490e766f4d1c4f97ff0fd",
-      "key_sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae"
+      "key_sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     },
     {
       "state": "panicking",
@@ -197,7 +207,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "868a12ae58af12419efc0a61ea0ef3f135f1f7b8f162a6c3f89c670e5747e9c7",
-      "key_sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4"
+      "key_sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     },
     {
       "state": "panicking",
@@ -259,7 +274,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "e5c3f493b9cc2e0ce6f7a94064a61b587ee24f6a32cbf0e0547728586fb1f1c6",
-      "key_sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3"
+      "key_sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     }
   ],
   "drawn_pose_count": 4,
@@ -286,15 +306,15 @@
     null
   ],
   "key_sha256": [
-    "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
-    "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
-    "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
-    "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3"
+    "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
+    "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
+    "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
+    "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/panicking.png",
-    "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+    "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
     "anchor": [
       256,
       704
@@ -310,7 +330,7 @@
     "frames": [
       {
         "path": "Generated/chibi/panicking/0000.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -319,7 +339,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0001.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -328,7 +348,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0002.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -337,7 +357,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0003.png",
-        "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+        "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
         "anchor": [
           256,
           704
@@ -346,7 +366,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0004.png",
-        "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+        "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
         "anchor": [
           256,
           704
@@ -355,7 +375,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0005.png",
-        "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+        "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
         "anchor": [
           256,
           704
@@ -364,7 +384,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0006.png",
-        "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+        "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
         "anchor": [
           256,
           704
@@ -373,7 +393,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0007.png",
-        "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+        "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
         "anchor": [
           256,
           704
@@ -382,7 +402,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0008.png",
-        "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+        "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
         "anchor": [
           256,
           704
@@ -391,7 +411,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0009.png",
-        "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+        "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
         "anchor": [
           256,
           704
@@ -400,7 +420,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0010.png",
-        "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+        "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
         "anchor": [
           256,
           704
@@ -409,7 +429,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0011.png",
-        "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+        "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
         "anchor": [
           256,
           704
@@ -418,7 +438,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0012.png",
-        "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+        "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
         "anchor": [
           256,
           704
@@ -427,7 +447,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0013.png",
-        "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+        "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
         "anchor": [
           256,
           704
@@ -436,7 +456,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0014.png",
-        "sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3",
+        "sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
         "anchor": [
           256,
           704
@@ -445,7 +465,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0015.png",
-        "sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3",
+        "sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
         "anchor": [
           256,
           704
@@ -454,7 +474,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0016.png",
-        "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+        "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
         "anchor": [
           256,
           704
@@ -463,7 +483,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0017.png",
-        "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+        "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
         "anchor": [
           256,
           704
@@ -472,7 +492,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0018.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -481,7 +501,7 @@
       },
       {
         "path": "Generated/chibi/panicking/0019.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -500,6 +520,10 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
-  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
 }

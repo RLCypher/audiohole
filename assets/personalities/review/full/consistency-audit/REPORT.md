@@ -1,3 +1,5 @@
+**Historical evidence.** Current Horu rest, scale, talking, working eyes and cup continuity are covered by the [latest report](../horu-revision/REPORT.md). The original source drawings and prior accepted rest remain archived.
+
 # UwU quick visual consistency review — 2026-11-02
 
 This is the historical review of revision 1 at commit `73edab2`. The [corrected candidate and current validation](../consistency-correction/REPORT.md) supersede its operating-file findings. Original source keys and the evidence sheets below are preserved.

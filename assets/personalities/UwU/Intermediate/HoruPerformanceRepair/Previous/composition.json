@@ -1,0 +1,3020 @@
+[
+  {
+    "state": "error",
+    "key": 0,
+    "source": "error-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      118,
+      76,
+      515,
+      750
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          370.66572398190044,
+          259.24886877828055,
+          1768
+        ],
+        [
+          537.4852374839538,
+          283.6636713735558,
+          779
+        ]
+      ],
+      "ear_target": [
+        [
+          243.5253164556962,
+          171.1977848101266,
+          1264
+        ],
+        [
+          384.7092592592593,
+          190.75555555555556,
+          540
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8454031464198432,
+      "translation": [
+        -69.75955226624171,
+        -48.51331465473484
+      ],
+      "neck_y": 270,
+      "body_vertical_fit": 1.0260047281323876,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        261,
+        471,
+        287,
+        502
+      ],
+      "assembly_top": 471,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "7d50ee3d35b3366eff73c0c3bc9fb859083f7fe13168f5bb439ccaacb30cf62c",
+    "key_sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1"
+  },
+  {
+    "state": "error",
+    "key": 1,
+    "source": "error-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      566,
+      75,
+      1015,
+      754
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          266.3253234750462,
+          305.53142329020335,
+          1082
+        ],
+        [
+          472.8135048231511,
+          265.60610932475885,
+          622
+        ]
+      ],
+      "ear_target": [
+        [
+          130.40463917525773,
+          212.93041237113403,
+          776
+        ],
+        [
+          314.73387096774195,
+          174.3978494623656,
+          372
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8953986159268742,
+      "translation": [
+        -108.34268684650883,
+        -62.03374718691376
+      ],
+      "neck_y": 288,
+      "body_vertical_fit": 0.9476082004555809,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        241,
+        468,
+        270,
+        499
+      ],
+      "assembly_top": 468,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "e2a0e2fb67e4a6a312aacffbbe15d48e72b8bbab9bef102e652ced82d86bc376",
+    "key_sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9"
+  },
+  {
+    "state": "error",
+    "key": 2,
+    "source": "error-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      42,
+      844,
+      529,
+      1487
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          410.0502283105023,
+          337.7801696020874,
+          1533
+        ],
+        [
+          598.4656862745098,
+          336.6666666666667,
+          612
+        ]
+      ],
+      "ear_target": [
+        [
+          278.3019197207679,
+          245.3150087260035,
+          1146
+        ],
+        [
+          440.45681818181816,
+          241.475,
+          440
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8608504272855085,
+      "translation": [
+        -74.7113090460785,
+        -46.903919228656434
+      ],
+      "neck_y": 334,
+      "body_vertical_fit": 1.0632183908045978,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        270,
+        486,
+        294,
+        518
+      ],
+      "assembly_top": 472,
+      "template": "canonical-badge-assembly.png",
+      "template_sha256": "528b8893eb2585e6f2ecdc1770f92b45bf4c4b61eb46cd340f232432b83fdd6b"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "4ccde18e5f562ae980c310bfccc9c6a517d7d0ba8b844ab3a204d77afaec6967",
+    "key_sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2"
+  },
+  {
+    "state": "error",
+    "key": 3,
+    "source": "error-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      587,
+      800,
+      1005,
+      1487
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          308.39924906132666,
+          237.4712140175219,
+          1598
+        ],
+        [
+          499.40041279669765,
+          233.9669762641899,
+          969
+        ]
+      ],
+      "ear_target": [
+        [
+          178.42179392142327,
+          147.65752409191995,
+          1349
+        ],
+        [
+          337.5699614890886,
+          144.37740693196406,
+          779
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.83326813096565,
+      "translation": [
+        -78.5609795103041,
+        -50.399744328993194
+      ],
+      "neck_y": 234,
+      "body_vertical_fit": 1.1163895486935866,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        236,
+        457,
+        262,
+        489
+      ],
+      "assembly_top": 457,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "508ea058fcbeb53ab31940087d4447bf80ec3e986317f5b64134cee0291cedc9",
+    "key_sha256": "6498e7688e9616e3868733a0feb17444eb785e893809c0935a4fa585607ab6bf"
+  },
+  {
+    "state": "angry",
+    "key": 0,
+    "source": "angry-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      63,
+      68,
+      533,
+      770
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          326.49979533360624,
+          256.2787556283258,
+          2443
+        ],
+        [
+          526.8290854572714,
+          273.18440779610194,
+          1334
+        ]
+      ],
+      "ear_target": [
+        [
+          223.32430689877498,
+          194.6247582205029,
+          1551
+        ],
+        [
+          374.63537414965987,
+          202.44761904761904,
+          735
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.7536417415344749,
+      "translation": [
+        -22.572291386233246,
+        -0.9765816467080413
+      ],
+      "neck_y": 278,
+      "body_vertical_fit": 1.0730478589420656,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        245,
+        486,
+        271,
+        520
+      ],
+      "assembly_top": 486,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "845e1ec74d9e0f308458c01e9845817607d1c41b772c1f65acc969e3e0c225ed",
+    "key_sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7"
+  },
+  {
+    "state": "angry",
+    "key": 1,
+    "source": "angry-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      528,
+      63,
+      1009,
+      771
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          244.78610354223434,
+          276.9396003633061,
+          2202
+        ],
+        [
+          427.8310308182784,
+          242.0998937300744,
+          941
+        ]
+      ],
+      "ear_target": [
+        [
+          139.0878205128205,
+          202.41474358974358,
+          1560
+        ],
+        [
+          279.2749140893471,
+          170.26632302405497,
+          582
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.7718847875995566,
+      "translation": [
+        -50.41009964475961,
+        -13.978811520125902
+      ],
+      "neck_y": 267,
+      "body_vertical_fit": 1.0606796116504855,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        219,
+        479,
+        245,
+        514
+      ],
+      "assembly_top": 479,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/angry-0001-patch.png",
+        "patch_sha256": "658cec8700d18f6b8ef1a3c05ee3bf8e8e8e14459e435b011f43e4059d06a2a4",
+        "mask": "GarmentEdits/angry-0001-mask.png",
+        "mask_sha256": "7fece4af1b414302498275d39aa86e1c75993eb719f6c320045692eb670020b4"
+      }
+    ],
+    "character_sha256": "4a1018d61ac1eacbe15b351569fdfe869a78e4adefd7668b4c06c1e11d726c37",
+    "key_sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749"
+  },
+  {
+    "state": "angry",
+    "key": 2,
+    "source": "angry-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      93,
+      804,
+      549,
+      1502
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          338.2083559413999,
+          232.0255018990776,
+          1843
+        ],
+        [
+          566.4363636363636,
+          258.5090909090909,
+          220
+        ]
+      ],
+      "ear_target": [
+        [
+          223.6250922509225,
+          187.84354243542435,
+          1355
+        ],
+        [
+          415.1279069767442,
+          204.21511627906978,
+          172
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8365329269132843,
+      "translation": [
+        -59.00604792868353,
+        -9.144839979769586
+      ],
+      "neck_y": 284,
+      "body_vertical_fit": 0.9813084112149533,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        240,
+        474,
+        270,
+        510
+      ],
+      "assembly_top": 474,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/angry-0002-patch.png",
+        "patch_sha256": "1f0620ac38d62c3ec1d2fe5388d51d824759dd0daa27cb817646e713fc8ef579",
+        "mask": "GarmentEdits/angry-0002-mask.png",
+        "mask_sha256": "3a4bcbae69981c0864ecc619eb8d8064d9e9aee1542f9662038f6f8da12c7e4c"
+      }
+    ],
+    "character_sha256": "a63ace9bb39ba0127010f86ec210399d9fd040e7b55f223814250d58b8e37c2a",
+    "key_sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d"
+  },
+  {
+    "state": "angry",
+    "key": 3,
+    "source": "angry-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      552,
+      812,
+      1008,
+      1504
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          280.223185759927,
+          250.6261980830671,
+          2191
+        ],
+        [
+          463.35571260306244,
+          234.5017667844523,
+          849
+        ]
+      ],
+      "ear_target": [
+        [
+          165.54771505376345,
+          177.61962365591398,
+          1488
+        ],
+        [
+          307.0119521912351,
+          159.69521912350598,
+          502
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.7756445476314248,
+      "translation": [
+        -52.09662550201779,
+        -19.486009036800425
+      ],
+      "neck_y": 250,
+      "body_vertical_fit": 1.135,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        244,
+        475,
+        271,
+        512
+      ],
+      "assembly_top": 475,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/angry-0003-patch.png",
+        "patch_sha256": "7ebd341778b7357e7f29472b7f514574f7d83973ea312fa78241844cc3f65e23",
+        "mask": "GarmentEdits/angry-0003-mask.png",
+        "mask_sha256": "813c1f50aaa92bbcc8c816e6ff0b950c0a8efd35877309df95034f65de0c2257"
+      }
+    ],
+    "character_sha256": "04a1f842a9264daa4ae716731b378145b23ce0ef46e067f300c68cc1187ba8ea",
+    "key_sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916"
+  },
+  {
+    "state": "surprised",
+    "key": 0,
+    "source": "surprised-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      55,
+      51,
+      500,
+      780
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          299.92566118656185,
+          255.60328806290207,
+          2798
+        ],
+        [
+          494.9073097211756,
+          252.03541823662397,
+          1327
+        ]
+      ],
+      "ear_target": [
+        [
+          197.0363815142576,
+          139.40265486725664,
+          2034
+        ],
+        [
+          348.3703703703704,
+          144.56134259259258,
+          864
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.7764656063801619,
+      "translation": [
+        -35.87685642109699,
+        -55.099999224526584
+      ],
+      "neck_y": 224,
+      "body_vertical_fit": 1.1294117647058823,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        265,
+        468,
+        290,
+        501
+      ],
+      "assembly_top": 468,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "8552948159e8dda37d3b40a1077365e021fd8fe569495614c3a7b83502bfab40",
+    "key_sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0"
+  },
+  {
+    "state": "surprised",
+    "key": 1,
+    "source": "surprised-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      516,
+      60,
+      1017,
+      775
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          298.1137832017229,
+          267.40847092605884,
+          2786
+        ],
+        [
+          470.2749800159872,
+          243.0263788968825,
+          1251
+        ]
+      ],
+      "ear_target": [
+        [
+          163.81370656370657,
+          153.26351351351352,
+          2072
+        ],
+        [
+          307.65320456540826,
+          135.94381035996489,
+          1139
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8332135567675245,
+      "translation": [
+        -84.3825116258563,
+        -68.04695642279592
+      ],
+      "neck_y": 232,
+      "body_vertical_fit": 1.0442477876106195,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        248,
+        475,
+        275,
+        508
+      ],
+      "assembly_top": 475,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "0dadf25f03897a38826f4b8366dd2918b4f8434953ecf68bbb4698597f626437",
+    "key_sha256": "0a36bdd6c3117feebd07fc178bc8d6506aae1bf2df613b43ac33524fd3b597e2"
+  },
+  {
+    "state": "surprised",
+    "key": 2,
+    "source": "surprised-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      113,
+      821,
+      519,
+      1502
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          361.6,
+          227.3,
+          0
+        ],
+        [
+          575.6,
+          284.0,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          250.5,
+          137.8,
+          0
+        ],
+        [
+          431.5,
+          187.7,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.8480852068238433,
+      "translation": [
+        -56.412727917652944,
+        -54.06298312451554
+      ],
+      "neck_y": 252,
+      "body_vertical_fit": 1.0660377358490567,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        301,
+        469,
+        328,
+        504
+      ],
+      "assembly_top": 469,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "183f1e1d2c0b8f1164ffe1adc9ed9874ee3e428a68a722dca744a4d8f7906967",
+    "key_sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca"
+  },
+  {
+    "state": "surprised",
+    "key": 3,
+    "source": "surprised-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      570,
+      786,
+      1009,
+      1508
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          304.4817843866171,
+          211.51412639405206,
+          2690
+        ],
+        [
+          499.0186219739292,
+          222.82029795158286,
+          1074
+        ]
+      ],
+      "ear_target": [
+        [
+          189.8136645962733,
+          118.46273291925466,
+          1932
+        ],
+        [
+          344.3525721455458,
+          124.54705144291091,
+          797
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.7936702172901443,
+      "translation": [
+        -51.774052683537434,
+        -50.85425629241212
+      ],
+      "neck_y": 205,
+      "body_vertical_fit": 1.1524249422632795,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        268,
+        460,
+        293,
+        495
+      ],
+      "assembly_top": 460,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/surprised-0003-patch.png",
+        "patch_sha256": "6948582a2f10c1af5fe117c70662dcc05aac1b9ebe1180c5284f7a853cffa22f",
+        "mask": "GarmentEdits/surprised-0003-mask.png",
+        "mask_sha256": "557f68b0957377ac79af8136d73c671c585f6150e9b40f717c2efd838ffb9837"
+      }
+    ],
+    "character_sha256": "8285a052691af06d3040ceaa14d7269707c666d1b1065ab918d8eb086a50279b",
+    "key_sha256": "aa8a8f2c0eb0408ba18e99ffd9751a8ea043e328fb3d8e8528b8e4fcaebc8aed"
+  },
+  {
+    "state": "celebrating",
+    "key": 0,
+    "source": "celebrating-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      121,
+      95,
+      500,
+      724
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          347.0507099391481,
+          298.17494929006085,
+          1972
+        ],
+        [
+          521.4080629301868,
+          285.9233038348083,
+          1017
+        ]
+      ],
+      "ear_target": [
+        [
+          243.97290485192187,
+          208.2173913043478,
+          1587
+        ],
+        [
+          399.37191157347206,
+          196.37321196358909,
+          769
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8916537405454771,
+      "translation": [
+        -65.5098484565417,
+        -58.111394488465805
+      ],
+      "neck_y": 296,
+      "body_vertical_fit": 1.0074074074074073,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        289,
+        497,
+        315,
+        529
+      ],
+      "assembly_top": 497,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "9ddc103640d5cf66415874985595d20eb9ea77a18303fabe3b9253b4529bc555",
+    "key_sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4"
+  },
+  {
+    "state": "celebrating",
+    "key": 1,
+    "source": "celebrating-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      593,
+      49,
+      1000,
+      726
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          303.00773195876286,
+          249.13853092783506,
+          1552
+        ],
+        [
+          460.68364030335863,
+          226.37811484290359,
+          923
+        ]
+      ],
+      "ear_target": [
+        [
+          181.80701754385964,
+          162.77944862155388,
+          1197
+        ],
+        [
+          321.3264462809917,
+          137.71625344352617,
+          726
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8897908311007056,
+      "translation": [
+        -88.19605850235001,
+        -61.307324688742625
+      ],
+      "neck_y": 244,
+      "body_vertical_fit": 1.013215859030837,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        265,
+        444,
+        293,
+        478
+      ],
+      "assembly_top": 444,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "cad51a1691fbda55918f021c520ca929300f941cb8c8801ec7fe22f3ec394602",
+    "key_sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29"
+  },
+  {
+    "state": "celebrating",
+    "key": 2,
+    "source": "celebrating-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      110,
+      813,
+      522,
+      1487
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          354.037093495935,
+          236.1900406504065,
+          1968
+        ],
+        [
+          534.3082400813835,
+          233.23499491353002,
+          983
+        ]
+      ],
+      "ear_target": [
+        [
+          248.31861413043478,
+          125.05774456521739,
+          1472
+        ],
+        [
+          402.9136577708006,
+          123.48194662480377,
+          637
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.857498886167082,
+      "translation": [
+        -55.26143108652002,
+        -76.99587697249864
+      ],
+      "neck_y": 214,
+      "body_vertical_fit": 1.1290322580645162,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        308,
+        424,
+        334,
+        460
+      ],
+      "assembly_top": 424,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "c5aaa4720a6bf2044c6f1109f3cc02d6999ead55a2d7ff7bd6e19d2bde1262e0",
+    "key_sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd"
+  },
+  {
+    "state": "celebrating",
+    "key": 3,
+    "source": "celebrating-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      606,
+      831,
+      1011,
+      1497
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          361.703125,
+          243.56451612903226,
+          1984
+        ],
+        [
+          526.2414151925078,
+          278.6004162330905,
+          961
+        ]
+      ],
+      "ear_target": [
+        [
+          239.04953145917003,
+          136.10843373493975,
+          1494
+        ],
+        [
+          386.2754409769335,
+          170.5345997286296,
+          737
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8987690034819911,
+      "translation": [
+        -86.36602854999575,
+        -81.33131122438849
+      ],
+      "neck_y": 248,
+      "body_vertical_fit": 1.0387243735763099,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        282,
+        460,
+        309,
+        494
+      ],
+      "assembly_top": 460,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "72681c112633c0d2980a21abb920f5a9eb0ece423558c73d4affc60718108f50",
+    "key_sha256": "36c72b596b120ee40a42658ed1c0f7b2a12bbde27a7ba3cf1f39539baf50dcc7"
+  },
+  {
+    "state": "panicking",
+    "key": 0,
+    "source": "panicking-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      64,
+      67,
+      481,
+      749
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          319.65442863698945,
+          259.8788435061955,
+          2179
+        ],
+        [
+          490.21832884097034,
+          264.97304582210245,
+          742
+        ]
+      ],
+      "ear_target": [
+        [
+          225.85787379192723,
+          163.0824332006822,
+          1759
+        ],
+        [
+          377.1735537190083,
+          168.69256198347108,
+          605
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.88736334926536,
+      "translation": [
+        -57.80998752173974,
+        -66.9796675992286
+      ],
+      "neck_y": 259,
+      "body_vertical_fit": 0.9866962305986696,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        270,
+        472,
+        295,
+        501
+      ],
+      "assembly_top": 472,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "93a01197a1c8ea25b9c4753145d5b0827fb0c10d66abb084823b08f07d3c84dd",
+    "key_sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9"
+  },
+  {
+    "state": "panicking",
+    "key": 1,
+    "source": "panicking-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      560,
+      67,
+      1024,
+      752
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          334.1021739130435,
+          259.4679347826087,
+          1840
+        ],
+        [
+          510.109375,
+          288.2864583333333,
+          192
+        ]
+      ],
+      "ear_target": [
+        [
+          206.48398091342875,
+          163.20654396728017,
+          1467
+        ],
+        [
+          365.4146341463415,
+          191.3048780487805,
+          164
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9049317062903955,
+      "translation": [
+        -96.02759118408397,
+        -70.58444778720443
+      ],
+      "neck_y": 272,
+      "body_vertical_fit": 0.9515418502202643,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        249,
+        469,
+        276,
+        501
+      ],
+      "assembly_top": 469,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "eeeb2437fde9f44758d169f3d3ce4b000dc1ea43619490e766f4d1c4f97ff0fd",
+    "key_sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae"
+  },
+  {
+    "state": "panicking",
+    "key": 2,
+    "source": "panicking-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      40,
+      822,
+      510,
+      1481
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          349.19786396852163,
+          242.23215289488476,
+          1779
+        ],
+        [
+          512.8072519083969,
+          248.87213740458014,
+          524
+        ]
+      ],
+      "ear_target": [
+        [
+          223.15531335149865,
+          127.09128065395096,
+          1468
+        ],
+        [
+          378.7078853046595,
+          134.97132616487454,
+          558
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9511919249559774,
+      "translation": [
+        -109.03455341835416,
+        -102.53591421263081
+      ],
+      "neck_y": 231,
+      "body_vertical_fit": 1.0172043010752687,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        316,
+        439,
+        343,
+        475
+      ],
+      "assembly_top": 439,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "868a12ae58af12419efc0a61ea0ef3f135f1f7b8f162a6c3f89c670e5747e9c7",
+    "key_sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4"
+  },
+  {
+    "state": "panicking",
+    "key": 3,
+    "source": "panicking-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      624,
+      837,
+      1013,
+      1491
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          321,
+          275,
+          0
+        ],
+        [
+          507,
+          262,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          194,
+          165,
+          0
+        ],
+        [
+          352,
+          163,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.8474630289886756,
+      "translation": [
+        -77.84969400131172,
+        -63.5438232834594
+      ],
+      "neck_y": 253,
+      "body_vertical_fit": 1.1163366336633664,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        260,
+        473,
+        284,
+        505
+      ],
+      "assembly_top": 473,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "e5c3f493b9cc2e0ce6f7a94064a61b587ee24f6a32cbf0e0547728586fb1f1c6",
+    "key_sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3"
+  },
+  {
+    "state": "happy",
+    "key": 0,
+    "source": "quiet-a-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      64,
+      67,
+      498,
+      758
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          299.07420634920635,
+          266.69126984126984,
+          2520
+        ],
+        [
+          481.31198102016606,
+          265.40806642941874,
+          843
+        ]
+      ],
+      "ear_target": [
+        [
+          206.89003944773177,
+          136.0369822485207,
+          2028
+        ],
+        [
+          367.7117572692794,
+          135.44247787610618,
+          791
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8824670419218923,
+      "translation": [
+        -57.03164680377125,
+        -99.04033358138497
+      ],
+      "neck_y": 228,
+      "body_vertical_fit": 1.0461538461538462,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        265,
+        463,
+        291,
+        497
+      ],
+      "assembly_top": 463,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "fefacc37f0bf4129c6fc8cb9d7999fe98cd91d2620941cf215b8062428232a0d",
+    "key_sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202"
+  },
+  {
+    "state": "happy",
+    "key": 1,
+    "source": "quiet-a-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      530,
+      68,
+      1006,
+      759
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          283.71794871794873,
+          266.71794871794873,
+          2340
+        ],
+        [
+          462.36908517350156,
+          260.22502628811776,
+          951
+        ]
+      ],
+      "ear_target": [
+        [
+          195.99791340636412,
+          132.38341158059467,
+          1917
+        ],
+        [
+          356.7176196032672,
+          130.5075845974329,
+          857
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8990964543771282,
+      "translation": [
+        -59.04433690945996,
+        -105.44078215443125
+      ],
+      "neck_y": 226,
+      "body_vertical_fit": 1.0257510729613735,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        258,
+        463,
+        285,
+        499
+      ],
+      "assembly_top": 463,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "df37f1f7d010f83481e76b056ef7ed476f168c49859051ad2f9925295fb772d1",
+    "key_sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921"
+  },
+  {
+    "state": "thinking",
+    "key": 0,
+    "source": "quiet-a-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      83,
+      803,
+      512,
+      1496
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          305.80619111709285,
+          247.96096904441453,
+          2229
+        ],
+        [
+          481.00212539851225,
+          218.817215727949,
+          941
+        ]
+      ],
+      "ear_target": [
+        [
+          200.83886771910724,
+          127.89929232444203,
+          1837
+        ],
+        [
+          356.62419562419564,
+          102.04504504504504,
+          777
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8891504050079829,
+      "translation": [
+        -71.06393497509833,
+        -92.5458373348755
+      ],
+      "neck_y": 208,
+      "body_vertical_fit": 1.0782608695652174,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        282,
+        457,
+        308,
+        491
+      ],
+      "assembly_top": 457,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "bbef1a06b430089161c9738067c5aaa267502d175c7a27ee3b2f7c29827a85e0",
+    "key_sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301"
+  },
+  {
+    "state": "thinking",
+    "key": 1,
+    "source": "quiet-a-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      582,
+      807,
+      1009,
+      1499
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          289.42433820624257,
+          249.90833662583958,
+          2531
+        ],
+        [
+          463.51657754010694,
+          216.50588235294117,
+          935
+        ]
+      ],
+      "ear_target": [
+        [
+          178.87891019172554,
+          132.7593340060545,
+          1982
+        ],
+        [
+          335.1002475247525,
+          98.99257425742574,
+          808
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.901624980586963,
+      "translation": [
+        -82.4455904132272,
+        -94.38940143437324
+      ],
+      "neck_y": 211,
+      "body_vertical_fit": 1.0511727078891258,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        287,
+        459,
+        312,
+        492
+      ],
+      "assembly_top": 459,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "dca41114dc12128a8a0b6bd25d7f16f4d901a58b6e8bc8847532865b9d3af3c0",
+    "key_sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333"
+  },
+  {
+    "state": "working",
+    "key": 0,
+    "source": "quiet-b-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      86,
+      52,
+      500,
+      786
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          332.0905366653011,
+          251.2769356820975,
+          2441
+        ],
+        [
+          520.148051948052,
+          251.68138528138527,
+          1155
+        ]
+      ],
+      "ear_target": [
+        [
+          228.9592808038075,
+          136.82020095187733,
+          1891
+        ],
+        [
+          386.8853838065194,
+          144.95688748685595,
+          951
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8408874687624966,
+      "translation": [
+        -50.396042475239085,
+        -70.57713048464257
+      ],
+      "neck_y": 229,
+      "body_vertical_fit": 1.014957264957265,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        261,
+        470,
+        292,
+        507
+      ],
+      "assembly_top": 470,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "6175c07c15631f1238d4dd963dc1fa7fc6911a3316c75c03ace500544d2e907c",
+    "key_sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08"
+  },
+  {
+    "state": "working",
+    "key": 1,
+    "source": "quiet-b-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      585,
+      52,
+      1005,
+      786
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          295.79579831932773,
+          259.9226890756303,
+          2380
+        ],
+        [
+          487.4591439688716,
+          238.4661478599222,
+          1285
+        ]
+      ],
+      "ear_target": [
+        [
+          199.84478096268253,
+          144.60411032990805,
+          1849
+        ],
+        [
+          364.93380855397146,
+          121.55906313645622,
+          982
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8643014311408576,
+      "translation": [
+        -56.09488902559326,
+        -82.29750578083062
+      ],
+      "neck_y": 224,
+      "body_vertical_fit": 0.9937888198757764,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        264,
+        467,
+        297,
+        505
+      ],
+      "assembly_top": 467,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "06eb2c4c39286940c42a366e4c5aaf87d76dd4213316cbec6779eb4b2959bfec",
+    "key_sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530"
+  },
+  {
+    "state": "talking",
+    "key": 0,
+    "source": "quiet-b-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      69,
+      801,
+      522,
+      1507
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          309.619209519762,
+          231.73013174670632,
+          2353
+        ],
+        [
+          495.33223684210526,
+          230.57894736842104,
+          912
+        ]
+      ],
+      "ear_target": [
+        [
+          213.6403712296984,
+          148.90777262180976,
+          1724
+        ],
+        [
+          366.3157894736842,
+          151.70914127423822,
+          722
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8222265564650443,
+      "translation": [
+        -40.948147580146156,
+        -39.75294412365443
+      ],
+      "neck_y": 237,
+      "body_vertical_fit": 1.0711009174311927,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        268,
+        466,
+        300,
+        504
+      ],
+      "assembly_top": 466,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "f05db9ee517754c54c7b03e30248268056f019a738db45b384a03ad038c32033",
+    "key_sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a"
+  },
+  {
+    "state": "talking",
+    "key": 1,
+    "source": "quiet-b-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      576,
+      812,
+      988,
+      1512
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          310.5103752759382,
+          233.54128035320088,
+          2265
+        ],
+        [
+          493.48665297741275,
+          240.26899383983573,
+          974
+        ]
+      ],
+      "ear_target": [
+        [
+          216.98374864572048,
+          149.64084507042253,
+          1846
+        ],
+        [
+          371.48387096774195,
+          160.46451612903226,
+          775
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8458703371347667,
+      "translation": [
+        -45.80480886527505,
+        -45.33834758506265
+      ],
+      "neck_y": 244,
+      "body_vertical_fit": 1.0267857142857142,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        276,
+        470,
+        307,
+        506
+      ],
+      "assembly_top": 470,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "bde76d9b4c03fc4ad74a2a3984a0de0c0b638235a922166089cdd5fc3f227835",
+    "key_sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670"
+  },
+  {
+    "state": "confused",
+    "key": 0,
+    "source": "quiet-c-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      89,
+      38,
+      506,
+      777
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          273.88643067846607,
+          295.49410029498523,
+          2034
+        ],
+        [
+          473.7647790914748,
+          211.64903546981955,
+          1607
+        ]
+      ],
+      "ear_target": [
+        [
+          167.43710870802505,
+          167.21001707455892,
+          1757
+        ],
+        [
+          354.83985507246376,
+          89.52826086956522,
+          1380
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9359326018309979,
+      "translation": [
+        -88.73708912079252,
+        -108.95675830648031
+      ],
+      "neck_y": 227,
+      "body_vertical_fit": 0.9352941176470588,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        287,
+        440,
+        315,
+        473
+      ],
+      "assembly_top": 440,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "fce3b4a0777cb7838e2db249b54589a430a3e349d986851e191d67a880816933",
+    "key_sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a"
+  },
+  {
+    "state": "confused",
+    "key": 1,
+    "source": "quiet-c-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      579,
+      40,
+      994,
+      776
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          381.19816933638447,
+          219.0887871853547,
+          2185
+        ],
+        [
+          562.402489626556,
+          335.7655601659751,
+          964
+        ]
+      ],
+      "ear_target": [
+        [
+          262.37393162393164,
+          93.94764957264957,
+          1872
+        ],
+        [
+          428.45390070921985,
+          201.94917257683215,
+          846
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9192145008815432,
+      "translation": [
+        -88.27178821348156,
+        -107.06666990651266
+      ],
+      "neck_y": 244,
+      "body_vertical_fit": 0.9603340292275574,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        283,
+        447,
+        311,
+        482
+      ],
+      "assembly_top": 447,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/confused-0001-patch.png",
+        "patch_sha256": "bd3d9c016da4a3976628aba45552b7987e1813856bf03ebbe17ab02c29dbe40f",
+        "mask": "GarmentEdits/confused-0001-mask.png",
+        "mask_sha256": "ce059cb381ae3447f3cd944911720d5893326b89c2656de05d5d202496fcd6f8"
+      }
+    ],
+    "character_sha256": "5f6c423356971cf264b5d4fefc95f5ac37bca860b8f2c5ebb3d45649885f94ac",
+    "key_sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e"
+  },
+  {
+    "state": "concerned",
+    "key": 0,
+    "source": "quiet-c-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      96,
+      803,
+      475,
+      1507
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          299.79105520614957,
+          273.95248078266945,
+          1431
+        ],
+        [
+          562.0709459459459,
+          312.3445945945946,
+          296
+        ]
+      ],
+      "ear_target": [
+        [
+          191.81658986175114,
+          146.99447004608294,
+          1085
+        ],
+        [
+          436.7234848484849,
+          183.12121212121212,
+          264
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9339139037639543,
+      "translation": [
+        -88.18241564576556,
+        -108.71765413183749
+      ],
+      "neck_y": 263,
+      "body_vertical_fit": 1.0091533180778032,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        274,
+        445,
+        302,
+        480
+      ],
+      "assembly_top": 445,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [
+      {
+        "patch": "GarmentEdits/concerned-0000-patch.png",
+        "patch_sha256": "33a90293d91108b1a8bf5e4554e58490cd9cfcd50a1fd8575300af21fbd1b198",
+        "mask": "GarmentEdits/concerned-0000-mask.png",
+        "mask_sha256": "9c9ffce543328d5cf757cbade5d3bb5d5d4073b9dd28e4213677ee199ed6555f"
+      }
+    ],
+    "character_sha256": "0a6b25ee7fe1fcf10833bee5ad2afe887285003ac4707b9a8d1cfed1546c02f7",
+    "key_sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7"
+  },
+  {
+    "state": "concerned",
+    "key": 1,
+    "source": "quiet-c-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      614,
+      810,
+      990,
+      1509
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          310.4,
+          268.1,
+          0
+        ],
+        [
+          555.7,
+          334.8,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          193.8,
+          136.4,
+          0
+        ],
+        [
+          422.2,
+          200,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.9326654621680558,
+      "translation": [
+        -95.89077839187655,
+        -112.95200357056046
+      ],
+      "neck_y": 266,
+      "body_vertical_fit": 1.0162412993039442,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        280,
+        446,
+        308,
+        479
+      ],
+      "assembly_top": 446,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "34c349164f818b1a961df5fe88d5578a4d37ff4f0dd5c81bc26f1dc34cf3a2ae",
+    "key_sha256": "c73b319c1c59169aa05716f536610701975428fdaabad8eb50938bbdfc042da3"
+  },
+  {
+    "state": "sleeping",
+    "key": 0,
+    "source": "quiet-d-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      58,
+      113,
+      509,
+      755
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          306.4615865084322,
+          290.1898813241724,
+          1601
+        ],
+        [
+          525.0907877169559,
+          383.1535380507343,
+          1498
+        ]
+      ],
+      "ear_target": [
+        [
+          217.2474513438369,
+          211.7701575532901,
+          1079
+        ],
+        [
+          393.54774305555554,
+          293.9236111111111,
+          1152
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.818703375277848,
+      "translation": [
+        -34.99977054962045,
+        -22.7873807494812
+      ],
+      "neck_y": 339,
+      "body_vertical_fit": 1.0110803324099722,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        308,
+        511,
+        336,
+        543
+      ],
+      "assembly_top": 511,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "97b41b2d6921c2b9dbaead11efb61ce8c68c81b8968c909ae07b29f0ef7da46d",
+    "key_sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421"
+  },
+  {
+    "state": "sleeping",
+    "key": 1,
+    "source": "quiet-d-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      589,
+      114,
+      1014,
+      755
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          300.7,
+          305,
+          0
+        ],
+        [
+          565.3,
+          460.2,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          182.5,
+          237.3,
+          0
+        ],
+        [
+          406.6,
+          354.7,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.824720568832006,
+      "translation": [
+        -62.554006304258564,
+        -19.538089635125516
+      ],
+      "neck_y": 383,
+      "body_vertical_fit": 0.9876923076923076,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        286,
+        515,
+        315,
+        548
+      ],
+      "assembly_top": 515,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "a9e1847d8703e8420c4bfd684cea4de3db65a0f877da2936d643163a0a022d0a",
+    "key_sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d"
+  },
+  {
+    "state": "smug",
+    "key": 0,
+    "source": "quiet-d-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      62,
+      796,
+      514,
+      1507
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          304.0884773662551,
+          215.17407407407407,
+          2430
+        ],
+        [
+          484.41283524904213,
+          215.49808429118775,
+          1044
+        ]
+      ],
+      "ear_target": [
+        [
+          212.7400442477876,
+          120.43639380530973,
+          1808
+        ],
+        [
+          365.9247730220493,
+          114.61348897535667,
+          771
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8501076293015705,
+      "translation": [
+        -45.82308214936495,
+        -65.5339023867084
+      ],
+      "neck_y": 207,
+      "body_vertical_fit": 1.0711206896551724,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        299,
+        449,
+        332,
+        489
+      ],
+      "assembly_top": 449,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "00b5bb41905f19494c7d147352dff20b09fcfbec05cd2467f5919247e98f514a",
+    "key_sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b"
+  },
+  {
+    "state": "smug",
+    "key": 1,
+    "source": "quiet-d-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      591,
+      799,
+      1004,
+      1515
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          335.6268656716418,
+          221.7105382180009,
+          2211
+        ],
+        [
+          554.9230769230769,
+          284.94038461538463,
+          520
+        ]
+      ],
+      "ear_target": [
+        [
+          221.1915144372422,
+          120.62522097819682,
+          1697
+        ],
+        [
+          404.25409836065575,
+          168.6639344262295,
+          366
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8292551609509428,
+      "translation": [
+        -56.52376159166914,
+        -65.42686857785822
+      ],
+      "neck_y": 232,
+      "body_vertical_fit": 1.102803738317757,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        292,
+        441,
+        323,
+        479
+      ],
+      "assembly_top": 441,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "55feac2817dc32d10c8cf1a4be825c35a1d76df1572718b2c1c0fc6f102cb4aa",
+    "key_sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d"
+  },
+  {
+    "state": "embarrassed",
+    "key": 0,
+    "source": "quiet-e-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      78,
+      83,
+      452,
+      744
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          305.98353208404313,
+          267.28392958546283,
+          1761
+        ],
+        [
+          467.2903225806452,
+          271.78709677419357,
+          620
+        ]
+      ],
+      "ear_target": [
+        [
+          177.2110408280621,
+          141.73778033352502,
+          1739
+        ],
+        [
+          337.87220447284346,
+          145.80351437699682,
+          626
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9959283817674832,
+      "translation": [
+        -127.52106671920075,
+        -124.66742011479352
+      ],
+      "neck_y": 248,
+      "body_vertical_fit": 0.9212121212121213,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        247,
+        463,
+        278,
+        500
+      ],
+      "assembly_top": 463,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "6aa4e3aec10e4dc5c5d972deefad8f9750c3a17038f1b15ba98cf61081e3598a",
+    "key_sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c"
+  },
+  {
+    "state": "embarrassed",
+    "key": 1,
+    "source": "quiet-e-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      598,
+      92,
+      963,
+      745
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          322.6703601108033,
+          269.4504155124654,
+          1805
+        ],
+        [
+          468.29695024077046,
+          288.79454253611556,
+          623
+        ]
+      ],
+      "ear_target": [
+        [
+          193.20290665176077,
+          142.1525992174399,
+          1789
+        ],
+        [
+          338.41639344262296,
+          162.22131147540983,
+          610
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9978757899110327,
+      "translation": [
+        -128.8339147582489,
+        -126.34260889186461
+      ],
+      "neck_y": 257,
+      "body_vertical_fit": 0.917864476386037,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        245,
+        465,
+        277,
+        501
+      ],
+      "assembly_top": 465,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "780961342bcd2d2c4277cb0c5344f298ec83eda861fcebf8f0e377a635a64f24",
+    "key_sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43"
+  },
+  {
+    "state": "laughing",
+    "key": 0,
+    "source": "quiet-e-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      119,
+      853,
+      502,
+      1493
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          364.0613943808533,
+          274.61186264308014,
+          1922
+        ],
+        [
+          525.6019830028329,
+          276.4702549575071,
+          706
+        ]
+      ],
+      "ear_target": [
+        [
+          235.82241014799155,
+          147.34619450317123,
+          1892
+        ],
+        [
+          396.8590308370044,
+          149.59618208516886,
+          681
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9969115707810987,
+      "translation": [
+        -127.11713701449594,
+        -126.21888144911773
+      ],
+      "neck_y": 253,
+      "body_vertical_fit": 0.9595744680851064,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        282,
+        466,
+        315,
+        503
+      ],
+      "assembly_top": 466,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "af52316ed097b6cadc43e22121b0b3d3e0b2d3e629a1c4ce4cf25033f9af97e6",
+    "key_sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6"
+  },
+  {
+    "state": "laughing",
+    "key": 1,
+    "source": "quiet-e-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      609,
+      834,
+      1008,
+      1491
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          299.98625618471686,
+          277.00054975261133,
+          1819
+        ],
+        [
+          454.78339350180505,
+          236.3519855595668,
+          554
+        ]
+      ],
+      "ear_target": [
+        [
+          168.3427672955975,
+          146.94654088050314,
+          1908
+        ],
+        [
+          322.57055214723925,
+          104.98977505112474,
+          489
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9986740945225783,
+      "translation": [
+        -131.42778851548707,
+        -130.36778122106574
+      ],
+      "neck_y": 231,
+      "body_vertical_fit": 0.9692622950819673,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        288,
+        460,
+        321,
+        498
+      ],
+      "assembly_top": 460,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "952ba72f4d34cf2da281b1e449b2d8898e2cd20f4e02d79aa3133855ad3e30cf",
+    "key_sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e"
+  },
+  {
+    "state": "suspicious",
+    "key": 0,
+    "source": "quiet-f-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      81,
+      84,
+      509,
+      762
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          259.65530671859784,
+          319.5053554040896,
+          1027
+        ],
+        [
+          536.8396226415094,
+          387.0141509433962,
+          212
+        ]
+      ],
+      "ear_target": [
+        [
+          167.5305164319249,
+          201.81807511737088,
+          852
+        ],
+        [
+          405.66187050359713,
+          261.1654676258993,
+          139
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.8602404092111916,
+      "translation": [
+        -55.99236851592792,
+        -72.39654325639003
+      ],
+      "neck_y": 322,
+      "body_vertical_fit": 1.0324324324324323,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        325,
+        450,
+        351,
+        484
+      ],
+      "assembly_top": 450,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "ccb5dfd21fd1684243fab800a3da31a9d61fadff5089d50d554692372ae9888a",
+    "key_sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39"
+  },
+  {
+    "state": "suspicious",
+    "key": 1,
+    "source": "quiet-f-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      595,
+      65,
+      999,
+      767
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          296.675704989154,
+          287.9327548806941,
+          922
+        ],
+        [
+          492.23467230443975,
+          248.69133192389006,
+          473
+        ]
+      ],
+      "ear_target": [
+        [
+          182.0206611570248,
+          169.02203856749313,
+          726
+        ],
+        [
+          355.195530726257,
+          134.75698324022346,
+          358
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.885062958375951,
+      "translation": [
+        -80.50958026883694,
+        -85.58353999767087
+      ],
+      "neck_y": 245,
+      "body_vertical_fit": 0.9956616052060737,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        288,
+        451,
+        317,
+        487
+      ],
+      "assembly_top": 451,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "b734dc726350fc0a8c50f72408d42bb1ce3f47a3bc9a3c728a2ec83981b524fc",
+    "key_sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424"
+  },
+  {
+    "state": "bored",
+    "key": 0,
+    "source": "quiet-f-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      83,
+      840,
+      514,
+      1488
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          273,
+          307,
+          0
+        ],
+        [
+          495,
+          272,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          155,
+          199,
+          0
+        ],
+        [
+          350,
+          173,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.8753398663406451,
+      "translation": [
+        -83.63050867480774,
+        -67.41089130561676
+      ],
+      "neck_y": 278,
+      "body_vertical_fit": 1.0730478589420656,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        309,
+        479,
+        334,
+        513
+      ],
+      "assembly_top": 479,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "4c228130da8bbb4af606ae0fa83dd78e4556cb17f7ac6c307647bca624fde4a1",
+    "key_sha256": "30fcbeb3e80432e1f50f370b2de1a643c45c61b7104fe367b12f299fa604b341"
+  },
+  {
+    "state": "bored",
+    "key": 1,
+    "source": "quiet-f-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      593,
+      856,
+      1013,
+      1492
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          265,
+          336,
+          0
+        ],
+        [
+          508,
+          303,
+          0
+        ]
+      ],
+      "ear_target": [
+        [
+          145,
+          225,
+          0
+        ],
+        [
+          350,
+          192,
+          0
+        ]
+      ],
+      "manual_landmarks": true,
+      "uniform_scale": 0.8467099596841067,
+      "translation": [
+        -79.75339941790725,
+        -62.0238321190721
+      ],
+      "neck_y": 297,
+      "body_vertical_fit": 1.1274238227146813,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        253,
+        465,
+        277,
+        497
+      ],
+      "assembly_top": 451,
+      "template": "canonical-badge-assembly.png",
+      "template_sha256": "528b8893eb2585e6f2ecdc1770f92b45bf4c4b61eb46cd340f232432b83fdd6b"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "b7ab979e0dd767feac5d3df7c1d62956d711c154a93f3963592a467eb3e5749b",
+    "key_sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568"
+  },
+  {
+    "state": "mischievous",
+    "key": 0,
+    "source": "quiet-g-source.png",
+    "source_cell": 0,
+    "source_crop_box": [
+      103,
+      99,
+      480,
+      752
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          327.19807008633825,
+          292.63179278821735,
+          1969
+        ],
+        [
+          503.68058968058966,
+          293.1732186732187,
+          814
+        ]
+      ],
+      "ear_target": [
+        [
+          209.18796992481202,
+          162.15962984384038,
+          1729
+        ],
+        [
+          376.24829467939975,
+          164.00545702592086,
+          733
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9466644955045682,
+      "translation": [
+        -100.56353133477938,
+        -114.19785938471347
+      ],
+      "neck_y": 262,
+      "body_vertical_fit": 0.9692982456140351,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        289,
+        469,
+        317,
+        504
+      ],
+      "assembly_top": 469,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "748171f3d14ba497db13440a82a4ba8accd4e1726904b498c6efc25ae80d762f",
+    "key_sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab"
+  },
+  {
+    "state": "mischievous",
+    "key": 1,
+    "source": "quiet-g-source.png",
+    "source_cell": 1,
+    "source_crop_box": [
+      600,
+      101,
+      958,
+      756
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          318.79750130140553,
+          297.7303487766788,
+          1921
+        ],
+        [
+          478.306146572104,
+          310.66548463356975,
+          846
+        ]
+      ],
+      "ear_target": [
+        [
+          211.35214723926381,
+          167.4552147239264,
+          1630
+        ],
+        [
+          356.6099706744868,
+          179.9266862170088,
+          682
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9110176971316121,
+      "translation": [
+        -79.10670587359073,
+        -103.43873507846865
+      ],
+      "neck_y": 269,
+      "body_vertical_fit": 1.0069444444444444,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        274,
+        470,
+        302,
+        504
+      ],
+      "assembly_top": 470,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "116d2450205dc9ce570aab78e5c11dba187ddae55cfbd5bdc2d94b5100562bd9",
+    "key_sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151"
+  },
+  {
+    "state": "deadpan",
+    "key": 0,
+    "source": "quiet-g-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      98,
+      783,
+      467,
+      1460
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          325.2085235920852,
+          219.44545915778792,
+          1971
+        ],
+        [
+          497.77142857142854,
+          207.1847619047619,
+          1050
+        ]
+      ],
+      "ear_target": [
+        [
+          198.42115869017633,
+          111.13853904282117,
+          1985
+        ],
+        [
+          364.8998127340824,
+          97.64887640449439,
+          1068
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9654699193725781,
+      "translation": [
+        -115.62070831814856,
+        -101.55561484192481
+      ],
+      "neck_y": 206,
+      "body_vertical_fit": 1.031055900621118,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        281,
+        446,
+        308,
+        482
+      ],
+      "assembly_top": 446,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "396246fcbe9d60cbf52f930f2e1c2658d200a7402db807866f7ebce30b9e95df",
+    "key_sha256": "edd6e7f461c7de5b4e895f33be11fb047b470fdea319ef91be747ebfc74d1ebc"
+  },
+  {
+    "state": "deadpan",
+    "key": 1,
+    "source": "quiet-g-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      591,
+      803,
+      970,
+      1462
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          278.7589784517159,
+          252.42857142857142,
+          1253
+        ],
+        [
+          474.84429065743944,
+          225.93079584775086,
+          289
+        ]
+      ],
+      "ear_target": [
+        [
+          168.1130587204207,
+          141.8606485539001,
+          1141
+        ],
+        [
+          351.0840707964602,
+          117.23451327433628,
+          226
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9330522391197965,
+      "translation": [
+        -91.97704406670755,
+        -93.6195584564326
+      ],
+      "neck_y": 228,
+      "body_vertical_fit": 1.0696629213483146,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        259,
+        450,
+        282,
+        486
+      ],
+      "assembly_top": 450,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "garment_edits": [],
+    "character_sha256": "c500ed1c40c4c1628c4293e2a8bbde14b9d984e677db72647f11a4c229d249bc",
+    "key_sha256": "7d051747e22736a2f25cfd0083aa4b0718e4e0c8d58203d9eb65e4e74c56a12f"
+  }
+]

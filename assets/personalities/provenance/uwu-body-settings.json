@@ -162,5 +162,8 @@
     "UwU/Intermediate/ConsistencyRevision/sleep-sleeve-edit.png": "e46d310740ae78204523a19800dc5f7ade97eedb89d604a1b8330c3154d92853",
     "UwU/Intermediate/ConsistencyRevision/extra-mint-edited.png": "a2833b02b8e010341bfa2c4eee61eaa7f444603bd580759db0f7ce3af702afd5",
     "UwU/Intermediate/ConsistencyRevision/quiet-d-before-sleeve-edit.png": "8126761fdc77ee5673046e8e238bb3bf8633422e45a970bc8d3fc0e109ecef3f"
-  }
+  },
+  "status": "Historical body-layer recipe; superseded for current rest, talking, eyes and prop composition",
+  "active_rest_revision": "provenance/horu-idle-revision.json",
+  "active_performance_revision": "provenance/horu-performance-repair.json"
 }

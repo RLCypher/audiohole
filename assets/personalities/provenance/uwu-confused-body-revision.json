@@ -3,9 +3,9 @@
   "state": "confused",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-2-consistency",
+  "revision": "horu-prop-continuity-3",
   "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
-  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
   "source": "UwU/Intermediate/ConsistencyRevision/quiet-c-source.png",
   "source_sha256": "5ec9be3d5e92b1d69b34be672d0c90314c0b9fa83d3e5f88aa1419adaa214ece",
   "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/confused",
@@ -73,7 +73,12 @@
       "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
       "garment_edits": [],
       "character_sha256": "fce3b4a0777cb7838e2db249b54589a430a3e349d986851e191d67a880816933",
-      "key_sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a"
+      "key_sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     },
     {
       "state": "confused",
@@ -142,7 +147,12 @@
         }
       ],
       "character_sha256": "5f6c423356971cf264b5d4fefc95f5ac37bca860b8f2c5ebb3d45649885f94ac",
-      "key_sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e"
+      "key_sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
     }
   ],
   "drawn_pose_count": 2,
@@ -163,13 +173,13 @@
     null
   ],
   "key_sha256": [
-    "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
-    "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e"
+    "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
+    "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/confused.png",
-    "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+    "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
     "anchor": [
       256,
       704
@@ -185,7 +195,7 @@
     "frames": [
       {
         "path": "Generated/chibi/confused/0000.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -194,7 +204,7 @@
       },
       {
         "path": "Generated/chibi/confused/0001.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -203,7 +213,7 @@
       },
       {
         "path": "Generated/chibi/confused/0002.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -212,7 +222,7 @@
       },
       {
         "path": "Generated/chibi/confused/0003.png",
-        "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+        "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
         "anchor": [
           256,
           704
@@ -221,7 +231,7 @@
       },
       {
         "path": "Generated/chibi/confused/0004.png",
-        "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+        "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
         "anchor": [
           256,
           704
@@ -230,7 +240,7 @@
       },
       {
         "path": "Generated/chibi/confused/0005.png",
-        "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+        "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
         "anchor": [
           256,
           704
@@ -239,7 +249,7 @@
       },
       {
         "path": "Generated/chibi/confused/0006.png",
-        "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+        "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
         "anchor": [
           256,
           704
@@ -248,7 +258,7 @@
       },
       {
         "path": "Generated/chibi/confused/0007.png",
-        "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+        "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
         "anchor": [
           256,
           704
@@ -257,7 +267,7 @@
       },
       {
         "path": "Generated/chibi/confused/0008.png",
-        "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+        "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
         "anchor": [
           256,
           704
@@ -266,7 +276,7 @@
       },
       {
         "path": "Generated/chibi/confused/0009.png",
-        "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+        "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
         "anchor": [
           256,
           704
@@ -275,7 +285,7 @@
       },
       {
         "path": "Generated/chibi/confused/0010.png",
-        "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+        "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
         "anchor": [
           256,
           704
@@ -284,7 +294,7 @@
       },
       {
         "path": "Generated/chibi/confused/0011.png",
-        "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+        "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
         "anchor": [
           256,
           704
@@ -293,7 +303,7 @@
       },
       {
         "path": "Generated/chibi/confused/0012.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -302,7 +312,7 @@
       },
       {
         "path": "Generated/chibi/confused/0013.png",
-        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
         "anchor": [
           256,
           704
@@ -321,6 +331,10 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
-  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
 }

@@ -5,13 +5,13 @@ import zipfile
 
 from PIL import Image, ImageDraw, ImageFont
 
-from avatar_assets import ROOT, read_json
+from avatar_assets import ROOT, read_json, personality_name, review_key
 
 
 def build():
     directory = ROOT/'review/idle-sequences'
-    identities = ['default', 'uwu', 'vanilla']
-    approval_label='APPROVED IDLE' if (ROOT/'provenance/idle-approval.json').exists() else 'UNAPPROVED'
+    identities = ['norm', 'horu', 'vanilla']
+    approval_label='Norm / Vanilla approved; revised Horu IDLE awaits review'
     sheets = [Image.open(directory/f'{pid}-all-frames.png').convert('RGB') for pid in identities]
     combined = Image.new('RGB', (sheets[0].width, sum(im.height for im in sheets)), '#151923')
     y = 0
@@ -27,7 +27,7 @@ def build():
         for col, frame_index in enumerate([0, 5]):
             im = Image.open(ROOT/f'{folder}/Generated/{style}/idle/{frame_index:04d}.png')
             x = col*640
-            draw.text((x+8, 4), f'{identity} / frame {frame_index:04d} / native 512 x 768', font=font, fill='white')
+            draw.text((x+8, 4), f'{personality_name(identity)} / frame {frame_index:04d} / native 512 x 768', font=font, fill='white')
             bg = Image.new('RGBA', im.size, '#e0e3e9')
             bg.alpha_composite(im)
             panel.alpha_composite(bg, (x, 34))
@@ -36,11 +36,11 @@ def build():
             small.alpha_composite(thumb)
             panel.alpha_composite(small, (x+512, 34))
             draw.text((x+515, 230), '128 x 192', font=font, fill='white')
-        panel.convert('RGB').save(directory/f'{identity}-native-compact-inspection.png')
+        panel.convert('RGB').save(directory/f'{review_key(identity)}-native-compact-inspection.png')
     cards = []
     for identity in identities:
         encoded = base64.b64encode((directory/f'{identity}-review.gif').read_bytes()).decode()
-        cards.append(f'''<section><h2>{identity}</h2>
+        cards.append(f'''<section><h2>{identity.capitalize()}</h2>
 <p>GIF review copy · autoplay · five-second loop</p>
 <img width="256" height="384" src="data:image/gif;base64,{encoded}" alt="{identity} IDLE animation">
 </section>''')

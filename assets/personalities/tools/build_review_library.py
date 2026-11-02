@@ -59,11 +59,12 @@ def sheet(identity,manifest,data):
     return out,available
 
 
-def build():
+def build(only_personalities=None):
     directory=ROOT/'review/full';directory.mkdir(exist_ok=True)
     catalog_cards=[];sheets=[]
     for identity,manifest in packs():
         label=personality_name(identity);key=review_key(identity)
+        refresh=only_personalities is None or identity in only_personalities
         data=load_pack(manifest,identity);style=data['default_style']
         contact,available=sheet(identity,manifest,data);sheets.append(contact)
         cards=[]
@@ -78,21 +79,22 @@ def build():
             native_link=f'{state}-native.png'
             gif_link=f'{state}.gif'
             frames_link=f'{state}-frames.png'
-            inspector=directory/key/f'{state}-inspector.html'
-            review(only_states={state,'idle'},only_personalities={identity},output_path=inspector,initial_state=state,summary=False)
-            # Each portable performance page embeds its GIF and static thumbnail;
-            # it can be opened independently without its parent directory.
-            source=ROOT/f'review/full/{key}/{state}.gif'
-            gif='data:image/gif;base64,'+base64.b64encode(source.read_bytes()).decode()
-            performance=header(f'{label} · {state}')+f'''<h1>{label} · {state}</h1><p class="status">{status}</p>
-<p>{count} operating frames · {duration} ms · {escape(entry.get('behavior',{}).get('mode','persistent'))}</p>
-<button id="replay">Replay</button> <label><input id="reduced" type="checkbox"> Reduced motion / static expression</label>
-<div><img id="animation" width="192" height="288" src="{gif}" alt="{label} {state}"></div>
-<p class="muted">GIF is a checkerboard review copy; operating PNGs retain real alpha. Finite animations stop at rest; static expressions remain visible for inspection. This page embeds its images and needs no server.</p>
-<script>const still={thumb!r};let counter=0;const image=document.getElementById('animation');const moving=image.getAttribute('src');
-function show(){{image.src=document.getElementById('reduced').checked?still:moving+'#replay='+counter++;}}
-document.getElementById('replay').onclick=show;document.getElementById('reduced').onchange=show;show();</script></html>'''
-            (directory/key/f'{state}-preview.html').write_text(performance)
+            if refresh:
+                inspector=directory/key/f'{state}-inspector.html'
+                review(only_states={state,'idle'},only_personalities={identity},output_path=inspector,initial_state=state,summary=False)
+                # Each portable performance page embeds its GIF and static thumbnail;
+                # it can be opened independently without its parent directory.
+                source=ROOT/f'review/full/{key}/{state}.gif'
+                gif='data:image/gif;base64,'+base64.b64encode(source.read_bytes()).decode()
+                performance=header(f'{label} · {state}')+f'''<h1>{label} · {state}</h1><p class="status">{status}</p>
+    <p>{count} operating frames · {duration} ms · {escape(entry.get('behavior',{}).get('mode','persistent'))}</p>
+    <button id="replay">Replay</button> <label><input id="reduced" type="checkbox"> Reduced motion / static expression</label>
+    <div><img id="animation" width="192" height="288" src="{gif}" alt="{label} {state}"></div>
+    <p class="muted">GIF is a checkerboard review copy; operating PNGs retain real alpha. Finite animations stop at rest; static expressions remain visible for inspection. This page embeds its images and needs no server.</p>
+    <script>const still={thumb!r};let counter=0;const image=document.getElementById('animation');const moving=image.getAttribute('src');
+    function show(){{image.src=document.getElementById('reduced').checked?still:moving+'#replay='+counter++;}}
+    document.getElementById('replay').onclick=show;document.getElementById('reduced').onchange=show;show();</script></html>'''
+                (directory/key/f'{state}-preview.html').write_text(performance)
             card=f'''<article><h2>{state}</h2><img width="128" height="192" src="{thumb}" alt="{label} {state} static">
 <p class="status">{status}</p><p>{count} frames · {duration} ms</p>
 <p><a href="{state}-preview.html">Play / reduced motion</a><br><a href="{state}-inspector.html">Native / compact frame inspector</a><br>
@@ -101,30 +103,36 @@ document.getElementById('replay').onclick=show;document.getElementById('reduced'
             catalog_cards.append(f'''<article><h2>{label} · {state}</h2><img width="128" height="192" src="{thumb}" alt="{label} {state}"><p class="status">{status}</p><p>{count}f · {duration}ms</p>
 <p><a href="{key}/{state}-preview.html">Playable preview</a><br><a href="{key}/{state}-inspector.html">Frame inspector</a><br><a href="{key}/{gif_link}">Direct GIF</a></p></article>''')
             print(identity,state,'review pages built',flush=True)
-        page=header(f'AudioHole {label} review')+f'<h1>{label} · Full expression catalog</h1><p>Norm and Vanilla approved. UwU body revisions await review; accepted IDLE is preserved.</p><p><a href="states-contact-sheet.png">State sheet</a> · <a href="face-details.png">Native detail sheet</a></p><main>'+''.join(cards)+'</main></html>'
-        (directory/key/'index.html').write_text(page)
-        # Compact portable review package: pages, GIFs, and frame sheets. Native
-        # operating PNGs/manifests stay in their repository pack for integration.
-        with zipfile.ZipFile(directory/f'{key}-review.zip','w',zipfile.ZIP_DEFLATED) as archive:
-            for path in (directory/key).iterdir():
-                if path.suffix in {'.html','.gif'} or path.name in {'states-contact-sheet.png','face-details.png'} or path.name.endswith('-frames.png'):
-                    if path.name=='index.html':
-                        portable=re.sub(r'<a href="[^"]+-native\.png">Native PNG preview</a>','<span>Native PNGs supplied in repository</span>',path.read_text())
-                        archive.writestr(path.name,portable)
-                    else:
-                        archive.write(path,path.name)
-            archive.writestr('README.txt','Extract and open index.html in a browser. Individual *-preview.html pages embed their media and also work alone. Norm and Vanilla are approved. UwU body revisions remain candidates; IDLE is accepted. Runtime assets are the separate transparent 512x768 PNG packs in the repository.\n')
+        if refresh:
+            page=header(f'AudioHole {label} review')+f'<h1>{label} · Full expression catalog</h1><p>Norm and Vanilla approved. Horu body and revised IDLE artwork await review.</p><p><a href="states-contact-sheet.png">State sheet</a> · <a href="face-details.png">Native detail sheet</a></p><main>'+''.join(cards)+'</main></html>'
+            (directory/key/'index.html').write_text(page)
+            # Compact portable review package: pages, GIFs, and frame sheets. Native
+            # operating PNGs/manifests stay in their repository pack for integration.
+            with zipfile.ZipFile(directory/f'{key}-review.zip','w',zipfile.ZIP_DEFLATED) as archive:
+                for path in (directory/key).iterdir():
+                    if path.suffix in {'.html','.gif'} or path.name in {'states-contact-sheet.png','face-details.png'} or path.name.endswith('-frames.png'):
+                        if path.name=='index.html':
+                            portable=re.sub(r'<a href="[^"]+-native\.png">Native PNG preview</a>','<span>Native PNGs supplied in repository</span>',path.read_text())
+                            archive.writestr(path.name,portable)
+                        else:
+                            archive.write(path,path.name)
+                archive.writestr('README.txt','Extract and open index.html in a browser. Individual *-preview.html pages embed their media and also work alone. Norm and Vanilla are approved. Horu body and revised IDLE artwork remain candidates. Runtime assets are the separate transparent 512x768 PNG packs in the repository.\n')
     combined=Image.new('RGB',(max(s.width for s in sheets),sum(s.height for s in sheets)),'#151923');y=0
     for image in sheets:combined.paste(image,(0,y));y+=image.height
     combined.save(directory/'all-states-contact-sheet.png')
     index=header('AudioHole full avatar catalog')+'''<h1>AudioHole · Full avatar catalog</h1>
-<p>Norm and Vanilla approved. UwU faces accepted; revised body performances require human review. Static expressions also serve reduced motion. Select a playable page to replay a reaction or inspect individual operating frames.</p>
-<p><a href="consistency-correction/REPORT.md">UwU consistency correction</a></p>
-<p><a href="uwu-body-revision-loop.gif">UwU body demo</a> · <a href="uwu-body-keyposes.png">Every body key</a> · <a href="UWU_BODY_REVISION.md">Body revision report</a></p>
+<p>Norm and Vanilla approved. Horu faces accepted; revised body performances require human review. Static expressions also serve reduced motion. Select a playable page to replay a reaction or inspect individual operating frames.</p>
+<p><a href="horu-revision/REPORT.md">Horu: current IDLE, scale, talking, eyes and props revision</a> · <a href="consistency-correction/REPORT.md">Previous consistency correction</a></p>
+<p><a href="horu-body-revision-loop.gif">Horu body demo</a> · <a href="horu-body-keyposes.png">Every body key</a> · <a href="HORU_BODY_REVISION.md">Body revision report</a></p>
 <p><a href="all-states-contact-sheet.png">All generated expressions</a> · <a href="inventory.json">Full inventory and validation</a> · <a href="HANDOFF.md">Integration handoff</a></p>
-<p><a href="norm-review.zip">Norm review ZIP</a> · <a href="uwu-review.zip">UwU review ZIP</a> · <a href="vanilla-review.zip">Vanilla review ZIP</a></p><main>'''+''.join(catalog_cards)+'</main></html>'
+<p><a href="norm-review.zip">Norm review ZIP</a> · <a href="horu-review.zip">Horu review ZIP</a> · <a href="vanilla-review.zip">Vanilla review ZIP</a></p><main>'''+''.join(catalog_cards)+'</main></html>'
     (directory/'index.html').write_text(index)
     print('Full catalog, per-state inspectors and portable review ZIPs built.',flush=True)
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--personality',choices=['default','uwu','vanilla'])
+    args=parser.parse_args()
+    build({args.personality} if args.personality else None)

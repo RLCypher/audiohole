@@ -45,7 +45,7 @@ def inventory():
         if rel in revisions:
             revision = revisions[rel]
             import hashlib
-            raw = p.read_bytes()
+            raw = (ROOT/revision.get('original_source',rel)).read_bytes()
             original = hashlib.sha256(raw[:revision['original_prefix_bytes']]).hexdigest()
             authority = ROOT/revision['authorization']
             if (original != expected or digest(p) != revision['current_sha256']

@@ -204,5 +204,8 @@
       0.6,
       1
     ]
-  }
+  },
+  "status": "historical; superseded",
+  "superseded_by": "provenance/horu-idle-revision.json",
+  "prior_record": "UwU/Intermediate/HoruIdleRevision/Previous/uwu-idle-animation.json"
 }

@@ -27,8 +27,8 @@ class FullLibraryTests(unittest.TestCase):
             self.assertEqual(digest(ROOT/relative),sha,relative)
         for identity,path in packs():
             data=read_json(path);states=data['styles'][data['default_style']]['states']
-            self.assertEqual(states['idle']['static']['status'],'approved')
-            self.assertEqual(states['idle']['animation']['status'],'approved')
+            self.assertEqual(states['idle']['static']['status'],'validated' if identity=='uwu' else 'approved')
+            self.assertEqual(states['idle']['animation']['status'],'validated' if identity=='uwu' else 'approved')
             for state,entry in states.items():
                 for kind in ['static','animation']:
                     asset=entry[kind]
@@ -61,8 +61,11 @@ class FullLibraryTests(unittest.TestCase):
     def test_reviewed_packs_are_usable_and_uwu_candidates_stay_filtered(self):
         for pid,folder,style,state in [('default','Norm','chibi','happy'),('vanilla','Vanilla','logo','error'),('uwu','UwU','chibi','error')]:
             selected=Resolver().resolve(ROOT/f'{folder}/manifest.json',pid,style,state)
-            self.assertEqual(selected.state,'idle' if pid=='uwu' else state)
-            self.assertTrue(selected.paths)
+            if pid=='uwu':
+                self.assertEqual(selected.source,'hide')
+            else:
+                self.assertEqual(selected.state,state)
+                self.assertTrue(selected.paths)
 
     def test_uwu_performances_use_distinct_drawn_body_keys_without_sticker_motion(self):
         from PIL import ImageChops
@@ -86,7 +89,7 @@ class FullLibraryTests(unittest.TestCase):
         from PIL import ImageChops
         directory=ROOT/'UwU/Intermediate/ConsistencyRevision'
         case=Image.open(directory/'canonical-case.png').convert('RGBA')
-        master=Image.open(ROOT/'UwU/Generated/chibi/idle.png').convert('RGBA')
+        master=Image.open(ROOT/'UwU/Intermediate/HoruIdleRevision/Previous/idle.png').convert('RGBA')
         brand=(94,498,213,596)
         self.assertEqual(case.crop(brand).tobytes(),master.crop(brand).tobytes())
         word=(95,574,213,594)
@@ -97,7 +100,12 @@ class FullLibraryTests(unittest.TestCase):
             state,key=item['state'],item['key']
             self.assertEqual(item['case_sha256'],digest(directory/'canonical-case.png'))
             character=Image.open(directory/f'Characters/{state}/{key:04d}.png').convert('RGBA')
-            expected=case.copy();expected.alpha_composite(character)
+            expected=Image.new('RGBA',(512,768))
+            if item.get('background_layer'):
+                expected.alpha_composite(Image.open(ROOT/'UwU/Intermediate/HoruPerformanceRepair'/item['background_layer']).convert('RGBA'))
+            expected.alpha_composite(case);expected.alpha_composite(character)
+            if item['cup']['location']=='case':
+                expected.alpha_composite(Image.open(ROOT/item['cup']['layer']).convert('RGBA'))
             actual=Image.open(directory/f'Keys/{state}/{key:04d}.png').convert('RGBA')
             self.assertEqual(actual.tobytes(),expected.tobytes(),(state,key,'case or layering changed'))
             alpha=list(character.crop(word).getchannel('A').get_flattened_data())
@@ -152,7 +160,7 @@ class FullLibraryTests(unittest.TestCase):
         self.assertEqual(frame.path.name,'surprised.png')
         production=AvatarPlayer()
         production.request(manifest,'uwu','chibi','surprised',0,reduced_motion=True)
-        self.assertEqual(production.frame_at(1).path.name,'idle.png')
+        self.assertIsNone(production.frame_at(1).path)
 
     def test_intentional_static_states_and_logo_optional_fallbacks_are_explicit(self):
         for pid in ['default','uwu']:

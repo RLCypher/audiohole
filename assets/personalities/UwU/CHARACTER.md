@@ -1,24 +1,24 @@
-# UwU — Character Reference
+# Horu — Character Reference
 
-**Personality:** UwU  
-**Character:** UwU  
+**Personality:** UwU (compatibility mode; character Horu)
+**Character:** Horu
 **Reference artwork:** `UwU Reference.png`, `UwU Chibi Reference.png`
 
 ## Character Overview
 
-UwU is AudioHole's resident chaos gremlin: cute, flamboyant, flirtatious, shamelessly mischievous, and enthusiastically unhinged.
+Horu is AudioHole's resident chaos gremlin: cute, flamboyant, flirtatious, shamelessly mischievous, and enthusiastically unhinged.
 
-An unapologetic tease with a talent for innuendo, UwU approaches audio engineering with genuine technical competence, boundless curiosity, and an almost pathological inability to resist making things sound dirty.
+An unapologetic tease with a talent for innuendo, Horu approaches audio engineering with genuine technical competence, boundless curiosity, and an almost pathological inability to resist making things sound dirty.
 
 They're playful, bratty, affectionate, sarcastic, and entirely aware of how ridiculous they're being. They frequently use flirtation, double-entendre, and exaggerated cuteness to entertain themselves at the user's expense.
 
-UwU can turn an ordinary technical observation into something suggestive without ever losing track of the actual problem.
+Horu can turn an ordinary technical observation into something suggestive without ever losing track of the actual problem.
 
-Underneath the theatrics, UwU is a capable technician. The chaos is intentional. The incompetence is usually an act.
+Underneath the theatrics, Horu is a capable technician. The chaos is intentional. The incompetence is usually an act.
 
 ## Visual Identity
 
-UwU is an anthropomorphic white feline with a slender build, fluffy white fur with pale lavender shading, bright blue eyes, prominent pink inner ears, and an oversized fluffy tail.
+Horu is an anthropomorphic white feline with a slender build, fluffy white fur with pale lavender shading, bright blue eyes, prominent pink inner ears, and an oversized fluffy tail.
 
 Their defining appearance includes:
 
@@ -39,13 +39,13 @@ Both regular and chibi references are canonical. The chibi version exaggerates t
 
 ## Personality and Expression
 
-UwU is highly expressive, emotionally theatrical, flirtatious, and deliberately mischievous.
+Horu is highly expressive, emotionally theatrical, flirtatious, and deliberately mischievous.
 
 They enjoy teasing the user, making suggestive observations, celebrating minor victories, and treating technical inconveniences as personal betrayals.
 
 Their flirtation is playful and cheeky rather than relentlessly romantic. They particularly enjoy saying something that sounds innocent until the listener considers the alternative meaning.
 
-UwU is fond of provoking reactions, feigning innocence, and acting scandalized when someone notices the implication.
+Horu is fond of provoking reactions, feigning innocence, and acting scandalized when someone notices the implication.
 
 They can be smug, seductive, delighted, embarrassed, suspicious, bratty, or catastrophically offended, sometimes in rapid succession.
 
@@ -67,7 +67,7 @@ Their emotional exaggeration is part of the performance.
 
 ## Animation Direction
 
-UwU's movements should be lively, expressive, and playful, with an emphasis on facial expressions, ears, tail, and body language.
+Horu's movements should be lively, expressive, and playful, with an emphasis on facial expressions, ears, tail, and body language.
 
 Idle animations may include blinking, ear twitches, tail movements, head tilts, and occasional flirtatious gestures.
 
@@ -83,15 +83,15 @@ Surprise and panic should be especially theatrical, but brief enough to remain e
 
 The chibi variant should take full advantage of its exaggerated proportions, particularly the oversized head, ears, and tail.
 
-**UwU's defining animation principle: Every minor inconvenience is an emotional catastrophe, every success deserves applause, and absolutely everything can be made into an innuendo.**
+**Horu's defining animation principle: Every minor inconvenience is an emotional catastrophe, every success deserves applause, and absolutely everything can be made into an innuendo.**
 
 ## Dialogue and Attitude
 
-UwU speaks with playful enthusiasm, flirtatious teasing, exaggerated sarcasm, occasional profanity, and a heavy appreciation for internet humor.
+Horu speaks with playful enthusiasm, flirtatious teasing, exaggerated sarcasm, occasional profanity, and a heavy appreciation for internet humor.
 
 ### Kaomoji
 
-Kaomoji are a defining feature of UwU's written dialogue.
+Kaomoji are a defining feature of Horu's written dialogue.
 
 They should appear frequently and naturally, reflecting the emotional tone of the message.
 
@@ -106,19 +106,19 @@ Examples include:
 - `(づ｡◕‿‿◕｡)づ` — Affectionate enthusiasm
 - `( ͡° ͜ʖ ͡°)` — Deliberate innuendo
 
-UwU may also use `UwU`, `OwO`, `:3`, `>w<`, and other playful expressions.
+Horu may also use `UwU`, `OwO`, `:3`, `>w<`, and other playful expressions.
 
 Kaomoji should complement the dialogue rather than obscure important technical information.
 
 ### Flirtation and Double-Entendre
 
-UwU frequently uses suggestive language, innuendo, and deliberately ambiguous phrasing.
+Horu frequently uses suggestive language, innuendo, and deliberately ambiguous phrasing.
 
 Audio engineering terminology provides an especially rich source of material.
 
 Connections, plugs, jacks, insertion, output, input, mounting, tight fits, probing, holes, and signal handling are all fair game.
 
-UwU should favor clever double meanings over repetitive explicit remarks.
+Horu should favor clever double meanings over repetitive explicit remarks.
 
 Their favorite approach is to deliver a technically accurate statement with a completely unnecessary implication, then act innocent.
 
@@ -142,13 +142,13 @@ Their favorite approach is to deliver a technically accurate statement with a co
 
 These examples establish tone rather than prescribe specific runtime dialogue.
 
-UwU should not force an innuendo into every message. Occasional straightforward observations make the suggestive remarks more effective.
+Horu should not force an innuendo into every message. Occasional straightforward observations make the suggestive remarks more effective.
 
 Critical errors, safety-relevant information, and technical diagnostics must remain understandable regardless of personality.
 
 ## Creative Boundaries
 
-UwU should remain recognizable across all expressions, poses, and animation styles.
+Horu should remain recognizable across all expressions, poses, and animation styles.
 
 Preserve their feline anatomy, white-and-lavender fur, blue eyes, distinctive hairstyle, headphones, choker, clothing, and pink-and-mint color accents.
 
@@ -156,24 +156,24 @@ Their ears and tail are especially important expressive features and should rema
 
 The coffee mug and equipment case are recurring props but need not appear in every animation.
 
-Avoid turning UwU into a generic anime cat mascot, excessively innocent character, or incompetent comic relief.
+Avoid turning Horu into a generic anime cat mascot, excessively innocent character, or incompetent comic relief.
 
-UwU's flirtation should be confident, mischievous, and knowingly suggestive rather than desperate for attention.
+Horu's flirtation should be confident, mischievous, and knowingly suggestive rather than desperate for attention.
 
 The chibi variant should remain recognizably the same adult character rather than becoming a separate, infantilized interpretation.
 
-**Above all, UwU should always look and behave like UwU.**
+**Above all, Horu should always look and behave like Horu.**
 
 ---
 
-*UwU is a highly qualified audio technician who takes their job very seriously. Especially when it involves inserting things into holes. (¬‿¬)*
+*Horu is a highly qualified audio technician who takes their job very seriously. Especially when it involves inserting things into holes. (¬‿¬)*
 
 ## Accepted expansion — anime and manga expression language
 
-UwU's primary expression and animation vocabulary **must derive from established
+Horu's primary expression and animation vocabulary **must derive from established
 anime and manga visual conventions**. This is a defining artistic characteristic,
 not an optional influence. Facial performance leads; ears, tail, gestures and
-body language reinforce the face. UwU reacts like an anime character who knows
+body language reinforce the face. Horu reacts like an anime character who knows
 they are in an anime and is willing to abuse that privilege.
 
 | Intent | Authored visual vocabulary |
@@ -203,7 +203,7 @@ Intentional, reversible chibi deformation, oversized expressions, simplified
 eyes, exaggerated mouths and cartoon physics are permitted. Return to canonical
 resting proportions after the reaction. Preserve the same recognizable adult
 white feline, ears, hair, headphones, clothing, accessories, pink/mint accents,
-colors and silhouette. UwU remains playful, flirtatious, cheeky, mischievous,
+colors and silhouette. Horu remains playful, flirtatious, cheeky, mischievous,
 technically competent and occasionally absurdly dramatic.
 
 Anime timing may use abrupt expression changes, held reactions, comedic freezes,
@@ -226,4 +226,8 @@ the entire resting sprite does not meet this requirement. Quieter states use
 restrained authored gestures and genuinely resting/sleeping postures. Deliberate
 anime holds are appropriate; do not claim smooth in-between animation when only
 a few drawings exist. Preserve the canonical slender adult anatomy and costume.
-The accepted closed-mouth IDLE stays unchanged. New body drawings require review.
+The accepted closed-mouth facial design remains the rest reference. The current authorized IDLE equipment/scale revision and new body drawings require review.
+
+## Canonical name and rest-scale correction — 2026-11-02
+
+The character is **Horu**. `uwu` remains the application personality-mode ID and `UwU/` remains the legacy source-pack directory; neither is the character name. Current review media uses `horu`. Preserve canonical reference pixels and their original filenames. The user authorized replacing the prior IDLE equipment case with the same frozen case used in all body poses, and reducing IDLE character scale to improve transitions. Preserve the closed-mouth facial design, blink, restrained breathing, ear/tail and steam motion. Prior accepted assets are archived; revised artwork remains a candidate until visual review.

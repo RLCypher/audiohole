@@ -1,11 +1,8 @@
 # AudioHole avatar pipeline
 
-The revised IDLE milestone is **approved**. The full library now contains 52
-static expressions, 49 sequences and 744 animation frames across Norm, UwU and
-Vanilla. **Norm and Vanilla are approved.** UwU's accepted facial direction now
-anchors revised full-body pose performances, which remain candidates for review.
-The review name and filenames use **Norm**; `default` is retained only as the
-established application mode compatibility key.
+The library contains 52 static expressions, 49 sequences and 744 animation frames across Norm, **Horu** and Vanilla. Norm and Vanilla are approved. Horu's revised IDLE, talking, working and prop-continuity assets await visual review. Horu is the character name; `uwu` is the stable application mode and `UwU/` is the legacy source pack directory. Public review names and filenames use `horu`, as `norm` is used for Norm.
+
+See the [current Horu correction report](review/full/horu-revision/REPORT.md), [native/compact scale comparisons](review/full/horu-revision/scale-compact.png) and [animated review](review/full/horu-revision/preview.gif). Earlier milestone descriptions below are historical where superseded by that report.
 
 Start with the [full catalog](review/full/index.html), [all-state sheet](review/full/all-states-contact-sheet.png),
 [inventory](review/full/INVENTORY.md), and [integration handoff](review/full/HANDOFF.md).
@@ -25,13 +22,13 @@ The original repository audit remains in [RECONNAISSANCE.md](RECONNAISSANCE.md).
   have a checkerboard review background; operating PNG transparency is unchanged.
   The frame inspector uses display-only WebP compression to reduce its size;
   use the native APNG or individual PNGs for exact pixel/edge inspection.
-- The latest authorized revision closes UwU's mouth and replaces both heavy
+- The latest authorized revision closes Horu's mouth and replaces both heavy
   steam plumes with smaller, fainter, independently animated layers. Original
   generated masters remain archived in `*/Intermediate/idle-before-steam-revision.png`.
-- Norm and UwU use reference-guided generated chibi illustrations. Vanilla is the
+- Norm and Horu use reference-guided generated chibi illustrations. Vanilla is the
   original logo pasted pixel-for-pixel onto a transparent portrait canvas.
 - Check Norm's facial hair, cap, headphones, fingers, coffee mug, clothing, cables,
-  and case. Check UwU's adult identity, ears, tail, eyes, forelock, accessories,
+  and case. Check Horu's adult identity, ears, tail, eyes, forelock, accessories,
   and clothing. Check small case lettering and emblems particularly closely.
 - Both character candidates have transparency warnings. The backend source has
   near-opaque foreground alpha capped at 254; the source also contained tiny
@@ -45,11 +42,11 @@ The original repository audit remains in [RECONNAISSANCE.md](RECONNAISSANCE.md).
 The latest user authorization accepts IDLE and permits full generation without
 routine batch approvals. All 39 accepted IDLE image hashes are frozen in
 `provenance/idle-approval.json`. Norm and Vanilla approvals freeze 501 operating PNG hashes (including all
-approved IDLE files) in `provenance/accepted-assets.json`. UwU's 19 new statics
+approved IDLE files) in `provenance/accepted-assets.json`. Horu's 19 new statics
 and 18 revised body sequences remain candidates; generation authorization does
 not grant artistic approval.
 See `review/full/` for per-personality review ZIPs and one small inspector per
-performance. Norm/UwU deadpan and Vanilla sleeping are intentionally static;
+performance. Norm/Horu deadpan and Vanilla sleeping are intentionally static;
 Vanilla optional emotional labels explicitly use its own IDLE.
 
 ## Run the tools
@@ -74,7 +71,7 @@ python -m unittest discover -s assets/personalities/tools -p 'test_*.py' -v
 ```
 
 `validate` is read-only and exits 1 on errors. Warnings require visual inspection.
-`--approved-only` reports the remaining unapproved generated reactions; approved Norm/Vanilla states are usable; UwU candidates retain their own approved IDLE fallback. The
+`--approved-only` reports the remaining unapproved generated reactions; approved Norm/Vanilla states are usable; Horu candidates retain their own approved IDLE fallback. The
 optional browser smoke check uses an already installed Playwright and Chromium:
 
 ```sh
@@ -98,7 +95,7 @@ retained sources are deterministic with the pinned Pillow version:
 
 ```sh
 python assets/personalities/tools/pipeline.py export-idle default assets/personalities/Norm/Intermediate/idle-source.png --replace
-python assets/personalities/tools/pipeline.py export-idle uwu assets/personalities/UwU/Intermediate/idle-source.png --replace
+python assets/personalities/tools/pipeline.py export-idle uwu assets/personalities/Horu/Intermediate/idle-source.png --replace
 python assets/personalities/tools/pipeline.py export-idle vanilla "assets/personalities/Vanilla/References/Vanilla Reference.png" --replace
 python assets/personalities/tools/pipeline.py review
 ```
@@ -209,7 +206,7 @@ commands, limitations, cache guidance, checks and remaining approval items are
 in the full handoff. No production C++ integration is claimed.
 
 
-UwU body revisions are packaged with `python assets/personalities/tools/revise_uwu_body.py`.
+Horu body revisions are packaged with `python assets/personalities/tools/revise_uwu_body.py`.
 The model draws the articulated key poses; the packager extracts complete
 silhouettes along clear sheet gutters, registers them by a case stripe, applies
 a common fit per state, and uses deliberate exposure holds. It adds no whole
@@ -217,7 +214,7 @@ sprite translation/rotation animation. New source sheets, exact prompts, key
 indices and a per-state provenance record are retained.
 
 
-UwU consistency revision 2 uses a fixed case and canonical badge layers. See
+Horu consistency revision 2 uses a fixed case and canonical badge layers. See
 [the correction report](review/full/consistency-correction/REPORT.md). Rebuild
 with `python assets/personalities/tools/correct_uwu_consistency.py --package`,
 then rebuild the body review, audit and catalog. The earlier body-only command

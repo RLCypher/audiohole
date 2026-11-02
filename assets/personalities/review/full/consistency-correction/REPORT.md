@@ -1,3 +1,5 @@
+**Historical evidence.** Current Horu rest, scale, talking, working eyes and cup continuity are covered by the [latest report](../horu-revision/REPORT.md). The original source drawings and prior accepted rest remain archived.
+
 # UwU consistency correction — candidate revision 2
 
 All 19 non-IDLE states now use character-only cleanup drawings, one frozen case
@@ -32,13 +34,13 @@ operating PNGs are unchanged. **This correction remains pending human art review
 
 ## Review at native and compact sizes
 
-- [UwU catalog](../uwu/index.html): per-state replay, native/compact inspection,
+- [UwU catalog](../horu/index.html): per-state replay, native/compact inspection,
   reduced motion, native PNG previews and every operating frame.
-- [Looping three-state GIF](../uwu-body-revision-loop.gif) and
-  [all 48 retained keys](../uwu-body-keyposes.png).
+- [Looping three-state GIF](../horu-body-revision-loop.gif) and
+  [all 48 retained keys](../horu-body-keyposes.png).
 - Native outfit/detail crops: [1](wardrobe-1.png), [2](wardrobe-2.png),
   [3](wardrobe-3.png), [4](wardrobe-4.png), [5](wardrobe-5.png), [6](wardrobe-6.png).
-- [Portable UwU review ZIP](../uwu-review.zip). Extract and open `index.html`
+- [Portable UwU review ZIP](../horu-review.zip). Extract and open `index.html`
   in a regular browser if the embedded visualization fails.
 
 47 keys are used in operating artwork; one deadpan variant remains an unused

@@ -18,11 +18,11 @@ READY = {'validated', 'approved'}
 
 def personality_name(identity):
     """Human names are independent of the application's compatibility IDs."""
-    return {'default': 'Norm', 'uwu': 'UwU', 'vanilla': 'Vanilla'}.get(identity, identity)
+    return {'default': 'Norm', 'uwu': 'Horu', 'vanilla': 'Vanilla'}.get(identity, identity)
 
 
 def review_key(identity):
-    return 'norm' if identity == 'default' else identity
+    return {'default': 'norm', 'uwu': 'horu'}.get(identity, identity)
 
 
 class AssetError(ValueError):

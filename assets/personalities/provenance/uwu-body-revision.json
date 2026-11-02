@@ -1,9 +1,9 @@
 {
   "authorization": "provenance/authorizations/uwu-consistency-correction.md",
   "status": "candidate",
-  "revision": "articulated-body-2-consistency",
-  "approved_idle_unchanged": true,
-  "method": "Drawn character layers with fixed case and canonical badge compositing; timed key holds.",
+  "revision": "horu-prop-continuity-3",
+  "approved_idle_unchanged": false,
+  "method": "Four new talking drawings; local working-eye correction; fixed case and continuous held/parked cup; other acting preserved.",
   "limitations": [
     "Limited key animation; no additional in-between drawings.",
     "Newly revealed prop/wardrobe details and source registration remain human art review items."
@@ -192,22 +192,22 @@
       "source_sha256": "73b39eddf09781820b0f44e3eee78140d3ed4d5091d3ec3542cbc1929cda81e2"
     },
     "talking": {
-      "drawn_pose_count": 2,
+      "drawn_pose_count": 4,
       "frame_source_key_indices": [
         0,
         0,
-        0,
-        0,
         1,
         1,
-        1,
-        1,
+        2,
+        2,
+        3,
+        3,
         0,
         0,
         0,
         0
       ],
-      "source_sha256": "73b39eddf09781820b0f44e3eee78140d3ed4d5091d3ec3542cbc1929cda81e2"
+      "source_sha256": "491c971a70d7d162a0d176e6283e95295869c09d17a7892a13e69a3eb05e7ba4"
     },
     "confused": {
       "drawn_pose_count": 2,
@@ -398,5 +398,8 @@
       "frame_source_key_indices": [],
       "source_sha256": "ac6a5603c3ff3ebe319e1ac27ce9141ee8cbd24e63892fc8948d86fc2adf7751"
     }
-  }
+  },
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json"
 }

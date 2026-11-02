@@ -377,15 +377,17 @@
     },
     {
       "personality_id": "uwu",
-      "name": "UwU",
+      "name": "Horu",
       "state": "idle",
-      "kind": "static"
+      "kind": "static",
+      "scope": "Archived prior IDLE; replaced operating IDLE is pending review."
     },
     {
       "personality_id": "uwu",
-      "name": "UwU",
+      "name": "Horu",
       "state": "idle",
-      "kind": "animation"
+      "kind": "animation",
+      "scope": "Archived prior IDLE; replaced operating IDLE is pending review."
     }
   ],
   "assets": {
@@ -877,19 +879,26 @@
     "Vanilla/Generated/logo/celebrating/0020.png": "2d0712eb0ce67a796bf9ff6c41712b21405380f435828ad7e54439ac9fb65242",
     "Vanilla/Generated/logo/celebrating/0021.png": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
     "Vanilla/Generated/logo/sleeping.png": "204d22e9df977c83ef1f1538f7528f752f8d70782f006678a6311958b4455086",
-    "UwU/Generated/chibi/idle.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-    "UwU/Generated/chibi/idle/0000.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-    "UwU/Generated/chibi/idle/0001.png": "b3d1f51acbccd61dcefa1c7d45569da3c0cef2a45ad96b586401f4b0ba5ab564",
-    "UwU/Generated/chibi/idle/0002.png": "e6a09b3a6247d9b8c573758777d09017a60fc62a20bd4bd3f2cdea4933b7a6d6",
-    "UwU/Generated/chibi/idle/0003.png": "93da7845d5e4463b789062517f4462c5cfe855d31118642e0c554d46213783a4",
-    "UwU/Generated/chibi/idle/0004.png": "0b7a1daaaa515fae2205fa7aa617f2204a8015e5f1f25d5cbe849184bd3d675d",
-    "UwU/Generated/chibi/idle/0005.png": "6c2d41167facb029032e991e01d8a719bc9e77053cfea425d2d14a0b944057c1",
-    "UwU/Generated/chibi/idle/0006.png": "d35a236b16eb4adece7936a9c5ea6285c90f0e3db1a6eafff6bd38786b20122b",
-    "UwU/Generated/chibi/idle/0007.png": "c2b0a2bb49537444ade17012d8caaf8ad9e834e7e3ae4bf841d1fdd678c2b7df",
-    "UwU/Generated/chibi/idle/0008.png": "2e61602ca963e71ba85d00fd5792d07e4c43ab9f23defab1b5fcf593b3c21bfd",
-    "UwU/Generated/chibi/idle/0009.png": "d5f6f12f3d0a0f85f10bf27c9fce55572bbf01cfdbec61a287a92ba2cf279362",
-    "UwU/Generated/chibi/idle/0010.png": "76ab87606d2e98baa27166aff541255067c15b7a73471f8cce226ee8f4e93a6a",
-    "UwU/Generated/chibi/idle/0011.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd"
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0000.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0001.png": "b3d1f51acbccd61dcefa1c7d45569da3c0cef2a45ad96b586401f4b0ba5ab564",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0002.png": "e6a09b3a6247d9b8c573758777d09017a60fc62a20bd4bd3f2cdea4933b7a6d6",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0003.png": "93da7845d5e4463b789062517f4462c5cfe855d31118642e0c554d46213783a4",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0004.png": "0b7a1daaaa515fae2205fa7aa617f2204a8015e5f1f25d5cbe849184bd3d675d",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0005.png": "6c2d41167facb029032e991e01d8a719bc9e77053cfea425d2d14a0b944057c1",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0006.png": "d35a236b16eb4adece7936a9c5ea6285c90f0e3db1a6eafff6bd38786b20122b",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0007.png": "c2b0a2bb49537444ade17012d8caaf8ad9e834e7e3ae4bf841d1fdd678c2b7df",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0008.png": "2e61602ca963e71ba85d00fd5792d07e4c43ab9f23defab1b5fcf593b3c21bfd",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0009.png": "d5f6f12f3d0a0f85f10bf27c9fce55572bbf01cfdbec61a287a92ba2cf279362",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0010.png": "76ab87606d2e98baa27166aff541255067c15b7a73471f8cce226ee8f4e93a6a",
+    "UwU/Intermediate/HoruIdleRevision/Previous/idle/0011.png": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd"
   },
-  "uwu": "Only IDLE approved; faces accepted in direction; revised body performances require review."
+  "uwu": "Prior approved IDLE preserved in archive; revised Horu IDLE and body performances pending visual review.",
+  "superseded_idle": {
+    "character": "Horu",
+    "personality_id": "uwu",
+    "authorization": "provenance/authorizations/horu-name-idle-scale.md",
+    "archive": "UwU/Intermediate/HoruIdleRevision/Previous",
+    "note": "Prior acceptance applies to archived pixels. Revised IDLE is validated, pending human review."
+  }
 }

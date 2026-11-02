@@ -41,9 +41,9 @@ def audit():
         shifts = [max(abs(b[j]-a[j]) for j in [0, 1]) for a, b in zip(centers, centers[1:]+centers[:1])]
         master_match = delta(master, frames[0])
         seam = delta(frames[0], frames[-1])
-        ground_box = (0, 616, 512, 768)
+        ground_box = (0, 632 if identity=='uwu' else 616, 512, 768)
         ground = max(delta(master.crop(ground_box), f.crop(ground_box)) for f in frames)
-        case_box = (64, 384, 264, 600) if identity == 'default' else (48, 440, 216, 616)
+        case_box = (64, 384, 264, 600) if identity == 'default' else (48, 480, 185, 616)
         case = None if identity == 'vanilla' else max(delta(master.crop(case_box), f.crop(case_box)) for f in frames)
         metrics = {'master_equals_first_frame_max_rgba_delta': master_match,
                    'loop_first_last_max_rgba_delta': seam,

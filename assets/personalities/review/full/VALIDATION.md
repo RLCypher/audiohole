@@ -1,3 +1,5 @@
+**Current results:** see [Horu revision validation](horu-revision/validation.json) and [report](horu-revision/REPORT.md). Earlier measurements below are historical where superseded.
+
 # Verification results
 
 - **52 Python tests passed**, including contract validation, real-library

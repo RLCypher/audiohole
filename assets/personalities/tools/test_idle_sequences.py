@@ -42,7 +42,10 @@ class InitialIdleTests(unittest.TestCase):
                 master = Image.open(ROOT/f'{folder}/Generated/{style}/idle.png')
                 i = 3
                 phase = i/11*2*math.pi
-                if identity == 'vanilla':
+                if identity == 'uwu':
+                    from revise_horu_idle import frame
+                    rebuilt = frame(i)
+                elif identity == 'vanilla':
                     rebuilt = vanilla_frame(master, phase)
                 else:
                     clean = Image.open(ROOT/f'{folder}/Intermediate/idle-clean-base.png')
@@ -70,7 +73,8 @@ class InitialIdleTests(unittest.TestCase):
         from PIL import ImageChops
         for folder in ['Norm','UwU']:
             with self.subTest(folder=folder):
-                layer = Image.open(ROOT/f'{folder}/Intermediate/idle-steam-layer.png')
+                relative='HoruIdleRevision/idle-steam-layer.png' if folder=='UwU' else 'idle-steam-layer.png'
+                layer = Image.open(ROOT/f'{folder}/Intermediate/{relative}')
                 self.assertLessEqual(layer.getchannel('A').getextrema()[1], 100)
                 a = steam_frame(layer,0,0,folder)
                 b = steam_frame(layer,math.pi,1,folder)
@@ -80,18 +84,18 @@ class InitialIdleTests(unittest.TestCase):
                 # The actual operating sequence must contain different steam pixels.
                 frame_a = Image.open(ROOT/f'{folder}/Generated/chibi/idle/0001.png')
                 frame_b = Image.open(ROOT/f'{folder}/Generated/chibi/idle/0005.png')
-                box = (376,210,415,270) if folder == 'Norm' else (374,270,400,325)
+                box = (376,210,415,270) if folder == 'Norm' else (360,323,393,373)
                 self.assertIsNotNone(ImageChops.difference(frame_a.crop(box),frame_b.crop(box)).getbbox())
 
     def test_uwu_closed_mouth_and_nose_survive_blink(self):
         master = Image.open(ROOT/'UwU/Generated/chibi/idle.png')
         blink = Image.open(ROOT/'UwU/Intermediate/idle-blink-keyframe.png')
-        original = Image.open(ROOT/'UwU/Intermediate/idle-before-steam-revision.png')
-        self.assertEqual(master.crop((253,264,302,294)).tobytes(),blink.crop((253,264,302,294)).tobytes())
-        self.assertEqual(master.crop((287,247,314,264)).tobytes(),original.crop((287,247,314,264)).tobytes())
+        from revise_horu_idle import render
+        original = Image.open(ROOT/'UwU/Intermediate/HoruIdleRevision/Previous/idle.png')
+        self.assertEqual(master.tobytes(),render(original).tobytes())
+        self.assertEqual(master.crop((258,317,305,344)).tobytes(),blink.crop((258,317,305,344)).tobytes())
         def tongue_pixels(image):
-            return sum(r > g*1.25 and r > b*.95 and g > 60 for r,g,b,a in image.crop((262,270,292,288)).get_flattened_data())
-        self.assertGreater(tongue_pixels(original),40)
+            return sum(r > g*1.25 and r > b*.95 and g > 60 for r,g,b,a in image.crop((267,323,294,338)).get_flattened_data())
         self.assertEqual(tongue_pixels(master),0)
 
     def test_portable_gif_previews_have_twelve_frames_and_matching_timing(self):

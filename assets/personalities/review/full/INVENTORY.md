@@ -1,6 +1,6 @@
 # Full avatar inventory
 
-Norm and Vanilla are approved. UwU IDLE is approved; its revised non-IDLE body performances await human review. The `default` machine ID is retained only for application compatibility.
+Norm and Vanilla are approved. Horu revised IDLE and body performances await human review. The `default` machine ID is retained only for application compatibility.
 
 | Personality | State | Static | Frames | Duration ms | Playback | Priority | Cooldown ms |
 |---|---|---|---:|---:|---|---:|---:|
@@ -44,23 +44,23 @@ Norm and Vanilla are approved. UwU IDLE is approved; its revised non-IDLE body p
 | Vanilla | bored | unavailable | 0 | 0 | fallback | — | — |
 | Vanilla | mischievous | unavailable | 0 | 0 | fallback | — | — |
 | Vanilla | deadpan | unavailable | 0 | 0 | fallback | — | — |
-| UwU | idle | approved | 12 | 5000 | persistent | 0 | 0 |
-| UwU | happy | validated | 12 | 1400 | finite | 30 | 2500 |
-| UwU | thinking | validated | 16 | 3200 | persistent | 10 | 500 |
-| UwU | working | validated | 16 | 2400 | persistent | 15 | 500 |
-| UwU | talking | validated | 12 | 1200 | persistent | 20 | 300 |
-| UwU | confused | validated | 14 | 1800 | finite | 35 | 3000 |
-| UwU | concerned | validated | 16 | 3200 | persistent | 45 | 1000 |
-| UwU | error | validated | 18 | 2000 | finite | 95 | 6000 |
-| UwU | angry | validated | 16 | 1800 | finite | 65 | 6000 |
-| UwU | surprised | validated | 14 | 1500 | finite | 70 | 5000 |
-| UwU | celebrating | validated | 22 | 2400 | finite | 55 | 8000 |
-| UwU | sleeping | validated | 16 | 4000 | persistent | 5 | 1000 |
-| UwU | smug | validated | 12 | 1600 | finite | 30 | 4000 |
-| UwU | embarrassed | validated | 16 | 1800 | finite | 40 | 5000 |
-| UwU | laughing | validated | 18 | 2000 | finite | 40 | 5000 |
-| UwU | suspicious | validated | 12 | 1800 | finite | 35 | 4000 |
-| UwU | panicking | validated | 20 | 2200 | finite | 85 | 8000 |
-| UwU | bored | validated | 12 | 4000 | persistent | 5 | 1000 |
-| UwU | mischievous | validated | 14 | 1800 | finite | 35 | 5000 |
-| UwU | deadpan | validated | 0 | 0 | finite | 35 | 4000 |
+| Horu | idle | validated | 12 | 5000 | persistent | 0 | 0 |
+| Horu | happy | validated | 12 | 1400 | finite | 30 | 2500 |
+| Horu | thinking | validated | 16 | 3200 | persistent | 10 | 500 |
+| Horu | working | validated | 16 | 2400 | persistent | 15 | 500 |
+| Horu | talking | validated | 12 | 1200 | persistent | 20 | 300 |
+| Horu | confused | validated | 14 | 1800 | finite | 35 | 3000 |
+| Horu | concerned | validated | 16 | 3200 | persistent | 45 | 1000 |
+| Horu | error | validated | 18 | 2000 | finite | 95 | 6000 |
+| Horu | angry | validated | 16 | 1800 | finite | 65 | 6000 |
+| Horu | surprised | validated | 14 | 1500 | finite | 70 | 5000 |
+| Horu | celebrating | validated | 22 | 2400 | finite | 55 | 8000 |
+| Horu | sleeping | validated | 16 | 4000 | persistent | 5 | 1000 |
+| Horu | smug | validated | 12 | 1600 | finite | 30 | 4000 |
+| Horu | embarrassed | validated | 16 | 1800 | finite | 40 | 5000 |
+| Horu | laughing | validated | 18 | 2000 | finite | 40 | 5000 |
+| Horu | suspicious | validated | 12 | 1800 | finite | 35 | 4000 |
+| Horu | panicking | validated | 20 | 2200 | finite | 85 | 8000 |
+| Horu | bored | validated | 12 | 4000 | persistent | 5 | 1000 |
+| Horu | mischievous | validated | 14 | 1800 | finite | 35 | 5000 |
+| Horu | deadpan | validated | 0 | 0 | finite | 35 | 4000 |

@@ -59,7 +59,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "7d50ee3d35b3366eff73c0c3bc9fb859083f7fe13168f5bb439ccaacb30cf62c",
-    "key_sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1"
+    "key_sha256": "24f8dc0926d435d7f9407aad6bd4870778acae8dbe49c572edd09a6ec58ee615",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "error",
@@ -121,7 +126,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "e2a0e2fb67e4a6a312aacffbbe15d48e72b8bbab9bef102e652ced82d86bc376",
-    "key_sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9"
+    "key_sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "error",
@@ -182,8 +192,14 @@
     },
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
-    "character_sha256": "4ccde18e5f562ae980c310bfccc9c6a517d7d0ba8b844ab3a204d77afaec6967",
-    "key_sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2"
+    "character_sha256": "28c126fa40edb52831b0c27936cf0c9de1ca720524d2a4f53f24b3c6eb38f3ab",
+    "key_sha256": "bd23a71e70edd4487ff9b24413a865cf2538f7e63a741e6444feec91943d90b7",
+    "background_layer": "error-0002-background.png",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "error",
@@ -245,7 +261,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "508ea058fcbeb53ab31940087d4447bf80ec3e986317f5b64134cee0291cedc9",
-    "key_sha256": "6498e7688e9616e3868733a0feb17444eb785e893809c0935a4fa585607ab6bf"
+    "key_sha256": "1c678fc317b735e519c8b62aea769e7e4f4463190a86b4e9bbe39ab290131530",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "angry",
@@ -307,7 +328,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "845e1ec74d9e0f308458c01e9845817607d1c41b772c1f65acc969e3e0c225ed",
-    "key_sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7"
+    "key_sha256": "0811255ebcf357e83a2f488e3ea0f33f2a70688e9a911d63e7d560168cf97336",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "angry",
@@ -376,7 +402,12 @@
       }
     ],
     "character_sha256": "4a1018d61ac1eacbe15b351569fdfe869a78e4adefd7668b4c06c1e11d726c37",
-    "key_sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749"
+    "key_sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "angry",
@@ -445,7 +476,12 @@
       }
     ],
     "character_sha256": "a63ace9bb39ba0127010f86ec210399d9fd040e7b55f223814250d58b8e37c2a",
-    "key_sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d"
+    "key_sha256": "f89f817a76c610f885889bccc6e0d98e25aa779de572d58ff5f2a1d1882d7ca4",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "angry",
@@ -514,7 +550,12 @@
       }
     ],
     "character_sha256": "04a1f842a9264daa4ae716731b378145b23ce0ef46e067f300c68cc1187ba8ea",
-    "key_sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916"
+    "key_sha256": "e62d262808b76543cf2a302fe406f20d1e6703b82a749d09977d3093c11f2b35",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "surprised",
@@ -576,7 +617,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "8552948159e8dda37d3b40a1077365e021fd8fe569495614c3a7b83502bfab40",
-    "key_sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0"
+    "key_sha256": "9afb2a9a655de1d8eb483538c5b0a0f087033f76186608c56aa79f64622221ba",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "surprised",
@@ -638,7 +684,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "0dadf25f03897a38826f4b8366dd2918b4f8434953ecf68bbb4698597f626437",
-    "key_sha256": "0a36bdd6c3117feebd07fc178bc8d6506aae1bf2df613b43ac33524fd3b597e2"
+    "key_sha256": "2791908ba59e23c3ec40851df8be4af7f975f58ff0867bdf6005cadc5a2c9a91",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "surprised",
@@ -700,7 +751,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "183f1e1d2c0b8f1164ffe1adc9ed9874ee3e428a68a722dca744a4d8f7906967",
-    "key_sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca"
+    "key_sha256": "bb81fce81ad0ef8888b0e34ccfc64b8ed95ce74b778d93f8457df1d5a1285937",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "surprised",
@@ -769,7 +825,12 @@
       }
     ],
     "character_sha256": "8285a052691af06d3040ceaa14d7269707c666d1b1065ab918d8eb086a50279b",
-    "key_sha256": "aa8a8f2c0eb0408ba18e99ffd9751a8ea043e328fb3d8e8528b8e4fcaebc8aed"
+    "key_sha256": "bf22a81359f85efad850fb297ae78db705e36a97fd28af87d0207dd25994b1eb",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "celebrating",
@@ -831,7 +892,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "9ddc103640d5cf66415874985595d20eb9ea77a18303fabe3b9253b4529bc555",
-    "key_sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4"
+    "key_sha256": "9c1d56b401ebc121c8da26888c47030ed57da5db962c022b7302e1f6490b5ce7",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "celebrating",
@@ -893,7 +959,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "cad51a1691fbda55918f021c520ca929300f941cb8c8801ec7fe22f3ec394602",
-    "key_sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29"
+    "key_sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "celebrating",
@@ -955,7 +1026,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "c5aaa4720a6bf2044c6f1109f3cc02d6999ead55a2d7ff7bd6e19d2bde1262e0",
-    "key_sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd"
+    "key_sha256": "6d100c809eb7276675760cf88c80d7e6f83fa3cda16bede46742540e46980f7b",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "celebrating",
@@ -1017,7 +1093,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "72681c112633c0d2980a21abb920f5a9eb0ece423558c73d4affc60718108f50",
-    "key_sha256": "36c72b596b120ee40a42658ed1c0f7b2a12bbde27a7ba3cf1f39539baf50dcc7"
+    "key_sha256": "c03e37a77234034302a0ed5b1bb31942b45b1a8b7bc0d7c47bf8cbabed10072b",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "panicking",
@@ -1079,7 +1160,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "93a01197a1c8ea25b9c4753145d5b0827fb0c10d66abb084823b08f07d3c84dd",
-    "key_sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9"
+    "key_sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "panicking",
@@ -1141,7 +1227,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "eeeb2437fde9f44758d169f3d3ce4b000dc1ea43619490e766f4d1c4f97ff0fd",
-    "key_sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae"
+    "key_sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "panicking",
@@ -1203,7 +1294,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "868a12ae58af12419efc0a61ea0ef3f135f1f7b8f162a6c3f89c670e5747e9c7",
-    "key_sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4"
+    "key_sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "panicking",
@@ -1265,7 +1361,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "e5c3f493b9cc2e0ce6f7a94064a61b587ee24f6a32cbf0e0547728586fb1f1c6",
-    "key_sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3"
+    "key_sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "happy",
@@ -1327,7 +1428,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "fefacc37f0bf4129c6fc8cb9d7999fe98cd91d2620941cf215b8062428232a0d",
-    "key_sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202"
+    "key_sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "happy",
@@ -1389,7 +1495,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "df37f1f7d010f83481e76b056ef7ed476f168c49859051ad2f9925295fb772d1",
-    "key_sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921"
+    "key_sha256": "288fbae5963c28c42fb5604a55f52502135ab8eb6efc8c90bd0c101082ef6136",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "thinking",
@@ -1451,7 +1562,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "bbef1a06b430089161c9738067c5aaa267502d175c7a27ee3b2f7c29827a85e0",
-    "key_sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301"
+    "key_sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "thinking",
@@ -1513,7 +1629,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "dca41114dc12128a8a0b6bd25d7f16f4d901a58b6e8bc8847532865b9d3af3c0",
-    "key_sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333"
+    "key_sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "working",
@@ -1574,8 +1695,24 @@
     },
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
-    "character_sha256": "6175c07c15631f1238d4dd963dc1fa7fc6911a3316c75c03ace500544d2e907c",
-    "key_sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08"
+    "character_sha256": "8751b7880a5718845a4af1935a35c8b161ac66f9bc1f8a1ffe5d2569273e63fc",
+    "key_sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
+    "eye_repair": {
+      "mask": "EyeEdits/0000-mask.png",
+      "material": "EyeEdits/0000-material.png",
+      "iris_envelope": [
+        283,
+        228,
+        311,
+        261
+      ],
+      "pixels_changed": 254
+    },
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "working",
@@ -1636,14 +1773,30 @@
     },
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
-    "character_sha256": "06eb2c4c39286940c42a366e4c5aaf87d76dd4213316cbec6779eb4b2959bfec",
-    "key_sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530"
+    "character_sha256": "d1391cf3706fa271896b176bc6d5490d8c0219173a6b3f5212479e13090590e5",
+    "key_sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
+    "eye_repair": {
+      "mask": "EyeEdits/0001-mask.png",
+      "material": "EyeEdits/0001-material.png",
+      "iris_envelope": [
+        278,
+        222,
+        308,
+        258
+      ],
+      "pixels_changed": 364
+    },
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "talking",
     "key": 0,
-    "source": "quiet-b-source.png",
-    "source_cell": 2,
+    "source": "talking-source.png",
+    "source_cell": 0,
     "source_crop_box": [
       69,
       801,
@@ -1653,59 +1806,64 @@
     "registration": {
       "ear_source": [
         [
-          309.619209519762,
-          231.73013174670632,
-          2353
+          335.9767576990122,
+          212.96920395119116,
+          1721
         ],
         [
-          495.33223684210526,
-          230.57894736842104,
-          912
+          489.66918714555766,
+          209.28166351606805,
+          529
         ]
       ],
       "ear_target": [
         [
-          213.6403712296984,
-          148.90777262180976,
-          1724
+          213.61261829652997,
+          150.77981072555204,
+          1585
         ],
         [
-          366.3157894736842,
-          151.70914127423822,
-          722
+          366.31475409836065,
+          149.827868852459,
+          610
         ]
       ],
       "manual_landmarks": false,
-      "uniform_scale": 0.8222265564650443,
+      "uniform_scale": 0.9932900996649361,
       "translation": [
-        -40.948147580146156,
-        -39.75294412365443
+        -120.08928522386122,
+        -59.40496332607432
       ],
-      "neck_y": 237,
-      "body_vertical_fit": 1.0711009174311927,
+      "neck_y": 255,
+      "body_vertical_fit": 0.8238532110091743,
       "ground_y": 704
     },
     "badge": {
       "box": [
-        268,
-        466,
-        300,
-        504
+        289,
+        443,
+        319,
+        474
       ],
-      "assembly_top": 466,
+      "assembly_top": 443,
       "template": "canonical-badge.png",
       "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
     },
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
-    "garment_edits": [],
-    "character_sha256": "f05db9ee517754c54c7b03e30248268056f019a738db45b384a03ad038c32033",
-    "key_sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a"
+    "character_sha256": "4fe0ebdf9e7b34f9027189b1e4476b48fb34b44e09f9b8b1a77dd87cb92fa5fa",
+    "key_sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+    "background_layer": "talking-0000-background.png",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "talking",
     "key": 1,
-    "source": "quiet-b-source.png",
-    "source_cell": 3,
+    "source": "talking-source.png",
+    "source_cell": 1,
     "source_crop_box": [
       576,
       812,
@@ -1715,53 +1873,58 @@
     "registration": {
       "ear_source": [
         [
-          310.5103752759382,
-          233.54128035320088,
-          2265
+          309.35673839184597,
+          217.6625141562854,
+          1766
         ],
         [
-          493.48665297741275,
-          240.26899383983573,
-          974
+          467.1768292682927,
+          210.5060975609756,
+          656
         ]
       ],
       "ear_target": [
         [
-          216.98374864572048,
-          149.64084507042253,
-          1846
+          216.79776674937966,
+          152.25434243176178,
+          1612
         ],
         [
-          371.48387096774195,
-          160.46451612903226,
-          775
+          371.64150943396226,
+          157.99854862119014,
+          689
         ]
       ],
       "manual_landmarks": false,
-      "uniform_scale": 0.8458703371347667,
+      "uniform_scale": 0.9808079024015638,
       "translation": [
-        -45.80480886527505,
-        -45.33834758506265
+        -86.59549172890075,
+        -54.84913343982225
       ],
-      "neck_y": 244,
-      "body_vertical_fit": 1.0267857142857142,
+      "neck_y": 258,
+      "body_vertical_fit": 0.828996282527881,
       "ground_y": 704
     },
     "badge": {
       "box": [
-        276,
-        470,
-        307,
-        506
+        290,
+        444,
+        320,
+        475
       ],
-      "assembly_top": 470,
+      "assembly_top": 444,
       "template": "canonical-badge.png",
       "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
     },
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
-    "garment_edits": [],
-    "character_sha256": "bde76d9b4c03fc4ad74a2a3984a0de0c0b638235a922166089cdd5fc3f227835",
-    "key_sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670"
+    "character_sha256": "520684dc6514e9b34709dd37118be374ce7a2bf0383ace2bc27512656e36c3d9",
+    "key_sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
+    "background_layer": "talking-0001-background.png",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "confused",
@@ -1823,7 +1986,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "fce3b4a0777cb7838e2db249b54589a430a3e349d986851e191d67a880816933",
-    "key_sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a"
+    "key_sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "confused",
@@ -1892,7 +2060,12 @@
       }
     ],
     "character_sha256": "5f6c423356971cf264b5d4fefc95f5ac37bca860b8f2c5ebb3d45649885f94ac",
-    "key_sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e"
+    "key_sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "concerned",
@@ -1961,7 +2134,12 @@
       }
     ],
     "character_sha256": "0a6b25ee7fe1fcf10833bee5ad2afe887285003ac4707b9a8d1cfed1546c02f7",
-    "key_sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7"
+    "key_sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "concerned",
@@ -2023,7 +2201,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "34c349164f818b1a961df5fe88d5578a4d37ff4f0dd5c81bc26f1dc34cf3a2ae",
-    "key_sha256": "c73b319c1c59169aa05716f536610701975428fdaabad8eb50938bbdfc042da3"
+    "key_sha256": "c73b319c1c59169aa05716f536610701975428fdaabad8eb50938bbdfc042da3",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "sleeping",
@@ -2085,7 +2268,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "97b41b2d6921c2b9dbaead11efb61ce8c68c81b8968c909ae07b29f0ef7da46d",
-    "key_sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421"
+    "key_sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "sleeping",
@@ -2147,7 +2335,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "a9e1847d8703e8420c4bfd684cea4de3db65a0f877da2936d643163a0a022d0a",
-    "key_sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d"
+    "key_sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "smug",
@@ -2209,7 +2402,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "00b5bb41905f19494c7d147352dff20b09fcfbec05cd2467f5919247e98f514a",
-    "key_sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b"
+    "key_sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "smug",
@@ -2271,7 +2469,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "55feac2817dc32d10c8cf1a4be825c35a1d76df1572718b2c1c0fc6f102cb4aa",
-    "key_sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d"
+    "key_sha256": "5e56a41b0d5dcda9f34d673584b7115dd2094e901a766b9de9cb75efb6739079",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "embarrassed",
@@ -2333,7 +2536,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "6aa4e3aec10e4dc5c5d972deefad8f9750c3a17038f1b15ba98cf61081e3598a",
-    "key_sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c"
+    "key_sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "embarrassed",
@@ -2395,7 +2603,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "780961342bcd2d2c4277cb0c5344f298ec83eda861fcebf8f0e377a635a64f24",
-    "key_sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43"
+    "key_sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "laughing",
@@ -2457,7 +2670,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "af52316ed097b6cadc43e22121b0b3d3e0b2d3e629a1c4ce4cf25033f9af97e6",
-    "key_sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6"
+    "key_sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "laughing",
@@ -2519,7 +2737,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "952ba72f4d34cf2da281b1e449b2d8898e2cd20f4e02d79aa3133855ad3e30cf",
-    "key_sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e"
+    "key_sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "suspicious",
@@ -2581,7 +2804,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "ccb5dfd21fd1684243fab800a3da31a9d61fadff5089d50d554692372ae9888a",
-    "key_sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39"
+    "key_sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "suspicious",
@@ -2643,7 +2871,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "b734dc726350fc0a8c50f72408d42bb1ce3f47a3bc9a3c728a2ec83981b524fc",
-    "key_sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424"
+    "key_sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "bored",
@@ -2705,7 +2938,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "4c228130da8bbb4af606ae0fa83dd78e4556cb17f7ac6c307647bca624fde4a1",
-    "key_sha256": "30fcbeb3e80432e1f50f370b2de1a643c45c61b7104fe367b12f299fa604b341"
+    "key_sha256": "30fcbeb3e80432e1f50f370b2de1a643c45c61b7104fe367b12f299fa604b341",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "bored",
@@ -2767,7 +3005,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "b7ab979e0dd767feac5d3df7c1d62956d711c154a93f3963592a467eb3e5749b",
-    "key_sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568"
+    "key_sha256": "dcf4ca75d70bd226842c0a7c7fae68d1b3e389da7656bf459e44f09cffe2852d",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "mischievous",
@@ -2829,7 +3072,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "748171f3d14ba497db13440a82a4ba8accd4e1726904b498c6efc25ae80d762f",
-    "key_sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab"
+    "key_sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "mischievous",
@@ -2891,7 +3139,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "116d2450205dc9ce570aab78e5c11dba187ddae55cfbd5bdc2d94b5100562bd9",
-    "key_sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151"
+    "key_sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "deadpan",
@@ -2953,7 +3206,12 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "396246fcbe9d60cbf52f930f2e1c2658d200a7402db807866f7ebce30b9e95df",
-    "key_sha256": "edd6e7f461c7de5b4e895f33be11fb047b470fdea319ef91be747ebfc74d1ebc"
+    "key_sha256": "b095b5f52b1c3f8a86cc6a4397d5e0524f057f166095f880ccd4017f88352e0e",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
   },
   {
     "state": "deadpan",
@@ -3015,6 +3273,145 @@
     "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
     "garment_edits": [],
     "character_sha256": "c500ed1c40c4c1628c4293e2a8bbde14b9d984e677db72647f11a4c229d249bc",
-    "key_sha256": "7d051747e22736a2f25cfd0083aa4b0718e4e0c8d58203d9eb65e4e74c56a12f"
+    "key_sha256": "96978de13171c04a0e9e468496a8dd0032a9d273bfc7b11fcb820009fb8891a1",
+    "cup": {
+      "location": "case",
+      "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+    },
+    "revision": "horu-prop-continuity-3"
+  },
+  {
+    "state": "talking",
+    "key": 2,
+    "source": "talking-source.png",
+    "source_cell": 2,
+    "source_crop_box": [
+      69,
+      801,
+      522,
+      1507
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          356.82179226069246,
+          186.85692464358453,
+          1964
+        ],
+        [
+          515.075,
+          201.3765625,
+          640
+        ]
+      ],
+      "ear_target": [
+        [
+          213.61261829652997,
+          150.77981072555204,
+          1585
+        ],
+        [
+          366.31475409836065,
+          149.827868852459,
+          610
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9609056430229435,
+      "translation": [
+        -128.94158771100592,
+        -36.22403451436736
+      ],
+      "neck_y": 251,
+      "body_vertical_fit": 0.8266423357664233,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        274,
+        439,
+        303,
+        471
+      ],
+      "assembly_top": 439,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "character_sha256": "a158855e159401bee1b8dc68efba12ce809a5ac3da3061e2aba8bceee5d89712",
+    "key_sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
+    "background_layer": "talking-0002-background.png",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
+  },
+  {
+    "state": "talking",
+    "key": 3,
+    "source": "talking-source.png",
+    "source_cell": 3,
+    "source_crop_box": [
+      576,
+      812,
+      988,
+      1512
+    ],
+    "registration": {
+      "ear_source": [
+        [
+          331.17638036809814,
+          192.34202453987731,
+          1956
+        ],
+        [
+          494.5459183673469,
+          201.17729591836735,
+          784
+        ]
+      ],
+      "ear_target": [
+        [
+          216.79776674937966,
+          152.25434243176178,
+          1612
+        ],
+        [
+          371.64150943396226,
+          157.99854862119014,
+          689
+        ]
+      ],
+      "manual_landmarks": false,
+      "uniform_scale": 0.9470807692684852,
+      "translation": [
+        -96.79321685258265,
+        -31.22084484432702
+      ],
+      "neck_y": 255,
+      "body_vertical_fit": 0.8361266294227188,
+      "ground_y": 704
+    },
+    "badge": {
+      "box": [
+        278,
+        442,
+        307,
+        473
+      ],
+      "assembly_top": 442,
+      "template": "canonical-badge.png",
+      "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+    },
+    "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+    "character_sha256": "9fccb8870aabc34cee17119be4d88a32740a23b05c2bdc93b10d2c3699ca3631",
+    "key_sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
+    "background_layer": "talking-0003-background.png",
+    "cup": {
+      "location": "hand",
+      "layer": null
+    },
+    "revision": "horu-prop-continuity-3"
   }
 ]

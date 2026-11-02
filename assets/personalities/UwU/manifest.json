@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "personality_id": "uwu",
-  "character_id": "uwu",
+  "character_id": "horu",
   "default_style": "chibi",
   "technical": {
     "width": 512,
@@ -20,24 +20,25 @@
       "states": {
         "idle": {
           "static": {
-            "status": "approved",
+            "status": "validated",
             "path": "Generated/chibi/idle.png",
-            "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+            "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
             "anchor": [
               256,
               704
-            ],
-            "review": {
-              "reviewer": "User",
-              "reviewed_at": "2026-11-01T21:39:05Z"
-            }
+            ]
           },
           "animation": {
-            "status": "approved",
+            "loop": true,
+            "priority": 0,
+            "interruptible": true,
+            "cooldown_ms": 0,
+            "transition": "cut",
+            "status": "validated",
             "frames": [
               {
                 "path": "Generated/chibi/idle/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -46,7 +47,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0001.png",
-                "sha256": "b3d1f51acbccd61dcefa1c7d45569da3c0cef2a45ad96b586401f4b0ba5ab564",
+                "sha256": "b08421f349a09712e79c144102561c92098b5d404cbc7402715e5b8b41c0495d",
                 "anchor": [
                   256,
                   704
@@ -55,7 +56,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0002.png",
-                "sha256": "e6a09b3a6247d9b8c573758777d09017a60fc62a20bd4bd3f2cdea4933b7a6d6",
+                "sha256": "c71a685a07b09f574af1d1bbbd5b1fd4f6ae35688ef712ddc81b1ac19b6cfff7",
                 "anchor": [
                   256,
                   704
@@ -64,7 +65,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0003.png",
-                "sha256": "93da7845d5e4463b789062517f4462c5cfe855d31118642e0c554d46213783a4",
+                "sha256": "c43e06418c39b4b797314c0136479ba9e3a18fe3cde29b9783341ab296243e3d",
                 "anchor": [
                   256,
                   704
@@ -73,7 +74,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0004.png",
-                "sha256": "0b7a1daaaa515fae2205fa7aa617f2204a8015e5f1f25d5cbe849184bd3d675d",
+                "sha256": "51d690a72dd73ac541f28782e0212f128c37749842c1a0f02cf33e9429303b41",
                 "anchor": [
                   256,
                   704
@@ -82,7 +83,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0005.png",
-                "sha256": "6c2d41167facb029032e991e01d8a719bc9e77053cfea425d2d14a0b944057c1",
+                "sha256": "415dcbf0b8d53eba27d847b5aa0e8e0b6ac7a4903fa1c103c097819f01ad6a66",
                 "anchor": [
                   256,
                   704
@@ -91,7 +92,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0006.png",
-                "sha256": "d35a236b16eb4adece7936a9c5ea6285c90f0e3db1a6eafff6bd38786b20122b",
+                "sha256": "234aebfa3f352873832b5e8b89a5d311a460528bfd0f9d96dd5348f52b611507",
                 "anchor": [
                   256,
                   704
@@ -100,7 +101,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0007.png",
-                "sha256": "c2b0a2bb49537444ade17012d8caaf8ad9e834e7e3ae4bf841d1fdd678c2b7df",
+                "sha256": "26076b53dece5b771be01e9e88843e7ccbd5ed39ab6ac59c32440b0ebbac5f70",
                 "anchor": [
                   256,
                   704
@@ -109,7 +110,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0008.png",
-                "sha256": "2e61602ca963e71ba85d00fd5792d07e4c43ab9f23defab1b5fcf593b3c21bfd",
+                "sha256": "7d2f1ecbfa408d3cb4ed26cb61de826bcacdead9c1322826d419719919b3ad34",
                 "anchor": [
                   256,
                   704
@@ -118,7 +119,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0009.png",
-                "sha256": "d5f6f12f3d0a0f85f10bf27c9fce55572bbf01cfdbec61a287a92ba2cf279362",
+                "sha256": "b973de1da28c1b462cc9f3ab74937455a951d8282c0487e69f3182f68d74ce64",
                 "anchor": [
                   256,
                   704
@@ -127,7 +128,7 @@
               },
               {
                 "path": "Generated/chibi/idle/0010.png",
-                "sha256": "76ab87606d2e98baa27166aff541255067c15b7a73471f8cce226ee8f4e93a6a",
+                "sha256": "36536c1030885cec6dc8e02f4b6534da3d3d7738420434d42ebdb0f86eab7e9d",
                 "anchor": [
                   256,
                   704
@@ -136,23 +137,14 @@
               },
               {
                 "path": "Generated/chibi/idle/0011.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 600
               }
-            ],
-            "loop": true,
-            "priority": 0,
-            "interruptible": true,
-            "cooldown_ms": 0,
-            "transition": "cut",
-            "review": {
-              "reviewer": "User",
-              "reviewed_at": "2026-11-01T21:39:05Z"
-            }
+            ]
           },
           "behavior": {
             "category": "ambient",
@@ -163,13 +155,14 @@
             "static_hold_ms": 5000,
             "return_to": "persistent",
             "reduced_motion": "static"
-          }
+          },
+          "note": "Horu: archived closed-mouth acting at 88% character scale with fixed canonical case; revised IDLE pending visual review."
         },
         "happy": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/happy.png",
-            "sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202",
+            "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
             "anchor": [
               256,
               704
@@ -185,7 +178,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/happy/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -194,7 +187,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -203,7 +196,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0002.png",
-                "sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202",
+                "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
                 "anchor": [
                   256,
                   704
@@ -212,7 +205,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0003.png",
-                "sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202",
+                "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
                 "anchor": [
                   256,
                   704
@@ -221,7 +214,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0004.png",
-                "sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921",
+                "sha256": "288fbae5963c28c42fb5604a55f52502135ab8eb6efc8c90bd0c101082ef6136",
                 "anchor": [
                   256,
                   704
@@ -230,7 +223,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0005.png",
-                "sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921",
+                "sha256": "288fbae5963c28c42fb5604a55f52502135ab8eb6efc8c90bd0c101082ef6136",
                 "anchor": [
                   256,
                   704
@@ -239,7 +232,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0006.png",
-                "sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921",
+                "sha256": "288fbae5963c28c42fb5604a55f52502135ab8eb6efc8c90bd0c101082ef6136",
                 "anchor": [
                   256,
                   704
@@ -248,7 +241,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0007.png",
-                "sha256": "213de6e2c8248e310cfbc0331f613753092569a85525a8d4a8023e2a5b8b4921",
+                "sha256": "288fbae5963c28c42fb5604a55f52502135ab8eb6efc8c90bd0c101082ef6136",
                 "anchor": [
                   256,
                   704
@@ -257,7 +250,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0008.png",
-                "sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202",
+                "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
                 "anchor": [
                   256,
                   704
@@ -266,7 +259,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0009.png",
-                "sha256": "a07f6fdb3e5324eeca1c19c740bd124259c79354a8bd1b7f6be7198c08359202",
+                "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
                 "anchor": [
                   256,
                   704
@@ -275,7 +268,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0010.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -284,7 +277,7 @@
               },
               {
                 "path": "Generated/chibi/happy/0011.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -303,13 +296,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "thinking": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/thinking.png",
-            "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+            "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
             "anchor": [
               256,
               704
@@ -325,7 +318,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/thinking/0000.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -334,7 +327,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0001.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -343,7 +336,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0002.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -352,7 +345,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0003.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -361,7 +354,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0004.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -370,7 +363,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0005.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -379,7 +372,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0006.png",
-                "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
+                "sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
                 "anchor": [
                   256,
                   704
@@ -388,7 +381,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0007.png",
-                "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
+                "sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
                 "anchor": [
                   256,
                   704
@@ -397,7 +390,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0008.png",
-                "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
+                "sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
                 "anchor": [
                   256,
                   704
@@ -406,7 +399,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0009.png",
-                "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
+                "sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
                 "anchor": [
                   256,
                   704
@@ -415,7 +408,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0010.png",
-                "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
+                "sha256": "147ad65f3c5249f0cb1b8f9a6e35c16724146db598e539d5d41654c81aa21fb7",
                 "anchor": [
                   256,
                   704
@@ -424,7 +417,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0011.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -433,7 +426,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0012.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -442,7 +435,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0013.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -451,7 +444,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0014.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -460,7 +453,7 @@
               },
               {
                 "path": "Generated/chibi/thinking/0015.png",
-                "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+                "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
                 "anchor": [
                   256,
                   704
@@ -479,13 +472,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "working": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/working.png",
-            "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+            "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
             "anchor": [
               256,
               704
@@ -501,7 +494,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/working/0000.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -510,7 +503,7 @@
               },
               {
                 "path": "Generated/chibi/working/0001.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -519,7 +512,7 @@
               },
               {
                 "path": "Generated/chibi/working/0002.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -528,7 +521,7 @@
               },
               {
                 "path": "Generated/chibi/working/0003.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -537,7 +530,7 @@
               },
               {
                 "path": "Generated/chibi/working/0004.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -546,7 +539,7 @@
               },
               {
                 "path": "Generated/chibi/working/0005.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -555,7 +548,7 @@
               },
               {
                 "path": "Generated/chibi/working/0006.png",
-                "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
+                "sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
                 "anchor": [
                   256,
                   704
@@ -564,7 +557,7 @@
               },
               {
                 "path": "Generated/chibi/working/0007.png",
-                "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
+                "sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
                 "anchor": [
                   256,
                   704
@@ -573,7 +566,7 @@
               },
               {
                 "path": "Generated/chibi/working/0008.png",
-                "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
+                "sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
                 "anchor": [
                   256,
                   704
@@ -582,7 +575,7 @@
               },
               {
                 "path": "Generated/chibi/working/0009.png",
-                "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
+                "sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
                 "anchor": [
                   256,
                   704
@@ -591,7 +584,7 @@
               },
               {
                 "path": "Generated/chibi/working/0010.png",
-                "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
+                "sha256": "e5d7bb3bf3a7616583f375bdaf9074e27bdc600379a9e91f4d9c6b01f6ad04a7",
                 "anchor": [
                   256,
                   704
@@ -600,7 +593,7 @@
               },
               {
                 "path": "Generated/chibi/working/0011.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -609,7 +602,7 @@
               },
               {
                 "path": "Generated/chibi/working/0012.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -618,7 +611,7 @@
               },
               {
                 "path": "Generated/chibi/working/0013.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -627,7 +620,7 @@
               },
               {
                 "path": "Generated/chibi/working/0014.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -636,7 +629,7 @@
               },
               {
                 "path": "Generated/chibi/working/0015.png",
-                "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+                "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
                 "anchor": [
                   256,
                   704
@@ -655,13 +648,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "talking": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/talking.png",
-            "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+            "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
             "anchor": [
               256,
               704
@@ -677,7 +670,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/talking/0000.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -686,7 +679,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0001.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -695,7 +688,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0002.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
                 "anchor": [
                   256,
                   704
@@ -704,7 +697,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0003.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
                 "anchor": [
                   256,
                   704
@@ -713,7 +706,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0004.png",
-                "sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670",
+                "sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
                 "anchor": [
                   256,
                   704
@@ -722,7 +715,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0005.png",
-                "sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670",
+                "sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
                 "anchor": [
                   256,
                   704
@@ -731,7 +724,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0006.png",
-                "sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670",
+                "sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
                 "anchor": [
                   256,
                   704
@@ -740,7 +733,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0007.png",
-                "sha256": "d1f33529c24f71ed50017401c3de8a4048d9b139e0fe6d788a22aacbad823670",
+                "sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
                 "anchor": [
                   256,
                   704
@@ -749,7 +742,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0008.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -758,7 +751,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0009.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -767,7 +760,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0010.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -776,7 +769,7 @@
               },
               {
                 "path": "Generated/chibi/talking/0011.png",
-                "sha256": "f75461bb7e2e9898d1b8c29fb683e6d9cd6344bffa245e72c890355816cc9b1a",
+                "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
                 "anchor": [
                   256,
                   704
@@ -795,13 +788,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: four redrawn two-arm speech poses, one continuously held cup; mouth shapes, elbow gestures and restrained follow-through; visual approval pending."
         },
         "confused": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/confused.png",
-            "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+            "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
             "anchor": [
               256,
               704
@@ -817,7 +810,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/confused/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -826,7 +819,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -835,7 +828,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -844,7 +837,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0003.png",
-                "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+                "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
                 "anchor": [
                   256,
                   704
@@ -853,7 +846,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0004.png",
-                "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+                "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
                 "anchor": [
                   256,
                   704
@@ -862,7 +855,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0005.png",
-                "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+                "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
                 "anchor": [
                   256,
                   704
@@ -871,7 +864,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0006.png",
-                "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+                "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
                 "anchor": [
                   256,
                   704
@@ -880,7 +873,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0007.png",
-                "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+                "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
                 "anchor": [
                   256,
                   704
@@ -889,7 +882,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0008.png",
-                "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+                "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
                 "anchor": [
                   256,
                   704
@@ -898,7 +891,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0009.png",
-                "sha256": "19b3d7cd7e6fbbcaf8c6c6f6a22a85a4355c3680b21530df51983034e078a17e",
+                "sha256": "db08de0899369aec0a2e11c3e4aa3fe5441da978c1f6c414bda8fc63c58dfaec",
                 "anchor": [
                   256,
                   704
@@ -907,7 +900,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0010.png",
-                "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+                "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
                 "anchor": [
                   256,
                   704
@@ -916,7 +909,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0011.png",
-                "sha256": "3100ac9804316f71eb2586a649b0fa5f0c02b7dcdae311c865be03429d29c40a",
+                "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
                 "anchor": [
                   256,
                   704
@@ -925,7 +918,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0012.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -934,7 +927,7 @@
               },
               {
                 "path": "Generated/chibi/confused/0013.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -953,7 +946,7 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "concerned": {
           "static": {
@@ -1129,13 +1122,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "error": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/error.png",
-            "sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9",
+            "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
             "anchor": [
               256,
               704
@@ -1151,7 +1144,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/error/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1160,7 +1153,7 @@
               },
               {
                 "path": "Generated/chibi/error/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1169,7 +1162,7 @@
               },
               {
                 "path": "Generated/chibi/error/0002.png",
-                "sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1",
+                "sha256": "24f8dc0926d435d7f9407aad6bd4870778acae8dbe49c572edd09a6ec58ee615",
                 "anchor": [
                   256,
                   704
@@ -1178,7 +1171,7 @@
               },
               {
                 "path": "Generated/chibi/error/0003.png",
-                "sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1",
+                "sha256": "24f8dc0926d435d7f9407aad6bd4870778acae8dbe49c572edd09a6ec58ee615",
                 "anchor": [
                   256,
                   704
@@ -1187,7 +1180,7 @@
               },
               {
                 "path": "Generated/chibi/error/0004.png",
-                "sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9",
+                "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
                 "anchor": [
                   256,
                   704
@@ -1196,7 +1189,7 @@
               },
               {
                 "path": "Generated/chibi/error/0005.png",
-                "sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9",
+                "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
                 "anchor": [
                   256,
                   704
@@ -1205,7 +1198,7 @@
               },
               {
                 "path": "Generated/chibi/error/0006.png",
-                "sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2",
+                "sha256": "bd23a71e70edd4487ff9b24413a865cf2538f7e63a741e6444feec91943d90b7",
                 "anchor": [
                   256,
                   704
@@ -1214,7 +1207,7 @@
               },
               {
                 "path": "Generated/chibi/error/0007.png",
-                "sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2",
+                "sha256": "bd23a71e70edd4487ff9b24413a865cf2538f7e63a741e6444feec91943d90b7",
                 "anchor": [
                   256,
                   704
@@ -1223,7 +1216,7 @@
               },
               {
                 "path": "Generated/chibi/error/0008.png",
-                "sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9",
+                "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
                 "anchor": [
                   256,
                   704
@@ -1232,7 +1225,7 @@
               },
               {
                 "path": "Generated/chibi/error/0009.png",
-                "sha256": "758021a102e107824739835356263f8704e10465f6bb9b0c1334b8b92bf666c9",
+                "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
                 "anchor": [
                   256,
                   704
@@ -1241,7 +1234,7 @@
               },
               {
                 "path": "Generated/chibi/error/0010.png",
-                "sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2",
+                "sha256": "bd23a71e70edd4487ff9b24413a865cf2538f7e63a741e6444feec91943d90b7",
                 "anchor": [
                   256,
                   704
@@ -1250,7 +1243,7 @@
               },
               {
                 "path": "Generated/chibi/error/0011.png",
-                "sha256": "375b1045bed42853ce23e04a3807e002349748e3a6419e13e960a1fdd22fecf2",
+                "sha256": "bd23a71e70edd4487ff9b24413a865cf2538f7e63a741e6444feec91943d90b7",
                 "anchor": [
                   256,
                   704
@@ -1259,7 +1252,7 @@
               },
               {
                 "path": "Generated/chibi/error/0012.png",
-                "sha256": "6498e7688e9616e3868733a0feb17444eb785e893809c0935a4fa585607ab6bf",
+                "sha256": "1c678fc317b735e519c8b62aea769e7e4f4463190a86b4e9bbe39ab290131530",
                 "anchor": [
                   256,
                   704
@@ -1268,7 +1261,7 @@
               },
               {
                 "path": "Generated/chibi/error/0013.png",
-                "sha256": "6498e7688e9616e3868733a0feb17444eb785e893809c0935a4fa585607ab6bf",
+                "sha256": "1c678fc317b735e519c8b62aea769e7e4f4463190a86b4e9bbe39ab290131530",
                 "anchor": [
                   256,
                   704
@@ -1277,7 +1270,7 @@
               },
               {
                 "path": "Generated/chibi/error/0014.png",
-                "sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1",
+                "sha256": "24f8dc0926d435d7f9407aad6bd4870778acae8dbe49c572edd09a6ec58ee615",
                 "anchor": [
                   256,
                   704
@@ -1286,7 +1279,7 @@
               },
               {
                 "path": "Generated/chibi/error/0015.png",
-                "sha256": "f82f051038cdf6c9b071b853e1cd8c3dc650fd0d0a7a84701c9daddb47912eb1",
+                "sha256": "24f8dc0926d435d7f9407aad6bd4870778acae8dbe49c572edd09a6ec58ee615",
                 "anchor": [
                   256,
                   704
@@ -1295,7 +1288,7 @@
               },
               {
                 "path": "Generated/chibi/error/0016.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1304,7 +1297,7 @@
               },
               {
                 "path": "Generated/chibi/error/0017.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1323,13 +1316,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "angry": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/angry.png",
-            "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
+            "sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
             "anchor": [
               256,
               704
@@ -1345,7 +1338,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/angry/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1354,7 +1347,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1363,7 +1356,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0002.png",
-                "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
+                "sha256": "0811255ebcf357e83a2f488e3ea0f33f2a70688e9a911d63e7d560168cf97336",
                 "anchor": [
                   256,
                   704
@@ -1372,7 +1365,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0003.png",
-                "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
+                "sha256": "0811255ebcf357e83a2f488e3ea0f33f2a70688e9a911d63e7d560168cf97336",
                 "anchor": [
                   256,
                   704
@@ -1381,7 +1374,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0004.png",
-                "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
+                "sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
                 "anchor": [
                   256,
                   704
@@ -1390,7 +1383,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0005.png",
-                "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
+                "sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
                 "anchor": [
                   256,
                   704
@@ -1399,7 +1392,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0006.png",
-                "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
+                "sha256": "f89f817a76c610f885889bccc6e0d98e25aa779de572d58ff5f2a1d1882d7ca4",
                 "anchor": [
                   256,
                   704
@@ -1408,7 +1401,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0007.png",
-                "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
+                "sha256": "f89f817a76c610f885889bccc6e0d98e25aa779de572d58ff5f2a1d1882d7ca4",
                 "anchor": [
                   256,
                   704
@@ -1417,7 +1410,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0008.png",
-                "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
+                "sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
                 "anchor": [
                   256,
                   704
@@ -1426,7 +1419,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0009.png",
-                "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
+                "sha256": "f89f817a76c610f885889bccc6e0d98e25aa779de572d58ff5f2a1d1882d7ca4",
                 "anchor": [
                   256,
                   704
@@ -1435,7 +1428,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0010.png",
-                "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
+                "sha256": "f89f817a76c610f885889bccc6e0d98e25aa779de572d58ff5f2a1d1882d7ca4",
                 "anchor": [
                   256,
                   704
@@ -1444,7 +1437,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0011.png",
-                "sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916",
+                "sha256": "e62d262808b76543cf2a302fe406f20d1e6703b82a749d09977d3093c11f2b35",
                 "anchor": [
                   256,
                   704
@@ -1453,7 +1446,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0012.png",
-                "sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916",
+                "sha256": "e62d262808b76543cf2a302fe406f20d1e6703b82a749d09977d3093c11f2b35",
                 "anchor": [
                   256,
                   704
@@ -1462,7 +1455,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0013.png",
-                "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
+                "sha256": "0811255ebcf357e83a2f488e3ea0f33f2a70688e9a911d63e7d560168cf97336",
                 "anchor": [
                   256,
                   704
@@ -1471,7 +1464,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0014.png",
-                "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
+                "sha256": "0811255ebcf357e83a2f488e3ea0f33f2a70688e9a911d63e7d560168cf97336",
                 "anchor": [
                   256,
                   704
@@ -1480,7 +1473,7 @@
               },
               {
                 "path": "Generated/chibi/angry/0015.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1499,13 +1492,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "surprised": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/surprised.png",
-            "sha256": "0a36bdd6c3117feebd07fc178bc8d6506aae1bf2df613b43ac33524fd3b597e2",
+            "sha256": "2791908ba59e23c3ec40851df8be4af7f975f58ff0867bdf6005cadc5a2c9a91",
             "anchor": [
               256,
               704
@@ -1521,7 +1514,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/surprised/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1530,7 +1523,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1539,7 +1532,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0002.png",
-                "sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0",
+                "sha256": "9afb2a9a655de1d8eb483538c5b0a0f087033f76186608c56aa79f64622221ba",
                 "anchor": [
                   256,
                   704
@@ -1548,7 +1541,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0003.png",
-                "sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0",
+                "sha256": "9afb2a9a655de1d8eb483538c5b0a0f087033f76186608c56aa79f64622221ba",
                 "anchor": [
                   256,
                   704
@@ -1557,7 +1550,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0004.png",
-                "sha256": "0a36bdd6c3117feebd07fc178bc8d6506aae1bf2df613b43ac33524fd3b597e2",
+                "sha256": "2791908ba59e23c3ec40851df8be4af7f975f58ff0867bdf6005cadc5a2c9a91",
                 "anchor": [
                   256,
                   704
@@ -1566,7 +1559,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0005.png",
-                "sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca",
+                "sha256": "bb81fce81ad0ef8888b0e34ccfc64b8ed95ce74b778d93f8457df1d5a1285937",
                 "anchor": [
                   256,
                   704
@@ -1575,7 +1568,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0006.png",
-                "sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca",
+                "sha256": "bb81fce81ad0ef8888b0e34ccfc64b8ed95ce74b778d93f8457df1d5a1285937",
                 "anchor": [
                   256,
                   704
@@ -1584,7 +1577,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0007.png",
-                "sha256": "0a36bdd6c3117feebd07fc178bc8d6506aae1bf2df613b43ac33524fd3b597e2",
+                "sha256": "2791908ba59e23c3ec40851df8be4af7f975f58ff0867bdf6005cadc5a2c9a91",
                 "anchor": [
                   256,
                   704
@@ -1593,7 +1586,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0008.png",
-                "sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca",
+                "sha256": "bb81fce81ad0ef8888b0e34ccfc64b8ed95ce74b778d93f8457df1d5a1285937",
                 "anchor": [
                   256,
                   704
@@ -1602,7 +1595,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0009.png",
-                "sha256": "ceb61eda5db56892b1ed3e2f27e4c4eb7a883ec6bd08c4cfbb71f1fb4a022cca",
+                "sha256": "bb81fce81ad0ef8888b0e34ccfc64b8ed95ce74b778d93f8457df1d5a1285937",
                 "anchor": [
                   256,
                   704
@@ -1611,7 +1604,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0010.png",
-                "sha256": "aa8a8f2c0eb0408ba18e99ffd9751a8ea043e328fb3d8e8528b8e4fcaebc8aed",
+                "sha256": "bf22a81359f85efad850fb297ae78db705e36a97fd28af87d0207dd25994b1eb",
                 "anchor": [
                   256,
                   704
@@ -1620,7 +1613,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0011.png",
-                "sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0",
+                "sha256": "9afb2a9a655de1d8eb483538c5b0a0f087033f76186608c56aa79f64622221ba",
                 "anchor": [
                   256,
                   704
@@ -1629,7 +1622,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0012.png",
-                "sha256": "6bbec0f398e938fcd7510e6f60fa98c4203b5a9d8f178bec8eafe8467911e9f0",
+                "sha256": "9afb2a9a655de1d8eb483538c5b0a0f087033f76186608c56aa79f64622221ba",
                 "anchor": [
                   256,
                   704
@@ -1638,7 +1631,7 @@
               },
               {
                 "path": "Generated/chibi/surprised/0013.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1657,13 +1650,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "celebrating": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/celebrating.png",
-            "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+            "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
             "anchor": [
               256,
               704
@@ -1679,7 +1672,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/celebrating/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1688,7 +1681,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1697,7 +1690,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1706,7 +1699,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0003.png",
-                "sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4",
+                "sha256": "9c1d56b401ebc121c8da26888c47030ed57da5db962c022b7302e1f6490b5ce7",
                 "anchor": [
                   256,
                   704
@@ -1715,7 +1708,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0004.png",
-                "sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4",
+                "sha256": "9c1d56b401ebc121c8da26888c47030ed57da5db962c022b7302e1f6490b5ce7",
                 "anchor": [
                   256,
                   704
@@ -1724,7 +1717,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0005.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1733,7 +1726,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0006.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1742,7 +1735,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0007.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1751,7 +1744,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0008.png",
-                "sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd",
+                "sha256": "6d100c809eb7276675760cf88c80d7e6f83fa3cda16bede46742540e46980f7b",
                 "anchor": [
                   256,
                   704
@@ -1760,7 +1753,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0009.png",
-                "sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd",
+                "sha256": "6d100c809eb7276675760cf88c80d7e6f83fa3cda16bede46742540e46980f7b",
                 "anchor": [
                   256,
                   704
@@ -1769,7 +1762,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0010.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1778,7 +1771,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0011.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1787,7 +1780,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0012.png",
-                "sha256": "384d7ad122e7b152628c3026939fa829ed6a7f81f6b35539ce5a9c1ebe4c0b29",
+                "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
                 "anchor": [
                   256,
                   704
@@ -1796,7 +1789,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0013.png",
-                "sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd",
+                "sha256": "6d100c809eb7276675760cf88c80d7e6f83fa3cda16bede46742540e46980f7b",
                 "anchor": [
                   256,
                   704
@@ -1805,7 +1798,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0014.png",
-                "sha256": "99e2c5c6d68ad144179081857122fadbbf4a3d66c14b457e77738c471a6fa4cd",
+                "sha256": "6d100c809eb7276675760cf88c80d7e6f83fa3cda16bede46742540e46980f7b",
                 "anchor": [
                   256,
                   704
@@ -1814,7 +1807,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0015.png",
-                "sha256": "36c72b596b120ee40a42658ed1c0f7b2a12bbde27a7ba3cf1f39539baf50dcc7",
+                "sha256": "c03e37a77234034302a0ed5b1bb31942b45b1a8b7bc0d7c47bf8cbabed10072b",
                 "anchor": [
                   256,
                   704
@@ -1823,7 +1816,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0016.png",
-                "sha256": "36c72b596b120ee40a42658ed1c0f7b2a12bbde27a7ba3cf1f39539baf50dcc7",
+                "sha256": "c03e37a77234034302a0ed5b1bb31942b45b1a8b7bc0d7c47bf8cbabed10072b",
                 "anchor": [
                   256,
                   704
@@ -1832,7 +1825,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0017.png",
-                "sha256": "36c72b596b120ee40a42658ed1c0f7b2a12bbde27a7ba3cf1f39539baf50dcc7",
+                "sha256": "c03e37a77234034302a0ed5b1bb31942b45b1a8b7bc0d7c47bf8cbabed10072b",
                 "anchor": [
                   256,
                   704
@@ -1841,7 +1834,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0018.png",
-                "sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4",
+                "sha256": "9c1d56b401ebc121c8da26888c47030ed57da5db962c022b7302e1f6490b5ce7",
                 "anchor": [
                   256,
                   704
@@ -1850,7 +1843,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0019.png",
-                "sha256": "8261eb53e0e8c2940f2a5d519b630497d39577727622873957d555bdd243a8f4",
+                "sha256": "9c1d56b401ebc121c8da26888c47030ed57da5db962c022b7302e1f6490b5ce7",
                 "anchor": [
                   256,
                   704
@@ -1859,7 +1852,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0020.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1868,7 +1861,7 @@
               },
               {
                 "path": "Generated/chibi/celebrating/0021.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -1887,13 +1880,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "sleeping": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/sleeping.png",
-            "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+            "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
             "anchor": [
               256,
               704
@@ -1909,7 +1902,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/sleeping/0000.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1918,7 +1911,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0001.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1927,7 +1920,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0002.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1936,7 +1929,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0003.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1945,7 +1938,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0004.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1954,7 +1947,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0005.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -1963,7 +1956,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0006.png",
-                "sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d",
+                "sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
                 "anchor": [
                   256,
                   704
@@ -1972,7 +1965,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0007.png",
-                "sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d",
+                "sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
                 "anchor": [
                   256,
                   704
@@ -1981,7 +1974,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0008.png",
-                "sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d",
+                "sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
                 "anchor": [
                   256,
                   704
@@ -1990,7 +1983,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0009.png",
-                "sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d",
+                "sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
                 "anchor": [
                   256,
                   704
@@ -1999,7 +1992,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0010.png",
-                "sha256": "35a51fbe8e69bfdccbe4bb0d5926710585a3bc0d4be095b04d202deef7c6bf6d",
+                "sha256": "1af3b836636cbd3ccb14d0e93825d27b6ca8435a672bbf730a6722ea85e4f0bf",
                 "anchor": [
                   256,
                   704
@@ -2008,7 +2001,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0011.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -2017,7 +2010,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0012.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -2026,7 +2019,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0013.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -2035,7 +2028,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0014.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -2044,7 +2037,7 @@
               },
               {
                 "path": "Generated/chibi/sleeping/0015.png",
-                "sha256": "4306884781b2f2a40d78b78674f47611c54b213ec371c4012318329c13edf421",
+                "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
                 "anchor": [
                   256,
                   704
@@ -2063,13 +2056,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "smug": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/smug.png",
-            "sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b",
+            "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
             "anchor": [
               256,
               704
@@ -2085,7 +2078,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/smug/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2094,7 +2087,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2103,7 +2096,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0002.png",
-                "sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b",
+                "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
                 "anchor": [
                   256,
                   704
@@ -2112,7 +2105,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0003.png",
-                "sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b",
+                "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
                 "anchor": [
                   256,
                   704
@@ -2121,7 +2114,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0004.png",
-                "sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d",
+                "sha256": "5e56a41b0d5dcda9f34d673584b7115dd2094e901a766b9de9cb75efb6739079",
                 "anchor": [
                   256,
                   704
@@ -2130,7 +2123,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0005.png",
-                "sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d",
+                "sha256": "5e56a41b0d5dcda9f34d673584b7115dd2094e901a766b9de9cb75efb6739079",
                 "anchor": [
                   256,
                   704
@@ -2139,7 +2132,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0006.png",
-                "sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d",
+                "sha256": "5e56a41b0d5dcda9f34d673584b7115dd2094e901a766b9de9cb75efb6739079",
                 "anchor": [
                   256,
                   704
@@ -2148,7 +2141,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0007.png",
-                "sha256": "5577fd3bad6cf2ec23f9199955bdc27f90f70dc406f8ee7a7ce4523235bef24d",
+                "sha256": "5e56a41b0d5dcda9f34d673584b7115dd2094e901a766b9de9cb75efb6739079",
                 "anchor": [
                   256,
                   704
@@ -2157,7 +2150,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0008.png",
-                "sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b",
+                "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
                 "anchor": [
                   256,
                   704
@@ -2166,7 +2159,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0009.png",
-                "sha256": "95f33aeea03cc72887d7470c90dcef410508cfaaaf427536da2797d710e5de6b",
+                "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
                 "anchor": [
                   256,
                   704
@@ -2175,7 +2168,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0010.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2184,7 +2177,7 @@
               },
               {
                 "path": "Generated/chibi/smug/0011.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2203,7 +2196,7 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "embarrassed": {
           "static": {
@@ -2225,7 +2218,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/embarrassed/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2234,7 +2227,7 @@
               },
               {
                 "path": "Generated/chibi/embarrassed/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2243,7 +2236,7 @@
               },
               {
                 "path": "Generated/chibi/embarrassed/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2351,7 +2344,7 @@
               },
               {
                 "path": "Generated/chibi/embarrassed/0014.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2360,7 +2353,7 @@
               },
               {
                 "path": "Generated/chibi/embarrassed/0015.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2379,13 +2372,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "laughing": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/laughing.png",
-            "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+            "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
             "anchor": [
               256,
               704
@@ -2401,7 +2394,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/laughing/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2410,7 +2403,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2419,7 +2412,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2428,7 +2421,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0003.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2437,7 +2430,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0004.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2446,7 +2439,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0005.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2455,7 +2448,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0006.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2464,7 +2457,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0007.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2473,7 +2466,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0008.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2482,7 +2475,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0009.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2491,7 +2484,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0010.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2500,7 +2493,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0011.png",
-                "sha256": "641ca317776b5e316f6788c9a1d848665d87b6b7d97b69f54c0a04d2ce2cc20e",
+                "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
                 "anchor": [
                   256,
                   704
@@ -2509,7 +2502,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0012.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2518,7 +2511,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0013.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2527,7 +2520,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0014.png",
-                "sha256": "030f3090afa82dc618b276a63b828b5f003c4d7dc92bd019867331215eac6ea6",
+                "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
                 "anchor": [
                   256,
                   704
@@ -2536,7 +2529,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0015.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2545,7 +2538,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0016.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2554,7 +2547,7 @@
               },
               {
                 "path": "Generated/chibi/laughing/0017.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2573,13 +2566,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "suspicious": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/suspicious.png",
-            "sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39",
+            "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
             "anchor": [
               256,
               704
@@ -2595,7 +2588,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/suspicious/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2604,7 +2597,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2613,7 +2606,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0002.png",
-                "sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39",
+                "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
                 "anchor": [
                   256,
                   704
@@ -2622,7 +2615,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0003.png",
-                "sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39",
+                "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
                 "anchor": [
                   256,
                   704
@@ -2631,7 +2624,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0004.png",
-                "sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424",
+                "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
                 "anchor": [
                   256,
                   704
@@ -2640,7 +2633,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0005.png",
-                "sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424",
+                "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
                 "anchor": [
                   256,
                   704
@@ -2649,7 +2642,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0006.png",
-                "sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424",
+                "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
                 "anchor": [
                   256,
                   704
@@ -2658,7 +2651,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0007.png",
-                "sha256": "3c0a5ca6574dd0249f53e41f3f07d31afd51e3a652b20b3db8d8195d16893424",
+                "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
                 "anchor": [
                   256,
                   704
@@ -2667,7 +2660,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0008.png",
-                "sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39",
+                "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
                 "anchor": [
                   256,
                   704
@@ -2676,7 +2669,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0009.png",
-                "sha256": "41d9bc819be066a6c7dc8e93b116e7b86cd0ca952e9ab91b54c773137474ec39",
+                "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
                 "anchor": [
                   256,
                   704
@@ -2685,7 +2678,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0010.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2694,7 +2687,7 @@
               },
               {
                 "path": "Generated/chibi/suspicious/0011.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2713,13 +2706,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "panicking": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/panicking.png",
-            "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+            "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
             "anchor": [
               256,
               704
@@ -2735,7 +2728,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/panicking/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2744,7 +2737,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2753,7 +2746,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2762,7 +2755,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0003.png",
-                "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+                "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
                 "anchor": [
                   256,
                   704
@@ -2771,7 +2764,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0004.png",
-                "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+                "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
                 "anchor": [
                   256,
                   704
@@ -2780,7 +2773,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0005.png",
-                "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+                "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
                 "anchor": [
                   256,
                   704
@@ -2789,7 +2782,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0006.png",
-                "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+                "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
                 "anchor": [
                   256,
                   704
@@ -2798,7 +2791,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0007.png",
-                "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+                "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
                 "anchor": [
                   256,
                   704
@@ -2807,7 +2800,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0008.png",
-                "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+                "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
                 "anchor": [
                   256,
                   704
@@ -2816,7 +2809,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0009.png",
-                "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+                "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
                 "anchor": [
                   256,
                   704
@@ -2825,7 +2818,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0010.png",
-                "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+                "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
                 "anchor": [
                   256,
                   704
@@ -2834,7 +2827,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0011.png",
-                "sha256": "0dd0217b78df26824f1144e4724850b0fa1da758d6f1d5a3534a0a2c7acd2aae",
+                "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
                 "anchor": [
                   256,
                   704
@@ -2843,7 +2836,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0012.png",
-                "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+                "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
                 "anchor": [
                   256,
                   704
@@ -2852,7 +2845,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0013.png",
-                "sha256": "2b1a01ae71d13720e035f8fd82b94c1b6b09807b195d7fbaab9d0c81b92842e4",
+                "sha256": "f79d5fb7ab81941a0244c8aa9b08b4b3a67821461e924f5e22f51a74ef5dcfdf",
                 "anchor": [
                   256,
                   704
@@ -2861,7 +2854,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0014.png",
-                "sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3",
+                "sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
                 "anchor": [
                   256,
                   704
@@ -2870,7 +2863,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0015.png",
-                "sha256": "fcaa98194b602c88b70d9bd5526ef6f89a0a0bbfc68789ac58938c5c331016f3",
+                "sha256": "24ade63c8cc1cf6db1c7c0035e6e4b10862e545d6a457b3fc3da99640dcce4ec",
                 "anchor": [
                   256,
                   704
@@ -2879,7 +2872,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0016.png",
-                "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+                "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
                 "anchor": [
                   256,
                   704
@@ -2888,7 +2881,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0017.png",
-                "sha256": "f400e3be94fc730de7d3fac39b5cf4d037682349d0e7cb9a1eb77cf2118b92d9",
+                "sha256": "9f7004dded4d1ce92d8198dd45cf13e7df43dd97312e85381af4fb8526b96af1",
                 "anchor": [
                   256,
                   704
@@ -2897,7 +2890,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0018.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2906,7 +2899,7 @@
               },
               {
                 "path": "Generated/chibi/panicking/0019.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -2925,7 +2918,7 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "bored": {
           "static": {
@@ -2983,7 +2976,7 @@
               },
               {
                 "path": "Generated/chibi/bored/0004.png",
-                "sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568",
+                "sha256": "dcf4ca75d70bd226842c0a7c7fae68d1b3e389da7656bf459e44f09cffe2852d",
                 "anchor": [
                   256,
                   704
@@ -2992,7 +2985,7 @@
               },
               {
                 "path": "Generated/chibi/bored/0005.png",
-                "sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568",
+                "sha256": "dcf4ca75d70bd226842c0a7c7fae68d1b3e389da7656bf459e44f09cffe2852d",
                 "anchor": [
                   256,
                   704
@@ -3001,7 +2994,7 @@
               },
               {
                 "path": "Generated/chibi/bored/0006.png",
-                "sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568",
+                "sha256": "dcf4ca75d70bd226842c0a7c7fae68d1b3e389da7656bf459e44f09cffe2852d",
                 "anchor": [
                   256,
                   704
@@ -3010,7 +3003,7 @@
               },
               {
                 "path": "Generated/chibi/bored/0007.png",
-                "sha256": "fdd1f8dd43b6cda793ac97c343b0f202a5c208fe5419c26a1ba6355be28e1568",
+                "sha256": "dcf4ca75d70bd226842c0a7c7fae68d1b3e389da7656bf459e44f09cffe2852d",
                 "anchor": [
                   256,
                   704
@@ -3065,13 +3058,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "mischievous": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/mischievous.png",
-            "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+            "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
             "anchor": [
               256,
               704
@@ -3087,7 +3080,7 @@
             "frames": [
               {
                 "path": "Generated/chibi/mischievous/0000.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -3096,7 +3089,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0001.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -3105,7 +3098,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0002.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -3114,7 +3107,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0003.png",
-                "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+                "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
                 "anchor": [
                   256,
                   704
@@ -3123,7 +3116,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0004.png",
-                "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+                "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
                 "anchor": [
                   256,
                   704
@@ -3132,7 +3125,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0005.png",
-                "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
+                "sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
                 "anchor": [
                   256,
                   704
@@ -3141,7 +3134,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0006.png",
-                "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
+                "sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
                 "anchor": [
                   256,
                   704
@@ -3150,7 +3143,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0007.png",
-                "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
+                "sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
                 "anchor": [
                   256,
                   704
@@ -3159,7 +3152,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0008.png",
-                "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
+                "sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
                 "anchor": [
                   256,
                   704
@@ -3168,7 +3161,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0009.png",
-                "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
+                "sha256": "d8b48261a24a756489626f582277a9b1c6bb3d6f2057b50fbe02ee6e964e9bc4",
                 "anchor": [
                   256,
                   704
@@ -3177,7 +3170,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0010.png",
-                "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+                "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
                 "anchor": [
                   256,
                   704
@@ -3186,7 +3179,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0011.png",
-                "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+                "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
                 "anchor": [
                   256,
                   704
@@ -3195,7 +3188,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0012.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -3204,7 +3197,7 @@
               },
               {
                 "path": "Generated/chibi/mischievous/0013.png",
-                "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+                "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
                 "anchor": [
                   256,
                   704
@@ -3223,13 +3216,13 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         },
         "deadpan": {
           "static": {
             "status": "validated",
             "path": "Generated/chibi/deadpan.png",
-            "sha256": "edd6e7f461c7de5b4e895f33be11fb047b470fdea319ef91be747ebfc74d1ebc",
+            "sha256": "b095b5f52b1c3f8a86cc6a4397d5e0524f057f166095f880ccd4017f88352e0e",
             "anchor": [
               256,
               704
@@ -3248,7 +3241,7 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Articulated costume-cleanup keys with one fixed case, canonical badge decals and timed holds; artistic approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
         }
       }
     },

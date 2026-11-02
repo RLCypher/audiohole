@@ -27,7 +27,7 @@ def main():
         results.append('catalog renders all 52 generated expressions offline')
         catalog.screenshot(path=str(root/'catalog-screenshot.png'),full_page=True)
         catalog.close()
-        selections=[('default','surprised'),('uwu','celebrating'),('uwu','panicking'),('uwu','deadpan'),('vanilla','error'),('vanilla','sleeping')]
+        selections=[('default','surprised'),('uwu','talking'),('uwu','working'),('uwu','celebrating'),('uwu','panicking'),('uwu','deadpan'),('vanilla','error'),('vanilla','sleeping')]
         for pid,state in selections:
             page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
             page.set_content((root/review_key(pid)/f'{state}-preview.html').read_text(),wait_until='load')
@@ -38,24 +38,24 @@ def main():
             page.close()
         results.append('representative expressive, theatrical and static previews support replay and reduced motion')
         # Check actual timed GIF playback, finite rest, and explicit replay.
-        page=context.new_page();page.set_content((root/'uwu/celebrating-preview.html').read_text(),wait_until='load')
+        page=context.new_page();page.set_content((root/'horu/celebrating-preview.html').read_text(),wait_until='load')
         page.wait_for_function('document.getElementById("animation").complete')
         image=page.locator('#animation')
         first=image.screenshot();page.wait_for_timeout(750);peak=image.screenshot()
         assert ImageChops.difference(Image.open(BytesIO(first)).convert('RGB'),Image.open(BytesIO(peak)).convert('RGB')).getbbox()
         page.wait_for_timeout(1900);rest=image.screenshot();page.click('#replay');page.wait_for_timeout(750);replay=image.screenshot()
         assert ImageChops.difference(Image.open(BytesIO(rest)).convert('RGB'),Image.open(BytesIO(replay)).convert('RGB')).getbbox(),'Replay did not restart finite GIF'
-        results.append('finite UwU celebration visibly advances, returns to rest, and replays')
+        results.append('finite Horu celebration visibly advances, returns to rest, and replays')
         page.close()
         demo=context.new_page()
-        encoded=base64.b64encode((root/'uwu-body-revision-loop.gif').read_bytes()).decode()
+        encoded=base64.b64encode((root/'horu-body-revision-loop.gif').read_bytes()).decode()
         demo.set_content(f'<img id="demo" src="data:image/gif;base64,{encoded}">',wait_until='load')
         demo.wait_for_function('document.getElementById("demo").complete')
         first=demo.locator('#demo').screenshot();demo.wait_for_timeout(750);acting=demo.locator('#demo').screenshot()
         assert ImageChops.difference(Image.open(BytesIO(first)).convert('RGB'),Image.open(BytesIO(acting)).convert('RGB')).getbbox()
         demo.close()
         results.append('standalone three-state body demo decodes and visibly animates offline')
-        for pid,state in [('default','talking'),('uwu','error'),('vanilla','working')]:
+        for pid,state in [('default','talking'),('uwu','talking'),('uwu','working'),('uwu','error'),('vanilla','working')]:
             page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
             page.set_content((root/review_key(pid)/f'{state}-inspector.html').read_text(),wait_until='load')
             page.wait_for_function('document.getElementById("avatar").complete && document.getElementById("avatar").naturalWidth === 512')
@@ -63,9 +63,14 @@ def main():
             if pid=='default':
                 assert page.locator('#personality option').all_text_contents()==['Norm']
                 assert page.locator('#summary').inner_text().startswith('Norm /')
+            elif pid=='uwu':
+                assert page.locator('#personality option').all_text_contents()==['Horu']
+                assert page.locator('#summary').inner_text().startswith('Horu /')
             page.check('#reduced');assert 'reduced_motion_static' in page.locator('#summary').inner_text()
             page.uncheck('#reduced');page.click('#step');assert 'Frame 2 /' in page.locator('#frame').inner_text()
-            page.check('#approved');assert page.evaluate('active.resolved_state') == ('idle' if pid=='uwu' else state)
+            page.check('#approved')
+            if pid=='uwu':assert page.locator('#avatar').is_hidden()
+            else:assert page.evaluate('active.resolved_state') == state
             page.uncheck('#approved');page.check('#missing');assert page.locator('#avatar').is_hidden()
             page.uncheck('#missing');page.select_option('#display','128');assert page.locator('#avatar').bounding_box()['width']==128
             page.select_option('#display','512');assert page.locator('#avatar').bounding_box()['width']==512

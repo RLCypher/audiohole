@@ -820,5 +820,6 @@
         }
       ]
     }
-  }
+  },
+  "status": "Historical generation; current results in validation.json and ../full/horu-revision/validation.json"
 }

@@ -62,7 +62,7 @@ def ear_anchors(image, offset=(0,0)):
     return ears
 
 
-def register_character(image, original, override=None):
+def register_character(image, original, override=None, working_height=768):
     if override:
         old=[[*p,0] for p in override['target']]
         new=[[p[0]+128,p[1]+128,0] for p in override['source']]
@@ -74,7 +74,7 @@ def register_character(image, original, override=None):
     old_center=[sum(p[j] for p in old)/2 for j in [0,1]]
     new_center=[sum(p[j] for p in new)/2 for j in [0,1]]
     dx,dy=[old_center[j]-scale*new_center[j] for j in [0,1]]
-    frame=image.transform((512,768),Image.Transform.AFFINE,(1/scale,0,-dx/scale,0,1/scale,-dy/scale),Image.Resampling.BICUBIC)
+    frame=image.transform((512,working_height),Image.Transform.AFFINE,(1/scale,0,-dx/scale,0,1/scale,-dy/scale),Image.Resampling.BICUBIC)
     frame.putalpha(frame.getchannel('A').point(lambda a:0 if a<=6 else 255 if a>=245 else a))
     bbox=frame.getchannel('A').point(lambda a:255 if a>=128 else 0).getbbox()
     if not bbox:raise AssetError('empty character layer')
@@ -278,7 +278,10 @@ def package(records):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('batches',nargs='*');parser.add_argument('--package',action='store_true')
-    args=parser.parse_args();case=canonical_case();records=[]
+    args=parser.parse_args()
+    if (ROOT/'provenance/horu-idle-revision.json').exists():
+        raise AssetError('Horu rest/prop revision is active; use revise_horu_idle.py and repair_horu_performances.py. Historical compositor cannot overwrite it.')
+    case=canonical_case();records=[]
     for batch in (args.batches or read_json(DIRECTORY/'guide-layout.json')):records.extend(corrected_keys(batch,case))
     write_json(DIRECTORY/'composition.json',records)
     print('Corrected keys composed:',len(records))
