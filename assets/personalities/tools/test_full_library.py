@@ -27,15 +27,15 @@ class FullLibraryTests(unittest.TestCase):
             self.assertEqual(digest(ROOT/relative),sha,relative)
         for identity,path in packs():
             data=read_json(path);states=data['styles'][data['default_style']]['states']
-            self.assertEqual(states['idle']['static']['status'],'validated' if identity=='uwu' else 'approved')
-            self.assertEqual(states['idle']['animation']['status'],'validated' if identity=='uwu' else 'approved')
+            self.assertEqual(states['idle']['static']['status'],'approved')
+            self.assertEqual(states['idle']['animation']['status'],'approved')
             for state,entry in states.items():
                 for kind in ['static','animation']:
                     asset=entry[kind]
                     if identity in {'default','vanilla'} and asset.get('path',asset.get('frames')):
                         self.assertEqual(asset['status'],'approved')
-                    elif identity=='uwu' and state!='idle':
-                        self.assertNotEqual(asset['status'],'approved')
+                    elif identity=='uwu' and state!='idle' and asset.get('path',asset.get('frames')):
+                        self.assertEqual(asset['status'],'approved')
         for relative,sha in read_json(ROOT/'provenance/accepted-assets.json')['assets'].items():
             self.assertEqual(digest(ROOT/relative),sha,relative)
 
@@ -58,14 +58,11 @@ class FullLibraryTests(unittest.TestCase):
                 image=Image.open(path.parent/entry['static']['path'])
                 for box in boxes:self.assertEqual(difference(master.crop(box),image.crop(box)),0,(identity,state,box))
 
-    def test_reviewed_packs_are_usable_and_uwu_candidates_stay_filtered(self):
+    def test_formally_accepted_packs_are_usable_including_horu(self):
         for pid,folder,style,state in [('default','Norm','chibi','happy'),('vanilla','Vanilla','logo','error'),('uwu','UwU','chibi','error')]:
             selected=Resolver().resolve(ROOT/f'{folder}/manifest.json',pid,style,state)
-            if pid=='uwu':
-                self.assertEqual(selected.source,'hide')
-            else:
-                self.assertEqual(selected.state,state)
-                self.assertTrue(selected.paths)
+            self.assertEqual(selected.state,state)
+            self.assertTrue(selected.paths)
 
     def test_uwu_performances_use_distinct_drawn_body_keys_without_sticker_motion(self):
         from PIL import ImageChops
@@ -160,7 +157,7 @@ class FullLibraryTests(unittest.TestCase):
         self.assertEqual(frame.path.name,'surprised.png')
         production=AvatarPlayer()
         production.request(manifest,'uwu','chibi','surprised',0,reduced_motion=True)
-        self.assertIsNone(production.frame_at(1).path)
+        self.assertEqual(production.frame_at(1).path.name,'surprised.png')
 
     def test_intentional_static_states_and_logo_optional_fallbacks_are_explicit(self):
         for pid in ['default','uwu']:

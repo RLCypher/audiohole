@@ -1,0 +1,13 @@
+{
+  "browser": "local Chromium, offline",
+  "passed": [
+    "catalog renders all 52 generated expressions offline",
+    "representative expressive, theatrical and static previews support replay and reduced motion",
+    "finite Horu celebration visibly advances, returns to rest, and replays",
+    "standalone three-state body demo decodes and visibly animates offline",
+    "state inspectors select requested states, step frames, filter approval, hide missing assets and scale correctly",
+    "portable ZIP catalog links resolve entirely within each archive"
+  ],
+  "errors": [],
+  "scope": "Workspace browser verification; Codex embedded visualization host is not directly testable."
+}

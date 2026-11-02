@@ -69,8 +69,7 @@ def main():
             page.check('#reduced');assert 'reduced_motion_static' in page.locator('#summary').inner_text()
             page.uncheck('#reduced');page.click('#step');assert 'Frame 2 /' in page.locator('#frame').inner_text()
             page.check('#approved')
-            if pid=='uwu':assert page.locator('#avatar').is_hidden()
-            else:assert page.evaluate('active.resolved_state') == state
+            assert page.evaluate('active.resolved_state') == state
             page.uncheck('#approved');page.check('#missing');assert page.locator('#avatar').is_hidden()
             page.uncheck('#missing');page.select_option('#display','128');assert page.locator('#avatar').bounding_box()['width']==128
             page.select_option('#display','512');assert page.locator('#avatar').bounding_box()['width']==512

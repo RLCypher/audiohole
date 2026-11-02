@@ -10,10 +10,10 @@
   "UwU/CHARACTER.md": {
     "original_prefix_bytes": 8610,
     "original_sha256": "ac93183aab23f77a066eeedcb25e81a6f44488afb113c4ba96a92b14fc2f7976",
-    "current_sha256": "28ce9efb3ca20a7af3a4bf4969b917f7740878530b899b1f97cc80d6a42fb7f7",
-    "authorization": "provenance/authorizations/horu-name-idle-scale.md",
-    "authorization_sha256": "fa1cca9723e2e1a57bb6fae02f94dc8c7eb2e3ab5a5350cb4216db1ee1324e3c",
-    "change": "Authorized character-name replacement and rest revision; original source document preserved in archive",
+    "current_sha256": "fc440282a15cf6dcde2c4659d6e4deb92b4ad37a35dcc0a8a12ba1dc43009e80",
+    "authorization": "provenance/authorizations/accepted-generation-engine-viewer.md",
+    "authorization_sha256": "19cc88199c354fa761e0ba25d7f49d02c3e27d17953c35f9ce01338494b01d1b",
+    "change": "Append formal baseline acceptance, canonical Horu name clarification and authorized scoped runtime/viewer assignment; original source preserved.",
     "previous_revisions": [
       {
         "current_sha256": "25bfa321cd0ca9ceebec5e096409343bd34fa781b5e5bff306f85b4e8c22d9cb",
@@ -24,6 +24,11 @@
         "current_sha256": "c6d9d14205a07ae7c53592c07870d88ca700d01c9ec70f2d4aa1a94bacf1f7eb",
         "authorization": "provenance/authorizations/norm-vanilla-approval-uwu-body-revision.md",
         "authorization_sha256": "674e383330f683a5ea8ea68aba48d8e940dd9e5013548caf1911ea97f0822549"
+      },
+      {
+        "current_sha256": "28ce9efb3ca20a7af3a4bf4969b917f7740878530b899b1f97cc80d6a42fb7f7",
+        "authorization": "provenance/authorizations/horu-name-idle-scale.md",
+        "authorization_sha256": "fa1cca9723e2e1a57bb6fae02f94dc8c7eb2e3ab5a5350cb4216db1ee1324e3c"
       }
     ],
     "original_source": "UwU/Intermediate/HoruIdleRevision/Previous/CHARACTER.md"
@@ -39,9 +44,16 @@
   "AVATAR_ASSETS.md": {
     "original_prefix_bytes": 19968,
     "original_sha256": "c7a352dca3bd01a5ef442570af53ca6419c48ef657319a60a179536495a84d1c",
-    "current_sha256": "f1d01516def223489246e0ae87ad2cf590bde5727dfc074749472199b548f50c",
-    "authorization": "provenance/authorizations/idle-acceptance-full-generation.md",
-    "authorization_sha256": "6dfd4ed8be41fcbfffb626647db98255ce888f3e4951673008e5c4ee840216b9",
-    "change": "append accepted creative/technical direction; original contents preserved byte-for-byte"
+    "current_sha256": "8e79e4d17a583bf315c547f64f0bc6aec5c4646ee2c1c937d756b26230e10339",
+    "authorization": "provenance/authorizations/accepted-generation-engine-viewer.md",
+    "authorization_sha256": "19cc88199c354fa761e0ba25d7f49d02c3e27d17953c35f9ce01338494b01d1b",
+    "change": "Append formal baseline acceptance, canonical Horu name clarification and authorized scoped runtime/viewer assignment; original source preserved.",
+    "previous_revisions": [
+      {
+        "current_sha256": "f1d01516def223489246e0ae87ad2cf590bde5727dfc074749472199b548f50c",
+        "authorization": "provenance/authorizations/idle-acceptance-full-generation.md",
+        "authorization_sha256": "6dfd4ed8be41fcbfffb626647db98255ce888f3e4951673008e5c4ee840216b9"
+      }
+    ]
   }
 }

@@ -1038,3 +1038,8 @@ selects the current personality's static expression, then its own fallback.
 Keep all operating images and frames exactly 512 × 768 8-bit RGBA PNG with true
 transparent backgrounds. Maintain explicit provenance, validation and approval
 status, anchors, file hashes, bounded sequences and personality isolation.
+
+
+## Accepted generation baseline and native playback assignment — 2026-11-02
+
+The user formally accepted the complete 796-PNG operating library. The UwU character is officially **Horu**, independently of the `uwu` personality identifier and legacy source folder. Runtime engine and standalone-viewer development is authorized within this asset workspace only. Original specifications and references remain preserved; historical naming/examples above are superseded by this identity clarification.

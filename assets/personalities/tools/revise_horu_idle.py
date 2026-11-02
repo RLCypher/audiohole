@@ -103,6 +103,9 @@ def archive_approval_paths():
 
 
 def package():
+    current=read_json(ROOT/'UwU/manifest.json')['styles']['chibi']['states']['idle']['static']
+    if current['status']=='approved':
+        raise AssetError('Approved generation baseline is frozen. Prepare an authorized versioned revision before replacing operating artwork.')
     from animate_idle import previews
     from generate_states import make_previews
 

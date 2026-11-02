@@ -27,7 +27,7 @@ def audit():
     for relative,sha in read_json(ROOT/'provenance/accepted-assets.json')['assets'].items():
         if not (ROOT/relative).is_file() or digest(ROOT/relative)!=sha:
             errors.append(f'approved artwork changed: {relative}')
-    result={'approval':'Norm and Vanilla approved; Horu revised IDLE and body candidates pending review',
+    result={'approval':'Norm, Horu and Vanilla approved; generation baseline formally accepted',
             'errors':errors,'packs':{},'totals':{'static_assets':0,'animation_sequences':0,'animation_frames':0,'operating_pngs':0}}
     for identity,manifest in packs():
         data=load_pack(manifest,identity);style=data['default_style'];info=data['styles'][style]
@@ -110,7 +110,7 @@ def audit():
 
 if __name__=='__main__':
     report=audit();write_json(ROOT/'review/full/inventory.json',report)
-    lines=['# Full avatar inventory','','Norm and Vanilla are approved. Horu revised IDLE and body performances await human review. The `default` machine ID is retained only for application compatibility.','',
+    lines=['# Full avatar inventory','','Norm and Vanilla are approved. Horu revised IDLE and body performances are approved. The `default` machine ID is retained only for application compatibility.','',
            '| Personality | State | Static | Frames | Duration ms | Playback | Priority | Cooldown ms |',
            '|---|---|---|---:|---:|---|---:|---:|']
     for identity,pack in report['packs'].items():

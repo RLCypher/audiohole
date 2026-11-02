@@ -115,6 +115,9 @@ def compose(case,cup,character,background=None,parked=False):
 
 
 def package():
+    current=read_json(ROOT/'UwU/manifest.json')['styles']['chibi']['states']['idle']['static']
+    if current['status']=='approved':
+        raise AssetError('Approved generation baseline is frozen. Prepare an authorized versioned revision before replacing operating artwork.')
     from generate_states import make_previews
     case=Image.open(ACTIVE/'canonical-case.png').convert('RGBA');cup=make_cup()
     drawings=talking_characters()

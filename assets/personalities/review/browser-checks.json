@@ -4,7 +4,7 @@
     "idle decoded at 512x768",
     "unknown state falls back within each personality",
     "missing pack and personality switches hide correctly",
-    "approval filter preserves Norm and hides the revised unapproved Horu IDLE",
+    "approval filter preserves the formally accepted Norm and Horu baseline",
     "disabled regular style cannot borrow chibi art",
     "all backgrounds and guide toggle",
     "native 512x768 and compact 128x192 display selectors",

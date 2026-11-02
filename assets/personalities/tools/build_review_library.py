@@ -104,7 +104,7 @@ def build(only_personalities=None):
 <p><a href="{key}/{state}-preview.html">Playable preview</a><br><a href="{key}/{state}-inspector.html">Frame inspector</a><br><a href="{key}/{gif_link}">Direct GIF</a></p></article>''')
             print(identity,state,'review pages built',flush=True)
         if refresh:
-            page=header(f'AudioHole {label} review')+f'<h1>{label} · Full expression catalog</h1><p>Norm and Vanilla approved. Horu body and revised IDLE artwork await review.</p><p><a href="states-contact-sheet.png">State sheet</a> · <a href="face-details.png">Native detail sheet</a></p><main>'+''.join(cards)+'</main></html>'
+            page=header(f'AudioHole {label} review')+f'<h1>{label} · Full expression catalog</h1><p>Norm and Vanilla approved. All current Norm, Horu and Vanilla artwork is formally approved.</p><p><a href="states-contact-sheet.png">State sheet</a> · <a href="face-details.png">Native detail sheet</a></p><main>'+''.join(cards)+'</main></html>'
             (directory/key/'index.html').write_text(page)
             # Compact portable review package: pages, GIFs, and frame sheets. Native
             # operating PNGs/manifests stay in their repository pack for integration.
@@ -116,12 +116,12 @@ def build(only_personalities=None):
                             archive.writestr(path.name,portable)
                         else:
                             archive.write(path,path.name)
-                archive.writestr('README.txt','Extract and open index.html in a browser. Individual *-preview.html pages embed their media and also work alone. Norm and Vanilla are approved. Horu body and revised IDLE artwork remain candidates. Runtime assets are the separate transparent 512x768 PNG packs in the repository.\n')
+                archive.writestr('README.txt','Extract and open index.html in a browser. Individual *-preview.html pages embed their media and also work alone. Norm and Vanilla are approved. Horu and its revised IDLE are formally approved. Runtime assets are the separate transparent 512x768 PNG packs in the repository.\n')
     combined=Image.new('RGB',(max(s.width for s in sheets),sum(s.height for s in sheets)),'#151923');y=0
     for image in sheets:combined.paste(image,(0,y));y+=image.height
     combined.save(directory/'all-states-contact-sheet.png')
     index=header('AudioHole full avatar catalog')+'''<h1>AudioHole · Full avatar catalog</h1>
-<p>Norm and Vanilla approved. Horu faces accepted; revised body performances require human review. Static expressions also serve reduced motion. Select a playable page to replay a reaction or inspect individual operating frames.</p>
+<p>Norm and Vanilla approved. Horu and its revised body performances are formally approved. Static expressions also serve reduced motion. Select a playable page to replay a reaction or inspect individual operating frames.</p>
 <p><a href="horu-revision/REPORT.md">Horu: current IDLE, scale, talking, eyes and props revision</a> · <a href="consistency-correction/REPORT.md">Previous consistency correction</a></p>
 <p><a href="horu-body-revision-loop.gif">Horu body demo</a> · <a href="horu-body-keyposes.png">Every body key</a> · <a href="HORU_BODY_REVISION.md">Body revision report</a></p>
 <p><a href="all-states-contact-sheet.png">All generated expressions</a> · <a href="inventory.json">Full inventory and validation</a> · <a href="HANDOFF.md">Integration handoff</a></p>

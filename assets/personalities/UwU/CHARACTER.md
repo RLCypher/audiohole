@@ -231,3 +231,8 @@ The accepted closed-mouth facial design remains the rest reference. The current 
 ## Canonical name and rest-scale correction — 2026-11-02
 
 The character is **Horu**. `uwu` remains the application personality-mode ID and `UwU/` remains the legacy source-pack directory; neither is the character name. Current review media uses `horu`. Preserve canonical reference pixels and their original filenames. The user authorized replacing the prior IDLE equipment case with the same frozen case used in all body poses, and reducing IDLE character scale to improve transitions. Preserve the closed-mouth facial design, blink, restrained breathing, ear/tail and steam motion. Prior accepted assets are archived; revised artwork remains a candidate until visual review.
+
+
+## Accepted generation baseline and native playback assignment — 2026-11-02
+
+The current Horu generation milestone, including revised IDLE, scale, talking, working eyes and mug/prop corrections, is formally accepted. Horu is the official character name; `uwu` remains the personality/configuration ID. Future changes use a new reviewed revision; do not regenerate accepted art for engine development.

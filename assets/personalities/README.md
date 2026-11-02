@@ -1,8 +1,10 @@
 # AudioHole avatar pipeline
 
-The library contains 52 static expressions, 49 sequences and 744 animation frames across Norm, **Horu** and Vanilla. Norm and Vanilla are approved. Horu's revised IDLE, talking, working and prop-continuity assets await visual review. Horu is the character name; `uwu` is the stable application mode and `UwU/` is the legacy source pack directory. Public review names and filenames use `horu`, as `norm` is used for Norm.
+The complete generation milestone is **formally accepted**: 52 static expressions, 49 sequences, 744 animation frames and 796 unchanged operating PNGs. Character names are Norm, **Horu** and Vanilla; existing personality IDs remain `default`, `uwu` and `vanilla`. The approved generation checkpoint is commit `0b41b8e`; [recovery and hashes](provenance/generation-acceptance/README.md) preserve all artwork, sources, intermediate layers, settings and review history.
 
-See the [current Horu correction report](review/full/horu-revision/REPORT.md), [native/compact scale comparisons](review/full/horu-revision/scale-compact.png) and [animated review](review/full/horu-revision/preview.gif). Earlier milestone descriptions below are historical where superseded by that report.
+The [native C++20 engine and standalone wxWidgets viewer](runtime/README.md) use the same production playback implementation. See the [primary-agent integration handoff](integration/HANDOFF.md) for the read-only GUI inspection, API, build/launch instructions, proposed integration changes and verification limits. Main AudioHole components are unchanged.
+
+Earlier generation reports retain their original review context; formal acceptance supersedes their pending-review labels.
 
 Start with the [full catalog](review/full/index.html), [all-state sheet](review/full/all-states-contact-sheet.png),
 [inventory](review/full/INVENTORY.md), and [integration handoff](review/full/HANDOFF.md).

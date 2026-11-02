@@ -39,7 +39,8 @@ class InitialIdleTests(unittest.TestCase):
         rigs = read_json(ROOT/'provenance/idle-rigs.json')
         for identity, folder, style in [('default', 'Norm', 'chibi'), ('uwu', 'UwU', 'chibi'), ('vanilla', 'Vanilla', 'logo')]:
             with self.subTest(identity=identity):
-                master = Image.open(ROOT/f'{folder}/Generated/{style}/idle.png')
+                with Image.open(ROOT/f'{folder}/Generated/{style}/idle.png') as loaded:
+                    master = loaded.copy()
                 i = 3
                 phase = i/11*2*math.pi
                 if identity == 'uwu':
