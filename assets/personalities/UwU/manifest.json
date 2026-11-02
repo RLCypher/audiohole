@@ -20,13 +20,17 @@
       "states": {
         "idle": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/idle.png",
             "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -34,7 +38,7 @@
             "interruptible": true,
             "cooldown_ms": 0,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/idle/0000.png",
@@ -144,7 +148,11 @@
                 ],
                 "duration_ms": 600
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -156,17 +164,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: archived closed-mouth acting at 88% character scale with fixed canonical case; revised IDLE pending visual review."
+          "note": "Horu: archived closed-mouth acting at 88% character scale with fixed canonical case; revised IDLE approved baseline."
         },
         "happy": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/happy.png",
             "sha256": "cfc0cf115fe0d18bae6c407030ab3c7187a5fb36812153bc1fa48195802e8eff",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -174,7 +186,7 @@
             "interruptible": true,
             "cooldown_ms": 2500,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/happy/0000.png",
@@ -284,7 +296,11 @@
                 ],
                 "duration_ms": 150
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -296,17 +312,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "thinking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/thinking.png",
             "sha256": "3ad404486007c09eb303b4ec662867337b461df0631490e0161a513dad1c54b2",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -314,7 +334,7 @@
             "interruptible": true,
             "cooldown_ms": 500,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/thinking/0000.png",
@@ -460,7 +480,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -472,17 +496,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "working": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/working.png",
             "sha256": "1f486555b1afd99c0c7fa946949fb3f7890a65de32d009101e2f9fa89659da56",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -490,7 +518,7 @@
             "interruptible": true,
             "cooldown_ms": 500,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/working/0000.png",
@@ -636,7 +664,11 @@
                 ],
                 "duration_ms": 150
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -648,17 +680,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "talking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/talking.png",
             "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -666,7 +702,7 @@
             "interruptible": true,
             "cooldown_ms": 300,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/talking/0000.png",
@@ -776,7 +812,11 @@
                 ],
                 "duration_ms": 100
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -788,17 +828,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: four redrawn two-arm speech poses, one continuously held cup; mouth shapes, elbow gestures and restrained follow-through; visual approval pending."
+          "note": "Horu: four redrawn two-arm speech poses, one continuously held cup; mouth shapes, elbow gestures and restrained follow-through; approved baseline."
         },
         "confused": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/confused.png",
             "sha256": "8e6115c6e07707b4f0804c709b06a28c1ead4fd9c88da00bf8992c241e81a955",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -806,7 +850,7 @@
             "interruptible": true,
             "cooldown_ms": 3000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/confused/0000.png",
@@ -934,7 +978,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -946,17 +994,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "concerned": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/concerned.png",
             "sha256": "8db52df9f6497587f408acc11fe318d97eaa3c310b05d0bff6f6e727419ba5d7",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -964,7 +1016,7 @@
             "interruptible": true,
             "cooldown_ms": 1000,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/concerned/0000.png",
@@ -1110,7 +1162,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -1122,17 +1178,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "error": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/error.png",
             "sha256": "69d6bc6169a8051da9ef4bc629ba0dfe49a4ee52c8dedc3385bf142012bf90e2",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -1140,7 +1200,7 @@
             "interruptible": true,
             "cooldown_ms": 6000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/error/0000.png",
@@ -1304,7 +1364,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1316,17 +1380,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "angry": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/angry.png",
             "sha256": "baab1d660e1d5dedaf472b37bd845302a9497caf97929877192a6fad13b694b8",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -1334,7 +1402,7 @@
             "interruptible": false,
             "cooldown_ms": 6000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/angry/0000.png",
@@ -1480,7 +1548,11 @@
                 ],
                 "duration_ms": 180
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1492,17 +1564,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "surprised": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/surprised.png",
             "sha256": "2791908ba59e23c3ec40851df8be4af7f975f58ff0867bdf6005cadc5a2c9a91",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -1510,7 +1586,7 @@
             "interruptible": false,
             "cooldown_ms": 5000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/surprised/0000.png",
@@ -1638,7 +1714,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1650,17 +1730,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "celebrating": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/celebrating.png",
             "sha256": "0b1c47feeeeb336c2c29f6a06e17f31441ac3ba881e75bcbf30c37e3c00cd295",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -1668,7 +1752,7 @@
             "interruptible": true,
             "cooldown_ms": 8000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/celebrating/0000.png",
@@ -1868,7 +1952,11 @@
                 ],
                 "duration_ms": 230
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -1880,17 +1968,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "sleeping": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/sleeping.png",
             "sha256": "630f27dcb0ce379e50123c666797ba34689b12bac417bc2ea80f0d9292197468",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -1898,7 +1990,7 @@
             "interruptible": true,
             "cooldown_ms": 1000,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/sleeping/0000.png",
@@ -2044,7 +2136,11 @@
                 ],
                 "duration_ms": 250
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -2056,17 +2152,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "smug": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/smug.png",
             "sha256": "29880cd6119619a076b5e415c9d4ed0fd4937b54ff425e0f6d274692f9217eca",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -2074,7 +2174,7 @@
             "interruptible": true,
             "cooldown_ms": 4000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/smug/0000.png",
@@ -2184,7 +2284,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2196,17 +2300,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "embarrassed": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/embarrassed.png",
             "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -2214,7 +2322,7 @@
             "interruptible": true,
             "cooldown_ms": 5000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/embarrassed/0000.png",
@@ -2360,7 +2468,11 @@
                 ],
                 "duration_ms": 180
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2372,17 +2484,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "laughing": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/laughing.png",
             "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -2390,7 +2506,7 @@
             "interruptible": true,
             "cooldown_ms": 5000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/laughing/0000.png",
@@ -2554,7 +2670,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2566,17 +2686,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "suspicious": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/suspicious.png",
             "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -2584,7 +2708,7 @@
             "interruptible": true,
             "cooldown_ms": 4000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/suspicious/0000.png",
@@ -2694,7 +2818,11 @@
                 ],
                 "duration_ms": 250
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -2706,17 +2834,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "panicking": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/panicking.png",
             "sha256": "d095ec10d0d541fb78be84e89e982a3af377b50fc84712281032bf148548e0fb",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -2724,7 +2856,7 @@
             "interruptible": true,
             "cooldown_ms": 8000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/panicking/0000.png",
@@ -2906,7 +3038,11 @@
                 ],
                 "duration_ms": 210
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "theatrical",
@@ -2918,17 +3054,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "bored": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/bored.png",
             "sha256": "30fcbeb3e80432e1f50f370b2de1a643c45c61b7104fe367b12f299fa604b341",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": true,
@@ -2936,7 +3076,7 @@
             "interruptible": true,
             "cooldown_ms": 1000,
             "transition": "cut",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/bored/0000.png",
@@ -3046,7 +3186,11 @@
                 ],
                 "duration_ms": 370
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "ambient",
@@ -3058,17 +3202,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "mischievous": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/mischievous.png",
             "sha256": "10bc6c7ba9dbda8dde546eef7fce27b42b8e37a88c31eaf8b2cf1dc01f5cd13e",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "loop": false,
@@ -3076,7 +3224,7 @@
             "interruptible": true,
             "cooldown_ms": 5000,
             "transition": "finish_then_persistent",
-            "status": "validated",
+            "status": "approved",
             "frames": [
               {
                 "path": "Generated/chibi/mischievous/0000.png",
@@ -3204,7 +3352,11 @@
                 ],
                 "duration_ms": 200
               }
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "behavior": {
             "category": "expressive",
@@ -3216,17 +3368,21 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         },
         "deadpan": {
           "static": {
-            "status": "validated",
+            "status": "approved",
             "path": "Generated/chibi/deadpan.png",
             "sha256": "b095b5f52b1c3f8a86cc6a4397d5e0524f057f166095f880ccd4017f88352e0e",
             "anchor": [
               256,
               704
-            ]
+            ],
+            "review": {
+              "reviewer": "User",
+              "reviewed_at": "2026-11-02T06:41:51Z"
+            }
           },
           "animation": {
             "status": "not_generated"
@@ -3241,7 +3397,7 @@
             "return_to": "persistent",
             "reduced_motion": "static"
           },
-          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; visual approval pending."
+          "note": "Horu: cup remains held or parked on the fixed case; drawn acting with deliberate holds; approved baseline."
         }
       }
     },
