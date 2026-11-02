@@ -1,0 +1,100 @@
+{
+  "source_commit": "70f23de70d390f388c1b0d787c924f88e89475c8",
+  "checkpoint_commit": "0b41b8e",
+  "packages_match_recorded_sha256": true,
+  "zip_crc_and_payload_hashes": "Passed by build_package.py; all 796 operating PNG hashes checked in both archives.",
+  "extracted_source_configure_build": "Passed with installed/extracted development dependencies; no application checkout source or targets needed.",
+  "extracted_native_tests": {
+    "passed": 29,
+    "failed": 0,
+    "operating_rgba_buffers": 796
+  },
+  "extracted_source_viewer": {
+    "bitmap_bytes": 1971120,
+    "checks": [
+      {
+        "check": "Vanilla approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Norm approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Horu approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Talking uses production playback",
+        "passed": true
+      },
+      {
+        "check": "Pause and frame step",
+        "passed": true
+      },
+      {
+        "check": "Reduced motion selects static",
+        "passed": true
+      },
+      {
+        "check": "Healthy Running is ambient",
+        "passed": true
+      },
+      {
+        "check": "Scanning is working",
+        "passed": true
+      },
+      {
+        "check": "Failure preempts cosmetic inspection",
+        "passed": true
+      },
+      {
+        "check": "Success cannot replace active failure",
+        "passed": true
+      },
+      {
+        "check": "Missing root hides without borrowing",
+        "passed": true
+      },
+      {
+        "check": "Unavailable regular style hides",
+        "passed": true
+      },
+      {
+        "check": "Restored Horu after faults",
+        "passed": true
+      },
+      {
+        "check": "Compact display is exactly 128x192",
+        "passed": true
+      },
+      {
+        "check": "Native display is exactly 512x768",
+        "passed": true
+      },
+      {
+        "check": "Restored Horu after faults",
+        "passed": true
+      },
+      {
+        "check": "Controls remain within the viewport",
+        "passed": true
+      },
+      {
+        "check": "Viewer screenshot saved",
+        "passed": true
+      }
+    ],
+    "decoded_bytes": 23592960,
+    "detail": "complete",
+    "maximum_present_ms": 13.276662,
+    "success": true
+  },
+  "bundled_linux_binary_automatic_root_discovery": {
+    "success": true,
+    "passed_gui_checks": 18,
+    "working_directory": "/tmp",
+    "root_argument_supplied": false
+  },
+  "platform": "Linux x86_64; Windows still requires the documented validation."
+}

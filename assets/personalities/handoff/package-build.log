@@ -1,0 +1,16 @@
+[  8%] Building CXX object CMakeFiles/audiohole_avatar.dir/src/assets.cpp.o
+[ 16%] Building CXX object CMakeFiles/audiohole_avatar.dir/src/session.cpp.o
+[ 25%] Building CXX object CMakeFiles/audiohole_avatar.dir/src/player.cpp.o
+[ 33%] Building CXX object CMakeFiles/audiohole_avatar.dir/src/sha256.cpp.o
+[ 41%] Linking CXX static library libaudiohole_avatar.a
+[ 41%] Built target audiohole_avatar
+[ 50%] Building CXX object CMakeFiles/audiohole_avatar_wx.dir/src/native_decoder.cpp.o
+[ 58%] Building CXX object CMakeFiles/audiohole_avatar_wx.dir/src/wx_panel.cpp.o
+[ 66%] Linking CXX static library libaudiohole_avatar_wx.a
+[ 66%] Built target audiohole_avatar_wx
+[ 75%] Building CXX object CMakeFiles/audiohole_avatar_viewer.dir/viewer/main.cpp.o
+[ 83%] Building CXX object CMakeFiles/avatar_tests.dir/tests/tests.cpp.o
+[ 91%] Linking CXX executable audiohole_avatar_viewer
+[ 91%] Built target audiohole_avatar_viewer
+[100%] Linking CXX executable avatar_tests
+[100%] Built target avatar_tests

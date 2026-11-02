@@ -1,0 +1,20 @@
+{
+  "branch": "avatar/asset-pipeline",
+  "source_commit": "70f23de70d390f388c1b0d787c924f88e89475c8",
+  "accepted_checkpoint_commit": "0b41b8e",
+  "packages": [
+    {
+      "path": "audiohole-avatar-runtime.zip",
+      "sha256": "edc66c03b6ed1c58c9dad3513905be72d4045d1f9979afdf4a36515e9206ad48",
+      "size_bytes": 241686740,
+      "purpose": "Approved operating/canonical assets, native module/viewer source, integration contract, tests and validation."
+    },
+    {
+      "path": "audiohole-avatar-generation-checkpoint.zip",
+      "sha256": "01706cc15ea9f63a96d64c55e03df37fcbb4730a67c5c8d2afdfe245004437a8",
+      "size_bytes": 850346787,
+      "purpose": "Complete accepted generation workspace including intermediate/source assets, scripts/settings and all prior previews."
+    }
+  ],
+  "scope": "No out-of-scope application files modified; no main-GUI integration, push or merge performed."
+}
