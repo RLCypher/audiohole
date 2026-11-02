@@ -1,0 +1,360 @@
+{
+  "review_date": "2026-11-02",
+  "verdict": "needs_revision",
+  "scope": "Quick visual pass of all 48 retained pose keys at native crop resolution; compact full-body sheet inspected. 47 keys are used, one unused deadpan variant is included for completeness.",
+  "not_a_frame_by_frame_motion_review": true,
+  "canonical_reference": "UwU/References/UwU Chibi Reference.png",
+  "approved_operating_reference": "UwU/Generated/chibi/idle.png",
+  "candidate_operating_files_verified": 295,
+  "approved_operating_hashes_unchanged": 501,
+  "missing_wordmark_states": 8,
+  "missing_wordmark_pose_keys": 16,
+  "missing_wordmark_animation_frames": 101,
+  "missing_wordmark_statics": 8,
+  "findings": [
+    {
+      "state": "concerned",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/concerned/0000.png",
+        "UwU/Generated/chibi/concerned/0001.png",
+        "UwU/Generated/chibi/concerned/0002.png",
+        "UwU/Generated/chibi/concerned/0003.png",
+        "UwU/Generated/chibi/concerned/0004.png",
+        "UwU/Generated/chibi/concerned/0005.png",
+        "UwU/Generated/chibi/concerned/0006.png",
+        "UwU/Generated/chibi/concerned/0007.png",
+        "UwU/Generated/chibi/concerned/0008.png",
+        "UwU/Generated/chibi/concerned/0009.png",
+        "UwU/Generated/chibi/concerned/0010.png",
+        "UwU/Generated/chibi/concerned/0011.png",
+        "UwU/Generated/chibi/concerned/0012.png",
+        "UwU/Generated/chibi/concerned/0013.png",
+        "UwU/Generated/chibi/concerned/0014.png",
+        "UwU/Generated/chibi/concerned/0015.png"
+      ]
+    },
+    {
+      "state": "confused",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/confused/0003.png",
+        "UwU/Generated/chibi/confused/0004.png",
+        "UwU/Generated/chibi/confused/0005.png",
+        "UwU/Generated/chibi/confused/0006.png",
+        "UwU/Generated/chibi/confused/0007.png",
+        "UwU/Generated/chibi/confused/0008.png",
+        "UwU/Generated/chibi/confused/0009.png",
+        "UwU/Generated/chibi/confused/0010.png",
+        "UwU/Generated/chibi/confused/0011.png"
+      ]
+    },
+    {
+      "state": "happy",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/happy/0002.png",
+        "UwU/Generated/chibi/happy/0003.png",
+        "UwU/Generated/chibi/happy/0004.png",
+        "UwU/Generated/chibi/happy/0005.png",
+        "UwU/Generated/chibi/happy/0006.png",
+        "UwU/Generated/chibi/happy/0007.png",
+        "UwU/Generated/chibi/happy/0008.png",
+        "UwU/Generated/chibi/happy/0009.png"
+      ]
+    },
+    {
+      "state": "sleeping",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/sleeping/0000.png",
+        "UwU/Generated/chibi/sleeping/0001.png",
+        "UwU/Generated/chibi/sleeping/0002.png",
+        "UwU/Generated/chibi/sleeping/0003.png",
+        "UwU/Generated/chibi/sleeping/0004.png",
+        "UwU/Generated/chibi/sleeping/0005.png",
+        "UwU/Generated/chibi/sleeping/0006.png",
+        "UwU/Generated/chibi/sleeping/0007.png",
+        "UwU/Generated/chibi/sleeping/0008.png",
+        "UwU/Generated/chibi/sleeping/0009.png",
+        "UwU/Generated/chibi/sleeping/0010.png",
+        "UwU/Generated/chibi/sleeping/0011.png",
+        "UwU/Generated/chibi/sleeping/0012.png",
+        "UwU/Generated/chibi/sleeping/0013.png",
+        "UwU/Generated/chibi/sleeping/0014.png",
+        "UwU/Generated/chibi/sleeping/0015.png"
+      ]
+    },
+    {
+      "state": "smug",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/smug/0002.png",
+        "UwU/Generated/chibi/smug/0003.png",
+        "UwU/Generated/chibi/smug/0004.png",
+        "UwU/Generated/chibi/smug/0005.png",
+        "UwU/Generated/chibi/smug/0006.png",
+        "UwU/Generated/chibi/smug/0007.png",
+        "UwU/Generated/chibi/smug/0008.png",
+        "UwU/Generated/chibi/smug/0009.png"
+      ]
+    },
+    {
+      "state": "talking",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/talking/0000.png",
+        "UwU/Generated/chibi/talking/0001.png",
+        "UwU/Generated/chibi/talking/0002.png",
+        "UwU/Generated/chibi/talking/0003.png",
+        "UwU/Generated/chibi/talking/0004.png",
+        "UwU/Generated/chibi/talking/0005.png",
+        "UwU/Generated/chibi/talking/0006.png",
+        "UwU/Generated/chibi/talking/0007.png",
+        "UwU/Generated/chibi/talking/0008.png",
+        "UwU/Generated/chibi/talking/0009.png",
+        "UwU/Generated/chibi/talking/0010.png",
+        "UwU/Generated/chibi/talking/0011.png"
+      ]
+    },
+    {
+      "state": "thinking",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/thinking/0000.png",
+        "UwU/Generated/chibi/thinking/0001.png",
+        "UwU/Generated/chibi/thinking/0002.png",
+        "UwU/Generated/chibi/thinking/0003.png",
+        "UwU/Generated/chibi/thinking/0004.png",
+        "UwU/Generated/chibi/thinking/0005.png",
+        "UwU/Generated/chibi/thinking/0006.png",
+        "UwU/Generated/chibi/thinking/0007.png",
+        "UwU/Generated/chibi/thinking/0008.png",
+        "UwU/Generated/chibi/thinking/0009.png",
+        "UwU/Generated/chibi/thinking/0010.png",
+        "UwU/Generated/chibi/thinking/0011.png",
+        "UwU/Generated/chibi/thinking/0012.png",
+        "UwU/Generated/chibi/thinking/0013.png",
+        "UwU/Generated/chibi/thinking/0014.png",
+        "UwU/Generated/chibi/thinking/0015.png"
+      ]
+    },
+    {
+      "state": "working",
+      "defect": "AUDIOHOLE wordmark missing from unobstructed case front",
+      "pose_key_indices": [
+        0,
+        1
+      ],
+      "static_affected": true,
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "operating_frame_paths": [
+        "UwU/Generated/chibi/working/0000.png",
+        "UwU/Generated/chibi/working/0001.png",
+        "UwU/Generated/chibi/working/0002.png",
+        "UwU/Generated/chibi/working/0003.png",
+        "UwU/Generated/chibi/working/0004.png",
+        "UwU/Generated/chibi/working/0005.png",
+        "UwU/Generated/chibi/working/0006.png",
+        "UwU/Generated/chibi/working/0007.png",
+        "UwU/Generated/chibi/working/0008.png",
+        "UwU/Generated/chibi/working/0009.png",
+        "UwU/Generated/chibi/working/0010.png",
+        "UwU/Generated/chibi/working/0011.png",
+        "UwU/Generated/chibi/working/0012.png",
+        "UwU/Generated/chibi/working/0013.png",
+        "UwU/Generated/chibi/working/0014.png",
+        "UwU/Generated/chibi/working/0015.png"
+      ]
+    }
+  ],
+  "other_findings": [
+    {
+      "severity": "high",
+      "area": "case construction/emblem",
+      "finding": "Front-panel proportions, emblem proportions/grid, wheels, latches and connector details are redrawn between keys. Centroid alignment does not lock prop design."
+    },
+    {
+      "severity": "high",
+      "area": "wearable brand badge",
+      "examples": [
+        "thinking key 0000",
+        "thinking key 0001",
+        "celebrating key 0003"
+      ],
+      "finding": "Canonical closed pink wormhole ellipse changes to stacked/open curved bars. Badge outline, size and attachment also vary."
+    },
+    {
+      "severity": "medium",
+      "area": "wardrobe",
+      "examples": [
+        "thinking keys 0000/0001",
+        "celebrating keys 0001/0002/0003",
+        "bored keys 0000/0001"
+      ],
+      "finding": "Garter widths/buckle arrangement and sleeve band placement/width need a fixed per-limb design check. Pose and occlusion account for some differences; exact counts are not assigned in this quick pass."
+    },
+    {
+      "severity": "review",
+      "area": "glove/palm design",
+      "examples": [
+        "celebrating key 0003: frames 0015-0017"
+      ],
+      "finding": "New pink palm pads/changed glove coverage are introduced without a clear canonical palm reference; treat as unresolved design rather than approved detail."
+    }
+  ],
+  "preliminary_correction": "Bored retains its case wordmark. The initial nine-state estimate and bored frame claim were corrected after closer crops. Confirmed missing-wordmark count is eight states.",
+  "operating_art_modified": false,
+  "approved_status_modified": false
+}

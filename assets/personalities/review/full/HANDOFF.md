@@ -1,5 +1,7 @@
 # Full avatar library and integration handoff
 
+**2026-11-02 visual review: UwU body artwork needs revision.** Confirmed case-wordmark, badge and wardrobe consistency findings are recorded in the [quick consistency audit](consistency-audit/REPORT.md). Existing technical passes do not grant artistic approval.
+
 The accepted IDLE assets now anchor complete core presentations for Norm, UwU,
 and Vanilla. Norm and UwU also have all eight requested optional expressions.
 The batch contains **52 static expressions, 49 animation sequences, 744 animation

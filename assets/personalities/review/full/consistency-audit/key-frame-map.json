@@ -1,0 +1,658 @@
+{
+  "scope": "All 48 retained body keys: 47 used in operating art and 1 unused deadpan variant. Native crops compare against approved IDLE.",
+  "keys": [
+    {
+      "state": "angry",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/angry/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        13,
+        14
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "angry",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/angry/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        8
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "angry",
+      "key": 2,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/angry/0002.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "angry",
+      "key": 3,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/angry/0003.png",
+      "operating_frame_indices": [
+        11,
+        12
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "bored",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/bored/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "bored",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/bored/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "celebrating",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/celebrating/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        18,
+        19
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "celebrating",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/celebrating/0001.png",
+      "operating_frame_indices": [
+        5,
+        6,
+        7,
+        10,
+        11,
+        12
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "celebrating",
+      "key": 2,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/celebrating/0002.png",
+      "operating_frame_indices": [
+        8,
+        9,
+        13,
+        14
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "celebrating",
+      "key": 3,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/celebrating/0003.png",
+      "operating_frame_indices": [
+        15,
+        16,
+        17
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "concerned",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/concerned/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "concerned",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/concerned/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "confused",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/confused/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        10,
+        11
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "confused",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/confused/0001.png",
+      "operating_frame_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "deadpan",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/deadpan/0000.png",
+      "operating_frame_indices": [],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "deadpan",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/deadpan/0001.png",
+      "operating_frame_indices": [],
+      "used_as_static": false,
+      "used_in_operating_art": false
+    },
+    {
+      "state": "embarrassed",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/embarrassed/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        5,
+        11,
+        12,
+        13
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "embarrassed",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/embarrassed/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "error",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/error/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        14,
+        15
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "error",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/error/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        8,
+        9
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "error",
+      "key": 2,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/error/0002.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        10,
+        11
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "error",
+      "key": 3,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/error/0003.png",
+      "operating_frame_indices": [
+        12,
+        13
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "happy",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/happy/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        8,
+        9
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "happy",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/happy/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "laughing",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/laughing/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        5,
+        12,
+        13,
+        14
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "laughing",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/laughing/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "mischievous",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/mischievous/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        10,
+        11
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "mischievous",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/mischievous/0001.png",
+      "operating_frame_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "panicking",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/panicking/0000.png",
+      "operating_frame_indices": [
+        3,
+        4,
+        16,
+        17
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "panicking",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/panicking/0001.png",
+      "operating_frame_indices": [
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "panicking",
+      "key": 2,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/panicking/0002.png",
+      "operating_frame_indices": [
+        7,
+        8,
+        12,
+        13
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "panicking",
+      "key": 3,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/panicking/0003.png",
+      "operating_frame_indices": [
+        14,
+        15
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "sleeping",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/sleeping/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "sleeping",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/sleeping/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "smug",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/smug/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        8,
+        9
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "smug",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/smug/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "surprised",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/surprised/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        11,
+        12
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "surprised",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/surprised/0001.png",
+      "operating_frame_indices": [
+        4,
+        7
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "surprised",
+      "key": 2,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/surprised/0002.png",
+      "operating_frame_indices": [
+        5,
+        6,
+        8,
+        9
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "surprised",
+      "key": 3,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/surprised/0003.png",
+      "operating_frame_indices": [
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "suspicious",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/suspicious/0000.png",
+      "operating_frame_indices": [
+        2,
+        3,
+        8,
+        9
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "suspicious",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/suspicious/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "talking",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/talking/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        8,
+        9,
+        10,
+        11
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "talking",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/talking/0001.png",
+      "operating_frame_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "thinking",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/thinking/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "thinking",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/thinking/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "working",
+      "key": 0,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/working/0000.png",
+      "operating_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "used_as_static": true,
+      "used_in_operating_art": true
+    },
+    {
+      "state": "working",
+      "key": 1,
+      "key_path": "UwU/Intermediate/BodyRevision/Keys/working/0001.png",
+      "operating_frame_indices": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "used_as_static": false,
+      "used_in_operating_art": true
+    }
+  ]
+}
