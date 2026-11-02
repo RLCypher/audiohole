@@ -93,6 +93,10 @@ Successful jobs then package and audit runtime imports, extract and launch the
 package in a temporary directory outside the source/build tree, and upload its
 contents as a GitHub Actions ZIP artifact. Upload is skipped on build, test,
 packaging, or smoke-test failure. Adding these steps is not evidence of a run.
+Checkout and artifact uploads use pinned Node.js 24 actions, requiring Actions
+Runner 2.327.1 or newer (provided by the GitHub-hosted Windows runner). Node.js is
+only a CI action runtime, not an AudioHole dependency. GUI evidence uploads run
+after failures only when evidence files exist, avoiding secondary missing-file warnings.
 
 ## Download and run a CI build
 

@@ -17,7 +17,7 @@ jobs:
       matrix:
         configuration: [debug, release]
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Verify Windows prerequisites (read-only)
         run: ./scripts/Verify-Environment.ps1
       - name: Test distribution-tool safeguards
@@ -50,7 +50,7 @@ jobs:
           ./scripts/Test-Package.ps1 -Archive $zip[0].FullName
           Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/artifact
       - name: Upload tested package contents (downloaded as a ZIP)
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: AudioHole-Windows-x64-${{ matrix.configuration }}-${{ github.sha }}
           path: build/artifact/
@@ -58,8 +58,8 @@ jobs:
           retention-days: 14
           compression-level: 0
       - name: Upload GUI smoke screenshots and evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ always() && hashFiles('build/windows-msvc/gui-smoke/**') != '' }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: AudioHole-GUI-evidence-${{ matrix.configuration }}-${{ github.sha }}
           path: build/windows-msvc/gui-smoke/
