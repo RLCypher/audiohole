@@ -1,0 +1,203 @@
+{
+  "personality_id": "uwu",
+  "state": "talking",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/quiet-b-source.png",
+  "source_sha256": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def",
+  "source_indices": [
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      13,
+      810,
+      530,
+      1492
+    ],
+    [
+      528,
+      819,
+      1020,
+      1490
+    ]
+  ],
+  "common_scale": 0.8670391939868457,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      125.58123370981755,
+      488.9748045178106
+    ],
+    [
+      125.53403141361257,
+      479.90314136125653
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 2,
+  "frame_source_key_indices": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "key_sha256": [
+    "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+    "81833465ca2ce3a667eb622f738016ab2eabae838ad8ac388a903cd913cf85f5"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/talking.png",
+    "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": true,
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "transition": "cut",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/talking/0000.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0001.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0002.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0003.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0004.png",
+        "sha256": "81833465ca2ce3a667eb622f738016ab2eabae838ad8ac388a903cd913cf85f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0005.png",
+        "sha256": "81833465ca2ce3a667eb622f738016ab2eabae838ad8ac388a903cd913cf85f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0006.png",
+        "sha256": "81833465ca2ce3a667eb622f738016ab2eabae838ad8ac388a903cd913cf85f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0007.png",
+        "sha256": "81833465ca2ce3a667eb622f738016ab2eabae838ad8ac388a903cd913cf85f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0008.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0009.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0010.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0011.png",
+        "sha256": "c543e737bb32d734e5fabce08405085fbf2ca6a8d22ecd29097c7a870e187948",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      }
+    ]
+  },
+  "behavior": {
+    "category": "ambient",
+    "mode": "persistent",
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "static_hold_ms": 1200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

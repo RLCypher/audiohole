@@ -1,0 +1,182 @@
+{
+  "personality_id": "vanilla",
+  "state": "confused",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/confused.png",
+    "sha256": "fb9cfe7ca8113297b7461936c84d88ea8cc0f8c8b6ee1aae920024923b39c51e",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/confused/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0001.png",
+        "sha256": "e9955704f216ee3ba8d436e99ca7b11735fbfdd7b6aceeb6a0c91a480af46174",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0002.png",
+        "sha256": "a91315da61fde37a5ffea1c775c62539c90d60f739c61d77aed48289faf62a67",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0003.png",
+        "sha256": "a0a69defeb5000f01bf9534c362e931c831d9752af94b806bdb5b4ab89785910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0004.png",
+        "sha256": "46877c9767b0a961f14dc5d78c4070037a9dcea7c2f9dcbf424558f33fd885c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0005.png",
+        "sha256": "4e27bdfca8743a04a4bb5e1ba004995cfab859259db220d731041e416968f071",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0006.png",
+        "sha256": "7fe452c7aaf673fab2b2d67d7e6fcdac37321313ddb5296be6c2168700ec5404",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0007.png",
+        "sha256": "c68370f19264504d03714ffaa02b100810625f9b7f12b89f0cfee1c6ddf69d01",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 300
+      },
+      {
+        "path": "Generated/logo/confused/0008.png",
+        "sha256": "01837e85a8d526922685d6d3e0cb0c76c66066b16949c082c561993a646dc753",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/confused/0009.png",
+        "sha256": "a7b357c8f5b3247731f0ee15b6debb754f5f864bf13eda2fc4a50cec7fc0dbbe",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0010.png",
+        "sha256": "8627174486f8a8cc71e0fc6449339d5b19e34ec03be43b01e54a56dd23949c58",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0011.png",
+        "sha256": "a7fef726a69859afdf85fe98db61473d2d5d7d4ef492550c44e38d68d3dfe9f2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0012.png",
+        "sha256": "7c17f4805a110397f8aa13219f524d3d57f4c3b9eea272a3b6a13b7f45f68f34",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/confused/0013.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 3000,
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 3000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

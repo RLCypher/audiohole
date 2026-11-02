@@ -1,0 +1,30 @@
+{
+  "approval": "pending human review",
+  "source": "Norm/Intermediate/idle-before-steam-revision.png",
+  "source_sha256": "16fb8f34992c773e7da409b69ab281fd21d19ef0a1af691fe890566640f6a0ab",
+  "changes": [
+    "subtler separate steam layer"
+  ],
+  "steam": {
+    "original_steam_box": [
+      365,
+      202,
+      439,
+      274
+    ],
+    "plume_size": [
+      26,
+      46
+    ],
+    "base_point": [
+      392,
+      270
+    ],
+    "opacity": 0.38
+  },
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "clean_base_sha256": "da0bc99df75a4cd34bf3a6eda7492c7090c602b2a593c82721d9852d8473dc49",
+  "steam_layer_sha256": "95ed239c9bb36166cc159762bf6aa78bca3681b823f04c52cfc82296d5bb7f84",
+  "preparation_sha256": "382b86888d6b1b98924f1b031486633315de31e1d42ec6cda489fad69723296c",
+  "settings_sha256": "1f1ca7679d3186e361d814c5f012472a14e68271835f93462ee9872de9f2265e"
+}

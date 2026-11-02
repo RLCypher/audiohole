@@ -1,0 +1,17 @@
+{
+  "reference": "UwU/Generated/chibi/idle.png",
+  "canonical_character_reference": "UwU/References/UwU Chibi Reference.png",
+  "frozen_rules": [
+    "Same modest off-shoulder charcoal cropped sweater and slender adult anatomy.",
+    "Wearer right upper sleeve (viewer left at rest): mint band with adjacent pink trim.",
+    "Wearer left forearm (viewer right at rest): broad pink band, no second mint armband.",
+    "Dark fingerless gloves cover palms; white fingertips; no new pink palm pads.",
+    "Primary garter on wearer left thigh (viewer right at rest): two connected bands with one small silver square buckle.",
+    "Other thigh uses a plain stocking top; omit invented matching garter/buckle hardware.",
+    "Broad pink/charcoal stocking bands and canonical mint-laced boots.",
+    "One circular pouch and one rectangular badge at the reference belt side.",
+    "Case and badge are reusable artwork; model output must not redraw their logos."
+  ],
+  "hidden_detail_interpretation": "The opposite upper thigh and open palms are not fully exposed by the canonical rest references. Use the least-added-detail interpretation: plain stocking top on the opposite leg and covered glove palms. These remain reviewable wardrobe choices, not newly human-approved canonical views.",
+  "status": "implementation constraints for candidate correction; human art approval pending"
+}

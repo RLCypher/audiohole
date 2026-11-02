@@ -1,0 +1,247 @@
+{
+  "personality_id": "uwu",
+  "state": "surprised",
+  "status": "validated",
+  "approval": "superseded historical candidate; see body revision",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "UwU/Intermediate/core-b-source.png",
+    "source_sha256": "72e3338bbab8f75cf2720581e81777832cecc3dae647dbc3f32270b2497c7e31",
+    "grid": [
+      2,
+      3
+    ],
+    "cell_index": 2,
+    "face_box": [
+      188,
+      155,
+      364,
+      331
+    ],
+    "registration_translation": [
+      0.6039215686274702,
+      0.07999999999998408
+    ],
+    "face_polygon": [
+      [
+        210,
+        171
+      ],
+      [
+        280,
+        170
+      ],
+      [
+        299,
+        186
+      ],
+      [
+        320,
+        190
+      ],
+      [
+        343,
+        201
+      ],
+      [
+        346,
+        245
+      ],
+      [
+        332,
+        269
+      ],
+      [
+        309,
+        292
+      ],
+      [
+        282,
+        302
+      ],
+      [
+        251,
+        290
+      ],
+      [
+        218,
+        271
+      ],
+      [
+        205,
+        237
+      ]
+    ],
+    "nose_preserved_box": [
+      289,
+      250,
+      312,
+      266
+    ],
+    "key_sha256": "e2b38a6b6b77f8ae22bae217d5c89810698c96b4ac59bec594a499230c4bd103"
+  },
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/surprised.png",
+    "sha256": "15cbef47f346a917c8e7438652f2f2e12b83ab74b672f0a9cf0ffdd39f5c0f17",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/surprised/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0001.png",
+        "sha256": "0667f09fd4a2e961fbaae964f02d28f56a52e71a9aa8713625749f7cdefb13eb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0002.png",
+        "sha256": "8fd8d5d3a15a20c7e40f2b6b62245271e6f42027f02812df1effea807c061be7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0003.png",
+        "sha256": "7f1c638cb82aed73057bf677e4edb3b70494f6523cd1d6e23cb3d1d9d67d2856",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0004.png",
+        "sha256": "35df8f85bdd566732619b8cea6dc53306987a3bb5df877ce31da18e603b333b6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0005.png",
+        "sha256": "190ee3d7cbd6b04944eb3f788d5167387d216ef2c20ae47a2405d3b1a8a08dfc",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0006.png",
+        "sha256": "6df988e6181b05de4eea96499a98a1f334a935b7311cc87ee9cf14922d2996a9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0007.png",
+        "sha256": "60abc59504ad619c661439189d30bf1e17c9da7c96264af32a66bb11977aabc3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/surprised/0008.png",
+        "sha256": "da000d1511ba90a027d2035b2e8466e3cb4eaf863d1080b2b1a5f2db46458dc5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 170
+      },
+      {
+        "path": "Generated/chibi/surprised/0009.png",
+        "sha256": "15da8411a5746ebdcd04c9bb47b414e7f74b169d2111d5d1f00135595fa407fe",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0010.png",
+        "sha256": "90952aeb00354c2473c86b4854f54cbe978dd6f7b7e2acf8857a04dbcf5450f5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0011.png",
+        "sha256": "39ba26097d21f9fc57cffb17f7b71f4ccfe681659fb05a40f86cec25b3e54350",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0012.png",
+        "sha256": "5e9d9326164f70eff22097f2cc0a2abcf385703e12f1f814918c0ff13212ef38",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0013.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent"
+  },
+  "behavior": {
+    "category": "theatrical",
+    "mode": "finite",
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 1500,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "superseded_by": "provenance/uwu-surprised-body-revision.json",
+  "historical_operating_artwork_commit": "ac57857"
+}

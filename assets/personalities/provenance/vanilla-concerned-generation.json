@@ -1,0 +1,200 @@
+{
+  "personality_id": "vanilla",
+  "state": "concerned",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/concerned.png",
+    "sha256": "ca933c53604e4b3ff74f0fa78da583cd27e44b6260b280ac4dbe449a4cd52b56",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/concerned/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0001.png",
+        "sha256": "29880bf112c917d0e41017fe01295f795c375e2b258f31662112541b13fe437c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0002.png",
+        "sha256": "84e2c85c40282fc3886cec9b3aaa6c822d46f04ff4e71e075f8198ea50a016b3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0003.png",
+        "sha256": "8f9d8c7756b2ce300bf3f6b67ea6c68888901b8c52e79bb7ea2e149af21abd47",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0004.png",
+        "sha256": "857b1e9e2b14e3065d8b7e4f9f182b44eec214d968e40ef77b769b8e98caceae",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0005.png",
+        "sha256": "c218cfecd779d20985969d759339575d9eb5e75dfc164982b1f422b94aea1e60",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0006.png",
+        "sha256": "70f0a1709c1f73ca7723fd6777c2666825fc6a343b043d13022b4574357d73ed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0007.png",
+        "sha256": "b60f6936b5a8055ca71a0bb6bc78e32f8e831d03779c404fbeb97d149df06c85",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0008.png",
+        "sha256": "bd1433f022fcd6cb0c2461826b0019383138ab328a0c30af7811e629af5d6731",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0009.png",
+        "sha256": "d1e49ebc67830a6c8f54e23107229c99c32bea9c19fdad7dc2e2f1aacd15ac78",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0010.png",
+        "sha256": "b2c233c242f7ba053ec9ec3a59463a3eca18383d72ea84e6d921b7afcd64398b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0011.png",
+        "sha256": "84bf5ead40cb373726e898c8ade24c103f301ed2f69f772b3fe20b79b89226e0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0012.png",
+        "sha256": "0ad4d5ee7239a566dca14e4760e3a8b8411fb9dbe881abb2f7b389985b72f9d9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0013.png",
+        "sha256": "db2f84068470fd31655faefb2515133c4677acf913a5ff97cd2a44f0eb475d49",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0014.png",
+        "sha256": "2dcec17deb3d2db2533cb824910d790d4a2333ca89e3243cedb1cb20fa1d6617",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/concerned/0015.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": true,
+    "priority": 45,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "persistent",
+    "priority": 45,
+    "interruptible": true,
+    "cooldown_ms": 1000,
+    "static_hold_ms": 3200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

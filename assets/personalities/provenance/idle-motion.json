@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "state": "idle",
+  "approval": "pending human review",
+  "timebase_ms": 100,
+  "exposure_ticks": [
+    5,
+    5,
+    4,
+    4,
+    4,
+    1,
+    1,
+    4,
+    5,
+    5,
+    6,
+    6
+  ],
+  "breath": [
+    0,
+    0.15,
+    0.45,
+    0.75,
+    0.95,
+    1,
+    0.98,
+    0.85,
+    0.65,
+    0.35,
+    0.1,
+    0
+  ],
+  "blink_indices": [
+    5,
+    6
+  ],
+  "compact_display": [
+    128,
+    192
+  ],
+  "notes": "12 authored frames on a shared 100 ms timebase; five-second loop. Shorter holds support visible steam motion. Closed eyes at 2.2-2.4 seconds; exact neutral endpoints."
+}

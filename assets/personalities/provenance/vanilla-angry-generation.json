@@ -1,0 +1,200 @@
+{
+  "personality_id": "vanilla",
+  "state": "angry",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/angry.png",
+    "sha256": "75553849feb7d9ed102525845be08b9c9c20551f7c89084b0b47ff72bf48ded8",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/angry/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0001.png",
+        "sha256": "c7566f2dc61dc2cbd6b0a91f1618b0f673e5d55edd5a1e4f2949ec359f16d79c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0002.png",
+        "sha256": "3bb822705427e0b9f5f402149957c2a87749075f0597a99197a3a28ad3a48ec5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0003.png",
+        "sha256": "4fb29d140cf88b4c89a9dbe9149e563ddfc90d56988fb648c625f59591cf58e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0004.png",
+        "sha256": "88d350b88f81384a8356bdd6b7bb44ba6e15f33a7e8edc15abb536eee9027359",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0005.png",
+        "sha256": "f90714d3be79001c1175518e4bffd899044b33ea08ecf73760138cb70eeb3868",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0006.png",
+        "sha256": "577407b801cfd67ecda2e4861b42adb47e5ef6b154febd3f100f98f5419b5cb3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0007.png",
+        "sha256": "3b055dad25e902f06b4c5557b4979011ab8e1fb86940a7fdca496c4edd17340d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0008.png",
+        "sha256": "ac6f0dbbd993d1b4f2ddc7f5c6a2c39c88668bc74e77683600668c1caba52cab",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/logo/angry/0009.png",
+        "sha256": "773c213e44c6e972196c3e7d1377e4c29eb4a9e26782527ca874030fd0041556",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/logo/angry/0010.png",
+        "sha256": "16bdf0f149a7a6301dd8bf310ba6502697cb03b21530c00f3f27e2efb6bf9caf",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0011.png",
+        "sha256": "a5ac59335cc5e00c90eb2ba3a211b7838428b81b87e1e1c823c91b46319e9529",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0012.png",
+        "sha256": "f2c38c5e2c0d7d045cad0caee64911e8f514403a940bfb4db55f05ffd3d148ac",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0013.png",
+        "sha256": "4d05eeee7bdb76c51da7ebb804df54beac0c034fa92cca05e913f522c0af1457",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0014.png",
+        "sha256": "d12497df6acf269529e5b52c4f3ac1cb8451703c07ba192e57f524884b8d2224",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/logo/angry/0015.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      }
+    ],
+    "loop": false,
+    "priority": 65,
+    "interruptible": false,
+    "cooldown_ms": 6000,
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "finite",
+    "priority": 65,
+    "interruptible": false,
+    "cooldown_ms": 6000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "12f57809b76549f494835769cd1d2003a86f3a01a2f34b11e0596ea3ec3fa3d3",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

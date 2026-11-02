@@ -1,0 +1,483 @@
+{
+  "approval": "pending human review",
+  "errors": [],
+  "operating_asset_count": 39,
+  "native_size": [
+    512,
+    768
+  ],
+  "compact_preview_size": [
+    128,
+    192
+  ],
+  "timing": {
+    "timebase_ms": 100,
+    "authored_frames": 12,
+    "loop_duration_ms": 5000,
+    "note": "Integer exposure holds on a 10 Hz timebase; not 10 unique drawings per second.",
+    "frame_durations_ms": [
+      500,
+      500,
+      400,
+      400,
+      400,
+      100,
+      100,
+      400,
+      500,
+      500,
+      600,
+      600
+    ]
+  },
+  "packs": {
+    "default": {
+      "errors": [],
+      "warnings": [
+        "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/angry/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/bored/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/bored/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/celebrating/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/concerned/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/concerned/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/confused/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/deadpan/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/embarrassed/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/embarrassed/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/error/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/happy/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/laughing/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/laughing/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/mischievous/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/mischievous/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/panicking/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/panicking/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/sleeping/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/sleeping/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/smug/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/smug/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/surprised/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/suspicious/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/suspicious/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/talking/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/talking/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/thinking/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/thinking/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/working/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/working/static: large semitransparent region: inspect halos or background remnants"
+      ],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.5,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": 0,
+        "alpha_bbox_per_frame": [
+          [
+            65,
+            64,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            449,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            63,
+            448,
+            704
+          ],
+          [
+            65,
+            64,
+            448,
+            704
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "blink_keyframe_outside_eye_mask_max_rgba_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          0.61009,
+          1.20308,
+          2.03185,
+          2.54952,
+          2.92704,
+          2.89255,
+          2.32756,
+          1.6815,
+          1.04272,
+          0.48825,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "d65883aab04689e9f15b1e5989e0fdc06233e498d30c22c754b2ac9a28e23628"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "8c2686441abc12d29a3101569c09e0be6a623119c69dce36240aa65f258f2d35"
+        }
+      },
+      "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+      "manifest_integrity": "pass"
+    },
+    "vanilla": {
+      "errors": [],
+      "warnings": [],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.0,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": null,
+        "alpha_bbox_per_frame": [
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ],
+          [
+            55,
+            210,
+            459,
+            557
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "outside_wormhole_max_rgba_delta": 0,
+        "whole_image_alpha_max_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          0.13052,
+          0.26443,
+          0.37884,
+          0.47021,
+          0.53818,
+          0.53792,
+          0.4659,
+          0.37189,
+          0.2624,
+          0.13045,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "438422c4b55ba2975b1330fc5c5762502adea35042b1cd6b3b8c4e3f60fbfc12"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "fe251fd5647454d0c61fc35b60c916dce9a34ad5312592a5acf4693301e53d50"
+        }
+      },
+      "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "manifest_integrity": "pass"
+    },
+    "uwu": {
+      "errors": [],
+      "warnings": [
+        "chibi/angry/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/angry/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/angry/animation: occupied area changed over 20%; inspect scale",
+        "chibi/celebrating/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/celebrating/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/confused/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/confused/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/confused/animation: occupied area changed over 20%; inspect scale",
+        "chibi/embarrassed/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/embarrassed/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/error/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/error/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/happy/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/happy/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/happy/animation: occupied area changed over 20%; inspect scale",
+        "chibi/idle/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/idle/static: large semitransparent region: inspect halos or background remnants",
+        "chibi/laughing/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/laughing/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/laughing/animation: occupied area changed over 20%; inspect scale",
+        "chibi/mischievous/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/panicking/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/smug/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/smug/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/smug/animation: occupied area changed over 20%; inspect scale",
+        "chibi/surprised/animation: bounding-box displacement exceeds 24px; inspect motion",
+        "chibi/surprised/animation: large semitransparent region: inspect halos or background remnants",
+        "chibi/suspicious/animation: large semitransparent region: inspect halos or background remnants"
+      ],
+      "frame_count": 12,
+      "alignment": {
+        "master_equals_first_frame_max_rgba_delta": 0,
+        "loop_first_last_max_rgba_delta": 0,
+        "max_adjacent_bbox_center_shift_px": 0.5,
+        "ground_region_max_rgba_delta": 0,
+        "protected_case_region_max_rgba_delta": 0,
+        "alpha_bbox_per_frame": [
+          [
+            42,
+            140,
+            449,
+            704
+          ],
+          [
+            42,
+            140,
+            450,
+            704
+          ],
+          [
+            42,
+            140,
+            450,
+            704
+          ],
+          [
+            42,
+            139,
+            450,
+            704
+          ],
+          [
+            42,
+            139,
+            450,
+            704
+          ],
+          [
+            42,
+            139,
+            449,
+            704
+          ],
+          [
+            42,
+            139,
+            449,
+            704
+          ],
+          [
+            42,
+            139,
+            448,
+            704
+          ],
+          [
+            42,
+            139,
+            448,
+            704
+          ],
+          [
+            42,
+            140,
+            448,
+            704
+          ],
+          [
+            42,
+            140,
+            449,
+            704
+          ],
+          [
+            42,
+            140,
+            449,
+            704
+          ]
+        ],
+        "unique_frame_hashes": 11,
+        "blink_keyframe_outside_eye_mask_max_rgba_delta": 0,
+        "compact_mean_rgb_change_vs_master_per_frame": [
+          0.0,
+          1.01853,
+          1.92952,
+          2.71434,
+          3.22412,
+          3.66225,
+          3.53238,
+          2.76902,
+          2.31944,
+          1.68873,
+          0.87595,
+          0.0
+        ]
+      },
+      "previews": {
+        "native": {
+          "size": [
+            512,
+            768
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "d6fd82cb12c3bb64c8cc09ccbadb1e922caa72323d9cd72f8bcf6d2a8bd9187a"
+        },
+        "compact": {
+          "size": [
+            128,
+            192
+          ],
+          "frames": 12,
+          "duration_ms": 5000,
+          "rgba_frames_match": true,
+          "sha256": "36c44102741f1b944771082d195ae4f2b84a19bed8e7775ff92fc366105c7f46"
+        }
+      },
+      "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+      "manifest_integrity": "pass"
+    }
+  }
+}

@@ -1,0 +1,449 @@
+{
+  "personality_id": "uwu",
+  "state": "talking",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "horu-prop-continuity-3",
+  "generation": "Four newly drawn two-arm talking poses with one held cup; fixed case and canonical badge composition.",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+  "source": "UwU/Intermediate/HoruPerformanceRepair/talking-source.png",
+  "source_sha256": "491c971a70d7d162a0d176e6283e95295869c09d17a7892a13e69a3eb05e7ba4",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/talking",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/talking",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "talking",
+      "key": 0,
+      "source": "talking-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        69,
+        801,
+        522,
+        1507
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            335.9767576990122,
+            212.96920395119116,
+            1721
+          ],
+          [
+            489.66918714555766,
+            209.28166351606805,
+            529
+          ]
+        ],
+        "ear_target": [
+          [
+            213.61261829652997,
+            150.77981072555204,
+            1585
+          ],
+          [
+            366.31475409836065,
+            149.827868852459,
+            610
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9932900996649361,
+        "translation": [
+          -120.08928522386122,
+          -59.40496332607432
+        ],
+        "neck_y": 255,
+        "body_vertical_fit": 0.8238532110091743,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          289,
+          443,
+          319,
+          474
+        ],
+        "assembly_top": 443,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "character_sha256": "4fe0ebdf9e7b34f9027189b1e4476b48fb34b44e09f9b8b1a77dd87cb92fa5fa",
+      "key_sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+      "background_layer": "talking-0000-background.png",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
+    },
+    {
+      "state": "talking",
+      "key": 1,
+      "source": "talking-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        576,
+        812,
+        988,
+        1512
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            309.35673839184597,
+            217.6625141562854,
+            1766
+          ],
+          [
+            467.1768292682927,
+            210.5060975609756,
+            656
+          ]
+        ],
+        "ear_target": [
+          [
+            216.79776674937966,
+            152.25434243176178,
+            1612
+          ],
+          [
+            371.64150943396226,
+            157.99854862119014,
+            689
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9808079024015638,
+        "translation": [
+          -86.59549172890075,
+          -54.84913343982225
+        ],
+        "neck_y": 258,
+        "body_vertical_fit": 0.828996282527881,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          290,
+          444,
+          320,
+          475
+        ],
+        "assembly_top": 444,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "character_sha256": "520684dc6514e9b34709dd37118be374ce7a2bf0383ace2bc27512656e36c3d9",
+      "key_sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
+      "background_layer": "talking-0001-background.png",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
+    },
+    {
+      "state": "talking",
+      "key": 2,
+      "source": "talking-source.png",
+      "source_cell": 2,
+      "source_crop_box": [
+        69,
+        801,
+        522,
+        1507
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            356.82179226069246,
+            186.85692464358453,
+            1964
+          ],
+          [
+            515.075,
+            201.3765625,
+            640
+          ]
+        ],
+        "ear_target": [
+          [
+            213.61261829652997,
+            150.77981072555204,
+            1585
+          ],
+          [
+            366.31475409836065,
+            149.827868852459,
+            610
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9609056430229435,
+        "translation": [
+          -128.94158771100592,
+          -36.22403451436736
+        ],
+        "neck_y": 251,
+        "body_vertical_fit": 0.8266423357664233,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          274,
+          439,
+          303,
+          471
+        ],
+        "assembly_top": 439,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "character_sha256": "a158855e159401bee1b8dc68efba12ce809a5ac3da3061e2aba8bceee5d89712",
+      "key_sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
+      "background_layer": "talking-0002-background.png",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
+    },
+    {
+      "state": "talking",
+      "key": 3,
+      "source": "talking-source.png",
+      "source_cell": 3,
+      "source_crop_box": [
+        576,
+        812,
+        988,
+        1512
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            331.17638036809814,
+            192.34202453987731,
+            1956
+          ],
+          [
+            494.5459183673469,
+            201.17729591836735,
+            784
+          ]
+        ],
+        "ear_target": [
+          [
+            216.79776674937966,
+            152.25434243176178,
+            1612
+          ],
+          [
+            371.64150943396226,
+            157.99854862119014,
+            689
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9470807692684852,
+        "translation": [
+          -96.79321685258265,
+          -31.22084484432702
+        ],
+        "neck_y": 255,
+        "body_vertical_fit": 0.8361266294227188,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          278,
+          442,
+          307,
+          473
+        ],
+        "assembly_top": 442,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "character_sha256": "9fccb8870aabc34cee17119be4d88a32740a23b05c2bdc93b10d2c3699ca3631",
+      "key_sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
+      "background_layer": "talking-0003-background.png",
+      "cup": {
+        "location": "hand",
+        "layer": null
+      },
+      "revision": "horu-prop-continuity-3"
+    }
+  ],
+  "drawn_pose_count": 4,
+  "frame_source_key_indices": [
+    0,
+    0,
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    0,
+    0,
+    0,
+    0
+  ],
+  "key_sha256": [
+    "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+    "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
+    "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
+    "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/talking.png",
+    "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": true,
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "transition": "cut",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/talking/0000.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0001.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0002.png",
+        "sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0003.png",
+        "sha256": "86e6024361c3fc6cf2418360192de265e7d8a43e51fcc13d206580522414a1c5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0004.png",
+        "sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0005.png",
+        "sha256": "2812f93896204009c6d079d0cbb0bbdc8da4e376ddc94cbfa8805ac89b2b046a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0006.png",
+        "sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0007.png",
+        "sha256": "55152eecb709195c0c16038cb3c4b892fbea2eb0b00cdd6b28f080db0668a29c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0008.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0009.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0010.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/talking/0011.png",
+        "sha256": "b5cb44462bee1c9926bd9ca9ca111f0fa8447cd5efcaa39daa280331ed5b69f6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      }
+    ]
+  },
+  "behavior": {
+    "category": "ambient",
+    "mode": "persistent",
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "static_hold_ms": 1200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
+}

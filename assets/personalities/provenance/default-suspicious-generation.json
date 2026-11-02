@@ -1,0 +1,235 @@
+{
+  "personality_id": "default",
+  "state": "suspicious",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/optional-a-source.png",
+    "source_sha256": "f452d7bad163f157ab33a0bafa74874a8efcf07818a73721e22743d0084cea24",
+    "grid": [
+      2,
+      2
+    ],
+    "cell_index": 3,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      12.400980392156896,
+      12.489775910364159
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "5eb9b68cd22a4821bce97e75ab821af5d8097d17d10e307bcdba5647b9e0fc6d"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/chibi/suspicious.png",
+    "sha256": "c6de722c78ce58173abf25ef719bc2789841bf9636d93e1c6a0a9a4621f778b7",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/chibi/suspicious/0000.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0001.png",
+        "sha256": "eb25d11fb62deabf7eb2d4373fb3172618f0bf309ef359afa47d600b0bd2c89b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0002.png",
+        "sha256": "622db1cf4dc3db9cc73a4adf1c3f05ee353ef2c2b2a66fa4b6d679dfd3f6b87c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0003.png",
+        "sha256": "5d8c126bd56872c83977588a68527d308d480eac9d3044caf2104b637c99d997",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0004.png",
+        "sha256": "05d7b20a3a019d6f7cd3a434d1d643b47c7aec986b38fc24267cdca60f34dd4a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0005.png",
+        "sha256": "b560a7db2c5d1a4a846e84560ae822acdeef23a790f58f3be56e39788b2f13ab",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0006.png",
+        "sha256": "c20778f01d01a4112e2c023e3e11150452329162eda5246d51303504629d7822",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 340
+      },
+      {
+        "path": "Generated/chibi/suspicious/0007.png",
+        "sha256": "aac02301cd650fe5c3747ce308e106c731e5aed2c8eea36cc43cf056d355ef96",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 220
+      },
+      {
+        "path": "Generated/chibi/suspicious/0008.png",
+        "sha256": "918cc057627ccbec24a774facd5a4b323bbf3dc032ef25b63091432426d5d81b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0009.png",
+        "sha256": "3751074d793220f3fcd1e56ebded35792b06fc04aa92b0a1710036601bfff440",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0010.png",
+        "sha256": "9032ed54869d524f2b54a8e9fef00c2b4b38dabe3d4845d1f176982f26f29c19",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0011.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      }
+    ],
+    "loop": false,
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

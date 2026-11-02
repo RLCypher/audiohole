@@ -1,0 +1,477 @@
+{
+  "generator_snapshot": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "face_settings": {
+    "default": {
+      "folder": "Norm",
+      "box": [
+        236,
+        134,
+        364,
+        262
+      ],
+      "polygon": [
+        [
+          258,
+          153
+        ],
+        [
+          289,
+          153
+        ],
+        [
+          308,
+          164
+        ],
+        [
+          332,
+          175
+        ],
+        [
+          343,
+          184
+        ],
+        [
+          342,
+          206
+        ],
+        [
+          335,
+          220
+        ],
+        [
+          324,
+          230
+        ],
+        [
+          323,
+          243
+        ],
+        [
+          298,
+          242
+        ],
+        [
+          290,
+          231
+        ],
+        [
+          268,
+          229
+        ],
+        [
+          250,
+          208
+        ]
+      ],
+      "polygons": [
+        [
+          [
+            258,
+            148
+          ],
+          [
+            287,
+            150
+          ],
+          [
+            308,
+            163
+          ],
+          [
+            308,
+            192
+          ],
+          [
+            298,
+            203
+          ],
+          [
+            266,
+            201
+          ],
+          [
+            251,
+            185
+          ]
+        ],
+        [
+          [
+            314,
+            166
+          ],
+          [
+            334,
+            170
+          ],
+          [
+            343,
+            182
+          ],
+          [
+            341,
+            204
+          ],
+          [
+            329,
+            206
+          ],
+          [
+            317,
+            202
+          ],
+          [
+            310,
+            191
+          ]
+        ],
+        [
+          [
+            269,
+            205
+          ],
+          [
+            304,
+            209
+          ],
+          [
+            331,
+            223
+          ],
+          [
+            331,
+            237
+          ],
+          [
+            313,
+            247
+          ],
+          [
+            286,
+            247
+          ],
+          [
+            269,
+            232
+          ]
+        ]
+      ],
+      "nose_region": [
+        310,
+        196,
+        340,
+        221
+      ],
+      "preserve_nose": [
+        313,
+        208,
+        337,
+        219
+      ],
+      "registration": [
+        -2,
+        9
+      ],
+      "edit_nose": true,
+      "nose_polygon": [
+        [
+          299,
+          205
+        ],
+        [
+          340,
+          205
+        ],
+        [
+          339,
+          220
+        ],
+        [
+          329,
+          224
+        ],
+        [
+          320,
+          223
+        ],
+        [
+          299,
+          220
+        ]
+      ],
+      "preserve_rectangles": [
+        [
+          334,
+          205,
+          350,
+          262
+        ]
+      ],
+      "mouth": [
+        272,
+        208,
+        334,
+        243
+      ]
+    },
+    "uwu": {
+      "folder": "UwU",
+      "box": [
+        188,
+        155,
+        364,
+        331
+      ],
+      "polygon": [
+        [
+          210,
+          171
+        ],
+        [
+          280,
+          170
+        ],
+        [
+          299,
+          186
+        ],
+        [
+          320,
+          190
+        ],
+        [
+          343,
+          201
+        ],
+        [
+          346,
+          245
+        ],
+        [
+          332,
+          269
+        ],
+        [
+          309,
+          292
+        ],
+        [
+          282,
+          302
+        ],
+        [
+          251,
+          290
+        ],
+        [
+          218,
+          271
+        ],
+        [
+          205,
+          237
+        ]
+      ],
+      "nose_region": [
+        278,
+        240,
+        320,
+        278
+      ],
+      "preserve_nose": [
+        289,
+        250,
+        312,
+        266
+      ],
+      "nose_polygon": [
+        [
+          289,
+          250
+        ],
+        [
+          311,
+          254
+        ],
+        [
+          307,
+          264
+        ],
+        [
+          300,
+          266
+        ],
+        [
+          293,
+          259
+        ]
+      ],
+      "mouth": [
+        253,
+        255,
+        305,
+        296
+      ]
+    }
+  },
+  "state_policies": {
+    "happy": [
+      "expressive",
+      "finite",
+      30,
+      2500,
+      12,
+      1400
+    ],
+    "thinking": [
+      "ambient",
+      "persistent",
+      10,
+      500,
+      16,
+      3200
+    ],
+    "working": [
+      "ambient",
+      "persistent",
+      15,
+      500,
+      16,
+      2400
+    ],
+    "talking": [
+      "ambient",
+      "persistent",
+      20,
+      300,
+      12,
+      1200
+    ],
+    "confused": [
+      "expressive",
+      "finite",
+      35,
+      3000,
+      14,
+      1800
+    ],
+    "concerned": [
+      "expressive",
+      "persistent",
+      45,
+      1000,
+      16,
+      3200
+    ],
+    "error": [
+      "theatrical",
+      "finite",
+      95,
+      6000,
+      18,
+      2000
+    ],
+    "angry": [
+      "theatrical",
+      "finite",
+      65,
+      6000,
+      16,
+      1800
+    ],
+    "surprised": [
+      "theatrical",
+      "finite",
+      70,
+      5000,
+      14,
+      1500
+    ],
+    "celebrating": [
+      "theatrical",
+      "finite",
+      55,
+      8000,
+      22,
+      2400
+    ],
+    "sleeping": [
+      "ambient",
+      "persistent",
+      5,
+      1000,
+      16,
+      4000
+    ],
+    "smug": [
+      "expressive",
+      "finite",
+      30,
+      4000,
+      12,
+      1600
+    ],
+    "embarrassed": [
+      "expressive",
+      "finite",
+      40,
+      5000,
+      16,
+      1800
+    ],
+    "laughing": [
+      "expressive",
+      "finite",
+      40,
+      5000,
+      18,
+      2000
+    ],
+    "suspicious": [
+      "expressive",
+      "finite",
+      35,
+      4000,
+      12,
+      1800
+    ],
+    "panicking": [
+      "theatrical",
+      "finite",
+      85,
+      8000,
+      20,
+      2200
+    ],
+    "bored": [
+      "ambient",
+      "persistent",
+      5,
+      1000,
+      12,
+      4000
+    ],
+    "mischievous": [
+      "expressive",
+      "finite",
+      35,
+      5000,
+      14,
+      1800
+    ],
+    "deadpan": [
+      "expressive",
+      "finite",
+      35,
+      4000,
+      0,
+      1600
+    ]
+  },
+  "dependency_hashes": {
+    "animate_idle.py": "9a4ed6c5abb18bcf425eaa478a0f0d86464881c18a93a6320eea0d9cb5eb8c58",
+    "avatar_assets.py": "340e473cefd30859a61c02c75e4b7cdc5e74168dbf51a06d2bc7fb36f02e00a7",
+    "pipeline.py": "1c4e53ae3de1f2f9472e3f500a6f0685dcbd66813a240fcfdf6146b49a99b4d1"
+  },
+  "backend_replay": "No seed/model version is exposed. Reproduce pixels from retained face keys, accepted IDLE and this repository revision."
+}

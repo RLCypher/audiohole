@@ -1,0 +1,8 @@
+..................................................../workspace/audiohole/assets/personalities/tools/test_idle_sequences.py:42: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/audiohole/assets/personalities/UwU/Generated/chibi/idle.png'>
+  master = Image.open(ROOT/f'{folder}/Generated/{style}/idle.png')
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.....
+----------------------------------------------------------------------
+Ran 57 tests in 47.997s
+
+OK

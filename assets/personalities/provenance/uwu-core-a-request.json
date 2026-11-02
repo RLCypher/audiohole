@@ -1,0 +1,24 @@
+{
+  "backend": "image_gen.imagegen",
+  "states": [
+    "happy",
+    "thinking",
+    "working",
+    "talking",
+    "confused",
+    "concerned"
+  ],
+  "grid": [
+    2,
+    3
+  ],
+  "face_box": [
+    188,
+    155,
+    364,
+    331
+  ],
+  "prompt": "Create a PRECISE SIX-PANEL FACE EXPRESSION SHEET for the same adult UwU white feline chibi character in the attached square face crop (first reference) and full sprite (second reference). 2 columns by 3 rows, six equal square cells, total portrait 1024x1536 if supported. No gaps, labels, borders or text. Each cell must reproduce the exact SAME SQUARE CROP, face scale, three-quarter orientation, position, hair, cheek shape, nose position, white fur/lavender shadows and illustration style of the first reference. The crop goes to all four cell edges just as in the first reference; DO NOT add padding, zoom, center a floating head, or draw the body. Match anatomy, markings and ears/headphones clipped at crop boundaries. Only the eyes, brows and mouth change. Facial anime/manga shorthand is required. Preserve blue eyes except deliberately simplified expressions. Read cells left-to-right top-to-bottom: 1 HAPPY closed-eye joyful crescent smile, delighted mouth with small fang. 2 THINKING focused sideways blue eyes, one raised eyebrow, small closed thoughtful mouth. 3 WORKING intensely focused narrowed blue eyes, determined little closed mouth. 4 TALKING open speaking mouth, lively blue eyes, friendly technically competent expression. 5 CONFUSED asymmetrical eyes and brows, small puzzled oval mouth, exaggerated but same face. 6 CONCERNED anxious blue eyes, inward brows, small trembling worried mouth. Keep the adult identity, no infantilization, no unrelated character, no new clothing or features. No symbols outside face; effects will be layered separately. True transparent alpha where reference crop is transparent. This is an animation-keyframe identity sheet, not six different head designs.",
+  "reference": "UwU/Generated/chibi/idle.png",
+  "approval": "pending human review"
+}

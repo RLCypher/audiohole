@@ -1,0 +1,8 @@
+{
+  "source_before": "quiet-d-before-sleeve-edit.png",
+  "source_before_sha256": "8126761fdc77ee5673046e8e238bb3bf8633422e45a970bc8d3fc0e109ecef3f",
+  "model_edit": "sleep-sleeve-edit.png",
+  "mask": "sleep-sleeve-edit-mask.png",
+  "result": "quiet-d-source.png",
+  "method": "Use model-edited sleeve colors only inside the two incorrect mint-band masks; all other pixels remain from the original cleanup source."
+}

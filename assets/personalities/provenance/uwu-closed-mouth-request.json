@@ -1,0 +1,7 @@
+{
+  "backend": "image_gen.imagegen",
+  "reference": "UwU/Generated/chibi/idle.png",
+  "prompt": "Edit the exact supplied UwU adult white feline chibi sprite: ONLY close the mouth. Replace the open mouth, tongue and visible fang with a small relaxed CLOSED-MOUTH feline smile, preserving the same muzzle, nose, cheeks and expression. No tongue, no mouth cavity, no teeth visible. Do not alter eyes, eyebrows, hair, ears, headphones, neck, body, proportions, outfit, coffee, equipment, tail, colors, scale or framing. The closed mouth should remain mischievous but calm for an IDLE animation. Keep real transparent alpha background, no glow. Preserve the exact normalized canvas coordinates and original 512x768 framing; do not zoom or recenter. Return one full sprite. Only the small mouth area is to change.",
+  "transparent_background": true,
+  "approval": "pending human review"
+}

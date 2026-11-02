@@ -1,0 +1,74 @@
+{
+  "error": [
+    "error",
+    "error",
+    "error",
+    "error"
+  ],
+  "angry": [
+    "angry",
+    "angry",
+    "angry",
+    "angry"
+  ],
+  "surprised": [
+    "surprised",
+    "surprised",
+    "surprised",
+    "surprised"
+  ],
+  "panicking": [
+    "panicking",
+    "panicking",
+    "panicking",
+    "panicking"
+  ],
+  "quiet-a": [
+    "happy",
+    "happy",
+    "thinking",
+    "thinking"
+  ],
+  "quiet-b": [
+    "working",
+    "working",
+    "talking",
+    "talking"
+  ],
+  "quiet-c": [
+    "confused",
+    "confused",
+    "concerned",
+    "concerned"
+  ],
+  "quiet-d": [
+    "sleeping",
+    "sleeping",
+    "smug",
+    "smug"
+  ],
+  "quiet-e": [
+    "embarrassed",
+    "embarrassed",
+    "laughing",
+    "laughing"
+  ],
+  "quiet-f": [
+    "suspicious",
+    "suspicious",
+    "bored",
+    "bored"
+  ],
+  "quiet-g": [
+    "mischievous",
+    "mischievous",
+    "deadpan",
+    "deadpan"
+  ],
+  "celebrating": [
+    "celebrating",
+    "celebrating",
+    "celebrating",
+    "celebrating"
+  ]
+}

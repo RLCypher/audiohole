@@ -1,0 +1,287 @@
+{
+  "personality_id": "uwu",
+  "state": "error",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/error-source.png",
+  "source_sha256": "a7219314c38d01335fd3e0489442fc11b20fca1322426c106ad8592aa89c87d1",
+  "source_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      44,
+      74,
+      509,
+      717
+    ],
+    [
+      550,
+      74,
+      1018,
+      717
+    ],
+    [
+      44,
+      838,
+      546,
+      1478
+    ],
+    [
+      550,
+      799,
+      1013,
+      1478
+    ]
+  ],
+  "common_scale": 0.8720737085770529,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      113.17707150964813,
+      447.2633371169126
+    ],
+    [
+      113.15323496027241,
+      447.39046538024974
+    ],
+    [
+      112.8409090909091,
+      446.975
+    ],
+    [
+      113.640625,
+      486.03683035714283
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 4,
+  "frame_source_key_indices": [
+    null,
+    null,
+    0,
+    0,
+    1,
+    1,
+    2,
+    2,
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    0,
+    0,
+    null,
+    null
+  ],
+  "key_sha256": [
+    "668035bbe8de52a995312b6f77b7a6f8d3d6dd18b1f96b60e42c23c5f0ee4aa3",
+    "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+    "846e6d40d91e62682a7173a55fd9ea064dd8c27735bf01a0183fb221ff7533b0",
+    "47ac18cd9949c093c008f635932d01b72a4444b6bf4e42a6ada5d72f4349953f"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/error.png",
+    "sha256": "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 95,
+    "interruptible": true,
+    "cooldown_ms": 6000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/error/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0001.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0002.png",
+        "sha256": "668035bbe8de52a995312b6f77b7a6f8d3d6dd18b1f96b60e42c23c5f0ee4aa3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0003.png",
+        "sha256": "668035bbe8de52a995312b6f77b7a6f8d3d6dd18b1f96b60e42c23c5f0ee4aa3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0004.png",
+        "sha256": "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0005.png",
+        "sha256": "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0006.png",
+        "sha256": "846e6d40d91e62682a7173a55fd9ea064dd8c27735bf01a0183fb221ff7533b0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0007.png",
+        "sha256": "846e6d40d91e62682a7173a55fd9ea064dd8c27735bf01a0183fb221ff7533b0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0008.png",
+        "sha256": "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0009.png",
+        "sha256": "159c34e8921f1aaacb33167b19b076f755d37bbd6df2a7b7db411fbac62068c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/chibi/error/0010.png",
+        "sha256": "846e6d40d91e62682a7173a55fd9ea064dd8c27735bf01a0183fb221ff7533b0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/chibi/error/0011.png",
+        "sha256": "846e6d40d91e62682a7173a55fd9ea064dd8c27735bf01a0183fb221ff7533b0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0012.png",
+        "sha256": "47ac18cd9949c093c008f635932d01b72a4444b6bf4e42a6ada5d72f4349953f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0013.png",
+        "sha256": "47ac18cd9949c093c008f635932d01b72a4444b6bf4e42a6ada5d72f4349953f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0014.png",
+        "sha256": "668035bbe8de52a995312b6f77b7a6f8d3d6dd18b1f96b60e42c23c5f0ee4aa3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0015.png",
+        "sha256": "668035bbe8de52a995312b6f77b7a6f8d3d6dd18b1f96b60e42c23c5f0ee4aa3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0016.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/error/0017.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ]
+  },
+  "behavior": {
+    "category": "theatrical",
+    "mode": "finite",
+    "priority": 95,
+    "interruptible": true,
+    "cooldown_ms": 6000,
+    "static_hold_ms": 2000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

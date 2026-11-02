@@ -1,0 +1,120 @@
+{
+  "personality_id": "vanilla",
+  "method": "fixed-master 2D limited-motion compositor",
+  "approval": "pending human review",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "motion_config_sha256": "d0a1bb1fa5e0482e6930b8b5a3dcde0032def9bfb64654909d2bc8f280b98dbc",
+  "rig_config_sha256": "3620a652d13d4a70a82a4f4bd92b146246d11ac2e84569fae578a403779b4026",
+  "compositor_sha256": "9a4ed6c5abb18bcf425eaa478a0f0d86464881c18a93a6320eea0d9cb5eb8c58",
+  "frames": [
+    {
+      "path": "Generated/logo/idle/0000.png",
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 500
+    },
+    {
+      "path": "Generated/logo/idle/0001.png",
+      "sha256": "89e2201dd1640e0ec22b059430e9d2a202c8a76a919059db1795e474b2b1dc46",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 500
+    },
+    {
+      "path": "Generated/logo/idle/0002.png",
+      "sha256": "1ac71c49e8211a0b273d88328cfaefab4a8d68726a2e160e0e074731330e535b",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/logo/idle/0003.png",
+      "sha256": "6509dfedbd8064e824cbff6b8f6df0e17f1645901aebb8074e1c25592e98cb86",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/logo/idle/0004.png",
+      "sha256": "dc7c442ac00d59cd3b7c180a4b156bb6ad64836307bb6f29d16aaf27886341ca",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/logo/idle/0005.png",
+      "sha256": "9adae362a1291f8bf4e990258e7d9c29676b507e7d773b3e500f1a91634717ac",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 100
+    },
+    {
+      "path": "Generated/logo/idle/0006.png",
+      "sha256": "e8bbbbed73dd0445aaba96bba4edba69cff1bd6b94624a932c39c7e6eb37e7c1",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 100
+    },
+    {
+      "path": "Generated/logo/idle/0007.png",
+      "sha256": "cc956e154a8c23cf432340d847c99d4c0f2634b32e37512fac3ef3576d00deae",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 400
+    },
+    {
+      "path": "Generated/logo/idle/0008.png",
+      "sha256": "84346788cc2d510761eee7b528e2656e272346e2e1db7fc4b3d37da513b79c6a",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 500
+    },
+    {
+      "path": "Generated/logo/idle/0009.png",
+      "sha256": "3ff40908a7018525d7b52cc3311356f1f154ea309c367148cfa2668137349b68",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 500
+    },
+    {
+      "path": "Generated/logo/idle/0010.png",
+      "sha256": "2c11fd44f3a3645a65094a8f77375003d5c6a29c86ad1ed36f8e73d871cc4a5f",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 600
+    },
+    {
+      "path": "Generated/logo/idle/0011.png",
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "anchor": [
+        256,
+        704
+      ],
+      "duration_ms": 600
+    }
+  ],
+  "protected_area": "Every RGBA pixel outside the binary ellipse mask is exact canonical master data; whole-image alpha unchanged."
+}

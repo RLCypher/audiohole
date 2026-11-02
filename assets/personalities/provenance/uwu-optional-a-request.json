@@ -1,0 +1,18 @@
+{
+  "folder": "UwU",
+  "batch": "optional-a",
+  "states": [
+    "smug",
+    "embarrassed",
+    "laughing",
+    "suspicious"
+  ],
+  "direction": "1 SMUG: anime half-lidded blue eyes and confident knowing fang grin. 2 EMBARRASSED: heavy pink blush and blush lines, flustered blue eyes, small nervous smiling mouth. 3 LAUGHING: anime closed delighted crescent eyes and huge laughing fang mouth. 4 SUSPICIOUS: narrow sideways blue eyes, one cocked brow, theatrical skeptical little mouth.",
+  "grid": [
+    2,
+    2
+  ],
+  "backend": "image_gen.imagegen",
+  "prompt": "Create exactly FOUR equal square FACE CROP expression cells in a 2x2 square sheet (1024x1024 if supported). No gaps, margins, labels, borders or text. Each cell must reproduce the precise square composition and scale of the FIRST attached face crop: same three-quarter face angle, same nose location, hair, cheeks, jaw, clipped headphones/accessories and square crop boundaries. Do not make floating heads, add padding, zoom, recenter, or show the whole body. The SECOND image establishes the same full adult character. Change ONLY the brows, eyes, cheeks/blush where appropriate and mouth. This is adult white feline UwU: preserve white and pale lavender fur, fluffy hair/forelock, pink feline nose, headphones/hair clips. Blue eyes unless the expression intentionally uses manga spiral/dot shorthand. Anime/manga facial language is mandatory; retain the same adult character. Read left to right, top to bottom: 1 SMUG: anime half-lidded blue eyes and confident knowing fang grin. 2 EMBARRASSED: heavy pink blush and blush lines, flustered blue eyes, small nervous smiling mouth. 3 LAUGHING: anime closed delighted crescent eyes and huge laughing fang mouth. 4 SUSPICIOUS: narrow sideways blue eyes, one cocked brow, theatrical skeptical little mouth. Same canonical illustration, linework, colors and identity in all four cells. True transparency where the reference crop is transparent. These are expression keys of one character; no new design.",
+  "approval": "pending human review"
+}

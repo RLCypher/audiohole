@@ -1,0 +1,46 @@
+{
+  "personality_id": "vanilla",
+  "style": "logo",
+  "state": "idle",
+  "approval": "pending human review",
+  "source": "Vanilla/References/Vanilla Reference.png",
+  "source_sha256": "cc3bba6fa536eb00c5d6c4e232c8eecaa683637076b1b82a5396abc5f1b8d655",
+  "source_size": [
+    512,
+    512
+  ],
+  "operation": "pixel-preserving canvas placement; no resampling",
+  "crop_box": [
+    0,
+    0,
+    512,
+    512
+  ],
+  "resampled_size": [
+    512,
+    512
+  ],
+  "offset": [
+    0,
+    128
+  ],
+  "output_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "output": "Vanilla/Generated/logo/idle.png",
+  "technical_validation": {
+    "size": [
+      512,
+      768
+    ],
+    "mode": "RGBA",
+    "bit_depth": 8,
+    "bbox": [
+      55,
+      210,
+      459,
+      557
+    ],
+    "transparent_pixels": 265971,
+    "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+    "warnings": []
+  }
+}

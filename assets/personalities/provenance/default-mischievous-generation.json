@@ -1,0 +1,253 @@
+{
+  "personality_id": "default",
+  "state": "mischievous",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/optional-b-source.png",
+    "source_sha256": "96be7dfac287ad22af3c58dfa8d123b150c452e2c9a10d212b91899cfe1d6fc8",
+    "grid": [
+      2,
+      2
+    ],
+    "cell_index": 2,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      4.49032258064517,
+      7.245468509984647
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "db92bc862a884bba0624eef459a2b7e7e3c97fa1d59953553cf88464cbf28a88"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/chibi/mischievous.png",
+    "sha256": "a938e08a009a0a372fa17cb0aff26b2b43342437df88eed3c4e3aa73bc7551fe",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/chibi/mischievous/0000.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0001.png",
+        "sha256": "eb9d03bed4581f1a1a1b5c1a35bd35c1e7ecc13f3722862f6f0943fa3adaae86",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0002.png",
+        "sha256": "313c28a78bcee208f5895a64d4888169706a8c4fba739a0e09a3ba558a9b7805",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0003.png",
+        "sha256": "4c0cd50417baa49834d53bd45ff8e9adf07f2cad057d56cadfee87d3eae17a7f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0004.png",
+        "sha256": "cba1810e1f3f6f55b3c52f3460c6cf9b4f3a8539de7a94249346a7431989c71c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0005.png",
+        "sha256": "66be4d032b88d2c0a9c594289411d5caa5ff534b20f1408aa8477358cefd173e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0006.png",
+        "sha256": "efd73c4300f05b6dd94044655ff1a2e6192cb9e9c90548e0c8af48215e26444b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0007.png",
+        "sha256": "cc7b2517791b1a7fa976df650bd22218bbb8158a9f5886d73ecb18679d5949c7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 300
+      },
+      {
+        "path": "Generated/chibi/mischievous/0008.png",
+        "sha256": "41324fac877327222fdfca3c94fb5657d15833e6439d6a96cd2afe2a5544fa94",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/chibi/mischievous/0009.png",
+        "sha256": "630d37fe2c4e9cf76e98502100dabae2493e8fb3b8deb252968bb2f5bfbc2719",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0010.png",
+        "sha256": "2a01be09f187f1ddb0cdd56eda302286a7f0106c6f282a0f542b3e791ef64593",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0011.png",
+        "sha256": "d3967875cd7c367b03108aed292b253dc2ab2d358547a942be5c1c9e104c30bb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0012.png",
+        "sha256": "9fa32093cd8d0f127376b4177b250782602963cc9e3eec54ffe62fd52ac4eeea",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/chibi/mischievous/0013.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": false,
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

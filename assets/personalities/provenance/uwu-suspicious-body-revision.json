@@ -1,0 +1,313 @@
+{
+  "personality_id": "uwu",
+  "state": "suspicious",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "horu-prop-continuity-3",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-f-source.png",
+  "source_sha256": "123b8d8904ae15b40827f09cc147ac7397a1ee44e796e6d9126ef2af3940e808",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/suspicious",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/suspicious",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "suspicious",
+      "key": 0,
+      "source": "quiet-f-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        81,
+        84,
+        509,
+        762
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            259.65530671859784,
+            319.5053554040896,
+            1027
+          ],
+          [
+            536.8396226415094,
+            387.0141509433962,
+            212
+          ]
+        ],
+        "ear_target": [
+          [
+            167.5305164319249,
+            201.81807511737088,
+            852
+          ],
+          [
+            405.66187050359713,
+            261.1654676258993,
+            139
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.8602404092111916,
+        "translation": [
+          -55.99236851592792,
+          -72.39654325639003
+        ],
+        "neck_y": 322,
+        "body_vertical_fit": 1.0324324324324323,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          325,
+          450,
+          351,
+          484
+        ],
+        "assembly_top": 450,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "ccb5dfd21fd1684243fab800a3da31a9d61fadff5089d50d554692372ae9888a",
+      "key_sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
+    },
+    {
+      "state": "suspicious",
+      "key": 1,
+      "source": "quiet-f-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        595,
+        65,
+        999,
+        767
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            296.675704989154,
+            287.9327548806941,
+            922
+          ],
+          [
+            492.23467230443975,
+            248.69133192389006,
+            473
+          ]
+        ],
+        "ear_target": [
+          [
+            182.0206611570248,
+            169.02203856749313,
+            726
+          ],
+          [
+            355.195530726257,
+            134.75698324022346,
+            358
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.885062958375951,
+        "translation": [
+          -80.50958026883694,
+          -85.58353999767087
+        ],
+        "neck_y": 245,
+        "body_vertical_fit": 0.9956616052060737,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          288,
+          451,
+          317,
+          487
+        ],
+        "assembly_top": 451,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "b734dc726350fc0a8c50f72408d42bb1ce3f47a3bc9a3c728a2ec83981b524fc",
+      "key_sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
+    }
+  ],
+  "drawn_pose_count": 2,
+  "frame_source_key_indices": [
+    null,
+    null,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    null,
+    null
+  ],
+  "key_sha256": [
+    "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+    "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/suspicious.png",
+    "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/suspicious/0000.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0001.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0002.png",
+        "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0003.png",
+        "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0004.png",
+        "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0005.png",
+        "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0006.png",
+        "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 340
+      },
+      {
+        "path": "Generated/chibi/suspicious/0007.png",
+        "sha256": "fd06fdb13304972f14b9cbd90fdc06ce5ece67e88067aa6a71eedc896c671cf5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 220
+      },
+      {
+        "path": "Generated/chibi/suspicious/0008.png",
+        "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0009.png",
+        "sha256": "67dc9ca224aa270ddb84bd4697fb71cdf41e59c25ca45a3620c8d4c5e6fe066c",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0010.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 110
+      },
+      {
+        "path": "Generated/chibi/suspicious/0011.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      }
+    ]
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 35,
+    "interruptible": true,
+    "cooldown_ms": 4000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
+}

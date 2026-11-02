@@ -1,0 +1,1897 @@
+{
+  "manifest": "/workspace/audiohole/assets/personalities/Vanilla/manifest.json",
+  "errors": [],
+  "warnings": [],
+  "assets": [
+    {
+      "path": "Generated/logo/idle.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "89e2201dd1640e0ec22b059430e9d2a202c8a76a919059db1795e474b2b1dc46",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1ac71c49e8211a0b273d88328cfaefab4a8d68726a2e160e0e074731330e535b",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "6509dfedbd8064e824cbff6b8f6df0e17f1645901aebb8074e1c25592e98cb86",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "dc7c442ac00d59cd3b7c180a4b156bb6ad64836307bb6f29d16aaf27886341ca",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "9adae362a1291f8bf4e990258e7d9c29676b507e7d773b3e500f1a91634717ac",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e8bbbbed73dd0445aaba96bba4edba69cff1bd6b94624a932c39c7e6eb37e7c1",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "cc956e154a8c23cf432340d847c99d4c0f2634b32e37512fac3ef3576d00deae",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "84346788cc2d510761eee7b528e2656e272346e2e1db7fc4b3d37da513b79c6a",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "3ff40908a7018525d7b52cc3311356f1f154ea309c367148cfa2668137349b68",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "2c11fd44f3a3645a65094a8f77375003d5c6a29c86ad1ed36f8e73d871cc4a5f",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/idle/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "a358ec697d16e9f7e9c3f64f5bc096d23b2394c9a023d61109f0d189fc123a08",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "59b0f094e8493b4dd0d5e4ea36d38e4445f27f215c849b8152e9251d9bd3757c",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "446311a1eb4bff538449bbb365f0a82a4a972d8b9b1216de22c724ed57c10be7",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "959e1cffff3cbd1e5ca8b06836b2751f1f77ba1abc4f2fd44d397e174a1dadbb",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "0b22624fd69cfe6a7a2840be224faa2935894ed69c947f9ee03cb4c94d77e3bb",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "822afae280cccf25acd218e6414e18d59385fd33eaac905a55dc888a4ece5ed1",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1f4f37ff14bcce72a4ebc60089b064a82ca2562a9ffbd498dc63f28824cb8dae",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e32276edccce072731eeb78010d2441a4be8401848731933a4026c1b6ce3a0ae",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "36a117186c2dbc5cd7e9bc465eae25ca972915858469948aa3534f01ef727e84",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "58ed197d993f1f2346b1b3518e14f785988a25eeb6006ddb4362b48365524984",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "b17c49c0c1da34cbee57769010be0fa69f09eede3806a9374bc885c472851aff",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/happy/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "eb05a2b43032dfd6211de6e6759f0166741b825b4965d41235e03a9e2f097ee7",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "d0992bfac560f5b1658deca7ca1cf4b03d01395e31a3a23a60851771a5dd14d3",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "bdad79eeccff7804c48c87cda1f1f10eda23bb690394df9cb26127c2f8a60c48",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "2356e207c398c4ea577597b5d279c355aed55bd873313acd153f5996996a6436",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "d6e51906f388fb496e48f3726e5e3b4385338ebfcb0ecb6da87b0a3d4c244c01",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "8b6869269b1fc1ab396aa6daa21de140c80c03dd0656c2e4815ad149c57e8e32",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "201ac6d2deefdb45f2bccd351d729b34169c28afb3f8fd0730abd1b09d07a05f",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "13b1760a2a8cfbf221a3b83d73984d8d07fd050bed000c7aeca749b5b30dd43a",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "43c7680841560e409694237158d603ff0153e1c10ab5b48c8aebf57ef1694a36",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "8cedd32b881362c08dc65ac64051dc3681dbac6be087a8e2d317264ff0570ee8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "c4de5c3fee2bf9dcbbb10765c1ac72cd5e6624ce995773b2b4fba7372584e3ca",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "ef560315cba50a78ae16e94a1e31e197dd673eecd8cf1e89ccb609d2b179cead",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "6dfcd1d6a93d9f798895ec4debe091dd17382eef71109fc335e8c83f8ef83caa",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "25ad54a387fafe542eb97f9cf179f673512fd8cd26062b080da77ef0dee5f3a6",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "75c1e0a8004bcc3694f6af7c7cac92ddeae7b6cbc33ee22fce171a132ee031b3",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/thinking/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "50fb4b16dfa411387a194ac55e68262276b0c9b9941c7fb9bf778e19e7760d06",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "c7a002abd8f46e24b3f656a1e59a26054a295b2adf51ad6cd45ebcd60ba9dbd4",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "b39c460c223cd422e85d0905c8762357f295b5d6056a9165e4cf82457c9cc773",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "d9d4cd8e9126581734ef81af89e7142d3f8341d8b5e88900259c3e4a46c59a4d",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "02649ce6b5820382a8e91aa48090bf8a6ba3d64aaed4a1e69487bc15099b0906",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "0229946257def8fb79d8eb02937c91e0eace12cd6b50f3784afa0b2a9572aeb5",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "d2e63a1ff7f571261e52393667741793d452b153f6b835fbe04937e0e6c1c2ed",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "ff132aa3db72d5640a68284a03df69cc8b29502d9ff3cfd6610874c26e1d1770",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "442c28b3fb6efe15078da77d9616a08031802610f13e063298d4d3a6ae85bfdd",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "47457cb776e3921ceb86267519d195d6bc9e5eae166fd7216989945ef3ca071a",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "265ba355fbe7d7b733c29db51383de3fa2447291199a16fe65d616af7b09811a",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "5521dc38f95822a4f2ee931169ed402cae4d34533c596c7658d4b72f737a86b5",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "5e787ed96cf818c91427fd38e9f6a7760dfdd44dcd11c2fd320e506104c00a7e",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "6d5d0df8ef8645d168e0ea3ecbeda76d9b433ff525bd5136d3d752d465d30ff2",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "98db10f7a424112c0f2f51a403876a056ab239c80247d481aa0ea907f630aec5",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/working/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e3537e69a1fdea4d3958c0c515f887418c8c4506ec360d28ce718713d19fa7ea",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e802c02dd15ac97b338b33d1f2f001f7fee14b51f18fbbe9b3fcb7c7744f0f00",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "2cc1c62577b86c6155d206d85d16ffa9a4467049c69b13b375d530bffec690fa",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "daa5bcc25fe1e5124ea6f672e76205635717b2751ac64f149d33958d3fed08b2",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "f2487ec2004e67c0921b54fc91ed3f82e8fa7f4ab3891e474c154f48252c58b1",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "2b17c334edf76b59bfcfb756a1e702389f50effa0112eb398015702cffded8bf",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "59417cbbf8a2b65b3f3758d8ff26ed327010371f4f11f2095cf64aa1a5287f18",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e00abce079f5f641871890486822e201a86976a975f6874c33c4eb27067ecd5d",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "55a0146d01724f2173c18aab0e591be2dd387eefa936104331dac0f4a156b102",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "6aee7df1825c7f17b94ca1a7aaef0ff12d28e351906c1f5fe767396104495e60",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "04af199cba5b9814324e5a402a3ff81c1c8618bd9fc3b5abb4f066aa057c17b1",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/talking/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "fb9cfe7ca8113297b7461936c84d88ea8cc0f8c8b6ee1aae920024923b39c51e",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "e9955704f216ee3ba8d436e99ca7b11735fbfdd7b6aceeb6a0c91a480af46174",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "a91315da61fde37a5ffea1c775c62539c90d60f739c61d77aed48289faf62a67",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "a0a69defeb5000f01bf9534c362e931c831d9752af94b806bdb5b4ab89785910",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "46877c9767b0a961f14dc5d78c4070037a9dcea7c2f9dcbf424558f33fd885c2",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "4e27bdfca8743a04a4bb5e1ba004995cfab859259db220d731041e416968f071",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "7fe452c7aaf673fab2b2d67d7e6fcdac37321313ddb5296be6c2168700ec5404",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "c68370f19264504d03714ffaa02b100810625f9b7f12b89f0cfee1c6ddf69d01",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "01837e85a8d526922685d6d3e0cb0c76c66066b16949c082c561993a646dc753",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "a7b357c8f5b3247731f0ee15b6debb754f5f864bf13eda2fc4a50cec7fc0dbbe",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "8627174486f8a8cc71e0fc6449339d5b19e34ec03be43b01e54a56dd23949c58",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "a7fef726a69859afdf85fe98db61473d2d5d7d4ef492550c44e38d68d3dfe9f2",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "7c17f4805a110397f8aa13219f524d3d57f4c3b9eea272a3b6a13b7f45f68f34",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/confused/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "ca933c53604e4b3ff74f0fa78da583cd27e44b6260b280ac4dbe449a4cd52b56",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0000.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0001.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "29880bf112c917d0e41017fe01295f795c375e2b258f31662112541b13fe437c",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0002.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "84e2c85c40282fc3886cec9b3aaa6c822d46f04ff4e71e075f8198ea50a016b3",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0003.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "8f9d8c7756b2ce300bf3f6b67ea6c68888901b8c52e79bb7ea2e149af21abd47",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0004.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "857b1e9e2b14e3065d8b7e4f9f182b44eec214d968e40ef77b769b8e98caceae",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0005.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "c218cfecd779d20985969d759339575d9eb5e75dfc164982b1f422b94aea1e60",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0006.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "70f0a1709c1f73ca7723fd6777c2666825fc6a343b043d13022b4574357d73ed",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0007.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "b60f6936b5a8055ca71a0bb6bc78e32f8e831d03779c404fbeb97d149df06c85",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0008.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "bd1433f022fcd6cb0c2461826b0019383138ab328a0c30af7811e629af5d6731",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0009.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "d1e49ebc67830a6c8f54e23107229c99c32bea9c19fdad7dc2e2f1aacd15ac78",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0010.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "b2c233c242f7ba053ec9ec3a59463a3eca18383d72ea84e6d921b7afcd64398b",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0011.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "84bf5ead40cb373726e898c8ade24c103f301ed2f69f772b3fe20b79b89226e0",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0012.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "0ad4d5ee7239a566dca14e4760e3a8b8411fb9dbe881abb2f7b389985b72f9d9",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0013.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "db2f84068470fd31655faefb2515133c4677acf913a5ff97cd2a44f0eb475d49",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0014.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "2dcec17deb3d2db2533cb824910d790d4a2333ca89e3243cedb1cb20fa1d6617",
+      "warnings": []
+    },
+    {
+      "path": "Generated/logo/concerned/0015.png",
+      "size": [
+        512,
+        768
+      ],
+      "mode": "RGBA",
+      "bit_depth": 8,
+      "bbox": [
+        55,
+        210,
+        459,
+        557
+      ],
+      "transparent_pixels": 265971,
+      "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+      "warnings": []
+    }
+  ]
+}

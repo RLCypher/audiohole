@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "packs": {
+    "default": "Norm/manifest.json",
+    "vanilla": "Vanilla/manifest.json",
+    "uwu": "UwU/manifest.json"
+  }
+}

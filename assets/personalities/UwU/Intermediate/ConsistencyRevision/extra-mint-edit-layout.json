@@ -1,0 +1,110 @@
+[
+  {
+    "state": "angry",
+    "key": 1,
+    "area": 84,
+    "box": [
+      299,
+      357,
+      338,
+      394
+    ],
+    "cell": 0,
+    "guide_rectangle": [
+      18,
+      23,
+      238,
+      232
+    ]
+  },
+  {
+    "state": "angry",
+    "key": 2,
+    "area": 283,
+    "box": [
+      360,
+      367,
+      410,
+      410
+    ],
+    "cell": 1,
+    "guide_rectangle": [
+      274,
+      33,
+      494,
+      222
+    ]
+  },
+  {
+    "state": "angry",
+    "key": 3,
+    "area": 101,
+    "box": [
+      307,
+      347,
+      349,
+      383
+    ],
+    "cell": 2,
+    "guide_rectangle": [
+      530,
+      33,
+      750,
+      222
+    ]
+  },
+  {
+    "state": "surprised",
+    "key": 3,
+    "area": 251,
+    "box": [
+      309,
+      343,
+      358,
+      382
+    ],
+    "cell": 3,
+    "guide_rectangle": [
+      18,
+      296,
+      238,
+      471
+    ]
+  },
+  {
+    "state": "confused",
+    "key": 1,
+    "area": 155,
+    "box": [
+      321,
+      325,
+      363,
+      367
+    ],
+    "cell": 4,
+    "guide_rectangle": [
+      274,
+      274,
+      494,
+      494
+    ]
+  },
+  {
+    "state": "concerned",
+    "key": 0,
+    "area": 118,
+    "box": [
+      367,
+      326,
+      406,
+      369
+    ],
+    "cell": 5,
+    "guide_rectangle": [
+      540,
+      274,
+      740,
+      494
+    ]
+  }
+]

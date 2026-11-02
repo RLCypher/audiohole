@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-02",
+  "environment": {
+    "os": "Debian 13 Linux x86_64",
+    "compiler": "GCC 14.2",
+    "cmake": "3.31.6",
+    "wxWidgets": "3.2.8 GTK",
+    "json": "3.11.3"
+  },
+  "native_tests": {
+    "passed": 29,
+    "failed": 0
+  },
+  "python_tests": {
+    "passed": 57,
+    "failed": 0
+  },
+  "native_rgba_buffers_equal_pillow": 796,
+  "gui": {
+    "bitmap_bytes": 1971120,
+    "checks": [
+      {
+        "check": "Vanilla approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Norm approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Horu approved asset renders",
+        "passed": true
+      },
+      {
+        "check": "Talking uses production playback",
+        "passed": true
+      },
+      {
+        "check": "Pause and frame step",
+        "passed": true
+      },
+      {
+        "check": "Reduced motion selects static",
+        "passed": true
+      },
+      {
+        "check": "Healthy Running is ambient",
+        "passed": true
+      },
+      {
+        "check": "Scanning is working",
+        "passed": true
+      },
+      {
+        "check": "Failure preempts cosmetic inspection",
+        "passed": true
+      },
+      {
+        "check": "Success cannot replace active failure",
+        "passed": true
+      },
+      {
+        "check": "Missing root hides without borrowing",
+        "passed": true
+      },
+      {
+        "check": "Unavailable regular style hides",
+        "passed": true
+      },
+      {
+        "check": "Restored Horu after faults",
+        "passed": true
+      },
+      {
+        "check": "Compact display is exactly 128x192",
+        "passed": true
+      },
+      {
+        "check": "Native display is exactly 512x768",
+        "passed": true
+      },
+      {
+        "check": "Restored Horu after faults",
+        "passed": true
+      },
+      {
+        "check": "Controls remain within the viewport",
+        "passed": true
+      },
+      {
+        "check": "Viewer screenshot saved",
+        "passed": true
+      }
+    ],
+    "decoded_bytes": 23592960,
+    "detail": "complete",
+    "maximum_present_ms": 10.987084,
+    "success": true
+  },
+  "browser_checks": {
+    "idle": 12,
+    "full_library": 6
+  },
+  "asan_ubsan": {
+    "passed": 29,
+    "failed": 0,
+    "leak_detection": false,
+    "reason": "LeakSanitizer unsupported under managed ptrace restrictions"
+  },
+  "integrity": {
+    "operating_pngs_unchanged": 796,
+    "inspected_source_blobs_unchanged": 17,
+    "all_changes_within": "assets/personalities/",
+    "errors": []
+  },
+  "remaining": [
+    "Windows MSVC/WIC/DPI/deployment",
+    "Actual main-GUI integration and header sizing",
+    "Target performance and leak profiling"
+  ],
+  "main_application_modified": false,
+  "audio_tested": false
+}

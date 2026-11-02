@@ -1,0 +1,243 @@
+{
+  "personality_id": "uwu",
+  "state": "working",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/quiet-b-source.png",
+  "source_sha256": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def",
+  "source_indices": [
+    0,
+    1
+  ],
+  "source_crop_boxes": [
+    [
+      11,
+      69,
+      506,
+      741
+    ],
+    [
+      526,
+      63,
+      1023,
+      741
+    ]
+  ],
+  "common_scale": 0.9184698286805001,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      127.6952296819788,
+      473.6687279151943
+    ],
+    [
+      127.49911816578484,
+      479.7195767195767
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 2,
+  "frame_source_key_indices": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "key_sha256": [
+    "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+    "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/working.png",
+    "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": true,
+    "priority": 15,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "transition": "cut",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/working/0000.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0001.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0002.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0003.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0004.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0005.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0006.png",
+        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0007.png",
+        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0008.png",
+        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0009.png",
+        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0010.png",
+        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0011.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0012.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0013.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0014.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/chibi/working/0015.png",
+        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      }
+    ]
+  },
+  "behavior": {
+    "category": "ambient",
+    "mode": "persistent",
+    "priority": 15,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "static_hold_ms": 2400,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

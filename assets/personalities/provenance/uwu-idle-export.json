@@ -1,0 +1,48 @@
+{
+  "personality_id": "uwu",
+  "style": "chibi",
+  "state": "idle",
+  "approval": "pending human review",
+  "source": "UwU/Intermediate/idle-source.png",
+  "source_sha256": "c44f667c59b8bc5671da65799c02a8da2e613c67356b55b3238f8cd8423e1075",
+  "source_size": [
+    1024,
+    1536
+  ],
+  "operation": "explicit alpha>=4 bounds crop, proportional Lanczos fit to 448x640, anchor placement",
+  "crop_box": [
+    60,
+    45,
+    1017,
+    1487
+  ],
+  "resampled_size": [
+    425,
+    640
+  ],
+  "offset": [
+    44,
+    64
+  ],
+  "output_sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+  "output": "UwU/Generated/chibi/idle.png",
+  "technical_validation": {
+    "size": [
+      512,
+      768
+    ],
+    "mode": "RGBA",
+    "bit_depth": 8,
+    "bbox": [
+      44,
+      64,
+      469,
+      704
+    ],
+    "transparent_pixels": 201001,
+    "sha256": "c93b21030de43e1b033314a1b1271cc4d33276105e91b842750714f41808861e",
+    "warnings": [
+      "large semitransparent region: inspect halos or background remnants"
+    ]
+  }
+}

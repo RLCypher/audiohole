@@ -1,0 +1,200 @@
+{
+  "personality_id": "vanilla",
+  "state": "working",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/working.png",
+    "sha256": "50fb4b16dfa411387a194ac55e68262276b0c9b9941c7fb9bf778e19e7760d06",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/working/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0001.png",
+        "sha256": "c7a002abd8f46e24b3f656a1e59a26054a295b2adf51ad6cd45ebcd60ba9dbd4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0002.png",
+        "sha256": "b39c460c223cd422e85d0905c8762357f295b5d6056a9165e4cf82457c9cc773",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0003.png",
+        "sha256": "d9d4cd8e9126581734ef81af89e7142d3f8341d8b5e88900259c3e4a46c59a4d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0004.png",
+        "sha256": "02649ce6b5820382a8e91aa48090bf8a6ba3d64aaed4a1e69487bc15099b0906",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0005.png",
+        "sha256": "0229946257def8fb79d8eb02937c91e0eace12cd6b50f3784afa0b2a9572aeb5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0006.png",
+        "sha256": "d2e63a1ff7f571261e52393667741793d452b153f6b835fbe04937e0e6c1c2ed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0007.png",
+        "sha256": "ff132aa3db72d5640a68284a03df69cc8b29502d9ff3cfd6610874c26e1d1770",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0008.png",
+        "sha256": "442c28b3fb6efe15078da77d9616a08031802610f13e063298d4d3a6ae85bfdd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0009.png",
+        "sha256": "47457cb776e3921ceb86267519d195d6bc9e5eae166fd7216989945ef3ca071a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0010.png",
+        "sha256": "265ba355fbe7d7b733c29db51383de3fa2447291199a16fe65d616af7b09811a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0011.png",
+        "sha256": "5521dc38f95822a4f2ee931169ed402cae4d34533c596c7658d4b72f737a86b5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0012.png",
+        "sha256": "5e787ed96cf818c91427fd38e9f6a7760dfdd44dcd11c2fd320e506104c00a7e",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0013.png",
+        "sha256": "6d5d0df8ef8645d168e0ea3ecbeda76d9b433ff525bd5136d3d752d465d30ff2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0014.png",
+        "sha256": "98db10f7a424112c0f2f51a403876a056ab239c80247d481aa0ea907f630aec5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      },
+      {
+        "path": "Generated/logo/working/0015.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 150
+      }
+    ],
+    "loop": true,
+    "priority": 15,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "persistent",
+    "priority": 15,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "static_hold_ms": 2400,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

@@ -1,0 +1,200 @@
+{
+  "personality_id": "vanilla",
+  "state": "thinking",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/thinking.png",
+    "sha256": "eb05a2b43032dfd6211de6e6759f0166741b825b4965d41235e03a9e2f097ee7",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/thinking/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0001.png",
+        "sha256": "d0992bfac560f5b1658deca7ca1cf4b03d01395e31a3a23a60851771a5dd14d3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0002.png",
+        "sha256": "bdad79eeccff7804c48c87cda1f1f10eda23bb690394df9cb26127c2f8a60c48",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0003.png",
+        "sha256": "2356e207c398c4ea577597b5d279c355aed55bd873313acd153f5996996a6436",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0004.png",
+        "sha256": "d6e51906f388fb496e48f3726e5e3b4385338ebfcb0ecb6da87b0a3d4c244c01",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0005.png",
+        "sha256": "8b6869269b1fc1ab396aa6daa21de140c80c03dd0656c2e4815ad149c57e8e32",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0006.png",
+        "sha256": "201ac6d2deefdb45f2bccd351d729b34169c28afb3f8fd0730abd1b09d07a05f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0007.png",
+        "sha256": "13b1760a2a8cfbf221a3b83d73984d8d07fd050bed000c7aeca749b5b30dd43a",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0008.png",
+        "sha256": "43c7680841560e409694237158d603ff0153e1c10ab5b48c8aebf57ef1694a36",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0009.png",
+        "sha256": "8cedd32b881362c08dc65ac64051dc3681dbac6be087a8e2d317264ff0570ee8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0010.png",
+        "sha256": "c4de5c3fee2bf9dcbbb10765c1ac72cd5e6624ce995773b2b4fba7372584e3ca",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0011.png",
+        "sha256": "ef560315cba50a78ae16e94a1e31e197dd673eecd8cf1e89ccb609d2b179cead",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0012.png",
+        "sha256": "6dfcd1d6a93d9f798895ec4debe091dd17382eef71109fc335e8c83f8ef83caa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0013.png",
+        "sha256": "25ad54a387fafe542eb97f9cf179f673512fd8cd26062b080da77ef0dee5f3a6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0014.png",
+        "sha256": "75c1e0a8004bcc3694f6af7c7cac92ddeae7b6cbc33ee22fce171a132ee031b3",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      },
+      {
+        "path": "Generated/logo/thinking/0015.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ],
+    "loop": true,
+    "priority": 10,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "persistent",
+    "priority": 10,
+    "interruptible": true,
+    "cooldown_ms": 500,
+    "static_hold_ms": 3200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

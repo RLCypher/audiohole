@@ -1,0 +1,247 @@
+{
+  "personality_id": "uwu",
+  "state": "surprised",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/surprised-source.png",
+  "source_sha256": "b0c0f583880474df30d14d7c3043fc16e3afd23cc4c2f3e3b3e5b9261ce09857",
+  "source_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      32,
+      47,
+      487,
+      723
+    ],
+    [
+      521,
+      49,
+      1012,
+      731
+    ],
+    [
+      33,
+      826,
+      518,
+      1484
+    ],
+    [
+      547,
+      790,
+      989,
+      1486
+    ]
+  ],
+  "common_scale": 0.9091139450620211,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      111.30882352941177,
+      475.80542986425337
+    ],
+    [
+      138.88677130044843,
+      474.4730941704036
+    ],
+    [
+      111.69650655021834,
+      459.6866812227074
+    ],
+    [
+      113.08898776418242,
+      495.7408231368187
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 4,
+  "frame_source_key_indices": [
+    null,
+    null,
+    0,
+    0,
+    1,
+    2,
+    2,
+    1,
+    2,
+    2,
+    3,
+    0,
+    0,
+    null
+  ],
+  "key_sha256": [
+    "474a2d56a22703ae9cf6c88700bf37306fda2b1995cecc1feb4661cf32eb75d4",
+    "ed4f2477e05d152f2cc8bf845ca77b59468289b123ee2726790ac09cc75528c9",
+    "6aff28b58059edcfc64cec5e96975e2e25e1e6815def399375f8de7f465f4c0f",
+    "4d4bf5c89b7cd246b95aab510e5bdb1e1c089f16d7901b2fd53d60fc6b7a47eb"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/surprised.png",
+    "sha256": "ed4f2477e05d152f2cc8bf845ca77b59468289b123ee2726790ac09cc75528c9",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/surprised/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0001.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0002.png",
+        "sha256": "474a2d56a22703ae9cf6c88700bf37306fda2b1995cecc1feb4661cf32eb75d4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0003.png",
+        "sha256": "474a2d56a22703ae9cf6c88700bf37306fda2b1995cecc1feb4661cf32eb75d4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0004.png",
+        "sha256": "ed4f2477e05d152f2cc8bf845ca77b59468289b123ee2726790ac09cc75528c9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0005.png",
+        "sha256": "6aff28b58059edcfc64cec5e96975e2e25e1e6815def399375f8de7f465f4c0f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0006.png",
+        "sha256": "6aff28b58059edcfc64cec5e96975e2e25e1e6815def399375f8de7f465f4c0f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0007.png",
+        "sha256": "ed4f2477e05d152f2cc8bf845ca77b59468289b123ee2726790ac09cc75528c9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 250
+      },
+      {
+        "path": "Generated/chibi/surprised/0008.png",
+        "sha256": "6aff28b58059edcfc64cec5e96975e2e25e1e6815def399375f8de7f465f4c0f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 170
+      },
+      {
+        "path": "Generated/chibi/surprised/0009.png",
+        "sha256": "6aff28b58059edcfc64cec5e96975e2e25e1e6815def399375f8de7f465f4c0f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0010.png",
+        "sha256": "4d4bf5c89b7cd246b95aab510e5bdb1e1c089f16d7901b2fd53d60fc6b7a47eb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0011.png",
+        "sha256": "474a2d56a22703ae9cf6c88700bf37306fda2b1995cecc1feb4661cf32eb75d4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0012.png",
+        "sha256": "474a2d56a22703ae9cf6c88700bf37306fda2b1995cecc1feb4661cf32eb75d4",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 80
+      },
+      {
+        "path": "Generated/chibi/surprised/0013.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ]
+  },
+  "behavior": {
+    "category": "theatrical",
+    "mode": "finite",
+    "priority": 70,
+    "interruptible": false,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 1500,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

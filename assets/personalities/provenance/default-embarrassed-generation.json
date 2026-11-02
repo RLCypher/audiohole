@@ -1,0 +1,271 @@
+{
+  "personality_id": "default",
+  "state": "embarrassed",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+  "generation": "reference-guided face key plus controlled 2D compositing",
+  "provenance": {
+    "source": "Norm/Intermediate/optional-a-source.png",
+    "source_sha256": "f452d7bad163f157ab33a0bafa74874a8efcf07818a73721e22743d0084cea24",
+    "grid": [
+      2,
+      2
+    ],
+    "cell_index": 1,
+    "face_box": [
+      236,
+      134,
+      364,
+      262
+    ],
+    "registration_translation": [
+      13.263492063492095,
+      10.165079365079379
+    ],
+    "face_polygon": [
+      [
+        258,
+        153
+      ],
+      [
+        289,
+        153
+      ],
+      [
+        308,
+        164
+      ],
+      [
+        332,
+        175
+      ],
+      [
+        343,
+        184
+      ],
+      [
+        342,
+        206
+      ],
+      [
+        335,
+        220
+      ],
+      [
+        324,
+        230
+      ],
+      [
+        323,
+        243
+      ],
+      [
+        298,
+        242
+      ],
+      [
+        290,
+        231
+      ],
+      [
+        268,
+        229
+      ],
+      [
+        250,
+        208
+      ]
+    ],
+    "nose_preserved_box": null,
+    "key_sha256": "f90e764cec07b08ca3a9490fcdbb6a531a86b5eea343c93a20df2a7818d9d4f5"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/chibi/embarrassed.png",
+    "sha256": "5a0302ba894999a4e171ef699414c94858abd57e7174f8ca124f6bbfcf483336",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/chibi/embarrassed/0000.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0001.png",
+        "sha256": "b91e571e669acb646ba82895f87f9f9d5c1a0cc227513c4f0f0c1f655c7fe3ef",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0002.png",
+        "sha256": "578e335a4d6235d0fb4378a5658d01d4494c25f3da3f0f789b0a3b858ca08e7d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0003.png",
+        "sha256": "38e1df9208936501097bac00727596a000bd59144d4410b974baf1bcc80d39c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0004.png",
+        "sha256": "e573f547bcf99ba11d07eb8e53c206db1a55749c1cab4400861d6fde4e93564f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0005.png",
+        "sha256": "df681636adf9782f026b8eb8c288e13c6e74068c5a9e78896c00dc10e65ec1aa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0006.png",
+        "sha256": "b32521a1e6bc5f5b6008999f5f9de88c10476f62a3d408f85023fc6f90b2bf64",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0007.png",
+        "sha256": "9bb5900b9fb3127e1a24af3dd03a7b9521c7b3ca51b48402d38cd0738a72c1be",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0008.png",
+        "sha256": "2a0f9d65eca8ce3dc1875214f44f8f29922ae9609f8892f671ddcbc15481f224",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0009.png",
+        "sha256": "4ced73a315a1a572870d02ccd3784de56344223060a65d569bad5649419b3988",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0010.png",
+        "sha256": "24c12c0534f90bf9c390b79100ede297bf8a694ac888f7af5abb18352240dbd5",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0011.png",
+        "sha256": "c3c9ab7e1b0546b0580cdd49fb0256fd26fca2d8432dd0baae4be682506de034",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0012.png",
+        "sha256": "57a79402ed7968778475222d00f3eb5a4f38b1d3db2ec95ea2d0824e53c5f311",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0013.png",
+        "sha256": "943f765f00d67ecde0c9fd74420d492a4d83df72cc7f168127daea8b26f0e711",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0014.png",
+        "sha256": "cc3a465ae3c8f7da6c4cfc7293b2094ce602a1a69c4be670e75e510803b21afb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/embarrassed/0015.png",
+        "sha256": "2e95bdd7dc2bb70096b1fd29ff3a49391ac72600855e10537c5ef0bea5fd9aed",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      }
+    ],
+    "loop": false,
+    "priority": 40,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 40,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

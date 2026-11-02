@@ -1,0 +1,164 @@
+{
+  "personality_id": "vanilla",
+  "state": "talking",
+  "status": "approved",
+  "approval": "approved by User",
+  "master_sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+  "generation": "canonical logo interior-only status composition",
+  "provenance": {
+    "source": "Vanilla/Generated/logo/idle.png",
+    "protected_exterior": "wormhole mask only"
+  },
+  "static": {
+    "status": "approved",
+    "path": "Generated/logo/talking.png",
+    "sha256": "e3537e69a1fdea4d3958c0c515f887418c8c4506ec360d28ce718713d19fa7ea",
+    "anchor": [
+      256,
+      704
+    ],
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "animation": {
+    "status": "approved",
+    "frames": [
+      {
+        "path": "Generated/logo/talking/0000.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0001.png",
+        "sha256": "e802c02dd15ac97b338b33d1f2f001f7fee14b51f18fbbe9b3fcb7c7744f0f00",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0002.png",
+        "sha256": "2cc1c62577b86c6155d206d85d16ffa9a4467049c69b13b375d530bffec690fa",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0003.png",
+        "sha256": "daa5bcc25fe1e5124ea6f672e76205635717b2751ac64f149d33958d3fed08b2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0004.png",
+        "sha256": "f2487ec2004e67c0921b54fc91ed3f82e8fa7f4ab3891e474c154f48252c58b1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0005.png",
+        "sha256": "2b17c334edf76b59bfcfb756a1e702389f50effa0112eb398015702cffded8bf",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0006.png",
+        "sha256": "59417cbbf8a2b65b3f3758d8ff26ed327010371f4f11f2095cf64aa1a5287f18",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0007.png",
+        "sha256": "e00abce079f5f641871890486822e201a86976a975f6874c33c4eb27067ecd5d",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0008.png",
+        "sha256": "55a0146d01724f2173c18aab0e591be2dd387eefa936104331dac0f4a156b102",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0009.png",
+        "sha256": "6aee7df1825c7f17b94ca1a7aaef0ff12d28e351906c1f5fe767396104495e60",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0010.png",
+        "sha256": "04af199cba5b9814324e5a402a3ff81c1c8618bd9fc3b5abb4f066aa057c17b1",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      },
+      {
+        "path": "Generated/logo/talking/0011.png",
+        "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 100
+      }
+    ],
+    "loop": true,
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "transition": "cut",
+    "review": {
+      "reviewer": "User",
+      "reviewed_at": "2026-11-01T23:04:11.686434Z"
+    }
+  },
+  "behavior": {
+    "category": "status",
+    "mode": "persistent",
+    "priority": 20,
+    "interruptible": true,
+    "cooldown_ms": 300,
+    "static_hold_ms": 1200,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "5147b64364357b8aed39214984900cc652b38e72d639881ef33b98573bc007b0",
+  "reproducer": {
+    "source": "provenance/generators/81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66.py",
+    "sha256": "81cfed7a65448ebbfe7f8e33be822d29ad7f346fb0da4b93e4d697871e3bde66",
+    "settings": "provenance/full-generation-settings.json"
+  },
+  "human_review_record": "provenance/accepted-assets.json"
+}

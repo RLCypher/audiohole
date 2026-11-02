@@ -1,0 +1,373 @@
+{
+  "personality_id": "uwu",
+  "state": "laughing",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "horu-prop-continuity-3",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
+  "master_sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-e-source.png",
+  "source_sha256": "10e4acda5842109c9dc50de0ce807f7bc2daa31e50f300b29aefe925d2bba0ae",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/laughing",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/laughing",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "laughing",
+      "key": 0,
+      "source": "quiet-e-source.png",
+      "source_cell": 2,
+      "source_crop_box": [
+        119,
+        853,
+        502,
+        1493
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            364.0613943808533,
+            274.61186264308014,
+            1922
+          ],
+          [
+            525.6019830028329,
+            276.4702549575071,
+            706
+          ]
+        ],
+        "ear_target": [
+          [
+            235.82241014799155,
+            147.34619450317123,
+            1892
+          ],
+          [
+            396.8590308370044,
+            149.59618208516886,
+            681
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9969115707810987,
+        "translation": [
+          -127.11713701449594,
+          -126.21888144911773
+        ],
+        "neck_y": 253,
+        "body_vertical_fit": 0.9595744680851064,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          282,
+          466,
+          315,
+          503
+        ],
+        "assembly_top": 466,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "af52316ed097b6cadc43e22121b0b3d3e0b2d3e629a1c4ce4cf25033f9af97e6",
+      "key_sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
+    },
+    {
+      "state": "laughing",
+      "key": 1,
+      "source": "quiet-e-source.png",
+      "source_cell": 3,
+      "source_crop_box": [
+        609,
+        834,
+        1008,
+        1491
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            299.98625618471686,
+            277.00054975261133,
+            1819
+          ],
+          [
+            454.78339350180505,
+            236.3519855595668,
+            554
+          ]
+        ],
+        "ear_target": [
+          [
+            168.3427672955975,
+            146.94654088050314,
+            1908
+          ],
+          [
+            322.57055214723925,
+            104.98977505112474,
+            489
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9986740945225783,
+        "translation": [
+          -131.42778851548707,
+          -130.36778122106574
+        ],
+        "neck_y": 231,
+        "body_vertical_fit": 0.9692622950819673,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          288,
+          460,
+          321,
+          498
+        ],
+        "assembly_top": 460,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "952ba72f4d34cf2da281b1e449b2d8898e2cd20f4e02d79aa3133855ad3e30cf",
+      "key_sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+      "cup": {
+        "location": "case",
+        "layer": "UwU/Intermediate/HoruPerformanceRepair/parked-cup.png"
+      },
+      "revision": "horu-prop-continuity-3"
+    }
+  ],
+  "drawn_pose_count": 2,
+  "frame_source_key_indices": [
+    null,
+    null,
+    null,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    null,
+    null,
+    null
+  ],
+  "key_sha256": [
+    "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+    "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/laughing.png",
+    "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 40,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/laughing/0000.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0001.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0002.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0003.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0004.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0005.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0006.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0007.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0008.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0009.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/chibi/laughing/0010.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/chibi/laughing/0011.png",
+        "sha256": "afa8d7d02078a58cf82bcb80fc229e54eb55acd114e199772ba6df361e5af0c2",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0012.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0013.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0014.png",
+        "sha256": "ba4f337f8f64ded68870df5dc46987c6e98217aed938beb58080d29fab69cb12",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0015.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0016.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/laughing/0017.png",
+        "sha256": "5a8b31110ea7a0f15c59d2860477f15b094815faeb404603486f5a37224c5d37",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 200
+      }
+    ]
+  },
+  "behavior": {
+    "category": "expressive",
+    "mode": "finite",
+    "priority": 40,
+    "interruptible": true,
+    "cooldown_ms": 5000,
+    "static_hold_ms": 2000,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a",
+  "generator_snapshot": "provenance/generators/745b9b7afa1cc8c14f5339a27878b363c095c01a5fd0f262613845b0a8eb3f6a.py",
+  "character_name": "Horu",
+  "rest_revision": "provenance/horu-idle-revision.json",
+  "performance_revision": "provenance/horu-performance-repair.json",
+  "base_character_generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d"
+}

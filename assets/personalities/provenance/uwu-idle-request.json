@@ -1,0 +1,12 @@
+{
+  "backend": "image_gen.imagegen",
+  "transparent_background": true,
+  "reference": "UwU/References/UwU Chibi Reference.png",
+  "prompt": "Create a single neutral IDLE master sprite for AudioHole, faithfully based on the supplied canonical chibi reference. Exactly one complete adult character with the same chibi proportions, pose, equipment case, coffee mug, outfit, headphones, and color palette. Preserve small identifying accessories, hands, feet, cables, and the AudioHole case emblem. Clean illustrated linework matching the reference. Full figure entirely visible, no clipping, no text outside existing case lettering, no ground plane, no shadow outside the figure. Real transparent background, not checkerboard. Portrait canvas 512 by 768 pixels if supported; fit within 448 by 640 pixels, centered horizontally, ground baseline at y=704, with generous transparent margin. This is a faithful idle master, no new expression or animation. Adult anthropomorphic white feline technician, pale lavender shading, blue eyes, pink inner ears, fluffy tail, white forelock, dark purple headphones, choker ring, cropped sweater, dark shorts, striped stockings, mint-laced boots. Preserve the adult identity and chibi reference design; relaxed mischievous expression.",
+  "seed": "unavailable: backend exposes no seed parameter",
+  "approval": "pending human review",
+  "requested_output": [
+    512,
+    768
+  ]
+}
