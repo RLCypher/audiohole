@@ -1,0 +1,75 @@
+#pragma once
+#include "audiohole/avatar/assets.hpp"
+#include <deque>
+#include <optional>
+#include <unordered_map>
+
+namespace audiohole::avatar {
+struct Decision {
+    bool accepted;
+    std::string reason;
+};
+struct Reaction {
+    std::string state, event_id;
+    std::uint64_t revision = 0;
+    std::int64_t occurred_ms = 0, ttl_ms = 2000;
+    int priority = -1; // -1 uses the manifest. Explicit severity wins otherwise.
+};
+struct Presentation {
+    Image image;
+    std::string personality, style, state, source, baseline;
+    int index = 0, frame_count = 0, exposure_ms = 0;
+    double elapsed_ms = 0;
+    int priority = 0;
+    bool reaction = false, loading = false, paused = false;
+    std::vector<std::string> diagnostics;
+};
+// Host-thread only, clock-injected playback. No filesystem, GUI, decoding, audio,
+// dialogue, operational-state inference, or reaction queue exists here.
+class Player {
+  public:
+    void reset(const std::string& personality, const std::string& style, std::int64_t now);
+    Decision context(std::string baseline, std::uint64_t revision, int priority, std::int64_t now,
+                     bool invalidate_reaction = false);
+    void install_baseline(ClipPtr clip, std::uint64_t revision, std::int64_t now);
+    Decision react(ClipPtr clip, const Reaction& event, std::int64_t now);
+    // Explicit viewer inspection bypasses event dedup/cooldown, not asset checks.
+    void inspect(ClipPtr clip, std::int64_t now);
+    Presentation tick(std::int64_t now);
+    void pause(bool value, std::int64_t now);
+    void speed(double multiplier, std::int64_t now);
+    void reduced_motion(bool value) {
+        reduced_ = value;
+    }
+    void restart(std::int64_t now);
+    void step(std::int64_t now);
+    std::uint64_t revision() const {
+        return revision_;
+    }
+    const std::string& personality() const {
+        return personality_;
+    }
+    const std::string& style() const {
+        return style_;
+    }
+    bool baseline_ready() const {
+        return static_cast<bool>(baseline_);
+    }
+
+  private:
+    std::string personality_, style_, baseline_state_ = "idle";
+    ClipPtr baseline_, active_;
+    std::uint64_t revision_ = 0;
+    int baseline_priority_ = 0, active_priority_ = 0;
+    std::int64_t last_now_ = 0;
+    bool clock_valid_ = false, finite_ = false, inspecting_ = false, paused_ = false,
+         reduced_ = false;
+    double elapsed_ = 0, baseline_elapsed_ = 0, speed_ = 1;
+    std::deque<std::string> event_order_;
+    std::unordered_map<std::string, bool> events_;
+    std::unordered_map<std::string, std::int64_t> last_started_;
+    void advance(std::int64_t now);
+    void complete();
+    bool owned(const ClipPtr& clip) const;
+};
+} // namespace audiohole::avatar

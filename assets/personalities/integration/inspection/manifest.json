@@ -1,0 +1,93 @@
+{
+  "repository": "RLCypher/audiohole",
+  "ref": "54314f56d08ca89be7b34aaf2a6a808670a83c94",
+  "branch": "work",
+  "inspection": "read-only GitHub connector; no main application files changed",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "git_blob_sha": "d337e2f58ce36a21aea72b2bddef6eb12e49c594",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/AGENTS.md"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "git_blob_sha": "3315426d7972f7b91f1601d7b42f42cdcfa1d094",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/CMakeLists.txt"
+    },
+    {
+      "path": "cmake/WxWidgets.cmake",
+      "git_blob_sha": "83fa82af48487f19f93f35142125ead023103338",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/cmake/WxWidgets.cmake"
+    },
+    {
+      "path": "cmake/Json.cmake",
+      "git_blob_sha": "21886cb4202285d7c013a70730628032e5adab5d",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/cmake/Json.cmake"
+    },
+    {
+      "path": "src/gui/frame.h",
+      "git_blob_sha": "a1d7eadf734a288c78ee9dcdbb7f16c0889395fd",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/frame.h"
+    },
+    {
+      "path": "src/gui/frame.cpp",
+      "git_blob_sha": "e108d1c2c37e2041aa34d42984c223d639f9d66e",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/frame.cpp"
+    },
+    {
+      "path": "src/gui/controls.cpp",
+      "git_blob_sha": "c353713d16d213c3c53a2d38514053f76b6d6daa",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/controls.cpp"
+    },
+    {
+      "path": "src/gui/appearance.cpp",
+      "git_blob_sha": "98ac42845b798e3b1f9c8070c1f81950b1d6009d",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/appearance.cpp"
+    },
+    {
+      "path": "src/gui/settings_view.cpp",
+      "git_blob_sha": "3fa291bc52d5bd6b6af0b0b8d8ca467486ae83b9",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/settings_view.cpp"
+    },
+    {
+      "path": "src/gui/branding.h",
+      "git_blob_sha": "e659c11f94dc570dd6c390c587dbeca4c30a42d0",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/branding.h"
+    },
+    {
+      "path": "src/gui/branding.cpp",
+      "git_blob_sha": "ab06cef40b8f127fd8e09f44b50beb5df78e889c",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/branding.cpp"
+    },
+    {
+      "path": "src/model/controller.h",
+      "git_blob_sha": "68247b0ae5246d2cc8fda1b31ce4f7f6a985c8f6",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/model/controller.h"
+    },
+    {
+      "path": "src/presentation/messages.h",
+      "git_blob_sha": "735413d7957c6c8fe59356b8b5310738558b427a",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/presentation/messages.h"
+    },
+    {
+      "path": "src/gui/README.md",
+      "git_blob_sha": "7d72eeef271939a750263666b940b8ff04ee1062",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/src/gui/README.md"
+    },
+    {
+      "path": "ENGINEERING.md",
+      "git_blob_sha": "d2f9be579d4b9c876d935e8dc888c939dec07db3",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/ENGINEERING.md"
+    },
+    {
+      "path": "BUILDING.md",
+      "git_blob_sha": "a3a95cb6079d5f74291a69a2e07dde573425cdab",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/BUILDING.md"
+    },
+    {
+      "path": "assets/presentation/README.md",
+      "git_blob_sha": "2d92914fc10ba32bacd34ee01f0e9d3d5f356277",
+      "url": "https://github.com/RLCypher/audiohole/blob/54314f56d08ca89be7b34aaf2a6a808670a83c94/assets/presentation/README.md"
+    }
+  ]
+}

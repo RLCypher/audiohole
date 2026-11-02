@@ -1,0 +1,31 @@
+PASS SHA-256 known vectors
+PASS Timing respects exposure boundaries and loop
+PASS Finite reaction returns to newest baseline
+PASS Critical baseline interrupts success immediately
+PASS Authoritative recovery invalidates an old high-priority reaction
+PASS Deduplication cooldown and stale event rejection
+PASS Priority and interruptibility
+PASS Personality isolation and switch clears reactions
+PASS Pause speed restart step reduced motion
+PASS Clock rejects reversal and invalid speed
+PASS All real operational states and healthy routing mapping
+PASS Repeated healthy snapshots never restart ambient time
+PASS Recovered snapshots suppress stale retained disconnection feedback
+PASS Manifest loader normal path and unknown-state fallback
+PASS Corrupt or missing animation falls back to own static
+PASS Unavailable style and identity mismatch hide
+PASS Traversal and wrong anchor are rejected
+PASS Symlinks cannot cross personality
+PASS Unapproved assets never reach production
+PASS Memory budget bounds decoded clip
+PASS Decoded buffers deduplicate and release despite weak cache
+PASS Duplicate JSON keys invalidate manifest
+PASS Fractional frame timing is rejected rather than truncated
+PASS Async selection discards stale personality results
+PASS Rapid baseline changes coalesce and latest context wins
+PASS Last owned frame freezes after failure and clears on switch
+PASS Async reaction dedup does not issue repeated loads
+PASS Operational sequences recover to current truth
+MEASURE native load maximum per state (static + animation): 1086.81 ms
+PASS Native decoder loads all approved static and animated states
+RESULT 29 passed, 0 failed
