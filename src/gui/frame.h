@@ -49,6 +49,7 @@ struct DirectionWidgets {
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{};
     wxSpinCtrl* buffer{};
+    wxButton* buffer_apply{};       // Disabled until a backend supports confirmed live updates.
     int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
     wxStaticText *evidence{}, *source_detail{}, *destination_detail{}, *summary{};
     std::vector<std::string> sources, destinations;
@@ -140,6 +141,7 @@ class Frame final : public wxFrame {
     wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
         *activity_{}, *device_detail_{};
     wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
+    wxButton* beep_button_{};
     wxListBox *profiles_{}, *holes_{}, *devices_{};
     wxTextCtrl *profile_name_{}, *profile_notes_{}, *hole_name_{}, *hole_notes_{}, *device_name_{},
         *device_notes_{}, *device_search_{}, *console_{}, *log_search_{};

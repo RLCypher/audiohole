@@ -67,8 +67,7 @@ void Frame::update_navigation() {
         auto* tab = navigation_[index];
         const bool active = static_cast<int>(index) == selected;
         tab->SetValue(active);
-        tab->SetToolTip(wxS("Open ") + notebook_->GetPageText(index) +
-                        wxS(". Use arrows or Ctrl+Tab to change pages."));
+        tab->UnsetToolTip();
         // Brackets and bold weight identify selection without adding a status suffix.
         const auto title = notebook_->GetPageText(index);
         tab->SetLabel(active ? wxS("[") + title + wxS("]") : title);

@@ -31,6 +31,8 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     const bool dark = button.GetBackgroundColour().GetLuminance() < 0.5;
     const bool hover = button.GetScreenRect().Contains(wxGetMousePosition());
     wxColour background = button.GetBackgroundColour();
+    if (!enabled)
+        background = dark ? wxColour(30, 36, 43) : wxColour(224, 226, 230);
     if (enabled && (hover || pressed))
         background = dark ? wxColour(pressed ? 40 : 52, pressed ? 59 : 75, pressed ? 78 : 96)
                           : wxColour(pressed ? 186 : 215, pressed ? 204 : 229, 244);

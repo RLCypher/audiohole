@@ -94,11 +94,13 @@ void Frame::build_settings() {
     numeric->Add(dfa_value_, 0, wxALIGN_CENTER_VERTICAL);
     numeric->Add(dfa_stepper_, 0, wxALIGN_CENTER_VERTICAL);
     advanced->Add(numeric, 0, wxALL, 4);
-    dfa_slider_->SetToolTip("Adjust DFA from 0 to 11. Each settled change has an acknowledgment.");
-    dfa_value_->SetToolTip("Use a decimal point. Extra digits round half-up to two places on "
+    dfa_slider_->SetToolTip(
+        "Fiddle with this if you think it'll help. We're not making any promises.");
+    dfa_value_->SetToolTip("Type your preferred amount of nonsense. Use a decimal point; extra "
+                           "digits round half-up on "
                            "Enter; raw values must be between 0 and 11.");
     dfa_stepper_->SetToolTip(
-        "Adjust the normalized DFA value by 0.01. Out-of-range input is rejected.");
+        "Nudge the nonsense by 0.01. Values outside 0.00 to 11.00 are rejected, not clamped.");
     dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_, dfa_stepper_, dfa_feedback_};
     // Tracking updates the visible number only. A release/keyboard settlement
     // selects at most one acknowledgment, never one per drag tick.
@@ -144,7 +146,7 @@ void Frame::build_settings() {
 }
 void Frame::testing_notice() {
     wxMessageBox(
-        "AudioHole testing build\n\n"
+        "AudioHole Preview Build\n\n"
         "All devices, capabilities, routing, scans, activity and recovery in this version "
         "are simulated. No real devices are opened and no audio is captured or played. "
         "Test Beep is also simulated and emits no sound. No displayed state is evidence "
@@ -154,7 +156,7 @@ void Frame::testing_notice() {
         "Choose a profile, select source and destination, then Apply. "
         "Save keeps edits without changing active routing. Close hides to the tray; "
         "Exit stops and closes AudioHole.",
-        wxS("AudioHole — Testing build"), wxOK | wxICON_INFORMATION, this);
+        wxS("AudioHole — Preview Build"), wxOK | wxICON_INFORMATION, this);
 }
 
 } // namespace audiohole::gui
@@ -228,7 +230,8 @@ void Frame::commit_dfa_text() {
     else if (input.status == presentation::DfaInputStatus::AboveMaximum)
         present_dfa(presentation::Message::DfaAboveMaximum);
     else
-        dfa_value_->SetToolTip("Enter a decimal number from 0.00 to 11.00.");
+        dfa_value_->SetToolTip(
+            "Type your preferred nonsense from 0.00 to 11.00. Extra digits round half-up.");
 }
 void Frame::adjust_dfa(int delta) {
     if (personality_ == "vanilla")

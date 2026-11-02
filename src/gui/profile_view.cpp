@@ -37,9 +37,18 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     label(box, w.group, "Buffer (ms)");
     w.buffer = new wxSpinCtrl(box, wxID_ANY, "6", wxDefaultPosition, wxDefaultSize,
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 1, 100, 6);
-    w.group->Add(w.buffer, 0, wxALL, 3);
+    auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
+    buffer_row->Add(w.buffer, 0, wxALL, 3);
+    w.buffer_apply = button(box, buffer_row, "Apply", [] {});
+    w.buffer_apply->Disable();
+    w.buffer_apply->SetToolTip(
+        "Live buffer application is unavailable in this preview backend. This button stays "
+        "disabled because there is no engine acknowledgment of an applied buffer. Save stores "
+        "the edited preference in this session; profile Apply activates a simulated plan.");
+    w.group->Add(buffer_row, 0, wxEXPAND);
     w.buffer->SetToolTip("Buffer duration in milliseconds. Smaller values can reduce latency but "
-                         "increase dropout risk. Changes are staged until Apply.");
+                         "increase dropout risk. This is an edited preference, not a measured or "
+                         "confirmed engine buffer; live application is unavailable here.");
     w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
                          "evidence below explains the recommendation.");
     w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
@@ -472,10 +481,18 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     label(box, observation, "Test Beep destination");
     destination_test_ = new wxChoice(box, wxID_ANY);
     observation->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
-    destination_test_->Bind(wxEVT_CHOICE,
-                            [this](wxCommandEvent&) { present(presentation::Message::BeepReady); });
+    destination_test_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        present(presentation::Message::BeepReady);
+        refresh();
+    });
     auto* beep = new wxBoxSizer(wxHORIZONTAL);
-    button(box, beep, "Test Beep", [this] {
+    beep_button_ = button(box, beep, "Test Beep", [this] {
+        // Read authoritative state on each click, including rapid repeat clicks.
+        if (!controller_->snapshot().beep_destination.empty()) {
+            controller_->cancel_beep();
+            refresh();
+            return;
+        }
         const int index = destination_test_->GetSelection();
         show_result(
             controller_->beep(index >= 0 && static_cast<std::size_t>(index) < beep_ids_.size()
@@ -483,30 +500,34 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
                                   : ""));
         refresh();
     });
-    button(box, beep, "Cancel Test Beep", [this] {
-        controller_->cancel_beep();
-        refresh();
-    });
+    beep_button_->SetLabel("Cancel Beep");
+    beep_button_->SetMinSize(beep_button_->GetBestSize());
+    beep_button_->SetLabel("Test Beep");
     observation->Add(beep);
     beep_status_ = label(box, observation, "Test Beep inactive.");
     label(box, observation, "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    auto* simulation = new wxStaticBoxSizer(wxVERTICAL, parent, "Simulate Errors");
+    auto* simulation_box = simulation->GetStaticBox();
+    layout->Add(simulation, 0, wxEXPAND | wxALL, 4);
+    label(simulation_box, simulation,
+          "Inject simulated routing failures to test status reporting and recovery behavior.");
     auto* failures = new wxBoxSizer(wxHORIZONTAL);
-    button(box, failures, "Forward failure", [this] {
+    button(simulation_box, failures, "Forward failure", [this] {
         if (hole_index_ >= 0)
             controller_->fail_path(draft_.holes.at(static_cast<std::size_t>(hole_index_)).id,
                                    false);
         refresh();
     });
-    button(box, failures, "Reverse failure", [this] {
+    button(simulation_box, failures, "Reverse failure", [this] {
         if (hole_index_ >= 0 && draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex)
             controller_->fail_path(draft_.holes.at(static_cast<std::size_t>(hole_index_)).id, true);
         refresh();
     });
-    button(box, failures, "Recover", [this] {
+    button(simulation_box, failures, "Recover", [this] {
         controller_->recover();
         refresh();
     });
-    observation->Add(failures);
+    simulation->Add(failures);
 }
 } // namespace audiohole::gui
 

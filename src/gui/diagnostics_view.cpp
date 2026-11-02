@@ -10,6 +10,14 @@ void Frame::build_scan() {
     scan_mode_ = choices(page, options, "Testing level", {"Easy", "Advanced"});
     scan_scope_ =
         choices(page, options, "Scope", {"Update saved devices", "Full scan", "Selected device"});
+    scan_mode_->SetToolTip(
+        "Easy selects the nonintrusive scan scenario. Advanced requests explicit consent for "
+        "potentially disruptive testing. Both levels currently simulate progress; neither opens "
+        "hardware or verifies device capabilities.");
+    scan_scope_->SetToolTip(
+        "Scope chooses the target: saved records, a full discovery scenario, or the device "
+        "selected on Devices. Level chooses testing intensity instead. This preview records the "
+        "chosen scope and simulates progress; it does not enumerate hardware.");
     scan_mode_->Bind(wxEVT_CHOICE,
                      [this](wxCommandEvent&) { present(presentation::Message::ScanLevelChanged); });
     scan_scope_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
@@ -67,9 +75,6 @@ void Frame::build_scan() {
         present(presentation::Message::DiagnosticsCleared);
     });
     root->Add(export_row);
-    console_->SetToolTip(
-        "The most recent 500 technical events. Copy and export include only the visible filtered "
-        "events, not audio samples, personality commentary, or user notes.");
     page->SetSizer(root);
     notebook_->AddPage(page, "Scanning / Diagnostics");
 }

@@ -1734,3 +1734,12 @@ occupies the replaceable client-area display (Vanilla retains its logo), with bo
 scrolling commentary beside it. No personality-module functionality is added.
 See assets/presentation/README.md for actual source dimensions, compact layout,
 truthful selected-configuration/count semantics and native validation limitations.
+
+### GUI and personality integration preparation
+
+The next milestone's inspection findings, implemented control refinements and
+remaining dependencies are recorded in
+[GUI_INTEGRATION_PREPARATION.md](GUI_INTEGRATION_PREPARATION.md).
+The current application remains preview-only and session-only. Test Mode,
+production persistence, package migration and avatar expression validation are
+not yet implemented. Avatar playback remains outside this milestone.

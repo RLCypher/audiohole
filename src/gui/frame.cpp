@@ -367,6 +367,20 @@ void Frame::refresh() {
         s.beep_destination.empty()
             ? wxString(wxS("Test Beep inactive."))
             : text("Test Beep active: " + s.beep_destination + ". Cancel immediately if needed."));
+    beep_button_->SetLabel(s.beep_destination.empty() ? "Test Beep" : "Cancel Beep");
+    const int beep_selection = destination_test_->GetSelection();
+    const auto* beep_target =
+        beep_selection >= 0 && static_cast<std::size_t>(beep_selection) < beep_ids_.size()
+            ? endpoint(s, beep_ids_[static_cast<std::size_t>(beep_selection)])
+            : nullptr;
+    const bool beep_available = beep_target && !beep_target->capture &&
+                                beep_target->availability == Availability::Available;
+    beep_button_->Enable(!s.beep_destination.empty() || beep_available);
+    beep_button_->SetToolTip(
+        s.beep_destination.empty()
+            ? "Start a bounded test for the explicitly selected playback destination. This "
+              "preview simulates the test interval and emits no sound."
+            : "Cancel the active simulated destination test immediately. No second test starts.");
     scan_progress_->SetValue(s.scan_percent);
     const auto query = log_search_->GetValue().Lower();
     std::string logs;
@@ -441,13 +455,41 @@ bool Frame::smoke(const wxString& directory) {
                 throw std::runtime_error(detail);
         };
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
-            if (dynamic_cast<wxButton*>(window) || dynamic_cast<wxToggleButton*>(window))
+            if (dynamic_cast<wxButton*>(window))
                 require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
                         "An action or navigation button lacks explanatory hover help");
             for (auto* child : window->GetChildren())
                 self(self, child);
         };
         check_button_help(check_button_help, this);
+        for (auto* tab : navigation_)
+            require(tab->GetToolTip() == nullptr, "Navigation must not have generic hover text");
+        require(!forward_.buffer_apply->IsEnabled() && !reverse_.buffer_apply->IsEnabled(),
+                "Live buffer Apply must remain unavailable without engine confirmation");
+        require(console_->GetToolTip() == nullptr, "Diagnostic log must not have hover text");
+        const auto target = std::find(beep_ids_.begin(), beep_ids_.end(), "vr-out");
+        require(target != beep_ids_.end(), "Preview beep destination missing");
+        destination_test_->SetSelection(static_cast<int>(target - beep_ids_.begin()));
+        refresh();
+        require(beep_button_->IsEnabled(), "Available beep target must enable the test button");
+        const auto beep_width = beep_button_->GetSize().x;
+        wxCommandEvent beep_click(wxEVT_BUTTON, beep_button_->GetId());
+        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+        require(controller_->snapshot().beep_destination == "vr-out" &&
+                    beep_button_->GetLabel() == "Cancel Beep",
+                "Beep label must follow the controller's active test state");
+        require(beep_button_->GetSize().x == beep_width, "Beep label changes button width");
+        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+        require(controller_->snapshot().beep_destination.empty() &&
+                    beep_button_->GetLabel() == "Test Beep",
+                "Second click must cancel the current beep");
+        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+        controller_->advance(1000);
+        refresh();
+        require(controller_->snapshot().beep_destination.empty() &&
+                    beep_button_->GetLabel() == "Test Beep" &&
+                    beep_button_->GetSize().x == beep_width,
+                "Natural beep completion must restore the fixed-width idle button");
         require(GetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow") != nullptr,
                 "Stable second-launch window identity missing");
         require(personality_choice_->GetString(0) == wxS("Norm") &&
