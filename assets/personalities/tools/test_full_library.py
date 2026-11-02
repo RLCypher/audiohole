@@ -70,7 +70,8 @@ class FullLibraryTests(unittest.TestCase):
         for state,entry in states.items():
             if state=='idle':continue
             record=read_json(ROOT/f'provenance/uwu-{state}-body-revision.json')
-            keys=[ROOT/f'UwU/Intermediate/BodyRevision/Keys/{state}/{i:04d}.png' for i in range(record['drawn_pose_count'])]
+            directory=record.get('keys_directory',f'UwU/Intermediate/BodyRevision/Keys/{state}')
+            keys=[ROOT/directory/f'{i:04d}.png' for i in range(record['drawn_pose_count'])]
             hashes=[digest(path) for path in keys]
             self.assertEqual(hashes,record['key_sha256'])
             self.assertEqual(len(set(hashes)),len(keys))
@@ -80,6 +81,43 @@ class FullLibraryTests(unittest.TestCase):
             for frame,key in zip(entry['animation'].get('frames',[]),record['frame_source_key_indices']):
                 expected=states['idle']['static']['sha256'] if key is None else hashes[key]
                 self.assertEqual(frame['sha256'],expected,(state,frame['path'],'unexpected sprite transform'))
+
+    def test_uwu_case_and_wordmark_use_one_fixed_layer_in_every_pose(self):
+        from PIL import ImageChops
+        directory=ROOT/'UwU/Intermediate/ConsistencyRevision'
+        case=Image.open(directory/'canonical-case.png').convert('RGBA')
+        master=Image.open(ROOT/'UwU/Generated/chibi/idle.png').convert('RGBA')
+        brand=(94,498,213,596)
+        self.assertEqual(case.crop(brand).tobytes(),master.crop(brand).tobytes())
+        word=(95,574,213,594)
+        word_pixels=list(master.crop(word).get_flattened_data())
+        letter_indices=[i for i,p in enumerate(word_pixels) if min(p[:3])>185 and p[3]>200]
+        self.assertGreater(len(letter_indices),150)
+        for item in read_json(directory/'composition.json'):
+            state,key=item['state'],item['key']
+            self.assertEqual(item['case_sha256'],digest(directory/'canonical-case.png'))
+            character=Image.open(directory/f'Characters/{state}/{key:04d}.png').convert('RGBA')
+            expected=case.copy();expected.alpha_composite(character)
+            actual=Image.open(directory/f'Keys/{state}/{key:04d}.png').convert('RGBA')
+            self.assertEqual(actual.tobytes(),expected.tobytes(),(state,key,'case or layering changed'))
+            alpha=list(character.crop(word).getchannel('A').get_flattened_data())
+            visible=[i for i in letter_indices if alpha[i]==0]
+            self.assertGreater(len(visible)/len(letter_indices),.75,(state,key,'wordmark excessively occluded'))
+            rendered=list(actual.crop(word).get_flattened_data())
+            for i in visible:self.assertEqual(rendered[i],word_pixels[i],(state,key,'visible lettering altered'))
+
+    def test_uwu_badges_reuse_the_canonical_emblem_in_the_actual_card(self):
+        directory=ROOT/'UwU/Intermediate/ConsistencyRevision'
+        for item in read_json(directory/'composition.json'):
+            meta=item['badge'];x0,y0,x1,y1=meta['box'];top=meta['assembly_top']
+            self.assertGreaterEqual(x1-x0,20,(item['state'],item['key'],'badge confused with buckle'))
+            self.assertGreaterEqual(y1-y0,25)
+            template=directory/meta['template']
+            self.assertEqual(digest(template),meta['template_sha256'])
+            patch=Image.open(template).convert('RGBA').resize((x1-x0,y1-top),Image.Resampling.LANCZOS)
+            character=Image.open(directory/f"Characters/{item['state']}/{item['key']:04d}.png").convert('RGBA').crop((x0,top,x1,y1))
+            for expected,actual in zip(patch.get_flattened_data(),character.get_flattened_data()):
+                if expected[3]==255:self.assertEqual(actual,expected,(item['state'],item['key'],'canonical badge changed'))
 
     def test_native_preview_samples_are_the_actual_operating_frames(self):
         for identity,path in packs():

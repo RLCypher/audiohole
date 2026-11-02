@@ -8,11 +8,11 @@ from animate_idle import checker
 def build():
     out=ROOT/'review/full';font=ImageFont.load_default(size=12)
     records=[read_json(p) for p in sorted((ROOT/'provenance').glob('uwu-*-body-revision.json'))]
-    entries=[(record['state'],i) for record in records for i in range(record['drawn_pose_count'])]
+    entries=[(record['state'],i,record.get('keys_directory',f'UwU/Intermediate/BodyRevision/Keys/{record["state"]}')) for record in records for i in range(record['drawn_pose_count'])]
     sheet=Image.new('RGB',(6*128,((len(entries)+5)//6)*224+40),'#151923')
     draw=ImageDraw.Draw(sheet);draw.text((8,10),'UwU / DRAWN BODY KEYS / CANDIDATES FOR REVIEW',font=font,fill='white')
-    for index,(state,key) in enumerate(entries):
-        image=Image.open(ROOT/f'UwU/Intermediate/BodyRevision/Keys/{state}/{key:04d}.png')
+    for index,(state,key,directory) in enumerate(entries):
+        image=Image.open(ROOT/directory/f'{key:04d}.png')
         tile=checker((128,192));tile.alpha_composite(image.resize(tile.size,Image.Resampling.LANCZOS))
         x,y=(index%6)*128,(index//6)*224+40;sheet.paste(tile.convert('RGB'),(x,y))
         draw.text((x+4,y+195),f'{state} {key:04d}',font=font,fill='white')

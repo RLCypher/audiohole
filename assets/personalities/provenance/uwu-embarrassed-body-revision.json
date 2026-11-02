@@ -3,44 +3,140 @@
   "state": "embarrassed",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-1",
-  "generation": "reference-guided full-body pose drawings with timed holds",
+  "revision": "articulated-body-2-consistency",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-  "source": "UwU/Intermediate/BodyRevision/quiet-e-source.png",
-  "source_sha256": "fb64a3deb8ff46ea7065487a2e11b4aefb885bb20cac8b2af4dccdb76c1e4ca0",
-  "source_indices": [
-    0,
-    1
-  ],
-  "source_crop_boxes": [
-    [
-      66,
-      62,
-      504,
-      751
-    ],
-    [
-      562,
-      69,
-      995,
-      753
-    ]
-  ],
-  "common_scale": 0.9040714283675849,
-  "registration": "mint case stripe centroid",
-  "source_prop_anchors": [
-    [
-      117.25237592397043,
-      473.32101372756074
-    ],
-    [
-      118.22703273495249,
-      466.2935586061246
-    ]
-  ],
-  "target_prop_anchor": [
-    156.6245883644347,
-    515.1778265642151
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-e-source.png",
+  "source_sha256": "10e4acda5842109c9dc50de0ce807f7bc2daa31e50f300b29aefe925d2bba0ae",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/embarrassed",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/embarrassed",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "embarrassed",
+      "key": 0,
+      "source": "quiet-e-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        78,
+        83,
+        452,
+        744
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            305.98353208404313,
+            267.28392958546283,
+            1761
+          ],
+          [
+            467.2903225806452,
+            271.78709677419357,
+            620
+          ]
+        ],
+        "ear_target": [
+          [
+            177.2110408280621,
+            141.73778033352502,
+            1739
+          ],
+          [
+            337.87220447284346,
+            145.80351437699682,
+            626
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9959283817674832,
+        "translation": [
+          -127.52106671920075,
+          -124.66742011479352
+        ],
+        "neck_y": 248,
+        "body_vertical_fit": 0.9212121212121213,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          247,
+          463,
+          278,
+          500
+        ],
+        "assembly_top": 463,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "6aa4e3aec10e4dc5c5d972deefad8f9750c3a17038f1b15ba98cf61081e3598a",
+      "key_sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c"
+    },
+    {
+      "state": "embarrassed",
+      "key": 1,
+      "source": "quiet-e-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        598,
+        92,
+        963,
+        745
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            322.6703601108033,
+            269.4504155124654,
+            1805
+          ],
+          [
+            468.29695024077046,
+            288.79454253611556,
+            623
+          ]
+        ],
+        "ear_target": [
+          [
+            193.20290665176077,
+            142.1525992174399,
+            1789
+          ],
+          [
+            338.41639344262296,
+            162.22131147540983,
+            610
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9978757899110327,
+        "translation": [
+          -128.8339147582489,
+          -126.34260889186461
+        ],
+        "neck_y": 257,
+        "body_vertical_fit": 0.917864476386037,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          245,
+          465,
+          277,
+          501
+        ],
+        "assembly_top": 465,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "780961342bcd2d2c4277cb0c5344f298ec83eda861fcebf8f0e377a635a64f24",
+      "key_sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43"
+    }
   ],
   "drawn_pose_count": 2,
   "frame_source_key_indices": [
@@ -62,13 +158,13 @@
     null
   ],
   "key_sha256": [
-    "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
-    "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524"
+    "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
+    "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/embarrassed.png",
-    "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+    "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
     "anchor": [
       256,
       704
@@ -111,7 +207,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0003.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -120,7 +216,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0004.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -129,7 +225,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0005.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -138,7 +234,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0006.png",
-        "sha256": "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524",
+        "sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
         "anchor": [
           256,
           704
@@ -147,7 +243,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0007.png",
-        "sha256": "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524",
+        "sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
         "anchor": [
           256,
           704
@@ -156,7 +252,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0008.png",
-        "sha256": "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524",
+        "sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
         "anchor": [
           256,
           704
@@ -165,7 +261,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0009.png",
-        "sha256": "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524",
+        "sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
         "anchor": [
           256,
           704
@@ -174,7 +270,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0010.png",
-        "sha256": "f929ae4b6cc52f0c18359511285e82b4ee2b707e9555a3b85e067ecbcb9e8524",
+        "sha256": "4ee4f127130f764681f60e692930b290560279b86e5366e4e253aa20a81b3d43",
         "anchor": [
           256,
           704
@@ -183,7 +279,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0011.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -192,7 +288,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0012.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -201,7 +297,7 @@
       },
       {
         "path": "Generated/chibi/embarrassed/0013.png",
-        "sha256": "0545dec2e64ec1ff8795458013a7f931a0197fcb48abf217e940ddc809d7fd3c",
+        "sha256": "9ba85fef2e1ef914f1c611dbe0395deb372944c8d2d4ff4662d786941ee7b86c",
         "anchor": [
           256,
           704
@@ -238,6 +334,6 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
-  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
+  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
 }

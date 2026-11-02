@@ -119,6 +119,7 @@ document.getElementById('replay').onclick=show;document.getElementById('reduced'
     combined.save(directory/'all-states-contact-sheet.png')
     index=header('AudioHole full avatar catalog')+'''<h1>AudioHole · Full avatar catalog</h1>
 <p>Norm and Vanilla approved. UwU faces accepted; revised body performances require human review. Static expressions also serve reduced motion. Select a playable page to replay a reaction or inspect individual operating frames.</p>
+<p><a href="consistency-correction/REPORT.md">UwU consistency correction</a></p>
 <p><a href="uwu-body-revision-loop.gif">UwU body demo</a> · <a href="uwu-body-keyposes.png">Every body key</a> · <a href="UWU_BODY_REVISION.md">Body revision report</a></p>
 <p><a href="all-states-contact-sheet.png">All generated expressions</a> · <a href="inventory.json">Full inventory and validation</a> · <a href="HANDOFF.md">Integration handoff</a></p>
 <p><a href="norm-review.zip">Norm review ZIP</a> · <a href="uwu-review.zip">UwU review ZIP</a> · <a href="vanilla-review.zip">Vanilla review ZIP</a></p><main>'''+''.join(catalog_cards)+'</main></html>'

@@ -3,66 +3,285 @@
   "state": "angry",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-1",
-  "generation": "reference-guided full-body pose drawings with timed holds",
+  "revision": "articulated-body-2-consistency",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-  "source": "UwU/Intermediate/BodyRevision/angry-source.png",
-  "source_sha256": "065613134357c42c068b22aaa8dfab8a314c89e0f69d22a70224b3515e7009b1",
-  "source_indices": [
-    0,
-    1,
-    2,
-    3
-  ],
-  "source_crop_boxes": [
-    [
-      9,
-      68,
-      507,
-      721
-    ],
-    [
-      551,
-      49,
-      1011,
-      728
-    ],
-    [
-      9,
-      819,
-      534,
-      1491
-    ],
-    [
-      552,
-      796,
-      1019,
-      1490
-    ]
-  ],
-  "common_scale": 0.8292264826540604,
-  "registration": "mint case stripe centroid",
-  "source_prop_anchors": [
-    [
-      116.10119695321,
-      447.21436343852014
-    ],
-    [
-      117.29220779220779,
-      466.2251082251082
-    ],
-    [
-      115.73254564983888,
-      464.1825993555317
-    ],
-    [
-      115.99354838709678,
-      487.0548387096774
-    ]
-  ],
-  "target_prop_anchor": [
-    156.6245883644347,
-    515.1778265642151
+  "source": "UwU/Intermediate/ConsistencyRevision/angry-source.png",
+  "source_sha256": "8cf935dfbead7df75e4c1e90a0fa918e3e53755722cafc82bab1b8884cf9fd54",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/angry",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/angry",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "angry",
+      "key": 0,
+      "source": "angry-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        63,
+        68,
+        533,
+        770
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            326.49979533360624,
+            256.2787556283258,
+            2443
+          ],
+          [
+            526.8290854572714,
+            273.18440779610194,
+            1334
+          ]
+        ],
+        "ear_target": [
+          [
+            223.32430689877498,
+            194.6247582205029,
+            1551
+          ],
+          [
+            374.63537414965987,
+            202.44761904761904,
+            735
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.7536417415344749,
+        "translation": [
+          -22.572291386233246,
+          -0.9765816467080413
+        ],
+        "neck_y": 278,
+        "body_vertical_fit": 1.0730478589420656,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          245,
+          486,
+          271,
+          520
+        ],
+        "assembly_top": 486,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "845e1ec74d9e0f308458c01e9845817607d1c41b772c1f65acc969e3e0c225ed",
+      "key_sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7"
+    },
+    {
+      "state": "angry",
+      "key": 1,
+      "source": "angry-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        528,
+        63,
+        1009,
+        771
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            244.78610354223434,
+            276.9396003633061,
+            2202
+          ],
+          [
+            427.8310308182784,
+            242.0998937300744,
+            941
+          ]
+        ],
+        "ear_target": [
+          [
+            139.0878205128205,
+            202.41474358974358,
+            1560
+          ],
+          [
+            279.2749140893471,
+            170.26632302405497,
+            582
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.7718847875995566,
+        "translation": [
+          -50.41009964475961,
+          -13.978811520125902
+        ],
+        "neck_y": 267,
+        "body_vertical_fit": 1.0606796116504855,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          219,
+          479,
+          245,
+          514
+        ],
+        "assembly_top": 479,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [
+        {
+          "patch": "GarmentEdits/angry-0001-patch.png",
+          "patch_sha256": "658cec8700d18f6b8ef1a3c05ee3bf8e8e8e14459e435b011f43e4059d06a2a4",
+          "mask": "GarmentEdits/angry-0001-mask.png",
+          "mask_sha256": "7fece4af1b414302498275d39aa86e1c75993eb719f6c320045692eb670020b4"
+        }
+      ],
+      "character_sha256": "4a1018d61ac1eacbe15b351569fdfe869a78e4adefd7668b4c06c1e11d726c37",
+      "key_sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749"
+    },
+    {
+      "state": "angry",
+      "key": 2,
+      "source": "angry-source.png",
+      "source_cell": 2,
+      "source_crop_box": [
+        93,
+        804,
+        549,
+        1502
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            338.2083559413999,
+            232.0255018990776,
+            1843
+          ],
+          [
+            566.4363636363636,
+            258.5090909090909,
+            220
+          ]
+        ],
+        "ear_target": [
+          [
+            223.6250922509225,
+            187.84354243542435,
+            1355
+          ],
+          [
+            415.1279069767442,
+            204.21511627906978,
+            172
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.8365329269132843,
+        "translation": [
+          -59.00604792868353,
+          -9.144839979769586
+        ],
+        "neck_y": 284,
+        "body_vertical_fit": 0.9813084112149533,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          240,
+          474,
+          270,
+          510
+        ],
+        "assembly_top": 474,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [
+        {
+          "patch": "GarmentEdits/angry-0002-patch.png",
+          "patch_sha256": "1f0620ac38d62c3ec1d2fe5388d51d824759dd0daa27cb817646e713fc8ef579",
+          "mask": "GarmentEdits/angry-0002-mask.png",
+          "mask_sha256": "3a4bcbae69981c0864ecc619eb8d8064d9e9aee1542f9662038f6f8da12c7e4c"
+        }
+      ],
+      "character_sha256": "a63ace9bb39ba0127010f86ec210399d9fd040e7b55f223814250d58b8e37c2a",
+      "key_sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d"
+    },
+    {
+      "state": "angry",
+      "key": 3,
+      "source": "angry-source.png",
+      "source_cell": 3,
+      "source_crop_box": [
+        552,
+        812,
+        1008,
+        1504
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            280.223185759927,
+            250.6261980830671,
+            2191
+          ],
+          [
+            463.35571260306244,
+            234.5017667844523,
+            849
+          ]
+        ],
+        "ear_target": [
+          [
+            165.54771505376345,
+            177.61962365591398,
+            1488
+          ],
+          [
+            307.0119521912351,
+            159.69521912350598,
+            502
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.7756445476314248,
+        "translation": [
+          -52.09662550201779,
+          -19.486009036800425
+        ],
+        "neck_y": 250,
+        "body_vertical_fit": 1.135,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          244,
+          475,
+          271,
+          512
+        ],
+        "assembly_top": 475,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [
+        {
+          "patch": "GarmentEdits/angry-0003-patch.png",
+          "patch_sha256": "7ebd341778b7357e7f29472b7f514574f7d83973ea312fa78241844cc3f65e23",
+          "mask": "GarmentEdits/angry-0003-mask.png",
+          "mask_sha256": "813c1f50aaa92bbcc8c816e6ff0b950c0a8efd35877309df95034f65de0c2257"
+        }
+      ],
+      "character_sha256": "04a1f842a9264daa4ae716731b378145b23ce0ef46e067f300c68cc1187ba8ea",
+      "key_sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916"
+    }
   ],
   "drawn_pose_count": 4,
   "frame_source_key_indices": [
@@ -84,15 +303,15 @@
     null
   ],
   "key_sha256": [
-    "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
-    "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
-    "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
-    "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b"
+    "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
+    "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
+    "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
+    "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/angry.png",
-    "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+    "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
     "anchor": [
       256,
       704
@@ -126,7 +345,7 @@
       },
       {
         "path": "Generated/chibi/angry/0002.png",
-        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
         "anchor": [
           256,
           704
@@ -135,7 +354,7 @@
       },
       {
         "path": "Generated/chibi/angry/0003.png",
-        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
         "anchor": [
           256,
           704
@@ -144,7 +363,7 @@
       },
       {
         "path": "Generated/chibi/angry/0004.png",
-        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
         "anchor": [
           256,
           704
@@ -153,7 +372,7 @@
       },
       {
         "path": "Generated/chibi/angry/0005.png",
-        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
         "anchor": [
           256,
           704
@@ -162,7 +381,7 @@
       },
       {
         "path": "Generated/chibi/angry/0006.png",
-        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
         "anchor": [
           256,
           704
@@ -171,7 +390,7 @@
       },
       {
         "path": "Generated/chibi/angry/0007.png",
-        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
         "anchor": [
           256,
           704
@@ -180,7 +399,7 @@
       },
       {
         "path": "Generated/chibi/angry/0008.png",
-        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "sha256": "62be551c54ab2b8d81379a2e1ec7f7844f23341815e6cb0d6b1ad143ae858749",
         "anchor": [
           256,
           704
@@ -189,7 +408,7 @@
       },
       {
         "path": "Generated/chibi/angry/0009.png",
-        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
         "anchor": [
           256,
           704
@@ -198,7 +417,7 @@
       },
       {
         "path": "Generated/chibi/angry/0010.png",
-        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "sha256": "151b36783ae9764c1efbad21d1158f6d16b138f539355503fd36bf6f0a8e756d",
         "anchor": [
           256,
           704
@@ -207,7 +426,7 @@
       },
       {
         "path": "Generated/chibi/angry/0011.png",
-        "sha256": "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b",
+        "sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916",
         "anchor": [
           256,
           704
@@ -216,7 +435,7 @@
       },
       {
         "path": "Generated/chibi/angry/0012.png",
-        "sha256": "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b",
+        "sha256": "4786e5a8f434d163c4af341a99b47b0e61bba04f88bb134eb2ee800b24ea1916",
         "anchor": [
           256,
           704
@@ -225,7 +444,7 @@
       },
       {
         "path": "Generated/chibi/angry/0013.png",
-        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
         "anchor": [
           256,
           704
@@ -234,7 +453,7 @@
       },
       {
         "path": "Generated/chibi/angry/0014.png",
-        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "sha256": "2799eed184d9c0e07cb6eee35e0f285ac3459bc6ab38a589e79dc29927129ee7",
         "anchor": [
           256,
           704
@@ -262,6 +481,6 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
-  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
+  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
 }

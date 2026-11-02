@@ -3,44 +3,140 @@
   "state": "working",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-1",
-  "generation": "reference-guided full-body pose drawings with timed holds",
+  "revision": "articulated-body-2-consistency",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-  "source": "UwU/Intermediate/BodyRevision/quiet-b-source.png",
-  "source_sha256": "f76c91b9700c73ca66f1447c32b439ce82cdc756d45e15eab2e5358a16e14def",
-  "source_indices": [
-    0,
-    1
-  ],
-  "source_crop_boxes": [
-    [
-      11,
-      69,
-      506,
-      741
-    ],
-    [
-      526,
-      63,
-      1023,
-      741
-    ]
-  ],
-  "common_scale": 0.9184698286805001,
-  "registration": "mint case stripe centroid",
-  "source_prop_anchors": [
-    [
-      127.6952296819788,
-      473.6687279151943
-    ],
-    [
-      127.49911816578484,
-      479.7195767195767
-    ]
-  ],
-  "target_prop_anchor": [
-    156.6245883644347,
-    515.1778265642151
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-b-source.png",
+  "source_sha256": "73b39eddf09781820b0f44e3eee78140d3ed4d5091d3ec3542cbc1929cda81e2",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/working",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/working",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "working",
+      "key": 0,
+      "source": "quiet-b-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        86,
+        52,
+        500,
+        786
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            332.0905366653011,
+            251.2769356820975,
+            2441
+          ],
+          [
+            520.148051948052,
+            251.68138528138527,
+            1155
+          ]
+        ],
+        "ear_target": [
+          [
+            228.9592808038075,
+            136.82020095187733,
+            1891
+          ],
+          [
+            386.8853838065194,
+            144.95688748685595,
+            951
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.8408874687624966,
+        "translation": [
+          -50.396042475239085,
+          -70.57713048464257
+        ],
+        "neck_y": 229,
+        "body_vertical_fit": 1.014957264957265,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          261,
+          470,
+          292,
+          507
+        ],
+        "assembly_top": 470,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "6175c07c15631f1238d4dd963dc1fa7fc6911a3316c75c03ace500544d2e907c",
+      "key_sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08"
+    },
+    {
+      "state": "working",
+      "key": 1,
+      "source": "quiet-b-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        585,
+        52,
+        1005,
+        786
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            295.79579831932773,
+            259.9226890756303,
+            2380
+          ],
+          [
+            487.4591439688716,
+            238.4661478599222,
+            1285
+          ]
+        ],
+        "ear_target": [
+          [
+            199.84478096268253,
+            144.60411032990805,
+            1849
+          ],
+          [
+            364.93380855397146,
+            121.55906313645622,
+            982
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.8643014311408576,
+        "translation": [
+          -56.09488902559326,
+          -82.29750578083062
+        ],
+        "neck_y": 224,
+        "body_vertical_fit": 0.9937888198757764,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          264,
+          467,
+          297,
+          505
+        ],
+        "assembly_top": 467,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "06eb2c4c39286940c42a366e4c5aaf87d76dd4213316cbec6779eb4b2959bfec",
+      "key_sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530"
+    }
   ],
   "drawn_pose_count": 2,
   "frame_source_key_indices": [
@@ -62,13 +158,13 @@
     0
   ],
   "key_sha256": [
-    "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
-    "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910"
+    "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
+    "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/working.png",
-    "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+    "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
     "anchor": [
       256,
       704
@@ -84,7 +180,7 @@
     "frames": [
       {
         "path": "Generated/chibi/working/0000.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -93,7 +189,7 @@
       },
       {
         "path": "Generated/chibi/working/0001.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -102,7 +198,7 @@
       },
       {
         "path": "Generated/chibi/working/0002.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -111,7 +207,7 @@
       },
       {
         "path": "Generated/chibi/working/0003.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -120,7 +216,7 @@
       },
       {
         "path": "Generated/chibi/working/0004.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -129,7 +225,7 @@
       },
       {
         "path": "Generated/chibi/working/0005.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -138,7 +234,7 @@
       },
       {
         "path": "Generated/chibi/working/0006.png",
-        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
         "anchor": [
           256,
           704
@@ -147,7 +243,7 @@
       },
       {
         "path": "Generated/chibi/working/0007.png",
-        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
         "anchor": [
           256,
           704
@@ -156,7 +252,7 @@
       },
       {
         "path": "Generated/chibi/working/0008.png",
-        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
         "anchor": [
           256,
           704
@@ -165,7 +261,7 @@
       },
       {
         "path": "Generated/chibi/working/0009.png",
-        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
         "anchor": [
           256,
           704
@@ -174,7 +270,7 @@
       },
       {
         "path": "Generated/chibi/working/0010.png",
-        "sha256": "2423f3dba6d12e65d3c9a1efb0f745f02b4d6f0cc6c7fbc05f202bedb2881910",
+        "sha256": "5e6d4b1d5bb8ca00aa27cf00140a21234ee028463f7ff3e6e49af56d9ebfb530",
         "anchor": [
           256,
           704
@@ -183,7 +279,7 @@
       },
       {
         "path": "Generated/chibi/working/0011.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -192,7 +288,7 @@
       },
       {
         "path": "Generated/chibi/working/0012.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -201,7 +297,7 @@
       },
       {
         "path": "Generated/chibi/working/0013.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -210,7 +306,7 @@
       },
       {
         "path": "Generated/chibi/working/0014.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -219,7 +315,7 @@
       },
       {
         "path": "Generated/chibi/working/0015.png",
-        "sha256": "5a01db172185ecd5a65b2e4de4b2ae841863feee64431b28059c2752728ad048",
+        "sha256": "38b3dded84563cd1cc97210eaf3c624994a8345955ae98a318061b2a50c38d08",
         "anchor": [
           256,
           704
@@ -238,6 +334,6 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
-  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
+  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
 }

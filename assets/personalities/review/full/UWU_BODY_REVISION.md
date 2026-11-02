@@ -1,6 +1,6 @@
 # UwU body performance revision
 
-**2026-11-02 visual review: UwU body artwork needs revision.** Confirmed case-wordmark, badge and wardrobe consistency findings are recorded in the [quick consistency audit](consistency-audit/REPORT.md). Existing technical passes do not grant artistic approval.
+**Current candidate: consistency revision 2.** Fixed case/badge layers and wardrobe corrections address the earlier visual findings. See the [correction report and current evidence](consistency-correction/REPORT.md). UwU remains pending human art approval; the [earlier audit](consistency-audit/REPORT.md) is historical.
 
 Norm and Vanilla are approved. Their operating pixels and all accepted IDLE
 assets remain unchanged. UwU's facial designs are the accepted direction; the

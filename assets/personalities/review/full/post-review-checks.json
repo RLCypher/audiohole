@@ -1,6 +1,12 @@
 {
-  "python_tests": 50,
-  "python_tests_seconds": 41.151,
+  "revision": "articulated-body-2-consistency",
+  "art_approval": "pending human review",
+  "python_tests": 52,
+  "python_test_seconds": 39.698,
+  "operating_pngs": 796,
+  "missing_operating_files": 0,
+  "orphaned_operating_files": 0,
+  "approved_png_hashes_unchanged": 501,
   "native_previews_decoded": 52,
   "native_previews": [
     {
@@ -212,13 +218,22 @@
       "frames": 14
     }
   ],
-  "approved_png_hashes_unchanged": 501,
-  "operating_pngs": 796,
-  "missing_operating_pngs": 0,
-  "orphaned_operating_pngs": 0,
-  "uwu_revised_static_states": 19,
-  "uwu_revised_sequences": 18,
-  "uwu_retained_pose_keys": 48,
-  "new_art_approval": "pending human review",
-  "mode_id_note": "Norm is the display/review name; default remains the application compatibility ID."
+  "reviewed_pose_keys": 48,
+  "used_pose_keys": 47,
+  "case_brand_block_exact_to_approved_idle": true,
+  "minimum_unoccluded_wordmark_letter_fraction": 0.8559622195985832,
+  "canonical_badge_template_checks": "pass: every pose uses source templates, including restored assemblies",
+  "wardrobe_local_edits": 8,
+  "source_and_dependency_hash_checks": "pass",
+  "browser_checks": {
+    "status": "pass",
+    "idle_checks": 12,
+    "full_review_groups": 6,
+    "reports": [
+      "review/browser-checks.json",
+      "review/full/browser-checks.json"
+    ],
+    "scope": "Offline Chromium; Codex embedded visualization host is not directly testable."
+  },
+  "scope": "Asset-only correction. No GUI/audio engine changes."
 }

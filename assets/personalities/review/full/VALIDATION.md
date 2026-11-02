@@ -1,6 +1,6 @@
 # Verification results
 
-- **50 Python tests passed**, including contract validation, real-library
+- **52 Python tests passed**, including contract validation, real-library
   acceptance, playback timing, priority/interruption, cooldowns, reduced motion,
   persistent return context, invalid/missing assets, recovery and personality
   isolation.
@@ -42,3 +42,10 @@ Near-opaque source alpha and facial-edge softness remain documented. New UwU
 pose/prop/wardrobe variations remain artistic review items. Technical validation
 does not replace human approval. No application C++ build target or Windows audio
 hardware integration exists in this checkout, so no such result is claimed.
+
+
+Current UwU candidate is consistency revision 2. Shared case/visible-lettering
+and canonical-badge tests now guard the visual defects found in revision 1.
+See [the correction validation](consistency-correction/validation.json) and
+[comparison report](consistency-correction/REPORT.md). All 52 native previews
+were decoded after the correction; both offline browser suites passed again.

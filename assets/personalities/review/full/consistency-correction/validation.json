@@ -1,0 +1,239 @@
+{
+  "revision": "articulated-body-2-consistency",
+  "art_approval": "pending human review",
+  "python_tests": 52,
+  "python_test_seconds": 39.698,
+  "operating_pngs": 796,
+  "missing_operating_files": 0,
+  "orphaned_operating_files": 0,
+  "approved_png_hashes_unchanged": 501,
+  "native_previews_decoded": 52,
+  "native_previews": [
+    {
+      "path": "review/full/norm/panicking-native.png",
+      "frames": 20
+    },
+    {
+      "path": "review/full/norm/celebrating-native.png",
+      "frames": 22
+    },
+    {
+      "path": "review/full/norm/smug-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/laughing-native.png",
+      "frames": 18
+    },
+    {
+      "path": "review/full/norm/sleeping-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/embarrassed-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/mischievous-native.png",
+      "frames": 14
+    },
+    {
+      "path": "review/full/norm/error-native.png",
+      "frames": 18
+    },
+    {
+      "path": "review/full/norm/suspicious-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/working-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/bored-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/deadpan-native.png",
+      "frames": 1
+    },
+    {
+      "path": "review/full/norm/thinking-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/talking-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/idle-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/concerned-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/happy-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/norm/confused-native.png",
+      "frames": 14
+    },
+    {
+      "path": "review/full/norm/angry-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/norm/surprised-native.png",
+      "frames": 14
+    },
+    {
+      "path": "review/full/uwu/panicking-native.png",
+      "frames": 9
+    },
+    {
+      "path": "review/full/uwu/celebrating-native.png",
+      "frames": 9
+    },
+    {
+      "path": "review/full/uwu/smug-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/laughing-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/sleeping-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/embarrassed-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/mischievous-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/error-native.png",
+      "frames": 9
+    },
+    {
+      "path": "review/full/uwu/suspicious-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/working-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/bored-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/deadpan-native.png",
+      "frames": 1
+    },
+    {
+      "path": "review/full/uwu/thinking-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/talking-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/idle-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/uwu/concerned-native.png",
+      "frames": 3
+    },
+    {
+      "path": "review/full/uwu/happy-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/confused-native.png",
+      "frames": 5
+    },
+    {
+      "path": "review/full/uwu/angry-native.png",
+      "frames": 9
+    },
+    {
+      "path": "review/full/uwu/surprised-native.png",
+      "frames": 9
+    },
+    {
+      "path": "review/full/vanilla/celebrating-native.png",
+      "frames": 22
+    },
+    {
+      "path": "review/full/vanilla/sleeping-native.png",
+      "frames": 1
+    },
+    {
+      "path": "review/full/vanilla/error-native.png",
+      "frames": 18
+    },
+    {
+      "path": "review/full/vanilla/working-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/vanilla/thinking-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/vanilla/talking-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/vanilla/idle-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/vanilla/concerned-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/vanilla/happy-native.png",
+      "frames": 12
+    },
+    {
+      "path": "review/full/vanilla/confused-native.png",
+      "frames": 14
+    },
+    {
+      "path": "review/full/vanilla/angry-native.png",
+      "frames": 16
+    },
+    {
+      "path": "review/full/vanilla/surprised-native.png",
+      "frames": 14
+    }
+  ],
+  "reviewed_pose_keys": 48,
+  "used_pose_keys": 47,
+  "case_brand_block_exact_to_approved_idle": true,
+  "minimum_unoccluded_wordmark_letter_fraction": 0.8559622195985832,
+  "canonical_badge_template_checks": "pass: every pose uses source templates, including restored assemblies",
+  "wardrobe_local_edits": 8,
+  "source_and_dependency_hash_checks": "pass",
+  "browser_checks": {
+    "status": "pass",
+    "idle_checks": 12,
+    "full_review_groups": 6,
+    "reports": [
+      "review/browser-checks.json",
+      "review/full/browser-checks.json"
+    ],
+    "scope": "Offline Chromium; Codex embedded visualization host is not directly testable."
+  },
+  "scope": "Asset-only correction. No GUI/audio engine changes."
+}

@@ -1,0 +1,169 @@
+{
+  "surprised/0002": {
+    "ears": {
+      "target": [
+        [
+          250.5,
+          137.8
+        ],
+        [
+          431.5,
+          187.7
+        ]
+      ],
+      "source": [
+        [
+          233.6,
+          99.3
+        ],
+        [
+          447.6,
+          156.0
+        ]
+      ]
+    },
+    "reason": "Manually verify separated ear interiors; omit hair-clip color component."
+  },
+  "concerned/0001": {
+    "ears": {
+      "target": [
+        [
+          193.8,
+          136.4
+        ],
+        [
+          422.2,
+          200
+        ]
+      ],
+      "source": [
+        [
+          182.4,
+          140.1
+        ],
+        [
+          427.7,
+          206.8
+        ]
+      ]
+    },
+    "reason": "Widely splayed ears; preserve their actual span."
+  },
+  "bored/0000": {
+    "ears": {
+      "target": [
+        [
+          155,
+          199
+        ],
+        [
+          350,
+          173
+        ]
+      ],
+      "source": [
+        [
+          145,
+          179
+        ],
+        [
+          367,
+          144
+        ]
+      ]
+    },
+    "reason": "Opposite ear folds behind hair; use geometric ear centers verified on native source."
+  },
+  "sleeping/0001": {
+    "ears": {
+      "target": [
+        [
+          182.5,
+          237.3
+        ],
+        [
+          406.6,
+          354.7
+        ]
+      ],
+      "source": [
+        [
+          172.7,
+          177
+        ],
+        [
+          437.3,
+          332.2
+        ]
+      ]
+    },
+    "reason": "Folded ears have a steep diagonal; omit hair-clip component."
+  },
+  "panicking/0003": {
+    "ears": {
+      "target": [
+        [
+          194,
+          165
+        ],
+        [
+          352,
+          163
+        ]
+      ],
+      "source": [
+        [
+          193,
+          147
+        ],
+        [
+          379,
+          134
+        ]
+      ]
+    },
+    "reason": "Folded near ear has no broad pink interior; use geometric centers."
+  },
+  "bored/0001": {
+    "ears": {
+      "target": [
+        [
+          145,
+          225
+        ],
+        [
+          350,
+          192
+        ]
+      ],
+      "source": [
+        [
+          137,
+          208
+        ],
+        [
+          380,
+          175
+        ]
+      ]
+    },
+    "reason": "Folded ear tips are nearly white; geometric centers verified on the native drawings. Restore omitted badge beside the pouch at the belt attachment.",
+    "badge_box": [
+      253,
+      465,
+      277,
+      497
+    ],
+    "add_badge_hanger": true
+  },
+  "error/0002": {
+    "badge_box": [
+      270,
+      486,
+      294,
+      518
+    ],
+    "add_badge_hanger": true,
+    "reason": "Cleanup backend omitted the badge. Restore the canonical complete badge at the original belt-side attachment."
+  }
+}

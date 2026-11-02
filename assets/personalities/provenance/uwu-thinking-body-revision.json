@@ -3,44 +3,140 @@
   "state": "thinking",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-1",
-  "generation": "reference-guided full-body pose drawings with timed holds",
+  "revision": "articulated-body-2-consistency",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-  "source": "UwU/Intermediate/BodyRevision/quiet-a-source.png",
-  "source_sha256": "c7f3c3ccf0eee49336895cf377e66c9b459df4017976703d767304c4a070a27b",
-  "source_indices": [
-    2,
-    3
-  ],
-  "source_crop_boxes": [
-    [
-      27,
-      790,
-      509,
-      1486
-    ],
-    [
-      540,
-      794,
-      997,
-      1485
-    ]
-  ],
-  "common_scale": 0.9124831033988112,
-  "registration": "mint case stripe centroid",
-  "source_prop_anchors": [
-    [
-      110.0748538011696,
-      507.15555555555557
-    ],
-    [
-      109.64260768335274,
-      503.2235157159488
-    ]
-  ],
-  "target_prop_anchor": [
-    156.6245883644347,
-    515.1778265642151
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-a-source.png",
+  "source_sha256": "4319d3d1d6c5d9422adddeed51018467ef6ce560e564423b11eb51accfa23f85",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/thinking",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/thinking",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "thinking",
+      "key": 0,
+      "source": "quiet-a-source.png",
+      "source_cell": 2,
+      "source_crop_box": [
+        83,
+        803,
+        512,
+        1496
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            305.80619111709285,
+            247.96096904441453,
+            2229
+          ],
+          [
+            481.00212539851225,
+            218.817215727949,
+            941
+          ]
+        ],
+        "ear_target": [
+          [
+            200.83886771910724,
+            127.89929232444203,
+            1837
+          ],
+          [
+            356.62419562419564,
+            102.04504504504504,
+            777
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.8891504050079829,
+        "translation": [
+          -71.06393497509833,
+          -92.5458373348755
+        ],
+        "neck_y": 208,
+        "body_vertical_fit": 1.0782608695652174,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          282,
+          457,
+          308,
+          491
+        ],
+        "assembly_top": 457,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "bbef1a06b430089161c9738067c5aaa267502d175c7a27ee3b2f7c29827a85e0",
+      "key_sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301"
+    },
+    {
+      "state": "thinking",
+      "key": 1,
+      "source": "quiet-a-source.png",
+      "source_cell": 3,
+      "source_crop_box": [
+        582,
+        807,
+        1009,
+        1499
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            289.42433820624257,
+            249.90833662583958,
+            2531
+          ],
+          [
+            463.51657754010694,
+            216.50588235294117,
+            935
+          ]
+        ],
+        "ear_target": [
+          [
+            178.87891019172554,
+            132.7593340060545,
+            1982
+          ],
+          [
+            335.1002475247525,
+            98.99257425742574,
+            808
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.901624980586963,
+        "translation": [
+          -82.4455904132272,
+          -94.38940143437324
+        ],
+        "neck_y": 211,
+        "body_vertical_fit": 1.0511727078891258,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          287,
+          459,
+          312,
+          492
+        ],
+        "assembly_top": 459,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "dca41114dc12128a8a0b6bd25d7f16f4d901a58b6e8bc8847532865b9d3af3c0",
+      "key_sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333"
+    }
   ],
   "drawn_pose_count": 2,
   "frame_source_key_indices": [
@@ -62,13 +158,13 @@
     0
   ],
   "key_sha256": [
-    "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
-    "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b"
+    "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
+    "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/thinking.png",
-    "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+    "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
     "anchor": [
       256,
       704
@@ -84,7 +180,7 @@
     "frames": [
       {
         "path": "Generated/chibi/thinking/0000.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -93,7 +189,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0001.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -102,7 +198,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0002.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -111,7 +207,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0003.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -120,7 +216,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0004.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -129,7 +225,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0005.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -138,7 +234,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0006.png",
-        "sha256": "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b",
+        "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
         "anchor": [
           256,
           704
@@ -147,7 +243,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0007.png",
-        "sha256": "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b",
+        "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
         "anchor": [
           256,
           704
@@ -156,7 +252,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0008.png",
-        "sha256": "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b",
+        "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
         "anchor": [
           256,
           704
@@ -165,7 +261,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0009.png",
-        "sha256": "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b",
+        "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
         "anchor": [
           256,
           704
@@ -174,7 +270,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0010.png",
-        "sha256": "bab8db3292cb9ae409b66eed7b4d9215cf6d9c4cb17a2825301f7d4a4f1b943b",
+        "sha256": "7144dec45807e421a785882a94eeaed170cd8ab6ce2dbbc4be302ee87bdce333",
         "anchor": [
           256,
           704
@@ -183,7 +279,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0011.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -192,7 +288,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0012.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -201,7 +297,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0013.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -210,7 +306,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0014.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -219,7 +315,7 @@
       },
       {
         "path": "Generated/chibi/thinking/0015.png",
-        "sha256": "97a2a85d6925b32a5aff15ea3a3831729f8e3c0fe650469e443ad09c3f539a7e",
+        "sha256": "9eaeabcfee039ef1cbf4d62947e0317c5f2a38167b5228dfb17a5e4fc569d301",
         "anchor": [
           256,
           704
@@ -238,6 +334,6 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
-  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
+  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
 }

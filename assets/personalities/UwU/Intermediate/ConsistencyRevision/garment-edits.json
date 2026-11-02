@@ -1,0 +1,92 @@
+[
+  {
+    "state": "angry",
+    "key": 1,
+    "box": [
+      299,
+      357,
+      338,
+      394
+    ],
+    "patch": "GarmentEdits/angry-0001-patch.png",
+    "mask": "GarmentEdits/angry-0001-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 0,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  },
+  {
+    "state": "angry",
+    "key": 2,
+    "box": [
+      360,
+      367,
+      410,
+      410
+    ],
+    "patch": "GarmentEdits/angry-0002-patch.png",
+    "mask": "GarmentEdits/angry-0002-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 1,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  },
+  {
+    "state": "angry",
+    "key": 3,
+    "box": [
+      307,
+      347,
+      349,
+      383
+    ],
+    "patch": "GarmentEdits/angry-0003-patch.png",
+    "mask": "GarmentEdits/angry-0003-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 2,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  },
+  {
+    "state": "surprised",
+    "key": 3,
+    "box": [
+      309,
+      343,
+      358,
+      382
+    ],
+    "patch": "GarmentEdits/surprised-0003-patch.png",
+    "mask": "GarmentEdits/surprised-0003-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 3,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  },
+  {
+    "state": "confused",
+    "key": 1,
+    "box": [
+      321,
+      325,
+      363,
+      367
+    ],
+    "patch": "GarmentEdits/confused-0001-patch.png",
+    "mask": "GarmentEdits/confused-0001-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 4,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  },
+  {
+    "state": "concerned",
+    "key": 0,
+    "box": [
+      367,
+      326,
+      406,
+      369
+    ],
+    "patch": "GarmentEdits/concerned-0000-patch.png",
+    "mask": "GarmentEdits/concerned-0000-mask.png",
+    "model_edit": "extra-mint-edited.png",
+    "guide_cell": 5,
+    "reason": "Remove extra mint stripe on wearer-left sleeve; retain pink band, original pose, silhouette and all pixels outside the local mask."
+  }
+]

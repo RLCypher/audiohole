@@ -356,5 +356,7 @@
   ],
   "preliminary_correction": "Bored retains its case wordmark. The initial nine-state estimate and bored frame claim were corrected after closer crops. Confirmed missing-wordmark count is eight states.",
   "operating_art_modified": false,
-  "approved_status_modified": false
+  "approved_status_modified": false,
+  "applies_to_commit": "73edab2",
+  "superseded_by": "review/full/consistency-correction/REPORT.md"
 }

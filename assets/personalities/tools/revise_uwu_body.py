@@ -165,6 +165,8 @@ def key_timeline(count, drawn_count, finite):
 
 
 def generate(selected=None):
+    if (ROOT/'provenance/uwu-consistency-revision.json').exists():
+        raise AssetError('the current body library uses fixed brand layers; rebuild with correct_uwu_consistency.py --package')
     manifest=ROOT/'UwU/manifest.json'
     data=read_json(manifest);info=data['styles']['chibi'];master_path=manifest.parent/'Generated/chibi/idle.png'
     master=Image.open(master_path).copy()

@@ -1,5 +1,7 @@
 # UwU quick visual consistency review — 2026-11-02
 
+This is the historical review of revision 1 at commit `73edab2`. The [corrected candidate and current validation](../consistency-correction/REPORT.md) supersede its operating-file findings. Original source keys and the evidence sheets below are preserved.
+
 **Verdict: needs revision.** Full-body acting improved, but the case and wearable
 branding are not consistent enough for approval. The previous technical checks
 verify valid files, hashes and playback; they do not certify visual identity.

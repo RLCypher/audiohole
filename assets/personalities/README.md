@@ -215,3 +215,11 @@ silhouettes along clear sheet gutters, registers them by a case stripe, applies
 a common fit per state, and uses deliberate exposure holds. It adds no whole
 sprite translation/rotation animation. New source sheets, exact prompts, key
 indices and a per-state provenance record are retained.
+
+
+UwU consistency revision 2 uses a fixed case and canonical badge layers. See
+[the correction report](review/full/consistency-correction/REPORT.md). Rebuild
+with `python assets/personalities/tools/correct_uwu_consistency.py --package`,
+then rebuild the body review, audit and catalog. The earlier body-only command
+now refuses to overwrite the corrected library. Human artistic approval remains
+pending for the 19 non-IDLE static states and 18 sequences.

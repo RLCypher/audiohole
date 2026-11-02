@@ -1,0 +1,267 @@
+{
+  "personality_id": "uwu",
+  "state": "angry",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/angry-source.png",
+  "source_sha256": "065613134357c42c068b22aaa8dfab8a314c89e0f69d22a70224b3515e7009b1",
+  "source_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      9,
+      68,
+      507,
+      721
+    ],
+    [
+      551,
+      49,
+      1011,
+      728
+    ],
+    [
+      9,
+      819,
+      534,
+      1491
+    ],
+    [
+      552,
+      796,
+      1019,
+      1490
+    ]
+  ],
+  "common_scale": 0.8292264826540604,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      116.10119695321,
+      447.21436343852014
+    ],
+    [
+      117.29220779220779,
+      466.2251082251082
+    ],
+    [
+      115.73254564983888,
+      464.1825993555317
+    ],
+    [
+      115.99354838709678,
+      487.0548387096774
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 4,
+  "frame_source_key_indices": [
+    null,
+    null,
+    0,
+    0,
+    1,
+    1,
+    2,
+    2,
+    1,
+    2,
+    2,
+    3,
+    3,
+    0,
+    0,
+    null
+  ],
+  "key_sha256": [
+    "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+    "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+    "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+    "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/angry.png",
+    "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 65,
+    "interruptible": false,
+    "cooldown_ms": 6000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/angry/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0001.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0002.png",
+        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0003.png",
+        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0004.png",
+        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0005.png",
+        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0006.png",
+        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0007.png",
+        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0008.png",
+        "sha256": "8c21b9bc431b3c23adf5061d4cc900ebc2a9740a9dc1bc07da4478fc26a9bfa0",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 270
+      },
+      {
+        "path": "Generated/chibi/angry/0009.png",
+        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/chibi/angry/0010.png",
+        "sha256": "cd1495a66418512ab999e38f66c0e0116df3ec8a40003dd58578c4f692f701c7",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0011.png",
+        "sha256": "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0012.png",
+        "sha256": "8a6286905058ccccfd373c14d9462ddde3c298f6fc33e84393e7f3fa018b478b",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0013.png",
+        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0014.png",
+        "sha256": "fb30011033e7eecaa4b363b76ac71b864166c1ff16064d35165505872270d8f9",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/angry/0015.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      }
+    ]
+  },
+  "behavior": {
+    "category": "theatrical",
+    "mode": "finite",
+    "priority": 65,
+    "interruptible": false,
+    "cooldown_ms": 6000,
+    "static_hold_ms": 1800,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}

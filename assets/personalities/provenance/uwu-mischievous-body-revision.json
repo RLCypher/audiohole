@@ -3,44 +3,140 @@
   "state": "mischievous",
   "status": "validated",
   "approval": "pending human review",
-  "revision": "articulated-body-1",
-  "generation": "reference-guided full-body pose drawings with timed holds",
+  "revision": "articulated-body-2-consistency",
+  "generation": "costume cleanup drawings plus reusable case and canonical badge layers",
   "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
-  "source": "UwU/Intermediate/BodyRevision/quiet-g-source.png",
-  "source_sha256": "c4d7d856238e98135024d544a322a12f9fff019686d71b5c3da3907c744e0d55",
-  "source_indices": [
-    0,
-    1
-  ],
-  "source_crop_boxes": [
-    [
-      32,
-      55,
-      541,
-      736
-    ],
-    [
-      546,
-      55,
-      1011,
-      736
-    ]
-  ],
-  "common_scale": 0.8798594711586387,
-  "registration": "mint case stripe centroid",
-  "source_prop_anchors": [
-    [
-      123.28452751817238,
-      470.595015576324
-    ],
-    [
-      118.03246753246754,
-      471.05627705627705
-    ]
-  ],
-  "target_prop_anchor": [
-    156.6245883644347,
-    515.1778265642151
+  "source": "UwU/Intermediate/ConsistencyRevision/quiet-g-source.png",
+  "source_sha256": "ac6a5603c3ff3ebe319e1ac27ce9141ee8cbd24e63892fc8948d86fc2adf7751",
+  "keys_directory": "UwU/Intermediate/ConsistencyRevision/Keys/mischievous",
+  "character_layers_directory": "UwU/Intermediate/ConsistencyRevision/Characters/mischievous",
+  "case_path": "UwU/Intermediate/ConsistencyRevision/canonical-case.png",
+  "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+  "composition": [
+    {
+      "state": "mischievous",
+      "key": 0,
+      "source": "quiet-g-source.png",
+      "source_cell": 0,
+      "source_crop_box": [
+        103,
+        99,
+        480,
+        752
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            327.19807008633825,
+            292.63179278821735,
+            1969
+          ],
+          [
+            503.68058968058966,
+            293.1732186732187,
+            814
+          ]
+        ],
+        "ear_target": [
+          [
+            209.18796992481202,
+            162.15962984384038,
+            1729
+          ],
+          [
+            376.24829467939975,
+            164.00545702592086,
+            733
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9466644955045682,
+        "translation": [
+          -100.56353133477938,
+          -114.19785938471347
+        ],
+        "neck_y": 262,
+        "body_vertical_fit": 0.9692982456140351,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          289,
+          469,
+          317,
+          504
+        ],
+        "assembly_top": 469,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "748171f3d14ba497db13440a82a4ba8accd4e1726904b498c6efc25ae80d762f",
+      "key_sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab"
+    },
+    {
+      "state": "mischievous",
+      "key": 1,
+      "source": "quiet-g-source.png",
+      "source_cell": 1,
+      "source_crop_box": [
+        600,
+        101,
+        958,
+        756
+      ],
+      "registration": {
+        "ear_source": [
+          [
+            318.79750130140553,
+            297.7303487766788,
+            1921
+          ],
+          [
+            478.306146572104,
+            310.66548463356975,
+            846
+          ]
+        ],
+        "ear_target": [
+          [
+            211.35214723926381,
+            167.4552147239264,
+            1630
+          ],
+          [
+            356.6099706744868,
+            179.9266862170088,
+            682
+          ]
+        ],
+        "manual_landmarks": false,
+        "uniform_scale": 0.9110176971316121,
+        "translation": [
+          -79.10670587359073,
+          -103.43873507846865
+        ],
+        "neck_y": 269,
+        "body_vertical_fit": 1.0069444444444444,
+        "ground_y": 704
+      },
+      "badge": {
+        "box": [
+          274,
+          470,
+          302,
+          504
+        ],
+        "assembly_top": 470,
+        "template": "canonical-badge.png",
+        "template_sha256": "2464348ccc82bf66692ef1bc0cdb831249c037576eb9fee5abe54671572eb5a2"
+      },
+      "case_sha256": "ec33838125b3a13a0e43d3ee5292b093faa7b9bbdc92e1884771711ed29148b9",
+      "garment_edits": [],
+      "character_sha256": "116d2450205dc9ce570aab78e5c11dba187ddae55cfbd5bdc2d94b5100562bd9",
+      "key_sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151"
+    }
   ],
   "drawn_pose_count": 2,
   "frame_source_key_indices": [
@@ -60,13 +156,13 @@
     null
   ],
   "key_sha256": [
-    "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
-    "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77"
+    "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
+    "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151"
   ],
   "static": {
     "status": "validated",
     "path": "Generated/chibi/mischievous.png",
-    "sha256": "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
+    "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
     "anchor": [
       256,
       704
@@ -109,7 +205,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0003.png",
-        "sha256": "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
+        "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
         "anchor": [
           256,
           704
@@ -118,7 +214,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0004.png",
-        "sha256": "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
+        "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
         "anchor": [
           256,
           704
@@ -127,7 +223,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0005.png",
-        "sha256": "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77",
+        "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
         "anchor": [
           256,
           704
@@ -136,7 +232,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0006.png",
-        "sha256": "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77",
+        "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
         "anchor": [
           256,
           704
@@ -145,7 +241,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0007.png",
-        "sha256": "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77",
+        "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
         "anchor": [
           256,
           704
@@ -154,7 +250,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0008.png",
-        "sha256": "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77",
+        "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
         "anchor": [
           256,
           704
@@ -163,7 +259,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0009.png",
-        "sha256": "1d83b656c4edc7c4b376f35755fb468f524ad001ba2b98358c62263b39d49e77",
+        "sha256": "e09042655e723feb392139ec80d8845f5cc5dfbf8b49d4281b278c93a3c14151",
         "anchor": [
           256,
           704
@@ -172,7 +268,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0010.png",
-        "sha256": "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
+        "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
         "anchor": [
           256,
           704
@@ -181,7 +277,7 @@
       },
       {
         "path": "Generated/chibi/mischievous/0011.png",
-        "sha256": "ceb937d5df10f0621c55ca350e66e6acf88a16d57a32f8651412c6058498f028",
+        "sha256": "a10ac291b6ecd75940fb56ed40b99c3346b239c45023c7994310b9f756226dab",
         "anchor": [
           256,
           704
@@ -218,6 +314,6 @@
     "return_to": "persistent",
     "reduced_motion": "static"
   },
-  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
-  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+  "generator_sha256": "df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d",
+  "generator_snapshot": "provenance/generators/df58d73a227b827896936e073bdfc07785334214947861435b197ee4f1594c2d.py"
 }

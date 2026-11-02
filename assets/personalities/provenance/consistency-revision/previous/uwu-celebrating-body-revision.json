@@ -1,0 +1,327 @@
+{
+  "personality_id": "uwu",
+  "state": "celebrating",
+  "status": "validated",
+  "approval": "pending human review",
+  "revision": "articulated-body-1",
+  "generation": "reference-guided full-body pose drawings with timed holds",
+  "master_sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+  "source": "UwU/Intermediate/BodyRevision/celebrating-source.png",
+  "source_sha256": "8c43aa7c460dd7c8080d8bdab4971d4c1ff392f51c4d50f9b0ac805f70ba4fbe",
+  "source_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "source_crop_boxes": [
+    [
+      28,
+      128,
+      513,
+      736
+    ],
+    [
+      540,
+      71,
+      1013,
+      736
+    ],
+    [
+      27,
+      801,
+      527,
+      1482
+    ],
+    [
+      540,
+      824,
+      1024,
+      1485
+    ]
+  ],
+  "common_scale": 0.8766274212532594,
+  "registration": "mint case stripe centroid",
+  "source_prop_anchors": [
+    [
+      112.12322274881517,
+      423.7594786729858
+    ],
+    [
+      112.7603305785124,
+      480.6387249114522
+    ],
+    [
+      112.86242774566475,
+      509.22196531791906
+    ],
+    [
+      112.81314878892734,
+      486.1983852364475
+    ]
+  ],
+  "target_prop_anchor": [
+    156.6245883644347,
+    515.1778265642151
+  ],
+  "drawn_pose_count": 4,
+  "frame_source_key_indices": [
+    null,
+    null,
+    null,
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    1,
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    3,
+    0,
+    0,
+    null,
+    null
+  ],
+  "key_sha256": [
+    "223138e57ab8d63db4b92a721e4cdb73371bd2f1a7940e21168feecd5cdaa4cb",
+    "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+    "a264b9e1e5199f449696aa1866982bd1839ce190a072fe9427f80a7e2c4d7800",
+    "90ac4aadc43a21044abfb9d6c2b7bc18d596801f99a6c195cf8926668236024f"
+  ],
+  "static": {
+    "status": "validated",
+    "path": "Generated/chibi/celebrating.png",
+    "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+    "anchor": [
+      256,
+      704
+    ]
+  },
+  "animation": {
+    "loop": false,
+    "priority": 55,
+    "interruptible": true,
+    "cooldown_ms": 8000,
+    "transition": "finish_then_persistent",
+    "status": "validated",
+    "frames": [
+      {
+        "path": "Generated/chibi/celebrating/0000.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0001.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0002.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0003.png",
+        "sha256": "223138e57ab8d63db4b92a721e4cdb73371bd2f1a7940e21168feecd5cdaa4cb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0004.png",
+        "sha256": "223138e57ab8d63db4b92a721e4cdb73371bd2f1a7940e21168feecd5cdaa4cb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0005.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0006.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0007.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0008.png",
+        "sha256": "a264b9e1e5199f449696aa1866982bd1839ce190a072fe9427f80a7e2c4d7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0009.png",
+        "sha256": "a264b9e1e5199f449696aa1866982bd1839ce190a072fe9427f80a7e2c4d7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0010.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0011.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 280
+      },
+      {
+        "path": "Generated/chibi/celebrating/0012.png",
+        "sha256": "ab3c2ebcd156503699d069d5d59fdb31e1daa10512202aa3b38c9ab5f258ecb6",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 180
+      },
+      {
+        "path": "Generated/chibi/celebrating/0013.png",
+        "sha256": "a264b9e1e5199f449696aa1866982bd1839ce190a072fe9427f80a7e2c4d7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0014.png",
+        "sha256": "a264b9e1e5199f449696aa1866982bd1839ce190a072fe9427f80a7e2c4d7800",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0015.png",
+        "sha256": "90ac4aadc43a21044abfb9d6c2b7bc18d596801f99a6c195cf8926668236024f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0016.png",
+        "sha256": "90ac4aadc43a21044abfb9d6c2b7bc18d596801f99a6c195cf8926668236024f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0017.png",
+        "sha256": "90ac4aadc43a21044abfb9d6c2b7bc18d596801f99a6c195cf8926668236024f",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0018.png",
+        "sha256": "223138e57ab8d63db4b92a721e4cdb73371bd2f1a7940e21168feecd5cdaa4cb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0019.png",
+        "sha256": "223138e57ab8d63db4b92a721e4cdb73371bd2f1a7940e21168feecd5cdaa4cb",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0020.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 90
+      },
+      {
+        "path": "Generated/chibi/celebrating/0021.png",
+        "sha256": "bb4aa03299bd06dc4ddf7c14eb297ca65a3e2054153b46c3f8b6dc29ffee0ecd",
+        "anchor": [
+          256,
+          704
+        ],
+        "duration_ms": 230
+      }
+    ]
+  },
+  "behavior": {
+    "category": "theatrical",
+    "mode": "finite",
+    "priority": 55,
+    "interruptible": true,
+    "cooldown_ms": 8000,
+    "static_hold_ms": 2400,
+    "return_to": "persistent",
+    "reduced_motion": "static"
+  },
+  "generator_sha256": "c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930",
+  "generator_snapshot": "provenance/generators/c12cc27c931887e4eea31c77ba2e5ae8fdd29a925f6a8729999a85b406031930.py"
+}
