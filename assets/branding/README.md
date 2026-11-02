@@ -97,8 +97,15 @@ RT_GROUP_ICON is AAA_AUDIOHOLE, and checks all seven referenced RT_ICON payloads
 against the canonical ICO for both that group and numeric window-icon resource 1,
 including their language variants. On Windows, windows_icon_check.py additionally
 uses ExtractIconExW at index zero and SHGetFileInfoW for large/small associated file
-icons, comparing rendered pixels to explicit canonical resource 1. No shell cache,
+icons, comparing rendered pixels to explicit canonical resource 1 loaded with
+LoadImageW from a resource-only module mapping. ExtractIconExW's special -1
+count-query index is never used to load the reference. Successful extraction checks
+both returned handles, without assuming the API reports exactly one. Portable
+contract tests cover one/two-handle counts, errors and partial-result cleanup;
+they do not exercise native shell rendering. No shell cache,
 file association or OS setting is changed. GUI smoke checks WM_GETICON's actual
 small/big handles against the canonical window bundle. These native checks run in
 Windows CI; cross-builds cannot execute them. Explorer and Task Manager appearance
 still require human review of the newly extracted artifact.
+Generated Python bytecode caches are ignored so verifier imports do not mark the
+source revision dirty before the package metadata audit.

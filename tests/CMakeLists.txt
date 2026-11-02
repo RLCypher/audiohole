@@ -33,4 +33,6 @@ find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
   add_test(NAME Branding.AssetIntegrity
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_assets.py")
+  add_test(NAME Branding.ShellExtractionContract
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/scripts/test_windows_icon_check.py")
 endif()
