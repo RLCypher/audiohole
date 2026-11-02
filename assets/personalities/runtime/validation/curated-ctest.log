@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /workspace/audiohole/assets/personalities/runtime/build-curated-handoff/compiled
+Test project /workspace/audiohole/assets/personalities/runtime/build-curated-handoff/compiled
+    Start 1: avatar_engine
+1/1 Test #1: avatar_engine ....................   Passed   11.70 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  11.71 sec

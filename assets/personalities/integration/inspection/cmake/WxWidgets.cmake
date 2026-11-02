@@ -1,0 +1,19 @@
+# Provisional wxWidgets evaluation for Milestone 0.2; D-031 remains Open.
+include(FetchContent)
+set(wxBUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(wxBUILD_USE_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
+set(wxBUILD_INSTALL OFF CACHE BOOL "" FORCE)
+set(wxBUILD_SAMPLES OFF CACHE STRING "" FORCE)
+set(wxBUILD_TESTS OFF CACHE STRING "" FORCE)
+set(wxBUILD_DEMOS OFF CACHE BOOL "" FORCE)
+foreach(feature LIBPNG LIBJPEG LIBTIFF ZLIB REGEX EXPAT NANOSVG)
+  set(wxUSE_${feature} OFF CACHE STRING "" FORCE)
+endforeach()
+foreach(feature WEBVIEW WEBVIEW_EDGE WEBVIEW_IE MEDIACTRL STC AUI PROPGRID RIBBON RICHTEXT HTML XML XRC OPENGL SOCKETS INTERNET PROTOCOL FTP HTTP URL FS_INET WEBREQUEST SVG ARTPROVIDER_TANGO WXHTML_HELP)
+  set(wxUSE_${feature} OFF CACHE BOOL "" FORCE)
+endforeach()
+FetchContent_Declare(wxwidgets
+  URL https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6.tar.bz2
+  URL_HASH SHA256=939e5b77ddc5b6092d1d7d29491fe67010a2433cf9b9c0d841ee4d04acb9dce7
+  DOWNLOAD_EXTRACT_TIMESTAMP FALSE)
+FetchContent_MakeAvailable(wxwidgets)

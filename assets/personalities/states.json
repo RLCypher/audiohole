@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "standard": [
+    "idle",
+    "happy",
+    "thinking",
+    "working",
+    "talking",
+    "confused",
+    "concerned",
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping"
+  ],
+  "optional": [
+    "smug",
+    "embarrassed",
+    "laughing",
+    "suspicious",
+    "panicking",
+    "bored",
+    "mischievous",
+    "deadpan"
+  ],
+  "unknown_state_fallback": "idle",
+  "fallback_order": [
+    "requested_animation",
+    "corresponding_static",
+    "personality_idle",
+    "last_valid_frame",
+    "hide"
+  ],
+  "generation_gate": "IDLE accepted by user. Full core and meaningful optional generation authorized; new assets remain unapproved until human review."
+}
