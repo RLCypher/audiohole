@@ -28,6 +28,23 @@ jobs:
         run: cmake --preset windows-msvc
       - name: Build
         run: cmake --build --preset windows-${{ matrix.configuration }} --parallel 2
+      - name: Package unverified Release tester build
+        if: matrix.configuration == 'release'
+        shell: pwsh
+        run: |
+          ./scripts/Package.ps1 -Configuration Release -Unverified -OutputDirectory build/tester-packages
+          $zip = @(Get-ChildItem build/tester-packages/*.zip)
+          if ($zip.Count -ne 1) { throw 'Expected exactly one unverified tester package.' }
+          Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/tester-artifact
+      - name: Upload unverified Release tester build
+        if: matrix.configuration == 'release'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: AudioHole-UNVERIFIED-tester-Windows-x64-release-${{ github.sha }}
+          path: build/tester-artifact/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
       - name: Verify embedded branding resources
         shell: pwsh
         run: |
