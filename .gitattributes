@@ -1,2 +1,6 @@
 # Keep vendor notices verbatim; their formatting is not project source style.
 third_party/licenses/*.txt -whitespace
+
+# Historical evidence is byte-preserved for the hashes in the schema review.
+# Treat its original CRLF as a line ending, including on Windows checkouts.
+docs/schema-review/legacy/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

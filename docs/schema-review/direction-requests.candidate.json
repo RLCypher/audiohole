@@ -1,0 +1,13 @@
+{
+  "source_request": {
+    "mode": "exclusive",
+    "format": { "selection": "manual", "sample_rate_hz": 48000, "channel_count": 2, "sample_representation": "signed_integer", "container_bits": 16, "valid_bits": 16, "channel_layout": { "status": "unknown" } },
+    "period": { "selection": "automatic" }
+  },
+  "destination_request": {
+    "mode": "shared",
+    "format": { "selection": "automatic" },
+    "period": { "selection": "automatic" }
+  },
+  "application_queue_request": { "selection": "automatic" }
+}

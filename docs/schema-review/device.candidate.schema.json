@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Candidate core only \u2014 NOT approved production format",
+  "type": "object",
+  "$defs": {
+    "status": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "supported",
+            "unsupported",
+            "unavailable",
+            "not_tested",
+            "inconclusive",
+            "not_applicable",
+            "failed",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "display_name",
+    "windows_name",
+    "notes",
+    "reported_capabilities",
+    "probed_capabilities",
+    "scan_history",
+    "identity",
+    "driver",
+    "metadata"
+  ],
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "windows_name": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/status"
+        }
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "reported_capabilities": {
+      "type": "object"
+    },
+    "probed_capabilities": {
+      "type": "object"
+    },
+    "scan_history": {
+      "type": "object"
+    },
+    "driver": {
+      "type": "object"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "logical_id",
+        "direction",
+        "fingerprint"
+      ],
+      "properties": {
+        "logical_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "enum": [
+            "capture",
+            "render"
+          ]
+        },
+        "fingerprint": {
+          "type": "object"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "record_type",
+        "schema_version"
+      ],
+      "properties": {
+        "record_type": {
+          "const": "audio_device"
+        },
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,113 @@
+
+{
+  "schema_version": "0.1",
+  "profileName": "VR to Rodecaster",
+  "display_description": "Low-latency VR microphone routing",
+  "description": "Routes VR headset microphone audio into the RODECaster Pro II.",
+  "totalHoles": 1,
+  "firstCreated": "not_applicable",
+  "lastEdited": "not_applicable",
+  "lastRun": "not_applicable",
+  "autoStart": false,
+
+  "holes": [
+    {
+      "holeName": "VR Mic to Mixer",
+      "enabled": true,
+      "protocol": "WASAPI_EXCLUSIVE",
+      "formatNegotiation": "auto",
+      "masterClock": "target",
+
+      "routing": {
+        "mode": "simplex",
+        "direction": "source_to_target",
+        "status": "not_tested"
+      },
+
+      "format": {
+        "selection": "auto",
+        "sample_rate_hz": "not_tested",
+        "sample_format": "not_tested",
+        "channels": "not_tested",
+        "resampling": "not_tested",
+        "verification": "not_tested"
+      },
+
+      "source": {
+        "logical_id": "audiohole-device-example-001",
+        "display_name": "VR Beyond Microphone",
+        "endpoint_id": "{EXAMPLE-SOURCE-ENDPOINT}",
+        "direction": "capture"
+      },
+
+      "target": {
+        "logical_id": "audiohole-device-example-002",
+        "display_name": "RODECaster Pro II",
+        "endpoint_id": "{EXAMPLE-TARGET-ENDPOINT}",
+        "direction": "playback"
+      },
+
+      "latency": {
+        "mode": "automatic",
+        "target_ms": 10,
+        "buffer_frames": "not_tested",
+        "measured_ms": "not_tested"
+      },
+
+      "clock_sync": {
+        "strategy": "destination_paced",
+        "drift_compensation": "automatic",
+        "measured_drift_ppm": "not_tested"
+      },
+
+      "advanced": {
+        "source": {
+          "exclusive_mode": true,
+          "buffer_frames": 0,
+          "dynamic_control": false,
+          "gain_control": "disabled",
+          "midi_control": false,
+          "safety_limit_percent": 100
+        },
+        "target": {
+          "exclusive_mode": true,
+          "buffer_frames": 0,
+          "dynamic_control": true,
+          "gain_control": "endpoint",
+          "midi_control": false,
+          "safety_limit_percent": 85
+        }
+      },
+
+      "in": {
+        "display_name": "VR Beyond Microphone",
+        "endpointGUID": "{EXAMPLE-SOURCE-ENDPOINT}",
+        "mode": "capture",
+        "channels": 2,
+        "format": "s16",
+        "sampleRate": 48000,
+        "buffer": 0,
+        "exclusiveMode": true,
+        "dynamicControl": false,
+        "gainControl": "disabled",
+        "midiControl": false,
+        "safetyLimit": 100
+      },
+
+      "out": {
+        "display_name": "RODECaster Pro II",
+        "endpointGUID": "{EXAMPLE-TARGET-ENDPOINT}",
+        "mode": "playback",
+        "channels": 2,
+        "format": "s16",
+        "sampleRate": 48000,
+        "buffer": 0,
+        "exclusiveMode": true,
+        "dynamicControl": true,
+        "gainControl": "endpoint",
+        "midiControl": false,
+        "safetyLimit": 85
+      }
+    }
+  ]
+}

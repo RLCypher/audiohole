@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Candidate core only \u2014 NOT approved production format",
+  "type": "object",
+  "$defs": {
+    "status": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "supported",
+            "unsupported",
+            "unavailable",
+            "not_tested",
+            "inconclusive",
+            "not_applicable",
+            "failed",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "metadata",
+    "bindings"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "record_type",
+        "schema_version"
+      ],
+      "properties": {
+        "record_type": {
+          "const": "device_bindings"
+        },
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "endpoint_id",
+          "match_status",
+          "observed_at"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/status"
+              }
+            ]
+          },
+          "match_status": {
+            "enum": [
+              "available",
+              "unavailable",
+              "unknown",
+              "ambiguous"
+            ]
+          },
+          "observed_at": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/status"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

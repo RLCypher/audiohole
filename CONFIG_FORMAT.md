@@ -1830,4 +1830,24 @@ Optional commentary files use the dedicated presentation-only format documented 
 profile/device JSON, machine-local bindings, or production settings. The companion
 `personalities/` directory is relative to the executable for this GUI testing build;
 this does not resolve O-006 storage roots for production routing configuration.
-Theme selection and DFA slider/history remain local session presentation state.
+Theme and selected personality ID now persist in isolated Preview Build preferences; DFA slider/history remains local session presentation state.
+
+
+### Owner-authorized provisional Test persistence
+
+The GUI refinement milestone explicitly authorizes a replaceable, versioned JSON
+provider around current in-memory records, isolated from Preview and production.
+See [PROVISIONAL_TEST_PERSISTENCE.md](PROVISIONAL_TEST_PERSISTENCE.md) for actual
+implemented format, roots, limits, atomic replacement/conflict behavior and gaps.
+Test Mode performs real disk load/save across restarts. This does not resolve
+O-004/O-006, implement the production per-device filename contract, or define
+capability/engine DTOs. A future production provider also needs richer domain
+records. The GUI contains no JSON serialization logic.
+
+The supplied historical examples are reviewed in
+[docs/schema-review/REVIEW.md](docs/schema-review/REVIEW.md), with field dispositions,
+gaps, candidate core schemas/samples, compatibility plan and owner questions.
+Those files are a **proposal**, not approved production schemas. They do not alter
+the current Test provider, trigger an import or authorize destructive migrations.
+Existing identity, filename, provenance, status and inheritance requirements above
+remain in force for future production work.

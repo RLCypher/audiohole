@@ -999,3 +999,13 @@ O-001 leaves fallback aggregation Open, O-002 leaves switch preparation threshol
 D-034/O-005 remain Open. The internal status design distinguishes selected preference, actual processing, observed health, and endpoint mode, independently per direction. Comparison candidates are unchanged transfer, application-managed adaptive resampling, and Windows-managed shared-render rate adjustment. Observe mismatch/confidence, occupancy, effective ratio, processing transitions, discontinuities/recovery, and latency without publishing new field names, enums, commands, or protocol schemas here.
 
 Automatic is the proposed prototype default; final algorithms and recovery permissions remain unresolved. Strict preservation stays internal/experimental, not a required public API capability: no intentional resampling, insertion, duplication, dropping, or other modification; incompatible formats are rejected; inability to continue is reported with explicit restart/rebuffer rather than silent compensation. No third public correction policy is added. Acceptance, current unchanged processing, and a scoped preservation observation do not prove end-to-end bit-perfect output. Public transport remains deferred under the existing decisions.
+
+
+### Implemented in-process Preview Build contract
+
+[INTERNAL_CONTROL_CONTRACT.md](INTERNAL_CONTROL_CONTRACT.md) documents the concrete
+application-controller decorator, typed correlated results, immutable snapshots,
+severity/events, bounded RAII pull subscriptions and explicit unavailable telemetry.
+It fronts the existing Preview simulator or isolated Test configuration backend.
+No production audio/scanner, network transport, CLI, OBS, Stream Deck or avatar
+integration is implied. These C++ contracts are not approved external JSON schemas.

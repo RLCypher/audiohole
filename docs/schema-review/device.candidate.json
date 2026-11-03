@@ -1,0 +1,56 @@
+{
+  "display_name": "VR Beyond Microphone",
+  "windows_name": "Microphone (Beyond)",
+  "notes": "Candidate example only. Renaming this file changes the display name, not identity.",
+  "reported_capabilities": {
+    "shared_mode": "unknown",
+    "exclusive_mode": "unknown",
+    "default_mix_format": { "status": "unavailable" },
+    "format_configurations": { "status": "unavailable", "reason": "No current scanner evidence supplied" }
+  },
+  "probed_capabilities": {
+    "scan_status": "not_tested",
+    "verified_configurations": { "status": "not_tested" },
+    "failed_configurations": { "status": "not_tested" },
+    "inconclusive_configurations": { "status": "not_tested" }
+  },
+  "scan_history": {
+    "first_scanned": { "status": "not_tested" },
+    "last_scanned": { "status": "not_tested" },
+    "last_successful_scan": { "status": "not_tested" },
+    "last_easy_scan": { "status": "not_tested" },
+    "last_advanced_scan": { "status": "not_tested" }
+  },
+  "identity": {
+    "logical_id": "audiohole-device-example-001",
+    "direction": "capture",
+    "fingerprint": {
+      "manufacturer": { "status": "unknown" },
+      "product": "Beyond Microphone",
+      "usb": {
+        "vendor_id": { "status": "unavailable" },
+        "product_id": { "status": "unavailable" },
+        "serial_number": { "status": "unavailable" },
+        "interface_number": { "status": "unavailable" }
+      },
+      "endpoint": {
+        "interface_name": "Microphone (Beyond)",
+        "role": { "status": "unknown" }
+      }
+    }
+  },
+  "driver": {
+    "name": { "status": "unavailable" },
+    "provider": { "status": "unavailable" },
+    "version": { "status": "unavailable" },
+    "date": { "status": "unavailable" },
+    "association_status": "unknown",
+    "last_observed": { "status": "unavailable" }
+  },
+  "metadata": {
+    "record_type": "audio_device",
+    "schema_version": 1,
+    "first_seen": { "status": "unknown" },
+    "last_seen": { "status": "unknown" }
+  }
+}

@@ -15,7 +15,7 @@ unsupported operations as unavailable. main owns STA COM, instance guard, mode
 selection and clean restart handshake. No privilege elevation or startup
 registration is introduced.
 
-A100ms timer advances Preview logical time and drains posted control commands;
+A 100 ms timer advances Preview logical time and drains posted control commands;
 it is neither an audio clock nor a performance measurement. refresh reads the
 backend's authoritative snapshot and gates personality messages by event sequence.
 Preview is deterministic, simulated and session-only. Test performs real isolated
@@ -44,7 +44,7 @@ is changed; only the app's own preference is saved.
 startup/explicit Reload, with no parsing during refresh/paint. Technical facts are
 compiled and independent. Identity switches clear previous art/flavor; missing
 owned optional images hide rather than borrow another character. Bother uses the
-existing weighted/no-repeat selector, a350ms cooldown and warning guard. DFA remains
+existing weighted/no-repeat selector, a 350 ms cooldown and warning guard. DFA remains
 presentation-only, with exact decimal range checking before half-up rounding,
 0.01 stepping and owner-authored thresholds/eggs. Its value/history stays transient.
 DFA feedback appears beside its controls when an operational warning must remain.

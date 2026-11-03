@@ -1,126 +1,100 @@
-# GUI refinement and integration preparation
+# GUI refinement and integration preparation — implementation report
 
-This records the November 2026 assignment, repository inspection, first GUI
-increment, and dependencies needed to finish the milestone. It is not a claim
-that Test Mode, production persistence, personality packages or avatar integration
-have been implemented.
+Branch: `work`; no merge into the primary branch. First GUI increment was
+`88d2e9996d2adc1ee1621eade199d3abf343d613`; implementation commits are
+`5138ed2` (persistence/control), `259b959` (packages/metadata), `518a42d`
+(GUI modes/restart). The historical schema proposal is a separate documentation
+commit; its final SHA is supplied in the delivery message. This report supersedes its earlier pending-work checklist.
 
-## Inspection findings
+1. **GUI:** fixed header/card geometry, frame padding and existing working icon
+   retained; dark footer legibility retained. New mode/settings, Bother entry,
+   buffer status and capability-driven disabled controls added without replacing
+   the view/editor layout. Native appearance/DPI review remains required.
+2. **Preview/Test:** original Preview fixtures/behavior remain simulated/session
+   only. Test has a real disk-backed configuration controller, starts empty, reads
+   and saves isolated provisional JSON across restarts. No production data touched.
+   [Persistence contract](PROVISIONAL_TEST_PERSISTENCE.md) documents exact limits
+   and production gaps. This is not approved production-schema compatibility.
+3. **Settings/restart:** two default-enabled startup checkboxes; next-launch mode,
+   dialog, appearance/personality/notifications/startup preview preferences persist.
+   Restart uses absolute executable and parent-exit handshake after safe GUI cleanup
+   and instance-guard release. Unsaved profile confirmation remains. No route/pending
+   operation auto-resumes. Native OS restart behavior is not executed locally.
+4. **Buffer:** adjacent Apply remains disabled/desaturated because no backend can
+   confirm live values. Editor/saved values are visible separately from explicitly
+   unavailable engine-requested/applied values. Existing profile Save/Apply behavior
+   remains; Test Save persists without pretending to apply audio settings.
+5. **Disabled/hover:** controls use capabilities and disabled native behavior;
+   application-painted buttons desaturate. Placeholder dialogs remain interactive.
+   Navigation/log generic hover removed; scan level/scope and DFA help explain
+   behavior without expanding the DFA acronym.
+6. **Beep:** one fixed-width Test Beep/Cancel Beep control follows backend state.
+   Cancellation, natural finish, Stop/replacement and overlap rejection are tested.
+   Preview is silent simulation; Test rejects playback, no invented audio.
+7. **Simulation:** entire Simulate Errors group exists only in Preview, including
+   existing directional failure/recovery behavior. No Test heading/gap/actions.
+8. **Bother:** Norm and Horu each have30 responses:10 general,10 factual tips,
+   5 eggs,5 explicitly fictional facts. Existing Messages weighting/history retained.
+   Avatar click or accessible Bother button uses350ms cooldown and warning guard;
+   no DFA/controller/configuration side effects. Horu works without borrowed art.
+9. **Expression metadata:** all built-in authored responses carry IDs/categories/
+   text/preferred/fallback expression. Legacy text/weights/order/Unicode/DFA eggs
+   remain intact. [Capability report](AVATAR_CAPABILITY_REPORT.md) comes from
+   read-only PR4 inspection at c6d8822259c71c7e1d64cee8fdc996569e29e60d: Norm/Horu20
+   approved default-style statics; deadpan static-only. Vanilla12 core, sleeping
+   static-only; optional8 unavailable. No asset decoding/hash audit claimed.
+10. **Packages:** dynamic folder manifests, stable ID/name distinction, relative
+    resources, bounded validation, duplicate/path/link rejection; optional missing
+    features disabled, invalid required resources reject whole package. GUI queries
+    metadata/events/expressions/resolved avatar paths. Runtime remains shared and
+    external. See [package contract](personalities/README.md) and Visitor fixture.
+11. **Migration:** built-ins moved to owned folders preserving IDs and dialogue.
+    Legacy flat v1/v2 files still load; v1 missing faces means no reaction. A missing
+    selection uses a whole available package, never mixed resources. No valid
+    package disables personality presentation. Saved desired ID is retained.
+    Extract new distributions fresh to avoid old duplicate flat files. Historical
+    device/profile migration is proposed only, never executed.
+12. **Communication:** ApplicationController decorates the same backend for GUI/
+    Tray; typed commands/correlated Accepted/Completed/Rejected/etc., immutable
+    snapshots, severity/events, telemetry states, bounded RAII subscriptions and
+    non-real-time post queue. See [internal contract](INTERNAL_CONTROL_CONTRACT.md).
+13. **Implemented versus proposed:** Test file I/O is real. Routing/scans/beep/
+    monitoring remain Preview simulations; no audio backend/scanner/avatar engine,
+    CLI/IPC/OBS/Stream Deck/desktop-pet integration is implemented. Live buffer
+    updates reject. Measured latency/xruns/applied buffers stay unavailable.
+14. **Validation:** portable Debug/Release tests, Windows cross-compilation,
+    distribution-tool fixture checks and candidate schema/sample validation are
+    recorded in the delivery message. Native Preview/Test smoke checks compile
+    and are registered for CI; Linux cannot execute them. Native MSVC/DPI/restart/
+    extracted-package acceptance is pending actual Windows execution. Do not call
+    compilation proof of hardware/audio/visual correctness.
+15. **Before avatar integration:** coordinate owned registry/asset migration with
+    PR4 owner; preserve approved manifests/art byte-for-byte, verify decoded assets
+    with its loader, link the shared Session once, connect selected stable identity,
+    authoritative baselines/severity and transient response occurrences/revisions/
+    expiry; clear identity on switch and shut down/join correctly. Session acceptance
+    is queued, not playback completion. No duplicated animation implementation.
+16. **Review/decisions:** no production schema approval inferred. Historical
+    [schema review](docs/schema-review/REVIEW.md) supplies full field mapping,
+    missing requirements, candidate versioned schemas/examples, safe migration plan
+    and eight owner questions. O-004/O-005/O-006 remain open. These do not block the
+    already authorized isolated Test provider or independent GUI milestone.
 
-- `src/model/controller.h` is the existing internal command/snapshot boundary.
-  Frame and Tray share its single controller. `SimulatedController` owns session
-  records and implements no device enumeration, audio streams or disk persistence.
-- `Result` currently means a synchronous simulator result. Events have monotonic
-  sequence numbers; snapshots hold authoritative simulated state. Results have no
-  request correlation IDs, subscriptions or worker-thread transport yet.
-- Profile Save modifies session records, while profile Apply validates and
-  activates a copied simulated plan. Neither persists files. Buffer preferences
-  are distinct from actual engine buffers; actual values remain unavailable.
-- Test Beep tracks a simulated destination and a bounded interval. It emits no
-  sound. Cancellation, natural completion, device loss and Stop clear that state.
-- Personality catalogs are flat JSON files. Norm uses stable ID `default`, UwU
-  uses `uwu`; `vanilla` is compiled in. Existing behavior includes per-event neutral
-  fallback. The requested package-isolation policy changes that behavior and
-  requires explicit migration tests, rather than silently borrowing resources.
-- No completed avatar subsystem, manifests or public API is present in the
-  inspected workspace or in this branch. The supplied static placeholder is not
-  the completed subsystem. It has not been changed or integrated.
-- `CONFIG_FORMAT.md`'s reconciliation notes and `DECISIONS.md` O-004/O-006 leave
-  production serialization and storage details unresolved. There is no production
-  persistence implementation in `src/` to reuse for Test Mode.
 
-## Implemented independent GUI increment
+## Verified local evidence
 
-- The existing startup notice now says Preview Build. It still describes the
-  existing simulated, session-only environment accurately. Two-mode selection and
-  startup preference persistence remain pending; no nonfunctional Test Mode choice
-  has been added.
-- Each buffer editor has an adjacent disabled Apply button. Its explanation
-  distinguishes an edited preference from confirmed live engine settings. The
-  controller has no live-buffer update/acknowledgment operation, so the button
-  cannot report fictitious application. Existing profile Save/Apply is preserved.
-- Application-painted disabled buttons use desaturated backgrounds and existing
-  disabled foregrounds. Native disabled control behavior is retained. Interactive
-  tutorial and other intentional placeholders remain enabled.
-- Navigation and log hover text are removed. Testing level and scope explain
-  their actual simulated behavior. DFA tooltips retain character while documenting
-  decimal rounding, range rejection and 0.01 steps; DFA behavior is unchanged.
-- A single fixed-minimum-width Test Beep/Cancel Beep button reads controller state
-  for every click. Refresh follows that state on start, cancellation and natural
-  completion. The preview continues to emit no sound.
-- Failure injection and recovery are moved into a separate Simulate Errors section.
-  All current sessions are preview sessions. Hiding that entire section in Test
-  Mode remains pending the authoritative mode implementation.
-- Native smoke checks cover beep cancellation/completion and width, disabled buffer
-  Apply, and absent navigation/log tooltips. Cross-compilation does not execute
-  these checks or establish Windows visual quality.
-
-## Required inputs before dependent implementation
-
-1. Supply a read-only repository/branch or workspace location for the completed
-   avatar subsystem. Inspect the actual manifests, public interfaces and per-character
-   expression availability. Do not infer availability from the 20 specification
-   identifiers in the assignment or from the temporary PNG.
-2. Supply the approved production persistence implementation/schema, or finalize
-   the unresolved contract explicitly. Test Mode must reuse that implementation
-   under an isolated root. Serializing the current fixture structs into a new
-   ad-hoc format would not establish production compatibility.
-
-## Remaining implementation sequence
-
-1. Add one authoritative operating mode at application construction. Preserve the
-   preview fixture environment. Build Test Mode from the approved persistence
-   provider without loading preview devices/profiles into that root. Store startup
-   dialog and next-launch mode preferences through the approved settings mechanism.
-   Record errors without overwriting newer or invalid user data.
-2. Add the two startup choices and Settings controls. Restart must save pending
-   preferences, complete shutdown and release the single-instance guard before
-   relaunching. Preserve unsaved-edit handling; a failed relaunch must remain
-   recoverable. Do not start a competing process against the existing guard.
-3. Gate the complete Simulate Errors section and handlers using the authoritative
-   mode. Test Mode must expose neither fixture injection nor empty section gaps.
-4. Discover data-only folder packages with stable IDs independent of folder names.
-   Validate versions, duplicate IDs, bounded resources and relative paths, including
-   symlink/reparse-point escapes. Migrate existing flat catalogs without changing
-   their exact dialogue or DFA selection. Preserve selected IDs. Required resource
-   failure rejects the package; optional avatar resources disable presentation or
-   select a documented same-personality fallback.
-5. Author exactly 30 Bother responses each for Norm and Horu: 10 general, 10 useful
-   factual tips, five easter eggs and five unmistakably fictional irrelevant facts.
-   Keep Bother independent of DFA, use existing repetition avoidance, and bound
-   click frequency. Preserve existing authored dialogue and easter eggs verbatim.
-6. Assign stable response IDs, categories, preferred expressions and optional
-   same-personality fallbacks to every applicable response. Validate against the
-   inspected manifests and publish an availability report for each character.
-   Until those manifests are available, expression support is **unverified** for
-   both Norm and Horu. Do not generate approved artwork or start animation playback.
-7. Extend the existing controller boundary for correlated command results and
-   bounded subscriptions to state/events. Keep its authoritative snapshot; do not
-   create a second engine-state store. Publish unavailable telemetry explicitly.
-   Unsupported live-buffer/audio commands must be rejected clearly. Control and
-   telemetry delivery must never block audio callbacks or depend on GUI responsiveness.
-
-## Future avatar handoff, not implemented integration
-
-The intended flow is a GUI click requesting Bother from the selected package,
-returning its stable personality/response IDs, text and validated expression
-metadata. A future presentation adapter can send that reaction and the selected
-package's resolved manifest/asset root to the shared avatar engine. No engine code
-belongs inside personality folders. Operational errors take priority over transient
-flavor. Completion returns to the latest authoritative baseline, with healthy
-active routing relaxed rather than continuously working.
-
-The exact call signatures, capability negotiation and interruption/duration fields
-must follow the completed subsystem's inspected API. OBS, Stream Deck, desktop-pet
-adapters and external IPC are not implemented by this increment.
-
-## Validation gates for completion
-
-Beyond current portable and native smoke tests, verify isolated persisted Test
-profiles/devices, preference round trips, restart ordering, failed writes, external
-edits and schema migration. Test package installation/removal, duplicate IDs,
-missing resources, path escapes, whole-personality fallback and saved selections.
-Check exact existing DFA strings and behavior, the 60 Bother category counts,
-expression availability and subscription lifecycle/error/cancellation behavior.
-Run native Windows builds, GUI/DPI inspection and extracted-package launch. Report
-these results separately from compilation and simulated operation results.
+- Debug portable CTest:93/93 passed; Release portable CTest:93/93 passed.
+- Windows x64 MinGW cross-build: complete GUI, Windows harness and test targets
+  compiled/linked, with no compiler warnings in the final build logs.
+- PowerShell distribution fixtures passed: exact runtime allowlist, metadata,
+  overwrite refusal, unexpected/test executable rejection and cleanup; native-only
+  execution refused on this Linux host as intended.
+- CMake Runtime install inspected: folder manifests/dialogue/owned preview PNGs,
+  executable, licenses, reference branding and checklist only; no test executables.
+- All70 original pools each in Norm/Horu compare equal to88d2e99 for every text,
+  weight and order.60 new Bother responses validated with required category counts.
+- Three candidate core JSON Schemas and their examples validate using Draft2020-12;
+  all historical/candidate JSON parses. This validates proposal syntax/core shape,
+  not product approval or production interoperability.
+- Native MSVC, GUI/Test smoke execution, OS restart and visual/DPI acceptance were
+  not run locally. CI retains these gates; no unverified Windows package is claimed.

@@ -1,0 +1,76 @@
+
+{
+  "schema_version": "0.1",
+  "display_name": "VR Beyond Microphone",
+  "windows_name": "Microphone (Beyond)",
+  "notes": "Example device. User-editable notes with no operational effect.",
+  "logical_id": "audiohole-device-example-001",
+
+  "identity": {
+    "endpoint_id": "{EXAMPLE-ENDPOINT-ID}",
+    "container_id": "unavailable",
+    "hardware_id": "unavailable",
+    "interface_path": "unavailable",
+    "manufacturer": "not_tested",
+    "product": "Beyond Microphone",
+    "serial_number": "unavailable"
+  },
+
+  "device": {
+    "direction": "capture",
+    "connection": "usb",
+    "state": "not_tested",
+    "is_default": "not_tested"
+  },
+
+  "capabilities": {
+    "recording": {
+      "status": "not_tested",
+      "shared_mode": {
+        "status": "not_tested",
+        "formats": "not_tested"
+      },
+      "exclusive_mode": {
+        "status": "not_tested",
+        "formats": "not_tested"
+      }
+    },
+    "playback": {
+      "status": "not_applicable",
+      "shared_mode": {
+        "status": "not_applicable",
+        "formats": "not_applicable"
+      },
+      "exclusive_mode": {
+        "status": "not_applicable",
+        "formats": "not_applicable"
+      }
+    }
+  },
+
+  "timing": {
+    "clock_domain": "not_tested",
+    "minimum_buffer_frames": "not_tested",
+    "default_buffer_frames": "not_tested",
+    "measured_latency_ms": "not_tested",
+    "drift_ppm": "not_tested"
+  },
+
+  "profiling": {
+    "easy_mode": {
+      "status": "not_tested",
+      "last_run": "not_applicable"
+    },
+    "advanced_mode": {
+      "status": "not_tested",
+      "last_run": "not_applicable"
+    }
+  },
+
+  "legacy_compatibility": {
+    "friendlyName": "VR Beyond Microphone",
+    "endpointGUID": "{EXAMPLE-ENDPOINT-ID}",
+    "deviceType": "capture",
+    "sharedFormats": []
+  }
+}

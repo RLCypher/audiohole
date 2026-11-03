@@ -1,0 +1,10 @@
+{
+  "metadata": { "record_type": "device_bindings", "schema_version": 1 },
+  "bindings": {
+    "audiohole-device-example-001": {
+      "endpoint_id": { "status": "unavailable" },
+      "match_status": "unknown",
+      "observed_at": { "status": "unknown" }
+    }
+  }
+}

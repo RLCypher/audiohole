@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Candidate core only \u2014 NOT approved production format",
+  "type": "object",
+  "$defs": {
+    "status": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "supported",
+            "unsupported",
+            "unavailable",
+            "not_tested",
+            "inconclusive",
+            "not_applicable",
+            "failed",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "display_name",
+    "notes",
+    "profile_id",
+    "holes",
+    "metadata"
+  ],
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "holes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "hole_id",
+          "display_name",
+          "notes",
+          "enabled",
+          "routing_mode",
+          "forward"
+        ],
+        "properties": {
+          "hole_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "routing_mode": {
+            "enum": [
+              "simplex",
+              "duplex"
+            ]
+          },
+          "forward": {
+            "type": "object",
+            "required": [
+              "source_device_id",
+              "destination_device_id"
+            ],
+            "properties": {
+              "source_device_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/status"
+                  }
+                ]
+              },
+              "destination_device_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/status"
+                  }
+                ]
+              }
+            }
+          },
+          "reverse": {
+            "type": "object",
+            "required": [
+              "source_device_id",
+              "destination_device_id"
+            ],
+            "properties": {
+              "source_device_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/status"
+                  }
+                ]
+              },
+              "destination_device_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/status"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "routing_mode": {
+                  "const": "duplex"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reverse"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "reverse"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "record_type",
+        "schema_version"
+      ],
+      "properties": {
+        "record_type": {
+          "const": "profile"
+        },
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

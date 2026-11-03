@@ -1,0 +1,39 @@
+{
+  "display_name": "VR to Rodecaster",
+  "notes": "Candidate draft shape only; request policies remain O-004. Not an import of conflicting legacy settings.",
+  "profile_id": "profile-example-001",
+  "holes": [
+    {
+      "display_name": "VR Mic to Mixer",
+      "notes": "No Windows endpoint IDs or duplicated device names.",
+      "hole_id": "hole-example-001",
+      "enabled": true,
+      "routing_mode": "simplex",
+      "forward": {
+        "source_device_id": "audiohole-device-example-001",
+        "destination_device_id": "audiohole-device-example-002"
+      }
+    },
+    {
+      "display_name": "Independent duplex draft",
+      "notes": "Illustrates missing references without inventing device identity. Disabled draft does not route.",
+      "hole_id": "hole-example-002",
+      "enabled": false,
+      "routing_mode": "duplex",
+      "forward": {
+        "source_device_id": { "status": "unavailable", "reason": "Not configured" },
+        "destination_device_id": { "status": "unavailable", "reason": "Not configured" }
+      },
+      "reverse": {
+        "source_device_id": { "status": "unavailable", "reason": "Not configured" },
+        "destination_device_id": { "status": "unavailable", "reason": "Not configured" }
+      }
+    }
+  ],
+  "metadata": {
+    "record_type": "profile",
+    "schema_version": 1,
+    "created_at": { "status": "unknown" },
+    "updated_at": { "status": "unknown" }
+  }
+}
