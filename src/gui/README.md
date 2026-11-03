@@ -27,8 +27,8 @@ Commands/results, immutable state, severity/events, unavailable telemetry and
 bounded pull subscriptions are documented in
 [INTERNAL_CONTROL_CONTRACT](../../INTERNAL_CONTROL_CONTRACT.md). The future engine
 must marshal completions without GUI/filesystem calls on audio threads. No real
-stream supervision, measured timing, production serializer or avatar playback is
-implemented. [Persistence](../../PROVISIONAL_TEST_PERSISTENCE.md) explains provisional
+stream supervision, measured timing or production serializer is implemented.
+Avatar playback now uses PR6's shared Session/Panel through AvatarHost. [Persistence](../../PROVISIONAL_TEST_PERSISTENCE.md) explains provisional
 Test JSON and its deliberate differences from unresolved production requirements.
 
 Application appearance uses palette.h, SurfacePanel, custom button painting,
@@ -67,3 +67,10 @@ direction through Controller::update_buffer, keeping other edits staged. Matchin
 active Preview paths expose simulated requested/confirmed values; Test has only
 saved configuration, with engine values unavailable. Unchanged/invalid/unsaved
 new directions keep this button disabled. This does not activate a whole profile.
+
+
+The operative avatar integration is documented in
+[AVATAR_INTEGRATION.md](../../AVATAR_INTEGRATION.md). The avatar is no longer the
+static AgentDisplay; that class remains for branding. The independent animation
+timer does not advance controller time and stops when hidden/minimized. All owned
+assets/manifests are deployed inside the selected personality package.

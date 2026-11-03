@@ -11,7 +11,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1536, 1024)),
       controller_(std::make_unique<ApplicationController>(std::move(controller))),
       preferences_(std::move(preferences)), restart_(std::move(restart)), timer_(this),
-      smoke_(smoke) {
+      avatar_timer_(this), smoke_(smoke) {
     if (!preferences_) {
         preferences_ = std::make_shared<BuildPreferences>(std::filesystem::path{}, true);
         preferences_->load();
@@ -103,9 +103,11 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     commentary_ = label(commentary_panel_, messages, "");
     fallback_notice_ = label(commentary_panel_, messages, "");
     // Existing commentary remains to the left of the replaceable agent image;
-    // no speech-bubble or animation system is introduced.
-    agent_display_ = new AgentDisplay(this, wxSize(144, 216));
-    agent_display_->clear_image();
+    // animation uses the shared avatar engine; branding stays independent.
+    agent_display_ = new avatar::Panel(this);
+    agent_display_->checkerboard(false);
+    avatar::initialize_image_decoder();
+    avatar_host_ = std::make_unique<presentation::AvatarHost>(avatar::native_decoder());
     agent_display_->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&) { bother(); });
     header->Add(agent_display_, 0, wxEXPAND | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
@@ -239,7 +241,51 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         else
             event.Skip();
     });
+    Bind(
+        wxEVT_TIMER,
+        [this](wxTimerEvent&) {
+            if (IsShown() && !IsIconized())
+                poll_avatar();
+        },
+        avatar_timer_.GetId());
+    Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
+        if (event.IsShown() && !IsIconized()) {
+            poll_avatar();
+            avatar_timer_.Start(16);
+        } else
+            avatar_timer_.Stop();
+        event.Skip();
+    });
+    Bind(wxEVT_ICONIZE, [this](wxIconizeEvent& event) {
+        if (!event.IsIconized() && IsShown()) {
+            poll_avatar();
+            avatar_timer_.Start(16);
+        } else
+            avatar_timer_.Stop();
+        event.Skip();
+    });
     timer_.Start(100);
+}
+void Frame::stop_avatar() {
+    avatar_timer_.Stop();
+    if (avatar_host_)
+        avatar_host_->shutdown();
+    if (agent_display_)
+        agent_display_->present({});
+}
+void Frame::poll_avatar() {
+    if (!avatar_host_)
+        return;
+    auto frame = avatar_host_->tick(avatar::monotonic_ms());
+    if (frame.diagnostics != last_avatar_diagnostics_) {
+        last_avatar_diagnostics_ = frame.diagnostics;
+        for (const auto& line : frame.diagnostics) {
+            avatar_diagnostics_.push_back("[avatar] " + line);
+            if (avatar_diagnostics_.size() > 32)
+                avatar_diagnostics_.erase(avatar_diagnostics_.begin());
+        }
+    }
+    agent_display_->present(std::move(frame));
 }
 void Frame::bother() {
     if (operational_warning_visible_ || personality_ == "vanilla" ||
@@ -259,6 +305,9 @@ void Frame::present(presentation::Message event) {
                                    event == presentation::Message::Invalid;
     last_message_ = event;
     const auto c = messages_.show(event, personality_, ++occurrence_);
+    avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
+                          avatar::monotonic_ms());
+    avatar_host_->react(event, c, occurrence_, avatar::monotonic_ms());
     fallback_copy_ =
         personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_;
     technical_copy_ = event == presentation::Message::Bother ? std::string{} : c.technical;
@@ -314,6 +363,8 @@ void Frame::layout_header() {
 }
 void Frame::show_result(const audiohole::Result& result) {
     operational_warning_visible_ = !result.ok;
+    avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
+                          avatar::monotonic_ms());
     technical_copy_ = result.detail;
     layout_header();
     if (!result.ok && !smoke_)
@@ -337,6 +388,7 @@ void Frame::end_observation() {
 // number gates commentary, so repainting/telemetry cannot consume more variants.
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
+    avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
     const bool preview = s.operating_mode == OperatingMode::Preview;
     start_->Enable(s.capabilities.routing);
     arm_ready_->Enable(s.capabilities.routing);
@@ -448,6 +500,10 @@ void Frame::refresh() {
         if (query.empty() || text(line).Lower().Contains(query))
             logs += line;
     }
+    if (severity_->GetSelection() == 0)
+        for (const auto& line : avatar_diagnostics_)
+            if (query.empty() || text(line).Lower().Contains(query))
+                logs += line + "\n";
     if (logs != last_log_) {
         console_->ChangeValue(text(logs));
         last_log_ = logs;
@@ -485,8 +541,10 @@ void Frame::refresh() {
                 routine = false;
             if (routine)
                 present(message);
-            if (e.type == "error" || e.type == "scan-failed") {
+            if (e.type == "error" || e.type == "scan-failed" || e.severity == Severity::Error ||
+                e.severity == Severity::Critical) {
                 operational_warning_visible_ = true;
+                avatar_host_->observe(s, true, avatar::monotonic_ms());
                 technical_copy_ = e.detail;
                 commentary_copy_.clear();
                 layout_header();
@@ -573,6 +631,18 @@ bool Frame::smoke(const wxString& directory) {
         require(commentary_->GetLabel().Contains(face),
                 "Kaomoji split across native wrapped lines");
         layout_header();
+        const auto await_avatar = [this, &require] {
+            const auto deadline = avatar::monotonic_ms() + 8000;
+            while (avatar::monotonic_ms() < deadline) {
+                poll_avatar();
+                const auto& frame = agent_display_->presentation();
+                if (frame.image && frame.personality == personality_)
+                    return;
+                wxMilliSleep(5);
+            }
+            require(false, "Avatar failed to load the selected owned pack");
+        };
+        await_avatar();
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
             if (dynamic_cast<wxButton*>(window))
                 require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
@@ -675,10 +745,8 @@ bool Frame::smoke(const wxString& directory) {
             require(avatar.GetTop() == header->GetPosition().y + FromDIP(6) &&
                         avatar.GetHeight() == header->GetSize().y - 2 * FromDIP(6),
                     "Avatar does not fill the header height");
-            const auto& source =
-                personality_ == "vanilla" ? canonical_logo() : placeholder_avatar();
-            require(static_cast<long long>(avatar.GetWidth()) * source.GetHeight() >=
-                        static_cast<long long>(avatar.GetHeight()) * source.GetWidth(),
+            require(static_cast<long long>(avatar.GetWidth()) * 768 >=
+                        static_cast<long long>(avatar.GetHeight()) * 512,
                     "Avatar width constrains its rendered height");
             require(agent_display_->GetPosition().x - card.GetRight() - 1 ==
                         FromDIP(8) + FromDIP(6),
@@ -696,7 +764,8 @@ bool Frame::smoke(const wxString& directory) {
         layout_header();
         require(occurrence_ == resize_occurrence, "Resizing reselected personality commentary");
         require(status_dot_->IsShown(), "Routing status indicator missing");
-        require(agent_display_->has_image() && canonical_logo().HasAlpha(),
+        require(static_cast<bool>(agent_display_->presentation().image) &&
+                    canonical_logo().HasAlpha(),
                 "Agent logo or transparency missing");
         // Exact samples from the immutable source verify WIC channel order and
         // alpha without claiming that a desktop screenshot has been reviewed.
@@ -726,6 +795,12 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().state == audiohole::State::Running,
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
+        const auto before_avatar_ticks = controller_->snapshot().revision;
+        wxTimerEvent avatar_tick(avatar_timer_);
+        for (int tick = 0; tick < 10; ++tick)
+            GetEventHandler()->ProcessEvent(avatar_tick);
+        require(controller_->snapshot().revision == before_avatar_ticks,
+                "Avatar timer advanced controller state or generated operational events");
         forward_.buffer->SetValue(13);
         acknowledge_buffer(forward_);
         require(forward_.buffer_apply->IsEnabled(),
@@ -847,7 +922,9 @@ bool Frame::smoke(const wxString& directory) {
                                                          : i == 2 ? "Horu"
                                                                   : "Norm"),
                     "Agent heading uses a mode label instead of its character/status name");
-            require(agent_display_->has_image(), "Selected built-in placeholder image missing");
+            await_avatar();
+            require(agent_display_->presentation().personality == personality_,
+                    "Selected built-in avatar retained a different identity");
             require(dfa_->IsShown() == (i != 1) && dfa_slider_->IsShown() == (i != 1),
                     "DFA visibility mismatch");
             require(dfa_value_->IsShown() == (i != 1) && dfa_stepper_->IsShown() == (i != 1) &&

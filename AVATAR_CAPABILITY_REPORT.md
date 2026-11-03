@@ -48,3 +48,9 @@ pointing to `pack/manifest.json`. Preserve pack contents byte-for-byte and keep 
 engine shared. Metadata resolution is implemented, but no PR4 manifests/art have
 been moved or runtime integrated. Missing owned avatar assets report unavailable;
 Horu does not display Norm's temporary preview image.
+
+
+PR6 integration now uses those approved default-style resources through the shared
+Session/Panel. Artwork/manifests are unchanged and deployed in owned packages.
+See [current integration](AVATAR_INTEGRATION.md); earlier no-playback statements
+record the original inspection-only stage.

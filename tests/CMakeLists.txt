@@ -1,5 +1,5 @@
 include(GoogleTest)
-add_executable(audiohole_model_tests model_test.cpp text_layout_test.cpp personality_files_test.cpp icon_outline_test.cpp dfa_test.cpp persistence_test.cpp application_controller_test.cpp)
+add_executable(audiohole_model_tests model_test.cpp avatar_host_test.cpp text_layout_test.cpp personality_files_test.cpp icon_outline_test.cpp dfa_test.cpp persistence_test.cpp application_controller_test.cpp)
 target_compile_definitions(audiohole_model_tests PRIVATE AUDIOHOLE_TEST_PERSONALITIES_DIR="${PROJECT_SOURCE_DIR}/personalities")
 target_link_libraries(audiohole_model_tests PRIVATE audiohole_model GTest::gtest_main)
 if(MSVC)
@@ -35,4 +35,12 @@ find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
   add_test(NAME Branding.AssetIntegrity
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_assets.py")
+  add_test(NAME Avatar.AssetIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_avatar_assets.py")
+endif()
+
+if(Python3_Interpreter_FOUND AND TARGET avatar_tests)
+  add_test(NAME Avatar.NativePixels COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/scripts/branding/verify_avatar_assets.py"
+    --decoded-report "${CMAKE_BINARY_DIR}/assets/personalities/runtime/validation/native-tests.json")
+  set_tests_properties(Avatar.NativePixels PROPERTIES DEPENDS avatar_engine TIMEOUT 30)
 endif()

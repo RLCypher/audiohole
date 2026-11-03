@@ -1,3 +1,8 @@
+> Main-app integration update: operating art/manifests now live in each owned
+> `personalities/<id>/avatar/pack/` folder. This directory holds shared runtime,
+> upstream validation and historical handoff. See [current integration](../../AVATAR_INTEGRATION.md).
+> The delivery description below records the original PR6 layout.
+
 # Approved avatar artwork, engine and integration handoff
 
 This curated delivery contains the 796 approved operating PNGs for Norm, Horu

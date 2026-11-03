@@ -272,19 +272,14 @@ void Frame::select_personality(const std::string& requested) {
     if (dfa_feedback_)
         dfa_feedback_->SetLabel("");
     personality_ = messages_.resolve_selection(requested);
-    // Clear the old identity before loading any new resource. A failed or missing
-    // preview leaves this package imageless; it never displays another character.
-    agent_display_->clear_image();
+    agent_display_->present({});
     const auto* selected_package = messages_.package(personality_);
-    bool show_image = false;
-    if (selected_package && !selected_package->preview_image.empty()) {
-        try {
-            agent_display_->set_image(package_preview(selected_package->preview_image));
-            show_image = true;
-        } catch (const std::exception&) { /* Optional preview is disabled. */
-        }
-    }
-    agent_display_->Show(show_image);
+    avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
+                          avatar::monotonic_ms());
+    avatar_host_->select(selected_package, avatar::monotonic_ms());
+    agent_display_->Show(avatar_host_->enabled());
+    last_avatar_diagnostics_.clear();
+    poll_avatar();
     const bool has_dfa = !messages_.variants(presentation::Message::Dfa, personality_).empty();
     personality_fallback_note_ =
         requested == personality_

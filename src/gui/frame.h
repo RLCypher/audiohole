@@ -1,8 +1,10 @@
 #pragma once
+#include "audiohole/avatar/wx_panel.hpp"
 #include "gui/branding.h"
 #include "model/build_preferences.h"
 #include "model/controller.h"
 #include "platform/windows/com_apartment.h"
+#include "presentation/avatar_host.h"
 #include "presentation/messages.h"
 #include <algorithm>
 #include <chrono>
@@ -71,6 +73,7 @@ class Frame final : public wxFrame {
     ~Frame() override {
         RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
+        stop_avatar();
         if (tray_)
             tray_->RemoveIcon();
     }
@@ -85,6 +88,7 @@ class Frame final : public wxFrame {
     }
     void exit() {
         timer_.Stop();
+        stop_avatar();
         controller_->stop();
         end_observation();
         if (tray_)
@@ -115,6 +119,11 @@ class Frame final : public wxFrame {
     std::function<void()> restart_;
     std::unique_ptr<Tray> tray_;
     wxTimer timer_;
+    wxTimer avatar_timer_;
+    std::unique_ptr<presentation::AvatarHost> avatar_host_;
+    std::vector<std::string> avatar_diagnostics_, last_avatar_diagnostics_;
+    void poll_avatar();
+    void stop_avatar();
     bool smoke_ = false, loading_ = false, dirty_ = false;
     audiohole::Profile draft_;
     int hole_index_ = -1;
@@ -140,7 +149,7 @@ class Frame final : public wxFrame {
     bool operational_warning_visible_ = false; // Header-copy protection, not engine health.
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
-    AgentDisplay* agent_display_{};
+    avatar::Panel* agent_display_{};
     std::chrono::steady_clock::time_point bother_after_{};
     void bother(); // GUI-thread click entry point; no avatar playback or controller commands.
     wxScrolledWindow* commentary_panel_{};

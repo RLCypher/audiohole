@@ -126,3 +126,13 @@ working directional buffer Apply, persisted Test values and retention of unrelat
 staged edits. It is compiled here; native Windows execution/visual checks remain
 CI/manual gates. Typed buffer input is validated before Apply/Save; invalid text
 is never silently committed as a spinner's cached or clamped value.
+
+
+## PR6 integration supersedes the earlier avatar deferral
+
+The owner authorized integration after the kaomoji wrapping fix (`3c6ef7a`).
+The approved PR6 engine/assets were imported in `1385b3f` and are now wired through
+AvatarHost, the shared Session and native Panel. See [integration report](AVATAR_INTEGRATION.md)
+for the completed boundaries, asset migration, tests and remaining native gates.
+The prior “no avatar integration” and placeholder-only statements describe earlier
+milestones. Audio engine integration and production schema approval remain separate.

@@ -269,3 +269,21 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Horu's kaomoji stay on one line at compact and enlarged sizes/DPI. Internal
   spaces are nonbreaking only for display; authored JSON/dialogue and selection
   history remain unchanged. Ordinary prose continues to wrap normally.
+
+## Integrated avatar engine
+
+- [ ] Norm, Horu and Vanilla load their approved owned animation packs, not the
+  old temporary previews. Verify smooth authored exposures, transparent edges,
+  fixed512×768 aspect/anchor and full-header placement at100/150/200% DPI.
+- [ ] Healthy Running is relaxed idle. Bother/DFA and other fresh responses request
+  their authored expressions, then return to the latest baseline. Warnings and
+  failures interrupt cosmetic feedback; recovery does not leave stale panic.
+- [ ] Switch personalities during loading/reactions: no old character/frame leaks.
+  Remove/corrupt an owned frame in a disposable copy: owned fallback/hide and
+  nonmodal All events diagnostics, with routing/configuration unaffected.
+- [ ] Hide to tray/minimize: avatar timer stops. Restore: current playback resumes
+  without changing routing or reselecting commentary. Respect Windows reduced
+  animation preference. Restart/Exit join the loader without hangs or leaked work.
+- [ ] Native CTest runs `avatar_engine` and `Avatar.NativePixels` alongside GUI
+  smoke. Extracted ZIP contains all approved owned assets and passes source-hash
+  validation. No native test/viewer executable or generation tools are shipped.

@@ -1743,3 +1743,12 @@ remaining dependencies are recorded in
 The current application remains preview-only and session-only. Test Mode,
 production persistence, package migration and avatar expression validation are
 not yet implemented. Avatar playback remains outside this milestone.
+
+
+## Shared avatar engine integration
+
+[AVATAR_INTEGRATION.md](AVATAR_INTEGRATION.md) documents the integrated PR6 Session,
+owned package migration, expression/baseline/priority hooks, timers, reduced motion,
+shutdown and validation gates. Earlier “not integrated yet” notes describe prior
+milestones and are superseded for avatar presentation. Audio routing remains the
+existing Preview simulation or Test configuration-only backend.

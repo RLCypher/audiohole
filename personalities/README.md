@@ -142,3 +142,15 @@ user data. Full reload replaces optional catalogs, including externally loaded o
 Selected ID/theme now persist in isolated Preview Build preferences. DFA value and
 history remain transient. These presentation formats do not approve production
 profile/device schemas or change any Open engine/storage decisions.
+
+
+## Integrated runtime
+
+The approved assets now live inside each built-in package's avatar/pack directory,
+with a single-ID avatar/registry.json. The main GUI uses the shared Session/Panel
+engine and the manifest's default style. Metadata exposes avatar_style and approved
+avatar_states; the engine still validates actual resources before display. Approved
+manifests/art were relocated unchanged. Avatar manifests have a separate2MiB bound.
+Earlier placeholder-only/no-playback notes above describe the pre-integration stage;
+see [current integration](../AVATAR_INTEGRATION.md). Optional/missing resources never
+borrow another character, and a missing avatar does not disable valid dialogue.

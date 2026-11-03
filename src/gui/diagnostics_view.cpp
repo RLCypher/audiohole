@@ -74,6 +74,7 @@ void Frame::build_scan() {
     button(page, export_row, "Export visible diagnostics…", [this] { export_log(); });
     button(page, export_row, "Clear diagnostics log", [this] {
         controller_->clear_diagnostics();
+        avatar_diagnostics_.clear();
         refresh();
         present(presentation::Message::DiagnosticsCleared);
     });

@@ -27,7 +27,8 @@ class TrayIconCache {
   private:
     std::map<std::tuple<int, int, int, int>, wxIcon> icons_;
 };
-// Reserved for a future agent. wx owns this child window. The image is copied by
+// Static branding/legacy preview renderer; animation uses avatar::Panel.
+// wx owns this child window. The image is copied by
 // wx ref-counting; callers retain their own image. No personality/engine commands,
 // animation, text generation, or I/O occurs during paint. All calls are GUI-thread.
 class AgentDisplay final : public wxPanel {

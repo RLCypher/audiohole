@@ -1,5 +1,6 @@
 #pragma once
 #include "audiohole/avatar/session.hpp"
+#include <wx/bitmap.h>
 #include <wx/panel.h>
 #include <wx/timer.h>
 

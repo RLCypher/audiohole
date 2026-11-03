@@ -100,13 +100,13 @@ Conceptual host flow, following the inspected PR4 API:
 const auto* pack = messages.package(selected_id);
 // Use pack->avatar_registry.parent_path() as Repository/Session root only
 // after avatar integration validates registry/manifests/assets with its loader.
-session.select(pack->id, "", now_ms); // selected pack's default style
+session.select(pack->id, pack->avatar_style, now_ms); // selected pack's default style
 const auto base = presentation_baseline(*batch.state);
 session.baseline(base.expression, base.revision, base.priority, now_ms, true);
 const auto copy = messages.show(event, selected_id, occurrence_id);
 // Reaction's event_id is an OCCURRENCE, distinct from authored copy.response_id.
 // Admit only with valid owned expression, current revision and bounded TTL.
-session.react({copy.expression, occurrence_id, base.revision, now_ms, 1500, 10}, now_ms);
+session.react({copy.expression, "dialogue:" + std::to_string(occurrence_id), base.revision, now_ms, 1500, 10}, now_ms);
 // Queued acceptance is not playback completion; inspect decisions after tick().
 ```
 
@@ -138,3 +138,9 @@ waiting directions never receive a fabricated confirmation. These are parameter
 confirmations, not measured latency, and are never persisted as runtime authority.
 The global telemetry metric remains unavailable because independent directions can
 have different buffers. No real audio engine buffer update has been implemented.
+
+
+The PR6 integration is now implemented by presentation::AvatarHost; the preceding
+future-adapter discussion describes its original design stage. See
+[AVATAR_INTEGRATION.md](AVATAR_INTEGRATION.md) for actual hooks, owned roots,
+priorities, lifecycle, platform patches and remaining native verification.

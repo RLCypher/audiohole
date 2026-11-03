@@ -35,7 +35,8 @@ std::vector<std::uint8_t> read(const std::filesystem::path& path, std::size_t ma
 Json document(const std::filesystem::path& path) {
     const auto bytes = read(path, 2 * 1024 * 1024);
     std::vector<std::set<std::string>> keys;
-    auto callback = [&](int, Json::parse_event_t event, Json& parsed) {
+    auto callback = [&](int depth, Json::parse_event_t event, Json& parsed) {
+        require(depth <= 16, "Avatar JSON nesting exceeds contract");
         if (event == Json::parse_event_t::object_start)
             keys.emplace_back();
         if (event == Json::parse_event_t::key)
