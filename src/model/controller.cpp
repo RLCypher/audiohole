@@ -19,7 +19,7 @@ const char* name(State s) {
 }
 const char* name(Availability a) {
     constexpr std::array names{"Available", "Unavailable", "Ambiguous identity",
-                               "Known, not tested"};
+                               "Known, not tested", "Unknown"};
     return names.at(static_cast<std::size_t>(a));
 }
 std::string Format::label() const {
@@ -172,7 +172,10 @@ SimulatedController::SimulatedController() {
     event("ready", "Ready to configure routing.");
 }
 void SimulatedController::event(std::string type, std::string detail) {
-    state_.events.push_back({++sequence_, std::move(type), std::move(detail)});
+    const auto severity = type == "error" || type == "scan-failed" ? Severity::Error
+                          : type == "recovering"                   ? Severity::Warning
+                                                                   : Severity::Info;
+    state_.events.push_back({++sequence_, std::move(type), std::move(detail), severity});
     if (state_.events.size() > maximum_diagnostic_events)
         state_.events.erase(state_.events.begin());
     ++state_.revision;

@@ -7,7 +7,7 @@ namespace audiohole {
 // D-019 public states. Resolving is internal to Starting, never a ninth state.
 enum class State { Stopped, Ready, Starting, Running, Degraded, Recovering, Failed, Stopping };
 const char* name(State state);
-enum class Availability { Available, Unavailable, Ambiguous, Untested };
+enum class Availability { Available, Unavailable, Ambiguous, Untested, Unknown };
 const char* name(Availability availability);
 // Complete fixture format tuple. Channel layout/mask is deliberately not inferred
 // from the channel count; production negotiation belongs to Milestone 1+.
@@ -48,15 +48,25 @@ struct PathStatus {
     State state = State::Stopped;
     std::string detail;
 };
+enum class Severity { Info, Warning, Error, Critical };
 struct Event {
     std::uint64_t sequence;
     std::string type, detail;
+    Severity severity = Severity::Info;
 };
 // Read-only view owned by the controller. References/pointers into its vectors
 // must not survive a mutating command. No audio buffers or measured telemetry.
 enum class ScanScope { Update, Full, Selected };
+enum class OperatingMode { Preview, Test };
+// Command availability, never evidence that hardware opened or audio flowed.
+struct BackendCapabilities {
+    bool simulated = true, routing = true, scanning = true, beep = true, monitoring = true;
+    bool persistence = false, live_buffer = false;
+};
 
 struct Snapshot {
+    OperatingMode operating_mode = OperatingMode::Preview;
+    BackendCapabilities capabilities;
     std::vector<Endpoint> endpoints;
     std::vector<Profile> profiles;
     std::string active_profile, pending_profile;
@@ -90,10 +100,14 @@ class Controller {
     virtual ~Controller() = default;
     // Borrowed until the next mutation; reading never advances simulated time.
     virtual const Snapshot& snapshot() const = 0;
-    // Save changes only session records. Apply validates and requests activation;
-    // failure preserves live routing. Unconfigured drafts can be saved without Apply.
+    virtual std::string last_edit_error() const {
+        return {};
+    }
+    // Save changes to backend-owned records (session Preview, persistent Test). Apply validates and
+    // requests activation; failure preserves live routing. Unconfigured drafts can be saved without
+    // Apply.
     virtual Result save(Profile, bool apply) = 0;
-    // Creates fresh logical IDs, including every duplicated hole. No disk writes.
+    // Creates fresh logical IDs, including every duplicated hole. Test commits to disk.
     virtual std::string create_profile(const std::string& name,
                                        const std::string& copy_from = {}) = 0;
     // Rejects deletion of an active or pending profile; callers confirm user intent.
