@@ -52,3 +52,6 @@ install(FILES "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png"
   DESTINATION assets/presentation COMPONENT Runtime)
 set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS
   "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png")
+
+install(FILES "${PROJECT_SOURCE_DIR}/assets/personalities/provenance/deployed-assets.json"
+  DESTINATION . RENAME avatar-assets.json COMPONENT Runtime)

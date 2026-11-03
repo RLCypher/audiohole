@@ -24,9 +24,14 @@ try {
     @(
         'cmake_minimum_required(VERSION 3.25)'
         'project(PackageFixture NONE)'
-        'install(FILES audiohole.exe MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt nlohmann-json-LICENSE.txt DESTINATION . COMPONENT Runtime)'
+        'install(FILES avatar-assets.json audiohole.exe MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt nlohmann-json-LICENSE.txt DESTINATION . COMPONENT Runtime)'
         'install(DIRECTORY personalities assets DESTINATION . COMPONENT Runtime)'
     ) | Set-Content "$fixture/source/CMakeLists.txt"
+    foreach ($relative in @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt'))) {
+        $path = Join-Path "$fixture/source" $relative
+        New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
+        if (-not (Test-Path -LiteralPath $path)) { 'Inert runtime fixture' | Set-Content $path }
+    }
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Fixture configure failed' }
     & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
@@ -35,7 +40,7 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default/personality.json', 'personalities/default/dialogue/responses.json', 'personalities/default/preview/placeholder.png', 'personalities/uwu/personality.json', 'personalities/uwu/dialogue/responses.json', 'personalities/uwu/preview/placeholder.png', 'personalities/vanilla/personality.json', 'personalities/vanilla/preview/logo.png', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png', 'build-info.json', 'README.txt')
+    $expected = @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt')) + @('build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD

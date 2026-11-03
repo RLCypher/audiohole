@@ -369,7 +369,7 @@ TEST_F(PersonalityFiles, MissingOptionalFeatureAndCapabilitiesNeverBorrowFromOth
     EXPECT_NE(messages.package("uwu")->preview_image, messages.package("default")->preview_image);
     EXPECT_EQ(messages.package("uwu")->preview_image.parent_path().parent_path(),
               messages.package("uwu")->package_root);
-    EXPECT_FALSE(messages.package("uwu")->avatar_available);
+    EXPECT_TRUE(messages.package("uwu")->avatar_available);
     EXPECT_EQ(messages.resolve_selection("removed"), "default");
     EXPECT_EQ(messages.resolve_selection("legacy"), "legacy");
 }

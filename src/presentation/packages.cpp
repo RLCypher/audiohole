@@ -42,9 +42,9 @@ bool linked(const std::filesystem::path& file) {
 #endif
     return std::filesystem::is_symlink(file);
 }
-Json document(const std::filesystem::path& file) {
+Json document(const std::filesystem::path& file, std::size_t limit = 65536) {
     std::ifstream input(file, std::ios::binary);
-    std::string bytes(65537, '\0');
+    std::string bytes(limit + 1, '\0');
     input.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
     require(input.eof() && !input.bad(), "Manifest missing or too large");
     bytes.resize(static_cast<std::size_t>(input.gcount()));
@@ -191,12 +191,24 @@ LoadResult Messages::load_package(const std::filesystem::path& directory) {
             const bool registry_exists = !candidate.avatar_registry.empty() &&
                                          std::filesystem::exists(candidate.avatar_registry);
             if (manifest_exists) {
-                const auto data = document(candidate.avatar_manifest);
+                const auto data = document(candidate.avatar_manifest, 2 * 1024 * 1024);
                 require(data.at("schema_version").is_number_integer() &&
                             data.at("schema_version") == 1 &&
                             data.at("personality_id") == candidate.id &&
                             data.at("styles").is_object(),
                         "Invalid avatar manifest identity/version");
+                candidate.avatar_style = data.value("default_style", std::string{});
+                if (!candidate.avatar_style.empty() &&
+                    data.at("styles").contains(candidate.avatar_style)) {
+                    const auto& style = data.at("styles").at(candidate.avatar_style);
+                    if (style.value("enabled", false) && style.contains("states"))
+                        for (const auto& [state, info] : style.at("states").items())
+                            if ((info.contains("static") &&
+                                 info.at("static").value("status", std::string{}) == "approved") ||
+                                (info.contains("animation") &&
+                                 info.at("animation").value("status", std::string{}) == "approved"))
+                                candidate.avatar_states.push_back(state);
+                }
             }
             if (registry_exists) {
                 const auto data = document(candidate.avatar_registry);

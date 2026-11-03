@@ -101,7 +101,8 @@ struct Copy {
 struct Personality {
     std::string id, display_name;
     std::map<std::string, std::vector<Variant>> events;
-    std::string character_name{}, description{};
+    std::string character_name{}, description{}, avatar_style{};
+    std::vector<std::string> avatar_states{};
     std::filesystem::path package_root{}, avatar_registry{}, avatar_manifest{}, preview_image{};
     std::vector<std::string> expressions{};
     int order = 100;

@@ -14,10 +14,15 @@ try {
     if ($roots.Count -ne 1) { throw 'Expected one package root.' }
     $root = $roots[0].FullName
     $files = @(Get-ChildItem -LiteralPath $root -File -Recurse)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default/personality.json', 'personalities/default/dialogue/responses.json', 'personalities/default/preview/placeholder.png', 'personalities/uwu/personality.json', 'personalities/uwu/dialogue/responses.json', 'personalities/uwu/preview/placeholder.png', 'personalities/vanilla/personality.json', 'personalities/vanilla/preview/logo.png', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png', 'build-info.json', 'README.txt')
+    $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('build-info.json', 'README.txt')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($root.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Package contains missing or unexpected files.'
+    }
+    $approved = Get-Content (Join-Path $PSScriptRoot '../assets/personalities/provenance/deployed-assets.json') -Raw | ConvertFrom-Json
+    foreach ($property in $approved.files.PSObject.Properties) {
+        $actualHash = (Get-FileHash -LiteralPath (Join-Path $root $property.Name) -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actualHash -ne $property.Value) { throw "Avatar asset differs from approved input: $($property.Name)" }
     }
     $metadata = Get-Content (Join-Path $root 'build-info.json') -Raw | ConvertFrom-Json
     if ($metadata.commit -notmatch '^[0-9a-f]{40}$' -or $metadata.source_dirty) { throw 'Invalid or dirty package metadata.' }

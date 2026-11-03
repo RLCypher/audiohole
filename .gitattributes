@@ -4,3 +4,8 @@ third_party/licenses/*.txt -whitespace
 # Historical evidence is byte-preserved for the hashes in the schema review.
 # Treat its original CRLF as a line ending, including on Windows checkouts.
 docs/schema-review/legacy/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Approved avatar manifests and deployed registries are byte-hashed runtime data.
+# Preserve their LF bytes on Windows as well as in the repository.
+personalities/*/avatar/pack/manifest.json -text
+personalities/*/avatar/registry.json -text
