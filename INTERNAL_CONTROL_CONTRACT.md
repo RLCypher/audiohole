@@ -88,7 +88,7 @@ No hardware backend reconnection protocol has been implemented.
 ## Future personality/avatar adapter (not linked)
 
 `presentation_baseline(snapshot)` maps healthy Running/Stopped/Ready to idle,
-Starting/Stopping to working, scanning to thinking, degraded/recovering to concern
+Starting/Stopping and scanning to working, degraded/recovering to concern
 and failed to error, with higher warning priorities. Combine these authoritative
 conditions with explicit validation errors where the host owns them. The GUI's
 Bother cooldown and warning guard prevent low-priority flavor masking errors.

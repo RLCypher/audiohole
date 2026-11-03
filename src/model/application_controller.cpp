@@ -35,7 +35,7 @@ Baseline presentation_baseline(const Snapshot& state) {
         break; // Healthy Running is relaxed; never permanent WORKING.
     }
     if (state.scanning && result.priority < 20) {
-        result.expression = "thinking";
+        result.expression = "working";
         result.priority = 20;
     }
     return result;

@@ -208,10 +208,10 @@ TEST(AvatarIntegration, BusyAndWarningConditionsStayAwakeAndWakeASleepingAvatar)
     wait_for(host, now, "sleeping");
     snapshot.scanning = true;
     host.observe(snapshot, false, now);
-    EXPECT_EQ(host.baseline().expression, "thinking");
-    wait_for(host, now, "thinking");
+    EXPECT_EQ(host.baseline().expression, "working");
+    wait_for(host, now, "working");
     now += 120000;
-    EXPECT_EQ(host.tick(now).baseline, "thinking");
+    EXPECT_EQ(host.tick(now).baseline, "working");
     snapshot.scanning = false;
     for (auto state :
          {audiohole::State::Starting, audiohole::State::Recovering, audiohole::State::Failed}) {

@@ -62,7 +62,7 @@ logs or notifications. Vanilla/missing pools stay quiet. Warning/wake precedence
 removes the rendering overlay without losing the last awake response.
 
 The existing application baseline helper remains authoritative: healthy Running,
-Ready and Stopped are idle; transitions/scans use its busy states; Degraded and
+Ready and Stopped are idle; transitions/scans use working; Degraded and
 Recovering use concern; Failed uses error. An active GUI warning has at least
 priority 70. Fresh severe events and real condition/profile changes invalidate old
 reactions even if cosmetic priority was high. Routine snapshot revisions do not
