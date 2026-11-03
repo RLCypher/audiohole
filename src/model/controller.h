@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -28,25 +29,32 @@ struct Settings {
     Format format;
     int buffer_ms = 6;
     std::string mode = "Automatic";
+    bool operator==(const Settings&) const = default;
 };
 struct Direction {
     std::string source, destination;
     Settings settings;
+    bool operator==(const Direction&) const = default;
 };
 struct Hole {
     std::string id, display_name, notes;
     bool enabled = true, duplex = false;
     Direction forward, reverse;
+    bool operator==(const Hole&) const = default;
 };
 struct Profile {
     std::string id, display_name, notes;
     std::vector<Hole> holes;
+    bool operator==(const Profile&) const = default;
 };
 struct PathStatus {
     std::string hole_id;
     bool reverse = false;
     State state = State::Stopped;
     std::string detail;
+    // Configuration confirmations from this backend, not measured latency.
+    // Preview values are explicitly simulated; absent means unconfirmed.
+    std::optional<int> requested_buffer_ms{}, applied_buffer_ms{};
 };
 enum class Severity { Info, Warning, Error, Critical };
 struct Event {
@@ -107,6 +115,11 @@ class Controller {
     // requests activation; failure preserves live routing. Unconfigured drafts can be saved without
     // Apply.
     virtual Result save(Profile, bool apply) = 0;
+    // Commit only this saved direction's buffer preference, preserving other
+    // staged GUI edits. The simulator also confirms a matching active direction;
+    // configuration-only backends never claim an engine application.
+    virtual Result update_buffer(const std::string& profile_id, const std::string& hole_id,
+                                 bool reverse, int milliseconds);
     // Creates fresh logical IDs, including every duplicated hole. Test commits to disk.
     virtual std::string create_profile(const std::string& name,
                                        const std::string& copy_from = {}) = 0;
@@ -157,6 +170,7 @@ class SimulatedController final : public Controller {
         return state_;
     }
     Result save(Profile, bool apply) override;
+    Result update_buffer(const std::string&, const std::string&, bool, int) override;
     std::string create_profile(const std::string&, const std::string& copy_from = {}) override;
     Result remove_profile(const std::string&) override;
     Hole make_hole() override;

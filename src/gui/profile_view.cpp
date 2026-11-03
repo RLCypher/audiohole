@@ -2,6 +2,14 @@
 #include "gui/frame.h"
 
 namespace audiohole::gui {
+namespace {
+std::optional<int> buffer_value(const wxSpinCtrl* control) {
+    long value = 0;
+    if (!control->GetTextValue().ToLong(&value) || value < 1 || value > 100)
+        return {};
+    return static_cast<int>(value);
+}
+} // namespace
 void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& w,
                             const wxString& title) {
     w.group = new wxStaticBoxSizer(wxVERTICAL, parent, title);
@@ -39,18 +47,19 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 1, 100, 6);
     auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
     buffer_row->Add(w.buffer, 0, wxALL, 3);
-    w.buffer_apply = button(box, buffer_row, "Apply", [] {});
+    w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
     w.buffer_apply->Disable();
     w.buffer_apply->SetToolTip(
-        "Live buffer application is unavailable in this preview backend. This button stays "
-        "disabled because there is no engine acknowledgment of an applied buffer. Save stores "
-        "the edited preference in this session; profile Apply activates a simulated plan.");
+        "Save just this direction's buffer preference. A matching active Preview direction also "
+        "updates its simulated buffer. Test Mode saves configuration only; no hardware buffer is "
+        "applied.");
     w.group->Add(buffer_row, 0, wxEXPAND);
     w.buffer_state = label(box, w.group, "Edited/saved preferences; engine values unavailable.");
     w.buffer_state->SetMinSize(wxSize(1, -1));
     w.buffer->SetToolTip("Buffer duration in milliseconds. Smaller values can reduce latency but "
                          "increase dropout risk. This is an edited preference, not a measured or "
-                         "confirmed engine buffer; live application is unavailable here.");
+                         "confirmed hardware buffer. Apply saves this preference; status shows any "
+                         "simulated confirmation.");
     w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
                          "evidence below explains the recommendation.");
     w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
@@ -104,8 +113,10 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         event.Skip();
     });
     w.buffer->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
-        if (!loading_)
+        if (!loading_) {
             dirty_ = true;
+            refresh();
+        }
     });
 }
 // Spin, Enter, and focus loss can describe the same edit. Compare the settled value
@@ -113,12 +124,40 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
 void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
     if (loading_ || hole_index_ < 0)
         return;
-    const int value = widgets.buffer->GetValue();
+    const auto parsed = buffer_value(widgets.buffer);
+    if (!parsed) {
+        refresh();
+        return;
+    }
+    const int value = *parsed;
     if (value == widgets.acknowledged_buffer_ms)
         return;
     widgets.acknowledged_buffer_ms = value;
     dirty_ = true;
     present(presentation::Message::BufferChanged);
+    refresh();
+}
+void Frame::apply_buffer(DirectionWidgets& widgets) {
+    if (loading_ || hole_index_ < 0 || static_cast<std::size_t>(hole_index_) >= draft_.holes.size())
+        return;
+    const auto parsed = buffer_value(widgets.buffer);
+    if (!parsed) {
+        show_result({false, "Enter a whole buffer value from 1 to 100 milliseconds."});
+        return;
+    }
+    capture_draft();
+    const auto& hole = draft_.holes[static_cast<std::size_t>(hole_index_)];
+    if (&widgets == &reverse_ && !hole.duplex)
+        return;
+    const auto result =
+        controller_->update_buffer(viewed_, hole.id, &widgets == &reverse_, *parsed);
+    commentary_copy_.clear(); // Replace the old "Save / Apply required" flavor after this result.
+    show_result(result);
+    if (result.ok) {
+        if (const auto* saved = profile(controller_->snapshot(), viewed_))
+            dirty_ = draft_ != *saved;
+    }
+    refresh();
 }
 void Frame::build_profiles() {
     auto* page = new wxPanel(notebook_);
@@ -331,6 +370,8 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
 void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direction& d) {
     const auto& snapshot = controller_->snapshot();
     std::string saved = "unsaved";
+    const bool reverse = &w == &reverse_;
+    bool saved_direction = false;
     if (const auto* stored = profile(snapshot, viewed_)) {
         const auto selected =
             hole_index_ >= 0 && static_cast<std::size_t>(hole_index_) < draft_.holes.size()
@@ -338,14 +379,49 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                 : std::string{};
         const auto hole = std::find_if(stored->holes.begin(), stored->holes.end(),
                                        [&](const auto& record) { return record.id == selected; });
-        if (hole != stored->holes.end())
-            saved = std::to_string(
-                        (&w == &forward_ ? hole->forward : hole->reverse).settings.buffer_ms) +
+        if (hole != stored->holes.end() && (!reverse || hole->duplex)) {
+            saved = std::to_string((reverse ? hole->reverse : hole->forward).settings.buffer_ms) +
                     " ms";
+            saved_direction = true;
+        }
     }
-    w.buffer_state->SetLabel(text("Edited: " + std::to_string(d.settings.buffer_ms) +
-                                  " ms | Saved: " + saved +
-                                  "\nEngine requested/applied: unavailable"));
+    const auto selected_hole =
+        hole_index_ >= 0 && static_cast<std::size_t>(hole_index_) < draft_.holes.size()
+            ? draft_.holes[static_cast<std::size_t>(hole_index_)].id
+            : std::string{};
+    const auto path =
+        std::find_if(snapshot.paths.begin(), snapshot.paths.end(), [&](const auto& item) {
+            return snapshot.active_profile == viewed_ && item.hole_id == selected_hole &&
+                   item.reverse == reverse;
+        });
+    const auto requested =
+        path == snapshot.paths.end() ? std::optional<int>{} : path->requested_buffer_ms;
+    const auto confirmed =
+        path == snapshot.paths.end() ? std::optional<int>{} : path->applied_buffer_ms;
+    const bool saved_changed = saved != std::to_string(d.settings.buffer_ms) + " ms";
+    const bool active_changed =
+        snapshot.capabilities.live_buffer && requested && *requested != d.settings.buffer_ms;
+    const auto parsed = buffer_value(w.buffer);
+    w.buffer_apply->Enable(saved_direction && parsed && (saved_changed || active_changed));
+    const wxString buffer_help =
+        !parsed ? "Enter a whole buffer value from 1 to 100 milliseconds."
+        : !saved_direction
+            ? "Save this profile and direction before applying an individual buffer preference."
+        : !saved_changed && !active_changed
+            ? "This buffer already matches the saved preference and any active Preview request."
+            : "Save only this direction's buffer preference. A matching active Preview direction "
+              "updates its simulated buffer; Test Mode saves configuration only.";
+    if (!w.buffer_apply->GetToolTip() || w.buffer_apply->GetToolTip()->GetTip() != buffer_help)
+        w.buffer_apply->SetToolTip(buffer_help);
+    auto value = [](std::optional<int> buffer) {
+        return buffer ? std::to_string(*buffer) + " ms" : "unavailable";
+    };
+    w.buffer_state->SetLabel(text(
+        "Edited: " + (parsed ? std::to_string(*parsed) + " ms" : "invalid (1–100 ms)") +
+        " | Saved: " + saved + "\n" +
+        (snapshot.capabilities.simulated ? "Preview requested: " + value(requested) +
+                                               " | confirmed: " + value(confirmed) + " (simulated)"
+                                         : "Engine requested/applied: unavailable")));
     const auto r = audiohole::recommend(controller_->snapshot(), d);
     const auto selected = !d.settings.automatic   ? d.settings.format
                           : !r.compatible.empty() ? r.compatible.front()
@@ -385,7 +461,8 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
     d.settings.automatic = f <= 0;
     if (f > 0 && static_cast<std::size_t>(f) <= w.formats.size())
         d.settings.format = w.formats[static_cast<std::size_t>(f - 1)];
-    d.settings.buffer_ms = w.buffer->GetValue();
+    if (const auto parsed = buffer_value(w.buffer))
+        d.settings.buffer_ms = *parsed;
     d.settings.mode = utf8(w.mode->GetStringSelection());
 }
 void Frame::capture_draft() {
@@ -469,6 +546,11 @@ void Frame::load_hole(int index) {
     editor->FitInside();
 }
 void Frame::save(bool apply) {
+    if (hole_index_ >= 0 && (!buffer_value(forward_.buffer) ||
+                             (duplex_->GetValue() && !buffer_value(reverse_.buffer)))) {
+        show_result({false, "Enter whole buffer values from 1 to 100 milliseconds before saving."});
+        return;
+    }
     capture_draft();
     const auto r = controller_->save(draft_, apply);
     show_result(r);

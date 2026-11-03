@@ -103,7 +103,25 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
 // Detail strings preview the production UI. This class still advances authored
 // fixtures only; the startup notice and exported diagnostics disclose that context.
 // Never interpret these strings or transitions as evidence of real stream operation.
+Result Controller::update_buffer(const std::string& profile_id, const std::string& hole_id,
+                                 bool reverse, int milliseconds) {
+    if (milliseconds < 1 || milliseconds > 100)
+        return {false, "Buffer must be between 1 and 100 milliseconds."};
+    const auto* saved = profile(snapshot(), profile_id);
+    if (!saved)
+        return {false, "Save or select a profile before applying its buffer preference."};
+    auto edited = *saved;
+    const auto hole = std::find_if(edited.holes.begin(), edited.holes.end(),
+                                   [&](const auto& value) { return value.id == hole_id; });
+    if (hole == edited.holes.end() || (reverse && !hole->duplex))
+        return {false, "Save this direction before applying its buffer preference."};
+    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    const auto result = save(std::move(edited), false);
+    return result.ok ? Result{true, "Buffer preference saved. No live engine buffer was applied."}
+                     : result;
+}
 SimulatedController::SimulatedController() {
+    state_.capabilities.live_buffer = true;
     const std::vector<Format> common{{}, {96000, 2, "float32"}, {48000, 2, "PCM24"}};
     state_.endpoints = {{"mixer-in", "Mixer microphone", "USB Audio Interface (Capture)",
                          "USB mixer", true, Availability::Available, common},
@@ -269,6 +287,32 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     event("activated", "Activated profile: " + candidate->display_name);
     return result;
 }
+Result SimulatedController::update_buffer(const std::string& profile_id, const std::string& hole_id,
+                                          bool reverse, int milliseconds) {
+    const auto saved = Controller::update_buffer(profile_id, hole_id, reverse, milliseconds);
+    if (!saved.ok)
+        return saved;
+    if (!state_.armed || live_.id != profile_id)
+        return saved;
+    const auto hole = std::find_if(live_.holes.begin(), live_.holes.end(),
+                                   [&](const auto& value) { return value.id == hole_id; });
+    if (hole == live_.holes.end() || (reverse && !hole->duplex))
+        return saved;
+    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    refresh_paths();
+    const auto path =
+        std::find_if(state_.paths.begin(), state_.paths.end(), [&](const auto& value) {
+            return value.hole_id == hole_id && value.reverse == reverse;
+        });
+    const bool confirmed = path != state_.paths.end() && path->applied_buffer_ms == milliseconds;
+    const auto detail =
+        confirmed
+            ? "Buffer preference saved; active Preview direction confirmed " +
+                  std::to_string(milliseconds) + " ms (simulated)."
+            : "Buffer preference saved; Preview request updated, awaiting a running direction.";
+    event("buffer-updated", detail);
+    return {true, detail};
+}
 void SimulatedController::stop() {
     state_.armed = false;
     state_.pending_profile.clear();
@@ -332,6 +376,9 @@ void SimulatedController::refresh_paths(bool reconnecting) {
                                                       : State::Running;
                     ++running;
                 }
+                path.requested_buffer_ms = direction.settings.buffer_ms;
+                if (path.state == State::Running)
+                    path.applied_buffer_ms = direction.settings.buffer_ms;
                 state_.paths.push_back(path);
             }
         }

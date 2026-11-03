@@ -51,7 +51,8 @@ struct DirectionWidgets {
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{};
     wxSpinCtrl* buffer{};
-    wxButton* buffer_apply{}; // Disabled until a backend supports confirmed live updates.
+    wxButton*
+        buffer_apply{}; // Commits one buffer preference; backend reports any live confirmation.
     wxStaticText* buffer_state{};
     int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
     wxStaticText *evidence{}, *source_detail{}, *destination_detail{}, *summary{};
@@ -140,7 +141,6 @@ class Frame final : public wxFrame {
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
     AgentDisplay* agent_display_{};
-    wxButton* bother_button_{};
     std::chrono::steady_clock::time_point bother_after_{};
     void bother(); // GUI-thread click entry point; no avatar playback or controller commands.
     wxScrolledWindow* commentary_panel_{};
@@ -200,6 +200,7 @@ class Frame final : public wxFrame {
     void update_direction_details(DirectionWidgets&, const audiohole::Direction&);
     // Acknowledge a committed editor change once; never changes controller/live state.
     void acknowledge_buffer(DirectionWidgets&);
+    void apply_buffer(DirectionWidgets&);
     void select_profile(const std::string&);
     void load_holes();
     void load_hole(int);

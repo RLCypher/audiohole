@@ -16,7 +16,7 @@ same decorator. There is no second routing state store or audio/scanner rewrite.
 | LoadProfile | profile.load | Completes with a copied saved profile; does not activate |
 | SaveConfiguration | configuration.save | Completes after save (real disk in Test); Apply is asynchronous Preview only |
 | DiscoverDevices | devices.discover | Preview simulated Easy/Advanced scan; Test rejects |
-| UpdateBuffer | buffer.update | Explicitly rejected; no live acknowledgment interface exists |
+| UpdateBuffer | buffer.update | Commits one saved directional buffer preference; matching active Preview direction updates with simulated confirmation |
 | RequestStatus | status.get | Completes with authoritative state available |
 | RequestDevices | devices.get | Same snapshot's records; no discovery side effect |
 | RequestDiagnostics | diagnostics.get | Same snapshot's retained events; no invented measurements |
@@ -121,3 +121,20 @@ GUI, Tray, future desktop pet, OBS, Stream Deck and CLI adapters can consume thi
 same state/result stream. Only GUI/Tray are wired now. Transport authentication,
 reconnection, runtime telemetry and actual audio/animation integrations are future
 work, not implied by these interfaces.
+
+
+## Buffer preference Apply follow-up
+
+`Controller::update_buffer(profile_id, hole_id, reverse, milliseconds)` validates
+1..100ms and a saved direction, then updates only that field through the existing
+save interface. Other GUI draft edits remain staged. `UpdateBuffer` carries an
+optional explicit profile_id; omission targets only the active profile, never an
+arbitrary selection. ConfigurationController commits real Test data with atomic
+replacement/conflict checks and reports no engine application. SimulatedController
+also updates a matching active copied plan without restarting unrelated directions.
+PathStatus exposes optional requested_buffer_ms/applied_buffer_ms; Preview confirms
+only Running directions and labels every confirmation simulated. Unavailable or
+waiting directions never receive a fabricated confirmation. These are parameter
+confirmations, not measured latency, and are never persisted as runtime authority.
+The global telemetry metric remains unavailable because independent directions can
+have different buffers. No real audio engine buffer update has been implemented.

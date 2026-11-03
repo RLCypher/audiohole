@@ -275,4 +275,27 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
         EXPECT_EQ(read(), broken);
     }
 }
+TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngine) {
+    seed();
+    ApplicationController application(
+        std::make_unique<ConfigurationController>(std::make_unique<TestJsonPersistence>(file)));
+    const auto original = *profile(application.snapshot(), "profile-1");
+    const auto result = application.submit(UpdateBuffer{"hole-1", true, 19, "profile-1"});
+    ASSERT_TRUE(result.result.ok);
+    EXPECT_EQ(result.outcome, Outcome::Completed);
+    EXPECT_FALSE(result.simulated);
+    EXPECT_TRUE(application.snapshot().paths.empty());
+    EXPECT_FALSE(application.snapshot().armed);
+    TestJsonPersistence restarted(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(restarted.load(records).ok);
+    auto expected = original;
+    expected.holes.front().reverse.settings.buffer_ms = 19;
+    EXPECT_EQ(records.profiles.front(), expected);
+    const auto prior = read();
+    write(prior + " "); // External edit must remain protected on this command path too.
+    EXPECT_FALSE(application.submit(UpdateBuffer{"hole-1", false, 12, "profile-1"}).result.ok);
+    EXPECT_EQ(read(), prior + " ");
+    EXPECT_EQ(*profile(application.snapshot(), "profile-1"), expected);
+}
 } // namespace

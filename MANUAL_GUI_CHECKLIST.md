@@ -228,8 +228,9 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   Saved device availability is explicitly unverified. Per-device filename rename
   is a future production requirement, not implemented by aggregated Test v1.
 - [ ] Test has no Simulate Errors heading/actions/gap and no enabled routing,
-  scan, monitoring, beep or Apply controls. Adjacent buffer Apply stays gray with
-  requested/applied values unavailable. Profile Save works without an engine.
+  scan, monitoring, beep or live profile Apply controls. Small buffer Apply enables
+  for a changed saved direction and persists only that preference; engine values
+  remain unavailable. Other staged edits remain unsaved.
 - [ ] Toggle startup dialog and next-launch mode, appearance, notifications and
   startup preview settings. Restart and fresh launch preserve values, never resume
   a previously pending route. Cancel unsaved-profile confirmation keeps the session.
@@ -242,8 +243,10 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   stable selected ID persists. Rename folder without changing identity. Remove it:
   whole-package fallback notice appears. Remove all valid packages: no character
   image or DFA/Bother, app/technical messages remain usable. Restore saved package.
-- [ ] Horu without a placeholder shows no Norm pixels; Bother button remains usable.
-  Norm/Vanilla use their own preview files. No avatar engine playback is present.
+- [ ] Horu uses the supplied owned placeholder, headed Horu. Vanilla is headed
+  Status; selector labels remain UwU/Vanilla. Norm/Vanilla use their own preview
+  files. No avatar engine playback is present. Bother has no visible button;
+  clicking Norm/Horu shows only a reply, with no technical line or needless scrollbar.
   Malformed, duplicate-ID, escaping-path packages fail without preventing startup.
 - [ ] Rapid Bother clicks stay bounded; each built-in pool has30 with10/10/5/5
   categories. Warning text retains priority, DFA/routing do not change.
@@ -253,3 +256,12 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Run both Debug/Release native CTest, including Gui.TestModeSmoke and the
   extracted clean package check. OS restart and appearance need human review;
   cross-compilation and portable unit tests do not satisfy these gates.
+
+- [ ] Change only a buffer: small Apply enables, Save/Apply commits only that
+  direction, and small Apply disables again. In Preview an active matching path
+  confirms its simulated buffer; the reverse direction stays independent. In Test
+  relaunch and confirm disk persistence with no running-engine claim. Other draft
+  edits and external-file conflict protection remain intact.
+- [ ] Type a new buffer value as well as using the spin arrows: small Apply updates
+  immediately. Invalid/empty/out-of-range text disables it; profile Save reports
+  invalid buffer input rather than persisting a cached/clamped number.

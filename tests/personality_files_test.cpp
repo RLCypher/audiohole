@@ -365,7 +365,10 @@ TEST_F(PersonalityFiles, MissingOptionalFeatureAndCapabilitiesNeverBorrowFromOth
     EXPECT_TRUE(messages.package("legacy")->preview_image.empty());
     EXPECT_EQ(messages.show(presentation::Message::Bother, "legacy", 1).commentary, "");
     EXPECT_EQ(messages.resolve_selection("uwu"), "uwu");
-    EXPECT_TRUE(messages.package("uwu")->preview_image.empty());
+    EXPECT_FALSE(messages.package("uwu")->preview_image.empty());
+    EXPECT_NE(messages.package("uwu")->preview_image, messages.package("default")->preview_image);
+    EXPECT_EQ(messages.package("uwu")->preview_image.parent_path().parent_path(),
+              messages.package("uwu")->package_root);
     EXPECT_FALSE(messages.package("uwu")->avatar_available);
     EXPECT_EQ(messages.resolve_selection("removed"), "default");
     EXPECT_EQ(messages.resolve_selection("legacy"), "legacy");

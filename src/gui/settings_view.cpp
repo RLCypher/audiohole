@@ -285,7 +285,6 @@ void Frame::select_personality(const std::string& requested) {
     }
     agent_display_->Show(show_image);
     const bool has_dfa = !messages_.variants(presentation::Message::Dfa, personality_).empty();
-    bother_button_->Show(!messages_.variants(presentation::Message::Bother, personality_).empty());
     personality_fallback_note_ =
         requested == personality_
             ? ""

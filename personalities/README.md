@@ -52,9 +52,10 @@ Paths must be relative, <=240 bytes, without absolute/drive/UNC/ADS/backslash,
 `.`/`..` or trailing Windows dots/spaces. Linked paths/escape attempts are rejected.
 Dialogue must be JSON. Preview PNG is optional, <=4MiB, dimensions1..4096 bounded
 before WIC decoding; decode failure hides it. Identity switches clear old pixels
-first. Norm owns the existing temporary placeholder; Horu has no temporary preview
-image and is hidden rather than borrowing Norm. An accessible Bother button keeps
-interactions available even without an image. No approved avatar art is copied,
+first. Norm owns the existing temporary placeholder; Horu owns the supplied
+`preview/placeholder.png` (original1199×1312 RGBA image, unchanged). Missing owned
+images hide the avatar rather than borrowing another character. Bother is a hidden
+avatar-click easter egg, with no visible Bother button. No approved avatar art is copied,
 regenerated, moved or substituted from PR4 in this milestone.
 
 `avatar.registry` and `avatar.manifest` resolve within the package. Missing files
@@ -113,8 +114,11 @@ History is bounded. Missing optional commentary shows the same operational techn
 information with no borrowed character or visual reaction.
 
 Both built-in Bother libraries contain exactly30:10 general,10 factual tips,5 easter
-eggs,5 unmistakably fictional facts. Avatar click or Bother button uses this picker,
-350ms monotonic cooldown and operational-warning guard. Bother has no controller,
+eggs,5 unmistakably fictional facts. Avatar click uses this picker, a350ms
+monotonic cooldown and operational-warning guard. Bother shows only the authored
+reply; its technical/status line is blank and hidden to preserve vertical space.
+The field heading uses character_name (Horu/Norm); Vanilla uses Status. Selector
+labels and stable IDs remain unchanged. Bother has no controller,
 DFA, scan or configuration side effects. Vanilla has no Bother/DFA feature.
 
 DFA button uses `dfa`; ordinary settled values use that pool. Existing threshold

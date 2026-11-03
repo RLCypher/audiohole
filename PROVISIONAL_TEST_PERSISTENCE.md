@@ -25,7 +25,7 @@ profile/device files, including into Test. Test starts empty on a new root and
 loads only its own records. It supports profile CRUD, independent directional
 settings and saved device label/notes edits. Device records can be added/edited
 externally while AudioHole is stopped. There is no real scanner to populate them.
-Test disables route/scan/monitor/beep/Apply and omits Simulate Errors entirely.
+Test disables route/scan/monitor/beep/live profile Apply and omits Simulate Errors entirely.
 Saved availability and formats are unverified records, not observations.
 
 Startup preferences, theme, selected personality stable ID, notification setting,
@@ -123,3 +123,10 @@ restart/defaults, Preview/Test separation and production sentinels. Native
 `Gui.TestModeSmoke` exercises Test GUI Save and reconstructs a disk-backed
 controller in an isolated root, without hardware. It does not prove OS-process
 restart/Explorer/tray behavior. Use MANUAL_GUI_CHECKLIST for that Windows gate.
+
+
+The small buffer Apply now saves just the selected saved direction's preference,
+including in Test Mode. It enables for valid changed values and disables after
+success; other unsaved profile edits remain staged. Saved Test values round-trip
+through the same provider with no schema change. It never reports a Test engine
+buffer as applied. Preview additionally reports simulated per-direction confirmation.

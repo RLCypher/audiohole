@@ -10,7 +10,7 @@ try {
         'Inert packaging fixture' | Set-Content "$fixture/source/$name"
     }
     New-Item -ItemType Directory -Path "$fixture/source/personalities" | Out-Null
-    foreach ($name in @('README.md', 'default/personality.json', 'default/dialogue/responses.json', 'default/preview/placeholder.png', 'uwu/personality.json', 'uwu/dialogue/responses.json', 'vanilla/personality.json', 'vanilla/preview/logo.png')) {
+    foreach ($name in @('README.md', 'default/personality.json', 'default/dialogue/responses.json', 'default/preview/placeholder.png', 'uwu/personality.json', 'uwu/dialogue/responses.json', 'uwu/preview/placeholder.png', 'vanilla/personality.json', 'vanilla/preview/logo.png')) {
         $path = Join-Path "$fixture/source/personalities" $name
         New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
         'Inert packaging fixture' | Set-Content $path
@@ -35,7 +35,7 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default/personality.json', 'personalities/default/dialogue/responses.json', 'personalities/default/preview/placeholder.png', 'personalities/uwu/personality.json', 'personalities/uwu/dialogue/responses.json', 'personalities/vanilla/personality.json', 'personalities/vanilla/preview/logo.png', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png', 'build-info.json', 'README.txt')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default/personality.json', 'personalities/default/dialogue/responses.json', 'personalities/default/preview/placeholder.png', 'personalities/uwu/personality.json', 'personalities/uwu/dialogue/responses.json', 'personalities/uwu/preview/placeholder.png', 'personalities/vanilla/personality.json', 'personalities/vanilla/preview/logo.png', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png', 'build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD

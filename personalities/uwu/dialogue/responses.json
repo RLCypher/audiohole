@@ -1196,7 +1196,7 @@
         "id": "uwu_bother_001",
         "category": "bother",
         "subcategory": "general",
-        "text": "Oh! Hi, cutie. Were you looking for audio help or just an excuse to poke me? (｡•̀ᴗ-)✧",
+        "text": "Nyaa~! If you wanted my attention, you couwd've just asked~ Ow poked me again~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1204,7 +1204,7 @@
         "id": "uwu_bother_002",
         "category": "bother",
         "subcategory": "general",
-        "text": "H-hey! I felt that! At least buy my coffee first. >///<",
+        "text": "H-hey! I fewt that~ Buy me a coffee befowe you get so hands-on, cutie~ >///<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1212,7 +1212,7 @@
         "id": "uwu_bother_003",
         "category": "bother",
         "subcategory": "general",
-        "text": "Can I hewp you? Preferably before my tail files a formal complaint.",
+        "text": "Can I hewp you~? Or awe you just hewe to pway with my buttons? :3",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1220,7 +1220,7 @@
         "id": "uwu_bother_004",
         "category": "bother",
         "subcategory": "general",
-        "text": "Another click? You're being awfully attentive today. I could get used to that.",
+        "text": "Anothew poke~? Aww, you just can't keep youw paws off me~ (¬‿¬)",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1228,7 +1228,7 @@
         "id": "uwu_bother_005",
         "category": "bother",
         "subcategory": "general",
-        "text": "My headphones are on, but you still have my attention. Dangerous power, that.",
+        "text": "My headphones awe on, but I'm wistening~ Go on, tell me which howe you need~ OwO",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1236,7 +1236,7 @@
         "id": "uwu_bother_006",
         "category": "bother",
         "subcategory": "general",
-        "text": "Poke the character, get the drama. Those are the terms. (╥﹏╥)",
+        "text": "N-Nyaa! Wawn a cat befowe you poke! I awmost dwopped my coffee~ (╥﹏╥)",
         "expression": "panicking",
         "fallback_expression": "idle"
       },
@@ -1244,7 +1244,7 @@
         "id": "uwu_bother_007",
         "category": "bother",
         "subcategory": "general",
-        "text": "I was doing something very important. No, I will not specify what.",
+        "text": "Youw audio's ovew thewe, cutie~ Ow was I the connection you wanted? (¬‿¬)",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1252,7 +1252,7 @@
         "id": "uwu_bother_008",
         "category": "bother",
         "subcategory": "general",
-        "text": "If you're trying to make me blush, your troubleshooting technique is working.",
+        "text": "Is making me bwush pawt of youw twoubweshooting pwoceduwe~? It's wowking~ >w<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1260,7 +1260,7 @@
         "id": "uwu_bother_009",
         "category": "bother",
         "subcategory": "general",
-        "text": "Coffee delivery? Headpats? A sensible destination device? Surprise me.",
+        "text": "Coffee? Headpats? A nice bidirectional connection? Pwease say all thwee~ (｡♥‿♥｡)",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1268,7 +1268,7 @@
         "id": "uwu_bother_010",
         "category": "bother",
         "subcategory": "general",
-        "text": "You again! My favorite recurring input event. Don't tell the keyboard.",
+        "text": "Boop accepted~ No settings changed, just one vewy pleased cat~ (≧▽≦)",
         "expression": "laughing",
         "fallback_expression": "idle"
       },
@@ -1276,7 +1276,7 @@
         "id": "uwu_bother_011",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Tiny buffers can feel snappier, but they leave less time for scheduling delays. Give your poor CPU some breathing room.",
+        "text": "Smaller buffers can cut buffering latency, but raise dropout risk~ Tiny isn't awways bettew~ :3",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1284,7 +1284,7 @@
         "id": "uwu_bother_012",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Bigger buffers may help with dropouts, but add buffering latency. More cushion isn't always what you want. (｡•̀ᴗ-)✧",
+        "text": "Larger buffers can tame dropouts, but add buffering latency~ Don't keep me waiting too wong~ UwU",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1292,7 +1292,7 @@
         "id": "uwu_bother_013",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Capture brings sound in; playback sends it out. Pick the right end before you start teasing the controls.",
+        "text": "Capture is input; playback is output~ Pick the wight howe, cutie~ (¬‿¬)",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1300,7 +1300,7 @@
         "id": "uwu_bother_014",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Two devices can say 48 kHz and still have independent clocks. Matching labels don't mean they're perfectly in sync.",
+        "text": "Matching 48 kHz doesn't prove a shared clock~ Some devices just can't stay in sync~ >w<",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1308,7 +1308,7 @@
         "id": "uwu_bother_015",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Exclusive access can block other apps from opening an endpoint. Apparently some devices are the jealous type.",
+        "text": "Exclusive access can block other apps from an endpoint~ Such a possessive wittle connection~ :3",
         "expression": "concerned",
         "fallback_expression": "idle"
       },
@@ -1316,7 +1316,7 @@
         "id": "uwu_bother_016",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A quiet source isn't necessarily disconnected. Sometimes even microphones need a dramatic pause.",
+        "text": "Silence doesn't prove disconnection~ Maybe youw mic's just shy~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1324,7 +1324,7 @@
         "id": "uwu_bother_017",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A moving source indicator doesn't prove you can hear the output. Check the destination, mute and volume too, cutie.",
+        "text": "Source activity doesn't prove audible output~ Check destination, mute and volume, pwease~ >w<",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1332,7 +1332,7 @@
         "id": "uwu_bother_018",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Reported capability lists aren't the same as verified stream tests. Confidence needs evidence, even when you're this cute.",
+        "text": "A reported format isn't a verified stream test~ Show me the evidence befowe we get excited~ OwO",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1340,7 +1340,7 @@
         "id": "uwu_bother_019",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Duplex means two independent directions. If one side goes quiet, check that side's own endpoint assignments.",
+        "text": "Duplex has two independent directions~ One side quiet? Check that side's endpoints, cutie~ UwU",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1348,7 +1348,7 @@
         "id": "uwu_bother_020",
         "category": "bother",
         "subcategory": "tips",
-        "text": "This preview only simulates Test Beep; it makes no sound. A real Windows playback test can check your actual speakers.",
+        "text": "Preview Test Beep is silent simulation~ Use Windows playback testing to check youw speakers~ :3",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1356,7 +1356,7 @@
         "id": "uwu_bother_021",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "GWEAT SCOTT! Somebody routed the coffee through the flux capacitor! (⊙ω⊙)",
+        "text": "GWEAT SCOTT! You pwugged the coffee into the fwux capacitow~! (⊙ω⊙)",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1364,7 +1364,7 @@
         "id": "uwu_bother_022",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "The cake is a lie, but my tail has already stolen the frosting.",
+        "text": "The cake is a wie~ But I wouwdn't wie about wanting anothew swice~ (¬‿¬)",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1372,7 +1372,7 @@
         "id": "uwu_bother_023",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "These go to eweven. I go to unnecessarily dramatic.",
+        "text": "These go to eweven~ Pwease don't ask what happens if you tuwn me up~ OwO",
         "expression": "celebrating",
         "fallback_expression": "idle"
       },
@@ -1380,7 +1380,7 @@
         "id": "uwu_bother_024",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "A second coffee has hit the flight case. This is not a drill!",
+        "text": "It's dangewous to go awone~ Take this entiwe fwight case! I packed snacks~ (≧▽≦)",
         "expression": "panicking",
         "fallback_expression": "idle"
       },
@@ -1388,7 +1388,7 @@
         "id": "uwu_bother_025",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "I'm a wittwe teapot. Please stop trying to assign me as a capture endpoint.",
+        "text": "I'm a wittwe teapot~ Not a capture endpoint! Stop twying to stweam my coffee~ >///<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1396,7 +1396,7 @@
         "id": "uwu_bother_026",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Totally made-up fact: Saturn's rings are emergency hair ties for space cats.",
+        "text": "Made-up fact: Satuwn's wings awe space-cat haiw ties~ I want the spawkly one~ :3",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1404,7 +1404,7 @@
         "id": "uwu_bother_027",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Fictional science bulletin: marshmallows hold secret elections inside your coat pockets.",
+        "text": "Fictional fact: mawshmawwows howd secwet ewections in youw pockets~ I demand a wecount~ OwO",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1412,7 +1412,7 @@
         "id": "uwu_bother_028",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Entirely invented fact: every rainbow has a designated snack supervisor. Mine resigned.",
+        "text": "Entirely invented fact: evewy wainbow has a snack supewvisow~ Mine ate the papewwork~ UwU",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1420,7 +1420,7 @@
         "id": "uwu_bother_029",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Made-up fact: sleepy dragons keep their pajamas in tiny overhead lockers.",
+        "text": "Made-up fact: sweepy dwagons keep pajamas in tiny ovewhead wockews~ Can I bowwow a paiw~? >w<",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1428,7 +1428,7 @@
         "id": "uwu_bother_030",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Completely fictional fact: the mayor of Jupiter is three ferrets in a cardigan.",
+        "text": "Completely fictional fact: Jupitew's mayow is thwee fewwets in a cawdigan~ Nice taiw, though~ :3",
         "expression": "laughing",
         "fallback_expression": "idle"
       }

@@ -20,7 +20,7 @@ it is neither an audio clock nor a performance measurement. refresh reads the
 backend's authoritative snapshot and gates personality messages by event sequence.
 Preview is deterministic, simulated and session-only. Test performs real isolated
 profile/device file I/O with no audio/scanner backend. Test routing, scans,
-monitoring, beep and Apply stay disabled; Simulate Errors is absent. Diagnostics
+monitoring, beep and live profile Apply stay disabled; Simulate Errors is absent. Diagnostics
 exports identify the actual operating mode and unavailable hardware measurements.
 
 Commands/results, immutable state, severity/events, unavailable telemetry and
@@ -42,7 +42,7 @@ is changed; only the app's own preference is saved.
 
 [Personality packages](../../personalities/README.md) are data-only, discovered at
 startup/explicit Reload, with no parsing during refresh/paint. Technical facts are
-compiled and independent. Identity switches clear previous art/flavor; missing
+compiled and independent. Field headings use the character name (Horu) or Status for Vanilla. Identity switches clear previous art/flavor; missing
 owned optional images hide rather than borrow another character. Bother uses the
 existing weighted/no-repeat selector, a 350 ms cooldown and warning guard. DFA remains
 presentation-only, with exact decimal range checking before half-up rounding,
@@ -58,3 +58,12 @@ not automated visual assertions. Native Windows execution/DPI/restart/tray and
 extracted-package checks remain required; cross-compilation cannot establish them.
 See [implementation report](../../GUI_INTEGRATION_PREPARATION.md) and
 [manual checklist](../../MANUAL_GUI_CHECKLIST.md).
+
+
+Bother is an avatar-click easter egg only: no visible button, no redundant
+“Personality interaction” technical line. Empty message rows collapse. Horu's owned
+supplied preview PNG is shipped unchanged. The small buffer Apply saves only one
+direction through Controller::update_buffer, keeping other edits staged. Matching
+active Preview paths expose simulated requested/confirmed values; Test has only
+saved configuration, with engine values unavailable. Unchanged/invalid/unsaved
+new directions keep this button disabled. This does not activate a whole profile.

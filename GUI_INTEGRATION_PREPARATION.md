@@ -98,3 +98,31 @@ commit; its final SHA is supplied in the delivery message. This report supersede
   not product approval or production interoperability.
 - Native MSVC, GUI/Test smoke execution, OS restart and visual/DPI acceptance were
   not run locally. CI retains these gates; no unverified Windows package is claimed.
+
+
+## Avatar/Apply follow-up
+
+The visible Bother button is removed; Bother remains an avatar-click easter egg.
+Its redundant technical line and other empty message rows are hidden. Character
+headings show Horu/Norm, with Status for Vanilla, while selector names/IDs stay
+stable. Horu's supplied placeholder is packaged byte-for-byte, and her30 Bother
+responses are re-authored to match the existing voice while retaining IDs,
+weights, metadata and10/10/5/5 categories. Other dialogue/DFA text is unchanged.
+
+Small buffer Apply is now implemented through configuration/command interfaces:
+only the selected saved direction's buffer is committed. It works in Test Mode
+with real persistence and no engine claim; active matching Preview directions
+also update their simulated live copy and publish requested/confirmed parameters.
+Other draft changes stay staged. This supersedes the earlier disabled-buffer
+limitation and accessible-button/absent-Horu-image notes above. Production engine
+and avatar integration remain outside scope.
+
+Follow-up validation:95/95 portable tests passed in each of Debug and Release;
+final Windows cross-build and distribution fixture checks passed. The installed
+Horu image matches the uploaded PNG exactly (SHA-256
+`3a257e594330402b7dd88917b3e5c61be09e9a6de5b87b2bc6e1b0a12cb7cb6c`).
+Native smoke coverage now includes character headings, absent Bother button/line,
+working directional buffer Apply, persisted Test values and retention of unrelated
+staged edits. It is compiled here; native Windows execution/visual checks remain
+CI/manual gates. Typed buffer input is validated before Apply/Save; invalid text
+is never silently committed as a spinner's cached or clamped value.

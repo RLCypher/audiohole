@@ -269,10 +269,9 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                                    snapshot().scanning ? "Scan accepted" : "Scan rejected"};
                 asynchronous = response.result.ok;
             } else if constexpr (std::is_same_v<T, UpdateBuffer>) {
-                // No current backend can confirm a live buffer update. A future
-                // backend must add an explicit request/ack API before this can pass.
-                response.result.detail =
-                    "Live buffer updates unsupported; edit and Save/Apply the profile";
+                response.result = backend_->update_buffer(
+                    value.profile_id.empty() ? snapshot().active_profile : value.profile_id,
+                    value.hole_id, value.reverse, value.milliseconds);
             } else if constexpr (std::is_same_v<T, StartBeep>) {
                 if (!caps.beep || !snapshot().beep_destination.empty()) {
                     response.result.detail = "Beep backend unavailable or playback already active";
@@ -368,6 +367,11 @@ Result ApplicationController::record(const char* name, Result result) {
 }
 Result ApplicationController::save(Profile value, bool apply) {
     return submit(SaveConfiguration{std::move(value), apply}).result;
+}
+Result ApplicationController::update_buffer(const std::string& profile_id,
+                                            const std::string& hole_id, bool reverse,
+                                            int milliseconds) {
+    return submit(UpdateBuffer{hole_id, reverse, milliseconds, profile_id}).result;
 }
 Result ApplicationController::activate(const std::string& id, bool arm) {
     return submit(StartRouting{id, arm}).result;

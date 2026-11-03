@@ -29,7 +29,7 @@ TEST(Communication, CorrelatesAcceptanceAndCompletionWithoutClaimingHardware) {
     EXPECT_FALSE(batch.telemetry->latency_ms.value.has_value());
     EXPECT_FALSE(batch.telemetry->applied_buffer_ms.value.has_value());
 }
-TEST(Communication, RejectsUnsupportedBufferAndMissingProfileWithoutChangingConfiguration) {
+TEST(Communication, RejectsUnresolvedBufferAndMissingProfileWithoutChangingConfiguration) {
     auto controller = preview();
     const auto before = controller.snapshot().revision;
     const auto buffer = controller.submit(UpdateBuffer{"hole-1", false, 4});
@@ -161,5 +161,38 @@ TEST(Communication, DeviceLossCancelsBeepWithoutClaimingPlaybackCompletion) {
     EXPECT_FALSE(std::any_of(batch.results.begin(), batch.results.end(), [&](const auto& result) {
         return result.request_id == beep.request_id && result.outcome == Outcome::Completed;
     }));
+}
+TEST(Communication, BufferApplyUpdatesOnlySelectedDirectionAndConfirmsSimulationSeparately) {
+    auto controller = preview();
+    auto subscription = controller.subscribe();
+    subscription.poll();
+    const auto original = *profile(controller.snapshot(), "profile-duplex");
+    const auto hole = original.holes.front().id;
+    const auto saved = controller.submit(UpdateBuffer{hole, true, 17, original.id});
+    ASSERT_EQ(saved.outcome, Outcome::Completed);
+    ASSERT_TRUE(saved.result.ok);
+    EXPECT_TRUE(controller.snapshot().paths.empty());
+    auto expected = original;
+    expected.holes.front().reverse.settings.buffer_ms = 17;
+    EXPECT_EQ(*profile(controller.snapshot(), original.id), expected);
+    ASSERT_TRUE(controller.activate(original.id).ok);
+    controller.advance(300);
+    auto active = controller.snapshot().paths;
+    ASSERT_EQ(active.size(), 2u);
+    EXPECT_EQ(active[1].applied_buffer_ms, 17);
+    const auto result = controller.submit(UpdateBuffer{hole, false, 11, original.id});
+    ASSERT_EQ(result.outcome, Outcome::Completed);
+    EXPECT_TRUE(result.simulated);
+    EXPECT_EQ(controller.snapshot().paths[0].requested_buffer_ms, 11);
+    EXPECT_EQ(controller.snapshot().paths[0].applied_buffer_ms, 11);
+    EXPECT_EQ(controller.snapshot().paths[1].applied_buffer_ms, 17);
+    EXPECT_EQ(controller.snapshot().state, State::Running);
+    const auto before = *profile(controller.snapshot(), original.id);
+    EXPECT_FALSE(controller.submit(UpdateBuffer{hole, false, 101, original.id}).result.ok);
+    EXPECT_EQ(*profile(controller.snapshot(), original.id), before);
+    controller.stop();
+    controller.advance(300);
+    EXPECT_FALSE(controller.snapshot().armed);
+    EXPECT_TRUE(controller.snapshot().paths.empty());
 }
 } // namespace

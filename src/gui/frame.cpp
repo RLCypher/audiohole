@@ -87,12 +87,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* comment_layout = new wxBoxSizer(wxVERTICAL);
     personality_heading_ = new wxStaticText(comment_surface, wxID_ANY, "Norm", wxDefaultPosition,
                                             wxDefaultSize, wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
-    auto* personality_row = new wxBoxSizer(wxHORIZONTAL);
-    personality_row->Add(personality_heading_, 1, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
-    bother_button_ = button(comment_surface, personality_row, "Bother", [this] { bother(); });
-    bother_button_->SetToolTip("Poke the selected personality. Repeated clicks are rate limited; "
-                               "routing and DFA are unchanged.");
-    comment_layout->Add(personality_row, 0, wxEXPAND);
+    comment_layout->Add(personality_heading_, 0, wxEXPAND | wxALL, FromDIP(4));
     personality_heading_->SetMinSize(wxSize(0, -1));
     personality_heading_->SetFont(GetFont().Bold());
     commentary_panel_ = new wxScrolledWindow(comment_surface);
@@ -265,7 +260,7 @@ void Frame::present(presentation::Message event) {
     const auto c = messages_.show(event, personality_, ++occurrence_);
     fallback_copy_ =
         personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_;
-    technical_copy_ = c.technical;
+    technical_copy_ = event == presentation::Message::Bother ? std::string{} : c.technical;
     commentary_copy_ = c.commentary;
     layout_header();
 }
@@ -298,6 +293,7 @@ void Frame::layout_header() {
     Layout(); // Allocate fixed branding/avatar regions before measuring text space.
     const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
+        control->Show(!copy.empty());
         control->SetLabel(text(copy));
         control->Wrap(width);
     };
@@ -306,8 +302,12 @@ void Frame::layout_header() {
     wrap(technical_, technical_copy_);
     wrap(commentary_, commentary_copy_);
     wrap(fallback_notice_, fallback_copy_);
-    personality_heading_->SetLabel(personality_choice_ ? personality_choice_->GetStringSelection()
-                                                       : wxString("Norm"));
+    const auto* selected = messages_.package(personality_);
+    personality_heading_->SetLabel(
+        text(selected && !selected->character_name.empty() ? selected->character_name
+             : selected && selected->id != "vanilla"       ? selected->display_name
+                                                           : "Status"));
+    commentary_panel_->Layout();
     commentary_panel_->FitInside();
     Layout();
 }
@@ -525,12 +525,26 @@ bool Frame::smoke(const wxString& directory) {
             profile_name_->ChangeValue("Restart persistence check");
             profile_notes_->ChangeValue("Native GUI Test data, saved without a routing backend.");
             save(false);
+            draft_.holes.push_back(controller_->make_hole());
+            save(false);
+            load_hole(0);
+            profile_notes_->ChangeValue("Other draft edits must remain unsaved");
+            forward_.buffer->SetValue(14);
+            acknowledge_buffer(forward_);
+            require(forward_.buffer_apply->IsEnabled(),
+                    "Test buffer preference Apply stayed disabled");
+            wxCommandEvent buffer_apply(wxEVT_BUTTON, forward_.buffer_apply->GetId());
+            forward_.buffer_apply->GetEventHandler()->ProcessEvent(buffer_apply);
+            require(!forward_.buffer_apply->IsEnabled() && dirty_,
+                    "Buffer-only save lost other staged edits");
             const auto saved_id = viewed_;
             ConfigurationController restarted(
                 std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
             const auto* loaded = audiohole::profile(restarted.snapshot(), saved_id);
-            require(loaded && loaded->display_name == "Restart persistence check",
-                    "Test GUI save did not survive a new controller");
+            require(loaded && loaded->display_name == "Restart persistence check" &&
+                        loaded->holes.front().forward.settings.buffer_ms == 14 &&
+                        loaded->notes == "Native GUI Test data, saved without a routing backend.",
+                    "Test buffer-only save did not persist or saved unrelated draft edits");
             require(!profile_apply_->IsEnabled(),
                     "Test Mode enabled Apply after creating a profile");
             if (!directory.empty()) {
@@ -561,7 +575,7 @@ bool Frame::smoke(const wxString& directory) {
         for (auto* tab : navigation_)
             require(tab->GetToolTip() == nullptr, "Navigation must not have generic hover text");
         require(!forward_.buffer_apply->IsEnabled() && !reverse_.buffer_apply->IsEnabled(),
-                "Live buffer Apply must remain unavailable without engine confirmation");
+                "Unchanged buffer preferences must keep Apply disabled");
         require(console_->GetToolTip() == nullptr, "Diagnostic log must not have hover text");
         const auto target = std::find(beep_ids_.begin(), beep_ids_.end(), "vr-out");
         require(target != beep_ids_.end(), "Preview beep destination missing");
@@ -601,7 +615,8 @@ bool Frame::smoke(const wxString& directory) {
         const auto bother_dfa = dfa_hundredths_;
         bother_after_ = {};
         bother();
-        require(last_message_ == presentation::Message::Bother &&
+        require(wxWindow::FindWindowByLabel("Bother", this) == nullptr && technical_copy_.empty() &&
+                    !technical_->IsShown() && last_message_ == presentation::Message::Bother &&
                     controller_->snapshot().revision == bother_revision &&
                     dfa_hundredths_ == bother_dfa,
                 "Bother must remain independent of controller and DFA state");
@@ -702,6 +717,16 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().state == audiohole::State::Running,
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
+        forward_.buffer->SetValue(13);
+        acknowledge_buffer(forward_);
+        require(forward_.buffer_apply->IsEnabled(),
+                "Edited buffer did not enable its Apply button");
+        wxCommandEvent buffer_apply(wxEVT_BUTTON, forward_.buffer_apply->GetId());
+        forward_.buffer_apply->GetEventHandler()->ProcessEvent(buffer_apply);
+        require(!forward_.buffer_apply->IsEnabled() && !dirty_ &&
+                    controller_->snapshot().paths[0].applied_buffer_ms == 13 &&
+                    controller_->snapshot().paths[1].applied_buffer_ms == 6,
+                "Buffer Apply failed confirmation or changed its sibling direction");
         duplex_->SetValue(false);
         wxCommandEvent duplex_change(wxEVT_CHECKBOX, duplex_->GetId());
         duplex_->GetEventHandler()->ProcessEvent(duplex_change);
@@ -809,6 +834,11 @@ bool Frame::smoke(const wxString& directory) {
             personality_choice_->SetSelection(i);
             wxCommandEvent change(wxEVT_CHOICE, personality_choice_->GetId());
             personality_choice_->GetEventHandler()->ProcessEvent(change);
+            require(personality_heading_->GetLabel() == (i == 1   ? "Status"
+                                                         : i == 2 ? "Horu"
+                                                                  : "Norm"),
+                    "Agent heading uses a mode label instead of its character/status name");
+            require(agent_display_->has_image(), "Selected built-in placeholder image missing");
             require(dfa_->IsShown() == (i != 1) && dfa_slider_->IsShown() == (i != 1),
                     "DFA visibility mismatch");
             require(dfa_value_->IsShown() == (i != 1) && dfa_stepper_->IsShown() == (i != 1) &&

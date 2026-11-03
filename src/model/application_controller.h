@@ -29,6 +29,7 @@ struct UpdateBuffer {
     std::string hole_id;
     bool reverse = false;
     int milliseconds = 0;
+    std::string profile_id{}; // Empty targets the active profile only.
 };
 struct RequestStatus {};
 struct RequestDevices {};
@@ -114,6 +115,7 @@ class ApplicationController final : public Controller {
     const Snapshot& snapshot() const override;
     std::string last_edit_error() const override;
     Result save(Profile, bool) override;
+    Result update_buffer(const std::string&, const std::string&, bool, int) override;
     std::string create_profile(const std::string&, const std::string& = {}) override;
     Result remove_profile(const std::string&) override;
     Hole make_hole() override;
