@@ -1831,6 +1831,11 @@ profile/device JSON, machine-local bindings, or production settings. The compani
 `personalities/` directory is relative to the executable for this GUI testing build;
 this does not resolve O-006 storage roots for production routing configuration.
 Theme and selected personality ID now persist in isolated Preview Build preferences; DFA slider/history remains local session presentation state.
+The owner-requested **Hold expressions between events** checkbox also persists
+there as optional boolean `hold_expressions` (default `false`) in preference schema
+version 1. Older files need no migration; invalid types are rejected and externally
+edited files retain the existing conflict protections. This is a presentation-only
+Preview Build preference, not a production device/profile schema decision.
 
 
 ### Owner-authorized provisional Test persistence

@@ -195,11 +195,13 @@ TEST_F(PersistenceTest, PreviewPreferencesDefaultEnabledPersistAcrossRestartAndK
     ASSERT_TRUE(settings.load().ok);
     EXPECT_TRUE(settings.values().preview_mode);
     EXPECT_TRUE(settings.values().show_preview_dialog);
+    EXPECT_FALSE(settings.values().hold_expressions);
     auto next = settings.values();
     next.preview_mode = false;
     next.show_preview_dialog = false;
     next.personality_id = "uwu";
     next.appearance = "dark";
+    next.hold_expressions = true;
     ASSERT_TRUE(settings.update(next).ok);
     auto invalid = next;
     invalid.personality_id = "../invalid";
@@ -235,6 +237,29 @@ TEST_F(PersistenceTest, PreferenceExternalEditsAndMalformedFilesAreNeverOverwrit
     std::string contents;
     std::getline(stream, contents);
     EXPECT_EQ(contents, "{broken");
+}
+TEST_F(PersistenceTest, ExpressionHoldPreferenceIsOptionalAndRejectsInvalidTypes) {
+    const auto preferences_file = root / "preferences.json";
+    const std::string legacy = R"({"format":"audiohole-preview-preferences","schema_version":1,
+        "preview_mode":true,"show_preview_dialog":true})";
+    {
+        std::ofstream stream(preferences_file);
+        stream << legacy;
+    }
+    BuildPreferences compatible(root);
+    ASSERT_TRUE(compatible.load().ok);
+    EXPECT_FALSE(compatible.values().hold_expressions);
+    const auto malformed = legacy.substr(0, legacy.size() - 1) + R"(,"hold_expressions":"yes"})";
+    {
+        std::ofstream stream(preferences_file);
+        stream << malformed;
+    }
+    BuildPreferences invalid(root);
+    EXPECT_FALSE(invalid.load().ok);
+    EXPECT_FALSE(invalid.update({}).ok);
+    std::ifstream stream(preferences_file);
+    const std::string bytes{std::istreambuf_iterator<char>(stream), {}};
+    EXPECT_EQ(bytes, malformed);
 }
 TEST_F(PersistenceTest, TypedTestCommandsRejectUnavailableBackendsAndOnlyCompleteRealSaves) {
     seed();

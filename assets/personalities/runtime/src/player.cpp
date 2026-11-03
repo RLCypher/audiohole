@@ -24,14 +24,15 @@ void Player::advance(std::int64_t now) {
     }
     last_now_ = now;
     clock_valid_ = true;
-    if (active_ && finite_) {
+    if (active_ && finite_ && (!hold_expressions_ || inspecting_)) {
         const int duration = active_->duration_ms();
-        if (elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms))
+        if (elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms) + active_hold_ms_)
             complete();
     }
 }
 void Player::complete() {
     active_.reset();
+    active_hold_ms_ = 0;
     finite_ = false;
     inspecting_ = false;
     elapsed_ = 0;
@@ -79,6 +80,8 @@ Decision Player::react(ClipPtr clip, const Reaction& event, std::int64_t now) {
     if (event.event_id.empty() || event.ttl_ms < 0 || event.occurred_ms < 0 ||
         event.occurred_ms > now || now - event.occurred_ms > event.ttl_ms)
         return {false, "stale_or_invalid_event"};
+    if (event.final_hold_ms < 0 || event.final_hold_ms > 5000)
+        return {false, "invalid_final_hold"};
     if (events_.contains(event.event_id))
         return {false, "duplicate_event"};
     const int priority = event.priority < 0 ? clip->behavior.priority : event.priority;
@@ -87,10 +90,13 @@ Decision Player::react(ClipPtr clip, const Reaction& event, std::int64_t now) {
     if (priority < baseline_priority_)
         return {false, "baseline_severity"};
     if (active_ && finite_) {
+        const auto duration = active_->duration_ms();
+        const bool held = hold_expressions_ && !inspecting_ &&
+                          elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms);
         if (priority < active_priority_ ||
-            (!active_->behavior.interruptible && priority <= active_priority_))
+            (!active_->behavior.interruptible && priority <= active_priority_ && !held))
             return {false, "priority_or_interrupt_policy"};
-        if (active_->requested == clip->requested && priority == active_priority_)
+        if (active_->requested == clip->requested && priority == active_priority_ && !held)
             return {false, "already_active"};
     }
     const auto previous = last_started_.find(event.state);
@@ -115,6 +121,7 @@ Decision Player::react(ClipPtr clip, const Reaction& event, std::int64_t now) {
     last_started_[event.state] = now;
     active_ = std::move(clip);
     active_priority_ = priority;
+    active_hold_ms_ = event.final_hold_ms;
     finite_ = true;
     inspecting_ = false;
     elapsed_ = 0;
@@ -126,6 +133,7 @@ void Player::inspect(ClipPtr clip, std::int64_t now) {
         return;
     active_ = std::move(clip);
     active_priority_ = active_->behavior.priority;
+    active_hold_ms_ = 0; // Viewer inspection retains the authored timing.
     finite_ = active_->behavior.finite;
     inspecting_ = true;
     elapsed_ = 0;
@@ -155,15 +163,21 @@ Presentation Player::tick(std::int64_t now) {
     }
     double position = active_ ? elapsed_ : baseline_elapsed_;
     result.elapsed_ms = position;
+    const auto duration = clip->duration_ms();
+    result.holding = active_ && finite_ && !inspecting_ &&
+                     position >= (duration ? duration : clip->behavior.static_hold_ms);
     if (reduced_) {
         result.image = clip->still ? clip->still : clip->frames.front();
         result.source = "reduced_motion_static";
         return result;
     }
-    const auto duration = clip->duration_ms();
     if (duration > 0) {
-        position =
-            clip->loop ? std::fmod(position, duration) : std::min(position, double(duration - 1));
+        // Finite reactions also accept looping baseline clips as fallbacks.
+        // Their extra hold must keep the final frame, rather than wrap to frame 0.
+        const bool loop =
+            clip->loop &&
+            !(active_ && finite_ && (active_hold_ms_ > 0 || (hold_expressions_ && !inspecting_)));
+        position = loop ? std::fmod(position, duration) : std::min(position, double(duration - 1));
         double end = 0;
         for (std::size_t i = 0; i < clip->durations_ms.size(); ++i) {
             end += clip->durations_ms[i];
@@ -201,7 +215,9 @@ void Player::step(std::int64_t now) {
         return;
     auto& elapsed = active_ ? elapsed_ : baseline_elapsed_;
     const auto duration = clip->duration_ms();
-    const double position = clip->loop ? std::fmod(elapsed, duration) : elapsed;
+    const bool loop = clip->loop && !(active_ && finite_ &&
+                                      (active_hold_ms_ > 0 || (hold_expressions_ && !inspecting_)));
+    const double position = loop ? std::fmod(elapsed, duration) : elapsed;
     int end = 0;
     for (int exposure : clip->durations_ms) {
         end += exposure;
@@ -210,7 +226,8 @@ void Player::step(std::int64_t now) {
             break;
         }
     }
-    if (active_ && finite_ && elapsed >= duration)
+    if (active_ && finite_ && (!hold_expressions_ || inspecting_) &&
+        elapsed >= duration + active_hold_ms_)
         complete();
 }
 } // namespace audiohole::avatar

@@ -94,6 +94,7 @@ Result BuildPreferences::load() {
             PreviewPreferences values;
             values.preview_mode = document.at("preview_mode").get<bool>();
             values.show_preview_dialog = document.at("show_preview_dialog").get<bool>();
+            values.hold_expressions = document.value("hold_expressions", false);
             values.personality_id = document.value("personality_id", std::string("default"));
             values.appearance = document.value("appearance", std::string("system"));
             values.notifications = optional_integer(document, "notifications", 0);
@@ -131,6 +132,7 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["schema_version"] = 1;
         document["preview_mode"] = values.preview_mode;
         document["show_preview_dialog"] = values.show_preview_dialog;
+        document["hold_expressions"] = values.hold_expressions;
         document["personality_id"] = values.personality_id;
         document["appearance"] = values.appearance;
         document["notifications"] = values.notifications;

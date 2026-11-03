@@ -74,7 +74,18 @@ TEST(AvatarIntegration, UsesSelectedResponseMetadataAndReturnsToCurrentBaseline)
     const auto reaction = wait_for(host, now, copy.expression, true);
     EXPECT_EQ(reaction.personality, "uwu");
     EXPECT_FALSE(host.react(p::Message::Bother, copy, 42, now).accepted);
-    now += 60000;
+    av::Repository repository(messages.package("uwu")->avatar_registry.parent_path(),
+                              fake_decoder());
+    const auto authored =
+        repository.load("uwu", messages.package("uwu")->avatar_style, copy.expression);
+    const auto duration =
+        authored->duration_ms() ? authored->duration_ms() : authored->behavior.static_hold_ms;
+    now += duration;
+    EXPECT_TRUE(host.tick(now).reaction);
+    EXPECT_EQ(host.tick(now).index, reaction.frame_count - 1);
+    now += 1999;
+    EXPECT_TRUE(host.tick(now).reaction);
+    ++now;
     EXPECT_EQ(host.tick(now).state, "idle");
     EXPECT_FALSE(host.tick(now).reaction);
     EXPECT_EQ(host.baseline().expression, "idle");
@@ -141,6 +152,145 @@ TEST(AvatarIntegration, IdentitySwitchClearsOldFramesAndMissingResourcesRemainIn
     }
     EXPECT_FALSE(failed.image);
     EXPECT_FALSE(failed.diagnostics.empty());
+}
+TEST(AvatarIntegration, SleepsAfterTwoMinutesDespitePollingAndWakesOnInputOrReaction) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    audiohole::Snapshot snapshot;
+    snapshot.state = audiohole::State::Running;
+    std::int64_t now = 100;
+    host.observe(snapshot, false, now);
+    for (const auto* id : {"default", "uwu", "vanilla"}) {
+        const auto selected_at = now;
+        host.select(messages.package(id), now);
+        wait_for(host, now, "idle");
+        for (int elapsed : {30000, 60000, 90000, 119999}) {
+            now = selected_at + elapsed;
+            ++snapshot.revision;
+            host.observe(snapshot, false, now);
+            EXPECT_EQ(host.tick(now).state, "idle");
+        }
+        now = selected_at + 120000;
+        EXPECT_EQ(host.tick(now).baseline, "sleeping");
+        const auto asleep = wait_for(host, now, "sleeping");
+        EXPECT_FALSE(asleep.reaction);
+        EXPECT_EQ(asleep.personality, id);
+        if (std::string(id) != "vanilla")
+            EXPECT_GT(asleep.frame_count, 1);
+
+        host.activity(now);
+        EXPECT_EQ(host.baseline().expression, "idle");
+        wait_for(host, now, "idle");
+        now += 119000;
+        host.activity(now); // Editing without generating dialogue also postpones sleep.
+        now += 1000;
+        EXPECT_EQ(host.tick(now).state, "idle");
+        now += 119000;
+        wait_for(host, now, "sleeping");
+        const auto copy = messages.show(p::Message::Ready, id, 42);
+        ASSERT_TRUE(host.react(p::Message::Ready, copy, 42, now).accepted);
+        EXPECT_EQ(host.baseline().expression, "idle");
+        now += 10000;
+        // Load freshness is separate from the already-tested reaction display hold.
+        EXPECT_NE(host.tick(now).baseline, "sleeping");
+    }
+}
+TEST(AvatarIntegration, BusyAndWarningConditionsStayAwakeAndWakeASleepingAvatar) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    audiohole::Snapshot snapshot;
+    std::int64_t now = 0;
+    host.select(messages.package("uwu"), now);
+    wait_for(host, now, "idle");
+    now = 120000;
+    wait_for(host, now, "sleeping");
+    snapshot.scanning = true;
+    host.observe(snapshot, false, now);
+    EXPECT_EQ(host.baseline().expression, "thinking");
+    wait_for(host, now, "thinking");
+    now += 120000;
+    EXPECT_EQ(host.tick(now).baseline, "thinking");
+    snapshot.scanning = false;
+    for (auto state :
+         {audiohole::State::Starting, audiohole::State::Recovering, audiohole::State::Failed}) {
+        snapshot.state = state;
+        host.observe(snapshot, false, now);
+        now += 120000;
+        EXPECT_NE(host.tick(now).baseline, "sleeping");
+    }
+    snapshot.state = audiohole::State::Running;
+    host.observe(snapshot, true, now);
+    now += 120000;
+    EXPECT_EQ(host.tick(now).baseline, "concerned");
+    host.observe(snapshot, false, now);
+    const auto quiet_since = now;
+    wait_for(host, now, "idle");
+    now = quiet_since + 119999;
+    EXPECT_EQ(host.tick(now).baseline, "idle");
+    ++now;
+    EXPECT_EQ(host.tick(now).baseline, "sleeping");
+}
+TEST(AvatarIntegration, MissingSleepingCapabilityKeepsOwnedIdle) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    auto package = *messages.package("uwu");
+    std::erase(package.avatar_states, "sleeping");
+    p::AvatarHost host(fake_decoder());
+    std::int64_t now = 0;
+    host.select(&package, now);
+    wait_for(host, now, "idle");
+    now = 120000;
+    EXPECT_EQ(host.tick(now).state, "idle");
+}
+TEST(AvatarIntegration, HeldExpressionStillYieldsToSleepAndOperationalWarnings) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    host.hold_expressions(true);
+    std::int64_t now = 0;
+    host.select(messages.package("uwu"), now);
+    wait_for(host, now, "idle");
+    const auto copy = messages.show(p::Message::Bother, "uwu", 1);
+    ASSERT_TRUE(host.react(p::Message::Bother, copy, 1, now).accepted);
+    const auto occurred_at = now;
+    wait_for(host, now, copy.expression, true);
+    now += 10000;
+    EXPECT_TRUE(host.tick(now).holding);
+    now = occurred_at + 120000;
+    EXPECT_EQ(host.tick(now).baseline, "sleeping");
+    EXPECT_FALSE(wait_for(host, now, "sleeping").reaction);
+    host.activity(now);
+    wait_for(host, now, "idle");
+    ASSERT_TRUE(host.react(p::Message::Bother, copy, 2, now).accepted);
+    wait_for(host, now, copy.expression, true);
+    now += 10000;
+    EXPECT_TRUE(host.tick(now).holding);
+    audiohole::Snapshot snapshot;
+    snapshot.state = audiohole::State::Failed;
+    host.observe(snapshot, true, now);
+    EXPECT_FALSE(wait_for(host, now, "error").reaction);
+}
+TEST(AvatarIntegration, DfaExpressionsFollowTheSelectedResponseMetadata) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    std::int64_t now = 0;
+    std::uint64_t occurrence = 0;
+    for (const auto* id : {"default", "uwu"}) {
+        host.select(messages.package(id), now);
+        wait_for(host, now, "idle");
+        for (auto event : {p::Message::Dfa121, p::Message::Dfa404, p::Message::Dfa777}) {
+            const auto copy = messages.show(event, id, ++occurrence);
+            ASSERT_TRUE(host.react(event, copy, occurrence, now).accepted);
+            const auto frame = wait_for(host, now, copy.expression, true);
+            EXPECT_EQ(frame.state, copy.expression);
+            EXPECT_EQ(frame.personality, id);
+            now += 10000;
+            EXPECT_FALSE(host.tick(now).reaction);
+        }
+    }
 }
 } // namespace
 

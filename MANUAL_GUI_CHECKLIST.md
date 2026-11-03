@@ -278,6 +278,20 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Healthy Running is relaxed idle. Bother/DFA and other fresh responses request
   their authored expressions, then return to the latest baseline. Warnings and
   failures interrupt cosmetic feedback; recovery does not leave stale panic.
+- [ ] With **Hold expressions between events** off, a reaction plays normally,
+  holds its final pose for two extra seconds and returns to the current baseline.
+  Turn it on in Personality settings: the pose remains until another event, and
+  another event with the same expression can replay it. Turn it off during a hold;
+  it releases after the normal deadline. Restart and verify the setting persists.
+- [ ] Try varied DFA replies and references: 1.21 looks surprised, 4.04 confused,
+  7.77 celebrating and 9.11 panicking for Norm/Horu. Ordinary replies also vary by
+  authored expression. Wording/weights and easter eggs stay intact; during an
+  operational warning DFA feedback remains local and cannot replace its avatar.
+- [ ] Leave the application untouched for two minutes while Stopped or healthy
+  Running: Norm/Horu use their sleeping animation, Status its sleeping still.
+  Input or a new reaction wakes it, including when expressions are held between
+  events. Scanning, transitions and warnings prevent sleep. Verify reduced motion,
+  tray restoration and that polling/paint never resets inactivity or routing.
 - [ ] Switch personalities during loading/reactions: no old character/frame leaks.
   Remove/corrupt an owned frame in a disposable copy: owned fallback/hide and
   nonmodal All events diagnostics, with routing/configuration unaffected.

@@ -1752,3 +1752,11 @@ owned package migration, expression/baseline/priority hooks, timers, reduced mot
 shutdown and validation gates. Earlier “not integrated yet” notes describe prior
 milestones and are superseded for avatar presentation. Audio routing remains the
 existing Preview simulation or Test configuration-only backend.
+
+Avatar reactions retain their final pose for two additional seconds before
+returning to the current baseline. The saved Personality setting **Hold expressions
+between events** (off by default) instead retains the final pose until a new event;
+it still yields to inactivity sleep and operational changes. After two minutes
+without application input or new reactions/operational changes, a healthy idle avatar sleeps; healthy routing
+continues. Input, window restoration and new reactions wake it. Scans, transitions
+and operational warnings/errors prevent sleep and can interrupt reaction holds.

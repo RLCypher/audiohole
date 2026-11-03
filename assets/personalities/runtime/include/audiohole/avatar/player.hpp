@@ -14,6 +14,9 @@ struct Reaction {
     std::uint64_t revision = 0;
     std::int64_t occurred_ms = 0, ttl_ms = 2000;
     int priority = -1; // -1 uses the manifest. Explicit severity wins otherwise.
+    // Extra display time after one authored pass (or the static hold), 0..5000 ms.
+    // Independent of event freshness/TTL; operational interruption still applies.
+    int final_hold_ms = 0;
 };
 struct Presentation {
     Image image;
@@ -21,7 +24,7 @@ struct Presentation {
     int index = 0, frame_count = 0, exposure_ms = 0;
     double elapsed_ms = 0;
     int priority = 0;
-    bool reaction = false, loading = false, paused = false;
+    bool reaction = false, loading = false, paused = false, holding = false;
     std::vector<std::string> diagnostics;
 };
 // Host-thread only, clock-injected playback. No filesystem, GUI, decoding, audio,
@@ -40,6 +43,11 @@ class Player {
     void speed(double multiplier, std::int64_t now);
     void reduced_motion(bool value) {
         reduced_ = value;
+    }
+    // Keep completed reaction poses until replaced/cancelled. Turning this off
+    // lets the next tick complete any reaction past its ordinary display deadline.
+    void hold_expressions(bool value) {
+        hold_expressions_ = value;
     }
     void restart(std::int64_t now);
     void step(std::int64_t now);
@@ -61,9 +69,10 @@ class Player {
     ClipPtr baseline_, active_;
     std::uint64_t revision_ = 0;
     int baseline_priority_ = 0, active_priority_ = 0;
+    int active_hold_ms_ = 0;
     std::int64_t last_now_ = 0;
     bool clock_valid_ = false, finite_ = false, inspecting_ = false, paused_ = false,
-         reduced_ = false;
+         reduced_ = false, hold_expressions_ = false;
     double elapsed_ = 0, baseline_elapsed_ = 0, speed_ = 1;
     std::deque<std::string> event_order_;
     std::unordered_map<std::string, bool> events_;

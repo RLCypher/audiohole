@@ -251,6 +251,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         avatar_timer_.GetId());
     Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
         if (event.IsShown() && !IsIconized()) {
+            avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
             avatar_timer_.Start(16);
         } else
@@ -259,6 +260,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     });
     Bind(wxEVT_ICONIZE, [this](wxIconizeEvent& event) {
         if (!event.IsIconized() && IsShown()) {
+            avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
             avatar_timer_.Start(16);
         } else
@@ -266,6 +268,20 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         event.Skip();
     });
     timer_.Start(100);
+    wxEvtHandler::AddFilter(this);
+}
+int Frame::FilterEvent(wxEvent& event) {
+    const auto type = event.GetEventType();
+    if (type == wxEVT_KEY_DOWN || type == wxEVT_CHAR_HOOK || type == wxEVT_MOTION ||
+        type == wxEVT_MOUSEWHEEL || type == wxEVT_LEFT_DOWN || type == wxEVT_RIGHT_DOWN ||
+        type == wxEVT_MIDDLE_DOWN) {
+        // Child mouse events do not bubble to Frame. Observe this window tree's
+        // input without consuming it or counting paint/timer events as activity.
+        auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
+        if (window && (window == this || IsDescendant(window)))
+            avatar_host_->activity(avatar::monotonic_ms());
+    }
+    return wxEventFilter::Event_Skip;
 }
 void Frame::stop_avatar() {
     avatar_timer_.Stop();
@@ -814,6 +830,15 @@ bool Frame::smoke(const wxString& directory) {
             GetEventHandler()->ProcessEvent(avatar_tick);
         require(controller_->snapshot().revision == before_avatar_ticks,
                 "Avatar timer advanced controller state or generated operational events");
+        require(!hold_expressions_->GetValue(), "Expression hold must be opt-in");
+        wxCommandEvent expression_hold(wxEVT_CHECKBOX, hold_expressions_->GetId());
+        for (bool hold : {true, false}) {
+            hold_expressions_->SetValue(hold);
+            hold_expressions_->GetEventHandler()->ProcessEvent(expression_hold);
+            require(preferences_->values().hold_expressions == hold &&
+                        controller_->snapshot().revision == before_avatar_ticks,
+                    "Expression hold checkbox failed to save or changed routing state");
+        }
         forward_.buffer->SetValue(13);
         acknowledge_buffer(forward_);
         require(forward_.buffer_apply->IsEnabled(),

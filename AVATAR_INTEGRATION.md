@@ -18,6 +18,39 @@ never calls a controller command, selects dialogue, interprets English status
 strings or changes settings. `Frame::present` supplies the chosen expression and
 one occurrence ID. A repeated authored response has a new occurrence identity.
 The same message/occurrence is not generated again by resizing or playback ticks.
+By default, GUI reactions retain their final frame for an additional 2000 ms after
+one authored pass (or the normal static-image hold), then resume the current baseline. The host
+opts into this engine playback policy without editing approved artwork/manifests
+or slowing the authored frames. Event freshness TTL remains separate from display
+duration. Warning/state changes and personality switches still interrupt at once;
+reduced motion keeps its still image for the extended duration. Idle loops and
+standalone viewer inspection keep their existing timing.
+
+DFA responses now use individually authored schema-2 expression/subcategory
+assignments through the same selection/metadata path as Bother. All 119 existing
+Norm/Horu DFA texts, IDs, weights and pool orders are preserved; the selected reply
+drives its own pose, including threshold/reference/validation responses. No English
+text parsing or separate animation randomness is introduced.
+
+Settings → Personality offers **Hold expressions between events**, unchecked by
+default. Checked, it keeps a completed pose until a new reaction or an overriding
+baseline change. Another occurrence of the same expression can replay it once the
+previous pass has finished (normal event deduplication/cooldown still applies).
+Turning the option off releases an already-held pose at its ordinary deadline.
+The isolated Preview Build preferences persist the optional boolean
+`hold_expressions`; older files omit it and retain timed holds. Failed/conflicting
+saves leave both the checkbox and runtime policy at the saved value. The option
+does not prevent inactivity sleep or operational interruption.
+
+After two minutes without input, dialogue reactions or meaningful operational
+changes, a healthy idle presentation uses its owned `sleeping` state (animated for
+Norm/Horu, intentionally static for Status). Healthy routing may continue while
+the avatar sleeps. Mouse/keyboard input within the application, window restoration
+and new reactions wake it. GUI polling, repainting, resizing and unchanged snapshot
+refreshes do not reset inactivity. Scanning, transitions, recovery, failures and
+visible operational warnings take precedence and prevent sleep. The host never
+changes controller state or commentary to enter/wake from sleep; packages without
+sleeping resources retain owned idle. Reduced motion uses the sleeping still image.
 
 The existing application baseline helper remains authoritative: healthy Running,
 Ready and Stopped are idle; transitions/scans use its busy states; Degraded and
@@ -92,6 +125,11 @@ No viewer, tests, Python tools or generation intermediates are installed.
 - The WIC decoder's NOMINMAX definition is guarded to avoid redefinition.
 - Runtime JSON parsing rejects nesting beyond 16, in addition to its byte bound,
   including files externally changed after package discovery.
+- Reactions accept a bounded, optional final-frame hold (default zero). The GUI
+  requests 2000 ms; immutable clip timing and ordinary engine defaults are preserved.
+- The player has an opt-in hold-between-events policy and reports the final hold
+  phase, letting the GUI replace that pose with inactivity sleep without cutting
+  off an animation that is still playing. Viewer defaults remain unchanged.
 
 No animation/asset-selection algorithm is duplicated or replaced. Upstream source
 and validation reports remain available under `assets/personalities/runtime`.
@@ -142,3 +180,15 @@ checks that waiting never advances controller state, and prints failures and loa
 diagnostics to stderr as well as `smoke-result.txt`. Production loading remains
 asynchronous. The follow-up cross-build and seven focused avatar/layout tests pass
 locally; a new native Windows run is still required to confirm GUI smoke passes.
+
+## Reaction settings and inactivity validation
+
+The later reaction/checkbox/sleep/DFA refinements pass 114/114 portable tests in
+both Debug and Release, including exact hold deadlines, reduced motion, repeated
+same-expression events, warning interruption, two-minute sleep/wake, preference
+restart compatibility and per-response DFA metadata. A before/after data audit
+confirms all DFA text, weights, IDs and ordering plus every non-DFA entry are
+unchanged. Windows cross-builds pass for the GUI, model tests and upstream engine
+tests. The native GUI smoke now exercises the checkbox without changing controller
+state. Actual Windows execution/visual inspection of these new behaviors remains
+pending; portable clocks/decoders do not substitute for that review.

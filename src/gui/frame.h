@@ -18,6 +18,7 @@
 #include <wx/collpane.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
+#include <wx/eventfilter.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include <wx/scrolwin.h>
@@ -63,14 +64,16 @@ struct DirectionWidgets {
 };
 // Native view/controller adapter. Owns the controller and tray; wx owns child widgets.
 // Editor drafts are separate from saved session records and the copied live plan.
-// Timers advance deterministic fixture time only; no I/O or audio work is done here.
-class Frame final : public wxFrame {
+// The control timer advances fixture time; the avatar timer samples presentation.
+// Neither performs audio work.
+class Frame final : public wxFrame, private wxEventFilter {
   public:
     // Takes exclusive controller ownership. All widgets and commands are GUI-thread only.
     explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
                    std::shared_ptr<BuildPreferences> preferences = {},
                    std::function<void()> restart = {});
     ~Frame() override {
+        wxEvtHandler::RemoveFilter(this);
         RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
         stop_avatar();
@@ -114,6 +117,7 @@ class Frame final : public wxFrame {
     bool smoke(const wxString& directory);
 
   private:
+    int FilterEvent(wxEvent& event) override;
     std::unique_ptr<audiohole::Controller> controller_;
     std::shared_ptr<BuildPreferences> preferences_;
     std::function<void()> restart_;
@@ -139,7 +143,7 @@ class Frame final : public wxFrame {
     std::vector<wxToggleButton*> navigation_;
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
-    wxCheckBox *preview_mode_{}, *show_preview_dialog_{};
+    wxCheckBox *preview_mode_{}, *show_preview_dialog_{}, *hold_expressions_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
     wxSlider* dfa_slider_{};
     wxTextCtrl* dfa_value_{};
@@ -151,7 +155,7 @@ class Frame final : public wxFrame {
     std::vector<wxWindow*> dfa_controls_;
     avatar::Panel* agent_display_{};
     std::chrono::steady_clock::time_point bother_after_{};
-    void bother(); // GUI-thread click entry point; no avatar playback or controller commands.
+    void bother(); // Avatar-click entry point; selected replies affect presentation only.
     wxScrolledWindow* commentary_panel_{};
     wxPanel* comment_surface_{};
     wxBoxSizer* routing_actions_{}; // Borrowed; natural button width bounds the commentary card.

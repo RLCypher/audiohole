@@ -93,6 +93,8 @@ Decision Session::baseline(std::string state, std::uint64_t revision, int priori
 Decision Session::react(Reaction event, std::int64_t now) {
     if (stopping_)
         return last_decision_ = {false, "shutdown"};
+    if (event.final_hold_ms < 0 || event.final_hold_ms > 5000)
+        return last_decision_ = {false, "invalid_final_hold"};
     if (std::find(submitted_events_.begin(), submitted_events_.end(), event.event_id) !=
         submitted_events_.end())
         return last_decision_ = {false, "duplicate_event"};

@@ -28,7 +28,8 @@ externally while AudioHole is stopped. There is no real scanner to populate them
 Test disables route/scan/monitor/beep/live profile Apply and omits Simulate Errors entirely.
 Saved availability and formats are unverified records, not observations.
 
-Startup preferences, theme, selected personality stable ID, notification setting,
+Startup preferences, theme, selected personality stable ID, the presentation-only
+`hold_expressions` boolean (optional, default false), notification setting,
 preview startup selection/delay/target are stored separately. A missing personality
 does not erase the desired saved ID. DFA value/history stays transient. Startup
 preview preferences do not automatically resume a route after restart. Close still

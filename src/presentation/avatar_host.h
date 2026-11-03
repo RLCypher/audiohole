@@ -13,9 +13,13 @@ class AvatarHost {
     ~AvatarHost();
     void select(const Personality* package, std::int64_t now);
     void observe(const Snapshot&, bool warning_visible, std::int64_t now);
+    // Host input/reactions reset the two-minute cosmetic inactivity timer.
+    // Waking never changes routing state or selects new dialogue.
+    void activity(std::int64_t now);
     avatar::Decision react(Message, const Copy&, std::uint64_t occurrence, std::int64_t now);
     avatar::Presentation tick(std::int64_t now);
     void reduced_motion(bool enabled);
+    void hold_expressions(bool enabled);
     void shutdown();
     bool enabled() const {
         return static_cast<bool>(session_);
@@ -30,7 +34,9 @@ class AvatarHost {
     std::unique_ptr<avatar::Session> session_;
     std::string personality_, style_;
     std::vector<std::string> supported_;
-    Baseline baseline_;
+    Baseline baseline_, awake_baseline_;
+    std::int64_t last_activity_ms_ = 0;
+    bool sleeping_ = false, hold_expressions_ = false;
     State state_ = State::Stopped;
     bool scanning_ = false, warning_ = false, reduced_ = false;
     std::string active_profile_;

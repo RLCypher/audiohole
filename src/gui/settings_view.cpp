@@ -57,6 +57,25 @@ void Frame::build_settings() {
     root->Add(preview_settings, 0, wxEXPAND | wxALL, 4);
     personality_choice_ = choices(page, root, "Personality", {});
     personality_notice_ = label(page, root, "");
+    hold_expressions_ = new wxCheckBox(page, wxID_ANY, "Hold expressions between events");
+    hold_expressions_->SetValue(preferences_->values().hold_expressions);
+    avatar_host_->hold_expressions(hold_expressions_->GetValue());
+    hold_expressions_->SetToolTip(
+        "Keep the final reaction pose until the next event. Unchecked: hold it for two extra "
+        "seconds. Warnings, personality changes and inactivity sleep still take priority.");
+    root->Add(hold_expressions_, 0, wxALL, 4);
+    hold_expressions_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.hold_expressions = hold_expressions_->GetValue();
+        const auto result = preferences_->update(next);
+        if (!result.ok) {
+            hold_expressions_->SetValue(preferences_->values().hold_expressions);
+            show_result(result);
+            return;
+        }
+        avatar_host_->hold_expressions(next.hold_expressions);
+        poll_avatar();
+    });
     personality_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         const int selected = personality_choice_->GetSelection();
         if (selected >= 0)
