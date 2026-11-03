@@ -46,6 +46,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         "disabled because there is no engine acknowledgment of an applied buffer. Save stores "
         "the edited preference in this session; profile Apply activates a simulated plan.");
     w.group->Add(buffer_row, 0, wxEXPAND);
+    w.buffer_state = label(box, w.group, "Edited/saved preferences; engine values unavailable.");
+    w.buffer_state->SetMinSize(wxSize(1, -1));
     w.buffer->SetToolTip("Buffer duration in milliseconds. Smaller values can reduce latency but "
                          "increase dropout risk. This is an edited preference, not a measured or "
                          "confirmed engine buffer; live application is unavailable here.");
@@ -136,15 +138,23 @@ void Frame::build_profiles() {
     button(sidebar, row, "New", [this] {
         if (!discard())
             return;
-        select_profile(controller_->create_profile("New profile"));
+        const auto id = controller_->create_profile("New profile");
+        if (id.empty())
+            show_result({false, controller_->last_edit_error()});
+        else
+            select_profile(id);
     });
-    button(sidebar, row, "Duplicate", [this] {
+    profile_duplicate_ = button(sidebar, row, "Duplicate", [this] {
         if (!discard())
             return;
-        select_profile(controller_->create_profile(draft_.display_name + " copy", viewed_));
+        const auto id = controller_->create_profile(draft_.display_name + " copy", viewed_);
+        if (id.empty())
+            show_result({false, controller_->last_edit_error()});
+        else
+            select_profile(id);
     });
-    button(sidebar, row, "Delete", [this] {
-        if (wxMessageBox("Delete this saved session profile?", "Confirm profile deletion",
+    profile_delete_ = button(sidebar, row, "Delete", [this] {
+        if (wxMessageBox("Delete this saved profile?", "Confirm profile deletion",
                          wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
             return;
         const auto r = controller_->remove_profile(viewed_);
@@ -185,9 +195,12 @@ void Frame::build_profiles() {
         load_hole(draft_.holes.empty() ? -1 : 0);
     });
     auto* saves = new wxBoxSizer(wxHORIZONTAL);
-    button(sidebar, saves, "Save", [this] { save(false); });
-    button(sidebar, saves, "Apply", [this] { save(true); });
-    button(sidebar, saves, "Revert", [this] {
+    profile_save_ = button(sidebar, saves, "Save", [this] { save(false); });
+    profile_apply_ = button(sidebar, saves, "Apply", [this] { save(true); });
+    if (controller_->snapshot().operating_mode == OperatingMode::Test)
+        profile_apply_->SetToolTip("Live routing is unavailable in Test Mode. Use Save to persist "
+                                   "profile preferences without claiming engine application.");
+    profile_revert_ = button(sidebar, saves, "Revert", [this] {
         if (discard())
             select_profile(viewed_);
     });
@@ -316,6 +329,23 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
 // Read-only display of requested settings and available endpoint records; never
 // label these as negotiated runtime measurements or verified hardware evidence.
 void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direction& d) {
+    const auto& snapshot = controller_->snapshot();
+    std::string saved = "unsaved";
+    if (const auto* stored = profile(snapshot, viewed_)) {
+        const auto selected =
+            hole_index_ >= 0 && static_cast<std::size_t>(hole_index_) < draft_.holes.size()
+                ? draft_.holes[static_cast<std::size_t>(hole_index_)].id
+                : std::string{};
+        const auto hole = std::find_if(stored->holes.begin(), stored->holes.end(),
+                                       [&](const auto& record) { return record.id == selected; });
+        if (hole != stored->holes.end())
+            saved = std::to_string(
+                        (&w == &forward_ ? hole->forward : hole->reverse).settings.buffer_ms) +
+                    " ms";
+    }
+    w.buffer_state->SetLabel(text("Edited: " + std::to_string(d.settings.buffer_ms) +
+                                  " ms | Saved: " + saved +
+                                  "\nEngine requested/applied: unavailable"));
     const auto r = audiohole::recommend(controller_->snapshot(), d);
     const auto selected = !d.settings.automatic   ? d.settings.format
                           : !r.compatible.empty() ? r.compatible.front()
@@ -392,8 +422,12 @@ void Frame::select_profile(const std::string& id) {
         if (saved.id == id)
             profiles_->SetSelection(static_cast<int>(profile_ids_.size()) - 1);
     }
-    if (startup_target_->GetCount())
-        startup_target_->SetSelection(0);
+    if (startup_target_->GetCount()) {
+        const auto& desired = preferences_->values().startup_profile_id;
+        const auto found = std::find(profile_ids_.begin(), profile_ids_.end(), desired);
+        startup_target_->SetSelection(
+            found == profile_ids_.end() ? 0 : static_cast<int>(found - profile_ids_.begin()));
+    }
     loading_ = false;
     dirty_ = false;
     load_holes();
@@ -440,6 +474,12 @@ void Frame::save(bool apply) {
     show_result(r);
     if (r.ok) {
         dirty_ = false;
+        const auto item = std::find(profile_ids_.begin(), profile_ids_.end(), viewed_);
+        if (item != profile_ids_.end()) {
+            const auto index = static_cast<unsigned>(item - profile_ids_.begin());
+            profiles_->SetString(index, text(draft_.display_name));
+            startup_target_->SetString(index, text(draft_.display_name));
+        }
         load_holes();
         holes_->SetSelection(hole_index_);
     }
@@ -506,6 +546,8 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     observation->Add(beep);
     beep_status_ = label(box, observation, "Test Beep inactive.");
     label(box, observation, "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    if (controller_->snapshot().operating_mode != OperatingMode::Preview)
+        return;
     auto* simulation = new wxStaticBoxSizer(wxVERTICAL, parent, "Simulate Errors");
     auto* simulation_box = simulation->GetStaticBox();
     layout->Add(simulation, 0, wxEXPAND | wxALL, 4);

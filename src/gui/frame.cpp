@@ -1,11 +1,21 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include "model/application_controller.h"
+#include "model/configuration_controller.h"
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
-Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
+Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
+             std::shared_ptr<BuildPreferences> preferences, std::function<void()> restart)
     : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1536, 1024)),
-      controller_(std::move(controller)), timer_(this), smoke_(smoke) {
+      controller_(std::make_unique<ApplicationController>(std::move(controller))),
+      preferences_(std::move(preferences)), restart_(std::move(restart)), timer_(this),
+      smoke_(smoke) {
+    if (!preferences_) {
+        preferences_ = std::make_shared<BuildPreferences>(std::filesystem::path{}, true);
+        preferences_->load();
+    }
+    personality_ = preferences_->values().personality_id;
     SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
     // A stable window property supports second-launch focus across build titles.
     // It is removed before the native window is destroyed (see the destructor).
@@ -57,7 +67,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
     routing_actions_ = actions;
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
-    button(this, actions, "Arm Ready", [this] { activate(true); });
+    arm_ready_ = button(this, actions, "Arm Ready", [this] { activate(true); });
     stop_ = button(this, actions, "Stop Routing", [this] {
         controller_->stop();
         refresh();
@@ -77,7 +87,12 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     auto* comment_layout = new wxBoxSizer(wxVERTICAL);
     personality_heading_ = new wxStaticText(comment_surface, wxID_ANY, "Norm", wxDefaultPosition,
                                             wxDefaultSize, wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
-    comment_layout->Add(personality_heading_, 0, wxEXPAND | wxALL, FromDIP(4));
+    auto* personality_row = new wxBoxSizer(wxHORIZONTAL);
+    personality_row->Add(personality_heading_, 1, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    bother_button_ = button(comment_surface, personality_row, "Bother", [this] { bother(); });
+    bother_button_->SetToolTip("Poke the selected personality. Repeated clicks are rate limited; "
+                               "routing and DFA are unchanged.");
+    comment_layout->Add(personality_row, 0, wxEXPAND);
     personality_heading_->SetMinSize(wxSize(0, -1));
     personality_heading_->SetFont(GetFont().Bold());
     commentary_panel_ = new wxScrolledWindow(comment_surface);
@@ -94,7 +109,8 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
     // Existing commentary remains to the left of the replaceable agent image;
     // no speech-bubble or animation system is introduced.
     agent_display_ = new AgentDisplay(this, wxSize(144, 216));
-    agent_display_->set_image(placeholder_avatar());
+    agent_display_->clear_image();
+    agent_display_->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&) { bother(); });
     header->Add(agent_display_, 0, wxEXPAND | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
@@ -211,10 +227,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
         e.Skip();
     });
     apply_appearance();
-    select_profile("profile-simplex");
+    select_profile(controller_->snapshot().profiles.empty()
+                       ? ""
+                       : controller_->snapshot().profiles.front().id);
     populate_devices();
     refresh();
-    present(presentation::Message::Ready);
+    if (!operational_warning_visible_)
+        present(presentation::Message::Ready);
     Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
         if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
             select_page((static_cast<std::size_t>(notebook_->GetSelection()) +
@@ -225,6 +244,16 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke)
             event.Skip();
     });
     timer_.Start(100);
+}
+void Frame::bother() {
+    if (operational_warning_visible_ || personality_ == "vanilla" ||
+        messages_.variants(presentation::Message::Bother, personality_).empty())
+        return;
+    const auto now = std::chrono::steady_clock::now();
+    if (now < bother_after_)
+        return;
+    bother_after_ = now + std::chrono::milliseconds(350);
+    present(presentation::Message::Bother);
 }
 void Frame::present(presentation::Message event) {
     operational_warning_visible_ = event == presentation::Message::ScanFailed ||
@@ -293,7 +322,7 @@ void Frame::show_result(const audiohole::Result& result) {
 bool Frame::discard() {
     if (!dirty_)
         return true;
-    return wxMessageBox("Discard unsaved editor changes? Saved session profiles and the active "
+    return wxMessageBox("Discard unsaved editor changes? Saved profiles and the active "
                         "route will be retained.",
                         "Unsaved changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
                         this) == wxYES;
@@ -307,6 +336,23 @@ void Frame::end_observation() {
 // number gates commentary, so repainting/telemetry cannot consume more variants.
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
+    const bool preview = s.operating_mode == OperatingMode::Preview;
+    start_->Enable(s.capabilities.routing);
+    arm_ready_->Enable(s.capabilities.routing);
+    stop_->Enable(s.capabilities.routing);
+    profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
+    profile_save_->Enable(!viewed_.empty());
+    profile_revert_->Enable(!viewed_.empty() && dirty_);
+    profile_duplicate_->Enable(!viewed_.empty());
+    profile_delete_->Enable(!viewed_.empty() && !(s.armed && viewed_ == s.active_profile) &&
+                            viewed_ != s.pending_profile);
+    scan_start_->Enable(s.capabilities.scanning);
+    scan_cancel_->Enable(s.capabilities.scanning && s.scanning);
+    scan_mode_->Enable(s.capabilities.scanning);
+    scan_scope_->Enable(s.capabilities.scanning);
+    monitor_->Enable(s.capabilities.monitoring);
+    activity_direction_->Enable(s.capabilities.monitoring && hole_index_ >= 0 &&
+                                draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex);
     if (hole_index_ >= 0) {
         Direction forward, reverse;
         read_direction(forward_, forward);
@@ -315,9 +361,11 @@ void Frame::refresh() {
         update_direction_details(reverse_, reverse);
     }
     const auto* active = audiohole::profile(s, s.active_profile);
-    std::string status = std::string("Routing: ") + audiohole::name(s.state) +
-                         "\nActive: " + (active ? active->display_name : "none") +
-                         "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
+    std::string status =
+        (preview ? std::string("Preview Mode | Routing: ") + audiohole::name(s.state)
+                 : std::string("Test Mode | Engine: unavailable")) +
+        "\nActive: " + (active ? active->display_name : "none") +
+        "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
     if (!s.pending_profile.empty())
         status += "\nStartup pending: " + std::to_string((s.pending_ms + 999) / 1000) + " s";
     std::vector<std::string> enabled_holes;
@@ -337,7 +385,9 @@ void Frame::refresh() {
         return event.type == "error" || event.type == "scan-failed";
     });
     const auto holes = draft_.holes.size();
-    SetStatusText(text(std::string("AudioHole | Engine: ") + name(s.state) +
+    SetStatusText(text(std::string(preview ? "AudioHole (Preview Mode) | Engine: "
+                                           : "AudioHole (Test Mode) | Engine: ") +
+                       (preview ? name(s.state) : "unavailable") +
                        " | Devices: " + std::to_string(s.endpoints.size()) +
                        " | Profiles: " + std::to_string(s.profiles.size()) +
                        " | Viewed holes: " + std::to_string(holes) +
@@ -375,9 +425,11 @@ void Frame::refresh() {
             : nullptr;
     const bool beep_available = beep_target && !beep_target->capture &&
                                 beep_target->availability == Availability::Available;
-    beep_button_->Enable(!s.beep_destination.empty() || beep_available);
+    beep_button_->Enable(s.capabilities.beep && (!s.beep_destination.empty() || beep_available));
     beep_button_->SetToolTip(
-        s.beep_destination.empty()
+        !preview ? "Test Beep playback is unavailable in Test Mode because no audio backend is "
+                   "installed."
+        : s.beep_destination.empty()
             ? "Start a bounded test for the explicitly selected playback destination. This "
               "preview simulates the test interval and emits no sound."
             : "Cancel the active simulated destination test immediately. No second test starts.");
@@ -454,6 +506,50 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        if (controller_->snapshot().operating_mode == OperatingMode::Test) {
+            require(controller_->snapshot().profiles.empty() &&
+                        controller_->snapshot().endpoints.empty(),
+                    "Test Mode leaked preview fixtures");
+            require(!start_->IsEnabled() && !arm_ready_->IsEnabled() && !scan_start_->IsEnabled() &&
+                        !beep_button_->IsEnabled(),
+                    "Test Mode enabled unsupported hardware controls");
+            require(wxWindow::FindWindowByLabel("Forward failure", this) == nullptr &&
+                        wxWindow::FindWindowByLabel("Reverse failure", this) == nullptr &&
+                        wxWindow::FindWindowByLabel("Simulate Errors", this) == nullptr,
+                    "Test Mode contains simulation controls");
+            auto* create = wxWindow::FindWindowByLabel("New", this);
+            require(create != nullptr, "New profile control missing");
+            wxCommandEvent new_profile(wxEVT_BUTTON, create->GetId());
+            create->GetEventHandler()->ProcessEvent(new_profile);
+            require(!viewed_.empty(), "Test Mode could not create persistent profile");
+            profile_name_->ChangeValue("Restart persistence check");
+            profile_notes_->ChangeValue("Native GUI Test data, saved without a routing backend.");
+            save(false);
+            const auto saved_id = viewed_;
+            ConfigurationController restarted(
+                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
+            const auto* loaded = audiohole::profile(restarted.snapshot(), saved_id);
+            require(loaded && loaded->display_name == "Restart persistence check",
+                    "Test GUI save did not survive a new controller");
+            require(!profile_apply_->IsEnabled(),
+                    "Test Mode enabled Apply after creating a profile");
+            if (!directory.empty()) {
+                wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+                wxBitmap bitmap(GetClientSize());
+                wxMemoryDC destination(bitmap);
+                wxClientDC source(this);
+                destination.Blit(0, 0, GetClientSize().x, GetClientSize().y, &source, 0, 0);
+                destination.SelectObject(wxNullBitmap);
+                bitmap.SaveFile(directory + "/test-mode.bmp", wxBITMAP_TYPE_BMP);
+                std::ofstream result(std::filesystem::path(directory.ToStdWstring()) /
+                                     "smoke-result.txt");
+                result << "PASS: Test Mode isolation, real GUI configuration save/reload, "
+                          "unavailable backend controls\n";
+                result.flush();
+                require(static_cast<bool>(result), "Test Mode evidence write failed");
+            }
+            return true;
+        }
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
             if (dynamic_cast<wxButton*>(window))
                 require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
@@ -490,6 +586,30 @@ bool Frame::smoke(const wxString& directory) {
                     beep_button_->GetLabel() == "Test Beep" &&
                     beep_button_->GetSize().x == beep_width,
                 "Natural beep completion must restore the fixed-width idle button");
+        show_result({false, "Operational warning retained."});
+        const auto warning_occurrence = occurrence_;
+        bother();
+        require(technical_copy_ == "Operational warning retained." &&
+                    occurrence_ == warning_occurrence,
+                "Bother must not replace an operational warning");
+        select_personality("uwu");
+        require(technical_copy_ == "Operational warning retained." && commentary_copy_.empty(),
+                "Personality switch concealed a warning or retained another character's flavor");
+        select_personality("default");
+        present(presentation::Message::Ready);
+        const auto bother_revision = controller_->snapshot().revision;
+        const auto bother_dfa = dfa_hundredths_;
+        bother_after_ = {};
+        bother();
+        require(last_message_ == presentation::Message::Bother &&
+                    controller_->snapshot().revision == bother_revision &&
+                    dfa_hundredths_ == bother_dfa,
+                "Bother must remain independent of controller and DFA state");
+        const auto bother_occurrence = occurrence_;
+        bother_after_ = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+        bother();
+        require(occurrence_ == bother_occurrence, "Bother ignored its click cooldown");
+        bother_after_ = {};
         require(GetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow") != nullptr,
                 "Stable second-launch window identity missing");
         require(personality_choice_->GetString(0) == wxS("Norm") &&
@@ -704,9 +824,12 @@ bool Frame::smoke(const wxString& directory) {
                 dfa_value_->ChangeValue(text(presentation::dfa_text(previous)));
             }
         }
+        const auto desired_personality = preferences_->values().personality_id;
         select_personality("missing-catalog");
-        require(personality_ == "vanilla" && !dfa_->IsShown() && !dfa_slider_->IsShown(),
-                "Unavailable catalog did not fall back to Vanilla");
+        require(preferences_->values().personality_id == desired_personality,
+                "Missing package erased the saved desired personality identity");
+        require(personality_ == "default" && dfa_->IsShown() && dfa_slider_->IsShown(),
+                "Unavailable catalog did not select the entire preferred built-in package");
         require(!fallback_notice_->GetLabel().empty(),
                 "Whole-personality fallback lacks explanation");
         select_personality("default");

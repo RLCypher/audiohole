@@ -30,7 +30,9 @@ void Frame::build_devices() {
             present(presentation::Message::DeviceSaved);
         }
     });
-    button(page, right, "Toggle availability", [this] {
+    auto* toggle_availability = button(page, right, "Toggle availability", [this] {
+        if (controller_->snapshot().operating_mode != OperatingMode::Preview)
+            return;
         if (const auto* e = audiohole::endpoint(controller_->snapshot(), device_id_)) {
             if (e->availability == audiohole::Availability::Ambiguous) {
                 show_result({false, "Ambiguous identities are not automatically resolved. Explicit "
@@ -46,6 +48,7 @@ void Frame::build_devices() {
             refresh();
         }
     });
+    toggle_availability->Show(controller_->snapshot().operating_mode == OperatingMode::Preview);
     page->SetSizer(root);
     notebook_->AddPage(page, "Devices");
     devices_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
@@ -92,6 +95,10 @@ void Frame::load_device() {
     if (e->formats.empty())
         details += "  Unknown / untested. No verified recommendation.\n";
     details += "Clock relationship: unknown.";
+    if (controller_->snapshot().operating_mode == OperatingMode::Test)
+        details = "Saved configuration only. Availability/formats are unverified records, not "
+                  "current hardware observations.\n\n" +
+                  details;
     device_detail_->SetLabel(text(details));
     device_detail_->Wrap(650);
 }

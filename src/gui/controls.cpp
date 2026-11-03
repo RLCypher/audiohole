@@ -164,7 +164,7 @@ wxString button_help(const wxString& title) {
         {"Reload personality files",
          "Reload optional commentary from the personalities folder beside this executable."},
         {"Load custom personality…", "Validate and select a local JSON commentary catalog. Invalid "
-                                     "files fall back to Vanilla."},
+                                     "files leave a complete available package selected."},
         {"Preview startup",
          "Exercise immediate or delayed profile activation without registering Windows startup."},
         {"Cancel pending activation",

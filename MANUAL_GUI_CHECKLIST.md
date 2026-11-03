@@ -71,7 +71,7 @@ Production buffer/queue policy remains unresolved.
 
 - [ ] On every fresh interactive launch, acknowledge the notice covering all
   simulated functions, silent Test Beep, no real audio/device access, and
-  session-only settings. Replay Tutorial instead shows its separate placeholder. Check that operation panels,
+  session-only Preview records plus isolated persisted Test records/preferences. Replay Tutorial instead shows its separate placeholder. Check that operation panels,
   top status, tray, and Norm/UwU commentary use production-style language.
 - [ ] Hover every action button; verify an explanation, readable text, and a
   dark blue-gray hot state in Dark. Press F1 on a focused button to read its help.
@@ -90,7 +90,7 @@ Production buffer/queue policy remains unresolved.
 - [ ] Start a second copy from a different extraction directory. The current
   instance should reopen instead of silently failing because its title has a build
   suffix. Exit completely before testing a newly downloaded executable.
-- [ ] Copy/export diagnostics: the output retains a simulated-data header even
+- [ ] Copy/export diagnostics in Preview: the output retains a simulated-data header even
   though the on-screen console previews production wording. Latency, clock drift,
   CPU and hardware verification remain unavailable; no measurements are invented.
 
@@ -215,3 +215,41 @@ require Windows execution; portable tests validate arithmetic/catalog semantics.
   artwork. Windows CI independently audits the first PE icon group and image data.
 
 Native Windows rendering and shell-cache behavior remain manual validation tasks.
+
+
+## Preview/Test persistence and package milestone (native validation pending)
+
+- [ ] Fresh per-user PreviewBuild root: both checkboxes enabled. Startup choices
+  Preview Mode/Test Mode and Preview Build wording match behavior. Test starts
+  empty; Preview retains fixtures. Production sentinel files stay untouched.
+- [ ] Test: New, duplicate, edit notes/holes/directional buffers, Save, Exit/relaunch.
+  Stable IDs and independent reverse values survive. Populate a Test device record
+  externally using the documented provisional shape; GUI Save preserves identity.
+  Saved device availability is explicitly unverified. Per-device filename rename
+  is a future production requirement, not implemented by aggregated Test v1.
+- [ ] Test has no Simulate Errors heading/actions/gap and no enabled routing,
+  scan, monitoring, beep or Apply controls. Adjacent buffer Apply stays gray with
+  requested/applied values unavailable. Profile Save works without an engine.
+- [ ] Toggle startup dialog and next-launch mode, appearance, notifications and
+  startup preview settings. Restart and fresh launch preserve values, never resume
+  a previously pending route. Cancel unsaved-profile confirmation keeps the session.
+- [ ] Restart via Settings closes tray/timers, waits for parent exit and opens one
+  new process; rapid repeated requests and normal second launch do not duplicate.
+  Test executable paths containing spaces/non-ASCII. Relaunch failure preserves data.
+- [ ] Malformed/newer/external-edited configuration reports errors and remains
+  byte-preserved after rejected Save. Repair while stopped, restart/reload records.
+- [ ] Copy Visitor example folder into personalities, Reload, select it, restart;
+  stable selected ID persists. Rename folder without changing identity. Remove it:
+  whole-package fallback notice appears. Remove all valid packages: no character
+  image or DFA/Bother, app/technical messages remain usable. Restore saved package.
+- [ ] Horu without a placeholder shows no Norm pixels; Bother button remains usable.
+  Norm/Vanilla use their own preview files. No avatar engine playback is present.
+  Malformed, duplicate-ID, escaping-path packages fail without preventing startup.
+- [ ] Rapid Bother clicks stay bounded; each built-in pool has30 with10/10/5/5
+  categories. Warning text retains priority, DFA/routing do not change.
+- [ ] Dark footer remains white/legible. Inspect header and endpoint-card rounded
+  corners at100/150/200% DPI, compact/maximized/restored sizes; image switches and
+  long status/notes do not create resizing artifacts. Verify fixed beep width.
+- [ ] Run both Debug/Release native CTest, including Gui.TestModeSmoke and the
+  extracted clean package check. OS restart and appearance need human review;
+  cross-compilation and portable unit tests do not satisfy these gates.

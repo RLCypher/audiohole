@@ -1,9 +1,11 @@
 #pragma once
 #include "gui/branding.h"
+#include "model/build_preferences.h"
 #include "model/controller.h"
 #include "platform/windows/com_apartment.h"
 #include "presentation/messages.h"
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -49,7 +51,8 @@ struct DirectionWidgets {
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{};
     wxSpinCtrl* buffer{};
-    wxButton* buffer_apply{};       // Disabled until a backend supports confirmed live updates.
+    wxButton* buffer_apply{}; // Disabled until a backend supports confirmed live updates.
+    wxStaticText* buffer_state{};
     int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
     wxStaticText *evidence{}, *source_detail{}, *destination_detail{}, *summary{};
     std::vector<std::string> sources, destinations;
@@ -61,7 +64,9 @@ struct DirectionWidgets {
 class Frame final : public wxFrame {
   public:
     // Takes exclusive controller ownership. All widgets and commands are GUI-thread only.
-    explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke);
+    explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
+                   std::shared_ptr<BuildPreferences> preferences = {},
+                   std::function<void()> restart = {});
     ~Frame() override {
         RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
@@ -105,6 +110,8 @@ class Frame final : public wxFrame {
 
   private:
     std::unique_ptr<audiohole::Controller> controller_;
+    std::shared_ptr<BuildPreferences> preferences_;
+    std::function<void()> restart_;
     std::unique_ptr<Tray> tray_;
     wxTimer timer_;
     bool smoke_ = false, loading_ = false, dirty_ = false;
@@ -122,6 +129,7 @@ class Frame final : public wxFrame {
     std::vector<wxToggleButton*> navigation_;
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
+    wxCheckBox *preview_mode_{}, *show_preview_dialog_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
     wxSlider* dfa_slider_{};
     wxTextCtrl* dfa_value_{};
@@ -132,6 +140,9 @@ class Frame final : public wxFrame {
     std::optional<int> last_dfa_settled_;
     std::vector<wxWindow*> dfa_controls_;
     AgentDisplay* agent_display_{};
+    wxButton* bother_button_{};
+    std::chrono::steady_clock::time_point bother_after_{};
+    void bother(); // GUI-thread click entry point; no avatar playback or controller commands.
     wxScrolledWindow* commentary_panel_{};
     wxPanel* comment_surface_{};
     wxBoxSizer* routing_actions_{}; // Borrowed; natural button width bounds the commentary card.
@@ -142,6 +153,9 @@ class Frame final : public wxFrame {
         *activity_{}, *device_detail_{};
     wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
     wxButton* beep_button_{};
+    wxButton* arm_ready_{};
+    wxButton* profile_apply_{};
+    wxButton *profile_save_{}, *profile_revert_{}, *profile_duplicate_{}, *profile_delete_{};
     wxListBox *profiles_{}, *holes_{}, *devices_{};
     wxTextCtrl *profile_name_{}, *profile_notes_{}, *hole_name_{}, *hole_notes_{}, *device_name_{},
         *device_notes_{}, *device_search_{}, *console_{}, *log_search_{};

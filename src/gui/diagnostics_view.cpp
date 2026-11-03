@@ -60,7 +60,10 @@ void Frame::build_scan() {
         // wxClipboard owns the supplied data object. Close on either SetData
         // outcome; never announce success when the clipboard rejects the data.
         const bool copied = wxTheClipboard->SetData(new wxTextDataObject(
-            wxS("AudioHole GUI testing build — SIMULATED data; no hardware measurements.\n\n") +
+            (controller_->snapshot().operating_mode == OperatingMode::Preview
+                 ? wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n")
+                 : wxS("AudioHole Test Mode — persisted configuration; no audio/scanner "
+                       "backend.\n\n")) +
             console_->GetValue()));
         wxTheClipboard->Close();
         if (copied)
@@ -88,7 +91,10 @@ void Frame::export_log() {
     wxFFile output(dialog.GetPath(), "wb");
     if (!output.IsOpened() ||
         !output.Write(
-            wxS("AudioHole GUI testing build — SIMULATED data; no hardware measurements.\n\n") +
+            (controller_->snapshot().operating_mode == OperatingMode::Preview
+                 ? wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n")
+                 : wxS("AudioHole Test Mode — persisted configuration; no audio/scanner "
+                       "backend.\n\n")) +
                 console_->GetValue(),
             wxConvUTF8) ||
         !output.Close())

@@ -1,7 +1,74 @@
+#include "gui/controls.h"
 #include "gui/frame.h"
+#include "model/configuration_controller.h"
 #include <cstdio>
 #include <cstdlib>
 #include <string_view>
+#include <wx/stdpaths.h>
+
+namespace {
+// Internal restart handshake: the child waits for the old process to terminate
+// BEFORE acquiring the single-instance guard or loading any user data.
+bool wait_for_restart_parent(DWORD parent) {
+    if (!parent || parent == GetCurrentProcessId())
+        return false;
+    const auto process =
+        OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parent);
+    if (!process)
+        return GetLastError() == ERROR_INVALID_PARAMETER; // Already exited.
+    std::wstring image(32768, L'\0');
+    DWORD length = static_cast<DWORD>(image.size());
+    bool same_image = false;
+    if (QueryFullProcessImageNameW(process, 0, image.data(), &length)) {
+        image.resize(length);
+        std::error_code error;
+        same_image =
+            std::filesystem::equivalent(
+                std::filesystem::path(image),
+                std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring()),
+                error) &&
+            !error;
+    } else
+        same_image = WaitForSingleObject(process, 0) == WAIT_OBJECT_0;
+    const bool exited = same_image && WaitForSingleObject(process, 15000) == WAIT_OBJECT_0;
+    CloseHandle(process);
+    return exited;
+}
+std::wstring quote_argument(const std::wstring& value) {
+    std::wstring result = L"\"";
+    std::size_t slashes = 0;
+    for (const auto character : value) {
+        if (character == L'\\') {
+            ++slashes;
+            continue;
+        }
+        result.append(character == L'\"' ? slashes * 2 + 1 : slashes, L'\\');
+        result += character;
+        slashes = 0;
+    }
+    result.append(slashes * 2, L'\\');
+    result += L'\"';
+    return result;
+}
+bool launch_restart(bool smoke, const wxString& screenshot_dir) {
+    const auto executable = wxStandardPaths::Get().GetExecutablePath().ToStdWstring();
+    auto command =
+        quote_argument(executable) + L" --restart-after " + std::to_wstring(GetCurrentProcessId());
+    if (smoke)
+        command += L" --smoke-test";
+    if (!screenshot_dir.empty())
+        command += L" --screenshot-dir " + quote_argument(screenshot_dir.ToStdWstring());
+    STARTUPINFOW startup{};
+    startup.cb = sizeof(startup);
+    PROCESS_INFORMATION process{};
+    if (!CreateProcessW(executable.c_str(), command.data(), nullptr, nullptr, FALSE, 0, nullptr,
+                        nullptr, &startup, &process))
+        return false;
+    CloseHandle(process.hThread);
+    CloseHandle(process.hProcess);
+    return true;
+}
+} // namespace
 
 namespace audiohole::gui {
 // Owns process-lifetime COM and the single-instance guard. The STA matches native
@@ -9,16 +76,33 @@ namespace audiohole::gui {
 class App final : public wxApp {
   public:
     bool OnInit() override {
-        bool smoke = false;
+        SetAppName("AudioHole");
+        bool smoke = false, test_mode_smoke = false;
         wxString screenshot_dir;
+        DWORD restart_parent = 0;
         for (int i = 1; i < argc; ++i) {
             if (wxString(argv[i]) == "--smoke-test")
                 smoke = true;
+            else if (wxString(argv[i]) == "--test-mode-smoke")
+                smoke = test_mode_smoke = true;
             else if (wxString(argv[i]) == "--screenshot-dir" && i + 1 < argc)
                 screenshot_dir = argv[++i];
-            else
+            else if (wxString(argv[i]) == "--restart-after" && i + 1 < argc) {
+                unsigned long value = 0;
+                if (!wxString(argv[++i]).ToULong(&value) || value == 0)
+                    return false;
+                restart_parent = static_cast<DWORD>(value);
+            } else
                 return false;
         }
+        if (restart_parent && !wait_for_restart_parent(restart_parent)) {
+            wxMessageBox("The previous AudioHole process did not shut down cleanly. No second "
+                         "session was started.",
+                         "AudioHole restart", wxOK | wxICON_ERROR);
+            return false;
+        }
+        smoke_ = smoke;
+        screenshot_dir_ = screenshot_dir;
         if (smoke) {
             // Unattended CI must fail visibly instead of hanging on a debug assert
             // or error dialog. Interactive users retain ordinary wx diagnostics.
@@ -67,11 +151,59 @@ class App final : public wxApp {
                 return false;
             }
         }
-        auto* frame = new Frame(std::make_unique<audiohole::SimulatedController>(), smoke);
+        auto root = smoke ? std::filesystem::path{}
+                          : std::filesystem::path(
+                                wxStandardPaths::Get().GetUserLocalDataDir().ToStdWstring()) /
+                                "PreviewBuild";
+        if (test_mode_smoke) {
+            smoke_root_ = std::filesystem::temp_directory_path() /
+                          ("AudioHole-mode-smoke-" + std::to_string(GetCurrentProcessId()) + "-" +
+                           std::to_string(GetTickCount64()));
+            if (!std::filesystem::create_directory(smoke_root_))
+                return false;
+            root = smoke_root_;
+        }
+        preferences_ = std::make_shared<BuildPreferences>(root, smoke);
+        const auto preferences_result = preferences_->load();
+        if (!preferences_result.ok && !smoke)
+            wxMessageBox(text(preferences_result.detail), "AudioHole preferences",
+                         wxOK | wxICON_WARNING);
+        bool preview = !test_mode_smoke && (smoke || preferences_->values().preview_mode);
+        if (!smoke && preferences_->values().show_preview_dialog) {
+            wxMessageDialog dialog(nullptr,
+                                   "Preview Mode loads demonstration profiles/devices and "
+                                   "simulates operations; Test Beep is silent.\n\n"
+                                   "Test Mode reads and saves real configuration under an isolated "
+                                   "Test data root using a provisional JSON format. Audio routing, "
+                                   "scanning and playback are unavailable.\n\n"
+                                   "Choose the environment for this session. Startup preferences "
+                                   "and restart controls are in Settings.",
+                                   wxS("AudioHole — Preview Build"),
+                                   wxYES_NO | wxCANCEL | wxICON_INFORMATION |
+                                       (preview ? 0 : wxNO_DEFAULT));
+            dialog.SetYesNoLabels("Preview Mode", "Test Mode");
+            const auto choice = dialog.ShowModal();
+            if (choice == wxID_CANCEL)
+                return false;
+            preview = choice == wxID_YES;
+            auto next = preferences_->values();
+            next.preview_mode = preview;
+            const auto saved = preferences_->update(next);
+            if (!saved.ok)
+                wxMessageBox(text(saved.detail), "AudioHole preferences", wxOK | wxICON_WARNING);
+        }
+        std::unique_ptr<Controller> controller;
+        if (preview)
+            controller = std::make_unique<SimulatedController>();
+        else
+            controller = std::make_unique<ConfigurationController>(
+                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
+        auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
+            restart_requested_ = true;
+            static_cast<Frame*>(GetTopWindow())->exit();
+        });
         SetTopWindow(frame);
         frame->Show();
-        if (!smoke)
-            CallAfter([frame] { frame->show_testing_notice(); });
         if (smoke)
             CallAfter([this, frame, screenshot_dir] {
                 result_ = frame->smoke(screenshot_dir) ? 0 : 1;
@@ -82,10 +214,26 @@ class App final : public wxApp {
     int OnExit() override {
         instance_.reset();
         apartment_.reset();
+        if (!smoke_root_.empty()) {
+            std::error_code ignored;
+            std::filesystem::remove_all(smoke_root_, ignored);
+        }
         return result_;
     }
     int OnRun() override {
         wxApp::OnRun();
+        if (restart_requested_) {
+            // All frames/timers have closed. Release the guard and COM before
+            // launching; the child still waits for this process to exit fully.
+            instance_.reset();
+            apartment_.reset();
+            if (!launch_restart(smoke_, screenshot_dir_)) {
+                wxMessageBox("AudioHole closed safely, but could not relaunch. Start it normally; "
+                             "saved files are preserved.",
+                             "AudioHole restart", wxOK | wxICON_ERROR);
+                return 1;
+            }
+        }
         return result_;
     }
 
@@ -93,6 +241,10 @@ class App final : public wxApp {
     std::unique_ptr<audiohole::windows::ComApartment> apartment_;
     std::unique_ptr<wxSingleInstanceChecker> instance_;
     int result_ = 0;
+    bool restart_requested_ = false, smoke_ = false;
+    wxString screenshot_dir_;
+    std::filesystem::path smoke_root_;
+    std::shared_ptr<BuildPreferences> preferences_;
 };
 
 } // namespace audiohole::gui

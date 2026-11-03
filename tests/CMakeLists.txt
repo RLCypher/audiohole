@@ -25,6 +25,8 @@ if(NOT AUDIOHOLE_MODEL_ONLY)
 
   add_test(NAME Gui.Smoke COMMAND audiohole --smoke-test --screenshot-dir "${CMAKE_BINARY_DIR}/gui-smoke/$<CONFIG>")
   set_tests_properties(Gui.Smoke PROPERTIES TIMEOUT 45)
+  add_test(NAME Gui.TestModeSmoke COMMAND audiohole --test-mode-smoke --screenshot-dir "${CMAKE_BINARY_DIR}/gui-smoke/$<CONFIG>/test-mode")
+  set_tests_properties(Gui.TestModeSmoke PROPERTIES TIMEOUT 45)
 endif()
 
 # Optional locally; the Windows CI workflow explicitly runs the same dependency-

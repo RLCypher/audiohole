@@ -1,5 +1,6 @@
 #pragma once
 #include "presentation/icon_outline.h"
+#include <filesystem>
 #include <map>
 #include <tuple>
 #include <wx/iconbndl.h>
@@ -12,6 +13,7 @@ namespace audiohole::gui {
 // immutable image remains valid for the process. GUI-thread/initialized COM only.
 const wxImage& canonical_logo();
 const wxImage& placeholder_avatar();
+wxImage package_preview(const std::filesystem::path&);
 wxIconBundle application_icons();
 // Pure view rendering: scales once per size/state, then strokes the exterior.
 // Cache owns native icons until the tray is destroyed; no audio-thread access.
@@ -35,6 +37,7 @@ class AgentDisplay final : public wxPanel {
     // The parent sizer allocates bounds; neither source pixels nor alpha change.
     void fit_height(int physical_height);
     void set_image(const wxImage& image);
+    void clear_image();
     bool has_image() const {
         return bitmap_.IsOk();
     }

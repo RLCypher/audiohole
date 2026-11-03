@@ -1,6 +1,7 @@
 #include "gui/branding.h"
 #include "gui/branding_resources.h"
 #include <algorithm>
+#include <fstream>
 #include <memory>
 #include <shlwapi.h>
 #include <stdexcept>
@@ -22,17 +23,7 @@ void check(HRESULT result) {
     if (FAILED(result))
         throw std::runtime_error("Branding image decode failed, HRESULT " + std::to_string(result));
 }
-wxImage decode_logo(int resource_id) {
-    const auto module = GetModuleHandleW(nullptr);
-    const auto resource = FindResourceW(module, MAKEINTRESOURCEW(resource_id), RT_RCDATA);
-    if (!resource)
-        throw std::runtime_error("Embedded AudioHole logo resource is missing");
-    // Resource bytes are borrowed from the loaded executable for process lifetime;
-    // SHCreateMemStream copies them into an independently owned decode stream.
-    const auto bytes = static_cast<const BYTE*>(LockResource(LoadResource(module, resource)));
-    const DWORD count = SizeofResource(module, resource);
-    if (!bytes || !count)
-        throw std::runtime_error("Embedded AudioHole logo resource is empty");
+wxImage decode_bytes(const BYTE* bytes, UINT count) {
     std::unique_ptr<IStream, ReleaseCom> stream(SHCreateMemStream(bytes, count));
     if (!stream)
         throw std::runtime_error("Could not create logo decode stream");
@@ -46,6 +37,10 @@ wxImage decode_logo(int resource_id) {
                                               &raw_decoder);
     std::unique_ptr<IWICBitmapDecoder, ReleaseCom> decoder(raw_decoder);
     check(result);
+    GUID container{};
+    check(decoder->GetContainerFormat(&container));
+    if (container != GUID_ContainerFormatPng)
+        throw std::runtime_error("Preview image must decode as PNG");
     IWICBitmapFrameDecode* raw_frame = nullptr;
     result = decoder->GetFrame(0, &raw_frame);
     std::unique_ptr<IWICBitmapFrameDecode, ReleaseCom> frame(raw_frame);
@@ -70,6 +65,19 @@ wxImage decode_logo(int resource_id) {
     }
     return image;
 }
+wxImage decode_logo(int resource_id) {
+    const auto module = GetModuleHandleW(nullptr);
+    const auto resource = FindResourceW(module, MAKEINTRESOURCEW(resource_id), RT_RCDATA);
+    if (!resource)
+        throw std::runtime_error("Embedded AudioHole logo resource is missing");
+    // Resource bytes are borrowed from the loaded executable for process lifetime;
+    // SHCreateMemStream copies them into an independently owned decode stream.
+    const auto bytes = static_cast<const BYTE*>(LockResource(LoadResource(module, resource)));
+    const DWORD count = SizeofResource(module, resource);
+    if (!bytes || !count)
+        throw std::runtime_error("Embedded AudioHole logo resource is empty");
+    return decode_bytes(bytes, count);
+}
 } // namespace
 const wxImage& canonical_logo() {
     static const wxImage image = decode_logo(AUDIOHOLE_LOGO_PNG);
@@ -78,6 +86,15 @@ const wxImage& canonical_logo() {
 const wxImage& placeholder_avatar() {
     static const wxImage image = decode_logo(AUDIOHOLE_PLACEHOLDER_PNG);
     return image;
+}
+wxImage package_preview(const std::filesystem::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    std::vector<BYTE> bytes(4 * 1024 * 1024 + 1);
+    input.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+    if (!input.eof() || input.bad() || input.gcount() <= 0)
+        throw std::runtime_error("Preview image missing or too large");
+    bytes.resize(static_cast<std::size_t>(input.gcount()));
+    return decode_bytes(bytes.data(), static_cast<UINT>(bytes.size()));
 }
 wxIconBundle application_icons() {
     wxIconBundle icons;
@@ -167,6 +184,12 @@ void AgentDisplay::set_image(const wxImage& image) {
     source_ = image;
     cached_bounds_ = wxSize();
     update_bitmap();
+}
+void AgentDisplay::clear_image() {
+    source_ = wxImage{};
+    bitmap_ = wxBitmap{};
+    cached_bounds_ = wxSize{};
+    Refresh();
 }
 void AgentDisplay::update_bitmap() {
     const auto size = GetClientSize();

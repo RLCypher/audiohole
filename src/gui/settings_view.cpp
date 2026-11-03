@@ -6,6 +6,54 @@ void Frame::build_settings() {
     auto* page = new wxScrolledWindow(notebook_);
     page->SetScrollRate(0, 16);
     auto* root = new wxBoxSizer(wxVERTICAL);
+    auto* preview_settings = new wxStaticBoxSizer(wxVERTICAL, page, "Preview Build environment");
+    auto* environment_box = preview_settings->GetStaticBox();
+    preview_mode_ = new wxCheckBox(environment_box, wxID_ANY,
+                                   "Preview Mode (load preview profiles and devices)");
+    preview_mode_->SetValue(preferences_->values().preview_mode);
+    preview_mode_->SetToolTip(
+        "Select the environment for the next launch. Preview uses demonstration records; Test uses "
+        "isolated persisted configuration. Restart is required.");
+    show_preview_dialog_ =
+        new wxCheckBox(environment_box, wxID_ANY, "Show preview dialog on startup");
+    show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
+    show_preview_dialog_->SetToolTip(
+        "Offer Preview Mode or Test Mode on startup. When disabled, the saved environment starts "
+        "directly; Settings can still change the next launch.");
+    preview_settings->Add(preview_mode_, 0, wxALL, 4);
+    preview_settings->Add(show_preview_dialog_, 0, wxALL, 4);
+    auto save_environment = [this](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.preview_mode = preview_mode_->GetValue();
+        next.show_preview_dialog = show_preview_dialog_->GetValue();
+        const auto result = preferences_->update(next);
+        if (!result.ok) {
+            preview_mode_->SetValue(preferences_->values().preview_mode);
+            show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
+            show_result(result);
+        }
+    };
+    preview_mode_->Bind(wxEVT_CHECKBOX, save_environment);
+    show_preview_dialog_->Bind(wxEVT_CHECKBOX, save_environment);
+    label(environment_box, preview_settings,
+          controller_->snapshot().operating_mode == OperatingMode::Preview
+              ? "Active: Preview Mode. Environment changes take effect after restart."
+              : "Active: Test Mode (persistent configuration only). Environment changes take "
+                "effect after restart.");
+    label(environment_box, preview_settings,
+          wxS("Test data: ") + wxString(preferences_->test_configuration().wstring()));
+    auto* restart_button = button(environment_box, preview_settings, "Restart AudioHole", [this] {
+        if (!discard())
+            return;
+        if (restart_)
+            restart_();
+        else
+            show_result({false, "Restart is unavailable for this host."});
+    });
+    restart_button->SetToolTip(
+        "Close this session cleanly and launch the saved environment after the current process "
+        "exits. Saved settings/data are preserved; unsaved edits require confirmation.");
+    root->Add(preview_settings, 0, wxEXPAND | wxALL, 4);
     personality_choice_ = choices(page, root, "Personality", {});
     personality_notice_ = label(page, root, "");
     personality_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
@@ -30,10 +78,21 @@ void Frame::build_settings() {
     });
     root->Add(catalogs);
     theme_choice_ = choices(page, root, "Appearance", {"Dark", "Light", "Follow System"});
-    theme_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) { apply_appearance(); });
-    theme_choice_->SetSelection(2);
-    theme_choice_->SetToolTip("Follow Windows app appearance, or choose Light or Dark for this "
-                              "session. Windows high contrast takes precedence.");
+    theme_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.appearance = theme_choice_->GetSelection() == 0   ? "dark"
+                          : theme_choice_->GetSelection() == 1 ? "light"
+                                                               : "system";
+        const auto result = preferences_->update(next);
+        if (!result.ok)
+            show_result(result);
+        apply_appearance();
+    });
+    theme_choice_->SetSelection(preferences_->values().appearance == "dark"    ? 0
+                                : preferences_->values().appearance == "light" ? 1
+                                                                               : 2);
+    theme_choice_->SetToolTip("Follow Windows app appearance, or save a Light/Dark preference. "
+                              "Windows high contrast takes precedence.");
     personality_choice_->SetToolTip("Choose optional commentary. Vanilla keeps facts only; "
                                     "switching personality never changes routing.");
     notifications_ = choices(page, root, "Tray notifications",
@@ -44,8 +103,24 @@ void Frame::build_settings() {
     delay_ = new wxSpinCtrl(page, wxID_ANY, "5", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS,
                             0, 300, 5);
     root->Add(delay_, 0, wxALL, 3);
+    notifications_->SetSelection(preferences_->values().notifications);
+    startup_->SetSelection(preferences_->values().startup_mode);
+    delay_->SetValue(preferences_->values().startup_delay_seconds);
+    auto save_startup = [this] {
+        auto next = preferences_->values();
+        next.notifications = notifications_->GetSelection();
+        next.startup_mode = startup_->GetSelection();
+        next.startup_delay_seconds = delay_->GetValue();
+        const int target = startup_target_->GetSelection();
+        if (target >= 0 && static_cast<std::size_t>(target) < profile_ids_.size())
+            next.startup_profile_id = profile_ids_[static_cast<std::size_t>(target)];
+        show_result(preferences_->update(next));
+    };
+    for (auto* choice : {notifications_, startup_, startup_target_})
+        choice->Bind(wxEVT_CHOICE, [save_startup](wxCommandEvent&) { save_startup(); });
+    delay_->Bind(wxEVT_SPINCTRL, [save_startup](wxSpinEvent&) { save_startup(); });
     auto* row = new wxBoxSizer(wxHORIZONTAL);
-    button(page, row, "Preview startup", [this] {
+    auto* startup_preview = button(page, row, "Preview startup", [this] {
         if (startup_->GetSelection() == 0) {
             controller_->stop();
             refresh();
@@ -61,12 +136,17 @@ void Frame::build_settings() {
                                   startup_->GetSelection() == 1 ? 0 : delay_->GetValue() * 1000));
         refresh();
     });
-    button(page, row, "Cancel pending activation", [this] {
+    auto* cancel_startup = button(page, row, "Cancel pending activation", [this] {
         controller_->stop();
         present(presentation::Message::Cancelled);
         refresh();
     });
     root->Add(row);
+    const bool preview_environment =
+        controller_->snapshot().operating_mode == OperatingMode::Preview;
+    for (auto* control :
+         std::vector<wxWindow*>{startup_preview, cancel_startup, startup_, startup_target_, delay_})
+        control->Enable(preview_environment);
     button(page, root, "Replay Tutorial", [this] {
         wxMessageBox("Tutorial not yet implemented, please enjoy this placeholder message.",
                      wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
@@ -152,7 +232,8 @@ void Frame::testing_notice() {
         "Test Beep is also simulated and emits no sound. No displayed state is evidence "
         "of a working hardware connection.\n\n"
         "The interface and personality messages preview the intended production experience. "
-        "Profiles, edits and preferences last for this session only.\n\n"
+        "Preview profiles and devices last for this session only. Test configuration and "
+        "Preview Build preferences are saved in their isolated data roots.\n\n"
         "Choose a profile, select source and destination, then Apply. "
         "Save keeps edits without changing active routing. Close hides to the tray; "
         "Exit stops and closes AudioHole.",
@@ -164,19 +245,16 @@ void Frame::testing_notice() {
 namespace audiohole::gui {
 void Frame::sync_personality_choices() {
     personality_choice_->Clear();
-    personality_ids_ = {"default", "vanilla", "uwu"};
-    personality_choice_->Append(wxS("Norm"));
-    personality_choice_->Append(wxS("Vanilla — Strictly informational"));
-    personality_choice_->Append(wxS("UwU"));
+    personality_ids_.clear();
     for (const auto& item : messages_.personalities()) {
-        if (item.id == "default" || item.id == "uwu")
-            continue;
         personality_ids_.push_back(item.id);
-        personality_choice_->Append(text(item.display_name + " [" + item.id + "]"));
+        personality_choice_->Append(text(item.display_name));
     }
+    personality_choice_->Enable(!personality_ids_.empty());
     const auto found = std::find(personality_ids_.begin(), personality_ids_.end(), personality_);
-    personality_choice_->SetSelection(
-        found == personality_ids_.end() ? 1 : static_cast<int>(found - personality_ids_.begin()));
+    personality_choice_->SetSelection(found == personality_ids_.end()
+                                          ? wxNOT_FOUND
+                                          : static_cast<int>(found - personality_ids_.begin()));
 }
 void Frame::reload_personalities() {
     const auto warnings = messages_.load_directory(personalities_directory_);
@@ -192,32 +270,63 @@ void Frame::reload_personalities() {
 void Frame::select_personality(const std::string& requested) {
     if (dfa_feedback_)
         dfa_feedback_->SetLabel("");
-    personality_ = messages_.available(requested) ? requested : "vanilla";
-    // Presentation-only placeholder policy; future assets still use set_image().
-    agent_display_->set_image(personality_ == "vanilla" ? canonical_logo() : placeholder_avatar());
-    personality_fallback_note_ = requested == personality_
-                                     ? ""
-                                     : "Selected personality file unavailable or invalid. Vanilla "
-                                       "is active; fix the file and Reload.";
-    const auto found = std::find(personality_ids_.begin(), personality_ids_.end(), personality_);
-    personality_choice_->SetSelection(
-        found == personality_ids_.end() ? 1 : static_cast<int>(found - personality_ids_.begin()));
-    for (auto* control : dfa_controls_)
-        control->Show(personality_ != "vanilla");
-    personality_notice_->SetLabel(
+    personality_ = messages_.resolve_selection(requested);
+    // Clear the old identity before loading any new resource. A failed or missing
+    // preview leaves this package imageless; it never displays another character.
+    agent_display_->clear_image();
+    const auto* selected_package = messages_.package(personality_);
+    bool show_image = false;
+    if (selected_package && !selected_package->preview_image.empty()) {
+        try {
+            agent_display_->set_image(package_preview(selected_package->preview_image));
+            show_image = true;
+        } catch (const std::exception&) { /* Optional preview is disabled. */
+        }
+    }
+    agent_display_->Show(show_image);
+    const bool has_dfa = !messages_.variants(presentation::Message::Dfa, personality_).empty();
+    bother_button_->Show(!messages_.variants(presentation::Message::Bother, personality_).empty());
+    personality_fallback_note_ =
         requested == personality_
-            ? wxString{}
-            : wxString(wxS("Selected personality file unavailable or invalid. Vanilla is active; "
-                           "fix the file and Reload.")));
-    if (technical_)
-        present(presentation::Message::Personality);
+            ? ""
+            : (personality_.empty()
+                   ? "No valid personality packages. Personality presentation disabled."
+                   : "Selected personality unavailable. A complete available package is active; "
+                     "repair and Reload to retry.");
+    // A temporary missing package does not erase the saved desired stable ID.
+    Result preference_result{true, {}};
+    if (requested == personality_ && !personality_.empty()) {
+        auto preference = preferences_->values();
+        preference.personality_id = personality_;
+        preference_result = preferences_->update(preference);
+    }
+    const auto found = std::find(personality_ids_.begin(), personality_ids_.end(), personality_);
+    personality_choice_->SetSelection(found == personality_ids_.end()
+                                          ? wxNOT_FOUND
+                                          : static_cast<int>(found - personality_ids_.begin()));
+    for (auto* control : dfa_controls_)
+        control->Show(has_dfa);
+    personality_notice_->SetLabel(text(personality_fallback_note_));
+    if (!preference_result.ok)
+        personality_notice_->SetLabel(text(preference_result.detail));
+    if (technical_) {
+        if (operational_warning_visible_) {
+            // A personality switch clears the previous character's flavor but
+            // cannot hide an authoritative warning with a low-priority greeting.
+            commentary_copy_.clear();
+            fallback_copy_ = personality_fallback_note_;
+            layout_header();
+        } else {
+            present(presentation::Message::Personality);
+        }
+    }
     notebook_->GetPage(3)->Layout();
     static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
 }
 // The raw decimal is range-checked before half-up rounding. Invalid text restores
 // the previous normalized presentation value; it never reaches the slider/state.
 void Frame::commit_dfa_text() {
-    if (personality_ == "vanilla")
+    if (messages_.variants(presentation::Message::Dfa, personality_).empty())
         return;
     const auto input = presentation::parse_dfa(utf8(dfa_value_->GetValue()));
     if (input.status == presentation::DfaInputStatus::Valid) {
@@ -234,7 +343,7 @@ void Frame::commit_dfa_text() {
             "Type your preferred nonsense from 0.00 to 11.00. Extra digits round half-up.");
 }
 void Frame::adjust_dfa(int delta) {
-    if (personality_ == "vanilla")
+    if (messages_.variants(presentation::Message::Dfa, personality_).empty())
         return;
     const auto input = presentation::parse_dfa(utf8(dfa_value_->GetValue()));
     if (input.status != presentation::DfaInputStatus::Valid) {
@@ -244,7 +353,7 @@ void Frame::adjust_dfa(int delta) {
     settle_dfa(input.hundredths + delta);
 }
 void Frame::settle_dfa(int hundredths) {
-    if (personality_ == "vanilla")
+    if (messages_.variants(presentation::Message::Dfa, personality_).empty())
         return;
     if (hundredths < 0 || hundredths > 1100) {
         dfa_value_->ChangeValue(text(presentation::dfa_text(dfa_hundredths_)));
@@ -261,7 +370,7 @@ void Frame::settle_dfa(int hundredths) {
     present_dfa(presentation::dfa_event(hundredths));
 }
 void Frame::present_dfa(presentation::Message event) {
-    if (personality_ == "vanilla")
+    if (messages_.variants(presentation::Message::Dfa, personality_).empty())
         return;
     if (!operational_warning_visible_) {
         dfa_feedback_->SetLabel("");
