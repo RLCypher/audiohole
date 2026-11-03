@@ -527,3 +527,12 @@ mischievous assignments. See [the assignments](personalities/README.md#dfa-expre
 Authored texts, IDs, weights, ordering, decimal thresholds and warning protection
 remain unchanged. The selected response supplies its expression; no second picker,
 runtime text inference or changes to routing/configuration are introduced.
+
+### Owner-requested sleep text
+
+Sleeping displays `zzz....`. Norm/Horu have an optional owned `dream` pool, selected
+by a sleep-only random schedule at quiet intervals; comments briefly replace the
+snoring text without submitting an avatar reaction or changing operational state.
+Warnings and input wake/remove this overlay; the awake response is retained.
+Vanilla and custom packages without dream text remain quiet. See GUI.md for timing
+and personalities/README.md for the existing schema-2 metadata format.

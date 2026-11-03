@@ -1493,6 +1493,40 @@
         "expression": "laughing",
         "fallback_expression": "idle"
       }
+    ],
+    "dream": [
+      {
+        "id": "uwu_dream_001",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Mmm... headpats and a cozy wittle nap~",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dream_002",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Dreaming of warm mugs and purrfect cable cuddles~",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dream_003",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Nyaa... five mowe minutes~ :3",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dream_004",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "A whole cloud of soft wittle headpats~",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

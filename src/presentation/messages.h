@@ -85,6 +85,7 @@ enum class Message {
     DfaNegative,
     DfaAboveMaximum,
     Bother,
+    Dream,
     Count
 };
 struct Variant {

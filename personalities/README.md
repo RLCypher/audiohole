@@ -177,3 +177,14 @@ eggs use `reference`, and rejected input uses `validation` subcategories.
 
 The assignments are authored JSON data using each character's approved states.
 Warnings still retain the header/visual priority when DFA feedback is shown locally.
+
+## Optional dream commentary
+
+The `dream` event uses the same schema-2 response objects, owned per personality.
+Norm/Horu supply short clearly cosmetic dream comments with `category: dream`,
+`subcategory: sleep`, `expression: sleeping` and owned idle fallback. Existing
+responses are unchanged. A sleep-only schedule selects this text occasionally;
+it does not submit an expression reaction (which would wake the avatar), overwrite
+awake copy, claim an operation succeeded, or create diagnostic notifications.
+Missing pools and Vanilla retain `zzz....` without random selection. See GUI.md
+for the interval, display duration and immediate warning/wake precedence.

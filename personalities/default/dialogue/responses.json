@@ -1466,6 +1466,40 @@
         "expression": "deadpan",
         "fallback_expression": "idle"
       }
+    ],
+    "dream": [
+      {
+        "id": "default_dream_001",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Dreaming of a coffee that never cools.",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dream_002",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Somewhere, a cable drawer is perfectly organized.",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dream_003",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "Dreaming of a very uneventful sound check.",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dream_004",
+        "category": "dream",
+        "subcategory": "sleep",
+        "text": "In this dream, every cable is the right length.",
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

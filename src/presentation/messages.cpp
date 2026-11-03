@@ -87,6 +87,7 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"dfa_negative", "DFA must be at least 0.00. Previous value retained."},
     {"dfa_above_maximum", "DFA must be at most 11.00. Previous value retained."},
     {"bother", "Personality interaction. Routing settings are unchanged."},
+    {"dream", ""}, // Cosmetic sleep text has no technical/operational claim.
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;
