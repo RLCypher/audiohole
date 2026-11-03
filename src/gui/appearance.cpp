@@ -102,8 +102,10 @@ void Frame::apply_appearance() {
                       (theme_choice_->GetSelection() == system_choice && system_dark()));
     apply_palette(this, dark_appearance_, contrast);
     if (!contrast) {
-        start_->SetBackgroundColour(palette::mint());
-        start_->SetForegroundColour(wxColour(7, 24, 19));
+        for (auto* primary : {start_, profile_save_}) {
+            primary->SetBackgroundColour(palette::mint());
+            primary->SetForegroundColour(wxColour(7, 24, 19));
+        }
         personality_heading_->SetForegroundColour(palette::magenta());
     }
     // Attribute 20 is DWMWA_USE_IMMERSIVE_DARK_MODE. Older Windows builds can

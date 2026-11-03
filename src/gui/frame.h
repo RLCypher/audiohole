@@ -6,6 +6,7 @@
 #include "platform/windows/com_apartment.h"
 #include "presentation/avatar_host.h"
 #include "presentation/messages.h"
+#include "presentation/sleep_commentary.h"
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
@@ -126,6 +127,10 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTimer avatar_timer_;
     std::unique_ptr<presentation::AvatarHost> avatar_host_;
     std::vector<std::string> avatar_diagnostics_, last_avatar_diagnostics_;
+    presentation::SleepCommentary sleep_commentary_{
+        static_cast<std::uint32_t>(std::chrono::steady_clock::now().time_since_epoch().count())};
+    std::string sleep_copy_;
+    std::uint64_t dream_occurrence_ = 0;
     void poll_avatar();
     void stop_avatar();
     bool smoke_ = false, loading_ = false, dirty_ = false;
@@ -168,10 +173,12 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxButton* beep_button_{};
     wxButton* arm_ready_{};
     wxButton* profile_apply_{};
-    wxButton *profile_save_{}, *profile_revert_{}, *profile_duplicate_{}, *profile_delete_{};
+    wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
+    wxPanel *profile_sidebar_{}, *profile_actions_{};
+    wxStaticText *profile_edit_state_{}, *hole_heading_{};
     wxListBox *profiles_{}, *holes_{}, *devices_{};
-    wxTextCtrl *profile_name_{}, *profile_notes_{}, *hole_name_{}, *hole_notes_{}, *device_name_{},
-        *device_notes_{}, *device_search_{}, *console_{}, *log_search_{};
+    wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
+        *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
     wxChoice *activity_direction_{}, *personality_choice_{}, *destination_test_{}, *scan_mode_{},
         *scan_scope_{}, *severity_{}, *startup_{}, *startup_target_{}, *notifications_{};
@@ -186,6 +193,14 @@ class Frame final : public wxFrame, private wxEventFilter {
     void layout_header();
     // Builders only construct widgets/bind events; they never issue routing commands.
     void build_profiles();
+    // Context menus capture stable IDs; opening them never discards staged edits.
+    std::unique_ptr<wxMenu> profile_menu(const std::string& id);
+    std::unique_ptr<wxMenu> hole_menu(const std::string& id);
+    void rename_profile(const std::string& name);
+    void rename_hole(const std::string& name);
+    void add_hole();
+    void duplicate_hole();
+    void remove_hole();
     void build_hole_diagnostics(wxWindow* parent, wxSizer* layout);
     void build_devices();
     void build_scan();

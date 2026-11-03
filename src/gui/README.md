@@ -36,9 +36,18 @@ read-only Windows theme/high-contrast queries and optional title-bar color. Nati
 controls and handlers are retained; system dialogs/menus follow Windows styling.
 High contrast takes precedence. Disabled buttons desaturate. Header geometry is
 bounded independently of copy length, text scrolls within the padded rounded card,
-and the avatar follows that card. Both profile columns scroll when constrained.
+and the avatar follows that card. The routing detail pane scrolls; the left Profiles
+column is fixed, with independent list/notes scrolling and an always-visible
+Save/Apply/Revert bar. Context menus target stable profile/hole IDs, rename stays
+staged, and duplicates receive fresh IDs. Glyph add buttons have explicit MSAA
+names as well as tooltips. Initial sizing prefers a work-area-bounded square.
 The dark status bar retains a readable foreground. No Windows appearance setting
 is changed; only the app's own preference is saved.
+
+Sleep text is a rendering overlay over retained awake copy. SleepCommentary uses
+an injected clock/random selector to schedule occasional owned dream text; it
+never calls AvatarHost::react, controller commands, or notifications. Waking and
+warnings remove the overlay without reselecting the awake response.
 
 [Personality packages](../../personalities/README.md) are data-only, discovered at
 startup/explicit Reload, with no parsing during refresh/paint. Technical facts are

@@ -4,12 +4,13 @@
 #include "model/configuration_controller.h"
 #include "presentation/text_layout.h"
 #include <cstdio>
+#include <wx/display.h>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
              std::shared_ptr<BuildPreferences> preferences, std::function<void()> restart)
-    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1536, 1024)),
+    : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1000, 1000)),
       controller_(std::make_unique<ApplicationController>(std::move(controller))),
       preferences_(std::move(preferences)), restart_(std::move(restart)), timer_(this),
       avatar_timer_(this), smoke_(smoke) {
@@ -22,7 +23,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     // A stable window property supports second-launch focus across build titles.
     // It is removed before the native window is destroyed (see the destructor).
     SetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow", reinterpret_cast<HANDLE>(1));
-    SetMinSize(FromDIP(wxSize(980, 740)));
+    SetMinSize(FromDIP(wxSize(980, 680)));
     SetIcons(application_icons());
     personalities_directory_ =
         std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
@@ -183,7 +184,6 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         }
         event.Skip();
     });
-    Centre();
     tray_ = std::make_unique<Tray>(*this);
     Bind(
         wxEVT_TIMER,
@@ -234,7 +234,10 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     if (!operational_warning_visible_)
         present(presentation::Message::Ready);
     Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
-        if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
+        if (event.ControlDown() && !event.AltDown() && event.GetKeyCode() == 'S' &&
+            notebook_->GetSelection() == 0 && profile_save_->IsEnabled())
+            save(false);
+        else if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
             select_page((static_cast<std::size_t>(notebook_->GetSelection()) +
                          (event.ShiftDown() ? 3 : 1)) %
                             4,
@@ -267,11 +270,28 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             avatar_timer_.Stop();
         event.Skip();
     });
+    // Prefer a square initial window when the fixed header and monitor permit
+    // it. Short displays retain the required width and use the available height.
+    const int display_index = wxDisplay::GetFromWindow(this);
+    const auto work =
+        wxDisplay(display_index == wxNOT_FOUND ? 0u : static_cast<unsigned>(display_index))
+            .GetClientArea();
+    const auto minimum = GetMinSize();
+    const int preferred_edge = std::max({FromDIP(1000), minimum.x, minimum.y});
+    const int edge = std::max(
+        1, std::min({preferred_edge, work.width - FromDIP(20), work.height - FromDIP(20)}));
+    SetSize(wxSize(std::max(minimum.x, edge), std::max(minimum.y, edge)));
+    Centre();
     timer_.Start(100);
     wxEvtHandler::AddFilter(this);
 }
 int Frame::FilterEvent(wxEvent& event) {
     const auto type = event.GetEventType();
+    if (type == wxEVT_MENU) {
+        // Native popup-menu commands are not child-window mouse events.
+        avatar_host_->activity(avatar::monotonic_ms());
+        return wxEventFilter::Event_Skip;
+    }
     if (type == wxEVT_KEY_DOWN || type == wxEVT_CHAR_HOOK || type == wxEVT_MOTION ||
         type == wxEVT_MOUSEWHEEL || type == wxEVT_LEFT_DOWN || type == wxEVT_RIGHT_DOWN ||
         type == wxEVT_MIDDLE_DOWN) {
@@ -293,7 +313,8 @@ void Frame::stop_avatar() {
 void Frame::poll_avatar() {
     if (!avatar_host_)
         return;
-    auto frame = avatar_host_->tick(avatar::monotonic_ms());
+    const auto now = avatar::monotonic_ms();
+    auto frame = avatar_host_->tick(now);
     if (frame.diagnostics != last_avatar_diagnostics_) {
         last_avatar_diagnostics_ = frame.diagnostics;
         for (const auto& line : frame.diagnostics) {
@@ -303,6 +324,28 @@ void Frame::poll_avatar() {
         }
     }
     agent_display_->present(std::move(frame));
+    const auto* package = messages_.package(personality_);
+    const bool has_dreams = package && package->events.contains("dream");
+    const auto change = sleep_commentary_.update(
+        avatar_host_->enabled() && avatar_host_->baseline().expression == "sleeping" &&
+            !operational_warning_visible_,
+        personality_, has_dreams, now);
+    using SleepChange = presentation::SleepCommentary::Change;
+    if (change != SleepChange::None) {
+        if (change == SleepChange::Awake)
+            sleep_copy_.clear();
+        else if (change == SleepChange::Dream) {
+            // Select authored sleep text without presenting an event/reaction:
+            // doing that would wake the avatar and overwrite its awake response.
+            sleep_copy_ =
+                messages_.show(presentation::Message::Dream, personality_, ++dream_occurrence_)
+                    .commentary;
+            if (sleep_copy_.empty())
+                sleep_copy_ = "zzz....";
+        } else
+            sleep_copy_ = "zzz....";
+        layout_header();
+    }
 }
 void Frame::bother() {
     if (operational_warning_visible_ || personality_ == "vanilla" ||
@@ -351,7 +394,7 @@ void Frame::layout_header() {
     agent_display_->fit_height(header_height - 2 * FromDIP(6));
     // Full-height artwork needs its real proportional width even at minimum
     // size. Increase the minimum instead of clipping or reducing the image.
-    auto minimum = FromDIP(wxSize(980, 740));
+    auto minimum = FromDIP(wxSize(980, 680));
     minimum.x = std::max(minimum.x, header->GetMinSize().x + GetSize().x - GetClientSize().x);
     if (GetMinSize() != minimum)
         SetMinSize(minimum);
@@ -366,9 +409,12 @@ void Frame::layout_header() {
     };
     status_->SetLabel(text(status_copy_));
     status_->SetToolTip(text(status_copy_));
-    wrap(technical_, technical_copy_);
-    wrap(commentary_, commentary_copy_);
-    wrap(fallback_notice_, fallback_copy_);
+    const bool asleep = !sleep_copy_.empty() && !operational_warning_visible_ &&
+                        avatar_host_->enabled() &&
+                        avatar_host_->baseline().expression == "sleeping";
+    wrap(technical_, asleep ? std::string{} : technical_copy_);
+    wrap(commentary_, asleep ? sleep_copy_ : commentary_copy_);
+    wrap(fallback_notice_, asleep ? std::string{} : fallback_copy_);
     const auto* selected = messages_.package(personality_);
     personality_heading_->SetLabel(
         text(selected && !selected->character_name.empty() ? selected->character_name
@@ -413,9 +459,16 @@ void Frame::refresh() {
     profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
     profile_save_->Enable(!viewed_.empty());
     profile_revert_->Enable(!viewed_.empty() && dirty_);
-    profile_duplicate_->Enable(!viewed_.empty());
-    profile_delete_->Enable(!viewed_.empty() && !(s.armed && viewed_ == s.active_profile) &&
-                            viewed_ != s.pending_profile);
+    profile_notes_->Enable(!viewed_.empty());
+    hole_new_->Enable(!viewed_.empty());
+    const auto edit_state =
+        text(viewed_.empty()
+                 ? std::string("No profile selected")
+                 : draft_.display_name + (dirty_ ? " — Unsaved changes" : " — No pending edits"));
+    if (profile_edit_state_->GetLabel() != edit_state) {
+        profile_edit_state_->SetLabel(edit_state);
+        profile_edit_state_->SetToolTip(edit_state);
+    }
     scan_start_->Enable(s.capabilities.scanning);
     scan_cancel_->Enable(s.capabilities.scanning && s.scanning);
     scan_mode_->Enable(s.capabilities.scanning);
@@ -582,6 +635,63 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        const auto check_profile_layout = [this, &require] {
+            auto* page = notebook_->GetPage(0);
+            page->Layout();
+            require(dynamic_cast<wxScrolledWindow*>(profile_sidebar_) == nullptr,
+                    "Profile column must not scroll as one section");
+            require(page->GetClientRect().Contains(profile_actions_->GetRect()) &&
+                        profile_actions_->GetRect().GetBottom() <
+                            profile_sidebar_->GetRect().GetTop(),
+                    "Profile save bar is clipped or overlaps the editor fields");
+            for (auto* action : {profile_save_, profile_apply_, profile_revert_})
+                require(action->IsShownOnScreen() &&
+                            profile_actions_->GetClientRect().Contains(action->GetRect()),
+                        "A profile save action is hidden or clipped");
+            for (wxWindow* field : std::vector<wxWindow*>{profiles_, profile_notes_, holes_})
+                require(field->GetParent() == profile_sidebar_ &&
+                            profile_sidebar_->GetClientRect().Contains(field->GetRect()),
+                        "An independently scrolling profile field is clipped");
+        };
+        layout_header();
+        check_profile_layout();
+        require(profile_new_->GetLabel() == "+" && hole_new_->GetLabel() == "+" &&
+                    profile_new_->GetName() == "New profile" && hole_new_->GetName() == "Add hole",
+                "Compact add controls lost their labels or accessible names");
+        require(wxWindow::FindWindowByName("Profile display name", this) == nullptr &&
+                    wxWindow::FindWindowByName("Hole display name", this) == nullptr,
+                "Inline name fields remain instead of contextual rename");
+        // Fill the actual native widgets well beyond their viewport. Their own
+        // scrollbars must appear without moving or hiding the shared save bar.
+        const auto original_profiles = profiles_->GetStrings();
+        const auto original_holes = holes_->GetStrings();
+        const int selected_profile = profiles_->GetSelection(),
+                  selected_hole = holes_->GetSelection();
+        const auto original_notes = profile_notes_->GetValue();
+        const auto action_bounds = profile_actions_->GetRect();
+        const auto overflow_revision = controller_->snapshot().revision;
+        wxString many_notes;
+        for (int i = 0; i < 200; ++i) {
+            profiles_->Append(wxString::Format("Overflow profile %d", i));
+            holes_->Append(wxString::Format("Overflow hole %d", i));
+            many_notes += "A long profile note with its own scroll position.\n";
+        }
+        profile_notes_->ChangeValue(many_notes);
+        check_profile_layout();
+        for (wxWindow* field : std::vector<wxWindow*>{profiles_, profile_notes_, holes_})
+            require((GetWindowLongPtrW(static_cast<HWND>(field->GetHandle()), GWL_STYLE) &
+                     WS_VSCROLL) != 0,
+                    "An overflowing profile field lacks its own native scrollbar");
+        require(profile_actions_->GetRect() == action_bounds &&
+                    controller_->snapshot().revision == overflow_revision,
+                "Overflow moved Save or changed controller state");
+        profiles_->Clear();
+        profiles_->Append(original_profiles);
+        profiles_->SetSelection(selected_profile);
+        holes_->Clear();
+        holes_->Append(original_holes);
+        holes_->SetSelection(selected_hole);
+        profile_notes_->ChangeValue(original_notes);
         if (controller_->snapshot().operating_mode == OperatingMode::Test) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),
@@ -593,17 +703,27 @@ bool Frame::smoke(const wxString& directory) {
                         wxWindow::FindWindowByLabel("Reverse failure", this) == nullptr &&
                         wxWindow::FindWindowByLabel("Simulate Errors", this) == nullptr,
                     "Test Mode contains simulation controls");
-            auto* create = wxWindow::FindWindowByLabel("New", this);
+            auto* create = profile_new_;
             require(create != nullptr, "New profile control missing");
             wxCommandEvent new_profile(wxEVT_BUTTON, create->GetId());
             create->GetEventHandler()->ProcessEvent(new_profile);
             require(!viewed_.empty(), "Test Mode could not create persistent profile");
-            profile_name_->ChangeValue("Restart persistence check");
+            rename_profile("Restart persistence check");
             profile_notes_->ChangeValue("Native GUI Test data, saved without a routing backend.");
-            save(false);
+            require(profile_edit_state_->GetLabel().Contains("Unsaved changes"),
+                    "Staged profile rename lacks a visible unsaved indicator");
+            wxKeyEvent save_key(wxEVT_CHAR_HOOK);
+            save_key.m_keyCode = 'S';
+            save_key.SetControlDown(true);
+            GetEventHandler()->ProcessEvent(save_key);
+            require(!dirty_ && profile_edit_state_->GetLabel().Contains("No pending edits"),
+                    "Ctrl+S failed to save the profile and clear the pending-edit indicator");
             draft_.holes.push_back(controller_->make_hole());
-            save(false);
+            load_holes();
             load_hole(0);
+            const auto persistent_hole_id = draft_.holes.front().id;
+            rename_hole("Persistent named hole");
+            save(false);
             profile_notes_->ChangeValue("Other draft edits must remain unsaved");
             forward_.buffer->SetValue(14);
             acknowledge_buffer(forward_);
@@ -618,6 +738,8 @@ bool Frame::smoke(const wxString& directory) {
                 std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
             const auto* loaded = audiohole::profile(restarted.snapshot(), saved_id);
             require(loaded && loaded->display_name == "Restart persistence check" &&
+                        loaded->holes.front().id == persistent_hole_id &&
+                        loaded->holes.front().display_name == "Persistent named hole" &&
                         loaded->holes.front().forward.settings.buffer_ms == 14 &&
                         loaded->notes == "Native GUI Test data, saved without a routing backend.",
                     "Test buffer-only save did not persist or saved unrelated draft edits");
@@ -669,6 +791,38 @@ bool Frame::smoke(const wxString& directory) {
             throw std::runtime_error(detail);
         };
         await_avatar();
+        const auto draft_before_menu = draft_;
+        const auto menu_revision = controller_->snapshot().revision;
+        auto profile_context = profile_menu(viewed_);
+        require(profile_context->FindItem(wxID_EDIT) && profile_context->FindItem(wxID_DUPLICATE) &&
+                    profile_context->FindItem(wxID_DELETE) && draft_ == draft_before_menu &&
+                    controller_->snapshot().revision == menu_revision,
+                "Opening profile context actions modified staged or controller state");
+        const int hole_before_menu = hole_index_;
+        const bool dirty_before_menu = dirty_;
+        const auto original_hole =
+            draft_before_menu.holes.at(static_cast<std::size_t>(hole_before_menu));
+        add_hole(); // The context target is deliberately not the selected row.
+        auto hole_context = hole_menu(original_hole.id);
+        wxCommandEvent duplicate(wxEVT_MENU, wxID_DUPLICATE);
+        hole_context->ProcessEvent(duplicate);
+        require(draft_.holes.size() == draft_before_menu.holes.size() + 2,
+                "Hole context menu did not duplicate its target");
+        const auto duplicate_id = draft_.holes.back().id;
+        require(duplicate_id != original_hole.id &&
+                    draft_.holes.back().forward == original_hole.forward &&
+                    draft_.holes.back().reverse == original_hole.reverse,
+                "Duplicating a hole reused its identity or changed directional configuration");
+        rename_hole("Context-renamed hole");
+        require(draft_.holes.back().id == duplicate_id &&
+                    hole_heading_->GetLabel() == "Context-renamed hole" &&
+                    controller_->snapshot().revision == menu_revision,
+                "Contextual hole rename changed identity or live state");
+        draft_ = draft_before_menu;
+        dirty_ = dirty_before_menu;
+        load_holes();
+        load_hole(hole_before_menu);
+        refresh();
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
             if (dynamic_cast<wxButton*>(window))
                 require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
@@ -741,13 +895,18 @@ bool Frame::smoke(const wxString& directory) {
         const auto initial_client = GetClientSize();
         const auto initial_status = status_copy_;
         const auto resize_occurrence = occurrence_;
+        SetSize(GetMinSize());
+        layout_header();
+        check_profile_layout();
         wxSize previous_card_size = wxDefaultSize;
         wxSize previous_avatar_size = wxDefaultSize;
-        for (const auto size : {wxSize(980, 740), wxSize(1250, 850), wxSize(1536, 1024),
-                                wxSize(1250, 850), wxSize(980, 740)}) {
+        for (const auto size :
+             {wxSize(980, 680), wxSize(1000, 1000), wxSize(980, 740), wxSize(1250, 850),
+              wxSize(1536, 1024), wxSize(1250, 850), wxSize(980, 740)}) {
             SetClientSize(FromDIP(size));
             status_copy_ = "Routing: Stopped\nActive: none\nViewed: short";
             layout_header();
+            check_profile_layout();
             const auto card = comment_surface_->GetRect();
             status_copy_ = "Routing: Recovering\nActive: " + std::string(250, 'A') +
                            "\nViewed: " + std::string(250, 'V') + "\nScan: 95%";
@@ -824,6 +983,9 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().state == audiohole::State::Running,
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
+        auto active_profile_context = profile_menu(viewed_);
+        require(!active_profile_context->FindItem(wxID_DELETE)->IsEnabled(),
+                "Context menu enabled deletion of an armed active profile");
         const auto before_avatar_ticks = controller_->snapshot().revision;
         wxTimerEvent avatar_tick(avatar_timer_);
         for (int tick = 0; tick < 10; ++tick)

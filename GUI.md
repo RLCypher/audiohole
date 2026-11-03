@@ -1760,3 +1760,46 @@ it still yields to inactivity sleep and operational changes. After two minutes
 without application input or new reactions/operational changes, a healthy idle avatar sleeps; healthy routing
 continues. Input, window restoration and new reactions wake it. Scans, transitions
 and operational warnings/errors prevent sleep and can interrupt reaction holds.
+
+While sleeping, the response area displays `zzz....` with no technical heading.
+Norm/Horu may show a brief owned dream comment after a random 45–90 second quiet
+interval, then return to `zzz....` after six seconds. Status and packages without
+a dream pool remain quiet. This cosmetic overlay neither replaces the retained
+awake response nor requests an avatar reaction or controller action. Input and
+warnings remove it immediately; no dream notifications or catch-up bursts occur.
+
+## Profile workspace polish
+
+Save, Apply and Revert occupy a permanent action bar above both Profiles editor
+panes. Save is visually primary and supports Ctrl+S while Profiles is open; the bar
+identifies the edited profile and any unsaved changes. Save retains existing
+configuration behavior; Apply remains a separate routing action and is unavailable
+in Test Mode. Editing or scrolling cannot hide these actions.
+
+The left column is a fixed panel with separate native scrollable Profiles, Notes
+and Holes fields. They share the available vertical space; the routing detail pane
+continues to scroll independently. Inline profile/hole name fields and repeated
+management buttons are removed. Each list has one compact **+** control with hover
+help and a descriptive accessibility name. Right-click or Shift+F10/Menu opens
+Rename, Duplicate and Delete for the targeted item. Merely opening/cancelling a
+menu preserves edits and restores the editor's selection. Acting on a different
+profile retains the existing unsaved-navigation confirmation.
+
+Renaming stages the display-name change for Save without changing logical IDs.
+Hole duplication retains directional configuration with a fresh ID. Profile
+duplication copies a saved profile with fresh profile/hole IDs; deletion retains
+confirmation and active/pending-profile protection. Holes show readable names and
+simplex/duplex status; endpoint details remain in the routing editor.
+
+The initial window prefers a 1000-DIP square within the monitor's work area.
+Shorter displays retain the fixed header's required width and use a shorter
+window. The minimum height is 680 DIP; this is a starting-size policy, not an
+aspect-ratio lock or persisted geometry. Native smoke covers field overflow,
+pinned actions at compact/square/wide sizes, context targeting, identity-preserving
+rename/duplication and Ctrl+S Test Mode persistence. Visual/DPI/assistive-technology
+review still requires Windows.
+
+Local verification for this refinement: 118/118 portable tests pass in Debug and
+Release, including sleep timing/identity/fallback tests; the Windows GUI and model
+test cross-builds pass. Native smoke assertions for the new profile layout and
+context actions are compiled but have not been executed in this Linux workspace.

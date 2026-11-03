@@ -12,7 +12,7 @@ namespace audiohole::gui {
 // Only application-palette painting is replaced; high contrast uses wx/Windows.
 class ActionButton final : public wxButton {
   public:
-    ActionButton(wxWindow* parent, const wxString& title);
+    ActionButton(wxWindow* parent, const wxString& title, long style = 0);
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
     bool use_native_colours = false;
 };

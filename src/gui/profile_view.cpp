@@ -1,13 +1,45 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <wx/access.h>
 
 namespace audiohole::gui {
 namespace {
+#if wxUSE_ACCESSIBILITY
+// A glyph's native button caption is not a useful screen-reader name.
+class AddAccessible final : public wxWindowAccessible {
+  public:
+    explicit AddAccessible(wxWindow* window) : wxWindowAccessible(window) {}
+    wxAccStatus GetName(int child, wxString* name) override {
+        if (child != 0)
+            return wxACC_NOT_IMPLEMENTED;
+        *name = GetWindow()->GetName();
+        return wxACC_OK;
+    }
+};
+#endif
 std::optional<int> buffer_value(const wxSpinCtrl* control) {
     long value = 0;
     if (!control->GetTextValue().ToLong(&value) || value < 1 || value > 100)
         return {};
     return static_cast<int>(value);
+}
+wxButton* add_control(wxWindow* parent, wxSizer* row, const wxString& name, const wxString& help,
+                      std::function<void()> action) {
+    auto* control = new ActionButton(parent, "+", wxBU_EXACTFIT);
+    control->SetMinSize(parent->FromDIP(wxSize(32, 32)));
+    control->SetName(name);
+#if wxUSE_ACCESSIBILITY
+    control->SetAccessible(new AddAccessible(control)); // Owned by the wx window.
+#endif
+    control->SetToolTip(help);
+    row->Add(control, 0, wxALL, parent->FromDIP(3));
+    control->Bind(wxEVT_BUTTON, [action](wxCommandEvent&) { action(); });
+    return control;
+}
+int context_item(wxListBox* list, const wxContextMenuEvent& event) {
+    return event.GetPosition() == wxDefaultPosition
+               ? list->GetSelection() // Keyboard context menu (Shift+F10/Menu key).
+               : list->HitTest(list->ScreenToClient(event.GetPosition()));
 }
 } // namespace
 void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& w,
@@ -159,97 +191,275 @@ void Frame::apply_buffer(DirectionWidgets& widgets) {
     }
     refresh();
 }
+std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
+    auto menu = std::make_unique<wxMenu>();
+    menu->Append(wxID_EDIT, wxS("Rename…"),
+                 "Rename the profile in the editor; Save keeps the change.");
+    menu->Append(wxID_DUPLICATE, "Duplicate", "Create a separate copy of the saved profile.");
+    menu->AppendSeparator();
+    menu->Append(wxID_DELETE, "Delete", "Delete this saved profile after confirmation.");
+    const auto& snapshot = controller_->snapshot();
+    menu->Enable(wxID_DELETE, !(snapshot.armed && id == snapshot.active_profile) &&
+                                  id != snapshot.pending_profile);
+    const auto choose = [this, id] {
+        if (!profile(controller_->snapshot(), id))
+            return false;
+        if (viewed_ == id)
+            return true;
+        if (!discard())
+            return false;
+        select_profile(id);
+        return !viewed_.empty();
+    };
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (!choose())
+                return;
+            wxTextEntryDialog dialog(this, "Profile name", "Rename profile",
+                                     text(draft_.display_name));
+            if (dialog.ShowModal() == wxID_OK)
+                rename_profile(utf8(dialog.GetValue()));
+        },
+        wxID_EDIT);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (!choose() || !discard())
+                return;
+            const auto* saved = profile(controller_->snapshot(), viewed_);
+            if (!saved)
+                return;
+            const auto copy = controller_->create_profile(saved->display_name + " copy", viewed_);
+            if (copy.empty())
+                show_result({false, controller_->last_edit_error()});
+            else
+                select_profile(copy);
+        },
+        wxID_DUPLICATE);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (!choose())
+                return;
+            if (wxMessageBox("Delete this saved profile?", "Confirm profile deletion",
+                             wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
+                return;
+            const auto result = controller_->remove_profile(viewed_);
+            show_result(result);
+            if (result.ok)
+                select_profile(controller_->snapshot().profiles.empty()
+                                   ? ""
+                                   : controller_->snapshot().profiles.front().id);
+        },
+        wxID_DELETE);
+    return menu;
+}
+std::unique_ptr<wxMenu> Frame::hole_menu(const std::string& id) {
+    auto menu = std::make_unique<wxMenu>();
+    menu->Append(wxID_EDIT, wxS("Rename…"), "Rename the hole in staged profile changes.");
+    menu->Append(wxID_DUPLICATE, "Duplicate",
+                 "Copy this hole's endpoints and directional settings.");
+    menu->AppendSeparator();
+    menu->Append(wxID_DELETE, "Delete", "Remove this hole from staged changes after confirmation.");
+    const auto choose = [this, id] {
+        capture_draft();
+        const auto found = std::find_if(draft_.holes.begin(), draft_.holes.end(),
+                                        [&](const auto& hole) { return hole.id == id; });
+        if (found == draft_.holes.end())
+            return false;
+        const int index = static_cast<int>(found - draft_.holes.begin());
+        if (index != hole_index_)
+            load_hole(index);
+        return true;
+    };
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (!choose())
+                return;
+            wxTextEntryDialog dialog(
+                this, "Hole name", "Rename hole",
+                text(draft_.holes[static_cast<std::size_t>(hole_index_)].display_name));
+            if (dialog.ShowModal() == wxID_OK)
+                rename_hole(utf8(dialog.GetValue()));
+        },
+        wxID_EDIT);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (choose())
+                duplicate_hole();
+        },
+        wxID_DUPLICATE);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, choose](wxCommandEvent&) {
+            if (choose())
+                remove_hole();
+        },
+        wxID_DELETE);
+    return menu;
+}
+void Frame::rename_profile(const std::string& name) {
+    auto value = text(name);
+    value.Trim(true).Trim(false);
+    if (value.empty() || viewed_.empty()) {
+        show_result({false, "Enter a profile name."});
+        return;
+    }
+    capture_draft();
+    draft_.display_name = utf8(value);
+    dirty_ = true;
+    const auto found = std::find(profile_ids_.begin(), profile_ids_.end(), viewed_);
+    if (found != profile_ids_.end())
+        profiles_->SetString(static_cast<unsigned>(found - profile_ids_.begin()), value);
+    refresh();
+}
+void Frame::rename_hole(const std::string& name) {
+    auto value = text(name);
+    value.Trim(true).Trim(false);
+    if (value.empty() || hole_index_ < 0) {
+        show_result({false, "Enter a hole name."});
+        return;
+    }
+    capture_draft();
+    draft_.holes.at(static_cast<std::size_t>(hole_index_)).display_name = utf8(value);
+    dirty_ = true;
+    load_holes();
+    holes_->SetSelection(hole_index_);
+    hole_heading_->SetLabel(value);
+    hole_heading_->SetToolTip(value);
+    refresh();
+}
+void Frame::add_hole() {
+    if (viewed_.empty())
+        return;
+    capture_draft();
+    draft_.holes.push_back(controller_->make_hole());
+    dirty_ = true;
+    load_holes();
+    load_hole(static_cast<int>(draft_.holes.size()) - 1);
+    present(presentation::Message::Created);
+    refresh();
+}
+void Frame::duplicate_hole() {
+    if (hole_index_ < 0)
+        return;
+    capture_draft();
+    auto copy = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+    copy.id = controller_->make_hole().id;
+    copy.display_name += " copy";
+    draft_.holes.push_back(std::move(copy));
+    dirty_ = true;
+    load_holes();
+    load_hole(static_cast<int>(draft_.holes.size()) - 1);
+    present(presentation::Message::Created);
+    refresh();
+}
+void Frame::remove_hole() {
+    if (hole_index_ < 0)
+        return;
+    if (wxMessageBox("Remove this hole from the editor? Save keeps the change; Apply changes "
+                     "active routing.",
+                     "Confirm hole removal", wxYES_NO | wxNO_DEFAULT, this) != wxYES)
+        return;
+    capture_draft();
+    draft_.holes.erase(draft_.holes.begin() + hole_index_);
+    dirty_ = true;
+    load_holes();
+    load_hole(draft_.holes.empty()
+                  ? -1
+                  : std::min(hole_index_, static_cast<int>(draft_.holes.size()) - 1));
+    refresh();
+}
 void Frame::build_profiles() {
     auto* page = new wxPanel(notebook_);
-    auto* horizontal = new wxBoxSizer(wxHORIZONTAL);
-    auto* sidebar = new wxScrolledWindow(page);
-    sidebar->SetScrollRate(FromDIP(12), FromDIP(12));
-    sidebar->SetMinSize(FromDIP(wxSize(290, -1)));
-    auto* left = new wxBoxSizer(wxVERTICAL);
-    sidebar->SetSizer(left);
-    horizontal->Add(sidebar, 0, wxEXPAND | wxALL, 4);
-    label(sidebar, left, "Profile");
-    profiles_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxSize(260, 135));
-    profiles_->SetToolTip("Open a profile for editing. Selection alone does not change active "
-                          "routing; use Start Routing or Apply.");
-    left->Add(profiles_, 0, wxEXPAND | wxALL, 3);
-    auto* row = new wxBoxSizer(wxHORIZONTAL);
-    button(sidebar, row, "New", [this] {
-        if (!discard())
-            return;
-        const auto id = controller_->create_profile("New profile");
-        if (id.empty())
-            show_result({false, controller_->last_edit_error()});
-        else
-            select_profile(id);
-    });
-    profile_duplicate_ = button(sidebar, row, "Duplicate", [this] {
-        if (!discard())
-            return;
-        const auto id = controller_->create_profile(draft_.display_name + " copy", viewed_);
-        if (id.empty())
-            show_result({false, controller_->last_edit_error()});
-        else
-            select_profile(id);
-    });
-    profile_delete_ = button(sidebar, row, "Delete", [this] {
-        if (wxMessageBox("Delete this saved profile?", "Confirm profile deletion",
-                         wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
-            return;
-        const auto r = controller_->remove_profile(viewed_);
-        show_result(r);
-        if (r.ok) {
-            viewed_.clear();
-            select_profile(controller_->snapshot().profiles.empty()
-                               ? ""
-                               : controller_->snapshot().profiles.front().id);
-        }
-    });
-    left->Add(row);
-    profile_name_ = field(sidebar, left, "Profile display name");
-    profile_notes_ = field(sidebar, left, "Profile notes", wxTE_MULTILINE);
-    profile_notes_->SetMinSize(wxSize(250, 65));
-    label(sidebar, left, "Holes");
-    holes_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxSize(260, 145));
-    left->Add(holes_, 1, wxEXPAND | wxALL, 3);
-    button(sidebar, left, "+ Add Hole", [this] {
-        capture_draft();
-        draft_.holes.push_back(controller_->make_hole());
-        dirty_ = true;
-        load_holes();
-        load_hole(static_cast<int>(draft_.holes.size()) - 1);
-        present(presentation::Message::Created);
-    });
-    button(sidebar, left, "Remove selected hole", [this] {
-        if (hole_index_ < 0)
-            return;
-        if (wxMessageBox(
-                "Remove this hole from the editor? Apply is required to change active routing.",
-                "Confirm hole removal", wxYES_NO | wxNO_DEFAULT, this) != wxYES)
-            return;
-        capture_draft();
-        draft_.holes.erase(draft_.holes.begin() + hole_index_);
-        dirty_ = true;
-        load_holes();
-        load_hole(draft_.holes.empty() ? -1 : 0);
-    });
+    auto* page_layout = new wxBoxSizer(wxVERTICAL);
+    // This action bar is outside both editor panes. Scrolling a field or the
+    // routing editor can never hide the profile's Save/Apply/Revert actions.
+    profile_actions_ = new wxPanel(page);
+    profile_actions_->SetName("Profile actions");
     auto* saves = new wxBoxSizer(wxHORIZONTAL);
-    profile_save_ = button(sidebar, saves, "Save", [this] { save(false); });
-    profile_apply_ = button(sidebar, saves, "Apply", [this] { save(true); });
+    profile_save_ = button(profile_actions_, saves, "Save", [this] { save(false); });
+    profile_save_->SetFont(profile_save_->GetFont().Bold());
+    profile_save_->SetToolTip(
+        "Save the current profile's staged changes without activating routing. Ctrl+S.");
+    profile_apply_ = button(profile_actions_, saves, "Apply", [this] { save(true); });
     if (controller_->snapshot().operating_mode == OperatingMode::Test)
         profile_apply_->SetToolTip("Live routing is unavailable in Test Mode. Use Save to persist "
                                    "profile preferences without claiming engine application.");
-    profile_revert_ = button(sidebar, saves, "Revert", [this] {
+    profile_revert_ = button(profile_actions_, saves, "Revert", [this] {
         if (discard())
             select_profile(viewed_);
     });
-    left->Add(saves);
+    profile_edit_state_ =
+        new wxStaticText(profile_actions_, wxID_ANY, "No profile selected", wxDefaultPosition,
+                         wxDefaultSize, wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+    profile_edit_state_->SetMinSize(wxSize(0, -1));
+    saves->Add(profile_edit_state_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, FromDIP(8));
+    profile_actions_->SetSizer(saves);
+    page_layout->Add(profile_actions_, 0, wxEXPAND | wxALL, FromDIP(3));
+    auto* horizontal = new wxBoxSizer(wxHORIZONTAL);
+    auto* sidebar = new wxPanel(page);
+    profile_sidebar_ = sidebar;
+    sidebar->SetName("Profile fields");
+    sidebar->SetMinSize(FromDIP(wxSize(280, -1)));
+    auto* left = new wxBoxSizer(wxVERTICAL);
+    sidebar->SetSizer(left);
+    horizontal->Add(sidebar, 0, wxEXPAND | wxALL, 4);
+    auto* profile_heading = new wxBoxSizer(wxHORIZONTAL);
+    label(sidebar, profile_heading, "Profiles");
+    profiles_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+                              wxLB_SINGLE | wxLB_HSCROLL | wxLB_NEEDED_SB);
+    profiles_->SetName("Profiles");
+    profiles_->SetMinSize(wxSize(FromDIP(260), profiles_->GetCharHeight() + FromDIP(8)));
+    profiles_->SetToolTip(
+        "Open a profile for editing. Selection alone does not change active "
+        "routing. Right-click or press Shift+F10 for Rename, Duplicate and Delete.");
+    profile_heading->AddStretchSpacer();
+    profile_new_ =
+        add_control(sidebar, profile_heading, "New profile", "Create a new profile.", [this] {
+            if (!discard())
+                return;
+            const auto id = controller_->create_profile("New profile");
+            if (id.empty())
+                show_result({false, controller_->last_edit_error()});
+            else
+                select_profile(id);
+        });
+    left->Add(profile_heading, 0, wxEXPAND);
+    left->Add(profiles_, 2, wxEXPAND | wxALL, 3);
+    label(sidebar, left, "Notes");
+    profile_notes_ = new wxTextCtrl(sidebar, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+                                    wxTE_MULTILINE | wxTE_WORDWRAP);
+    profile_notes_->SetName("Profile notes");
+    profile_notes_->SetMinSize(wxSize(FromDIP(260), profile_notes_->GetCharHeight() + FromDIP(12)));
+    profile_notes_->SetToolTip(
+        "Notes for the profile currently being edited. Save keeps staged changes.");
+    left->Add(profile_notes_, 2, wxEXPAND | wxALL, 3);
+    auto* hole_heading = new wxBoxSizer(wxHORIZONTAL);
+    label(sidebar, hole_heading, "Holes");
+    hole_heading->AddStretchSpacer();
+    hole_new_ = add_control(sidebar, hole_heading, "Add hole",
+                            "Add a hole to this profile's staged changes.", [this] { add_hole(); });
+    left->Add(hole_heading, 0, wxEXPAND);
+    holes_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+                           wxLB_SINGLE | wxLB_HSCROLL | wxLB_NEEDED_SB);
+    holes_->SetName("Holes");
+    holes_->SetMinSize(wxSize(FromDIP(260), holes_->GetCharHeight() + FromDIP(8)));
+    holes_->SetToolTip(
+        "Choose a hole to edit. Right-click or press Shift+F10 for Rename, Duplicate and Delete.");
+    left->Add(holes_, 3, wxEXPAND | wxALL, 3);
     auto* editor = new wxScrolledWindow(page);
     editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
     editor->SetSizer(right);
     horizontal->Add(editor, 1, wxEXPAND | wxALL, 3);
-    hole_name_ = field(editor, right, "Hole display name");
+    hole_heading_ = label(editor, right, "Select a hole");
+    hole_heading_->SetWindowStyleFlag(wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+    hole_heading_->SetMinSize(wxSize(0, -1));
+    hole_heading_->SetFont(hole_heading_->GetFont().Bold());
     auto* toggles = new wxBoxSizer(wxHORIZONTAL);
     enabled_ = new wxCheckBox(editor, wxID_ANY, "Enabled");
     duplex_ = new wxCheckBox(editor, wxID_ANY, "Duplex (independent directions)");
@@ -261,7 +471,8 @@ void Frame::build_profiles() {
     build_direction(editor, right, reverse_, "Reverse");
     path_status_ = label(editor, right, "No active paths.");
     build_hole_diagnostics(editor, right);
-    page->SetSizer(horizontal);
+    page_layout->Add(horizontal, 1, wxEXPAND);
+    page->SetSizer(page_layout);
     notebook_->AddPage(page, "Profiles");
     profiles_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
         const int i = profiles_->GetSelection();
@@ -279,7 +490,28 @@ void Frame::build_profiles() {
         capture_draft();
         load_hole(i);
     });
-    for (auto* f : {profile_name_, profile_notes_, hole_name_, hole_notes_})
+    profiles_->Bind(wxEVT_CONTEXT_MENU, [this](wxContextMenuEvent& event) {
+        const int index = context_item(profiles_, event);
+        if (index < 0 || static_cast<std::size_t>(index) >= profile_ids_.size())
+            return;
+        auto menu = profile_menu(profile_ids_[static_cast<std::size_t>(index)]);
+        profiles_->SetSelection(index);
+        profiles_->PopupMenu(menu.get());
+        const auto selected = std::find(profile_ids_.begin(), profile_ids_.end(), viewed_);
+        profiles_->SetSelection(selected == profile_ids_.end()
+                                    ? wxNOT_FOUND
+                                    : static_cast<int>(selected - profile_ids_.begin()));
+    });
+    holes_->Bind(wxEVT_CONTEXT_MENU, [this](wxContextMenuEvent& event) {
+        const int index = context_item(holes_, event);
+        if (index < 0 || static_cast<std::size_t>(index) >= draft_.holes.size())
+            return;
+        auto menu = hole_menu(draft_.holes[static_cast<std::size_t>(index)].id);
+        holes_->SetSelection(index);
+        holes_->PopupMenu(menu.get());
+        holes_->SetSelection(hole_index_);
+    });
+    for (auto* f : {profile_notes_, hole_notes_})
         f->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
             if (!loading_)
                 dirty_ = true;
@@ -468,12 +700,10 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
 void Frame::capture_draft() {
     if (loading_)
         return;
-    draft_.display_name = utf8(profile_name_->GetValue());
     draft_.notes = utf8(profile_notes_->GetValue());
     if (hole_index_ < 0 || static_cast<std::size_t>(hole_index_) >= draft_.holes.size())
         return;
     auto& h = draft_.holes[static_cast<std::size_t>(hole_index_)];
-    h.display_name = utf8(hole_name_->GetValue());
     h.notes = utf8(hole_notes_->GetValue());
     h.enabled = enabled_->GetValue();
     h.duplex = duplex_->GetValue();
@@ -487,7 +717,6 @@ void Frame::select_profile(const std::string& id) {
     const auto* p = audiohole::profile(controller_->snapshot(), id);
     draft_ = p ? *p : audiohole::Profile{};
     loading_ = true;
-    profile_name_->ChangeValue(text(draft_.display_name));
     profile_notes_->ChangeValue(text(draft_.notes));
     profiles_->Clear();
     profile_ids_.clear();
@@ -516,7 +745,7 @@ void Frame::load_holes() {
     for (const auto& h : draft_.holes) {
         std::string caption = h.enabled ? "[enabled] " : "[disabled] ";
         caption += h.display_name + (h.duplex ? " — duplex" : " — simplex");
-        holes_->Append(text(caption + "\n" + h.forward.source + " → " + h.forward.destination));
+        holes_->Append(text(caption));
     }
 }
 void Frame::load_hole(int index) {
@@ -526,13 +755,14 @@ void Frame::load_hole(int index) {
     const audiohole::Hole h =
         index >= 0 ? draft_.holes.at(static_cast<std::size_t>(index)) : audiohole::Hole{};
     holes_->SetSelection(index);
-    hole_name_->ChangeValue(text(h.display_name));
+    hole_heading_->SetLabel(text(index >= 0 ? h.display_name : std::string("Select a hole")));
+    hole_heading_->SetToolTip(text(h.display_name));
     hole_notes_->ChangeValue(text(h.notes));
     enabled_->SetValue(h.enabled);
     duplex_->SetValue(h.duplex);
     activity_direction_->SetSelection(0);
     activity_direction_->Enable(index >= 0 && h.duplex);
-    for (wxWindow* widget : std::vector<wxWindow*>{hole_name_, hole_notes_, enabled_, duplex_})
+    for (wxWindow* widget : std::vector<wxWindow*>{hole_notes_, enabled_, duplex_})
         widget->Enable(index >= 0);
     populate_direction(forward_, h.forward);
     populate_direction(reverse_, h.reverse);
@@ -541,7 +771,7 @@ void Frame::load_hole(int index) {
     reverse_.group->ShowItems(h.duplex && index >= 0);
     update_beep_destinations();
     loading_ = false;
-    auto* editor = dynamic_cast<wxScrolledWindow*>(hole_name_->GetParent());
+    auto* editor = dynamic_cast<wxScrolledWindow*>(hole_heading_->GetParent());
     editor->Layout();
     editor->FitInside();
 }

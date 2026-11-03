@@ -272,6 +272,11 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 
 ## Integrated avatar engine
 
+- [ ] Sleep replaces the response with `zzz....`; Norm/Horu occasionally show a
+  short dream comment after 45–90 seconds, returning to `zzz....` after six seconds.
+  Dreams do not wake the avatar, change routing or send notifications. Input or a
+  warning immediately restores awake feedback; Status stays quiet.
+
 - [ ] Norm, Horu and Vanilla load their approved owned animation packs, not the
   old temporary previews. Verify smooth authored exposures, transparent edges,
   fixed512×768 aspect/anchor and full-header placement at100/150/200% DPI.
@@ -301,3 +306,22 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Native CTest runs `avatar_engine` and `Avatar.NativePixels` alongside GUI
   smoke. Extracted ZIP contains all approved owned assets and passes source-hash
   validation. No native test/viewer executable or generation tools are shipped.
+
+## Profile workspace regression checks
+
+- [ ] At minimum, square and wide sizes, Save/Apply/Revert and the pending-edit
+  indicator stay visible above the editor. Fill Profiles, Notes and Holes beyond
+  their viewport: each scrolls independently, and Save never moves out of view.
+  The right routing editor retains its own scrolling. Test 100/150/200% DPI.
+- [ ] Profiles and Holes each expose one **+** with descriptive hover/F1 help and
+  screen-reader name. Right-click different rows and try Shift+F10/Menu from the
+  keyboard: Rename/Duplicate/Delete target that row, while cancelling the menu
+  preserves the current editor and staged changes.
+- [ ] Rename a profile and hole; verify visible names/pending edits change, IDs
+  stay stable, and Save or Ctrl+S persists them in Test Mode across restart.
+  Revert discards unsaved renames. Duplicate a hole from a row other than the
+  current one: copied endpoints/settings match its target and its ID is fresh.
+  Deleting retains confirmation; active/pending profile deletion stays blocked.
+- [ ] Launch on a roomy display: the initial window is square. On shorter work
+  areas it fits the required header width without forcing a square height.
+  Resizing remains free, and Notes benefits from the removed name fields/buttons.

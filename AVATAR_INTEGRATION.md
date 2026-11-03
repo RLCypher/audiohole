@@ -52,6 +52,15 @@ visible operational warnings take precedence and prevent sleep. The host never
 changes controller state or commentary to enter/wake from sleep; packages without
 sleeping resources retain owned idle. Reduced motion uses the sleeping still image.
 
+The later sleep-text refinement displays `zzz....` over retained awake copy.
+An isolated SleepCommentary clock/random schedule may select a short owned `dream`
+reply after 45–90 seconds of quiet, display it for six seconds, then return to
+snoring. This is the explicit sleep-only exception to event-driven commentary;
+ordinary control/playback polling still does not reselect awake responses. Dream
+text never calls AvatarHost::react, wakes the avatar, or posts controller events,
+logs or notifications. Vanilla/missing pools stay quiet. Warning/wake precedence
+removes the rendering overlay without losing the last awake response.
+
 The existing application baseline helper remains authoritative: healthy Running,
 Ready and Stopped are idle; transitions/scans use its busy states; Degraded and
 Recovering use concern; Failed uses error. An active GUI warning has at least

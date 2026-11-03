@@ -95,8 +95,8 @@ void SurfacePanel::set_content_sizer(wxSizer* contents) {
     inset->Add(contents, 1, wxEXPAND | wxALL, FromDIP(12));
     SetSizer(inset);
 }
-ActionButton::ActionButton(wxWindow* parent, const wxString& title)
-    : wxButton(parent, wxID_ANY, title) {
+ActionButton::ActionButton(wxWindow* parent, const wxString& title, long style)
+    : wxButton(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, style) {
     SetToolTip(button_help(title));
     SetMinSize(wxSize(-1, FromDIP(32)));
     bind_feedback(this);
