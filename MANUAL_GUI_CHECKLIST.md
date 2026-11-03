@@ -265,3 +265,7 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Type a new buffer value as well as using the spin arrows: small Apply updates
   immediately. Invalid/empty/out-of-range text disables it; profile Save reports
   invalid buffer input rather than persisting a cached/clamped number.
+
+- [ ] Horu's kaomoji stay on one line at compact and enlarged sizes/DPI. Internal
+  spaces are nonbreaking only for display; authored JSON/dialogue and selection
+  history remain unchanged. Ordinary prose continues to wrap normally.

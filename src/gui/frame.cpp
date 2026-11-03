@@ -2,6 +2,7 @@
 #include "gui/controls.h"
 #include "model/application_controller.h"
 #include "model/configuration_controller.h"
+#include "presentation/text_layout.h"
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
@@ -294,7 +295,7 @@ void Frame::layout_header() {
     const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
         control->Show(!copy.empty());
-        control->SetLabel(text(copy));
+        control->SetLabel(text(presentation::keep_kaomoji_together(copy)));
         control->Wrap(width);
     };
     status_->SetLabel(text(status_copy_));
@@ -564,6 +565,14 @@ bool Frame::smoke(const wxString& directory) {
             }
             return true;
         }
+        const auto face = wxString::FromUTF8("(⁄\xC2\xA0⁄>⁄ω⁄<⁄\xC2\xA0⁄)");
+        commentary_->SetLabel(text(presentation::keep_kaomoji_together("Prefix (⁄ ⁄>⁄ω⁄<⁄ ⁄)")));
+        wxClientDC face_measure(commentary_);
+        face_measure.SetFont(commentary_->GetFont());
+        commentary_->Wrap(face_measure.GetTextExtent("Prefix (⁄ ").GetWidth());
+        require(commentary_->GetLabel().Contains(face),
+                "Kaomoji split across native wrapped lines");
+        layout_header();
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
             if (dynamic_cast<wxButton*>(window))
                 require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),

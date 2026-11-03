@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "presentation/text_layout.h"
 
 namespace audiohole::gui {
 void Frame::build_settings() {
@@ -379,8 +380,8 @@ void Frame::present_dfa(presentation::Message event) {
     const auto copy = messages_.show(event, personality_, ++occurrence_);
     // Preserve the warning, its commentary policy and last_message_ in the header.
     // This local feedback still uses the same authored catalog/selection machinery.
-    dfa_feedback_->SetLabel(
-        text(copy.technical + " " + copy.commentary + " " + copy.fallback_detail));
+    dfa_feedback_->SetLabel(text(presentation::keep_kaomoji_together(
+        copy.technical + " " + copy.commentary + " " + copy.fallback_detail)));
     dfa_feedback_->Wrap(700);
     notebook_->GetPage(3)->Layout();
     static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
