@@ -385,14 +385,16 @@
       {
         "id": "uwu_dfa_001",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Nyaa~ I did absowutewy nothing! Did you wike that? (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
         "weight": 3,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_002",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Aww~ all that clicking and not a singwe thing done~ :3",
         "weight": 1,
         "expression": "mischievous",
@@ -401,38 +403,43 @@
       {
         "id": "uwu_dfa_003",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "Did that fix it~? :3",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "confused",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_004",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "That shouwd do it~ UwU",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_005",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "Oughtta do the twick~ >w<",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_006",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "So much anticipation, so wittle action~ (¬‿¬)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_007",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Twy it now~ How does that feew? :3",
         "weight": 1,
         "expression": "mischievous",
@@ -441,86 +448,97 @@
       {
         "id": "uwu_dfa_008",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "A wittle adjustment, just fow you~ UwU",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_009",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Bettew? I knew you'd wike that~ (¬‿¬)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_010",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "All that teasing, and stiww nothing happened~ >w<",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_011",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "I moved it a vewy pwofessional amount~ OwO",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "working",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_012",
         "category": "dfa",
+        "subcategory": "placebo",
         "text": "Pwease enjoy this cawefully tuned nothing~ :3",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_013",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "That's youw placebo, nice and tight~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_014",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "I'll weave it wight thewe, then~ UwU",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "talking",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_015",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "Give it anothew twy~ Pwease tell me that did it! :3",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "concerned",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_016",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "One vewy cawefully cawibwated wittle nothing~ UwU",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "thinking",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_017",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "Did you feew that? Me neithew~ >w<",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "confused",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_018",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "I gave youw placebo a wittle extwa attention~ (¬‿¬)",
         "weight": 1,
         "expression": "mischievous",
@@ -529,22 +547,25 @@
       {
         "id": "uwu_dfa_019",
         "category": "dfa",
+        "subcategory": "playful",
         "text": "Aww~ you keep pwessing, and I keep doing nothing! OwO",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "surprised",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_020",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "Considew it pwofessionawwy fiddwed with~ :3",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_021",
         "category": "dfa",
+        "subcategory": "playful",
         "text": "Same wittle nothing, a whowe new position~ UwU",
         "weight": 1,
         "expression": "mischievous",
@@ -553,17 +574,19 @@
       {
         "id": "uwu_dfa_022",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Want a wittle mowe placebo in that howe? (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_023",
         "category": "dfa",
+        "subcategory": "playful",
         "text": "Nothing changed~ But I did it with feewing! (｡♥‿♥｡)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -679,9 +702,10 @@
       {
         "id": "uwu_dfa_minimum_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "Done fucking awound~ :3",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -689,14 +713,16 @@
       {
         "id": "uwu_dfa_nice_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "NICE!",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_nice_002",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "NICE! A vewy pwetty wittle numbew~ :3",
         "weight": 1,
         "expression": "mischievous",
@@ -707,6 +733,7 @@
       {
         "id": "uwu_dfa_dank_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "DANK!",
         "weight": 1,
         "expression": "mischievous",
@@ -715,9 +742,10 @@
       {
         "id": "uwu_dfa_dank_002",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "DANK! That’s a cheeky wittle setting~ OwO",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       }
     ],
@@ -725,17 +753,19 @@
       {
         "id": "uwu_dfa_metal_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "That's metal af~ OwO",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_metal_002",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "A vewy metal wittle howe~ >w<",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -743,9 +773,10 @@
       {
         "id": "uwu_dfa_six_seven_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "SIX SEVEN!",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -753,17 +784,19 @@
       {
         "id": "uwu_dfa_maximum_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "It goes louder now.",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "surprised",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_dfa_maximum_002",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "It goes louder now~ Aww, all the way to eweven! >w<",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -915,9 +948,10 @@
       {
         "id": "uwu_dfa_101_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Did you wead the instwuctions? (・ω・)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "thinking",
         "fallback_expression": "idle"
       }
     ],
@@ -925,9 +959,10 @@
       {
         "id": "uwu_dfa_121_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "GWEAT SCOTT!! (⊙ω⊙)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "surprised",
         "fallback_expression": "idle"
       }
     ],
@@ -935,9 +970,10 @@
       {
         "id": "uwu_dfa_134_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Skiww issue (╥﹏╥)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -945,9 +981,10 @@
       {
         "id": "uwu_dfa_222_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Two much fuw you? (｡•̀ᴗ-)✧",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "smug",
         "fallback_expression": "idle"
       }
     ],
@@ -955,9 +992,10 @@
       {
         "id": "uwu_dfa_256_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "So many possibiwities! (≧▽≦)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -965,9 +1003,10 @@
       {
         "id": "uwu_dfa_300_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Pwease pick one! (｡•́︿•̀｡)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],
@@ -975,9 +1014,10 @@
       {
         "id": "uwu_dfa_314_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "I'll take mine cream fiwwed pls (─‿‿─)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -985,9 +1025,10 @@
       {
         "id": "uwu_dfa_333_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Hawf the eviw, aww the cute (⸝⸝> ᴗ <⸝⸝)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -995,9 +1036,10 @@
       {
         "id": "uwu_dfa_401_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "You don't have pewmission! (＞﹏＜)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],
@@ -1005,9 +1047,10 @@
       {
         "id": "uwu_dfa_403_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "No mowe fwucking awound! (╥﹏╥)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -1015,9 +1058,10 @@
       {
         "id": "uwu_dfa_404_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Ewwow 404: Bwain not found (×﹏×)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -1025,9 +1069,10 @@
       {
         "id": "uwu_dfa_409_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Too many confwicts! (＠_＠)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -1035,9 +1080,10 @@
       {
         "id": "uwu_dfa_410_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Whewe did it go?! (・_・;)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "surprised",
         "fallback_expression": "idle"
       }
     ],
@@ -1045,9 +1091,10 @@
       {
         "id": "uwu_dfa_413_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "It won't fit!! (⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -1055,9 +1102,10 @@
       {
         "id": "uwu_dfa_418_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "I'm a wittwe teapot! (｡･ω･｡)ﾉ♡",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -1065,9 +1113,10 @@
       {
         "id": "uwu_dfa_429_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "TOO MUCH FWUCKING A-WOUND!! (╯°□°)╯",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "angry",
         "fallback_expression": "idle"
       }
     ],
@@ -1075,9 +1124,10 @@
       {
         "id": "uwu_dfa_451_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Why is evewything on fiwe?! (⊙﹏⊙)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "panicking",
         "fallback_expression": "idle"
       }
     ],
@@ -1085,9 +1135,10 @@
       {
         "id": "uwu_dfa_500_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Intewnaw sewvew ewwow! Pwease gib headpats to westawt (╥﹏╥)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],
@@ -1095,9 +1146,10 @@
       {
         "id": "uwu_dfa_503_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Emotionawwy unavaiwabwe (｡•́︿•̀｡)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],
@@ -1105,9 +1157,10 @@
       {
         "id": "uwu_dfa_621_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "(O‿‿O);;",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -1115,9 +1168,10 @@
       {
         "id": "uwu_dfa_707_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "BEEP BOOP! DWUM TIME! (ﾉ≧∀≦)ﾉ",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -1125,9 +1179,10 @@
       {
         "id": "uwu_dfa_777_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "JACKPOT!! ヽ(>∀<☆)ノ",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -1135,9 +1190,10 @@
       {
         "id": "uwu_dfa_808_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "BASS GO BWOOOOOM!! (ﾉ≧∀≦)ﾉ",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -1145,9 +1201,10 @@
       {
         "id": "uwu_dfa_909_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "UNTZ UNTZ UNTZ!! ヽ(⌐■_■)ノ♪",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -1155,9 +1212,10 @@
       {
         "id": "uwu_dfa_911_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "A SECOND STWEAM?! (╯°□°)╯︵ ┻━┻",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "panicking",
         "fallback_expression": "idle"
       }
     ],
@@ -1165,9 +1223,10 @@
       {
         "id": "uwu_dfa_1024_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "1024 tiny bits of mischief! (≧▽≦)",
         "weight": 1,
-        "expression": "mischievous",
+        "expression": "laughing",
         "fallback_expression": "idle"
       }
     ],
@@ -1175,9 +1234,10 @@
       {
         "id": "uwu_dfa_negative_001",
         "category": "dfa",
+        "subcategory": "validation",
         "text": "NYEGATIVE FWUCK?! (╥﹏╥)",
         "weight": 1,
-        "expression": "surprised",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       }
     ],
@@ -1185,9 +1245,10 @@
       {
         "id": "uwu_dfa_above_maximum_001",
         "category": "dfa",
+        "subcategory": "validation",
         "text": "Too much fwucking awound!! (╥﹏╥)",
         "weight": 1,
-        "expression": "surprised",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],

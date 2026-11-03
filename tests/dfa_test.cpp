@@ -1,6 +1,8 @@
 #include "presentation/messages.h"
+#include <algorithm>
 #include <array>
 #include <gtest/gtest.h>
+#include <set>
 
 using namespace audiohole::presentation;
 TEST(DfaDecimal, NormalizesHalfUpUsingDecimalDigits) {
@@ -118,4 +120,44 @@ TEST(DfaCatalog, ValidationUsesAuthoredPoolsAndNoVanillaFlavor) {
     EXPECT_TRUE(messages.variants(Message::DfaAboveMaximum, "vanilla").empty());
     EXPECT_EQ(messages.variants(Message::Dfa, "default").size(), 23u);
     EXPECT_EQ(messages.variants(Message::Dfa, "uwu").size(), 23u);
+}
+TEST(DfaCatalog, EachResponseCarriesOwnedExpressionMetadataLikeBother) {
+    Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    for (const auto* id : {"default", "uwu"}) {
+        const auto* package = messages.package(id);
+        ASSERT_NE(package, nullptr);
+        std::set<std::string> expressions;
+        std::size_t count = 0;
+        for (int i = 0; i < static_cast<int>(Message::Count); ++i) {
+            const auto event = static_cast<Message>(i);
+            if (!event_id(event).starts_with("dfa"))
+                continue;
+            const auto pool = messages.variants(event, id);
+            ASSERT_FALSE(pool.empty());
+            for (const auto& response : pool) {
+                EXPECT_EQ(response.category, "dfa");
+                EXPECT_FALSE(response.subcategory.empty());
+                EXPECT_EQ(response.fallback_expression, "idle");
+                EXPECT_NE(std::find(package->avatar_states.begin(), package->avatar_states.end(),
+                                    response.expression),
+                          package->avatar_states.end());
+                expressions.insert(response.expression);
+                ++count;
+            }
+            const auto selected = messages.show(event, id, 1);
+            const auto found = std::find_if(pool.begin(), pool.end(), [&](const auto& response) {
+                return response.id == selected.response_id;
+            });
+            ASSERT_NE(found, pool.end());
+            EXPECT_EQ(selected.expression, found->expression);
+            EXPECT_EQ(selected.subcategory, found->subcategory);
+            EXPECT_EQ(messages.show(event, id, 1).expression, selected.expression);
+        }
+        EXPECT_GE(expressions.size(), 12u); // Prevent a return to one face for every response.
+        EXPECT_EQ(count, std::string(id) == "default" ? 58u : 61u);
+        EXPECT_EQ(messages.show(Message::Dfa121, id, 2).expression, "surprised");
+        EXPECT_EQ(messages.show(Message::Dfa404, id, 2).expression, "confused");
+        EXPECT_EQ(messages.show(Message::Dfa777, id, 2).expression, "celebrating");
+    }
 }

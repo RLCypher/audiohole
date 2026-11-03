@@ -385,6 +385,7 @@
       {
         "id": "default_dfa_001",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "DFA executed. Nothing happened.",
         "weight": 3,
         "expression": "deadpan",
@@ -393,38 +394,43 @@
       {
         "id": "default_dfa_002",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "Still doing absolutely nothing.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "bored",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_003",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "Did that fix it?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_004",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "That should do it.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_005",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "Oughtta do the trick.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_006",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "A remarkably uneventful button.",
         "weight": 1,
         "expression": "deadpan",
@@ -433,102 +439,115 @@
       {
         "id": "default_dfa_007",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "Try it now.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "talking",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_008",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "How's that?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "thinking",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_009",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Better? Thought so.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_010",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "That's the adjustment you were looking for.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_011",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "I've moved it a very professional amount.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "working",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_012",
         "category": "dfa",
+        "subcategory": "placebo",
         "text": "The placebo is now correctly aligned.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_013",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "I'll leave it there, then.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "talking",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_014",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "Exactly as much improvement as before.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "bored",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_015",
         "category": "dfa",
+        "subcategory": "reassuring",
         "text": "Give that a go.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "talking",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_016",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "One carefully calibrated non-adjustment.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "thinking",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_017",
         "category": "dfa",
+        "subcategory": "questioning",
         "text": "Right. Any better?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_018",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "I've taken the edge off the nothing.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_019",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "That's about as fixed as this button gets.",
         "weight": 1,
         "expression": "deadpan",
@@ -537,30 +556,34 @@
       {
         "id": "default_dfa_020",
         "category": "dfa",
+        "subcategory": "calibration",
         "text": "Consider it professionally fiddled with.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_021",
         "category": "dfa",
+        "subcategory": "teasing",
         "text": "Same nothing, different confidence.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_022",
         "category": "dfa",
+        "subcategory": "placebo",
         "text": "Would you like a little more placebo?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_023",
         "category": "dfa",
+        "subcategory": "dry",
         "text": "Nothing changed. With conviction.",
         "weight": 1,
         "expression": "deadpan",
@@ -679,9 +702,10 @@
       {
         "id": "default_dfa_minimum_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "Done fucking around.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "bored",
         "fallback_expression": "idle"
       }
     ],
@@ -689,9 +713,10 @@
       {
         "id": "default_dfa_nice_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "NICE!",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       }
     ],
@@ -699,9 +724,10 @@
       {
         "id": "default_dfa_dank_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "DANK!",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       }
     ],
@@ -709,17 +735,19 @@
       {
         "id": "default_dfa_metal_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "That's metal af.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       },
       {
         "id": "default_dfa_metal_002",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "Heavy metal. Still doing nothing.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -727,9 +755,10 @@
       {
         "id": "default_dfa_six_seven_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "SIX SEVEN!",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -737,9 +766,10 @@
       {
         "id": "default_dfa_maximum_001",
         "category": "dfa",
+        "subcategory": "milestone",
         "text": "It goes louder now.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       }
     ],
@@ -891,9 +921,10 @@
       {
         "id": "default_dfa_101_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Have you tried reading the documentation?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],
@@ -901,9 +932,10 @@
       {
         "id": "default_dfa_121_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Great Scott! 1.21 gigawatts!",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "surprised",
         "fallback_expression": "idle"
       }
     ],
@@ -911,9 +943,10 @@
       {
         "id": "default_dfa_134_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Skill issue.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "smug",
         "fallback_expression": "idle"
       }
     ],
@@ -921,9 +954,10 @@
       {
         "id": "default_dfa_222_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "That's a little too much.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],
@@ -931,9 +965,10 @@
       {
         "id": "default_dfa_256_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "All 256 possibilities, and you chose this.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],
@@ -941,9 +976,10 @@
       {
         "id": "default_dfa_300_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Make up your mind.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -951,9 +987,10 @@
       {
         "id": "default_dfa_314_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "A La Mode Enabled",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -961,9 +998,10 @@
       {
         "id": "default_dfa_333_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Diet Satan.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       }
     ],
@@ -971,9 +1009,10 @@
       {
         "id": "default_dfa_401_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "You're not authorized to fuck around.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],
@@ -981,9 +1020,10 @@
       {
         "id": "default_dfa_403_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Fuck around privileges revoked.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "angry",
         "fallback_expression": "idle"
       }
     ],
@@ -991,9 +1031,10 @@
       {
         "id": "default_dfa_404_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "This is not the DFA you're looking for.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -1001,9 +1042,10 @@
       {
         "id": "default_dfa_409_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "You have a conflict of interest. And audio devices.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -1011,9 +1053,10 @@
       {
         "id": "default_dfa_410_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "It was here a minute ago.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "surprised",
         "fallback_expression": "idle"
       }
     ],
@@ -1021,9 +1064,10 @@
       {
         "id": "default_dfa_413_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Your hole isn't big enough.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       }
     ],
@@ -1031,9 +1075,10 @@
       {
         "id": "default_dfa_418_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "I'm a teapot.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -1041,9 +1086,10 @@
       {
         "id": "default_dfa_429_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "You're fucking around too fast.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "angry",
         "fallback_expression": "idle"
       }
     ],
@@ -1051,6 +1097,7 @@
       {
         "id": "default_dfa_451_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "It was a pleasure to burn.",
         "weight": 1,
         "expression": "deadpan",
@@ -1061,9 +1108,10 @@
       {
         "id": "default_dfa_500_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Internal server error. Have you tried turning yourself off and on again?",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "confused",
         "fallback_expression": "idle"
       }
     ],
@@ -1071,9 +1119,10 @@
       {
         "id": "default_dfa_503_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Currently unavailable. Emotionally, mostly.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "bored",
         "fallback_expression": "idle"
       }
     ],
@@ -1081,9 +1130,10 @@
       {
         "id": "default_dfa_621_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "I know what you are. (￣︿￣)",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],
@@ -1091,9 +1141,10 @@
       {
         "id": "default_dfa_707_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Drum machine detected.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -1101,9 +1152,10 @@
       {
         "id": "default_dfa_777_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Jackpot.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "celebrating",
         "fallback_expression": "idle"
       }
     ],
@@ -1111,9 +1163,10 @@
       {
         "id": "default_dfa_808_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "808s and heartbreak.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "bored",
         "fallback_expression": "idle"
       }
     ],
@@ -1121,9 +1174,10 @@
       {
         "id": "default_dfa_909_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Four on the floor.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "happy",
         "fallback_expression": "idle"
       }
     ],
@@ -1131,9 +1185,10 @@
       {
         "id": "default_dfa_911_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "Sir, a second audio stream has hit the buffer.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "panicking",
         "fallback_expression": "idle"
       }
     ],
@@ -1141,9 +1196,10 @@
       {
         "id": "default_dfa_1024_001",
         "category": "dfa",
+        "subcategory": "reference",
         "text": "That's a whole kibibyte of fuckery.",
         "weight": 1,
-        "expression": "deadpan",
+        "expression": "mischievous",
         "fallback_expression": "idle"
       }
     ],
@@ -1151,6 +1207,7 @@
       {
         "id": "default_dfa_negative_001",
         "category": "dfa",
+        "subcategory": "validation",
         "text": "NEGATIVE FUCK.",
         "weight": 1,
         "expression": "surprised",
@@ -1161,9 +1218,10 @@
       {
         "id": "default_dfa_above_maximum_001",
         "category": "dfa",
+        "subcategory": "validation",
         "text": "Too much fucking around.",
         "weight": 1,
-        "expression": "surprised",
+        "expression": "concerned",
         "fallback_expression": "idle"
       }
     ],

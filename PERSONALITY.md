@@ -517,3 +517,13 @@ Use exactly **Norm** and **UwU** in the selector and supplied catalog display na
 without subtitles. Stable IDs remain `default` and `uwu`, and filenames remain
 `default.json` and `uwu.json`. Norm is still the default; Vanilla is unchanged.
 This rename does not change any authored response, routing or persistence behavior.
+
+### Owner-requested DFA animation variety
+
+DFA replies use the same schema-2 metadata path as Bother. Individual preferred
+expressions and semantic subcategories now accompany all general, threshold,
+reference and validation replies, replacing the blanket Norm deadpan/Horu
+mischievous assignments. See [the assignments](personalities/README.md#dfa-expression-assignments).
+Authored texts, IDs, weights, ordering, decimal thresholds and warning protection
+remain unchanged. The selected response supplies its expression; no second picker,
+runtime text inference or changes to routing/configuration are introduced.

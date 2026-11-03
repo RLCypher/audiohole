@@ -154,3 +154,26 @@ manifests/art were relocated unchanged. Avatar manifests have a separate2MiB bou
 Earlier placeholder-only/no-playback notes above describe the pre-integration stage;
 see [current integration](../AVATAR_INTEGRATION.md). Optional/missing resources never
 borrow another character, and a missing avatar does not disable valid dialogue.
+
+## DFA expression assignments
+
+DFA uses the same schema-2 response metadata and single weighted selection as
+Bother: `id`, `category`, `subcategory`, `text`, optional `weight`, `expression` and
+`fallback_expression`. Each selected reply supplies both its text and its pose;
+the runtime does not classify English text or choose a second random animation.
+All 58 Norm and 61 Horu DFA entries now carry individual assignments. Their text,
+IDs, weights, pool order, threshold/validation behavior and owned `idle` fallbacks
+are unchanged. General replies distinguish dry, questioning, reassuring, teasing,
+calibration and placebo tones; named thresholds use `milestone`, numeric easter
+eggs use `reference`, and rejected input uses `validation` subcategories.
+
+| DFA reference | Norm expression | Horu expression |
+| --- | --- | --- |
+| 1.21, Great Scott | surprised | surprised |
+| 1.34, skill issue | smug | embarrassed |
+| 4.04, not found | confused | confused |
+| 7.77, jackpot | celebrating | celebrating |
+| 9.11, second stream | panicking | panicking |
+
+The assignments are authored JSON data using each character's approved states.
+Warnings still retain the header/visual priority when DFA feedback is shown locally.
