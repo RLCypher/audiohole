@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "id": "visitor",
+  "display_name": "Visitor example",
+  "events": {
+    "ready": [
+      { "id": "visitor_ready_001", "category": "status", "text": "Visitor reporting for optional commentary duty.", "expression": "happy", "fallback_expression": "idle" }
+    ]
+  }
+}

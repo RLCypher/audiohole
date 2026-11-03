@@ -29,7 +29,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Runtime installation failed; build and test this configuration first.' }
     $files = @(Get-ChildItem -LiteralPath $stage -File -Recurse)
     # Explicit runtime allowlist: never copy a build tree, tests, or sources.
-    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default.json', 'personalities/uwu.json', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png')
+    $expected = @('audiohole.exe', 'MANUAL_GUI_CHECKLIST.md', 'wxWidgets-LGPL.txt', 'wxWidgets-LICENSE.txt', 'nlohmann-json-LICENSE.txt', 'personalities/default/personality.json', 'personalities/default/dialogue/responses.json', 'personalities/default/preview/placeholder.png', 'personalities/uwu/personality.json', 'personalities/uwu/dialogue/responses.json', 'personalities/vanilla/personality.json', 'personalities/vanilla/preview/logo.png', 'personalities/README.md', 'assets/branding/audiohole-logo.png', 'assets/branding/audiohole.ico', 'assets/presentation/placeholder-avatar.png')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($stage.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Unexpected Runtime component contents; audit the package allowlist before distributing.'
@@ -43,7 +43,7 @@ try {
         configuration = $Configuration
         platform = 'Windows x64'
         source_dirty = $dirty
-        purpose = 'Milestone 0.2 simulated GUI evaluation'
+        purpose = 'Preview Build GUI and isolated configuration evaluation'
         executable = 'audiohole.exe'
         actions_run = $runUrl
         packaged_at_utc = [DateTime]::UtcNow.ToString('o')
@@ -55,9 +55,9 @@ Commit: $commit
 Source has uncommitted changes: $dirty
 CI: $runUrl
 
-Purpose: Milestone 0.2 simulated GUI evaluation, not a formal release.
+Purpose: Preview Build GUI and isolated configuration evaluation, not a formal release.
 Launch audiohole.exe to evaluate the native GUI with authored simulated devices.
-SIMULATION ONLY: no audio capture/render, real endpoint enumeration, or persistent edits.
+No real audio capture/render or endpoint enumeration. Preview uses simulated records; Test persists isolated configuration.
 Use MANUAL_GUI_CHECKLIST.md for evaluation workflows.
 The Release package is preferred for ordinary manual testing.
 
@@ -66,15 +66,15 @@ No Visual Studio, SDK, CMake, Git, test framework, administrator rights,
 driver, service, or separately installed VC runtime is needed to launch this build.
 The reference MSVC build uses the static CRT. Normal Windows system DLLs remain required.
 
-Known limitations: all devices, scans, activity, failures, and Test Beep are simulated.
-Test Beep emits NO SOUND. Profiles and settings last only for this session.
+Known limitations: Preview devices, scans, activity, failures and Test Beep are simulated. Test has real configuration I/O but no audio/scanner backend.
+Test Beep emits NO SOUND. Test configuration and Preview Build preferences persist; Preview fixtures remain session-only.
 Synchronization algorithms, production schemas, and storage roots remain unresolved.
 wxWidgets 3.2.6 is statically linked; license and LGPL text are included.
 The header-only nlohmann/json 3.11.3 MIT notice is included.
-Normal and UwU commentary are editable JSON files in personalities/.
-Vanilla is the built-in fallback. Light/Dark/System choices are in Settings.
+Personality folders in personalities/ contain editable manifests and dialogue. Copy a valid folder to install it.
+Missing selections fall back to an entire available package; no valid packages disables personality presentation. Light/Dark/System choices are in Settings.
 Follow System is the default. Windows-owned dialogs retain system styling.
-The startup notice discloses all simulated functions, including silent Test Beep.
+The optional startup dialog explains both modes, including silent Preview Test Beep.
 Interface and commentary wording preview the intended production experience.
 This package is for private evaluation. AudioHole's project license remains undecided.
 The test-only GoogleTest dependency is not part of this package.

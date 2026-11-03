@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "api_version": 1,
+  "id": "visitor",
+  "display_name": "Visitor example",
+  "character_name": "Visitor",
+  "description": "Minimal data-only package. Copy this whole folder into personalities and restart or Reload.",
+  "dialogue": { "responses": "dialogue/responses.json", "bother": null, "dfa": null },
+  "avatar": { "registry": null, "manifest": null },
+  "expressions": ["idle", "happy"]
+}

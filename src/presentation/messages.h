@@ -84,18 +84,28 @@ enum class Message {
     Dfa1024,
     DfaNegative,
     DfaAboveMaximum,
+    Bother,
     Count
 };
 struct Variant {
     std::string text;
     unsigned weight = 1;
+    std::string id{}, category{}, subcategory{}, expression{}, fallback_expression{};
 };
 struct Copy {
     std::string technical, commentary, fallback_detail;
+    // Selected data for a future presenter; no animation or engine calls here.
+    std::string personality_id{}, response_id{}, category{}, subcategory{}, expression{},
+        fallback_expression{};
 };
 struct Personality {
     std::string id, display_name;
     std::map<std::string, std::vector<Variant>> events;
+    std::string character_name{}, description{};
+    std::filesystem::path package_root{}, avatar_registry{}, avatar_manifest{}, preview_image{};
+    std::vector<std::string> expressions{};
+    int order = 100;
+    bool packaged = false, avatar_available = false;
 };
 struct LoadResult {
     bool ok;
@@ -136,15 +146,19 @@ class Messages {
     // ID. Failure invalidates a previous catalog from that same path, returns
     // neutral guidance, and never activates a partial catalog.
     LoadResult load_file(const std::filesystem::path& path);
-    // Explicit reload clears optional catalogs, then loads sorted *.json files.
+    // Explicit reload discovers folders and legacy flat JSON catalogs.
     // Invalid/deleted files therefore cannot leave stale commentary active.
     std::vector<std::string> load_directory(const std::filesystem::path& directory);
+    LoadResult load_package(const std::filesystem::path& directory);
     std::vector<Personality> personalities() const;
+    const Personality* package(const std::string& id) const;
+    // Whole-personality selection; empty means presentation disabled.
+    std::string resolve_selection(const std::string& requested) const;
     bool available(const std::string& id) const;
     std::vector<Variant> variants(Message event, const std::string& id) const;
-    // Missing events use Vanilla individually. Unknown personality IDs use
-    // Vanilla entirely. Neither fallback consumes randomness. Occurrences cache
-    // selection; only distinct events may choose anew, without immediate repeats.
+    // Missing events use only compiled operational facts, never another catalog.
+    // The GUI resolves whole-personality selection first. Neither fallback consumes randomness.
+    // Occurrences cache selection; only distinct events may choose anew, without immediate repeats.
     Copy show(Message, const std::string& id, std::uint64_t occurrence);
     Copy show(Message event, Mode mode, std::uint64_t occurrence) {
         return show(event, mode_id(mode), occurrence);

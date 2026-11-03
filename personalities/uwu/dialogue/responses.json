@@ -1,0 +1,1437 @@
+{
+  "schema_version": 2,
+  "id": "uwu",
+  "display_name": "UwU",
+  "events": {
+    "ready": [
+      {
+        "id": "uwu_ready_001",
+        "category": "status",
+        "text": "Hewwo~ Weady to open some howes? I've been waiting fow you~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_ready_002",
+        "category": "status",
+        "text": "Aww~ so many pwetty howes, so many ways to connect~ OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "created": [
+      {
+        "id": "uwu_created_001",
+        "category": "status",
+        "text": "Anothew howe?! My, someone's feeling adventuwous today~ OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_created_002",
+        "category": "status",
+        "text": "A fwesh wittle opening~ Pwease choose whewe it goes! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "enabled": [
+      {
+        "id": "uwu_enabled_001",
+        "category": "status",
+        "text": "Aww~ you opened it fow me! Now put something thwough it~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_enabled_002",
+        "category": "status",
+        "text": "Weady and waiting to be fiwwed with signaw~ >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "disabled": [
+      {
+        "id": "uwu_disabled_001",
+        "category": "status",
+        "text": "Aww, cwosing up awweady? I was just getting stawted~ (╥﹏╥)",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_disabled_002",
+        "category": "status",
+        "text": "A wittle west fow that howe~ I'll be hewe when you need it! :3",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "source": [
+      {
+        "id": "uwu_source_001",
+        "category": "status",
+        "text": "Ooh, a fwesh input! I can wowk with that~ (¬‿¬)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_source_002",
+        "category": "status",
+        "text": "That's a pwetty input~ Pwease put it wight hewe~ UwU",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "destination": [
+      {
+        "id": "uwu_destination_001",
+        "category": "status",
+        "text": "That's whewe you want it to come out? How vewy specific of you~ UwU",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_destination_002",
+        "category": "status",
+        "text": "Mmm~ a pwace fow all that output! (｡♥‿♥｡)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "started": [
+      {
+        "id": "uwu_started_001",
+        "category": "status",
+        "text": "We'we connected~ Now wet me heaw you make some noise! >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_started_002",
+        "category": "status",
+        "text": "Ooh~ a nice tight connection, just how I wike it~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "stopped": [
+      {
+        "id": "uwu_stopped_001",
+        "category": "status",
+        "text": "Aww, finished awweady? I was having so much fun~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_stopped_002",
+        "category": "status",
+        "text": "Puwwing out fow now? I'll keep youw howes weady~ UwU",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "duplex": [
+      {
+        "id": "uwu_duplex_001",
+        "category": "status",
+        "text": "B-both ways at once?! You weawwy know how to keep a howe busy~ OwO (｡♥‿♥｡)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_duplex_002",
+        "category": "status",
+        "text": "Fwont and back~ Oh my, that's a vewy busy connection! >w<",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "activated": [
+      {
+        "id": "uwu_activated_001",
+        "category": "status",
+        "text": "Aww~ a whowe new position fow evewything! I wove a good weawwangement~ :3",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_activated_002",
+        "category": "status",
+        "text": "A fwesh way to get evewything plugged in~ (¬‿¬)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      }
+    ],
+    "pending": [
+      {
+        "id": "uwu_pending_001",
+        "category": "status",
+        "text": "Just a wittle anticipation~ Don't make me wait too wong! (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_pending_002",
+        "category": "status",
+        "text": "I'll be weady when it's time to swip it in~ OwO",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "reconnected": [
+      {
+        "id": "uwu_reconnected_001",
+        "category": "status",
+        "text": "You came back! I kept youw howe nice and weady~ UwU",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_reconnected_002",
+        "category": "status",
+        "text": "Ooh~ swiding back in wike you nevew weft! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "disconnected": [
+      {
+        "id": "uwu_disconnected_001",
+        "category": "status",
+        "text": "You puwwed out without wawning?! At weast say goodbye fiwst~ (╥﹏╥)",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_disconnected_002",
+        "category": "status",
+        "text": "Aww~ an empty howe again? Come back soon~ >w<",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "signal": [
+      {
+        "id": "uwu_signal_001",
+        "category": "status",
+        "text": "Ooh! I can feew the signaw coming in~ Keep going! >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_signal_002",
+        "category": "status",
+        "text": "A wittle signaw tickwe~ Just what this howe needed! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "no_signal": [
+      {
+        "id": "uwu_no_signal_001",
+        "category": "status",
+        "text": "It's so quiet in hewe... give me a wittle something? :3",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_no_signal_002",
+        "category": "status",
+        "text": "Aww~ this howe's waiting fow a tiny tickwe~ UwU",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_ready": [
+      {
+        "id": "uwu_beep_ready_001",
+        "category": "status",
+        "text": "Wanna make it squeak? Pick youw output and give it a wittle beep~ (¬‿¬)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_beep_ready_002",
+        "category": "status",
+        "text": "A wittle beep, just fow that howe~ :3",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_complete": [
+      {
+        "id": "uwu_beep_complete_001",
+        "category": "status",
+        "text": "Beep~! A wittle squeak fow youw chosen howe~ UwU",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_beep_complete_002",
+        "category": "status",
+        "text": "Aww~ the wittle tickwe is finished! >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_rejected": [
+      {
+        "id": "uwu_beep_rejected_001",
+        "category": "status",
+        "text": "P-pwease pick an output fiwst~ I can't beep into the void! >w<",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_beep_rejected_002",
+        "category": "status",
+        "text": "A wittle destination pwease~ Which howe gets the beep? :3",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "questionable": [
+      {
+        "id": "uwu_questionable_001",
+        "category": "status",
+        "text": "Ooh, that's a naughty wittle config~ It might feed back, but if you insist... (¬‿¬)",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_questionable_002",
+        "category": "status",
+        "text": "That connection's getting adventuwous~ Pwease check the detaiws! OwO",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "invalid": [
+      {
+        "id": "uwu_invalid_001",
+        "category": "status",
+        "text": "Nuh-uh~ that numbew doesn't fit in this howe. Twy again, pwease? :3",
+        "weight": 1,
+        "expression": "confused",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_invalid_002",
+        "category": "status",
+        "text": "A wittle adjustment pwease~ That one's not weady to swip in! >w<",
+        "weight": 1,
+        "expression": "confused",
+        "fallback_expression": "idle"
+      }
+    ],
+    "recovering": [
+      {
+        "id": "uwu_recovering_001",
+        "category": "status",
+        "text": "Hang on, sweetie~ I'm twying to get you plugged back in! (╥﹏╥)",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_recovering_002",
+        "category": "status",
+        "text": "I'll get that wittle connection weady again~ UwU",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa": [
+      {
+        "id": "uwu_dfa_001",
+        "category": "dfa",
+        "text": "Nyaa~ I did absowutewy nothing! Did you wike that? (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 3,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_002",
+        "category": "dfa",
+        "text": "Aww~ all that clicking and not a singwe thing done~ :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_003",
+        "category": "dfa",
+        "text": "Did that fix it~? :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_004",
+        "category": "dfa",
+        "text": "That shouwd do it~ UwU",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_005",
+        "category": "dfa",
+        "text": "Oughtta do the twick~ >w<",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_006",
+        "category": "dfa",
+        "text": "So much anticipation, so wittle action~ (¬‿¬)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_007",
+        "category": "dfa",
+        "text": "Twy it now~ How does that feew? :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_008",
+        "category": "dfa",
+        "text": "A wittle adjustment, just fow you~ UwU",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_009",
+        "category": "dfa",
+        "text": "Bettew? I knew you'd wike that~ (¬‿¬)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_010",
+        "category": "dfa",
+        "text": "All that teasing, and stiww nothing happened~ >w<",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_011",
+        "category": "dfa",
+        "text": "I moved it a vewy pwofessional amount~ OwO",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_012",
+        "category": "dfa",
+        "text": "Pwease enjoy this cawefully tuned nothing~ :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_013",
+        "category": "dfa",
+        "text": "That's youw placebo, nice and tight~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_014",
+        "category": "dfa",
+        "text": "I'll weave it wight thewe, then~ UwU",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_015",
+        "category": "dfa",
+        "text": "Give it anothew twy~ Pwease tell me that did it! :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_016",
+        "category": "dfa",
+        "text": "One vewy cawefully cawibwated wittle nothing~ UwU",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_017",
+        "category": "dfa",
+        "text": "Did you feew that? Me neithew~ >w<",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_018",
+        "category": "dfa",
+        "text": "I gave youw placebo a wittle extwa attention~ (¬‿¬)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_019",
+        "category": "dfa",
+        "text": "Aww~ you keep pwessing, and I keep doing nothing! OwO",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_020",
+        "category": "dfa",
+        "text": "Considew it pwofessionawwy fiddwed with~ :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_021",
+        "category": "dfa",
+        "text": "Same wittle nothing, a whowe new position~ UwU",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_022",
+        "category": "dfa",
+        "text": "Want a wittle mowe placebo in that howe? (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_023",
+        "category": "dfa",
+        "text": "Nothing changed~ But I did it with feewing! (｡♥‿♥｡)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "cancelled": [
+      {
+        "id": "uwu_cancelled_001",
+        "category": "status",
+        "text": "Aww~ stopping the anticipation? I'll wait fow you~ UwU",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_cancelled_002",
+        "category": "status",
+        "text": "No mowe teasing that connection fow now~ :3",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "personality": [
+      {
+        "id": "uwu_personality_001",
+        "category": "status",
+        "text": "Ooh~ a new wittle voice, same pwetty howes! OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_personality_002",
+        "category": "status",
+        "text": "Dwessing up the commentary~ The connections stay exactwy whewe they awe! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_started": [
+      {
+        "id": "uwu_scan_started_001",
+        "category": "status",
+        "text": "Ooh~ time to inspect those pwetty wittle connections! OwO",
+        "weight": 1,
+        "expression": "working",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_started_002",
+        "category": "status",
+        "text": "A wittle peek at those connections~ :3",
+        "weight": 1,
+        "expression": "working",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_completed": [
+      {
+        "id": "uwu_scan_completed_001",
+        "category": "status",
+        "text": "Aww~ all inspected and weady fow you! UwU",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_completed_002",
+        "category": "status",
+        "text": "Finished checking those howes~ Looking pwetty! >w<",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_cancelled": [
+      {
+        "id": "uwu_scan_cancelled_001",
+        "category": "status",
+        "text": "Aww~ stopping the wittle inspection? :3",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_cancelled_002",
+        "category": "status",
+        "text": "No mowe peeking at the howes fow now~ UwU",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_failed": [
+      {
+        "id": "uwu_scan_failed_001",
+        "category": "status",
+        "text": "The wittle inspection needs anothew look~",
+        "weight": 1,
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_failed_002",
+        "category": "status",
+        "text": "Aww~ pwease check the inspection detaiws.",
+        "weight": 1,
+        "expression": "error",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_minimum": [
+      {
+        "id": "uwu_dfa_minimum_001",
+        "category": "dfa",
+        "text": "Done fucking awound~ :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_nice": [
+      {
+        "id": "uwu_dfa_nice_001",
+        "category": "dfa",
+        "text": "NICE!",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_nice_002",
+        "category": "dfa",
+        "text": "NICE! A vewy pwetty wittle numbew~ :3",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_dank": [
+      {
+        "id": "uwu_dfa_dank_001",
+        "category": "dfa",
+        "text": "DANK!",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_dank_002",
+        "category": "dfa",
+        "text": "DANK! That’s a cheeky wittle setting~ OwO",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_metal": [
+      {
+        "id": "uwu_dfa_metal_001",
+        "category": "dfa",
+        "text": "That's metal af~ OwO",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_metal_002",
+        "category": "dfa",
+        "text": "A vewy metal wittle howe~ >w<",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_six_seven": [
+      {
+        "id": "uwu_dfa_six_seven_001",
+        "category": "dfa",
+        "text": "SIX SEVEN!",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_maximum": [
+      {
+        "id": "uwu_dfa_maximum_001",
+        "category": "dfa",
+        "text": "It goes louder now.",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_dfa_maximum_002",
+        "category": "dfa",
+        "text": "It goes louder now~ Aww, all the way to eweven! >w<",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "buffer_changed": [
+      {
+        "id": "uwu_buffer_changed_001",
+        "category": "status",
+        "text": "Buffer tweaked~ comfy little sample cushions! :3",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_buffer_changed_002",
+        "category": "status",
+        "text": "A tiny timing tune-up~ weady when you awe! ^w^",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "simplex": [
+      {
+        "id": "uwu_simplex_001",
+        "category": "status",
+        "text": "Just one way~ I'll keep that howe focused! :3",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_simplex_002",
+        "category": "status",
+        "text": "A wittle one-way connection~ UwU",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_saved": [
+      {
+        "id": "uwu_device_saved_001",
+        "category": "status",
+        "text": "Youw device has its pwetty name tag~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_device_saved_002",
+        "category": "status",
+        "text": "Aww~ notes tucked away, same wittle device! UwU",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_level_changed": [
+      {
+        "id": "uwu_scan_level_changed_001",
+        "category": "status",
+        "text": "How cwosely awe we peeking~? OwO",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_level_changed_002",
+        "category": "status",
+        "text": "A wittle inspection adjustment~ :3",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_scope_changed": [
+      {
+        "id": "uwu_scan_scope_changed_001",
+        "category": "status",
+        "text": "Those awe the howes we'we checking~ UwU",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_scan_scope_changed_002",
+        "category": "status",
+        "text": "Picking whewe to peek~ OwO",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_copied": [
+      {
+        "id": "uwu_diagnostics_copied_001",
+        "category": "status",
+        "text": "Detaiws on youw cwipboard~ handwe with cawe! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_diagnostics_copied_002",
+        "category": "status",
+        "text": "A wittle bundle of notes, just fow you~ UwU",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_exported": [
+      {
+        "id": "uwu_diagnostics_exported_001",
+        "category": "status",
+        "text": "Aww~ youw notes awe all packed up! :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_diagnostics_exported_002",
+        "category": "status",
+        "text": "Detaiws tucked into a pwetty wittle file~ UwU",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_cleared": [
+      {
+        "id": "uwu_diagnostics_cleared_001",
+        "category": "status",
+        "text": "A fwesh wittle page~ same pwetty connections! :3",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_diagnostics_cleared_002",
+        "category": "status",
+        "text": "Cweaned the wogbook~ weady fow mowe! UwU",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_101": [
+      {
+        "id": "uwu_dfa_101_001",
+        "category": "dfa",
+        "text": "Did you wead the instwuctions? (・ω・)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_121": [
+      {
+        "id": "uwu_dfa_121_001",
+        "category": "dfa",
+        "text": "GWEAT SCOTT!! (⊙ω⊙)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_134": [
+      {
+        "id": "uwu_dfa_134_001",
+        "category": "dfa",
+        "text": "Skiww issue (╥﹏╥)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_222": [
+      {
+        "id": "uwu_dfa_222_001",
+        "category": "dfa",
+        "text": "Two much fuw you? (｡•̀ᴗ-)✧",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_256": [
+      {
+        "id": "uwu_dfa_256_001",
+        "category": "dfa",
+        "text": "So many possibiwities! (≧▽≦)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_300": [
+      {
+        "id": "uwu_dfa_300_001",
+        "category": "dfa",
+        "text": "Pwease pick one! (｡•́︿•̀｡)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_314": [
+      {
+        "id": "uwu_dfa_314_001",
+        "category": "dfa",
+        "text": "I'll take mine cream fiwwed pls (─‿‿─)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_333": [
+      {
+        "id": "uwu_dfa_333_001",
+        "category": "dfa",
+        "text": "Hawf the eviw, aww the cute (⸝⸝> ᴗ <⸝⸝)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_401": [
+      {
+        "id": "uwu_dfa_401_001",
+        "category": "dfa",
+        "text": "You don't have pewmission! (＞﹏＜)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_403": [
+      {
+        "id": "uwu_dfa_403_001",
+        "category": "dfa",
+        "text": "No mowe fwucking awound! (╥﹏╥)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_404": [
+      {
+        "id": "uwu_dfa_404_001",
+        "category": "dfa",
+        "text": "Ewwow 404: Bwain not found (×﹏×)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_409": [
+      {
+        "id": "uwu_dfa_409_001",
+        "category": "dfa",
+        "text": "Too many confwicts! (＠_＠)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_410": [
+      {
+        "id": "uwu_dfa_410_001",
+        "category": "dfa",
+        "text": "Whewe did it go?! (・_・;)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_413": [
+      {
+        "id": "uwu_dfa_413_001",
+        "category": "dfa",
+        "text": "It won't fit!! (⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_418": [
+      {
+        "id": "uwu_dfa_418_001",
+        "category": "dfa",
+        "text": "I'm a wittwe teapot! (｡･ω･｡)ﾉ♡",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_429": [
+      {
+        "id": "uwu_dfa_429_001",
+        "category": "dfa",
+        "text": "TOO MUCH FWUCKING A-WOUND!! (╯°□°)╯",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_451": [
+      {
+        "id": "uwu_dfa_451_001",
+        "category": "dfa",
+        "text": "Why is evewything on fiwe?! (⊙﹏⊙)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_500": [
+      {
+        "id": "uwu_dfa_500_001",
+        "category": "dfa",
+        "text": "Intewnaw sewvew ewwow! Pwease gib headpats to westawt (╥﹏╥)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_503": [
+      {
+        "id": "uwu_dfa_503_001",
+        "category": "dfa",
+        "text": "Emotionawwy unavaiwabwe (｡•́︿•̀｡)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_621": [
+      {
+        "id": "uwu_dfa_621_001",
+        "category": "dfa",
+        "text": "(O‿‿O);;",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_707": [
+      {
+        "id": "uwu_dfa_707_001",
+        "category": "dfa",
+        "text": "BEEP BOOP! DWUM TIME! (ﾉ≧∀≦)ﾉ",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_777": [
+      {
+        "id": "uwu_dfa_777_001",
+        "category": "dfa",
+        "text": "JACKPOT!! ヽ(>∀<☆)ノ",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_808": [
+      {
+        "id": "uwu_dfa_808_001",
+        "category": "dfa",
+        "text": "BASS GO BWOOOOOM!! (ﾉ≧∀≦)ﾉ",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_909": [
+      {
+        "id": "uwu_dfa_909_001",
+        "category": "dfa",
+        "text": "UNTZ UNTZ UNTZ!! ヽ(⌐■_■)ノ♪",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_911": [
+      {
+        "id": "uwu_dfa_911_001",
+        "category": "dfa",
+        "text": "A SECOND STWEAM?! (╯°□°)╯︵ ┻━┻",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_1024": [
+      {
+        "id": "uwu_dfa_1024_001",
+        "category": "dfa",
+        "text": "1024 tiny bits of mischief! (≧▽≦)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_negative": [
+      {
+        "id": "uwu_dfa_negative_001",
+        "category": "dfa",
+        "text": "NYEGATIVE FWUCK?! (╥﹏╥)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_above_maximum": [
+      {
+        "id": "uwu_dfa_above_maximum_001",
+        "category": "dfa",
+        "text": "Too much fwucking awound!! (╥﹏╥)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "bother": [
+      {
+        "id": "uwu_bother_001",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Oh! Hi, cutie. Were you looking for audio help or just an excuse to poke me? (｡•̀ᴗ-)✧",
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_002",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "H-hey! I felt that! At least buy my coffee first. >///<",
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_003",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Can I hewp you? Preferably before my tail files a formal complaint.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_004",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Another click? You're being awfully attentive today. I could get used to that.",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_005",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "My headphones are on, but you still have my attention. Dangerous power, that.",
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_006",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Poke the character, get the drama. Those are the terms. (╥﹏╥)",
+        "expression": "panicking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_007",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "I was doing something very important. No, I will not specify what.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_008",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "If you're trying to make me blush, your troubleshooting technique is working.",
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_009",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Coffee delivery? Headpats? A sensible destination device? Surprise me.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_010",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "You again! My favorite recurring input event. Don't tell the keyboard.",
+        "expression": "laughing",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_011",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Tiny buffers can feel snappier, but they leave less time for scheduling delays. Give your poor CPU some breathing room.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_012",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Bigger buffers may help with dropouts, but add buffering latency. More cushion isn't always what you want. (｡•̀ᴗ-)✧",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_013",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Capture brings sound in; playback sends it out. Pick the right end before you start teasing the controls.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_014",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Two devices can say 48 kHz and still have independent clocks. Matching labels don't mean they're perfectly in sync.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_015",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Exclusive access can block other apps from opening an endpoint. Apparently some devices are the jealous type.",
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_016",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A quiet source isn't necessarily disconnected. Sometimes even microphones need a dramatic pause.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_017",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A moving source indicator doesn't prove you can hear the output. Check the destination, mute and volume too, cutie.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_018",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Reported capability lists aren't the same as verified stream tests. Confidence needs evidence, even when you're this cute.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_019",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Duplex means two independent directions. If one side goes quiet, check that side's own endpoint assignments.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_020",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "This preview only simulates Test Beep; it makes no sound. A real Windows playback test can check your actual speakers.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_021",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "GWEAT SCOTT! Somebody routed the coffee through the flux capacitor! (⊙ω⊙)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_022",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "The cake is a lie, but my tail has already stolen the frosting.",
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_023",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "These go to eweven. I go to unnecessarily dramatic.",
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_024",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "A second coffee has hit the flight case. This is not a drill!",
+        "expression": "panicking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_025",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "I'm a wittwe teapot. Please stop trying to assign me as a capture endpoint.",
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_026",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Totally made-up fact: Saturn's rings are emergency hair ties for space cats.",
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_027",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Fictional science bulletin: marshmallows hold secret elections inside your coat pockets.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_028",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Entirely invented fact: every rainbow has a designated snack supervisor. Mine resigned.",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_029",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Made-up fact: sleepy dragons keep their pajamas in tiny overhead lockers.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_030",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Completely fictional fact: the mayor of Jupiter is three ferrets in a cardigan.",
+        "expression": "laughing",
+        "fallback_expression": "idle"
+      }
+    ]
+  }
+}

@@ -86,6 +86,7 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"dfa_1024", "DFA Acknowledged"},
     {"dfa_negative", "DFA must be at least 0.00. Previous value retained."},
     {"dfa_above_maximum", "DFA must be at most 11.00. Previous value retained."},
+    {"bother", "Personality interaction. Routing settings are unchanged."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;
@@ -319,7 +320,14 @@ LoadResult Messages::load_file(const std::filesystem::path& path) {
         });
         (void)root.dump(); // Reject invalid UTF-8, including inside otherwise unused future events.
         require_valid_catalog(root.is_object() && root.size() == 4 &&
-                              root.at("schema_version") == 1);
+                              (root.at("schema_version") == 1 || root.at("schema_version") == 2));
+        const bool metadata_required = root.at("schema_version") == 2;
+        std::set<std::string> response_ids;
+        const std::set<std::string> expressions{
+            "idle",        "happy",     "thinking", "working",     "talking",
+            "confused",    "concerned", "error",    "angry",       "surprised",
+            "celebrating", "sleeping",  "smug",     "embarrassed", "laughing",
+            "suspicious",  "panicking", "bored",    "mischievous", "deadpan"};
         Personality candidate;
         candidate.id = root.at("id").get<std::string>();
         candidate.display_name = root.at("display_name").get<std::string>();
@@ -328,24 +336,47 @@ LoadResult Messages::load_file(const std::filesystem::path& path) {
             presentation_text(candidate.display_name, maximum_display_name_bytes));
         const auto& events = root.at("events");
         require_valid_catalog(events.is_object() && events.size() <= maximum_event_pools);
+        require_valid_catalog(!metadata_required || !events.empty());
         for (const auto& [key, pool] : events.items()) {
             require_valid_catalog(identifier(key) && pool.is_array() && !pool.empty() &&
                                   pool.size() <= maximum_variants_per_pool);
             for (const auto& entry : pool) {
                 Variant variant;
-                if (entry.is_string())
+                if (entry.is_string()) {
+                    require_valid_catalog(!metadata_required);
                     variant.text = entry.get<std::string>();
-                else {
-                    require_valid_catalog(entry.is_object() && entry.contains("text") &&
-                                          entry.size() <= 2);
+                } else {
+                    require_valid_catalog(entry.is_object() && entry.contains("text"));
+                    for (const auto& [field, value] : entry.items()) {
+                        (void)value;
+                        require_valid_catalog(
+                            field == "text" || field == "weight" ||
+                            (metadata_required &&
+                             (field == "id" || field == "category" || field == "subcategory" ||
+                              field == "expression" || field == "fallback_expression")));
+                    }
                     variant.text = entry.at("text").get<std::string>();
                     if (entry.contains("weight")) {
                         require_valid_catalog(entry.at("weight").is_number_integer());
                         const auto weight = entry.at("weight").get<std::int64_t>();
                         require_valid_catalog(weight >= 1 && weight <= maximum_variant_weight);
                         variant.weight = static_cast<unsigned>(weight);
-                    } else
-                        require_valid_catalog(entry.size() == 1);
+                    }
+                    if (metadata_required) {
+                        variant.id = entry.at("id").get<std::string>();
+                        variant.category = entry.at("category").get<std::string>();
+                        variant.subcategory = entry.value("subcategory", std::string{});
+                        variant.expression = entry.at("expression").get<std::string>();
+                        variant.fallback_expression =
+                            entry.value("fallback_expression", std::string{});
+                        require_valid_catalog(
+                            identifier(variant.id) && response_ids.insert(variant.id).second &&
+                            identifier(variant.category) &&
+                            (variant.subcategory.empty() || identifier(variant.subcategory)) &&
+                            expressions.contains(variant.expression) &&
+                            (variant.fallback_expression.empty() ||
+                             expressions.contains(variant.fallback_expression)));
+                    }
                 }
                 require_valid_catalog(presentation_text(variant.text, maximum_variant_bytes));
                 auto& variants = candidate.events[key];
@@ -381,10 +412,11 @@ LoadResult Messages::load_file(const std::filesystem::path& path) {
                 ++previous;
         }
         history_.clear();
-        return {false,
-                {},
-                "Personality file unavailable or invalid. Use UTF-8 JSON schema version 1 with "
-                "valid commentary pools; Vanilla remains available."};
+        return {
+            false,
+            {},
+            "Personality file unavailable or invalid. Use UTF-8 JSON schema version 1 or 2 with "
+            "valid commentary pools; Vanilla remains available."};
     }
 }
 std::vector<std::string> Messages::load_directory(const std::filesystem::path& directory) {
@@ -394,18 +426,26 @@ std::vector<std::string> Messages::load_directory(const std::filesystem::path& d
     std::vector<std::string> warnings;
     std::error_code error;
     std::vector<std::filesystem::path> files;
+    std::size_t visited = 0;
     for (std::filesystem::directory_iterator iterator(directory, error), end;
          !error && iterator != end; iterator.increment(error)) {
-        if (iterator->path().extension() == ".json")
-            files.push_back(iterator->path());
+        if (++visited > 512) {
+            warnings.push_back(
+                "Personality directory has too many entries; presentation disabled.");
+            return warnings;
+        }
+        const auto path = iterator->path();
+        if ((iterator->is_directory(error) && std::filesystem::exists(path / "personality.json")) ||
+            path.extension() == ".json")
+            files.push_back(path);
         if (files.size() > maximum_catalogs) {
-            warnings.push_back("Too many personality files; keep at most 32. Vanilla is available "
-                               "until the directory is corrected.");
+            catalogs_.clear();
+            warnings.push_back("Too many personalities; keep at most 32. Presentation disabled.");
             return warnings;
         }
     }
     if (error) {
-        warnings.push_back("Personality directory unavailable. Vanilla is the safe fallback.");
+        warnings.push_back("Personality directory unavailable. Presentation disabled.");
         return warnings;
     }
     std::sort(files.begin(), files.end());
@@ -413,7 +453,7 @@ std::vector<std::string> Messages::load_directory(const std::filesystem::path& d
         files.resize(maximum_catalogs);
     std::set<std::string> seen_ids;
     for (const auto& file : files) {
-        auto result = load_file(file);
+        auto result = std::filesystem::is_directory(file) ? load_package(file) : load_file(file);
         if (!result.ok)
             warnings.push_back(result.detail);
         else if (!seen_ids.insert(result.id).second) {
@@ -429,7 +469,23 @@ std::vector<Personality> Messages::personalities() const {
     std::vector<Personality> result;
     for (const auto& [id, catalog] : catalogs_)
         result.push_back(catalog);
+    std::sort(result.begin(), result.end(), [](const auto& a, const auto& b) {
+        return std::tie(a.order, a.id) < std::tie(b.order, b.id);
+    });
     return result;
+}
+const Personality* Messages::package(const std::string& id) const {
+    const auto found = catalogs_.find(id);
+    return found == catalogs_.end() ? nullptr : &found->second;
+}
+std::string Messages::resolve_selection(const std::string& requested) const {
+    if (catalogs_.contains(requested))
+        return requested;
+    for (const auto& id : {"default", "vanilla", "uwu"})
+        if (catalogs_.contains(id))
+            return id;
+    const auto items = personalities();
+    return items.empty() ? std::string{} : items.front().id;
 }
 bool Messages::available(const std::string& id) const {
     return id == "vanilla" || catalogs_.contains(id);
@@ -442,15 +498,47 @@ std::vector<Variant> Messages::variants(Message event, const std::string& id) co
     return pool == catalog->second.events.end() ? std::vector<Variant>{} : pool->second;
 }
 Copy Messages::show(Message event, const std::string& id, std::uint64_t occurrence) {
+    if (!history_.contains({event, id}) && history_.size() >= 512)
+        history_.clear();
     auto& history = history_[{event, id}];
     if (history.valid && history.occurrence == occurrence)
         return history.copy;
     Copy result{technical(event), {}, {}};
+    result.personality_id = id.empty() ? "" : available(id) ? id : "vanilla";
+    if (result.personality_id == "vanilla") {
+        result.response_id = "vanilla_" + event_id(event);
+        result.category = "technical";
+        result.expression = "idle";
+        switch (event) {
+        case Message::Invalid:
+        case Message::ScanFailed:
+            result.expression = "error";
+            break;
+        case Message::Disconnected:
+        case Message::Questionable:
+        case Message::Recovering:
+            result.expression = "concerned";
+            break;
+        case Message::Created:
+        case Message::Reconnected:
+        case Message::ScanCompleted:
+            result.expression = "happy";
+            break;
+        case Message::Source:
+        case Message::Destination:
+        case Message::BufferChanged:
+            result.expression = "thinking";
+            break;
+        default:
+            break;
+        }
+        result.fallback_expression = "idle";
+    }
     const auto pool = variants(event, id);
     if (id != "vanilla" && pool.empty())
         result.fallback_detail =
-            available(id) ? "No commentary for this event; Vanilla information shown."
-                          : "Selected personality unavailable; Vanilla information shown.";
+            available(id) ? "No optional commentary for this event; technical information shown."
+                          : "Selected personality unavailable; technical information shown.";
     unsigned total = 0;
     for (std::size_t index = 0; index < pool.size(); ++index)
         if (pool.size() == 1 || static_cast<int>(index) != history.last)
@@ -464,6 +552,11 @@ Copy Messages::show(Message event, const std::string& id, std::uint64_t occurren
                 continue;
             if (choice < pool[index].weight) {
                 result.commentary = pool[index].text;
+                result.response_id = pool[index].id;
+                result.category = pool[index].category;
+                result.subcategory = pool[index].subcategory;
+                result.expression = pool[index].expression;
+                result.fallback_expression = pool[index].fallback_expression;
                 history.last = static_cast<int>(index);
                 break;
             }

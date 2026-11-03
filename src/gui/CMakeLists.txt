@@ -29,12 +29,14 @@ install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
   "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION . COMPONENT Runtime)
 
 add_custom_target(audiohole_personality_files ALL
+  # Remove only obsolete source-owned flat catalogs from an incremental build's
+  # staging area. Fresh distributions contain folder packages, not both layouts.
+  COMMAND ${CMAKE_COMMAND} -E rm -f "$<TARGET_FILE_DIR:audiohole>/personalities/default.json" "$<TARGET_FILE_DIR:audiohole>/personalities/uwu.json"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/personalities" "$<TARGET_FILE_DIR:audiohole>/personalities"
   COMMENT "Stage editable personality files beside the GUI")
 add_dependencies(audiohole audiohole_personality_files)
-install(FILES "${PROJECT_SOURCE_DIR}/personalities/default.json"
-  "${PROJECT_SOURCE_DIR}/personalities/uwu.json" "${PROJECT_SOURCE_DIR}/personalities/README.md"
-  DESTINATION personalities COMPONENT Runtime)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/personalities/" DESTINATION personalities COMPONENT Runtime
+  FILES_MATCHING PATTERN "*.json" PATTERN "*.png" PATTERN "README.md")
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION . COMPONENT Runtime)
 
 # Original and ICO are embedded for offline/isolated launch; copies in the ZIP

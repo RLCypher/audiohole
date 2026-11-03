@@ -1,0 +1,1413 @@
+{
+  "schema_version": 2,
+  "id": "default",
+  "display_name": "Norm",
+  "events": {
+    "ready": [
+      {
+        "id": "default_ready_001",
+        "category": "status",
+        "text": "Alright. Let's wire this up.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_ready_002",
+        "category": "status",
+        "text": "A cable without the desk clutter.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "created": [
+      {
+        "id": "default_created_001",
+        "category": "status",
+        "text": "Another hole. Naturally.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_created_002",
+        "category": "status",
+        "text": "Room for one more connection.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "enabled": [
+      {
+        "id": "default_enabled_001",
+        "category": "status",
+        "text": "Hole's open.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_enabled_002",
+        "category": "status",
+        "text": "Ready for a connection.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "disabled": [
+      {
+        "id": "default_disabled_001",
+        "category": "status",
+        "text": "Hole's closed.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_disabled_002",
+        "category": "status",
+        "text": "Taking that one out of the plan.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "source": [
+      {
+        "id": "default_source_001",
+        "category": "status",
+        "text": "Source is connected.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_source_002",
+        "category": "status",
+        "text": "Found the input end.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "destination": [
+      {
+        "id": "default_destination_001",
+        "category": "status",
+        "text": "Output assigned.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_destination_002",
+        "category": "status",
+        "text": "That's the other end sorted.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "started": [
+      {
+        "id": "default_started_001",
+        "category": "status",
+        "text": "Signal's moving.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_started_002",
+        "category": "status",
+        "text": "The cable is connected.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "stopped": [
+      {
+        "id": "default_stopped_001",
+        "category": "status",
+        "text": "That's enough of that.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_stopped_002",
+        "category": "status",
+        "text": "Cable put away.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "duplex": [
+      {
+        "id": "default_duplex_001",
+        "category": "status",
+        "text": "Both ways. Ambitious.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_duplex_002",
+        "category": "status",
+        "text": "Two directions, one hole.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "activated": [
+      {
+        "id": "default_activated_001",
+        "category": "status",
+        "text": "New setup's in.",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_activated_002",
+        "category": "status",
+        "text": "A different arrangement of cables.",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      }
+    ],
+    "pending": [
+      {
+        "id": "default_pending_001",
+        "category": "status",
+        "text": "Holding that configuration.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_pending_002",
+        "category": "status",
+        "text": "Waiting for the appointed moment.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "reconnected": [
+      {
+        "id": "default_reconnected_001",
+        "category": "status",
+        "text": "Back where it belongs.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_reconnected_002",
+        "category": "status",
+        "text": "Plug found its way home.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "disconnected": [
+      {
+        "id": "default_disconnected_001",
+        "category": "status",
+        "text": "Someone pulled the plug.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_disconnected_002",
+        "category": "status",
+        "text": "One end went missing.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "signal": [
+      {
+        "id": "default_signal_001",
+        "category": "status",
+        "text": "Yep, something's coming in.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_signal_002",
+        "category": "status",
+        "text": "The input is busy.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "no_signal": [
+      {
+        "id": "default_no_signal_001",
+        "category": "status",
+        "text": "Nothing coming in yet.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_no_signal_002",
+        "category": "status",
+        "text": "Quiet at the input.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_ready": [
+      {
+        "id": "default_beep_ready_001",
+        "category": "status",
+        "text": "Let's check that output.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_beep_ready_002",
+        "category": "status",
+        "text": "Pick the output, then give it a beep.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_complete": [
+      {
+        "id": "default_beep_complete_001",
+        "category": "status",
+        "text": "That's the beep done.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_beep_complete_002",
+        "category": "status",
+        "text": "Did you hear that?",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_rejected": [
+      {
+        "id": "default_beep_rejected_001",
+        "category": "status",
+        "text": "Pick an output first.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_beep_rejected_002",
+        "category": "status",
+        "text": "Even a beep needs somewhere to go.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "questionable": [
+      {
+        "id": "default_questionable_001",
+        "category": "status",
+        "text": "I wouldn't, but it's your gear.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_questionable_002",
+        "category": "status",
+        "text": "Worth checking that cable loop.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "invalid": [
+      {
+        "id": "default_invalid_001",
+        "category": "status",
+        "text": "Skill issue. Try again.",
+        "weight": 1,
+        "expression": "confused",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_invalid_002",
+        "category": "status",
+        "text": "That value needs another look.",
+        "weight": 1,
+        "expression": "confused",
+        "fallback_expression": "idle"
+      }
+    ],
+    "recovering": [
+      {
+        "id": "default_recovering_001",
+        "category": "status",
+        "text": "Trying to get it back.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_recovering_002",
+        "category": "status",
+        "text": "Working on the missing connection.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa": [
+      {
+        "id": "default_dfa_001",
+        "category": "dfa",
+        "text": "DFA executed. Nothing happened.",
+        "weight": 3,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_002",
+        "category": "dfa",
+        "text": "Still doing absolutely nothing.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_003",
+        "category": "dfa",
+        "text": "Did that fix it?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_004",
+        "category": "dfa",
+        "text": "That should do it.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_005",
+        "category": "dfa",
+        "text": "Oughtta do the trick.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_006",
+        "category": "dfa",
+        "text": "A remarkably uneventful button.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_007",
+        "category": "dfa",
+        "text": "Try it now.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_008",
+        "category": "dfa",
+        "text": "How's that?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_009",
+        "category": "dfa",
+        "text": "Better? Thought so.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_010",
+        "category": "dfa",
+        "text": "That's the adjustment you were looking for.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_011",
+        "category": "dfa",
+        "text": "I've moved it a very professional amount.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_012",
+        "category": "dfa",
+        "text": "The placebo is now correctly aligned.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_013",
+        "category": "dfa",
+        "text": "I'll leave it there, then.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_014",
+        "category": "dfa",
+        "text": "Exactly as much improvement as before.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_015",
+        "category": "dfa",
+        "text": "Give that a go.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_016",
+        "category": "dfa",
+        "text": "One carefully calibrated non-adjustment.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_017",
+        "category": "dfa",
+        "text": "Right. Any better?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_018",
+        "category": "dfa",
+        "text": "I've taken the edge off the nothing.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_019",
+        "category": "dfa",
+        "text": "That's about as fixed as this button gets.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_020",
+        "category": "dfa",
+        "text": "Consider it professionally fiddled with.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_021",
+        "category": "dfa",
+        "text": "Same nothing, different confidence.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_022",
+        "category": "dfa",
+        "text": "Would you like a little more placebo?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_023",
+        "category": "dfa",
+        "text": "Nothing changed. With conviction.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "cancelled": [
+      {
+        "id": "default_cancelled_001",
+        "category": "status",
+        "text": "Changed your mind. Fair.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_cancelled_002",
+        "category": "status",
+        "text": "That's off the list.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "personality": [
+      {
+        "id": "default_personality_001",
+        "category": "status",
+        "text": "Same engineer, different commentary.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_personality_002",
+        "category": "status",
+        "text": "The cables didn't notice.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_started": [
+      {
+        "id": "default_scan_started_001",
+        "category": "status",
+        "text": "Let’s inspect the wiring.",
+        "weight": 1,
+        "expression": "working",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_started_002",
+        "category": "status",
+        "text": "Taking inventory of the plugs.",
+        "weight": 1,
+        "expression": "working",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_completed": [
+      {
+        "id": "default_scan_completed_001",
+        "category": "status",
+        "text": "Inspection complete. Clipboard down.",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_completed_002",
+        "category": "status",
+        "text": "That should cover the patch bay.",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_cancelled": [
+      {
+        "id": "default_scan_cancelled_001",
+        "category": "status",
+        "text": "Clipboard down.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_cancelled_002",
+        "category": "status",
+        "text": "Leaving that inspection unfinished.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_failed": [
+      {
+        "id": "default_scan_failed_001",
+        "category": "status",
+        "text": "Inspection did not finish.",
+        "weight": 1,
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_failed_002",
+        "category": "status",
+        "text": "That inspection needs another look.",
+        "weight": 1,
+        "expression": "error",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_minimum": [
+      {
+        "id": "default_dfa_minimum_001",
+        "category": "dfa",
+        "text": "Done fucking around.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_nice": [
+      {
+        "id": "default_dfa_nice_001",
+        "category": "dfa",
+        "text": "NICE!",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_dank": [
+      {
+        "id": "default_dfa_dank_001",
+        "category": "dfa",
+        "text": "DANK!",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_metal": [
+      {
+        "id": "default_dfa_metal_001",
+        "category": "dfa",
+        "text": "That's metal af.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_dfa_metal_002",
+        "category": "dfa",
+        "text": "Heavy metal. Still doing nothing.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_six_seven": [
+      {
+        "id": "default_dfa_six_seven_001",
+        "category": "dfa",
+        "text": "SIX SEVEN!",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_maximum": [
+      {
+        "id": "default_dfa_maximum_001",
+        "category": "dfa",
+        "text": "It goes louder now.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "buffer_changed": [
+      {
+        "id": "default_buffer_changed_001",
+        "category": "status",
+        "text": "A little timing adjustment. Apply when ready.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_buffer_changed_002",
+        "category": "status",
+        "text": "A little room to breathe. Apply when ready.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "simplex": [
+      {
+        "id": "default_simplex_001",
+        "category": "status",
+        "text": "One way it is.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_simplex_002",
+        "category": "status",
+        "text": "Keeping this connection pointed in one direction.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_saved": [
+      {
+        "id": "default_device_saved_001",
+        "category": "status",
+        "text": "Name on the patch sheet. Sorted.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_device_saved_002",
+        "category": "status",
+        "text": "Noted. Same device, clearer label.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_level_changed": [
+      {
+        "id": "default_scan_level_changed_001",
+        "category": "status",
+        "text": "Choosing how closely to inspect the wiring.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_level_changed_002",
+        "category": "status",
+        "text": "Inspection depth set. Clipboard ready.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "scan_scope_changed": [
+      {
+        "id": "default_scan_scope_changed_001",
+        "category": "status",
+        "text": "That's the patch bay we're checking.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_scan_scope_changed_002",
+        "category": "status",
+        "text": "Inspection boundaries set.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_copied": [
+      {
+        "id": "default_diagnostics_copied_001",
+        "category": "status",
+        "text": "Clipboard loaded. The other kind.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_diagnostics_copied_002",
+        "category": "status",
+        "text": "A little paperwork to take with you.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_exported": [
+      {
+        "id": "default_diagnostics_exported_001",
+        "category": "status",
+        "text": "Paper trail filed.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_diagnostics_exported_002",
+        "category": "status",
+        "text": "Evidence packed and ready.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "diagnostics_cleared": [
+      {
+        "id": "default_diagnostics_cleared_001",
+        "category": "status",
+        "text": "Clean slate. Same cables.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_diagnostics_cleared_002",
+        "category": "status",
+        "text": "Fresh page in the logbook.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_101": [
+      {
+        "id": "default_dfa_101_001",
+        "category": "dfa",
+        "text": "Have you tried reading the documentation?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_121": [
+      {
+        "id": "default_dfa_121_001",
+        "category": "dfa",
+        "text": "Great Scott! 1.21 gigawatts!",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_134": [
+      {
+        "id": "default_dfa_134_001",
+        "category": "dfa",
+        "text": "Skill issue.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_222": [
+      {
+        "id": "default_dfa_222_001",
+        "category": "dfa",
+        "text": "That's a little too much.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_256": [
+      {
+        "id": "default_dfa_256_001",
+        "category": "dfa",
+        "text": "All 256 possibilities, and you chose this.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_300": [
+      {
+        "id": "default_dfa_300_001",
+        "category": "dfa",
+        "text": "Make up your mind.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_314": [
+      {
+        "id": "default_dfa_314_001",
+        "category": "dfa",
+        "text": "A La Mode Enabled",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_333": [
+      {
+        "id": "default_dfa_333_001",
+        "category": "dfa",
+        "text": "Diet Satan.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_401": [
+      {
+        "id": "default_dfa_401_001",
+        "category": "dfa",
+        "text": "You're not authorized to fuck around.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_403": [
+      {
+        "id": "default_dfa_403_001",
+        "category": "dfa",
+        "text": "Fuck around privileges revoked.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_404": [
+      {
+        "id": "default_dfa_404_001",
+        "category": "dfa",
+        "text": "This is not the DFA you're looking for.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_409": [
+      {
+        "id": "default_dfa_409_001",
+        "category": "dfa",
+        "text": "You have a conflict of interest. And audio devices.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_410": [
+      {
+        "id": "default_dfa_410_001",
+        "category": "dfa",
+        "text": "It was here a minute ago.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_413": [
+      {
+        "id": "default_dfa_413_001",
+        "category": "dfa",
+        "text": "Your hole isn't big enough.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_418": [
+      {
+        "id": "default_dfa_418_001",
+        "category": "dfa",
+        "text": "I'm a teapot.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_429": [
+      {
+        "id": "default_dfa_429_001",
+        "category": "dfa",
+        "text": "You're fucking around too fast.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_451": [
+      {
+        "id": "default_dfa_451_001",
+        "category": "dfa",
+        "text": "It was a pleasure to burn.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_500": [
+      {
+        "id": "default_dfa_500_001",
+        "category": "dfa",
+        "text": "Internal server error. Have you tried turning yourself off and on again?",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_503": [
+      {
+        "id": "default_dfa_503_001",
+        "category": "dfa",
+        "text": "Currently unavailable. Emotionally, mostly.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_621": [
+      {
+        "id": "default_dfa_621_001",
+        "category": "dfa",
+        "text": "I know what you are. (￣︿￣)",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_707": [
+      {
+        "id": "default_dfa_707_001",
+        "category": "dfa",
+        "text": "Drum machine detected.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_777": [
+      {
+        "id": "default_dfa_777_001",
+        "category": "dfa",
+        "text": "Jackpot.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_808": [
+      {
+        "id": "default_dfa_808_001",
+        "category": "dfa",
+        "text": "808s and heartbreak.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_909": [
+      {
+        "id": "default_dfa_909_001",
+        "category": "dfa",
+        "text": "Four on the floor.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_911": [
+      {
+        "id": "default_dfa_911_001",
+        "category": "dfa",
+        "text": "Sir, a second audio stream has hit the buffer.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_1024": [
+      {
+        "id": "default_dfa_1024_001",
+        "category": "dfa",
+        "text": "That's a whole kibibyte of fuckery.",
+        "weight": 1,
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_negative": [
+      {
+        "id": "default_dfa_negative_001",
+        "category": "dfa",
+        "text": "NEGATIVE FUCK.",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "dfa_above_maximum": [
+      {
+        "id": "default_dfa_above_maximum_001",
+        "category": "dfa",
+        "text": "Too much fucking around.",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "bother": [
+      {
+        "id": "default_bother_001",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Hello. Yes, the coffee is load-bearing.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_002",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Can I help you, or are we testing the structural integrity of my patience?",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_003",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Still here. The headphones aren't a privacy policy.",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_004",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "That's a click. Very convincing. Got anything with a waveform?",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_005",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "If you need a cable, ask. If you need emotional support, the case has wheels.",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_006",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Repeated clicking does not qualify as a percussion performance.",
+        "expression": "bored",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_007",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "You've found the engineer. Management remains unavailable.",
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_008",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "I can hear you looking at the wrong output device.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_009",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "The coffee is hot, the routing is complicated, and somehow you're clicking me.",
+        "expression": "confused",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_010",
+        "category": "bother",
+        "subcategory": "general",
+        "text": "Fine. You have my attention. Please use it more efficiently than that buffer.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_011",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A smaller buffer can reduce buffering latency, but it gives the system less time to recover from scheduling delays.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_012",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A larger buffer can reduce dropouts at the cost of more buffering latency. It doesn't repair a disconnected endpoint.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_013",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Capture is the source side; playback is the destination side. Device names don't always make that obvious.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_014",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A shared sample rate does not prove two devices share a clock. Independent hardware can still drift.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_015",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Exclusive access can prevent another application from opening the same endpoint. Check who else is using it.",
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_016",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Silence is not proof of disconnection. The source may simply have nothing to say.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_017",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "Source activity does not prove the destination is audible. Check its selection, mute state and volume too.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_018",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A listed format is reported capability information. It is not the same as a successful stream test.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_019",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "A duplex hole has two directions. Check both source and destination assignments when only one direction works.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_020",
+        "category": "bother",
+        "subcategory": "tips",
+        "text": "This preview's Test Beep is silent simulation. Use a real Windows playback test when checking your physical speakers.",
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_021",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "Great Scott. Somebody gave the patch bay a flux capacitor.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_022",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "There are four lights. None of them is a clipping indicator.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_023",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "The cake is a balanced output. Still a lie.",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_024",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "These go to eleven. My tolerance doesn't.",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_025",
+        "category": "bother",
+        "subcategory": "easter_egg",
+        "text": "Have you tried turning the coffee off and on again? Don't. That's how we lose people.",
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_026",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Completely fabricated fact: the moon is a retired volume knob.",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_027",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Made-up fact: every seventh pigeon contains a tiny patch bay.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_028",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Fictional discovery: socks migrate through bass ports every Thursday.",
+        "expression": "confused",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_029",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Invented fact: clouds are upholstered flight cases for exhausted thunderstorms.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_030",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "Entirely fictional fact: the first cable tie was elected mayor of Neptune.",
+        "expression": "deadpan",
+        "fallback_expression": "idle"
+      }
+    ]
+  }
+}

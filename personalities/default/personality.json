@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "api_version": 1,
+  "id": "default",
+  "display_name": "Norm",
+  "character_name": "Norm",
+  "description": "Norm commentary and local interactions.",
+  "order": 0,
+  "dialogue": {
+    "responses": "dialogue/responses.json",
+    "dfa": "dialogue/responses.json",
+    "bother": "dialogue/responses.json"
+  },
+  "avatar": {
+    "registry": "avatar/registry.json",
+    "manifest": "avatar/pack/manifest.json"
+  },
+  "expressions": [
+    "idle",
+    "happy",
+    "thinking",
+    "working",
+    "talking",
+    "confused",
+    "concerned",
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping",
+    "smug",
+    "embarrassed",
+    "laughing",
+    "suspicious",
+    "panicking",
+    "bored",
+    "mischievous",
+    "deadpan"
+  ],
+  "preview_image": "preview/placeholder.png"
+}

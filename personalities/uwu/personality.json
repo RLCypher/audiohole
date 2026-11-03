@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "api_version": 1,
+  "id": "uwu",
+  "display_name": "UwU",
+  "character_name": "Horu",
+  "description": "Horu commentary and local interactions.",
+  "order": 20,
+  "dialogue": {
+    "responses": "dialogue/responses.json",
+    "dfa": "dialogue/responses.json",
+    "bother": "dialogue/responses.json"
+  },
+  "avatar": {
+    "registry": "avatar/registry.json",
+    "manifest": "avatar/pack/manifest.json"
+  },
+  "expressions": [
+    "idle",
+    "happy",
+    "thinking",
+    "working",
+    "talking",
+    "confused",
+    "concerned",
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping",
+    "smug",
+    "embarrassed",
+    "laughing",
+    "suspicious",
+    "panicking",
+    "bored",
+    "mischievous",
+    "deadpan"
+  ]
+}

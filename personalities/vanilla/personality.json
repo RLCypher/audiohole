@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "api_version": 1,
+  "id": "vanilla",
+  "display_name": "Vanilla — Strictly informational",
+  "character_name": "",
+  "description": "Technical information only.",
+  "order": 10,
+  "dialogue": {
+    "builtin_technical": true
+  },
+  "avatar": {
+    "registry": "avatar/registry.json",
+    "manifest": "avatar/pack/manifest.json"
+  },
+  "expressions": [
+    "idle",
+    "happy",
+    "thinking",
+    "working",
+    "talking",
+    "confused",
+    "concerned",
+    "error",
+    "angry",
+    "surprised",
+    "celebrating",
+    "sleeping"
+  ],
+  "preview_image": "preview/logo.png"
+}
