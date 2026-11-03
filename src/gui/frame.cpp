@@ -792,6 +792,7 @@ bool Frame::smoke(const wxString& directory) {
         };
         await_avatar();
         const auto draft_before_menu = draft_;
+        const auto routing_before_menu = controller_->snapshot();
         const auto menu_revision = controller_->snapshot().revision;
         auto profile_context = profile_menu(viewed_);
         require(profile_context->FindItem(wxID_EDIT) && profile_context->FindItem(wxID_DUPLICATE) &&
@@ -813,11 +814,24 @@ bool Frame::smoke(const wxString& directory) {
                     draft_.holes.back().forward == original_hole.forward &&
                     draft_.holes.back().reverse == original_hole.reverse,
                 "Duplicating a hole reused its identity or changed directional configuration");
+        const auto& after_navigation = controller_->snapshot();
+        require(after_navigation.state == routing_before_menu.state &&
+                    after_navigation.armed == routing_before_menu.armed &&
+                    after_navigation.active_profile == routing_before_menu.active_profile &&
+                    after_navigation.pending_profile == routing_before_menu.pending_profile &&
+                    after_navigation.profiles == routing_before_menu.profiles &&
+                    after_navigation.paths.size() == routing_before_menu.paths.size(),
+                "Contextual hole editing changed routing or saved profiles");
+        // Adding/selecting a hole stops passive observation, which legitimately
+        // advances the controller revision. Measure rename from its own start.
+        const auto rename_revision = after_navigation.revision;
         rename_hole("Context-renamed hole");
-        require(draft_.holes.back().id == duplicate_id &&
-                    hole_heading_->GetLabel() == "Context-renamed hole" &&
-                    controller_->snapshot().revision == menu_revision,
-                "Contextual hole rename changed identity or live state");
+        require(draft_.holes.back().id == duplicate_id,
+                "Contextual hole rename changed its logical identity");
+        require(hole_heading_->GetLabel() == "Context-renamed hole",
+                "Contextual hole rename did not update the editor heading");
+        require(controller_->snapshot().revision == rename_revision,
+                "Contextual hole rename changed controller state");
         draft_ = draft_before_menu;
         dirty_ = dirty_before_menu;
         load_holes();

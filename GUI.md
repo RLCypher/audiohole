@@ -1803,3 +1803,9 @@ Local verification for this refinement: 118/118 portable tests pass in Debug and
 Release, including sleep timing/identity/fallback tests; the Windows GUI and model
 test cross-builds pass. Native smoke assertions for the new profile layout and
 context actions are compiled but have not been executed in this Linux workspace.
+
+Windows Debug CI at `5e900a1` subsequently compiled and passed 126/127 tests. The
+remaining GUI smoke assertion incorrectly measured rename's revision from before
+hole navigation, which stops passive observation and advances the revision. The
+check now measures rename independently and separately verifies that navigation
+preserves routing and saved profiles. Its native rerun remains pending.
