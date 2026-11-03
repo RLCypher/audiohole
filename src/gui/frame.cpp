@@ -3,6 +3,7 @@
 #include "model/application_controller.h"
 #include "model/configuration_controller.h"
 #include "presentation/text_layout.h"
+#include <cstdio>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
@@ -632,15 +633,24 @@ bool Frame::smoke(const wxString& directory) {
                 "Kaomoji split across native wrapped lines");
         layout_header();
         const auto await_avatar = [this, &require] {
+            // Smoke runs synchronously on the GUI thread: no timer event can
+            // consume the worker's completed load until we explicitly poll it.
+            const auto revision = controller_->snapshot().revision;
             const auto deadline = avatar::monotonic_ms() + 8000;
             while (avatar::monotonic_ms() < deadline) {
                 poll_avatar();
                 const auto& frame = agent_display_->presentation();
-                if (frame.image && frame.personality == personality_)
+                if (frame.image && frame.personality == personality_) {
+                    require(controller_->snapshot().revision == revision,
+                            "Waiting for avatar loading advanced controller state");
                     return;
+                }
                 wxMilliSleep(5);
             }
-            require(false, "Avatar failed to load the selected owned pack");
+            std::string detail = "Avatar failed to load the selected owned pack: " + personality_;
+            for (const auto& diagnostic : agent_display_->presentation().diagnostics)
+                detail += "\n" + diagnostic;
+            throw std::runtime_error(detail);
         };
         await_avatar();
         const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
@@ -764,6 +774,9 @@ bool Frame::smoke(const wxString& directory) {
         layout_header();
         require(occurrence_ == resize_occurrence, "Resizing reselected personality commentary");
         require(status_dot_->IsShown(), "Routing status indicator missing");
+        // The warning/Bother checks above switched packs after the first wait.
+        // Resizing does not tick playback or publish the newly loaded frame.
+        await_avatar();
         require(static_cast<bool>(agent_display_->presentation().image) &&
                     canonical_logo().HasAlpha(),
                 "Agent logo or transparency missing");
@@ -1054,10 +1067,14 @@ bool Frame::smoke(const wxString& directory) {
         }
         return true;
     } catch (const std::exception& e) {
+        // CTest captures stderr even for the Windows GUI executable. Keep the
+        // assertion in its failed-test output as well as the downloadable file.
+        std::fprintf(stderr, "GUI smoke FAIL: %s\n", e.what());
+        std::fflush(stderr);
         if (!directory.empty()) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             std::ofstream out(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt");
-            out << "FAIL: " << e.what();
+            out << "FAIL: " << e.what() << '\n';
         }
         return false;
     }

@@ -129,3 +129,16 @@ checks including unexpected-executable rejection and staging cleanup. Native GUI
 WIC pixel comparison and extracted-ZIP execution are registered CI gates, not
 claimed local executions. Branch:work. Kaomoji fix:3c6ef7a; original PR6 import:1385b3f;
 owned-package relocation:e024de6; the final host-wiring commit follows those.
+
+## GUI smoke synchronization follow-up
+
+The owner's Windows Release log reports 111/112 tests passing, including the
+native avatar engine, WIC pixel comparison and Test Mode GUI smoke. Preview GUI
+smoke failed without printing its assertion. Inspection found that its warning
+and Bother checks switch packs after the initial avatar wait, clearing the panel;
+the later image assertion ran before the GUI-thread poll published the new load.
+The smoke test now waits for the selected identity again before that assertion,
+checks that waiting never advances controller state, and prints failures and load
+diagnostics to stderr as well as `smoke-result.txt`. Production loading remains
+asynchronous. The follow-up cross-build and seven focused avatar/layout tests pass
+locally; a new native Windows run is still required to confirm GUI smoke passes.
