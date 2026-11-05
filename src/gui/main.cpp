@@ -3,6 +3,7 @@
 #include "model/configuration_controller.h"
 #include <cstdio>
 #include <cstdlib>
+#include <shobjidl.h>
 #include <string_view>
 #include <wx/stdpaths.h>
 
@@ -80,6 +81,7 @@ class App final : public wxApp {
         bool smoke = false, test_mode_smoke = false;
         wxString screenshot_dir;
         DWORD restart_parent = 0;
+        std::optional<ShellAction> shell_action;
         for (int i = 1; i < argc; ++i) {
             if (wxString(argv[i]) == "--smoke-test")
                 smoke = true;
@@ -87,12 +89,28 @@ class App final : public wxApp {
                 smoke = test_mode_smoke = true;
             else if (wxString(argv[i]) == "--screenshot-dir" && i + 1 < argc)
                 screenshot_dir = argv[++i];
-            else if (wxString(argv[i]) == "--restart-after" && i + 1 < argc) {
+            else if (wxString(argv[i]) == "--taskbar-action" && i + 1 < argc && !shell_action) {
+                shell_action = parse_shell_action(wxString(argv[++i]).ToStdWstring());
+                if (!shell_action)
+                    return false;
+            } else if (wxString(argv[i]) == "--restart-after" && i + 1 < argc) {
                 unsigned long value = 0;
                 if (!wxString(argv[++i]).ToULong(&value) || value == 0)
                     return false;
                 restart_parent = static_cast<DWORD>(value);
             } else
+                return false;
+        }
+        if (shell_action) {
+            if (smoke || restart_parent)
+                return false;
+            if (const auto existing = find_application_window()) {
+                (void)forward_shell_action(existing, *shell_action);
+                return false;
+            }
+            // Persisted shell tasks do not authorize a fresh routing session.
+            // Only Open / Controls may launch the ordinary startup workflow.
+            if (*shell_action != ShellAction::Open && *shell_action != ShellAction::Controls)
                 return false;
         }
         if (restart_parent && !wait_for_restart_parent(restart_parent)) {
@@ -124,6 +142,7 @@ class App final : public wxApp {
             return false;
         }
         if (!smoke) {
+            (void)SetCurrentProcessExplicitAppUserModelID(shell_app_id);
             instance_ = std::make_unique<wxSingleInstanceChecker>("AudioHole-simulated-GUI-" +
                                                                   wxGetUserId());
             if (instance_->IsAnotherRunning()) {
@@ -213,6 +232,8 @@ class App final : public wxApp {
         });
         SetTopWindow(frame);
         frame->Show();
+        if (shell_action == ShellAction::Controls)
+            frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::Controls); });
         if (smoke)
             CallAfter([this, frame, screenshot_dir] {
                 result_ = frame->smoke(screenshot_dir) ? 0 : 1;

@@ -87,3 +87,10 @@ assets/manifests are deployed inside the selected personality package.
 The two Devices lists, hidden-device behavior, evidence projections, scan scopes,
 limits, consent, storage and cancellation contracts are documented in
 [SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md).
+
+`Frame::shell_menu` is shared by the tray and taskbar Controls task. The flat
+Windows Jump List also offers Close/Exit and available routing tasks directly.
+`shell_actions` owns Windows COM Jump List construction and a bounded fixed-action
+relay to the existing GUI; it never creates a backend in the relay process.
+The native window menu exposes Controls/Exit too. See TRAY.md and the manual
+checklist for shell behavior, lifecycle and validation limits.

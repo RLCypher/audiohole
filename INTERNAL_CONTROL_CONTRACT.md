@@ -149,3 +149,13 @@ The PR6 integration is now implemented by presentation::AvatarHost; the precedin
 future-adapter discussion describes its original design stage. See
 [AVATAR_INTEGRATION.md](AVATAR_INTEGRATION.md) for actual hooks, owned roots,
 priorities, lifecycle, platform patches and remaining native verification.
+
+## Private Windows shell adapter
+
+The owner-requested taskbar tasks use the existing GUI actions and shared tray menu.
+A short-lived `--taskbar-action` invocation relays one fixed enum through bounded
+WM_COPYDATA admission to the existing GUI, which queues execution on its control
+thread. No profile data, executable code, file paths or JSON command payloads are
+accepted by that message. Disabled backend capabilities are rechecked at admission
+and execution. This adds no public transport, production schema, routing engine or
+permission to start routing after a session has exited. See TRAY.md.

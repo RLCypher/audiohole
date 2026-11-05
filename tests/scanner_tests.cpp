@@ -29,18 +29,24 @@ struct Register { Register(const char* name, void(*body)()) { tests().emplace_ba
 
 std::string bytes(const fs::path& path) {
   std::ifstream in(path, std::ios::binary);
-  return std::string(std::istreambuf_iterator<char>(in), {});
+  if (!in) throw std::runtime_error("Cannot open fixture file: " + path_utf8(path));
+  const std::string result(std::istreambuf_iterator<char>(in), {});
+  if (in.bad()) throw std::runtime_error("Cannot read fixture file: " + path_utf8(path));
+  return result;
 }
 Json read(const fs::path& path) { return Json::parse(bytes(path)); }
 void write(const fs::path& path, const Json& data) {
   fs::create_directories(path.parent_path());
-  std::ofstream(path, std::ios::binary) << data.dump(2) << '\n';
+  std::ofstream out(path, std::ios::binary);
+  out << data.dump(2) << '\n'; out.flush();
+  if (!out) throw std::runtime_error("Cannot write fixture file: " + path_utf8(path));
 }
 // The suite nests six cases, renamed Unicode records, reports and atomic-write
 // suffixes under this root. Use extended Windows paths so runner-specific TEMP
 // lengths cannot prevent the fixture from reaching the behavior under test.
 fs::path fixture_root() {
-  const auto path = fs::absolute(fs::temp_directory_path() / new_logical_id("audiohole-tests"));
+  auto path = fs::absolute(fs::temp_directory_path() / new_logical_id("audiohole-tests"));
+  path.make_preferred();
 #ifdef _WIN32
   const auto native = path.native();
   if (native.starts_with(L"\\\\?\\")) return path;
@@ -157,7 +163,7 @@ TEST(missing_devices_remain_and_reconnect) {
   const auto original = bytes(f.files()[0]);
   CHECK(f.store.reconcile(discovery({}), second).result == "completed");
   CHECK(bytes(f.files()[0]) == original);
-  auto summary = read(f.portable / "devices/playback_devices.json");
+  auto summary = read(f.portable / "devices" / "playback_devices.json");
   CHECK(summary["devices"][0]["availability"] == "not_present");
   CHECK(f.store.reconcile(discovery({endpoint()}), second).result == "completed");
   CHECK(f.files().size() == 1);
@@ -195,7 +201,7 @@ TEST(multiple_endpoints_claiming_one_record_are_rejected) {
 }
 TEST(malformed_record_blocks_updates) {
   Fixture f;
-  const auto bad = f.portable / "devices/playback/Broken.json";
+  const auto bad = f.portable / "devices" / "playback" / "Broken.json";
   fs::create_directories(bad.parent_path()); std::ofstream(bad) << "{ broken";
   const auto report = f.store.reconcile(discovery({endpoint()}), first);
   CHECK(report.result == "failed"); CHECK(report.saved == 0);
@@ -211,7 +217,7 @@ TEST(duplicate_logical_ids_block_updates) {
 }
 TEST(partial_record_preserves_unknown_fields) {
   Fixture f;
-  const auto path = f.portable / "devices/playback/Imported.json";
+  const auto path = f.portable / "devices" / "playback" / "Imported.json";
   write(path, {{"device_name", "Imported"}, {"logical_id", "imported-id"},
                {"identity", {{"direction", "render"}}}, {"metadata", {{"schema_version", 2}}},
                {"custom", Json::array({1, "unchanged"})}});
@@ -222,7 +228,7 @@ TEST(partial_record_preserves_unknown_fields) {
 }
 TEST(legacy_schema_migration_retains_attempt_semantics) {
   Fixture f;
-  const auto path = f.portable / "devices/playback/Legacy.json";
+  const auto path = f.portable / "devices" / "playback" / "Legacy.json";
   Json legacy{{"windows_name", "Old Windows name"}, {"notes", "Leave alone"},
     {"identity", {{"logical_id", "permanent-id"}, {"direction", "render"}}},
     {"scan_history", {{"first_scanned", first}, {"last_scanned", second}, {"last_scan_result", "interrupted"}}},
@@ -239,7 +245,7 @@ TEST(legacy_schema_migration_retains_attempt_semantics) {
 }
 TEST(conflicting_legacy_fields_are_not_guessed) {
   Fixture f;
-  const auto path = f.portable / "devices/playback/Legacy.json";
+  const auto path = f.portable / "devices" / "playback" / "Legacy.json";
   write(path, {{"windows_name", "Old"}, {"device_name", "Conflicting"},
     {"identity", {{"logical_id", "id"}, {"direction", "render"}}}, {"metadata", {{"schema_version", 1}}}});
   const auto original = bytes(path);
@@ -248,7 +254,7 @@ TEST(conflicting_legacy_fields_are_not_guessed) {
 }
 TEST(future_schema_is_never_rewritten) {
   Fixture f;
-  const auto path = f.portable / "devices/playback/Future.json";
+  const auto path = f.portable / "devices" / "playback" / "Future.json";
   write(path, {{"metadata", {{"schema_version", 99}}}, {"new_data", true}});
   const auto original = bytes(path);
   CHECK(f.store.reconcile(discovery({endpoint()}), first).result == "failed");
@@ -380,7 +386,7 @@ TEST(unicode_names_and_notes_round_trip) {
 }
 TEST(duplicate_json_keys_block_updates) {
   Fixture f;
-  const auto path = f.portable / "devices/playback/Bad.json";
+  const auto path = f.portable / "devices" / "playback" / "Bad.json";
   fs::create_directories(path.parent_path());
   std::ofstream(path) << "{\"logical_id\":\"one\",\"logical_id\":\"two\"}";
   const auto original = bytes(path);
@@ -426,7 +432,7 @@ TEST(partial_discovery_retains_previous_completed_timestamp) {
 }
 TEST(corrupt_summary_regenerates_without_losing_records) {
   Fixture f; f.store.reconcile(discovery({endpoint()}), first);
-  const auto summary = f.portable / "devices/playback_devices.json";
+  const auto summary = f.portable / "devices" / "playback_devices.json";
   std::ofstream(summary) << "corrupted generated view";
   CHECK(f.store.reconcile(discovery({endpoint()}), second).result == "completed");
   CHECK(read(summary)["devices"].size() == 1);
@@ -489,7 +495,7 @@ TEST(utility_outputs_json_and_detailed_debug_text) {
   const auto first_run = run_scan_utility(options, factory);
   CHECK(first_run.report.result == "completed");
   CHECK(read(first_run.report_json)["result"] == "completed");
-  CHECK(fs::exists(options.portable_root / "devices/playback/Speakers.json"));
+  CHECK(fs::exists(options.portable_root / "devices" / "playback" / "Speakers.json"));
   const auto log = bytes(first_run.debug_log);
   CHECK(log.find("endpoint-one") != std::string::npos);
   CHECK(log.find("0x88890008") != std::string::npos);
@@ -632,7 +638,7 @@ TEST(deep_checkpoints_preserve_notes_extensions_and_unverified_signal) {
   CHECK(attempt["stages"].size() == 1);
   const auto path = f.portable / "probe_history" / (attempt["attempt_id"].get<std::string>() + ".json");
   CHECK(read(path)["classification"] == "verified");
-  CHECK(read(f.portable / "devices/playback_devices.json")["devices"][0]["probed_capabilities"] == updated["probed_capabilities"]);
+  CHECK(read(f.portable / "devices" / "playback_devices.json")["devices"][0]["probed_capabilities"] == updated["probed_capabilities"]);
 }
 TEST(deep_denied_consent_never_runs_worker) {
   Fixture f; f.store.reconcile(discovery({probe_endpoint()}), first);
@@ -956,7 +962,7 @@ TEST(automated_suite_detects_note_corruption_in_its_test_copy) {
     [] { return std::make_unique<FakeProbeRunner>(); }, true, {}, [&](const Progress& p) {
       if (modified || p.phase != "suite_phase_started" || p.details.value("label", "") != "rescan-after-filename-and-notes-edits") return;
       for (const auto& run : fs::directory_iterator(options.output_parent)) {
-        const auto dir = run.path() / "full-basic" / "portable/devices/recording";
+        const auto dir = run.path() / "full-basic" / "portable" / "devices" / "recording";
         if (!fs::exists(dir)) continue;
         for (const auto& entry : fs::directory_iterator(dir)) if (entry.path().extension() == ".json") {
           auto data = read(entry.path()); data["notes"] = "Corruption injected by the development test"; write(entry.path(), data); modified = true; break;

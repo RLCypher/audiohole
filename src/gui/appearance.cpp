@@ -129,6 +129,28 @@ void Frame::update_status_indicator() {
     status_dot_->Refresh();
 }
 WXLRESULT Frame::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    if (message == WM_COPYDATA && controller_) {
+        const auto action = decode_shell_action(reinterpret_cast<const COPYDATASTRUCT*>(lparam));
+        if (!action || IsBeingDeleted())
+            return FALSE;
+        if ((*action == ShellAction::Start || *action == ShellAction::Stop) &&
+            !controller_->snapshot().capabilities.routing)
+            return FALSE;
+        // Acknowledge admission before running a menu or beginning shutdown, so
+        // Explorer's short-lived relay never waits for UI/worker cleanup.
+        CallAfter([this, action = *action] { perform_shell_action(action); });
+        return TRUE;
+    }
+    if (message == WM_SYSCOMMAND) {
+        const auto command = static_cast<UINT>(wparam) & 0xFFF0;
+        if (command == shell_controls_command || command == shell_exit_command) {
+            CallAfter([this, command] {
+                perform_shell_action(command == shell_controls_command ? ShellAction::Controls
+                                                                       : ShellAction::Exit);
+            });
+            return 0;
+        }
+    }
     const auto result = wxFrame::MSWWindowProc(message, wparam, lparam);
     if (message == WM_DEVICECHANGE && !smoke_ && controller_ &&
         controller_->snapshot().scanner.available) {

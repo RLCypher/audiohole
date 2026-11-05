@@ -185,6 +185,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         event.Skip();
     });
     tray_ = std::make_unique<Tray>(*this);
+    initialize_shell_controls();
     Bind(
         wxEVT_TIMER,
         [this](wxTimerEvent&) {
@@ -674,6 +675,40 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        {
+            auto menu = shell_menu();
+            const int close = menu->FindItem("Close window"),
+                      exit = menu->FindItem("Exit AudioHole");
+            const int start = menu->FindItem("Start Routing"),
+                      stop = menu->FindItem("Stop Routing");
+            require(close != wxNOT_FOUND && exit != wxNOT_FOUND,
+                    "Shared shell menu lacks separate Close and Exit actions");
+            require(start != wxNOT_FOUND && stop != wxNOT_FOUND &&
+                        menu->IsEnabled(start) == controller_->snapshot().capabilities.routing &&
+                        menu->IsEnabled(stop) == controller_->snapshot().capabilities.routing,
+                    "Taskbar/tray routing availability differs from the backend");
+            require(menu->FindItem("Activate profile") != wxNOT_FOUND &&
+                        menu->FindItem("Direction states (read-only)") != wxNOT_FOUND,
+                    "Shared shell menu lost profile or direction controls");
+            const auto system = GetSystemMenu(static_cast<HWND>(GetHandle()), FALSE);
+            require(system &&
+                        GetMenuState(system, shell_controls_command, MF_BYCOMMAND) !=
+                            static_cast<UINT>(-1) &&
+                        GetMenuState(system, shell_exit_command, MF_BYCOMMAND) !=
+                            static_cast<UINT>(-1),
+                    "Native window menu lacks AudioHole controls or Exit");
+            const auto revision = controller_->snapshot().revision;
+            std::uint32_t invalid = 999;
+            COPYDATASTRUCT packet{shell_message_tag, sizeof(invalid), &invalid};
+            require(SendMessageW(static_cast<HWND>(GetHandle()), WM_COPYDATA, 0,
+                                 reinterpret_cast<LPARAM>(&packet)) == FALSE,
+                    "Shell relay accepted an unknown action");
+            packet.cbData = 0;
+            require(SendMessageW(static_cast<HWND>(GetHandle()), WM_COPYDATA, 0,
+                                 reinterpret_cast<LPARAM>(&packet)) == FALSE &&
+                        controller_->snapshot().revision == revision,
+                    "Malformed shell request changed the controller");
+        }
         const auto check_profile_layout = [this, &require] {
             auto* page = notebook_->GetPage(0);
             page->Layout();

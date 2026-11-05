@@ -24,7 +24,10 @@ void Tray::update(const audiohole::Snapshot& s) {
     tooltip_ = tip;
 }
 wxMenu* Tray::CreatePopupMenu() {
-    const auto& s = frame_.controller().snapshot();
+    return frame_.shell_menu().release(); // wxTaskBarIcon takes ownership.
+}
+std::unique_ptr<wxMenu> Frame::shell_menu() {
+    const auto& s = controller_->snapshot();
     auto* menu = new wxMenu;
     menu->Append(wxID_ANY, text(std::string{} + audiohole::name(s.state)))->Enable(false);
     auto add = [menu](const wxString& title, std::function<void()> action, bool enabled = true) {
@@ -32,14 +35,12 @@ wxMenu* Tray::CreatePopupMenu() {
         menu->Append(id, title)->Enable(enabled);
         menu->Bind(wxEVT_MENU, [action](wxCommandEvent&) { action(); }, id);
     };
-    add("Open AudioHole", [this] { frame_.open(); });
-    add("Start Routing", [this] { frame_.tray_start(); }, s.capabilities.routing);
+    add("Open AudioHole", [this] { perform_shell_action(ShellAction::Open); });
     add(
-        "Stop Routing",
-        [this] {
-            frame_.controller().stop();
-            frame_.refresh();
-        },
+        "Start Routing", [this] { perform_shell_action(ShellAction::Start); },
+        s.capabilities.routing);
+    add(
+        "Stop Routing", [this] { perform_shell_action(ShellAction::Stop); },
         s.capabilities.routing);
     auto* profiles = new wxMenu;
     for (const auto& p : s.profiles) {
@@ -47,8 +48,7 @@ wxMenu* Tray::CreatePopupMenu() {
         auto* item = profiles->AppendRadioItem(id, text(p.display_name));
         item->Check(p.id == s.active_profile);
         item->Enable(s.capabilities.routing);
-        profiles->Bind(
-            wxEVT_MENU, [this, key = p.id](wxCommandEvent&) { frame_.tray_activate(key); }, id);
+        profiles->Bind(wxEVT_MENU, [this, key = p.id](wxCommandEvent&) { tray_activate(key); }, id);
     }
     menu->AppendSubMenu(profiles, "Activate profile");
     auto* holes = new wxMenu;
@@ -61,8 +61,56 @@ wxMenu* Tray::CreatePopupMenu() {
         holes->Append(wxID_ANY, "No active directions")->Enable(false);
     menu->AppendSubMenu(holes, "Direction states (read-only)");
     menu->AppendSeparator();
-    add("Exit AudioHole", [this] { frame_.exit(); });
-    return menu;
+    add("Close window", [this] { perform_shell_action(ShellAction::Close); });
+    add("Exit AudioHole", [this] { perform_shell_action(ShellAction::Exit); });
+    return std::unique_ptr<wxMenu>(menu);
+}
+
+void Frame::perform_shell_action(ShellAction action) {
+    if (IsBeingDeleted())
+        return;
+    switch (action) {
+    case ShellAction::Open:
+        open();
+        break;
+    case ShellAction::Controls: {
+        open();
+        auto menu = shell_menu();
+        PopupMenu(menu.get(), ScreenToClient(wxGetMousePosition()));
+        break;
+    }
+    case ShellAction::Start:
+        if (controller_->snapshot().capabilities.routing)
+            tray_start();
+        break;
+    case ShellAction::Stop:
+        if (controller_->snapshot().capabilities.routing) {
+            controller_->stop();
+            refresh();
+        }
+        break;
+    case ShellAction::Close:
+        Close();
+        break; // Existing close-to-tray handling.
+    case ShellAction::Exit:
+        exit();
+        break;
+    }
+}
+void Frame::initialize_shell_controls() {
+    if (const auto menu = GetSystemMenu(static_cast<HWND>(GetHandle()), FALSE)) {
+        // Shift+right-click and Alt+Space retain the native window commands too.
+        ModifyMenuW(menu, SC_CLOSE, MF_BYCOMMAND | MF_STRING, SC_CLOSE, L"Close window\tAlt+F4");
+        AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+        AppendMenuW(menu, MF_STRING, shell_controls_command, L"AudioHole controls…");
+        AppendMenuW(menu, MF_STRING, shell_exit_command, L"Exit AudioHole");
+    }
+    if (!smoke_) {
+        const auto result = publish_shell_tasks(controller_->snapshot().capabilities.routing);
+        if (FAILED(result))
+            wxLogDebug("Windows could not publish AudioHole taskbar tasks (HRESULT 0x%08lx).",
+                       static_cast<unsigned long>(result));
+    }
 }
 
 } // namespace audiohole::gui

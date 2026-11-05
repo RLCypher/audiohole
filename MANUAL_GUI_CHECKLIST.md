@@ -355,3 +355,18 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   preserves it. Inspect both executable imports in the packaged runtime.
 - [ ] Test routing/monitor/beep remain unavailable, Preview stays simulated and no
   automated fixture runner executes during a GUI scan. See SCANNER_TEST_MODE.md.
+
+## Taskbar / tray parity
+
+- [ ] With the GUI open, ordinary taskbar right-click offers Close window and
+  Exit AudioHole. Verify Open, Start/Stop (Preview) and AudioHole controls… too.
+  Controls opens the same tray menu, with profile activation and read-only states.
+- [ ] Close window hides to the tray and preserves the active Preview route/draft;
+  Open restores it. Exit cancels a scan, stops the session and removes the tray icon.
+- [ ] Test Mode has no routing tasks in the Jump List; the shared menu disables
+  Start/Stop/profile activation. Taskbar actions never initialize a second backend.
+- [ ] Alt+Space and Shift+right-click expose native window controls plus AudioHole
+  controls and Exit. Check normal and pinned taskbar use and Explorer restart.
+- [ ] After exiting, stale Start/Stop/Close/Exit shortcuts do not create a new session
+  or data root. Open follows normal startup preferences. Check paths with spaces and
+  Unicode and verify shortcuts target the current running executable.

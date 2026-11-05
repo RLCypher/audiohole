@@ -1,6 +1,7 @@
 #pragma once
 #include "audiohole/avatar/wx_panel.hpp"
 #include "gui/branding.h"
+#include "gui/shell_actions.h"
 #include "model/build_preferences.h"
 #include "model/controller.h"
 #include "platform/windows/com_apartment.h"
@@ -117,6 +118,9 @@ class Frame final : public wxFrame, private wxEventFilter {
         else
             activate(false);
     }
+    // Tray and taskbar share these actions and menus on the GUI thread.
+    std::unique_ptr<wxMenu> shell_menu();
+    void perform_shell_action(ShellAction);
     // Reads one controller snapshot; changes commentary only for new event occurrences.
     void refresh();
     // Internal developer check; dispatches native events and writes explicit evidence.
@@ -212,6 +216,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void layout_header();
     // Builders only construct widgets/bind events; they never issue routing commands.
     void build_profiles();
+    void initialize_shell_controls();
     // Context menus capture stable IDs; opening them never discards staged edits.
     std::unique_ptr<wxMenu> profile_menu(const std::string& id);
     std::unique_ptr<wxMenu> hole_menu(const std::string& id);

@@ -1368,3 +1368,26 @@ authoritative aggregate state. Unknown is neutral; no health inference or new
 engine state is added. Canonical state text remains in the tooltip/menu. Cache by
 size/color and do not repaint an unchanged icon. All existing menu/lifecycle behavior
 is retained. See [branding architecture](assets/branding/README.md).
+
+## Owner-requested taskbar controls
+
+The running GUI publishes Windows Jump List tasks for Open AudioHole,
+AudioHole controls…, Start Routing, Stop Routing, Close window and Exit AudioHole.
+Windows Jump Lists are flat: AudioHole controls… opens the same freshly built menu
+as the tray, including profile activation and read-only direction states. Both
+surfaces use the same controller and action handlers. Test Mode omits routing tasks
+from the Jump List and keeps those actions disabled in the full menu.
+
+Close window follows the existing close-to-tray behavior and retains the session;
+Exit stops/cancels work and shuts down. Alt+Space / Shift+right-click retains the
+native window menu, with AudioHole controls… and Exit AudioHole added alongside
+Close window. Explorer's pin/unpin and other shell-owned items remain OS-managed.
+
+Jump List commands relay a fixed, bounded private action to the existing GUI before
+preferences or backends are initialized in the short-lived relay. The relay checks
+that the target window runs the same executable and uses a two-second admission
+wait. Execution is queued on the GUI thread; admission does not claim routing or
+shutdown completion. Persisted Start/Stop/Close/Exit shortcuts do not launch a new
+session if no GUI exists. Open/Controls can use the ordinary startup workflow.
+This OS shell adapter is not a public external-control transport or a new production
+configuration format. Unattended smoke tests never publish persistent Jump Lists.
