@@ -732,6 +732,7 @@ Discovery batch_discovery() {
 TEST(deep_batch_options_require_explicit_consistent_scope) {
   const auto options = utility_options({"--deep-all", "--confirm-disruption", "--system-timeout-ms", "7200000"}, "unused");
   CHECK(options.deep && options.deep_all && options.confirm_disruption); CHECK(options.system_timeout_ms == 7200000);
+  CHECK(utility_options({"--deep-all", "--system-timeout-ms", "0"}, "unused").system_timeout_ms == 0);
   for (const auto& args : std::vector<std::vector<fs::path>>{
       {"--deep-all", "--device", "id"}, {"--deep", "--system-timeout-ms", "2000"},
       {"--deep-all", "--system-timeout-ms", "999"}, {"--deep-all", "--system-timeout-ms", "7200001"}}) {

@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <wx/datetime.h>
 #include <wx/ffile.h>
 
 namespace audiohole::gui {
@@ -27,15 +28,16 @@ void Frame::build_scan() {
     deep_mode_ = choices(pane, limits, "Operating mode", {"shared", "exclusive", "both"});
     deep_mode_->SetToolTip("Select shared, exclusive, or both for bounded Deep tests; exclusive "
                            "tests can conflict with other applications.");
-    auto* budgets = new wxBoxSizer(wxHORIZONTAL);
+    auto* budgets = new wxGridSizer(1, 5, FromDIP(8), FromDIP(8));
     auto* attempts_column = new wxBoxSizer(wxVERTICAL);
-    label(pane, attempts_column, "Attempts / device");
+    label(pane, attempts_column, "Configurations / device");
     deep_attempts_ = new wxSpinCtrl(pane, wxID_ANY, {}, wxDefaultPosition, wxSize(110, -1));
     deep_attempts_->SetRange(1, 64);
+    deep_attempts_->SetName("Configurations per device");
     deep_attempts_->SetValue(8);
     deep_attempts_->SetToolTip("Maximum tested candidate combinations per device, from 1 to 64.");
-    attempts_column->Add(deep_attempts_, 0, wxALL, 3);
-    budgets->Add(attempts_column);
+    attempts_column->Add(deep_attempts_, 0, wxALL | wxEXPAND, 3);
+    budgets->Add(attempts_column, 1, wxEXPAND);
     auto seconds = [&](const char* title, unsigned minimum, unsigned maximum, unsigned initial) {
         auto* column = new wxBoxSizer(wxVERTICAL);
         label(pane, column, title);
@@ -49,8 +51,15 @@ void Frame::build_scan() {
     deep_duration_ = seconds("Stream (s)", 250, 30000, 2000);
     deep_attempt_timeout_ = seconds("Attempt limit (s)", 1250, 120000, 10000);
     deep_device_timeout_ = seconds("Device limit (s)", 1000, 600000, 120000);
-    deep_system_timeout_ = seconds("Scan limit (s)", 1000, 3600000, 600000);
-    limits->Add(budgets);
+    deep_system_timeout_ = seconds("Scan limit (s; 0 = unlimited)", 0, 3600000, 600000);
+    deep_system_timeout_->editor()->SetToolTip(
+        "Total Deep scan time in seconds; 0 disables the overall deadline. Per-device and "
+        "per-attempt limits and Cancel remain active.");
+    const int control_height = deep_attempts_->GetBestSize().y;
+    for (auto* control :
+         {deep_duration_, deep_attempt_timeout_, deep_device_timeout_, deep_system_timeout_})
+        control->SetMinSize(wxSize(FromDIP(100), control_height));
+    limits->Add(budgets, 0, wxEXPAND | wxALL, FromDIP(3));
     scan_context_ = field(pane, limits,
                           "Optional operating context (other apps, device setup, observed issue)");
     scan_context_->SetMaxLength(8192);
@@ -120,10 +129,19 @@ void Frame::build_scan() {
                          "context. Review it before sharing.",
                          "Analysis bundle", wxOK | wxCANCEL | wxICON_INFORMATION, this) != wxOK)
             return;
-        wxFileDialog dialog(this, "Export last scan session", {}, "AudioHole-scan.zip",
+        const auto filename =
+            wxS("AudioHole-scan-") + wxDateTime::Now().Format("%Y%m%d-%H%M%S") + wxS(".zip");
+        wxFileDialog dialog(this, "Export last scan session", {}, filename,
                             "ZIP archives (*.zip)|*.zip", wxFD_SAVE);
         if (dialog.ShowModal() != wxID_OK)
             return;
+        while (wxFileExists(dialog.GetPath())) {
+            wxMessageBox(
+                "That ZIP already exists. Choose a different name to preserve the existing bundle.",
+                "Export scan bundle", wxOK | wxICON_INFORMATION, this);
+            if (dialog.ShowModal() != wxID_OK)
+                return;
+        }
         ScannerActionRequest request;
         request.kind = ScannerActionKind::Export;
         request.output = std::filesystem::path(dialog.GetPath().ToStdWstring());
@@ -145,7 +163,13 @@ void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
     }
     ScanOptions options;
     options.mode = utf8(deep_mode_->GetStringSelection());
-    options.attempts = static_cast<unsigned>(deep_attempts_->GetValue());
+    unsigned long attempt_count = 0;
+    if (deep && (!deep_attempts_->GetTextValue().ToULong(&attempt_count) || attempt_count < 1 ||
+                 attempt_count > 64)) {
+        show_result({false, "Enter a whole configuration count from 1 to 64 per device."});
+        return;
+    }
+    options.attempts = deep ? static_cast<unsigned>(attempt_count) : 8;
     const auto duration = deep_duration_->milliseconds(),
                attempt = deep_attempt_timeout_->milliseconds(),
                device = deep_device_timeout_->milliseconds(),
@@ -159,6 +183,11 @@ void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
         show_result(
             {false,
              "The attempt limit must be at least 1 second longer than the stream duration."});
+        return;
+    }
+    if (deep && *batch != 0 && *batch < 1000) {
+        show_result(
+            {false, "Use 0 for unlimited total scan time, or a scan limit of at least 1 second."});
         return;
     }
     options.duration_ms = duration.value_or(2000);
@@ -179,6 +208,10 @@ void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
         if (wxMessageBox(
                 text(
                     "Deep scan target: " + target + "\nMode: " + options.mode +
+                    "\nOverall scan limit: " +
+                    (options.system_timeout_ms == 0
+                         ? std::string("Unlimited (attempt/device limits remain active)")
+                         : std::to_string(options.system_timeout_ms / 1000) + " seconds") +
                     "\n\nFor best results, close applications that may have active audio streams: "
                     "browsers, "
                     "game launchers such as Steam and Epic, and chat apps such as Discord and "

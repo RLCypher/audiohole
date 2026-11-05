@@ -161,6 +161,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
     wxCheckBox *preview_mode_{}, *show_preview_dialog_{}, *hold_expressions_{};
+    wxCheckBox* loop_until_event_{};
+    wxSpinCtrl* animation_loops_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
     wxSlider* dfa_slider_{};
     wxTextCtrl* dfa_value_{};
@@ -210,6 +212,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::shared_ptr<const DeviceInspection> device_edit_snapshot_;
     bool device_dirty_ = false, populating_devices_ = false;
     std::uint64_t device_save_generation_ = 0;
+    bool scanner_clock_active_ = false;
+    std::chrono::steady_clock::time_point scanner_clock_started_{};
     wxStaticText* scan_state_{};
     wxChoice* deep_mode_{};
     wxSpinCtrl* deep_attempts_{};
@@ -281,7 +285,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     // Called on page change, hide/minimize, Stop, and shutdown. No sample ownership.
     void end_observation();
     void present(presentation::Message);
-    void show_result(const audiohole::Result&);
+    void show_result(const audiohole::Result&, bool operational = false);
     void testing_notice();
     void export_log();
     void update_console(const wxString&);

@@ -220,3 +220,21 @@ external rename/reload, hidden persistence across restart and archive review.
 Use the optional context field to identify other audio applications and physical
 setup. Preserve exact tuples, driver versions, HRESULTs and observation timestamps;
 do not infer unmeasured behavior from a green CI test.
+
+## Active-backlog follow-up
+
+[GUI_REVISION_NOTES.md](GUI_REVISION_NOTES.md) documents the superseding progress,
+checkpoint, clear-list and error-recovery behavior. Deep scan limit `0` now means no
+overall batch deadline; attempt/device bounds and Cancel remain active. Visible
+progress uses names and real device/configuration plan counts, while JSONL exports
+retain raw IDs, monotonic elapsed times and checkpoint timing. API stages append
+to the bounded journal; durable canonical checkpoints occur at attempt start and
+finish rather than at every stage. A process crash leaves the initial attempt
+explicitly inconclusive; a power failure can lose the journal tail. Full terminal
+history remains atomic. This is a performance change, not stronger verification.
+
+The explicitly confirmed Clear device list action deletes scanner-owned records,
+history, local bindings/backups and saved sessions, preserving profiles and unrelated
+files. New scan identities can require profile device reselection. Preview does not
+perform this destructive action. Export/validation errors are local feedback and
+no longer latch the avatar's operational-warning state.

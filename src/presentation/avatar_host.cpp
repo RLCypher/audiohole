@@ -33,6 +33,7 @@ void AvatarHost::select(const Personality* package, std::int64_t now) {
     session_->select(personality_, style_, now);
     session_->player().reduced_motion(reduced_);
     session_->player().hold_expressions(hold_expressions_);
+    session_->player().reaction_playback(reaction_loops_, loop_until_event_);
     baseline_ = {awake_baseline_.expression, awake_baseline_.priority, revision_};
     session_->baseline(baseline_.expression, revision_, baseline_.priority, now, true);
 }
@@ -102,7 +103,7 @@ avatar::Presentation AvatarHost::tick(std::int64_t now) {
     // Only a quiet, healthy baseline may sleep. Telemetry refreshes do not
     // count as activity; active/pending reactions must finish before sleeping.
     if (!sleeping_ && awake_baseline_.expression == "idle" && awake_baseline_.priority == 0 &&
-        (!frame.reaction || frame.holding) && !frame.loading &&
+        (!frame.reaction || frame.holding || frame.looping) && !frame.loading &&
         now - last_activity_ms_ >= sleep_after_ms &&
         std::find(supported_.begin(), supported_.end(), "sleeping") != supported_.end()) {
         sleeping_ = true;
@@ -116,6 +117,14 @@ void AvatarHost::reduced_motion(bool enabled) {
     reduced_ = enabled;
     if (session_)
         session_->player().reduced_motion(enabled);
+}
+void AvatarHost::reaction_playback(int count, bool until_event) {
+    if (count < 1 || count > 20)
+        throw std::invalid_argument("Invalid animation loop count");
+    reaction_loops_ = count;
+    loop_until_event_ = until_event;
+    if (session_)
+        session_->player().reaction_playback(count, until_event);
 }
 void AvatarHost::hold_expressions(bool enabled) {
     hold_expressions_ = enabled;

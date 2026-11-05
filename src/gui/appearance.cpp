@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "gui/native_theme.h"
 #include <dwmapi.h>
 #include <wx/settings.h>
 #include <wx/tglbtn.h>
@@ -24,9 +25,9 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
     const wxColour surface = dark ? palette::charcoal() : wxColour(245, 247, 250);
     const wxColour input = dark ? palette::input() : wxColour(255, 255, 255);
     const wxColour foreground = dark ? wxColour(237, 240, 246) : wxColour(23, 30, 40);
-    // Native visual styles can ignore explicit backgrounds. Disable them on
-    // application controls so their text/background remain a matched pair.
-    // High contrast instead uses Windows' own colors and native styles.
+    // Pair application text/background first. The native-theme pass then applies
+    // scrollbar/arrow styles; app-owned buttons keep their matched custom paint.
+    // High contrast uses Windows' own colors and native styles throughout.
     window->SetThemeEnabled(contrast);
     if (auto* panel = dynamic_cast<SurfacePanel*>(window))
         panel->use_system_colours = contrast;
@@ -49,8 +50,16 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
             : foreground);
     if (!contrast && window->GetName() == "brand-wordmark")
         window->SetForegroundColour(palette::mint());
+    if (!contrast && window->GetName() == "brand-wordmark-hole")
+        window->SetForegroundColour(palette::magenta());
     for (auto* child : window->GetChildren())
         apply_palette(child, dark, contrast);
+    if (auto* list = dynamic_cast<DeviceList*>(window)) {
+        list->GetMainWindow()->SetBackgroundColour(
+            contrast ? wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW) : input);
+        list->GetMainWindow()->SetForegroundColour(
+            contrast ? wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) : foreground);
+    }
 }
 } // namespace
 void Frame::select_page(std::size_t page, bool focus) {
@@ -101,7 +110,9 @@ void Frame::apply_appearance() {
     dark_appearance_ =
         !contrast && (theme_choice_->GetSelection() == dark_choice ||
                       (theme_choice_->GetSelection() == system_choice && system_dark()));
+    prepare_native_theme(dark_appearance_, contrast);
     apply_palette(this, dark_appearance_, contrast);
+    native_theme(this, dark_appearance_, contrast);
     if (!contrast) {
         for (auto* primary : {start_, profile_save_}) {
             primary->SetBackgroundColour(palette::mint());

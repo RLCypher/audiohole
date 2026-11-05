@@ -13,6 +13,7 @@ namespace audiohole {
 struct ScannerServiceOptions {
     std::filesystem::path portable_root, local_root, probe_executable;
     std::string source = "real_windows_mmdevice_wasapi";
+    std::string build_id = "unknown";
 };
 struct ScannerFactories {
     std::function<std::unique_ptr<scanner::EndpointProvider>()> provider;

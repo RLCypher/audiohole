@@ -4,6 +4,7 @@
 #include <bit>
 #include <chrono>
 #include <set>
+#include <limits>
 #include <stdexcept>
 
 namespace audiohole::scanner {
@@ -185,15 +186,32 @@ DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTar
       attempt["status"] = "running"; attempt["signal_verification"] = "not_tested";
       attempt["verification_scope"] = "buffer_processing"; attempt["driver_context"] = target.record.at("driver");
       attempt["stages"] = Json::array();
+      const auto attempt_started = std::chrono::steady_clock::now();
+      if (progress) progress({"deep_attempt_preparing", target.endpoint_id, report.attempted, candidates.size(), probe_job_json(job)});
       store.checkpoint_probe(target.logical_id, attempt, false);
+      const auto worker_started = std::chrono::steady_clock::now();
+      attempt["initial_checkpoint_ms"] = std::chrono::duration_cast<std::chrono::milliseconds>(worker_started - attempt_started).count();
       ++report.attempted;
+      if (progress) progress({"deep_attempt_started", target.endpoint_id, report.attempted - 1, candidates.size(), probe_job_json(job)});
       Json outcome;
       try {
+        const auto remaining_after_checkpoint = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now()).count();
+        if (stop.stop_requested() || remaining_after_checkpoint < static_cast<long long>(limits.duration_ms + 1000))
+          outcome = {{"classification", "inconclusive"}, {"cleanup", "completed"},
+            {"reason", stop.stop_requested() ? "Canceled before worker launch" : "Device budget exhausted during initial checkpoint; worker not launched"}};
+        else {
+        job.timeout_ms = static_cast<unsigned>(std::min<long long>(job.timeout_ms, remaining_after_checkpoint));
+        attempt["timeout_ms"] = job.timeout_ms;
         outcome = runner.execute(job, stop, [&](const Json& stage) {
+          if (attempt["stages"].size() >= 128) throw std::runtime_error("Probe stage budget exceeded");
           attempt["stages"].push_back(stage);
-          store.checkpoint_probe(target.logical_id, attempt, false);
+          // The session's bounded append journal receives each stage. Rewriting
+          // all device/history JSON here blocks pipe draining after the worker
+          // has already exited. Durable canonical checkpoints bracket attempts;
+          // an interrupted attempt remains explicitly inconclusive/running.
           if (progress) progress({"deep_stage", target.endpoint_id, report.attempted - 1, candidates.size(), stage});
         });
+        }
       } catch (const std::exception& e) {
         outcome = {{"classification", "inconclusive"}, {"cleanup", "unknown"}, {"reason", e.what()}};
       }
@@ -214,11 +232,17 @@ DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTar
             it.key() == "process_exit_observed" || it.key() == "worker_exit_code")
           attempt[it.key()] = it.value();
       }
+      attempt["worker_wall_ms"] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - worker_started).count();
       attempt["status"] = stop.stop_requested() ? "interrupted" : "completed";
       attempt["signal_verification"] = "not_tested";
       attempt["verification_scope"] = "buffer_processing";
       attempt["finished_utc"] = utc_now();
+      const auto checkpoint_started = std::chrono::steady_clock::now();
+      if (progress) progress({"deep_checkpoint_begin", target.endpoint_id, report.attempted, candidates.size(), Json::object()});
       store.checkpoint_probe(target.logical_id, attempt, true);
+      if (progress) progress({"deep_checkpoint_finished", target.endpoint_id, report.attempted, candidates.size(),
+        {{"checkpoint_ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - checkpoint_started).count()},
+         {"attempt_wall_ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - attempt_started).count()}}});
       auto summary = attempt;
       summary["stage_count"] = summary["stages"].size();
       summary.erase("stages");
@@ -265,8 +289,8 @@ DeepBatchReport run_deep_scan_batch(DeviceStore& store, ProbeRunner& runner,
   try {
     validate_deep_limits(limits);
     if (!consent) throw std::invalid_argument("Full-system Deep Scan requires explicit disruption consent");
-    if (system_timeout_ms < 1000 || system_timeout_ms > 7200000)
-      throw std::invalid_argument("System timeout must be 1000..7200000 ms");
+    if ((system_timeout_ms && system_timeout_ms < 1000) || system_timeout_ms > 7200000)
+      throw std::invalid_argument("System timeout must be 0 (unlimited) or 1000..7200000 ms");
     std::set<std::string> ids, endpoints;
     for (const auto& target : targets) {
       if (target.logical_id.empty() || target.endpoint_id.empty() || !ids.insert(target.logical_id).second ||
@@ -276,12 +300,16 @@ DeepBatchReport run_deep_scan_batch(DeviceStore& store, ProbeRunner& runner,
         {"planned", plan_deep_candidates(target, limits).size()}});
     }
     if (targets.empty()) throw std::runtime_error("No active, uniquely bound endpoints are available for Deep Scan");
+    std::size_t planned = 0;
+    for (const auto& device : batch.devices) planned += device["planned"].get<std::size_t>();
+    if (progress) progress({"deep_plan", {}, 0, planned, {{"devices", targets.size()}, {"configurations", planned}}});
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(system_timeout_ms);
     if (checkpoint) checkpoint(batch);
     bool incomplete = false;
     for (std::size_t i = 0; i < targets.size(); ++i) {
       if (stop.stop_requested()) { batch.result = "interrupted"; break; }
-      const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now()).count();
+      const auto remaining = system_timeout_ms ? std::chrono::duration_cast<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now()).count()
+                                                : static_cast<long long>(std::numeric_limits<unsigned>::max());
       if (remaining < static_cast<long long>(limits.duration_ms + 1000)) {
         batch.result = "partially_completed";
         batch.diagnostics.push_back({"system_budget_exhausted", "Full-system Deep Scan deadline reached; remaining devices were not tested", {}, {}});

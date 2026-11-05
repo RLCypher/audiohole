@@ -108,6 +108,15 @@ class ProcessRunner final : public ProbeRunner {
         try {
           std::size_t newline = 0;
           while ((newline = pending.find('\n')) != std::string::npos) {
+            // Stage consumers may perform journal I/O. Recheck cancellation and
+            // deadlines between messages instead of starving them while output
+            // remains available. A completed child may still have queued evidence.
+            if (stop.stop_requested() && !cancel_sent) {
+              SetEvent(cancel.value); cancel_sent = true;
+              deadline = std::min(deadline, std::chrono::steady_clock::now() + std::chrono::milliseconds(500));
+            }
+            if (std::chrono::steady_clock::now() >= deadline && WaitForSingleObject(process.value, 0) != WAIT_OBJECT_0)
+              throw std::runtime_error(cancel_sent ? "Probe canceled" : "Probe attempt timed out");
             auto message = detail::parse_json(pending.substr(0, newline)); pending.erase(0, newline + 1);
             if (message.value("attempt_id", "") != job.attempt_id) throw std::runtime_error("Probe attempt ID mismatch");
             if (message.value("type", "") == "stage" && !received_result) {

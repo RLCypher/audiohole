@@ -31,7 +31,7 @@ ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
       if (selected) report.selected_endpoint_ids.push_back(endpoint.endpoint_id);
       if (progress) progress({"scope_selection", endpoint.endpoint_id, report.observed, 0,
         {{"scope", scope}, {"identity", identity.status}, {"logical_id", identity.logical_id},
-         {"device_name", endpoint.device_name}, {"state", endpoint.state}, {"capability_queries", selected ? "selected" : "skipped"},
+         {"device_name", endpoint.device_name}, {"direction", endpoint.direction}, {"state", endpoint.state}, {"capability_queries", selected ? "selected" : "skipped"},
          {"fingerprint", endpoint.fingerprint}, {"local_identity", endpoint.local_identity}, {"driver", endpoint.driver}}});
       return selected;
     });

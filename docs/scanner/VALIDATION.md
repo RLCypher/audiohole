@@ -121,3 +121,27 @@ retain these checks; no test is disabled. Application startup size, pane minimum
 user configuration and scanner behavior are unchanged. The native Windows rerun
 is required to confirm the repair. The updated GUI cross-compiles and links for
 Windows x64 successfully; native smoke execution was not available locally.
+
+## Active-backlog revision
+
+The owner-authorized follow-up implements the active GUI backlog plus unlimited
+overall Deep time at zero and local recovery for invalid numeric input. See
+[GUI_REVISION_NOTES.md](../../GUI_REVISION_NOTES.md) for behavior, persistence and
+interruption contracts. The uploaded 20-minute scan motivated removing full JSON
+rewrites from API-stage callbacks. A regression with 80 stage events retains all
+stages/external edits and bounds AtomicWriter calls to at most eight per attempt;
+it does not measure real Windows disk speed or prove a hardware speedup.
+
+All 146 portable CTest entries pass in both Debug and Release, including scanner contracts, typed
+command completion, stage retention/write bounds, zero-budget completion and
+cancellation, destructive-clear isolation/confirmation/restart, invalid-admission
+severity, name/count progress, repeat/continuous/static playback, inactivity sleep
+and preference compatibility. A delayed-checkpoint test additionally proves that
+a worker is not launched after checkpoint latency exhausts its device budget.
+All Windows x64 application/test targets cross-compile and link. The Runtime
+installation matches its exact 825-file allowlist, including the byte-preserved
+Material font/license/notice; canonical PE icon checks and all 796 avatar PNG checks
+pass. Native MSVC Debug/Release GUI smoke,
+extracted-package execution, theme/selection/Material rendering at multiple DPIs,
+Windows file-operation failure cases and real hardware timing remain required.
+No automated test deletes actual user scan data or performs unconsented probing.

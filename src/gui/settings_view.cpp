@@ -1,6 +1,7 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
 #include "presentation/text_layout.h"
+#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 void Frame::build_settings() {
@@ -58,24 +59,62 @@ void Frame::build_settings() {
     root->Add(preview_settings, 0, wxEXPAND | wxALL, 4);
     personality_choice_ = choices(page, root, "Personality", {});
     personality_notice_ = label(page, root, "");
+    auto* playback = new wxWrapSizer(wxHORIZONTAL);
     hold_expressions_ = new wxCheckBox(page, wxID_ANY, "Hold expressions between events");
-    hold_expressions_->SetValue(preferences_->values().hold_expressions);
-    avatar_host_->hold_expressions(hold_expressions_->GetValue());
+    animation_loops_ = new wxSpinCtrl(page, wxID_ANY, "1", wxDefaultPosition,
+                                      FromDIP(wxSize(75, -1)), wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER,
+                                      1, 20, preferences_->values().animation_loops);
+    animation_loops_->SetName("Animation loop count");
+    loop_until_event_ = new wxCheckBox(page, wxID_ANY, "Loop until next event");
+    playback->Add(hold_expressions_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    label(page, playback, "Animation loop count");
+    playback->Add(animation_loops_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    playback->Add(loop_until_event_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    root->Add(playback, 0, wxEXPAND);
     hold_expressions_->SetToolTip(
-        "Keep the final reaction pose until the next event. Unchecked: hold it for two extra "
-        "seconds. Warnings, personality changes and inactivity sleep still take priority.");
-    root->Add(hold_expressions_, 0, wxALL, 4);
-    hold_expressions_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
-        auto next = preferences_->values();
-        next.hold_expressions = hold_expressions_->GetValue();
-        const auto result = preferences_->update(next);
-        if (!result.ok) {
-            hold_expressions_->SetValue(preferences_->values().hold_expressions);
-            show_result(result);
+        "Hold the last frame after the final repeat. Otherwise hold it for two extra seconds. "
+        "Warnings, new events and inactivity sleep can interrupt.");
+    animation_loops_->SetToolTip("Total plays per reaction, 1–20; 1 plays once. Baseline "
+                                 "idle/working animations keep their authored looping behavior.");
+    loop_until_event_->SetToolTip("Repeat the reaction until another event. Overrides loop count "
+                                  "and final-frame hold; warnings, identity changes and inactivity "
+                                  "sleep still take priority. Reduced motion remains static.");
+    auto sync_playback = [this] {
+        const auto& values = preferences_->values();
+        hold_expressions_->SetValue(values.hold_expressions);
+        animation_loops_->SetValue(values.animation_loops);
+        loop_until_event_->SetValue(values.loop_until_event);
+        hold_expressions_->Enable(!values.loop_until_event);
+        animation_loops_->Enable(!values.loop_until_event);
+        avatar_host_->hold_expressions(values.hold_expressions);
+        avatar_host_->reaction_playback(values.animation_loops, values.loop_until_event);
+    };
+    sync_playback();
+    auto save_playback = [this, sync_playback] {
+        long count = 0;
+        if (!animation_loops_->GetTextValue().ToLong(&count) || count < 1 || count > 20) {
+            wxMessageBox("Enter a total play count from 1 to 20.", "Animation loop count",
+                         wxOK | wxICON_INFORMATION, this);
+            sync_playback();
             return;
         }
-        avatar_host_->hold_expressions(next.hold_expressions);
+        auto next = preferences_->values();
+        next.hold_expressions = hold_expressions_->GetValue();
+        next.animation_loops = static_cast<int>(count);
+        next.loop_until_event = loop_until_event_->GetValue();
+        const auto result = preferences_->update(next);
+        sync_playback();
+        if (!result.ok)
+            show_result(result);
         poll_avatar();
+    };
+    hold_expressions_->Bind(wxEVT_CHECKBOX, [save_playback](wxCommandEvent&) { save_playback(); });
+    loop_until_event_->Bind(wxEVT_CHECKBOX, [save_playback](wxCommandEvent&) { save_playback(); });
+    animation_loops_->Bind(wxEVT_SPINCTRL, [save_playback](wxSpinEvent&) { save_playback(); });
+    animation_loops_->Bind(wxEVT_TEXT_ENTER, [save_playback](wxCommandEvent&) { save_playback(); });
+    animation_loops_->Bind(wxEVT_KILL_FOCUS, [save_playback](wxFocusEvent& event) {
+        save_playback();
+        event.Skip();
     });
     personality_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         const int selected = personality_choice_->GetSelection();

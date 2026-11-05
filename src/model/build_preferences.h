@@ -6,6 +6,8 @@ struct PreviewPreferences {
     bool preview_mode = true;
     bool show_preview_dialog = true;
     bool hold_expressions = false;
+    bool loop_until_event = false;
+    int animation_loops = 1;
     std::string personality_id = "default";
     std::string appearance = "system";
     int notifications = 0, startup_mode = 0, startup_delay_seconds = 5;

@@ -1810,3 +1810,14 @@ remaining GUI smoke assertion incorrectly measured rename's revision from before
 hole navigation, which stops passive observation and advances the revision. The
 check now measures rename independently and separately verifies that navigation
 preserves routing and saved profiles. Its native rerun remains pending.
+
+## Owner-authorized current GUI polish
+
+See [GUI_REVISION_NOTES.md](GUI_REVISION_NOTES.md) for the implemented active backlog:
+name-based numbered scan progress and elapsed time, unlimited overall Deep budget
+at zero, confirmed scanner-data clearing, theme-matched native scrollbars/controls,
+readable dark selected rows, equal Deep limit fields, bottom-aligned cyan/pink
+wordmark, type-colored device cards, Material heading icons, reaction repeat controls
+and local validation/export error recovery. Actual operational warnings retain
+priority. Native visual/DPI/high-contrast assessment remains necessary; older
+Windows theme capabilities have a native fallback. Animation pruning is deferred.

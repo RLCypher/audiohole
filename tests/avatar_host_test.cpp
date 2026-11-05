@@ -319,3 +319,21 @@ TEST(AvatarIntegration, RejectsExcessiveRuntimeJsonNestingWithoutLoadingArt) {
         std::any_of(clip->diagnostics.begin(), clip->diagnostics.end(),
                     [](const auto& line) { return line.find("nesting") != std::string::npos; }));
 }
+
+TEST(AvatarIntegration, ContinuouslyLoopingCosmeticReactionStillYieldsToInactivitySleep) {
+    p::Messages messages(4);
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    audiohole::Snapshot snapshot;
+    std::int64_t now = 100;
+    host.observe(snapshot, false, now);
+    host.select(messages.package("uwu"), now);
+    host.reaction_playback(2, true);
+    wait_for(host, now, "idle");
+    const auto copy = messages.show(p::Message::Bother, "uwu", 1);
+    ASSERT_TRUE(host.react(p::Message::Bother, copy, 1, now).accepted);
+    wait_for(host, now, copy.expression, true);
+    now += 120001;
+    host.tick(now);
+    EXPECT_FALSE(wait_for(host, now, "sleeping").reaction);
+}

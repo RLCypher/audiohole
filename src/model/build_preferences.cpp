@@ -7,7 +7,8 @@
 namespace audiohole {
 namespace {
 bool valid(const PreviewPreferences& values) {
-    return !values.personality_id.empty() && values.personality_id.size() <= 64 &&
+    return values.animation_loops >= 1 && values.animation_loops <= 20 &&
+           !values.personality_id.empty() && values.personality_id.size() <= 64 &&
            std::all_of(values.personality_id.begin(), values.personality_id.end(),
                        [](unsigned char c) {
                            return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' ||
@@ -95,6 +96,8 @@ Result BuildPreferences::load() {
             values.preview_mode = document.at("preview_mode").get<bool>();
             values.show_preview_dialog = document.at("show_preview_dialog").get<bool>();
             values.hold_expressions = document.value("hold_expressions", false);
+            values.loop_until_event = document.value("loop_until_event", false);
+            values.animation_loops = optional_integer(document, "animation_loops", 1);
             values.personality_id = document.value("personality_id", std::string("default"));
             values.appearance = document.value("appearance", std::string("system"));
             values.notifications = optional_integer(document, "notifications", 0);
@@ -133,6 +136,8 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["preview_mode"] = values.preview_mode;
         document["show_preview_dialog"] = values.show_preview_dialog;
         document["hold_expressions"] = values.hold_expressions;
+        document["loop_until_event"] = values.loop_until_event;
+        document["animation_loops"] = values.animation_loops;
         document["personality_id"] = values.personality_id;
         document["appearance"] = values.appearance;
         document["notifications"] = values.notifications;

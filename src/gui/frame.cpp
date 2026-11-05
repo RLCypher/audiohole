@@ -38,7 +38,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* brand_logo = new AgentDisplay(this, wxSize(64, 64));
     brand_row->Add(brand_logo, 0, wxALIGN_CENTER_VERTICAL);
     information->Add(brand_row, 0, wxEXPAND);
-    auto* heading = label(this, brand_row, "AudioHole");
+    auto* heading = label(this, brand_row, "Audio");
+    brand_row->GetItem(heading)->SetFlag(wxALIGN_BOTTOM | wxLEFT);
+    auto* hole_wordmark = label(this, brand_row, "Hole");
+    hole_wordmark->SetName("brand-wordmark-hole");
+    hole_wordmark->SetFont(wxFont(wxFontInfo(20).Bold()));
+    brand_row->GetItem(hole_wordmark)->SetFlag(wxALIGN_BOTTOM);
+    brand_row->GetItem(hole_wordmark)->SetBorder(0);
     heading->SetName("brand-wordmark");
     heading->SetFont(wxFont(wxFontInfo(20).Bold()));
     label(this, information, "Put your audio wherever you want.");
@@ -441,7 +447,17 @@ void Frame::layout_header() {
     commentary_panel_->FitInside();
     Layout();
 }
-void Frame::show_result(const audiohole::Result& result) {
+void Frame::show_result(const audiohole::Result& result, bool operational) {
+    // Input/file-action failures are recoverable locally. They do not authorize
+    // a persistent operational warning or suppress cosmetic interactions.
+    if (!result.ok && !operational) {
+        if (!smoke_)
+            wxMessageBox(text(result.detail), "AudioHole — action unavailable",
+                         wxOK | wxICON_INFORMATION, this);
+        return;
+    }
+    if (result.ok && operational_warning_visible_ && !operational)
+        return;
     operational_warning_visible_ = !result.ok;
     avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
                           avatar::monotonic_ms());
@@ -604,10 +620,19 @@ void Frame::refresh() {
     else
         scan_progress_->SetValue(std::clamp(s.scan_percent, 0, 100));
     wxString scan_status;
+    if (s.scanner.busy && !scanner_clock_active_)
+        scanner_clock_started_ = std::chrono::steady_clock::now();
+    scanner_clock_active_ = s.scanner.busy;
     if (s.scanner.available) {
         scan_status = text(s.scanner.phase + " | " + s.scanner.result);
-        if (!s.scanner.busy)
-            scan_status += "\n" + text(s.scanner.detail).Left(240);
+        if (s.scanner.busy)
+            scan_status +=
+                wxString::Format(" | Elapsed %lld s",
+                                 static_cast<long long>(
+                                     std::chrono::duration_cast<std::chrono::seconds>(
+                                         std::chrono::steady_clock::now() - scanner_clock_started_)
+                                         .count()));
+        scan_status += "\n" + text(s.scanner.detail).Left(380);
     } else
         scan_status = s.scanning ? "Preview scan in progress" : "No scan in progress";
     if (scan_state_->GetLabel() != scan_status) {
@@ -618,7 +643,8 @@ void Frame::refresh() {
     const auto query = log_search_->GetValue().Lower();
     std::string logs;
     for (const auto& e : s.events) {
-        if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed")
+        if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed" &&
+            e.type != "scanner-action-failed" && e.type != "configuration-save-failed")
             continue;
         if (severity_->GetSelection() == 2 && e.type != "state" && e.type != "activated" &&
             e.type != "stopped")
@@ -669,6 +695,9 @@ void Frame::refresh() {
                 routine = false;
             if (routine)
                 present(message);
+            if (e.type == "scanner-action-failed" && !smoke_)
+                wxMessageBox(text(e.detail), "Device / export operation", wxOK | wxICON_ERROR,
+                             this);
             if (e.type == "error" || e.type == "scan-failed" || e.severity == Severity::Error ||
                 e.severity == Severity::Critical) {
                 operational_warning_visible_ = true;
@@ -739,6 +768,24 @@ bool Frame::smoke(const wxString& directory) {
         deep_duration_->editor()->ChangeValue("2.0001");
         require(!deep_duration_->milliseconds(), "Excess seconds precision was silently rounded");
         deep_duration_->editor()->ChangeValue("2");
+        const auto retained_technical = technical_copy_, retained_commentary = commentary_copy_;
+        const auto warning_before_input = operational_warning_visible_;
+        show_result({false, "Invalid numeric field fixture"});
+        require(operational_warning_visible_ == warning_before_input &&
+                    technical_copy_ == retained_technical &&
+                    commentary_copy_ == retained_commentary,
+                "Recoverable validation error changed avatar/personality state");
+        wxCommandEvent continuous_event(wxEVT_CHECKBOX, loop_until_event_->GetId());
+        loop_until_event_->SetValue(true);
+        loop_until_event_->GetEventHandler()->ProcessEvent(continuous_event);
+        require(preferences_->values().loop_until_event && !animation_loops_->IsEnabled() &&
+                    !hold_expressions_->IsEnabled(),
+                "Continuous playback did not override hold/count controls");
+        loop_until_event_->SetValue(false);
+        loop_until_event_->GetEventHandler()->ProcessEvent(continuous_event);
+        require(!preferences_->values().loop_until_event && animation_loops_->IsEnabled() &&
+                    hold_expressions_->IsEnabled(),
+                "Disabling continuous playback did not restore hold/count controls");
         const auto check_profile_layout = [this, &require] {
             auto* page = notebook_->GetPage(0);
             page->Layout();
@@ -1087,7 +1134,7 @@ bool Frame::smoke(const wxString& directory) {
                     beep_button_->GetLabel() == "Test Beep" &&
                     beep_button_->GetSize().x == beep_width,
                 "Natural beep completion must restore the fixed-width idle button");
-        show_result({false, "Operational warning retained."});
+        show_result({false, "Operational warning retained."}, true);
         const auto warning_occurrence = occurrence_;
         bother();
         require(technical_copy_ == "Operational warning retained." &&
@@ -1322,7 +1369,7 @@ bool Frame::smoke(const wxString& directory) {
         dfa_stepper_->GetEventHandler()->ProcessEvent(step);
         require(dfa_hundredths_ == 134 && last_message_ == presentation::Message::DfaAboveMaximum,
                 "DFA stepper bypassed raw range validation");
-        show_result({false, "Operational warning retained during DFA validation."});
+        show_result({false, "Operational warning retained during DFA validation."}, true);
         const auto warning = technical_copy_;
         dfa_value_->ChangeValue(wxS("11.001"));
         dfa_value_->GetEventHandler()->ProcessEvent(enter);

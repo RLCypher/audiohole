@@ -24,9 +24,11 @@ void Player::advance(std::int64_t now) {
     }
     last_now_ = now;
     clock_valid_ = true;
-    if (active_ && finite_ && (!hold_expressions_ || inspecting_)) {
+    if (active_ && finite_ && (inspecting_ || (!hold_expressions_ && !loop_until_event_))) {
         const int duration = active_->duration_ms();
-        if (elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms) + active_hold_ms_)
+        if (elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms) *
+                                (inspecting_ ? 1 : reaction_loops_) +
+                            active_hold_ms_)
             complete();
     }
 }
@@ -91,8 +93,11 @@ Decision Player::react(ClipPtr clip, const Reaction& event, std::int64_t now) {
         return {false, "baseline_severity"};
     if (active_ && finite_) {
         const auto duration = active_->duration_ms();
-        const bool held = hold_expressions_ && !inspecting_ &&
-                          elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms);
+        const bool held =
+            !inspecting_ && (loop_until_event_ ||
+                             (hold_expressions_ &&
+                              elapsed_ >= (duration ? duration : active_->behavior.static_hold_ms) *
+                                              reaction_loops_));
         if (priority < active_priority_ ||
             (!active_->behavior.interruptible && priority <= active_priority_ && !held))
             return {false, "priority_or_interrupt_policy"};
@@ -164,8 +169,10 @@ Presentation Player::tick(std::int64_t now) {
     double position = active_ ? elapsed_ : baseline_elapsed_;
     result.elapsed_ms = position;
     const auto duration = clip->duration_ms();
-    result.holding = active_ && finite_ && !inspecting_ &&
-                     position >= (duration ? duration : clip->behavior.static_hold_ms);
+    result.looping = active_ && finite_ && !inspecting_ && loop_until_event_;
+    result.holding =
+        active_ && finite_ && !inspecting_ && !loop_until_event_ &&
+        position >= (duration ? duration : clip->behavior.static_hold_ms) * reaction_loops_;
     if (reduced_) {
         result.image = clip->still ? clip->still : clip->frames.front();
         result.source = "reduced_motion_static";
@@ -177,7 +184,13 @@ Presentation Player::tick(std::int64_t now) {
         const bool loop =
             clip->loop &&
             !(active_ && finite_ && (active_hold_ms_ > 0 || (hold_expressions_ && !inspecting_)));
-        position = loop ? std::fmod(position, duration) : std::min(position, double(duration - 1));
+        if (active_ && finite_ && !inspecting_)
+            position = (loop_until_event_ || position < double(duration) * reaction_loops_)
+                           ? std::fmod(position, duration)
+                           : double(duration - 1);
+        else
+            position =
+                loop ? std::fmod(position, duration) : std::min(position, double(duration - 1));
         double end = 0;
         for (std::size_t i = 0; i < clip->durations_ms.size(); ++i) {
             end += clip->durations_ms[i];

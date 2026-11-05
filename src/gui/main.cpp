@@ -216,6 +216,7 @@ class App final : public wxApp {
             controller = std::make_unique<SimulatedController>();
         else {
             ScannerServiceOptions scanner;
+            scanner.build_id = AUDIOHOLE_BUILD_COMMIT;
             scanner.portable_root = preferences_->data_root(OperatingMode::Test);
             scanner.local_root = scanner.portable_root.parent_path() / "test-local";
             scanner.probe_executable =

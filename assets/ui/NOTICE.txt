@@ -1,0 +1,9 @@
+Material Icons — Google Material Design Icons
+Copyright Google Inc. Licensed under the Apache License, Version 2.0.
+See MaterialIcons-LICENSE.txt. The font retains its original copyright metadata.
+
+Upstream: https://github.com/google/material-design-icons/tree/master/font
+Source file: font/MaterialIcons-Regular.ttf
+SHA-256: ef149f08bdd2ff09a4e2c8573476b7b0f3fbb15b623954ade59899e7175bedda
+Glyphs currently used: mic (e029), output (ebbe).
+Loaded privately for this process; no system font installation.

@@ -1,6 +1,7 @@
 #include "model/scanner_service.h"
 #include "audiohole/scoped_scan.hpp"
 #include "audiohole/test_suite.hpp"
+#include "presentation/scan_progress.h"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -223,14 +224,6 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
     }
     return result;
 }
-std::string excerpt(const std::string& text) {
-    if (text.size() <= 4096)
-        return text;
-    std::size_t end = 4096;
-    while (end && (static_cast<unsigned char>(text[end]) & 0xc0) == 0x80)
-        --end;
-    return text.substr(0, end) + "\n[Console excerpt; full details in the analysis bundle.]";
-}
 void write_json(const std::filesystem::path& path, const Json& document) {
     scan::make_atomic_writer()->write(path, document.dump(2) + "\n", std::nullopt);
 }
@@ -318,6 +311,17 @@ struct ScannerService::Impl {
                                     job.action.expected_bytes);
                 final.detail = "Device name and notes saved. Logical identity and profile "
                                "references are unchanged.";
+            } else if (job.action.kind == ScannerActionKind::ClearInventory) {
+                if (!job.action.confirmed)
+                    throw std::runtime_error(
+                        "Clearing scan information requires explicit confirmation");
+                const auto cleared = store.clear_inventory();
+                last_session.clear();
+                final.result = cleared.result;
+                final.detail = "Device scan records, history, bindings and saved scan sessions "
+                               "cleared. Profile references are retained.";
+                for (const auto& item : cleared.diagnostics)
+                    final.detail += "\n" + diagnostic(item);
             } else if (job.action.kind == ScannerActionKind::RefreshAvailability) {
                 auto provider = make_provider();
                 scan::Discovery identities;
@@ -391,6 +395,7 @@ struct ScannerService::Impl {
         write_json(directory / "request.json",
                    {{"source", options.source},
                     {"scanner_version", "0.4.0"},
+                    {"build_id", options.build_id},
                     {"scope", scope},
                     {"depth", job.deep ? "deep" : "basic"},
                     {"logical_id", job.logical_id},
@@ -408,8 +413,14 @@ struct ScannerService::Impl {
             throw std::runtime_error("Could not create the scan progress log.");
         std::uint64_t log_bytes = 0;
         bool truncated = false;
+        const auto scan_started = std::chrono::steady_clock::now();
+        presentation::ScanProgressText visible_progress;
         const auto progress = [&](const scan::Progress& progress) {
-            const Json data{{"phase", progress.phase},
+            const Json data{{"elapsed_ms", std::chrono::duration_cast<std::chrono::milliseconds>(
+                                               std::chrono::steady_clock::now() - scan_started)
+                                               .count()},
+                            {"timestamp_utc", scan::utc_now()},
+                            {"phase", progress.phase},
                             {"endpoint_id", progress.endpoint_id},
                             {"completed", progress.completed},
                             {"total", progress.total},
@@ -417,16 +428,25 @@ struct ScannerService::Impl {
             const auto bytes = data.dump() + "\n";
             if (log_bytes + bytes.size() <= 64ULL * 1024 * 1024) {
                 log << bytes;
+                // Flush the append stream for process-crash diagnostics. This is
+                // not an fsync per API event; durable JSON start/finish checkpoints
+                // retain the recovery contract without thousands of full rewrites.
+                log.flush();
+                if (!log)
+                    throw std::runtime_error("Could not append scan stage journal");
                 log_bytes += bytes.size();
             } else
                 truncated = true;
             ScannerUpdate update;
             update.generation = job.generation;
             update.phase = progress.phase;
-            update.detail = excerpt(bytes);
-            update.percent = progress.total ? static_cast<int>(std::min<std::size_t>(
-                                                  99, progress.completed * 100 / progress.total))
-                                            : -1;
+            const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                                     std::chrono::steady_clock::now() - scan_started)
+                                     .count();
+            update.detail =
+                "[Elapsed " + std::to_string(elapsed) + " s] " + visible_progress.consume(progress);
+            update.percent = visible_progress.percent();
+            final.percent = update.percent;
             publish(std::move(update));
         };
         auto provider = make_provider();
@@ -439,7 +459,7 @@ struct ScannerService::Impl {
             "; selected capability queries: " + std::to_string(basic.selected_endpoint_ids.size()) +
             "; known identities refreshed: " + std::to_string(basic.metadata_updated) + ".";
         for (const auto& item : basic.scan.diagnostics)
-            final.detail += "\n" + diagnostic(item);
+            final.detail += "\n" + visible_progress.describe(item);
         if (job.deep && (final.result == "completed" || final.result == "partially_completed") &&
             !job.stop.stop_requested()) {
             auto targets = store.probe_targets();
@@ -477,7 +497,7 @@ struct ScannerService::Impl {
                     "\nDeep: " + deep.result + "; targets: " + std::to_string(targets.size()) +
                     ". v0.4 stream evidence is limited; it is not a health/recommendation badge.";
                 for (const auto& item : deep.diagnostics)
-                    final.detail += "\n" + diagnostic(item);
+                    final.detail += "\n" + visible_progress.describe(item);
             }
         }
         if (job.stop.stop_requested())
@@ -614,9 +634,10 @@ std::uint64_t ScannerService::start_scan(bool deep, ScanScope scope, const std::
         scan::validate_deep_limits({options.attempts, options.duration_ms,
                                     options.attempt_timeout_ms, options.device_timeout_ms,
                                     options.mode});
-        if (options.system_timeout_ms < 1000 || options.system_timeout_ms > 3600000)
+        if ((options.system_timeout_ms && options.system_timeout_ms < 1000) ||
+            options.system_timeout_ms > 3600000)
             throw std::invalid_argument(
-                "The Deep scan system budget must be 1 second to 60 minutes.");
+                "The Deep scan system budget must be 0 (unlimited), or 1 second to 60 minutes.");
     }
     Impl::Job job;
     job.scan = true;

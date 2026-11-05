@@ -52,13 +52,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     auto* playback = new SurfacePanel(box, "playback-card");
     auto* source_layout = new wxBoxSizer(wxVERTICAL);
     auto* destination_layout = new wxBoxSizer(wxVERTICAL);
-    label(capture, source_layout, "Source (Capture)")->SetFont(GetFont().Bold());
+    material_heading(capture, source_layout, "Source (Capture)", true);
     w.source = new wxComboBox(capture, wxID_ANY);
     w.source->SetMinSize(FromDIP(wxSize(120, -1)));
     source_layout->Add(w.source, 0, wxEXPAND | wxALL, FromDIP(8));
     w.source_detail = label(capture, source_layout, "Select a source");
     capture->set_content_sizer(source_layout);
-    label(playback, destination_layout, "Destination (Playback)")->SetFont(GetFont().Bold());
+    material_heading(playback, destination_layout, "Destination (Playback)", false);
     w.destination = new wxComboBox(playback, wxID_ANY);
     w.destination->SetMinSize(FromDIP(wxSize(120, -1)));
     destination_layout->Add(w.destination, 0, wxEXPAND | wxALL, FromDIP(8));

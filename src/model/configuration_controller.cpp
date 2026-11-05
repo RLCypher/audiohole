@@ -37,8 +37,10 @@ ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPe
 ConfigurationController::~ConfigurationController() = default;
 void ConfigurationController::event(std::string type, std::string detail) {
     const auto severity = type == "error" || type == "scan-failed" ? Severity::Error
-                          : type == "recovering"                   ? Severity::Warning
-                                                                   : Severity::Info;
+                          : type == "recovering" || type == "scanner-action-failed" ||
+                                  type == "configuration-save-failed" || type == "action-rejected"
+                              ? Severity::Warning
+                              : Severity::Info;
     state_.events.push_back({++event_sequence_, std::move(type), std::move(detail), severity});
     if (state_.events.size() > 500)
         state_.events.erase(state_.events.begin());
@@ -47,7 +49,7 @@ void ConfigurationController::event(std::string type, std::string detail) {
 Result ConfigurationController::unavailable(const std::string& operation) {
     const auto detail =
         operation + " is unavailable: Test Mode has no routing, monitoring or playback engine.";
-    event("error", detail);
+    event("action-rejected", detail);
     return {false, detail};
 }
 Result ConfigurationController::commit(ConfigurationRecords records, const std::string& detail) {
@@ -59,7 +61,7 @@ Result ConfigurationController::commit(ConfigurationRecords records, const std::
     const auto result = persistence_->save(records);
     if (!result.ok) {
         edit_error_ = result.detail;
-        event("error", edit_error_);
+        event("configuration-save-failed", edit_error_);
         return result;
     }
     state_.endpoints = std::move(records.devices);
@@ -211,7 +213,7 @@ void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, con
         event("scan-start", deep ? "Deep scan started with explicit consent and bounded limits."
                                  : "Basic device discovery and capability queries started.");
     } catch (const std::exception& error) {
-        event("scan-failed", error.what());
+        event("scanner-action-failed", error.what());
     }
 }
 void ConfigurationController::stop() {
@@ -238,9 +240,10 @@ Result ConfigurationController::scanner_action(const ScannerActionRequest& reque
         scanner_job_is_scan_ = false;
         state_.scanner.result = "running";
         state_.scanner.phase =
-            request.kind == ScannerActionKind::EditMetadata          ? "saving device metadata"
-            : request.kind == ScannerActionKind::Export              ? "exporting"
-            : request.kind == ScannerActionKind::SetHidden           ? "saving visibility"
+            request.kind == ScannerActionKind::ClearInventory ? "clearing device scan information"
+            : request.kind == ScannerActionKind::EditMetadata ? "saving device metadata"
+            : request.kind == ScannerActionKind::Export       ? "exporting"
+            : request.kind == ScannerActionKind::SetHidden    ? "saving visibility"
             : request.kind == ScannerActionKind::RefreshAvailability ? "refreshing availability"
                                                                      : "loading inventory";
         ++state_.revision;
@@ -288,7 +291,7 @@ void ConfigurationController::advance(int) {
             ++state_.scanner.inventory_revision;
         }
         if (scanner_job_is_scan_) {
-            state_.scan_percent = 100;
+            state_.scan_percent = update.result == "completed" ? 100 : update.percent;
             event(update.result == "interrupted" ? "scan-cancelled"
                   : update.result == "completed" || update.result == "partially_completed"
                       ? "scan-complete"
@@ -297,7 +300,7 @@ void ConfigurationController::advance(int) {
         } else
             event(update.result == "completed" || update.result == "partially_completed"
                       ? "scanner-updated"
-                      : "error",
+                      : "scanner-action-failed",
                   update.detail);
     }
 }

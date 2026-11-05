@@ -1,6 +1,8 @@
 #include "gui/controls.h"
 #include <windows.h>
 #include <wx/dcbuffer.h>
+#include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 namespace audiohole::gui {
 namespace {
@@ -28,14 +30,15 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     const auto* draw = reinterpret_cast<DRAWITEMSTRUCT*>(item);
     const bool enabled = !(draw->itemState & ODS_DISABLED);
     const bool pressed = (draw->itemState & ODS_SELECTED) != 0;
-    const bool dark = button.GetBackgroundColour().GetLuminance() < 0.5;
+    const bool dark = button.GetParent()->GetBackgroundColour().GetLuminance() < 0.5;
     const bool hover = button.GetScreenRect().Contains(wxGetMousePosition());
     wxColour background = button.GetBackgroundColour();
     if (!enabled)
         background = dark ? wxColour(30, 36, 43) : wxColour(224, 226, 230);
     if (enabled && (hover || pressed))
-        background = dark ? wxColour(pressed ? 40 : 52, pressed ? 59 : 75, pressed ? 78 : 96)
-                          : wxColour(pressed ? 186 : 215, pressed ? 204 : 229, 244);
+        background = background == palette::mint() ? background.ChangeLightness(pressed ? 85 : 110)
+                     : dark ? wxColour(pressed ? 40 : 52, pressed ? 59 : 75, pressed ? 78 : 96)
+                            : wxColour(pressed ? 186 : 215, pressed ? 204 : 229, 244);
     const wxColour foreground = !enabled
                                     ? wxColour(dark ? 136 : 110, dark ? 147 : 110, dark ? 163 : 110)
                                     : button.GetForegroundColour();
@@ -99,17 +102,35 @@ ActionButton::ActionButton(wxWindow* parent, const wxString& title, long style)
     : wxButton(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, style) {
     SetToolTip(button_help(title));
     SetMinSize(wxSize(-1, FromDIP(32)));
+    MakeOwnerDrawn();
     bind_feedback(this);
 }
 bool ActionButton::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     return use_native_colours ? wxButton::MSWOnDraw(item) : paint_button(*this, item, false);
 }
 NavigationButton::NavigationButton(wxWindow* parent) : wxToggleButton(parent, wxID_ANY, "") {
+    MakeOwnerDrawn();
     bind_feedback(this);
 }
 bool NavigationButton::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     return use_native_colours ? wxToggleButton::MSWOnDraw(item)
                               : paint_button(*this, item, GetValue());
+}
+void material_heading(wxWindow* parent, wxSizer* layout, const wxString& title, bool capture) {
+    static const bool loaded = wxFont::AddPrivateFont(
+        wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath() + wxFILE_SEP_PATH +
+        "assets" + wxFILE_SEP_PATH + "ui" + wxFILE_SEP_PATH + "MaterialIcons-Regular.ttf");
+    auto* row = new wxBoxSizer(wxHORIZONTAL);
+    if (loaded) {
+        auto* icon =
+            new wxStaticText(parent, wxID_ANY, wxString(wxUniChar(capture ? 0xe029 : 0xebbe)));
+        icon->SetFont(wxFont(wxFontInfo(18).FaceName("Material Icons")));
+        icon->SetName(capture ? "Microphone icon" : "Media output icon");
+        icon->SetToolTip(title);
+        row->Add(icon, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, parent->FromDIP(6));
+    }
+    label(parent, row, title)->SetFont(parent->GetFont().Bold());
+    layout->Add(row, 0, wxEXPAND);
 }
 wxColour routing_colour(audiohole::State state) {
     switch (state) {

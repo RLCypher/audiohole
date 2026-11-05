@@ -49,14 +49,53 @@ class StatusDot final : public wxDataViewCustomRenderer {
   private:
     wxString status_;
 };
+class DeviceName final : public wxDataViewCustomRenderer {
+  public:
+    DeviceName() : wxDataViewCustomRenderer("string", wxDATAVIEW_CELL_INERT) {}
+    bool SetValue(const wxVariant& value) override {
+        name_ = value.GetString();
+        return true;
+    }
+    bool GetValue(wxVariant& value) const override {
+        value = name_;
+        return true;
+    }
+    wxSize GetSize() const override {
+        return GetView()->FromDIP(wxSize(100, 22));
+    }
+#if wxUSE_ACCESSIBILITY
+    wxString GetAccessibleDescription() const override {
+        return name_;
+    }
+#endif
+    bool Render(wxRect rect, wxDC* dc, int state) override {
+        HIGHCONTRASTW contrast{};
+        contrast.cbSize = sizeof(contrast);
+        const bool system =
+            SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
+            (contrast.dwFlags & HCF_HIGHCONTRASTON);
+        const bool selected = state & wxDATAVIEW_CELL_SELECTED;
+        const bool dark = GetView()->GetBackgroundColour().GetLuminance() < 0.5;
+        dc->SetTextForeground(system             ? wxSystemSettings::GetColour(selected
+                                                                                   ? wxSYS_COLOUR_HIGHLIGHTTEXT
+                                                                                   : wxSYS_COLOUR_WINDOWTEXT)
+                              : selected && dark ? *wxWHITE
+                                                 : GetView()->GetForegroundColour());
+        const auto text = wxControl::Ellipsize(name_, *dc, wxELLIPSIZE_END, rect.width);
+        dc->DrawText(text, rect.x, rect.y + (rect.height - dc->GetCharHeight()) / 2);
+        return true;
+    }
+
+  private:
+    wxString name_;
+};
 } // namespace
 DeviceList::DeviceList(wxWindow* parent)
     : wxDataViewListCtrl(parent, wxID_ANY, wxDefaultPosition, wxSize(300, 100),
                          wxDV_SINGLE | wxDV_NO_HEADER) {
     SetMinSize(wxSize(120, 40));
     AppendColumn(new wxDataViewColumn("Status", new StatusDot, 0, FromDIP(30), wxALIGN_CENTER, 0));
-    auto* renderer = new wxDataViewTextRenderer("string", wxDATAVIEW_CELL_INERT);
-    renderer->EnableEllipsize(wxELLIPSIZE_END);
+    auto* renderer = new DeviceName;
     AppendColumn(new wxDataViewColumn("Device name", renderer, 1, 260, wxALIGN_LEFT, 0));
     Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
         const int width = GetClientSize().x;

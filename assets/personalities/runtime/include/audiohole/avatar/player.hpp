@@ -2,6 +2,7 @@
 #include "audiohole/avatar/assets.hpp"
 #include <deque>
 #include <optional>
+#include <stdexcept>
 #include <unordered_map>
 
 namespace audiohole::avatar {
@@ -24,7 +25,7 @@ struct Presentation {
     int index = 0, frame_count = 0, exposure_ms = 0;
     double elapsed_ms = 0;
     int priority = 0;
-    bool reaction = false, loading = false, paused = false, holding = false;
+    bool reaction = false, loading = false, paused = false, holding = false, looping = false;
     std::vector<std::string> diagnostics;
 };
 // Host-thread only, clock-injected playback. No filesystem, GUI, decoding, audio,
@@ -49,6 +50,14 @@ class Player {
     void hold_expressions(bool value) {
         hold_expressions_ = value;
     }
+    // Total authored passes, 1..20; continuous reactions yield to context changes
+    // and subsequent events. Baseline looping/reduced-motion stay independent.
+    void reaction_playback(int count, bool until_event) {
+        if (count < 1 || count > 20)
+            throw std::invalid_argument("Invalid animation loop count");
+        reaction_loops_ = count;
+        loop_until_event_ = until_event;
+    }
     void restart(std::int64_t now);
     void step(std::int64_t now);
     std::uint64_t revision() const {
@@ -70,6 +79,8 @@ class Player {
     std::uint64_t revision_ = 0;
     int baseline_priority_ = 0, active_priority_ = 0;
     int active_hold_ms_ = 0;
+    int reaction_loops_ = 1;
+    bool loop_until_event_ = false;
     std::int64_t last_now_ = 0;
     bool clock_valid_ = false, finite_ = false, inspecting_ = false, paused_ = false,
          reduced_ = false, hold_expressions_ = false;

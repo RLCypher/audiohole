@@ -410,3 +410,37 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   slash ZIP-relative record references, included raw histories or explicit missing
   reasons. Selected-device Basic completion may advance its date despite unrelated
   enumeration errors, but the overall partial result and diagnostics remain visible.
+
+## Current backlog acceptance
+
+- [ ] In Dark, selected Devices names are white on the existing darker-blue highlight;
+  Light keeps its lighter-blue selection. Check focused/unfocused and high contrast.
+- [ ] Check scrollbars, dropdown arrows/lists, steppers and normal/disabled/hover/pressed
+  buttons in Light, Dark and Follow System, including live OS changes and 100/150/200% DPI.
+  Older Windows may use its native theme fallback; no system preference changes.
+- [ ] Deep fields have equal widths/heights and padded spacing. Enter invalid values
+  in buffer, Deep limits, loop count and startup controls: dismissing feedback must
+  leave avatar clicks/personality usable and retain any genuine existing warning.
+- [ ] Audio/Hole align with the logo bottom, using existing interface cyan/pink.
+  Capture/Playback list borders match routing cards. Material Mic/Output icons load
+  beside readable labels from the extracted package without installing fonts.
+- [ ] Deep progress shows familiar names, direction, device/configuration counts,
+  format/mode, setup/stream/cleanup/save stages and a live elapsed clock during waits.
+  A partial/cancelled scan does not display 100%; raw IDs remain in exported evidence.
+- [ ] Scan limit 0 explicitly disables total batch deadline, retaining attempt/device
+  limits and Cancel; use a small finite per-device limit for assessment. Also check
+  ordinary finite budgets. Never use an unconsented hardware scan in CI.
+- [ ] Export twice without editing the suggested name; collisions ask for another
+  name and never replace an archive. Cancel/retry must not trap the personality card.
+- [ ] Clear device list defaults to No, names all deleted metadata/history/bindings/
+  sessions, and requires a deliberate Yes. With disposable Test data, verify restart,
+  empty device lists, preserved profiles/preferences/unrelated files and unresolved
+  saved references. Clear is unavailable during scans and in Preview.
+- [ ] Test loop count 1 and 3, hold after final repeat, continuous looping precedence,
+  and restoring saved count/hold after disabling continuous playback. Check the next
+  event (including same expression), real warning, identity switch, reduced motion,
+  two-minute sleep/wake and preference restart. Idle-ending artwork may still look
+  idle when held; pruning/import is intentionally deferred.
+- [ ] Compare a real scan bundle before/after: checkpoint timings, complete raw stage
+  histories and external notes/extensions must survive. Measure actual wall time;
+  portable tests do not establish a hardware speedup or stronger verification.

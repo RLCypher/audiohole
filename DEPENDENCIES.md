@@ -538,3 +538,14 @@ service or DLL is required at runtime. The test-fixture runner is linked only in
 test targets; GUI export links a separate archive target. See
 [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) for the private probe process boundary
 and evidence limitations. This does not select an audio engine or final serializer.
+
+### Owner-requested Material UI icons
+
+The byte-preserved Google Material Icons Regular font is committed in `assets/ui/`
+(SHA-256 `ef149f08bdd2ff09a4e2c8573476b7b0f3fbb15b623954ade59899e7175bedda`).
+Its Apache-2.0 license and attribution are shipped beside it. Only the decorative
+Mic/Output glyphs are currently used, beside accessible text. wx privately loads
+it for this process; no system font installation, runtime network request or new
+runtime library is required. Native appearance additionally uses Windows uxtheme;
+optional dark-mode entry points are version/capability gated and process-local.
+See GUI_REVISION_NOTES.md for limitations and validation requirements.

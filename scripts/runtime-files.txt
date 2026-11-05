@@ -2,6 +2,9 @@ MANUAL_GUI_CHECKLIST.md
 assets/branding/audiohole-logo.png
 assets/branding/audiohole.ico
 assets/presentation/placeholder-avatar.png
+assets/ui/MaterialIcons-LICENSE.txt
+assets/ui/MaterialIcons-Regular.ttf
+assets/ui/NOTICE.txt
 audiohole-probe.exe
 audiohole.exe
 avatar-assets.json

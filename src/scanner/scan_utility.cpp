@@ -61,8 +61,8 @@ UtilityOptions utility_options(const std::vector<fs::path>& arguments, const fs:
       throw std::invalid_argument("--confirm-disruption requires --device ID or --deep-all");
     if (seen.contains("--system-timeout-ms") && !result.deep_all)
       throw std::invalid_argument("--system-timeout-ms requires --deep-all");
-    if (result.system_timeout_ms < 1000 || result.system_timeout_ms > 7200000)
-      throw std::invalid_argument("System timeout must be 1000..7200000 ms");
+    if ((result.system_timeout_ms && result.system_timeout_ms < 1000) || result.system_timeout_ms > 7200000)
+      throw std::invalid_argument("System timeout must be 0 (unlimited) or 1000..7200000 ms");
   }
   return result;
 }

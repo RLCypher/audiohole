@@ -98,4 +98,42 @@ TEST(AvatarReactionHold, StaticAndReducedMotionReactionsRetainTheirStillImage) {
         EXPECT_FALSE(playback.tick(2650).reaction);
     }
 }
+TEST(AvatarPlayback, CountsTotalPassesThenHoldsOnlyAfterTheLastPass) {
+    auto playback = player();
+    playback.reaction_playback(3, false);
+    playback.hold_expressions(true);
+    auto reaction = clip("happy");
+    ASSERT_TRUE(playback.react(reaction, {"happy", "repeat", 1, 0, 2000, 10, 2000}, 0).accepted);
+    EXPECT_EQ(playback.tick(300).index, 0);
+    EXPECT_EQ(playback.tick(600).index, 0);
+    EXPECT_FALSE(playback.tick(899).holding);
+    EXPECT_TRUE(playback.tick(900).holding);
+    EXPECT_EQ(playback.tick(10000).image, reaction->frames.back());
+    playback.hold_expressions(false);
+    EXPECT_FALSE(playback.tick(10000).reaction);
+    EXPECT_THROW(playback.reaction_playback(0, false), std::invalid_argument);
+    EXPECT_THROW(playback.reaction_playback(21, false), std::invalid_argument);
+}
+TEST(AvatarPlayback, ContinuousOverridesHoldAndYieldsToNextEventAndWarning) {
+    auto playback = player();
+    playback.reaction_playback(1, true);
+    playback.hold_expressions(true);
+    auto reaction = clip("happy");
+    ASSERT_TRUE(playback.react(reaction, {"happy", "first", 1, 0, 2000, 10, 2000}, 0).accepted);
+    const auto repeated = playback.tick(3000);
+    EXPECT_TRUE(repeated.looping);
+    EXPECT_FALSE(repeated.holding);
+    EXPECT_EQ(repeated.index, 0);
+    ASSERT_TRUE(
+        playback.react(reaction, {"happy", "next", 1, 3000, 2000, 10, 2000}, 3000).accepted);
+    EXPECT_EQ(playback.tick(3000).index, 0);
+    ASSERT_TRUE(playback.context("concerned", 2, 70, 3100, true).accepted);
+    EXPECT_FALSE(playback.tick(3100).reaction);
+    playback = player();
+    playback.reaction_playback(2, false);
+    playback.reduced_motion(true);
+    ASSERT_TRUE(playback.react(reaction, {"happy", "static", 1, 0, 2000, 10, 2000}, 0).accepted);
+    EXPECT_EQ(playback.tick(500).image, reaction->still);
+    EXPECT_FALSE(playback.tick(2600).reaction);
+}
 } // namespace

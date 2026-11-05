@@ -25,6 +25,8 @@ class NavigationButton final : public wxToggleButton {
 // GUI-thread only. Helpers own no windows or GDI resources beyond a paint call.
 wxString button_help(const wxString& title);
 wxColour routing_colour(audiohole::State state);
+// Decorative Material glyph next to the authoritative accessible text label.
+void material_heading(wxWindow* parent, wxSizer*, const wxString& title, bool capture);
 // Native sizer-owned panel with a restrained rounded outline. Children remain
 // ordinary accessible controls; paint has no controller or personality behavior.
 class SurfacePanel final : public wxPanel {

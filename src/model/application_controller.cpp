@@ -270,7 +270,8 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                                value.options);
                 if (snapshot().scanner.available) {
                     target = std::to_string(snapshot().scanner.generation);
-                    budget_ms = value.advanced
+                    budget_ms = value.advanced && value.options.system_timeout_ms == 0 ? -1
+                                : value.advanced
                                     ? static_cast<int>(value.options.system_timeout_ms + 180000)
                                     : 180000;
                 }
@@ -359,8 +360,10 @@ void ApplicationController::settle(int elapsed_ms) {
                      current.scanner.result != "partially_completed";
             cancelled = complete && current.scanner.result == "interrupted";
         }
-        iterator->remaining_ms -= std::clamp(elapsed_ms, 0, 30000);
-        if (complete || failed || cancelled || iterator->remaining_ms <= 0) {
+        if (iterator->remaining_ms >= 0)
+            iterator->remaining_ms =
+                std::max(0, iterator->remaining_ms - std::clamp(elapsed_ms, 0, 30000));
+        if (complete || failed || cancelled || iterator->remaining_ms == 0) {
             result.outcome = cancelled  ? Outcome::Cancelled
                              : failed   ? Outcome::Failed
                              : complete ? Outcome::Completed

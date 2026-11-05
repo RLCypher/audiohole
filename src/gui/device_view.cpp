@@ -1,6 +1,7 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
 #include <wx/datetime.h>
+#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 namespace {
@@ -45,13 +46,18 @@ void Frame::build_devices() {
     auto* left = new wxBoxSizer(wxVERTICAL);
     device_search_ = field(browser, left, "Search devices");
     auto list = [&](const char* title, DeviceList*& box, std::vector<std::string>& ids) {
-        label(browser, left, title);
-        box = new DeviceList(browser);
+        const bool capture = std::string(title) == "Capture devices";
+        auto* card = new SurfacePanel(browser, capture ? "capture-card" : "playback-card");
+        auto* content = new wxBoxSizer(wxVERTICAL);
+        material_heading(card, content, text(title), capture);
+        box = new DeviceList(card);
         box->SetName(text(title));
         box->SetToolTip(
             "Status dots: green available; gray unavailable; yellow attention or unknown; red "
             "explicitly unusable. Right-click for scans and Hide / Unhide.");
-        left->Add(box, 1, wxEXPAND | wxALL, 3);
+        content->Add(box, 1, wxEXPAND | wxALL, 3);
+        card->set_content_sizer(content);
+        left->Add(card, 1, wxEXPAND | wxALL, 3);
         auto* control = box;
         auto* mapped_ids = &ids;
         box->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [this, control, mapped_ids](wxDataViewEvent&) {
@@ -147,7 +153,7 @@ void Frame::build_devices() {
     evidence_panel->SetSizer(evidence_layout);
     device_rows_->SplitHorizontally(notes_panel, evidence_panel);
     right->Add(device_rows_, 1, wxEXPAND);
-    auto* maintenance = new wxBoxSizer(wxHORIZONTAL);
+    auto* maintenance = new wxWrapSizer(wxHORIZONTAL);
     for (const auto& item :
          {std::pair{"Reload saved devices", ScannerActionKind::Reload},
           std::pair{"Refresh availability", ScannerActionKind::RefreshAvailability}}) {
@@ -168,6 +174,25 @@ void Frame::build_devices() {
                                  "creating new records.");
         scanner_actions_.push_back(action);
     }
+    auto* clear = button(details, maintenance, "Clear device list…", [this] {
+        if (wxMessageBox(
+                "Delete all Test Mode device scan records, including device names, notes, hidden "
+                "preferences, probe histories, local bindings and saved scan sessions?\n\n"
+                "Saved profiles remain, but their devices may need to be selected again after "
+                "rescanning. Exported bundles outside these data folders remain.\n\n"
+                "This cannot be undone. Continue?",
+                "Clear device scan information", wxYES_NO | wxNO_DEFAULT | wxICON_WARNING,
+                this) != wxYES)
+            return;
+        ScannerActionRequest request;
+        request.kind = ScannerActionKind::ClearInventory;
+        request.confirmed = true;
+        device_dirty_ = false;
+        scanner_action(request);
+    });
+    clear->SetToolTip("Delete scanner records and scan history in the isolated Test data roots, "
+                      "after confirmation. Available only while the scanner is idle.");
+    scanner_actions_.push_back(clear);
     right->Add(maintenance, 0, wxEXPAND);
     auto* toggle = button(details, right, "Toggle availability", [this] {
         if (controller_->snapshot().operating_mode != OperatingMode::Preview)
@@ -243,6 +268,8 @@ void Frame::populate_devices() {
                 ids.push_back(e.id);
             }
     }
+    if (!endpoint(controller_->snapshot(), device_id_) && !device_dirty_)
+        device_id_.clear();
     if (device_id_.empty()) {
         const auto& ids = capture_device_ids_.empty() ? playback_device_ids_ : capture_device_ids_;
         const auto first =

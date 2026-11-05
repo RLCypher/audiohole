@@ -1878,3 +1878,20 @@ An interrupted rename/content sequence is recoverable by Reload, but is not a
 multi-file transaction. See SCANNER_TEST_MODE.md for the failure contract. Scan
 duration controls display decimal seconds; existing JSON/request fields remain
 integer milliseconds. No device/profile schema migration is introduced.
+
+### Current GUI refinement preferences and scan observations
+
+The isolated build-preference document (schema 1) adds optional integer
+`animation_loops` (1–20, default 1) and boolean `loop_until_event` (default false).
+Existing `hold_expressions` remains independent and remembered when continuous
+looping temporarily takes precedence. Invalid types/ranges preserve the original
+file; older documents need no migration. These remain provisional build preferences.
+
+Scan requests retain integer milliseconds: `system_timeout_ms: 0` now explicitly
+means unlimited **overall** Deep batch time. Individual attempt/device limits remain
+finite. Attempt observations may include `initial_checkpoint_ms` and `worker_wall_ms`;
+the bounded session journal includes monotonic elapsed/stage and final-checkpoint
+wall times. These are measured processing timings, not audio latency guarantees.
+No profile/device format is finalized. Explicit Clear device list intentionally
+removes scanner identities/data; saved profile references remain and may require
+rebinding. See GUI_REVISION_NOTES.md for confirmation and failure behavior.

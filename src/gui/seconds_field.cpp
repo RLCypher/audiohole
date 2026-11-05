@@ -8,8 +8,9 @@ SecondsField::SecondsField(wxWindow* parent, unsigned minimum_ms, unsigned maxim
     auto* row = new wxBoxSizer(wxHORIZONTAL);
     text_ = new wxTextCtrl(this, wxID_ANY,
                            wxString::FromUTF8(presentation::seconds_from_milliseconds(initial_ms)),
-                           wxDefaultPosition, wxSize(80, -1));
-    auto* step = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_VERTICAL);
+                           wxDefaultPosition, FromDIP(wxSize(80, -1)));
+    auto* step = new wxSpinButton(this, wxID_ANY, wxDefaultPosition,
+                                  wxSize(FromDIP(18), text_->GetBestSize().y), wxSP_VERTICAL);
     step->SetRange(-1, 1);
     step->SetValue(0);
     row->Add(text_, 1, wxEXPAND);

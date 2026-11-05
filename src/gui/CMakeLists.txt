@@ -10,12 +10,12 @@ if(Git_FOUND)
     set(audiohole_build_commit "unknown")
   endif()
 endif()
-add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp)
+add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
 # uuid precedes wx's transitive oleacc import library to avoid duplicate GUID
 # objects in MinGW; MSVC uses the same system GUID library.
-target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base uuid dwmapi advapi32 windowscodecs shlwapi propsys shell32)
+target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base uuid uxtheme dwmapi advapi32 windowscodecs shlwapi propsys shell32)
 if(MSVC)
   target_compile_definitions(audiohole PRIVATE AUDIOHOLE_MSVC_MANIFEST)
   target_compile_options(audiohole PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:/W4;/permissive-;/utf-8>")
@@ -57,3 +57,8 @@ set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS
 
 install(FILES "${PROJECT_SOURCE_DIR}/assets/personalities/provenance/deployed-assets.json"
   DESTINATION . RENAME avatar-assets.json COMPONENT Runtime)
+
+# Apache-2.0 Material icon font, loaded privately for this process only.
+add_custom_command(TARGET audiohole POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_directory
+  "${PROJECT_SOURCE_DIR}/assets/ui" "$<TARGET_FILE_DIR:audiohole>/assets/ui")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/ui/" DESTINATION assets/ui COMPONENT Runtime)

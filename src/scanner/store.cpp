@@ -522,9 +522,75 @@ void DeviceStore::set_hidden(const std::string& logical_id, bool hidden) {
   writer_->write(found->path, ordered_record(found->data).dump(2) + "\n", found->original);
 }
 
-void DeviceStore::edit_metadata(const std::string &logical_id, const std::string &display_name,
-                                const std::string &notes, const std::string &expected_path,
-                                const std::string &expected_bytes) {
+ScanReport DeviceStore::clear_inventory() {
+  detail::StoreLock portable_lock(portable_root_);
+  detail::StoreLock local_lock(local_root_);
+  std::vector<std::pair<fs::path, fs::path>> retired;
+  const std::vector<fs::path> paths{portable_root_ / "devices", portable_root_ / "probe_history",
+                                    local_root_ / "device_bindings.json",
+                                    local_root_ / "device_bindings.json.bak",
+                                    local_root_ / "sessions"};
+  // Validate everything before moving the first path. No symlink traversal or
+  // wildcard deletion is permitted for this explicitly destructive action.
+  const auto reject_link = [](const fs::path& path) {
+    bool linked = fs::is_symlink(fs::symlink_status(path));
+#ifdef _WIN32
+    const auto attributes = GetFileAttributesW(path.c_str());
+    linked = linked ||
+             (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_REPARSE_POINT));
+#endif
+    if (linked)
+      throw std::runtime_error("Refusing to clear a linked scanner path: " + path_utf8(path));
+  };
+  for (const auto& path : paths) {
+    reject_link(path);
+    if (fs::is_directory(path))
+      for (auto entry = fs::recursive_directory_iterator(path);
+           entry != fs::recursive_directory_iterator(); ++entry) {
+        reject_link(entry->path()); // Includes Windows junctions, before descent.
+        if (entry.depth() > 64)
+          throw std::runtime_error("Unexpected nesting in scanner data; no data was cleared");
+      }
+  }
+  try {
+    for (const auto& path : paths) {
+      if (!fs::exists(path))
+        continue;
+      auto destination = path;
+      destination += ".cleared-" + new_logical_id("retired");
+      detail::move_no_replace(path, destination);
+      retired.emplace_back(path, destination);
+    }
+  } catch (const std::exception& error) {
+    std::string recovery;
+    for (auto it = retired.rbegin(); it != retired.rend(); ++it)
+      try {
+        detail::move_no_replace(it->second, it->first);
+      } catch (const std::exception& failure) {
+        recovery += "; recovery: " + path_utf8(it->second) + ": " + failure.what();
+      }
+    throw std::runtime_error(std::string(error.what()) + recovery);
+  }
+  ScanReport report;
+  report.result = "completed";
+  for (const auto& entry : retired) {
+    std::error_code error;
+    fs::remove_all(entry.second, error);
+    if (error) {
+      report.result = "partially_completed";
+      report.diagnostics.push_back(
+          {"retired_data_not_removed",
+           "Inventory cleared, but retired files could not be deleted: " + error.message(),
+           path_utf8(entry.second),
+           {}});
+    }
+  }
+  return report;
+}
+
+void DeviceStore::edit_metadata(const std::string& logical_id, const std::string& display_name,
+                                const std::string& notes, const std::string& expected_path,
+                                const std::string& expected_bytes) {
   if (display_name.empty() || display_name.size() > 180 ||
       safe_filename(display_name) != display_name)
     throw std::invalid_argument("Use a nonempty Windows-compatible device name (up to 180 UTF-8 "

@@ -171,3 +171,14 @@ The worker validates and renames the canonical JSON without replacing another
 device, preserves unknown fields, and reports stale edits or failed recovery.
 No routing action or format preference changes result from a metadata save.
 Existing machine-local bindings and profile references use the same ID.
+
+### Current scanner/validation refinement
+
+`ScannerActionKind::ClearInventory` requires a per-request `confirmed` flag. It is
+idle-only and removes only scanner-owned Test paths, retaining profile references.
+Recoverable scanner file actions emit `scanner-action-failed`; rejected admission
+and configuration save failures do not become runtime-health errors. True scan
+execution failures remain `scan-failed`. An unlimited Deep request uses zero overall
+budget and an internal no-deadline pending-command sentinel; authoritative terminal
+completion and cancellation still settle it. No polling timeout implies cancellation.
+See GUI_REVISION_NOTES.md for durable checkpoints and the stage-journal contract.

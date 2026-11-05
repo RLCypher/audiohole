@@ -201,3 +201,13 @@ unchanged. Windows cross-builds pass for the GUI, model tests and upstream engin
 tests. The native GUI smoke now exercises the checkbox without changing controller
 state. Actual Windows execution/visual inspection of these new behaviors remains
 pending; portable clocks/decoders do not substitute for that review.
+
+## Owner-requested repeat controls
+
+Reactions now have global presentation preferences for total plays (1–20, default
+1) and continuous looping until the next event. Continuous looping takes precedence
+over count/final hold, while authored baselines remain independent. Holds begin
+after the last finite pass. Reduced motion stays static; new events, severity,
+identity changes and inactivity sleep remain authoritative interruptions. Optional
+build-preference fields `animation_loops` and `loop_until_event` persist these values.
+Artwork/manifests have not been pruned. See GUI_REVISION_NOTES.md for full behavior.

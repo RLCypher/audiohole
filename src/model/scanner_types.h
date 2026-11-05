@@ -14,11 +14,19 @@ struct ScanOptions {
              device_timeout_ms = 120000, system_timeout_ms = 600000;
     bool consent = false;
 };
-enum class ScannerActionKind { Reload, RefreshAvailability, SetHidden, Export, EditMetadata };
+enum class ScannerActionKind {
+    Reload,
+    RefreshAvailability,
+    SetHidden,
+    Export,
+    EditMetadata,
+    ClearInventory
+};
 struct ScannerActionRequest {
     ScannerActionKind kind = ScannerActionKind::Reload;
     std::string logical_id;
     bool hidden = false;
+    bool confirmed = false; // Per-request destructive clear authorization; never persisted.
     std::filesystem::path output;
     std::string operating_context;
     std::string display_name, notes, expected_path, expected_bytes;

@@ -119,6 +119,11 @@ class DeviceStore {
   // A user preference, not endpoint availability. Fresh read/merge plus checked
   // atomic replacement preserves external notes, extensions and identity.
   void set_hidden(const std::string& logical_id, bool hidden);
+  // Explicit user action only. Retire scanner-owned records/history/bindings and
+  // session evidence, retaining profile configuration and unrelated files. Failed
+  // retirement rolls back without replacement; removal errors retain retired data
+  // and return diagnostics. Never called on startup or cancellation.
+  ScanReport clear_inventory();
   // User metadata only. The snapshot path/bytes reject stale editor writes.
   // Rename never replaces another device. Failed writes attempt a checked path
   // rollback; a concurrent external edit is retained and reported for recovery.

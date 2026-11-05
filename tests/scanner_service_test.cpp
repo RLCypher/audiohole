@@ -594,4 +594,227 @@ TEST_F(ScannerIntegration, ControllerKeepsScannerRecordsSeparateAndCorrelatesHid
     EXPECT_TRUE(endpoint(controller.snapshot(), id)->hidden);
 }
 } // namespace
+TEST_F(ScannerIntegration, UnlimitedBatchRunsItsPlanAndExportsRawStagesAndMonotonicTimings) {
+    auto worker = service();
+    ScanOptions options;
+    options.consent = true;
+    options.system_timeout_ms = 0;
+    options.attempts = 1;
+    const auto result = finish(*worker, worker->start_scan(true, ScanScope::Full, {}, options));
+    EXPECT_EQ(result.result, "partially_completed"); // Deliberately inconclusive fixture results.
+    EXPECT_EQ(evidence->probed.size(), 2u);
+    const auto directory = scan::utf8_path(result.session_path);
+    const auto request = Json::parse(bytes(directory / "request.json"));
+    EXPECT_EQ(request["system_timeout_ms"], 0);
+    EXPECT_TRUE(request.contains("build_id"));
+    std::ifstream journal(directory / "progress.jsonl");
+    std::string line;
+    unsigned stages = 0;
+    while (std::getline(journal, line)) {
+        const auto event = Json::parse(line);
+        EXPECT_TRUE(event["elapsed_ms"].is_number_integer());
+        EXPECT_TRUE(event["timestamp_utc"].is_string());
+        if (event["phase"] == "deep_stage") {
+            ++stages;
+            EXPECT_TRUE(event["endpoint_id"].is_string());
+        }
+    }
+    EXPECT_EQ(stages, 2u);
+}
+TEST_F(ScannerIntegration, ClearRequiresConfirmationAndPreservesProfilesAndOtherFiles) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    ApplicationController controller(std::make_unique<ConfigurationController>(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service()));
+    finish(controller);
+    const auto id = controller.snapshot().endpoints.front().id;
+    const auto profile_id = controller.create_profile("Keep my profile");
+    auto profile = *audiohole::profile(controller.snapshot(), profile_id);
+    auto hole = controller.make_hole();
+    hole.forward.source = id;
+    hole.forward.destination = controller.snapshot().endpoints.back().id;
+    profile.holes.push_back(hole);
+    ASSERT_TRUE(controller.save(profile, false).ok);
+    write(portable / "unrelated.json", {{"keep", true}});
+    std::filesystem::create_directories(local / "sessions");
+    write(local / "sessions" / "old.json", {{"evidence", true}});
+    std::filesystem::create_directories(portable / "probe_history");
+    write(portable / "probe_history" / "old.json", {{"evidence", true}});
+    write(local / "device_bindings.json.bak", {{"backup", true}});
+    ScannerActionRequest request;
+    request.kind = ScannerActionKind::ClearInventory;
+    ASSERT_TRUE(controller.scanner_action(request).ok);
+    finish(controller);
+    EXPECT_EQ(controller.snapshot().scanner.result, "failed");
+    EXPECT_EQ(controller.snapshot().endpoints.size(), 2u);
+    const auto outside = root / "outside-scanner-data";
+    std::filesystem::create_directory(outside);
+    write(outside / "user.json", {{"preserve", true}});
+    std::error_code link_error;
+    const auto link = portable / "probe_history" / "external-link";
+    std::filesystem::create_directory_symlink(outside, link, link_error);
+    if (!link_error) {
+        EXPECT_THROW(store.clear_inventory(), std::exception);
+        EXPECT_EQ(store.inventory().devices.size(), 2u);
+        EXPECT_TRUE(std::filesystem::exists(outside / "user.json"));
+        std::filesystem::remove(link);
+    }
+    request.confirmed = true;
+    auto consumer = controller.subscribe();
+    consumer.poll();
+    ASSERT_TRUE(controller.scanner_action(request).ok);
+    finish(controller);
+    EXPECT_TRUE(controller.snapshot().endpoints.empty());
+    EXPECT_EQ(controller.snapshot().scanner.result, "completed");
+    EXPECT_FALSE(std::filesystem::exists(portable / "devices"));
+    EXPECT_FALSE(std::filesystem::exists(local / "sessions"));
+    EXPECT_FALSE(std::filesystem::exists(local / "device_bindings.json"));
+    EXPECT_FALSE(std::filesystem::exists(local / "device_bindings.json.bak"));
+    EXPECT_FALSE(std::filesystem::exists(portable / "probe_history"));
+    EXPECT_TRUE(std::filesystem::exists(portable / "unrelated.json"));
+    EXPECT_TRUE(std::filesystem::exists(outside / "user.json"));
+    EXPECT_EQ(audiohole::profile(controller.snapshot(), profile_id)->holes.front().forward.source,
+              id);
+    ConfigurationController restarted(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service());
+    finish(restarted);
+    EXPECT_TRUE(restarted.snapshot().endpoints.empty());
+    ASSERT_TRUE(audiohole::profile(restarted.snapshot(), profile_id));
+    EXPECT_EQ(audiohole::profile(restarted.snapshot(), profile_id)->holes.front().forward.source,
+              id);
+    const auto updates = consumer.poll();
+    EXPECT_TRUE(std::any_of(updates.results.begin(), updates.results.end(), [](const auto& result) {
+        return result.command == "scanner.action" && result.outcome == Outcome::Completed;
+    }));
+}
+TEST_F(ScannerIntegration, InvalidScanAdmissionDoesNotCreateAnOperationalWarning) {
+    ApplicationController controller(std::make_unique<ConfigurationController>(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service()));
+    finish(controller);
+    ScanOptions options;
+    options.consent = true;
+    options.attempts = 0;
+    controller.scan(true, true, ScanScope::Full, {}, options);
+    EXPECT_FALSE(controller.snapshot().scanning);
+    EXPECT_FALSE(controller.snapshot().scanner.busy);
+    EXPECT_TRUE(std::any_of(controller.snapshot().events.begin(),
+                            controller.snapshot().events.end(), [](const auto& event) {
+                                return event.type == "scanner-action-failed" &&
+                                       event.severity == Severity::Warning;
+                            }));
+    EXPECT_TRUE(std::none_of(controller.snapshot().events.begin(),
+                             controller.snapshot().events.end(), [](const auto& event) {
+                                 return event.severity == Severity::Error ||
+                                        event.type == "scan-failed";
+                             }));
+}
+TEST_F(ScannerIntegration, UnlimitedBatchDoesNotExpireTheControllerAndRemainsCancellable) {
+    evidence->block = true;
+    ApplicationController controller(std::make_unique<ConfigurationController>(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service()));
+    finish(controller);
+    auto consumer = controller.subscribe();
+    consumer.poll();
+    ScanOptions options;
+    options.consent = true;
+    options.system_timeout_ms = 0;
+    controller.scan(true, true, ScanScope::Full, {}, options);
+    ASSERT_TRUE(controller.snapshot().scanner.busy);
+    for (int i = 0; i < 20; ++i)
+        controller.advance(30000);
+    const auto before_cancel = consumer.poll();
+    EXPECT_TRUE(
+        std::none_of(before_cancel.results.begin(), before_cancel.results.end(),
+                     [](const auto& result) { return result.outcome == Outcome::TimedOut; }));
+    controller.scan(false);
+    finish(controller);
+    EXPECT_EQ(controller.snapshot().scanner.result, "interrupted");
+    const auto canceled = consumer.poll();
+    EXPECT_TRUE(
+        std::any_of(canceled.results.begin(), canceled.results.end(),
+                    [](const auto& result) { return result.outcome == Outcome::Cancelled; }));
+}
+class CountingWriter final : public scan::AtomicWriter {
+  public:
+    unsigned writes = 0;
+    bool delay_next_write = false;
+    std::shared_ptr<scan::AtomicWriter> actual = scan::make_atomic_writer();
+    void write(const std::filesystem::path& path, const std::string& data,
+               const std::optional<std::string>& expected) override {
+        ++writes;
+        if (delay_next_write) {
+            delay_next_write = false;
+            std::this_thread::sleep_for(800ms);
+        }
+        actual->write(path, data, expected);
+    }
+};
+class ManyStages final : public scan::ProbeRunner {
+  public:
+    unsigned calls = 0;
+    std::function<void()> edit;
+    Json execute(const scan::ProbeJob&, std::stop_token,
+                 const scan::ProbeStageSink& stage) override {
+        ++calls;
+        for (int i = 0; i < 80; ++i) {
+            stage({{"api", "fixture-stage"}, {"phase", "end"}, {"number", i}});
+            if (i == 40 && edit)
+                edit();
+        }
+        return {{"classification", "inconclusive"}, {"cleanup", "completed"}};
+    }
+};
+TEST_F(ScannerIntegration,
+       StageJournalAvoidsFullRewritesAndRetainsExternalEditsAndTerminalEvidence) {
+    auto writer = std::make_shared<CountingWriter>();
+    scan::DeviceStore counted(portable, local, writer);
+    ASSERT_EQ(counted.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto record = counted.inventory().devices.front();
+    const auto target = counted.probe_targets().front();
+    writer->writes = 0;
+    ManyStages runner;
+    runner.edit = [&] {
+        auto edited = Json::parse(bytes(record.path));
+        EXPECT_EQ(edited["probed_capabilities"]["test_attempts"][0]["classification"],
+                  "inconclusive");
+        EXPECT_EQ(edited["probed_capabilities"]["test_attempts"][0]["status"], "running");
+        edited["notes"] = "External edit during probing";
+        write(record.path, edited);
+    };
+    unsigned journaled = 0;
+    scan::DeepLimits limits;
+    limits.max_attempts = 1;
+    const auto report =
+        scan::run_deep_scan(counted, runner, target, limits, true, {}, [&](const auto& event) {
+            if (event.phase == "deep_stage")
+                ++journaled;
+        });
+    EXPECT_EQ(report.attempted, 1u);
+    EXPECT_EQ(journaled, 80u);
+    EXPECT_LE(writer->writes, 8u); // Work is bounded per attempt, not per API event.
+    const auto saved = Json::parse(bytes(record.path));
+    EXPECT_EQ(saved["notes"], "External edit during probing");
+    EXPECT_EQ(saved["probed_capabilities"]["test_attempts"][0]["stages"].size(), 80u);
+    EXPECT_EQ(report.attempts[0]["stage_count"], 80);
+    EXPECT_TRUE(report.attempts[0].contains("initial_checkpoint_ms"));
+    EXPECT_TRUE(report.attempts[0].contains("worker_wall_ms"));
+}
+} // namespace audiohole
+
+namespace audiohole {
+TEST_F(ScannerIntegration, CheckpointLatencyDoesNotLaunchWorkerAfterDeviceBudgetIsSpent) {
+    auto writer = std::make_shared<CountingWriter>();
+    scan::DeviceStore counted(portable, local, writer);
+    ASSERT_EQ(counted.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto target = counted.probe_targets().front();
+    writer->delay_next_write = true;
+    ManyStages runner;
+    scan::DeepLimits limits{1, 250, 2000, 2000, "shared"};
+    const auto report = scan::run_deep_scan(counted, runner, target, limits, true);
+    EXPECT_EQ(runner.calls, 0u);
+    EXPECT_EQ(report.result, "partially_completed");
+    ASSERT_EQ(report.attempts.size(), 1u);
+    EXPECT_EQ(report.attempts[0]["classification"], "inconclusive");
+    EXPECT_NE(report.attempts[0]["reason"].get<std::string>().find("budget exhausted"),
+              std::string::npos);
+}
 } // namespace audiohole
