@@ -30,3 +30,29 @@ Job Object behavior, WASAPI support or driver reliability. The native CI workflo
 retains its Debug/Release and extracted-package validation gates. See
 [SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md) and the manual checklist for the
 remaining hardware/visual checks and the inherited Deep evidence limitation.
+
+
+## Follow-up: Windows scanner contract fixtures
+
+The subsequently supplied Windows Debug CTest log reports **135/136 CTest entries
+passed**, including both GUI smoke tests and all eight scanner/controller integration
+tests. `Scanner.Contracts` ran 80 internal checks, of which four failed. Thus the
+GUI compiled; the CTest gate prevented packaging.
+
+The append-only log fixture wrote in Windows text mode (CRLF) but asserted an LF
+byte prefix. It now writes explicit binary LF and CRLF fixtures and checks exact
+preservation plus actual appended bytes. The three automated-suite failures were
+reproduced on the development host by enforcing a 260-character file-path limit
+under a runner-sized temporary root: nested case/report/device paths and atomic
+write suffixes exceeded that limit before the intended checks could run. Windows
+contract fixtures now use absolute extended paths, including UNC handling. A
+Windows-only regression performs real Unicode writes, atomic replacement and
+backup reads beyond 280 path characters. Suite failures also include their manifest
+rather than only a final result assertion.
+
+After this fixture fix, all 78 portable scanner checks pass in Debug and Release,
+and the updated Windows contract executable cross-compiles/links. The new
+Windows-only regression and the full Windows CI rerun remain pending. No scanner
+runtime, GUI behavior, test skip, success criterion, routing logic or queued taskbar
+menu feature was changed by this repair. Native package validation remains gated
+on successful CTest; it has not been claimed as passed.

@@ -36,8 +36,22 @@ void write(const fs::path& path, const Json& data) {
   fs::create_directories(path.parent_path());
   std::ofstream(path, std::ios::binary) << data.dump(2) << '\n';
 }
+// The suite nests six cases, renamed Unicode records, reports and atomic-write
+// suffixes under this root. Use extended Windows paths so runner-specific TEMP
+// lengths cannot prevent the fixture from reaching the behavior under test.
+fs::path fixture_root() {
+  const auto path = fs::absolute(fs::temp_directory_path() / new_logical_id("audiohole-tests"));
+#ifdef _WIN32
+  const auto native = path.native();
+  if (native.starts_with(L"\\\\?\\")) return path;
+  if (native.starts_with(L"\\\\")) return fs::path(L"\\\\?\\UNC\\" + native.substr(2));
+  return fs::path(L"\\\\?\\" + native);
+#else
+  return path;
+#endif
+}
 struct Fixture {
-  fs::path root = fs::temp_directory_path() / new_logical_id("audiohole-tests");
+  fs::path root = fixture_root();
   fs::path portable = root / "portable", local = root / "local";
   DeviceStore store{portable, local};
   ~Fixture() {
@@ -511,12 +525,19 @@ TEST(utility_cancellation_still_writes_debug_and_run_report) {
 }
 TEST(utility_explicit_debug_text_is_append_only) {
   Fixture f;
-  const auto path = f.root / "debug.txt";
-  fs::create_directories(f.root); std::ofstream(path) << "Previous user debug text\n";
-  const auto options = utility_options({"--results", f.root / "results", "--debug-log", path}, f.root);
-  const auto result = run_scan_utility(options, [] { return std::make_unique<FakeProvider>(); });
-  CHECK(result.report.result == "completed");
-  CHECK(bytes(path).starts_with("Previous user debug text\n"));
+  fs::create_directories(f.root);
+  for (const auto* ending : {"\n", "\r\n"}) {
+    const auto path = f.root / (std::string(ending) == "\n" ? "debug-lf.txt" : "debug-crlf.txt");
+    const std::string original = std::string("Previous user debug text") + ending;
+    // Binary fixture I/O makes the expected bytes explicit on every platform.
+    // The logger must append without normalizing either newline convention.
+    std::ofstream(path, std::ios::binary) << original;
+    const auto options = utility_options({"--results", f.root / "results", "--debug-log", path}, f.root);
+    const auto result = run_scan_utility(options, [] { return std::make_unique<FakeProvider>(); });
+    CHECK(result.report.result == "completed");
+    const auto appended = bytes(path);
+    CHECK(appended.starts_with(original)); CHECK(appended.size() > original.size());
+  }
 }
 TEST(utility_debug_failure_does_not_scan_or_modify_json) {
   Fixture f;
@@ -883,9 +904,13 @@ TestSuiteResult fixture_suite(const fs::path& parent, bool fault = false, std::s
       if (fault) r->answer = {{"classification", "inconclusive"}, {"cleanup", "unknown"}}; return r;
     }, true, stop);
 }
+void check_suite_result(const TestSuiteResult& result, const std::string& expected) {
+  if (result.result != expected)
+    throw std::runtime_error("Expected suite result " + expected + "; manifest: " + result.manifest.dump(2));
+}
 TEST(automated_suite_covers_six_scopes_and_checks_unicode_notes_and_filenames) {
   Fixture f; const auto result = fixture_suite(f.root / "suite");
-  CHECK(result.result == "completed"); CHECK(fs::exists(result.archive)); CHECK(fs::file_size(result.archive) > 1000);
+  check_suite_result(result, "completed"); CHECK(fs::exists(result.archive)); CHECK(fs::file_size(result.archive) > 1000);
   CHECK(result.manifest["cases"].size() == 6); CHECK(result.manifest["hardware_source"] == "simulated_local_contract_fixture");
   for (const auto& c : result.manifest["cases"]) {
     CHECK(c["result"] == "completed"); CHECK(c["user_edits_verification"]["result"] == "passed");
@@ -907,7 +932,7 @@ TEST(automated_suite_denied_consent_starts_no_provider_and_writes_nothing) {
 }
 TEST(automated_suite_worker_uncertainty_stops_later_cases_but_packages_results) {
   Fixture f; const auto result = fixture_suite(f.root / "suite", true);
-  CHECK(result.result == "partially_completed"); CHECK(fs::exists(result.archive));
+  check_suite_result(result, "partially_completed"); CHECK(fs::exists(result.archive));
   CHECK(result.manifest["cases"][4]["result"] == "not_tested"); CHECK(result.manifest["cases"][5]["result"] == "not_tested");
   CHECK(result.manifest.contains("halt_reason"));
 }
@@ -938,7 +963,8 @@ TEST(automated_suite_detects_note_corruption_in_its_test_copy) {
         }
       }
     });
-  CHECK(modified); CHECK(result.result == "failed"); CHECK(fs::exists(result.archive));
+  if (!modified) throw std::runtime_error("Suite did not reach the note-corruption phase; manifest: " + result.manifest.dump(2));
+  check_suite_result(result, "failed"); CHECK(fs::exists(result.archive));
   CHECK(result.manifest["cases"][0]["user_edits_verification"]["result"] == "failed");
 }
 TEST(result_zip_refuses_overwrite_and_symlinks) {
@@ -974,6 +1000,23 @@ int fixture_worker() {
   if (behavior == "missing_evidence") result.erase("serviced_frames");
   std::cout << Json{{"type", "result"}, {"attempt_id", behavior == "wrong_id" ? "wrong" : id}, {"result", result}}.dump() << '\n' << std::flush;
   return 0;
+}
+TEST(windows_atomic_writes_support_deep_unicode_fixture_paths) {
+  Fixture f;
+  auto directory = f.root;
+  while (directory.native().size() < 280) directory /= "Nested fixture records";
+  fs::create_directories(directory);
+  const auto path = directory / utf8_path("Notes - \xc3\xa9 \xce\xa9.json");
+  auto writer = make_atomic_writer();
+  const std::string original = Json{{"notes", "Keep Unicode: \xc3\xa9 \xce\xa9"}, {"extension", true}}.dump(2) + '\n';
+  writer->write(path, original, std::nullopt);
+  CHECK(bytes(path) == original);
+  auto updated = Json::parse(original); updated["notes"] = "Edited notes";
+  const auto replacement = updated.dump(2) + '\n';
+  writer->write(path, replacement, original);
+  CHECK(bytes(path) == replacement);
+  auto backup = path; backup += ".bak";
+  CHECK(bytes(backup) == original); CHECK(read(path)["extension"] == true);
 }
 TEST(windows_worker_protocol_rejects_faults_and_bounds_hangs) {
   auto runner = make_process_probe_runner(test_executable());
