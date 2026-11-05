@@ -520,3 +520,21 @@ dependency is added; libpng/zlib remain disabled in wx. Pillow **12.3.0**, **MIT
 is an optional maintainer-only ICO regeneration tool; generated icons are committed.
 Python's standard library verifies assets in CI. Ordinary CMake builds and runtime
 branding need neither Pillow nor external PNG files. See assets/branding/README.md.
+
+### Scanner v0.4 integration dependencies
+
+The owner-supplied scanner is built as a separate C++20 static library, reusing
+nlohmann/json 3.11.3 for its off-audio-thread file serialization. JSON use is no
+longer limited to personality files. Windows scanning adds only system libraries
+`ole32`, `uuid`, `propsys`, `setupapi` and `cfgmgr32`.
+
+Analysis-bundle ZIP export reuses the handover's **miniz 3.1.0** (MIT) dependency,
+pinned to SHA-256
+`09569fc19d060ac9f5999ba9356728c2494ebe6a24ac0eb0a6b6ae3d396cfea6`.
+Its four C sources are statically linked with the same CRT settings; optional
+upstream tests/tools/install rules are not enabled. Its original license is
+installed as `miniz-LICENSE.txt`. No archive decoder, external program, network
+service or DLL is required at runtime. The test-fixture runner is linked only into
+test targets; GUI export links a separate archive target. See
+[SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) for the private probe process boundary
+and evidence limitations. This does not select an audio engine or final serializer.

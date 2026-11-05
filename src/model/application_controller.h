@@ -24,6 +24,10 @@ struct DiscoverDevices {
     bool advanced = false;
     ScanScope scope = ScanScope::Update;
     std::string selected_device;
+    ScanOptions options;
+};
+struct ScannerAction {
+    ScannerActionRequest request;
 };
 struct UpdateBuffer {
     std::string hole_id;
@@ -40,7 +44,7 @@ struct StartBeep {
 struct CancelBeep {};
 using Command = std::variant<StartRouting, StopRouting, LoadProfile, SaveConfiguration,
                              DiscoverDevices, UpdateBuffer, RequestStatus, RequestDevices,
-                             RequestDiagnostics, StartBeep, CancelBeep>;
+                             RequestDiagnostics, StartBeep, CancelBeep, ScannerAction>;
 const char* command_id(const Command&);
 enum class Outcome { Accepted, Completed, Rejected, Failed, Cancelled, TimedOut };
 struct CommandResult {
@@ -130,7 +134,9 @@ class ApplicationController final : public Controller {
     Result beep(const std::string&) override;
     void cancel_beep() override;
     void clear_diagnostics() override;
-    void scan(bool, bool = false, ScanScope = ScanScope::Update, const std::string& = {}) override;
+    void scan(bool, bool = false, ScanScope = ScanScope::Update, const std::string& = {},
+              const ScanOptions& = {}) override;
+    Result scanner_action(const ScannerActionRequest&) override;
 
   private:
     struct Posted {

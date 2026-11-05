@@ -11,7 +11,7 @@ const char* command_id(const Command& command) {
     static constexpr std::array names{"routing.start",      "routing.stop",     "profile.load",
                                       "configuration.save", "devices.discover", "buffer.update",
                                       "status.get",         "devices.get",      "diagnostics.get",
-                                      "beep.start",         "beep.cancel"};
+                                      "beep.start",         "beep.cancel",      "scanner.action"};
     return names.at(command.index());
 }
 Baseline presentation_baseline(const Snapshot& state) {
@@ -200,8 +200,10 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                            {}};
     std::string target;
     bool asynchronous = false;
+    int budget_ms = 30000;
     if (pending_.size() >= maximum_posts && (std::holds_alternative<StartRouting>(command) ||
                                              std::holds_alternative<DiscoverDevices>(command) ||
+                                             std::holds_alternative<ScannerAction>(command) ||
                                              std::holds_alternative<StartBeep>(command) ||
                                              (std::holds_alternative<SaveConfiguration>(command) &&
                                               std::get<SaveConfiguration>(command).apply))) {
@@ -260,14 +262,26 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                     cancel_pending("beep.start", "Apply cancelled Test Beep");
                 }
             } else if constexpr (std::is_same_v<T, DiscoverDevices>) {
-                if (!caps.scanning || snapshot().scanning) {
+                if (!caps.scanning || snapshot().scanning || snapshot().scanner.busy) {
                     response.result.detail = "Scanner unavailable or already busy";
                     return;
                 }
-                backend_->scan(true, value.advanced, value.scope, value.selected_device);
+                backend_->scan(true, value.advanced, value.scope, value.selected_device,
+                               value.options);
+                if (snapshot().scanner.available) {
+                    target = std::to_string(snapshot().scanner.generation);
+                    budget_ms = value.advanced
+                                    ? static_cast<int>(value.options.system_timeout_ms + 180000)
+                                    : 180000;
+                }
                 response.result = {snapshot().scanning,
                                    snapshot().scanning ? "Scan accepted" : "Scan rejected"};
                 asynchronous = response.result.ok;
+            } else if constexpr (std::is_same_v<T, ScannerAction>) {
+                response.result = backend_->scanner_action(value.request);
+                asynchronous = response.result.ok && snapshot().scanner.busy;
+                target = std::to_string(snapshot().scanner.generation);
+                budget_ms = value.request.kind == ScannerActionKind::Export ? 600000 : 30000;
             } else if constexpr (std::is_same_v<T, UpdateBuffer>) {
                 response.result = backend_->update_buffer(
                     value.profile_id.empty() ? snapshot().active_profile : value.profile_id,
@@ -300,7 +314,7 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                                           : Outcome::Rejected;
     if (asynchronous)
         pending_.push_back(
-            {response, target, 30000,
+            {response, target, budget_ms,
              snapshot().events.empty() ? last_event_ : snapshot().events.back().sequence});
     publish(response);
     return response;
@@ -327,11 +341,23 @@ void ApplicationController::settle(int elapsed_ms) {
             cancelled = !complete;
         } else if (result.command == "devices.discover") {
             complete = !current.scanning;
+            if (current.scanner.available) {
+                complete = std::to_string(current.scanner.completed_generation) == iterator->target;
+                failed = complete && current.scanner.result != "completed" &&
+                         current.scanner.result != "partially_completed" &&
+                         current.scanner.result != "interrupted";
+                cancelled = complete && current.scanner.result == "interrupted";
+            }
             for (const auto& event : current.events)
                 if (event.sequence > previously_published_event) {
                     failed = failed || event.type == "scan-failed";
                     cancelled = cancelled || event.type == "scan-cancelled";
                 }
+        } else if (result.command == "scanner.action") {
+            complete = std::to_string(current.scanner.completed_generation) == iterator->target;
+            failed = complete && current.scanner.result != "completed" &&
+                     current.scanner.result != "partially_completed";
+            cancelled = complete && current.scanner.result == "interrupted";
         }
         iterator->remaining_ms -= std::clamp(elapsed_ms, 0, 30000);
         if (complete || failed || cancelled || iterator->remaining_ms <= 0) {
@@ -347,6 +373,9 @@ void ApplicationController::settle(int elapsed_ms) {
             if (result.outcome == Outcome::TimedOut)
                 result.result = {false, "Command timed out; current state is authoritative. "
                                         "Timeout does not imply cancellation."};
+            else if ((result.command == "scanner.action" || result.command == "devices.discover") &&
+                     current.scanner.available && !current.scanner.detail.empty())
+                result.result.detail = current.scanner.detail;
             result.revision = current.revision;
             iterator = pending_.erase(iterator);
             publish(result);
@@ -443,14 +472,19 @@ void ApplicationController::clear_diagnostics() {
     record("diagnostics.clear", {true, "Session diagnostics cleared"});
 }
 void ApplicationController::scan(bool enabled, bool advanced, ScanScope scope,
-                                 const std::string& selected) {
+                                 const std::string& selected, const ScanOptions& options) {
     require_owner();
     if (enabled)
-        (void)submit(DiscoverDevices{advanced, scope, selected});
+        (void)submit(DiscoverDevices{advanced, scope, selected, options});
     else {
         backend_->scan(false);
-        cancel_pending("devices.discover", "Scan cancelled");
+        // Real scanner cancellation completes only after the worker cleans up.
+        if (!snapshot().scanner.available)
+            cancel_pending("devices.discover", "Scan cancelled");
         publish();
     }
+}
+Result ApplicationController::scanner_action(const ScannerActionRequest& request) {
+    return submit(ScannerAction{request}).result;
 }
 } // namespace audiohole

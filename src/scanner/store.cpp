@@ -31,7 +31,7 @@ void object_field(Json& j, const std::string& key) {
 }
 Json ordered_record(const Json& input) {
   Json result = Json::object();
-  for (const auto* field : {"display_name", "device_name", "notes", "logical_id",
+  for (const auto* field : {"display_name", "device_name", "hidden", "notes", "logical_id",
                            "scan_history", "identity", "reported_capabilities",
                            "probed_capabilities", "driver", "diagnostics", "metadata"})
     if (input.contains(field)) result[field] = input[field];
@@ -100,6 +100,8 @@ Json normalize(Json j, const fs::path& path) {
       (direction == "render" && directory != "playback"))
     throw std::runtime_error("Endpoint direction conflicts with record directory");
   if (!j.contains("notes")) j["notes"] = "";
+  if (!j.contains("hidden")) j["hidden"] = false;
+  if (!j["hidden"].is_boolean()) throw std::runtime_error("hidden must be a boolean");
   if (!j["notes"].is_string()) throw std::runtime_error("notes must be a string");
   const auto name = path_utf8(path.stem());
   if (name.empty() || name.back() == '.' || name.back() == ' ' ||
@@ -206,6 +208,12 @@ DeviceStore::DeviceStore(fs::path portable_root, fs::path local_root, std::share
 }
 
 ScanReport DeviceStore::reconcile(const Discovery& discovery, const std::string& timestamp) {
+  return reconcile_impl(discovery, timestamp, false);
+}
+ScanReport DeviceStore::refresh_metadata(const Discovery& discovery, const std::string& timestamp) {
+  return reconcile_impl(discovery, timestamp, true);
+}
+ScanReport DeviceStore::reconcile_impl(const Discovery& discovery, const std::string& timestamp, bool metadata_only) {
   ScanReport report{"failed", discovery.endpoints.size(), 0, discovery.diagnostics};
   if (discovery.cancelled) { report.result = "interrupted"; return report; }
   if (!discovery.complete && discovery.endpoints.empty()) {
@@ -320,6 +328,7 @@ ScanReport DeviceStore::reconcile(const Discovery& discovery, const std::string&
       if (rejected.contains(i) || historical.contains(i)) continue;
       const auto& endpoint = discovery.endpoints[i];
       if (!matches[i]) {
+        if (metadata_only) continue; // New endpoints require an explicit capability scan.
         const auto folder = portable_root_ / "devices" / (endpoint.direction == "capture" ? "recording" : "playback");
         const auto base = safe_filename(endpoint.device_name);
         fs::path path;
@@ -352,12 +361,14 @@ ScanReport DeviceStore::reconcile(const Discovery& discovery, const std::string&
         history["first_scanned"] = status("unknown"); // do not invent the discovery time of an imported record
         history["first_scanned_origin"] = "unavailable_in_imported_record";
       }
-      history["last_attempt"] = timestamp;
-      if (discovery.complete) history["last_scanned"] = timestamp;
-      history["last_scan_type"] = "basic";
-      history["last_easy_scan"] = timestamp;
-      history["last_scan_result"] = discovery.complete ? "completed" : "partially_completed";
-      if (discovery.complete) history["last_successful_scan"] = timestamp;
+      if (!metadata_only) {
+        history["last_attempt"] = timestamp;
+        if (discovery.complete) history["last_scanned"] = timestamp;
+        history["last_scan_type"] = "basic";
+        history["last_easy_scan"] = timestamp;
+        history["last_scan_result"] = discovery.complete ? "completed" : "partially_completed";
+        if (discovery.complete) history["last_successful_scan"] = timestamp;
+      }
       auto& identity = record["identity"];
       const auto old_name = text(identity, "current_device_name");
       if (!old_name.empty() && old_name != endpoint.device_name)
@@ -375,8 +386,10 @@ ScanReport DeviceStore::reconcile(const Discovery& discovery, const std::string&
         }
       }
       merge_observation(driver, endpoint.driver);
-      merge_observation(record["reported_capabilities"], endpoint.reported_capabilities);
-      record["diagnostics"] = endpoint.diagnostics;
+      if (!metadata_only) {
+        merge_observation(record["reported_capabilities"], endpoint.reported_capabilities);
+        record["diagnostics"] = endpoint.diagnostics;
+      }
       const auto id = text(record, "logical_id");
       if (!bindings.contains(id)) bindings[id] = Json::object();
       auto& binding = bindings[id];
@@ -396,7 +409,7 @@ ScanReport DeviceStore::reconcile(const Discovery& discovery, const std::string&
     for (std::size_t n = 0; n < records.size(); ++n) {
       auto& record = records[n];
       const auto bytes = record.data.dump(2) + "\n";
-      if (changed.contains(n) || bytes != record.original) {
+      if (changed.contains(n) || (discovery.full_inventory && !metadata_only && bytes != record.original)) {
         try {
           writer_->write(record.path, bytes, record.original.empty() ? std::nullopt
                                                                    : std::optional(record.original));
@@ -436,6 +449,7 @@ namespace {
 std::vector<Record> probe_records(const fs::path& root) {
   std::vector<Record> records;
   std::set<std::string> ids;
+  std::uintmax_t bytes_read = 0;
   for (const auto* directory : {"recording", "playback"}) {
     const auto folder = root / "devices" / directory;
     if (!fs::exists(folder)) continue;
@@ -443,10 +457,19 @@ std::vector<Record> probe_records(const fs::path& root) {
       auto extension = path_utf8(entry.path().extension());
       std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
       if (extension != ".json") continue;
-      const auto original = detail::read_optional(entry.path()).value();
-      auto record = normalize(detail::parse_json(original), entry.path());
-      if (!ids.insert(text(record, "logical_id")).second) throw std::runtime_error("Duplicate logical ID in probe inventory");
-      records.push_back({entry.path(), original, std::move(record)});
+      if (records.size() >= 4096) throw std::runtime_error("Device inventory exceeds 4096 records");
+      try {
+        const auto original = detail::read_optional(entry.path()).value();
+        bytes_read += original.size();
+        if (bytes_read > 128ULL * 1024 * 1024) throw std::runtime_error("Device inventory exceeds 128 MiB");
+        auto record = normalize(detail::parse_json(original), entry.path());
+        if (!ids.insert(text(record, "logical_id")).second) throw std::runtime_error("Duplicate logical ID in probe inventory");
+        for (const auto& existing : records)
+          if (same_filename(existing.path, entry.path())) throw std::runtime_error("Case-insensitive filename conflict");
+        records.push_back({entry.path(), original, std::move(record)});
+      } catch (const std::exception& error) {
+        throw std::runtime_error(path_utf8(entry.path()) + ": " + error.what());
+      }
     }
   }
   return records;
@@ -459,6 +482,44 @@ Json probe_bindings(const fs::path& root) {
       !cache.contains("bindings") || !cache["bindings"].is_object()) throw std::runtime_error("Invalid local probe bindings");
   return cache["bindings"];
 }
+}
+
+InventorySnapshot DeviceStore::inventory() {
+  InventorySnapshot result;
+  try {
+    detail::StoreLock portable_lock(portable_root_);
+    detail::StoreLock local_lock(local_root_);
+    const auto records = probe_records(portable_root_);
+    const auto bindings = fs::exists(local_root_ / "device_bindings.json")
+      ? probe_bindings(local_root_) : Json::object();
+    for (const auto& record : records) {
+      const auto id = text(record.data, "logical_id");
+      auto binding = bindings.contains(id) ? bindings.at(id) : Json::object();
+      if (!binding.is_object() || (!binding.empty() &&
+          (text(binding, "endpoint_id").empty() || text(binding, "direction") != text(record.data["identity"], "direction"))))
+        throw std::runtime_error("Invalid local binding for saved device: " + id);
+      result.devices.push_back({record.path, record.data, std::move(binding), record.original});
+    }
+    std::sort(result.devices.begin(), result.devices.end(), [](const auto& a, const auto& b) {
+      return text(a.record["identity"], "direction") + text(a.record, "display_name") <
+             text(b.record["identity"], "direction") + text(b.record, "display_name");
+    });
+    result.complete = true;
+  } catch (const std::exception& error) {
+    result.devices.clear();
+    result.diagnostics.push_back({"inventory_unavailable", error.what(), path_utf8(portable_root_), {}});
+  }
+  return result;
+}
+void DeviceStore::set_hidden(const std::string& logical_id, bool hidden) {
+  detail::StoreLock portable_lock(portable_root_);
+  auto records = probe_records(portable_root_);
+  auto found = std::find_if(records.begin(), records.end(), [&](const auto& record) {
+    return text(record.data, "logical_id") == logical_id;
+  });
+  if (found == records.end()) throw std::runtime_error("Saved device no longer exists");
+  found->data["hidden"] = hidden;
+  writer_->write(found->path, ordered_record(found->data).dump(2) + "\n", found->original);
 }
 
 std::vector<ProbeTarget> DeviceStore::probe_targets() {

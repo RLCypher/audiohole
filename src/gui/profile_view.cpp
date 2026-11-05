@@ -554,8 +554,12 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.destination->Clear();
     w.sources.clear();
     w.destinations.clear();
+    w.retained_source = d.source;
+    w.retained_destination = d.destination;
     wxArrayString source_search, dest_search;
     for (const auto& e : controller_->snapshot().endpoints) {
+        if (e.hidden)
+            continue;
         const auto caption =
             text(e.display_name + " [" + e.id + "] — " + audiohole::name(e.availability));
         auto* list = e.capture ? w.source : w.destination;
@@ -568,6 +572,14 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
             list->SetToolTip(text(e.windows_name + " | logical ID: " + e.id));
         }
     }
+    // A configured hidden/missing binding remains visible as field text, never
+    // as an offered list item. Saving unrelated edits retains its exact ID.
+    if (w.source->GetSelection() == wxNOT_FOUND && !d.source.empty())
+        w.source->SetValue(text("Saved binding (hidden or missing): " + d.source));
+    if (w.destination->GetSelection() == wxNOT_FOUND && !d.destination.empty())
+        w.destination->SetValue(text("Saved binding (hidden or missing): " + d.destination));
+    w.retained_source_caption = w.source->GetValue();
+    w.retained_destination_caption = w.destination->GetValue();
     w.source->AutoComplete(source_search);
     w.destination->AutoComplete(dest_search);
     const auto r = audiohole::recommend(controller_->snapshot(), d);
@@ -682,13 +694,16 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
 // Only an explicit list selection becomes a logical binding. Free text used for
 // searching is never guessed as a device identity; validation reports missing IDs.
 void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
-    auto read_id = [](wxComboBox* box, const std::vector<std::string>& ids) {
+    auto read_id = [](wxComboBox* box, const std::vector<std::string>& ids,
+                      const std::string& retained, const wxString& original) {
         const int i = box->GetSelection();
         return i >= 0 && static_cast<std::size_t>(i) < ids.size() ? ids[static_cast<std::size_t>(i)]
+               : box->GetValue() == original                      ? retained
                                                                   : std::string{};
     };
-    d.source = read_id(w.source, w.sources);
-    d.destination = read_id(w.destination, w.destinations);
+    d.source = read_id(w.source, w.sources, w.retained_source, w.retained_source_caption);
+    d.destination = read_id(w.destination, w.destinations, w.retained_destination,
+                            w.retained_destination_caption);
     const int f = w.format->GetSelection();
     d.settings.automatic = f <= 0;
     if (f > 0 && static_cast<std::size_t>(f) <= w.formats.size())
@@ -901,6 +916,8 @@ void Frame::update_beep_destinations() {
     for (const auto* d : {&hole.forward, hole.duplex ? &hole.reverse : nullptr})
         if (d) {
             if (const auto* e = audiohole::endpoint(controller_->snapshot(), d->destination)) {
+                if (e->hidden)
+                    continue;
                 destination_test_->Append(
                     text(std::string(d == &hole.forward ? "Forward → " : "Reverse → ") +
                          e->display_name + " [" + e->id + "]"));

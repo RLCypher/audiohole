@@ -13,7 +13,9 @@ endif()
 add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostics_view.cpp settings_view.cpp tray.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
-target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base dwmapi advapi32 windowscodecs shlwapi)
+# uuid precedes wx's transitive oleacc import library to avoid duplicate GUID
+# objects in MinGW; MSVC uses the same system GUID library.
+target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base uuid dwmapi advapi32 windowscodecs shlwapi)
 if(MSVC)
   target_compile_definitions(audiohole PRIVATE AUDIOHOLE_MSVC_MANIFEST)
   target_compile_options(audiohole PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:/W4;/permissive-;/utf-8>")
@@ -34,7 +36,7 @@ add_custom_target(audiohole_personality_files ALL
   COMMAND ${CMAKE_COMMAND} -E rm -f "$<TARGET_FILE_DIR:audiohole>/personalities/default.json" "$<TARGET_FILE_DIR:audiohole>/personalities/uwu.json"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/personalities" "$<TARGET_FILE_DIR:audiohole>/personalities"
   COMMENT "Stage editable personality files beside the GUI")
-add_dependencies(audiohole audiohole_personality_files)
+add_dependencies(audiohole audiohole_personality_files audiohole-probe)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/personalities/" DESTINATION personalities COMPONENT Runtime
   FILES_MATCHING PATTERN "*.json" PATTERN "*.png" PATTERN "README.md")
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION . COMPONENT Runtime)

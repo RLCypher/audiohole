@@ -235,3 +235,20 @@ system styling. This evaluation retains session-only presentation preferences.
 Native smoke tests cover file availability, DFA slider inertness/visibility, scan
 callouts, theme changes preserving controller revision, and selected navigation.
 Screenshots and the manual checklist are still required for visual acceptance.
+
+
+## Test-mode scanner integration
+
+The runtime now also installs the private `audiohole-probe.exe` helper and the
+miniz 3.1.0 license. Keep the helper beside `audiohole.exe`; launch the GUI normally,
+then select Test Mode for real Windows scans. The helper has no public scanning
+command. The strict runtime allowlist and import audit cover both executables.
+`Scanner.Contracts` is test-only, as are the injected scanner integration tests;
+their data never becomes runtime inventory.
+
+The scanner reuses nlohmann/json 3.11.3. ZIP export adds pinned miniz C sources (see
+DEPENDENCIES.md). Offline builds may use
+`-DFETCHCONTENT_SOURCE_DIR_MINIZ=C:/path/to/miniz-3.1.0` after verifying its recorded
+archive hash. Model-only checks also build scanner contracts and background-service
+integration tests, but do not execute Windows hardware APIs. Read
+[SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) before interpreting Deep evidence.

@@ -189,6 +189,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         wxEVT_TIMER,
         [this](wxTimerEvent&) {
             controller_->advance(100);
+            if (device_change_pending_ && !controller_->snapshot().scanner.busy &&
+                std::chrono::steady_clock::now() >= device_change_after_) {
+                device_change_pending_ = false;
+                ScannerActionRequest request;
+                request.kind = ScannerActionKind::RefreshAvailability;
+                (void)controller_->scanner_action(request);
+            }
             refresh();
         },
         timer_.GetId());
@@ -469,10 +476,27 @@ void Frame::refresh() {
         profile_edit_state_->SetLabel(edit_state);
         profile_edit_state_->SetToolTip(edit_state);
     }
-    scan_start_->Enable(s.capabilities.scanning);
-    scan_cancel_->Enable(s.capabilities.scanning && s.scanning);
-    scan_mode_->Enable(s.capabilities.scanning);
-    scan_scope_->Enable(s.capabilities.scanning);
+    if (s.scanner.inventory_revision != device_inventory_revision_) {
+        device_inventory_revision_ = s.scanner.inventory_revision;
+        capture_draft();
+        populate_devices();
+        if (hole_index_ >= 0) {
+            const auto& h = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+            populate_direction(forward_, h.forward);
+            populate_direction(reverse_, h.reverse);
+        }
+        update_beep_destinations();
+    }
+    const bool scanner_idle = !s.scanner.busy && !s.scanning;
+    scan_start_->Enable(s.capabilities.scanning && scanner_idle);
+    const bool selected_device = endpoint(s, device_id_) != nullptr;
+    device_update_->Enable(s.capabilities.scanning && scanner_idle && selected_device);
+    device_deep_->Enable(s.capabilities.scanning && scanner_idle && selected_device);
+    for (auto* action : scanner_actions_)
+        action->Enable(s.scanner.available && scanner_idle);
+    scan_cancel_->Enable(s.capabilities.scanning && (s.scanning || s.scanner.busy));
+    scan_mode_->Enable(s.capabilities.scanning && scanner_idle);
+    scan_scope_->Enable(s.capabilities.scanning && scanner_idle);
     monitor_->Enable(s.capabilities.monitoring);
     activity_direction_->Enable(s.capabilities.monitoring && hole_index_ >= 0 &&
                                 draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex);
@@ -556,7 +580,22 @@ void Frame::refresh() {
             ? "Start a bounded test for the explicitly selected playback destination. This "
               "preview simulates the test interval and emits no sound."
             : "Cancel the active simulated destination test immediately. No second test starts.");
-    scan_progress_->SetValue(s.scan_percent);
+    if (s.scanner.busy && s.scan_percent < 0)
+        scan_progress_->Pulse();
+    else
+        scan_progress_->SetValue(std::clamp(s.scan_percent, 0, 100));
+    wxString scan_status;
+    if (s.scanner.available) {
+        scan_status = text(s.scanner.phase + " | " + s.scanner.result);
+        if (!s.scanner.busy)
+            scan_status += "\n" + text(s.scanner.detail).Left(240);
+    } else
+        scan_status = s.scanning ? "Preview scan in progress" : "No scan in progress";
+    if (scan_state_->GetLabel() != scan_status) {
+        scan_state_->SetLabel(scan_status);
+        scan_state_->Wrap(900);
+        scan_state_->GetParent()->Layout();
+    }
     const auto query = log_search_->GetValue().Lower();
     std::string logs;
     for (const auto& e : s.events) {
@@ -696,8 +735,8 @@ bool Frame::smoke(const wxString& directory) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),
                     "Test Mode leaked preview fixtures");
-            require(!start_->IsEnabled() && !arm_ready_->IsEnabled() && !scan_start_->IsEnabled() &&
-                        !beep_button_->IsEnabled(),
+            require(!start_->IsEnabled() && !arm_ready_->IsEnabled() &&
+                        controller_->snapshot().capabilities.scanning && !beep_button_->IsEnabled(),
                     "Test Mode enabled unsupported hardware controls");
             require(wxWindow::FindWindowByLabel("Forward failure", this) == nullptr &&
                         wxWindow::FindWindowByLabel("Reverse failure", this) == nullptr &&
@@ -762,6 +801,30 @@ bool Frame::smoke(const wxString& directory) {
             }
             return true;
         }
+        require(capture_devices_ && playback_devices_ && capture_devices_ != playback_devices_,
+                "Devices must have separate capture and playback lists");
+        const auto hidden_id = draft_.holes.front().forward.source;
+        require(!hidden_id.empty(), "Preview source fixture is missing");
+        const auto before_hide = draft_.holes.front().forward;
+        ScannerActionRequest hide;
+        hide.kind = ScannerActionKind::SetHidden;
+        hide.logical_id = hidden_id;
+        hide.hidden = true;
+        scanner_action(hide);
+        require(capture_devices_->FindString("----- Hidden devices -----") != wxNOT_FOUND,
+                "Hidden capture device lacks a divider");
+        require(std::find(forward_.sources.begin(), forward_.sources.end(), hidden_id) ==
+                    forward_.sources.end(),
+                "Hidden device remains a configurator choice");
+        Direction retained;
+        read_direction(forward_, retained);
+        require(retained.source == before_hide.source &&
+                    retained.destination == before_hide.destination,
+                "Hiding a device discarded a saved routing reference");
+        hide.hidden = false;
+        scanner_action(hide);
+        require(capture_devices_->FindString("----- Hidden devices -----") == wxNOT_FOUND,
+                "Empty hidden section remained after unhide");
         const auto face = wxString::FromUTF8("(⁄\xC2\xA0⁄>⁄ω⁄<⁄\xC2\xA0⁄)");
         commentary_->SetLabel(text(presentation::keep_kaomoji_together("Prefix (⁄ ⁄>⁄ω⁄<⁄ ⁄)")));
         wxClientDC face_measure(commentary_);

@@ -1,5 +1,7 @@
 #pragma once
+#include "model/scanner_types.h"
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -23,6 +25,8 @@ struct Endpoint {
     bool capture = false;
     Availability availability = Availability::Available;
     std::vector<Format> formats;
+    bool hidden = false;
+    std::shared_ptr<const DeviceInspection> inspection{};
 };
 struct Settings {
     bool automatic = true;
@@ -85,6 +89,7 @@ struct Snapshot {
     std::vector<PathStatus> paths;
     std::vector<Event> events;
     std::uint64_t revision = 0;
+    ScannerStatus scanner;
 };
 struct Result {
     bool ok;
@@ -158,7 +163,10 @@ class Controller {
     // Simulated progress only. Advanced consent and scope are presentation concerns;
     // no fixture capability is promoted to experimental/verified hardware evidence.
     virtual void scan(bool enabled, bool advanced = false, ScanScope scope = ScanScope::Update,
-                      const std::string& selected_device = {}) = 0;
+                      const std::string& selected_device = {}, const ScanOptions& options = {}) = 0;
+    virtual Result scanner_action(const ScannerActionRequest&) {
+        return {false, "Scanner inspection actions are unavailable."};
+    }
 };
 // Owns all session data and a copied live plan, so saved edits cannot mutate
 // active routing. Only advance() completes pending transitions. This deterministic
@@ -186,7 +194,8 @@ class SimulatedController final : public Controller {
     void cancel_beep() override;
     void clear_diagnostics() override;
     void scan(bool, bool advanced = false, ScanScope scope = ScanScope::Update,
-              const std::string& selected_device = {}) override;
+              const std::string& selected_device = {}, const ScanOptions& options = {}) override;
+    Result scanner_action(const ScannerActionRequest&) override;
 
   private:
     Snapshot state_;

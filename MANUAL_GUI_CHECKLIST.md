@@ -228,7 +228,8 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   Saved device availability is explicitly unverified. Per-device filename rename
   is a future production requirement, not implemented by aggregated Test v1.
 - [ ] Test has no Simulate Errors heading/actions/gap and no enabled routing,
-  scan, monitoring, beep or live profile Apply controls. Small buffer Apply enables
+  monitoring, beep or live profile Apply controls. Scanning is enabled through the
+  real scanner integration described below. Small buffer Apply enables
   for a changed saved direction and persists only that preference; engine values
   remain unavailable. Other staged edits remain unsaved.
 - [ ] Toggle startup dialog and next-launch mode, appearance, notifications and
@@ -325,3 +326,32 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Launch on a roomy display: the initial window is square. On shorter work
   areas it fits the required header width without forcing a square height.
   Resizing remains free, and Notes benefits from the removed name fields/buttons.
+
+
+## Real scanner integration in Test Mode (native/hardware validation pending)
+
+- [ ] Devices has separate Capture and Playback lists, no device checkboxes. Each
+  matching hidden section has one non-actionable divider; no empty divider appears.
+- [ ] Right-click/keyboard context menu targets the pointed/selected stable ID and
+  offers Update device, Deep update device, Hide/Unhide. The two scan actions also
+  work from visible buttons; disabled/busy/ambiguous targets never substitute hardware.
+- [ ] Basic Full, Update and Selected collect real reported evidence. Update skips
+  known capability queries while refreshing state/driver metadata. Inspect exact
+  format tuples and explicit unsupported/unavailable/unknown values and HRESULTs.
+- [ ] Deep Full, Update and Selected require scope-specific consent and honor all
+  exposed budgets/mode. Cancel waits for cleanup; UI stays responsive. Confirm short
+  stream classifications are labelled limited evidence, never Healthy/Recommended.
+- [ ] Hide a device, restart, and confirm hidden status in its JSON near its name.
+  It remains below the divider and absent from new configurator/beep options.
+  Existing saved references remain intact; hiding does not interrupt a live Preview route.
+- [ ] Rename a canonical device JSON file and edit notes/extension fields externally.
+  Reload updates the filename display name without changing identity or losing edits.
+  Malformed/newer/duplicate records report failure and preserve the last good view.
+- [ ] Refresh availability / unplug-return use metadata-only work, preserve scan
+  timestamps and do not create devices. Review timestamps rather than assuming a
+  loaded record proves current availability.
+- [ ] Enter operating context and export a new scan ZIP. Review request, progress,
+  reports, canonical records and local bindings. Refusing an existing destination
+  preserves it. Inspect both executable imports in the packaged runtime.
+- [ ] Test routing/monitor/beep remain unavailable, Preview stays simulated and no
+  automated fixture runner executes during a GUI scan. See SCANNER_TEST_MODE.md.

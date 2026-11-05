@@ -1856,3 +1856,15 @@ Those files are a **proposal**, not approved production schemas. They do not alt
 the current Test provider, trigger an import or authorize destructive migrations.
 Existing identity, filename, provenance, status and inheritance requirements above
 remain in force for future production work.
+
+### Owner-authorized scanner integration in Test Mode
+
+[SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) supersedes the earlier statement that
+Test Mode has no scanner or per-device filename implementation. Real scanner
+records use the handed-off device-v2 format in isolated `test/devices/` folders;
+profiles/legacy devices retain their replaceable provisional provider. Machine-local
+bindings/session evidence are separate. Optional boolean `hidden` defaults to false
+and is preserved beside names/identity in each scanner record. This is the
+owner-requested device visibility preference, not a production profile schema
+approval. Filename rename preserves logical identity. No destructive migration or
+resolution of O-004/O-006 is authorized by this increment.

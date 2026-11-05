@@ -61,6 +61,9 @@ struct DirectionWidgets {
     int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
     wxStaticText *evidence{}, *source_detail{}, *destination_detail{}, *summary{};
     std::vector<std::string> sources, destinations;
+    std::string retained_source,
+        retained_destination; // Hidden/missing saved bindings, never dropdown options.
+    wxString retained_source_caption, retained_destination_caption;
     std::vector<audiohole::Format> formats;
 };
 // Native view/controller adapter. Owns the controller and tray; wx owns child widgets.
@@ -93,6 +96,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     void exit() {
         timer_.Stop();
         stop_avatar();
+        if (controller_->snapshot().scanning || controller_->snapshot().scanner.busy)
+            controller_->scan(false);
         controller_->stop();
         end_observation();
         if (tray_)
@@ -176,7 +181,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
     wxPanel *profile_sidebar_{}, *profile_actions_{};
     wxStaticText *profile_edit_state_{}, *hole_heading_{};
-    wxListBox *profiles_{}, *holes_{}, *devices_{};
+    wxListBox *profiles_{}, *holes_{}, *capture_devices_{}, *playback_devices_{};
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
@@ -185,7 +190,21 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxSpinCtrl* delay_{};
     wxGauge* scan_progress_{};
     DirectionWidgets forward_, reverse_;
-    std::vector<std::string> profile_ids_, device_ids_, beep_ids_;
+    std::vector<std::string> profile_ids_, capture_device_ids_, playback_device_ids_, beep_ids_;
+    wxChoice* device_view_{};
+    wxTextCtrl* device_evidence_{};
+    wxButton *device_save_{}, *device_update_{}, *device_deep_{};
+    std::vector<wxButton*> scanner_actions_;
+    std::uint64_t device_inventory_revision_ = 0;
+    std::string loaded_device_id_;
+    bool device_dirty_ = false;
+    wxStaticText* scan_state_{};
+    wxChoice* deep_mode_{};
+    wxSpinCtrl *deep_attempts_{}, *deep_duration_{}, *deep_attempt_timeout_{},
+        *deep_device_timeout_{}, *deep_system_timeout_{};
+    wxTextCtrl* scan_context_{};
+    std::chrono::steady_clock::time_point device_change_after_{};
+    bool device_change_pending_ = false;
     std::string last_log_;
     // Retain unwrapped copy so resizing never rerolls commentary or accumulates
     // line breaks. These are transient view strings, not controller state.
@@ -241,6 +260,10 @@ class Frame final : public wxFrame, private wxEventFilter {
     void activate(bool);
     void populate_devices();
     void load_device();
+    bool select_device(const std::string&);
+    void device_context(wxListBox*, const std::vector<std::string>&, wxContextMenuEvent&);
+    void request_scan(bool deep, ScanScope, const std::string&);
+    void scanner_action(const ScannerActionRequest&);
     // Called on page change, hide/minimize, Stop, and shutdown. No sample ownership.
     void end_observation();
     void present(presentation::Message);

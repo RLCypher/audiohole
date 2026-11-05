@@ -2,8 +2,10 @@ MANUAL_GUI_CHECKLIST.md
 assets/branding/audiohole-logo.png
 assets/branding/audiohole.ico
 assets/presentation/placeholder-avatar.png
+audiohole-probe.exe
 audiohole.exe
 avatar-assets.json
+miniz-LICENSE.txt
 nlohmann-json-LICENSE.txt
 personalities/README.md
 personalities/default/avatar/pack/Generated/chibi/angry.png

@@ -39,7 +39,8 @@ void Frame::build_settings() {
     label(environment_box, preview_settings,
           controller_->snapshot().operating_mode == OperatingMode::Preview
               ? "Active: Preview Mode. Environment changes take effect after restart."
-              : "Active: Test Mode (persistent configuration only). Environment changes take "
+              : "Active: Test Mode (persistent configuration and real device scanning). "
+                "Environment changes take "
                 "effect after restart.");
     label(environment_box, preview_settings,
           wxS("Test data: ") + wxString(preferences_->test_configuration().wstring()));
@@ -245,6 +246,16 @@ void Frame::build_settings() {
     reload_personalities();
 }
 void Frame::testing_notice() {
+    if (controller_->snapshot().operating_mode == OperatingMode::Test) {
+        wxMessageBox(
+            "Test Mode saves isolated configuration and reads real Windows device evidence. "
+            "Basic scans do not open experimental streams. Deep scans require consent and can "
+            "interrupt audio. "
+            "Routing, monitoring and Test Beep remain unavailable. External device JSON edits and "
+            "filename renames can be read with Reload saved devices.",
+            "AudioHole Test Mode", wxOK | wxICON_INFORMATION, this);
+        return;
+    }
     wxMessageBox(
         "AudioHole Preview Build\n\n"
         "All devices, capabilities, routing, scans, activity and recovery in this version "

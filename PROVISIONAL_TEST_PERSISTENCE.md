@@ -24,9 +24,10 @@ silent Test Beep, simulated scans/failures and no hardware access. It writes no
 profile/device files, including into Test. Test starts empty on a new root and
 loads only its own records. It supports profile CRUD, independent directional
 settings and saved device label/notes edits. Device records can be added/edited
-externally while AudioHole is stopped. There is no real scanner to populate them.
-Test disables route/scan/monitor/beep/live profile Apply and omits Simulate Errors entirely.
-Saved availability and formats are unverified records, not observations.
+externally while AudioHole is stopped. These aggregated legacy device entries remain
+unverified. The later [scanner integration](SCANNER_TEST_MODE.md) adds separate real
+device-v2 records; they are never flattened into this file.
+Test disables route/monitor/beep/live profile Apply and omits Simulate Errors entirely.
 
 Startup preferences, theme, selected personality stable ID, the presentation-only
 `hold_expressions` boolean (optional, default false), notification setting,
@@ -81,8 +82,9 @@ references and empty endpoint choices are retained as drafts, never guessed or
 activated. `availability` explicitly accepts available, unavailable, ambiguous,
 untested, unknown. These are current model spellings; they are not a new production
 status vocabulary. Empty formats means **no recorded tuples**, not unsupported.
-Test Mode cannot establish tested support. Additional capability evidence can
-round-trip as unknown extension data but is not interpreted. Current primitive
+This aggregated legacy provider cannot establish tested support. Additional capability
+evidence in this file can round-trip as unknown extension data but is not interpreted;
+the separate scanner record/evidence view has its own documented limits. Current primitive
 fields cannot express every production status object; this is a documented limit.
 
 Maximum document 2 MiB, nesting16; devices512, profiles256, holes/profile128,
@@ -131,3 +133,7 @@ including in Test Mode. It enables for valid changed values and disables after
 success; other unsaved profile edits remain staged. Saved Test values round-trip
 through the same provider with no schema change. It never reports a Test engine
 buffer as applied. Preview additionally reports simulated per-direction confirmation.
+
+Optional device boolean `hidden` defaults to false in legacy Test v1 entries.
+Scanner-owned visibility instead lives in each canonical device JSON, as documented
+in [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md). No production schema is finalized.

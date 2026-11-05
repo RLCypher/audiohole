@@ -510,8 +510,20 @@ void SimulatedController::cancel_beep() {
     beep_ms_ = 0;
     state_.beep_destination.clear();
 }
+Result SimulatedController::scanner_action(const ScannerActionRequest& request) {
+    if (request.kind != ScannerActionKind::SetHidden)
+        return {false, "Real scanner inspection is available in Test Mode."};
+    const auto found =
+        std::find_if(state_.endpoints.begin(), state_.endpoints.end(),
+                     [&](const auto& device) { return device.id == request.logical_id; });
+    if (found == state_.endpoints.end())
+        return {false, "Device no longer exists."};
+    found->hidden = request.hidden;
+    event("device-visibility", "Preview device visibility changed; routing is unchanged.");
+    return {true, "Device visibility changed for this Preview session."};
+}
 void SimulatedController::scan(bool enabled, bool advanced, ScanScope scope,
-                               const std::string& selected_device) {
+                               const std::string& selected_device, const ScanOptions&) {
     if (enabled && scope == ScanScope::Selected && !endpoint(state_, selected_device)) {
         event("scan-failed", "Select a saved device on the Devices page before a selected-device "
                              "scan. No scan started.");

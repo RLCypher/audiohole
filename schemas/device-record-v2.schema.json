@@ -23,6 +23,11 @@
       "type": "string",
       "minLength": 1
     },
+    "hidden": {
+      "type": "boolean",
+      "default": false,
+      "description": "User visibility preference. Hidden devices remain saved/scannable but are excluded from configurator choices."
+    },
     "notes": {
       "type": "string"
     },

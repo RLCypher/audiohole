@@ -170,17 +170,17 @@ class App final : public wxApp {
                          wxOK | wxICON_WARNING);
         bool preview = !test_mode_smoke && (smoke || preferences_->values().preview_mode);
         if (!smoke && preferences_->values().show_preview_dialog) {
-            wxMessageDialog dialog(nullptr,
-                                   "Preview Mode loads demonstration profiles/devices and "
-                                   "simulates operations; Test Beep is silent.\n\n"
-                                   "Test Mode reads and saves real configuration under an isolated "
-                                   "Test data root using a provisional JSON format. Audio routing, "
-                                   "scanning and playback are unavailable.\n\n"
-                                   "Choose the environment for this session. Startup preferences "
-                                   "and restart controls are in Settings.",
-                                   wxS("AudioHole — Preview Build"),
-                                   wxYES_NO | wxCANCEL | wxICON_INFORMATION |
-                                       (preview ? 0 : wxNO_DEFAULT));
+            wxMessageDialog dialog(
+                nullptr,
+                "Preview Mode loads demonstration profiles/devices and "
+                "simulates operations; Test Beep is silent.\n\n"
+                "Test Mode reads and saves real configuration under an isolated "
+                "Test data root using a provisional JSON format. Scans read real Windows "
+                "devices; Deep testing requires consent. Routing and playback are unavailable.\n\n"
+                "Choose the environment for this session. Startup preferences "
+                "and restart controls are in Settings.",
+                wxS("AudioHole — Preview Build"),
+                wxYES_NO | wxCANCEL | wxICON_INFORMATION | (preview ? 0 : wxNO_DEFAULT));
             dialog.SetYesNoLabels("Preview Mode", "Test Mode");
             const auto choice = dialog.ShowModal();
             if (choice == wxID_CANCEL)
@@ -195,9 +195,18 @@ class App final : public wxApp {
         std::unique_ptr<Controller> controller;
         if (preview)
             controller = std::make_unique<SimulatedController>();
-        else
+        else {
+            ScannerServiceOptions scanner;
+            scanner.portable_root = preferences_->data_root(OperatingMode::Test);
+            scanner.local_root = scanner.portable_root.parent_path() / "test-local";
+            scanner.probe_executable =
+                std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
+                    .parent_path() /
+                "audiohole-probe.exe";
             controller = std::make_unique<ConfigurationController>(
-                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
+                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()),
+                std::make_unique<ScannerService>(std::move(scanner)));
+        }
         auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
             restart_requested_ = true;
             static_cast<Frame*>(GetTopWindow())->exit();

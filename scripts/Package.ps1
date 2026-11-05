@@ -66,7 +66,7 @@ No Visual Studio, SDK, CMake, Git, test framework, administrator rights,
 driver, service, or separately installed VC runtime is needed to launch this build.
 The reference MSVC build uses the static CRT. Normal Windows system DLLs remain required.
 
-Known limitations: Preview devices, scans, activity, failures and Test Beep are simulated. Test has real configuration I/O but no audio/scanner backend.
+Known limitations: Preview devices, scans, activity, failures and Test Beep are simulated. Test has real configuration I/O and Windows device scanning. Deep testing requires consent. No routing/playback backend.
 Test Beep emits NO SOUND. Test configuration and Preview Build preferences persist; Preview fixtures remain session-only.
 Synchronization algorithms, production schemas, and storage roots remain unresolved.
 wxWidgets 3.2.6 is statically linked; license and LGPL text are included.

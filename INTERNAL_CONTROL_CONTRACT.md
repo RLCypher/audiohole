@@ -15,27 +15,29 @@ same decorator. There is no second routing state store or audio/scanner rewrite.
 | StopRouting | routing.stop | Preview accepts until authoritative Stopped; Test rejects |
 | LoadProfile | profile.load | Completes with a copied saved profile; does not activate |
 | SaveConfiguration | configuration.save | Completes after save (real disk in Test); Apply is asynchronous Preview only |
-| DiscoverDevices | devices.discover | Preview simulated Easy/Advanced scan; Test rejects |
+| DiscoverDevices | devices.discover | Preview simulated Easy/Advanced; Test queues real scoped Basic/Deep work with consent/limits |
 | UpdateBuffer | buffer.update | Commits one saved directional buffer preference; matching active Preview direction updates with simulated confirmation |
 | RequestStatus | status.get | Completes with authoritative state available |
 | RequestDevices | devices.get | Same snapshot's records; no discovery side effect |
 | RequestDiagnostics | diagnostics.get | Same snapshot's retained events; no invented measurements |
 | StartBeep | beep.start | Preview silent bounded simulation, overlap rejected; Test rejects |
 | CancelBeep | beep.cancel | Cancels Preview active beep and correlated pending request |
+| ScannerAction | scanner.action | Test queues Reload, RefreshAvailability, SetHidden or Export; Preview supports session-only SetHidden |
 
 Existing configuration/create/remove/device-update/startup/clear methods are also
 recorded as named results. Simulation/recovery/observation publish authoritative
 state/events. No deferred per-hole quick toggles or executable external plugins
-are added. A future real probe command requires consent and backend semantics;
-Advanced Preview is a simulation, not proof that hardware probing is integrated.
+are added. Test Deep requests carry explicit consent and bounded scan options. Preview Advanced
+remains simulated. See [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) for evidence limits.
 
 Every result carries a monotonic request ID, command ID, outcome, detail, snapshot
 revision and simulated flag. Outcomes are Accepted, Completed, Rejected, Failed,
 Cancelled, TimedOut. Admission is not operation success or audibility. Pending
 activation/stop/scan/beep requests are settled from backend snapshots; Ready is a
 terminal armed/waiting configuration, not flowing audio. Stop cancels pending
-requests; replacement activation supersedes old activation. Requests have a bounded
-30-second logical wait. Timeout reports uncertainty and does **not** silently
+requests; replacement activation supersedes old activation. Ordinary requests have a bounded
+30-second logical wait. Real Basic scans use 180 seconds; Deep scans use the
+requested batch budget plus 180 seconds; export uses 600 seconds. Timeout reports uncertainty and does **not** silently
 cancel or undo an operation; use explicit Stop/Cancel and inspect state.
 
 Legacy `Result.ok` callers still receive command admission or synchronous save
@@ -69,7 +71,10 @@ control thread. Wrong-thread use throws a logic error. `post(Command)` alone
 supports a non-real-time producer: try-lock admission to a bounded queue returns
 an ID/queued receipt, or false/0 if busy/full. It does not execute backend work.
 The owner's `advance()` drains it before advancing backend time. Queued receipt
-is not the Accepted command outcome. There are no internal worker threads,
+is not the Accepted command outcome. The decorator itself has no worker threads or public transport. The Test backend
+owns one ScannerService worker, with a private child-process pipe protocol for Deep
+probes. Scanner completion/cancellation is generation-correlated; cancellation does
+not publish a terminal result until cleanup has been consumed. There are no public
 network endpoints, named pipes, sockets or automatic reconnect loops.
 
 This seam allocates/copies and configuration saves do filesystem I/O on the

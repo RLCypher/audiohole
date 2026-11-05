@@ -24,7 +24,7 @@ try {
     @(
         'cmake_minimum_required(VERSION 3.25)'
         'project(PackageFixture NONE)'
-        'install(FILES avatar-assets.json audiohole.exe MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt nlohmann-json-LICENSE.txt DESTINATION . COMPONENT Runtime)'
+        'install(FILES avatar-assets.json audiohole.exe audiohole-probe.exe miniz-LICENSE.txt MANUAL_GUI_CHECKLIST.md wxWidgets-LGPL.txt wxWidgets-LICENSE.txt nlohmann-json-LICENSE.txt DESTINATION . COMPONENT Runtime)'
         'install(DIRECTORY personalities assets DESTINATION . COMPONENT Runtime)'
     ) | Set-Content "$fixture/source/CMakeLists.txt"
     foreach ($relative in @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt'))) {

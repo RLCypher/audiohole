@@ -1,10 +1,12 @@
 #include "model/configuration_controller.h"
+#include "model/scanner_service.h"
 #include <algorithm>
 #include <stdexcept>
 
 namespace audiohole {
-ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPersistence> provider)
-    : persistence_(std::move(provider)) {
+ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPersistence> provider,
+                                                 std::unique_ptr<ScannerService> scanner)
+    : persistence_(std::move(provider)), scanner_(std::move(scanner)) {
     if (!persistence_)
         throw std::invalid_argument("Test configuration provider is required");
     state_.operating_mode = OperatingMode::Test;
@@ -26,7 +28,13 @@ ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPe
         edit_error_ = result.detail;
         event("error", result.detail);
     }
+    if (scanner_) {
+        state_.capabilities.scanning = true;
+        state_.scanner.available = true;
+        (void)scanner_action(ScannerActionRequest{});
+    }
 }
+ConfigurationController::~ConfigurationController() = default;
 void ConfigurationController::event(std::string type, std::string detail) {
     const auto severity = type == "error" || type == "scan-failed" ? Severity::Error
                           : type == "recovering"                   ? Severity::Warning
@@ -38,14 +46,16 @@ void ConfigurationController::event(std::string type, std::string detail) {
 }
 Result ConfigurationController::unavailable(const std::string& operation) {
     const auto detail =
-        operation +
-        " is unavailable: Test Mode has persistent configuration but no audio/scanner backend.";
+        operation + " is unavailable: Test Mode has no routing, monitoring or playback engine.";
     event("error", detail);
     return {false, detail};
 }
 Result ConfigurationController::commit(ConfigurationRecords records, const std::string& detail) {
     if (!loaded_)
         return {false, edit_error_};
+    // Scanner device-v2 records remain authoritative in their own files. Never
+    // flatten rich observations into the provisional profile/configuration file.
+    std::erase_if(records.devices, [](const auto& device) { return bool(device.inspection); });
     const auto result = persistence_->save(records);
     if (!result.ok) {
         edit_error_ = result.detail;
@@ -54,6 +64,7 @@ Result ConfigurationController::commit(ConfigurationRecords records, const std::
     }
     state_.endpoints = std::move(records.devices);
     state_.profiles = std::move(records.profiles);
+    merge_scanner_devices();
     for (const auto& device : state_.endpoints)
         used_ids_.insert(device.id);
     for (const auto& saved : state_.profiles) {
@@ -126,6 +137,10 @@ Result ConfigurationController::update_endpoint(const Endpoint& edited) {
     const auto* original = endpoint(state_, edited.id);
     if (!original)
         return {false, "Saved device no longer exists."};
+    if (original->inspection)
+        return {false,
+                "Edit this device's JSON notes or rename its file, then Reload saved devices. "
+                "Scanner observations are read-only here."};
     if (edited.windows_name != original->windows_name || edited.capture != original->capture)
         return {false, "Device identity and direction are read-only; edit their saved record "
                        "explicitly outside the GUI."};
@@ -155,9 +170,126 @@ void ConfigurationController::fail_path(const std::string&, bool) {
 void ConfigurationController::recover() {
     unavailable("Recovery");
 }
-void ConfigurationController::scan(bool enabled, bool, ScanScope, const std::string&) {
-    if (enabled)
-        unavailable("Device scanning");
+void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, const std::string& id,
+                                   const ScanOptions& options) {
+    if (!scanner_) {
+        if (enabled)
+            unavailable("Device scanning");
+        return;
+    }
+    if (!enabled) {
+        scanner_->cancel();
+        if (state_.scanner.busy) {
+            state_.scanner.phase = "cancelling";
+            state_.scanner.detail = "Cancellation requested; waiting for scanner/worker cleanup.";
+            ++state_.revision;
+        }
+        return;
+    }
+    if (state_.scanner.busy) {
+        event("scan-failed", "Another scanner operation is still running or cleaning up.");
+        return;
+    }
+    try {
+        const auto generation = scanner_->start_scan(deep, scope, id, options);
+        if (!generation)
+            throw std::runtime_error("The scanner is still finishing its previous operation.");
+        state_.scanner.generation = generation;
+        state_.scanner.busy = state_.scanning = scanner_job_is_scan_ = true;
+        state_.scanner.result = "running";
+        state_.scanner.phase = "starting";
+        state_.scan_percent = -1;
+        event("scan-start", deep ? "Deep scan started with explicit consent and bounded limits."
+                                 : "Basic device discovery and capability queries started.");
+    } catch (const std::exception& error) {
+        event("scan-failed", error.what());
+    }
+}
+void ConfigurationController::stop() {
+    if (scanner_)
+        scan(false);
+}
+Result ConfigurationController::scanner_action(const ScannerActionRequest& request) {
+    if (state_.scanner.busy)
+        return {false, "Wait for the current scanner operation or cancel it first."};
+    const auto* selected = endpoint(state_, request.logical_id);
+    if (request.kind == ScannerActionKind::SetHidden && selected && !selected->inspection) {
+        auto edited = *selected;
+        edited.hidden = request.hidden;
+        return update_endpoint(edited);
+    }
+    if (!scanner_)
+        return {false, "The scanner service is unavailable."};
+    try {
+        const auto generation = scanner_->action(request);
+        if (!generation)
+            return {false, "The scanner is still finishing its previous operation."};
+        state_.scanner.generation = generation;
+        state_.scanner.busy = true;
+        scanner_job_is_scan_ = false;
+        state_.scanner.result = "running";
+        state_.scanner.phase = request.kind == ScannerActionKind::Export      ? "exporting"
+                               : request.kind == ScannerActionKind::SetHidden ? "saving visibility"
+                               : request.kind == ScannerActionKind::RefreshAvailability
+                                   ? "refreshing availability"
+                                   : "loading inventory";
+        ++state_.revision;
+        return {true, "Scanner operation accepted."};
+    } catch (const std::exception& error) {
+        return {false, error.what()};
+    }
+}
+void ConfigurationController::merge_scanner_devices() {
+    std::erase_if(state_.endpoints, [](const auto& device) { return bool(device.inspection); });
+    for (const auto& device : scanner_devices_) {
+        const auto existing = std::find_if(state_.endpoints.begin(), state_.endpoints.end(),
+                                           [&](const auto& item) { return item.id == device.id; });
+        if (existing != state_.endpoints.end()) {
+            existing->availability = Availability::Ambiguous;
+            event("error",
+                  "A legacy Test device and scanner record share logical ID " + device.id +
+                      ". Resolve the conflicting records explicitly; neither was overwritten.");
+        } else
+            state_.endpoints.push_back(device);
+    }
+    for (const auto& device : state_.endpoints)
+        used_ids_.insert(device.id);
+}
+void ConfigurationController::advance(int) {
+    if (!scanner_)
+        return;
+    for (auto& update : scanner_->drain()) {
+        if (update.generation != state_.scanner.generation)
+            continue; // A superseded operation cannot publish into a newer view.
+        state_.scanner.phase = update.phase;
+        state_.scanner.detail = update.detail;
+        state_.scan_percent = update.percent;
+        if (!update.terminal) {
+            event("scan-progress", update.detail);
+            continue;
+        }
+        state_.scanner.busy = state_.scanning = false;
+        state_.scanner.completed_generation = update.generation;
+        state_.scanner.result = update.result;
+        state_.scanner.session_path = update.session_path;
+        if (update.inventory_valid) {
+            scanner_devices_ = std::move(update.devices);
+            merge_scanner_devices();
+            ++state_.scanner.inventory_revision;
+        }
+        if (scanner_job_is_scan_) {
+            state_.scan_percent = 100;
+            event(update.result == "interrupted" ? "scan-cancelled"
+                  : update.result == "completed" || update.result == "partially_completed"
+                      ? "scan-complete"
+                      : "scan-failed",
+                  update.detail);
+        } else
+            event(update.result == "completed" || update.result == "partially_completed"
+                      ? "scanner-updated"
+                      : "error",
+                  update.detail);
+    }
 }
 void ConfigurationController::clear_diagnostics() {
     state_.events.clear();

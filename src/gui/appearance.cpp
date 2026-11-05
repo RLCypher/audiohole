@@ -130,6 +130,12 @@ void Frame::update_status_indicator() {
 }
 WXLRESULT Frame::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
     const auto result = wxFrame::MSWWindowProc(message, wparam, lparam);
+    if (message == WM_DEVICECHANGE && !smoke_ && controller_ &&
+        controller_->snapshot().scanner.available) {
+        // Debounce notifications; all enumeration remains on the owned worker.
+        device_change_pending_ = true;
+        device_change_after_ = std::chrono::steady_clock::now() + std::chrono::milliseconds(750);
+    }
     if (message == WM_SETTINGCHANGE && theme_choice_)
         CallAfter([this] {
             if (!IsBeingDeleted())

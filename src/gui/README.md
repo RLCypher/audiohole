@@ -9,7 +9,7 @@ adapters, and introduces no worker or external transport.
 
 View builders remain separate: profile_view owns editor drafts independently of
 saved records/live plans; device_view never enumerates Windows endpoints;
-diagnostics_view copies/exports only explicit user-requested text. Settings persist
+diagnostics_view submits typed scan requests and exports explicit diagnostics/bundles. Settings persist
 isolated Preview Build preferences, dynamically discover personalities and present
 unsupported operations as unavailable. main owns STA COM, instance guard, mode
 selection and clean restart handshake. No privilege elevation or startup
@@ -19,8 +19,8 @@ A 100 ms timer advances Preview logical time and drains posted control commands;
 it is neither an audio clock nor a performance measurement. refresh reads the
 backend's authoritative snapshot and gates personality messages by event sequence.
 Preview is deterministic, simulated and session-only. Test performs real isolated
-profile/device file I/O with no audio/scanner backend. Test routing, scans,
-monitoring, beep and live profile Apply stay disabled; Simulate Errors is absent. Diagnostics
+profile/device file I/O and real Windows scanning through the owned ScannerService worker.
+Test routing, monitoring, beep and live profile Apply stay disabled; Simulate Errors is absent. Diagnostics
 exports identify the actual operating mode and unavailable hardware measurements.
 
 Commands/results, immutable state, severity/events, unavailable telemetry and
@@ -83,3 +83,7 @@ The operative avatar integration is documented in
 static AgentDisplay; that class remains for branding. The independent animation
 timer does not advance controller time and stops when hidden/minimized. All owned
 assets/manifests are deployed inside the selected personality package.
+
+The two Devices lists, hidden-device behavior, evidence projections, scan scopes,
+limits, consent, storage and cancellation contracts are documented in
+[SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md).

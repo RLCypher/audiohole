@@ -112,6 +112,7 @@ Json encode(const ConfigurationRecords& records) {
         result["devices"].push_back(
             {{"id", d.id},
              {"display_name", d.display_name},
+             {"hidden", d.hidden},
              {"windows_name", d.windows_name},
              {"notes", d.notes},
              {"capture", d.capture},
@@ -151,6 +152,7 @@ ConfigurationRecords decode(const Json& root) {
         Endpoint d;
         d.id = id(v, device_ids);
         d.display_name = string(v, "display_name");
+        d.hidden = v.value("hidden", false);
         d.windows_name = string(v, "windows_name");
         d.notes = string(v, "notes");
         d.capture = v.at("capture").get<bool>();

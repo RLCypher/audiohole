@@ -37,11 +37,18 @@ try {
     if ($LASTEXITCODE -ne 0 -or -not $installation) { throw 'Cannot locate dumpbin for the runtime dependency audit.' }
     $version = (Get-Content (Join-Path $installation 'VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt') -Raw).Trim()
     $dumpbin = Join-Path $installation "VC/Tools/MSVC/$version/bin/Hostx64/x64/dumpbin.exe"
-    $imports = & $dumpbin /nologo /dependents $exe
-    if ($LASTEXITCODE -ne 0) { throw 'Runtime import audit failed.' }
-    if (($imports -join "`n") -match '(?i)\b(?:msvcp\d+\w*|vcruntime\w*|ucrtbased|libstdc\+\+[^\s]*|libgcc[^\s]*)\.dll') {
-        throw 'Package unexpectedly imports a non-system compiler runtime DLL.'
+    foreach ($binary in @('audiohole.exe', 'audiohole-probe.exe')) {
+        $imports = & $dumpbin /nologo /dependents (Join-Path $root $binary)
+        if ($LASTEXITCODE -ne 0) { throw "Runtime import audit failed: $binary" }
+        if (($imports -join "`n") -match '(?i)\b(?:msvcp\d+\w*|vcruntime\w*|ucrtbased|libstdc\+\+[^\s]*|libgcc[^\s]*)\.dll') {
+            throw "Package unexpectedly imports a non-system compiler runtime DLL: $binary"
+        }
     }
+    # The helper accepts only the private protocol; never discover hardware here.
+    $helper = Start-Process -FilePath (Join-Path $root 'audiohole-probe.exe') -WorkingDirectory $root -PassThru
+    if (-not $helper.WaitForExit(10000)) { $helper.Kill(); throw 'Private probe helper did not reject missing arguments.' }
+    $helper.WaitForExit()
+    if ($helper.ExitCode -ne 2) { throw 'Private probe helper accepted a public invocation.' }
     # Run the GUI's internal smoke mode from the extracted tree. It dispatches
     # native widget events and writes evidence; stdout is not a GUI contract.
     $evidence = Join-Path $temporary 'gui-evidence'

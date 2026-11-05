@@ -92,6 +92,19 @@ struct ScanReport {
 void to_json(Json& json, const ScanReport& report);
 
 struct ProbeTarget;
+// Validated, immutable view of authoritative records. Loading normalizes legacy
+// fields/filename authority in memory only; it never rewrites device JSON.
+struct SavedDevice {
+  fs::path path;
+  Json record;
+  Json local_binding = Json::object();
+  std::string original_bytes;
+};
+struct InventorySnapshot {
+  std::vector<SavedDevice> devices;
+  std::vector<Diagnostic> diagnostics;
+  bool complete = false;
+};
 struct IdentityResolution { std::string status; std::string logical_id; };
 using IdentityResolver = std::function<IdentityResolution(const Endpoint&)>;
 class DeviceStore {
@@ -99,6 +112,13 @@ class DeviceStore {
   DeviceStore(fs::path portable_root, fs::path local_root,
               std::shared_ptr<AtomicWriter> writer = make_atomic_writer());
   ScanReport reconcile(const Discovery& discovery, const std::string& timestamp);
+  // Metadata observations refresh known identities/availability without creating
+  // records, replacing capability evidence, or advancing capability-scan dates.
+  ScanReport refresh_metadata(const Discovery& discovery, const std::string& timestamp);
+  InventorySnapshot inventory();
+  // A user preference, not endpoint availability. Fresh read/merge plus checked
+  // atomic replacement preserves external notes, extensions and identity.
+  void set_hidden(const std::string& logical_id, bool hidden);
   std::vector<ProbeTarget> probe_targets();
   void checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal);
   IdentityResolver identity_resolver();
@@ -106,6 +126,7 @@ class DeviceStore {
   fs::path portable_root_;
   fs::path local_root_;
   std::shared_ptr<AtomicWriter> writer_;
+  ScanReport reconcile_impl(const Discovery&, const std::string&, bool metadata_only);
 };
 
 class BasicScanner {

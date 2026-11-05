@@ -1,11 +1,13 @@
 #include "audiohole/scoped_scan.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 namespace audiohole::scanner {
 void to_json(Json& j, const ScopedReport& r) {
   j = Json{{"scope", r.scope}, {"basic_scan", r.scan}, {"identity_observations", r.observed},
     {"known_devices_skipped", r.known_skipped}, {"ambiguous_devices_skipped", r.ambiguous_skipped},
-    {"selected_endpoint_ids", r.selected_endpoint_ids}};
+    {"selected_endpoint_ids", r.selected_endpoint_ids}, {"metadata_updated", r.metadata_updated},
+    {"inventory_complete", r.inventory_complete}};
 }
 ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
     const std::string& scope, const std::string& logical_id, std::stop_token stop, const ProgressSink& progress) {
@@ -15,9 +17,12 @@ ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
     if (scope == "device" && logical_id.empty()) throw std::invalid_argument("Per-device scope requires a logical ID");
     if (stop.stop_requested()) { report.scan.result = "interrupted"; return report; }
     const auto resolve = store.identity_resolver();
+    Discovery identities;
     auto discovery = provider.discover(stop, progress, [&](const Endpoint& endpoint) {
       ++report.observed;
       const auto identity = resolve(endpoint);
+      if (scope != "device" || (identity.status == "known" && identity.logical_id == logical_id))
+        identities.endpoints.push_back(endpoint);
       const bool selected = scope == "full" ||
         (scope == "update" && identity.status == "new" && endpoint.state != "not_present") ||
         (scope == "device" && identity.status == "known" && identity.logical_id == logical_id);
@@ -31,6 +36,11 @@ ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
       return selected;
     });
     discovery.full_inventory = scope == "full";
+    report.inventory_complete = discovery.complete;
+    identities.complete = discovery.complete;
+    identities.cancelled = discovery.cancelled;
+    identities.full_inventory = scope != "device";
+    identities.diagnostics = discovery.diagnostics;
     if (progress) for (const auto& endpoint : discovery.endpoints)
       progress({"selected_endpoint_observation", endpoint.endpoint_id, 0, discovery.endpoints.size(),
         {{"device_name", endpoint.device_name}, {"state", endpoint.state}, {"fingerprint", endpoint.fingerprint},
@@ -41,6 +51,16 @@ ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
       return report;
     }
     report.scan = store.reconcile(discovery, utc_now());
+    if (report.scan.result == "completed" || report.scan.result == "partially_completed") {
+      const auto refreshed = store.refresh_metadata(identities, utc_now());
+      report.metadata_updated = refreshed.saved;
+      for (const auto& diagnostic : refreshed.diagnostics)
+        if (std::none_of(report.scan.diagnostics.begin(), report.scan.diagnostics.end(), [&](const auto& existing) {
+              return existing.code == diagnostic.code && existing.context == diagnostic.context && existing.message == diagnostic.message;
+            })) report.scan.diagnostics.push_back(diagnostic);
+      if (refreshed.result != "completed" && report.scan.result == "completed")
+        report.scan.result = "partially_completed";
+    }
     if (report.ambiguous_skipped) {
       report.scan.diagnostics.push_back({"identity_ambiguity", "Ambiguous endpoint identities were skipped; they were not treated as new devices", {}, {}});
       if (report.scan.result == "completed") report.scan.result = "partially_completed";
