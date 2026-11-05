@@ -376,6 +376,8 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Drag the Profiles width divider and the Profiles/Notes/Holes height dividers.
   Keep drafts intact, scroll each field independently and verify Save/Apply/Revert
   remains visible. Repeat at compact, square and wide sizes and 100/150/200% DPI.
+  At a minimum pane size the divider must clamp; enlarge the window or move in the
+  other direction to verify available travel without clipping either field.
 - [ ] Drag the Devices column and Notes/Overview height dividers. Notes and evidence
   wrap. Long names ellipsize; hover shows the full name. The lists have no unnecessary
   horizontal scrollbar. Check keyboard navigation and status descriptions with a

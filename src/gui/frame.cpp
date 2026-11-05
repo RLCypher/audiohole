@@ -796,11 +796,36 @@ bool Frame::smoke(const wxString& directory) {
         holes_->Append(original_holes);
         holes_->SetSelection(selected_hole);
         profile_notes_->ChangeValue(original_notes);
-        // Exercise real splitter geometry without changing drafts or saved state.
-        for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_}) {
+        // A short desktop can put both rows at their minimum sizes, leaving no
+        // legal sash travel. Verify movement with deliberate spare space, then
+        // restore the original compact layout and verify its bounds again.
+        const auto workspace_client = GetClientSize();
+        const std::array<wxSplitterWindow*, 5> dividers{
+            profile_columns_, profile_rows_, profile_lower_rows_, device_columns_, device_rows_};
+        std::array<int, 5> original_sashes{};
+        for (std::size_t i = 0; i < dividers.size(); ++i)
+            original_sashes[i] = dividers[i]->GetSashPosition();
+        SetClientSize(FromDIP(wxSize(1000, 1000)));
+        layout_header();
+        profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
+        profile_lower_rows_->SetSashPosition(profile_lower_rows_->GetClientSize().y / 2);
+        auto move_divider = [this](wxSplitterWindow* split) {
+            split->UpdateSize();
             const int before = split->GetSashPosition();
             split->SetSashPosition(before + FromDIP(12));
-            require(split->GetSashPosition() != before, "Profile divider cannot be adjusted");
+            // A legal minimum or maximum clamps movement in one direction.
+            if (split->GetSashPosition() == before)
+                split->SetSashPosition(before - FromDIP(12));
+            if (split->GetSashPosition() == before)
+                throw std::runtime_error(
+                    utf8(split->GetName()) + " cannot be adjusted; sash=" + std::to_string(before) +
+                    ", client=" + std::to_string(split->GetClientSize().x) + "x" +
+                    std::to_string(split->GetClientSize().y) +
+                    ", minimum pane=" + std::to_string(split->GetMinimumPaneSize()));
+            return before;
+        };
+        for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_}) {
+            const int before = move_divider(split);
             check_profile_layout();
             split->SetSashPosition(before);
         }
@@ -809,10 +834,9 @@ bool Frame::smoke(const wxString& directory) {
                 "Resizing profile fields changed editor or saved state");
         notebook_->SetSelection(1);
         notebook_->GetPage(1)->Layout();
+        device_rows_->SetSashPosition(device_rows_->GetClientSize().y / 3);
         for (auto* split : {device_columns_, device_rows_}) {
-            const int before = split->GetSashPosition();
-            split->SetSashPosition(before + FromDIP(12));
-            require(split->GetSashPosition() != before, "Device divider cannot be adjusted");
+            const int before = move_divider(split);
             require(notebook_->GetPage(1)->GetScreenRect().Contains(device_save_->GetScreenRect()),
                     "Resizing device fields hid Save");
             split->SetSashPosition(before);
@@ -853,6 +877,11 @@ bool Frame::smoke(const wxString& directory) {
             console_->ShowPosition(console_->GetLastPosition());
         }
         notebook_->SetSelection(0);
+        SetClientSize(workspace_client);
+        layout_header();
+        for (std::size_t i = 0; i < dividers.size(); ++i)
+            dividers[i]->SetSashPosition(original_sashes[i]);
+        check_profile_layout();
         if (controller_->snapshot().operating_mode == OperatingMode::Test) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),

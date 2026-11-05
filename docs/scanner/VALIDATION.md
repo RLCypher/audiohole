@@ -103,3 +103,21 @@ context menus, tooltip/assistive-technology behavior, high DPI, local-time/DST
 rendering, filename operations on Windows and real hardware scans remain native
 validation tasks. See the appended manual checklist. No test is skipped and no
 existing test gate is weakened to produce a package.
+
+## Follow-up: divider smoke fixture on compact Windows desktops
+
+The supplied Windows log reports both GUI smoke modes failing the same shared
+assertion: `Profile divider cannot be adjusted`. That fixture attempted only a
+12-DIP positive movement from the monitor-dependent startup layout. wxSplitterWindow
+correctly clamps a sash at pane-size limits; nested Notes/Holes can have no spare
+travel on a short desktop. A clamped move alone does not establish a broken divider.
+
+The smoke fixture now makes a 1000-DIP square client area, gives the nested rows
+spare space, and requires real movement, trying the opposite direction if one
+direction is clamped. It restores the original size and sash positions and checks
+the compact layout's field bounds and pinned Save bar again. Failures name the
+specific divider and report sash/client/minimum dimensions. Both smoke modes
+retain these checks; no test is disabled. Application startup size, pane minimums,
+user configuration and scanner behavior are unchanged. The native Windows rerun
+is required to confirm the repair. The updated GUI cross-compiles and links for
+Windows x64 successfully; native smoke execution was not available locally.
