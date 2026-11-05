@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudioHole device record v2",
+  "type": "object",
+  "required": [
+    "display_name",
+    "device_name",
+    "notes",
+    "logical_id",
+    "scan_history",
+    "identity",
+    "reported_capabilities",
+    "probed_capabilities",
+    "driver",
+    "metadata"
+  ],
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "device_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": "string"
+    },
+    "logical_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scan_history": {
+      "type": "object",
+      "required": [
+        "first_scanned",
+        "last_scanned",
+        "last_attempt"
+      ],
+      "properties": {
+        "first_scanned": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "last_scanned": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "last_attempt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "last_successful_scan": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "last_advanced_scan": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": true
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "direction",
+        "fingerprint"
+      ],
+      "properties": {
+        "direction": {
+          "enum": [
+            "capture",
+            "render"
+          ]
+        },
+        "fingerprint": {
+          "type": "object"
+        },
+        "current_device_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "reported_capabilities": {
+      "type": "object"
+    },
+    "probed_capabilities": {
+      "type": "object",
+      "properties": {
+        "test_attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/probeAttempt"
+          }
+        },
+        "latest_attempt_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "driver": {
+      "type": "object"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "record_type"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "record_type": {
+          "const": "audio_device"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "timestamp": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "unknown",
+                "unavailable",
+                "not_tested",
+                "not_applicable"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "probeAttempt": {
+      "type": "object",
+      "required": [
+        "attempt_id",
+        "logical_id",
+        "format",
+        "mode",
+        "provenance",
+        "duration_ms",
+        "timeout_ms",
+        "started_utc",
+        "status",
+        "classification",
+        "stages",
+        "verification_scope",
+        "signal_verification"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logical_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "object"
+        },
+        "mode": {
+          "enum": [
+            "shared",
+            "exclusive"
+          ]
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 250,
+          "maximum": 30000
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1250,
+          "maximum": 120000
+        },
+        "started_utc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "finished_utc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "status": {
+          "enum": [
+            "running",
+            "completed",
+            "interrupted"
+          ]
+        },
+        "classification": {
+          "enum": [
+            "verified",
+            "accepted",
+            "failed",
+            "inconclusive"
+          ]
+        },
+        "cleanup": {
+          "enum": [
+            "completed",
+            "failed",
+            "unknown"
+          ]
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "api",
+              "phase"
+            ],
+            "properties": {
+              "api": {
+                "type": "string"
+              },
+              "phase": {
+                "enum": [
+                  "begin",
+                  "end"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "verification_scope": {
+          "const": "buffer_processing"
+        },
+        "signal_verification": {
+          "const": "not_tested"
+        }
+      },
+      "not": {
+        "required": [
+          "endpoint_id"
+        ]
+      },
+      "additionalProperties": true
+    }
+  }
+}

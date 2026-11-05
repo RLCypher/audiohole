@@ -1,0 +1,87 @@
+{
+  "handover": "AudioHole-GUI-Agent-Handover-v0.4.zip",
+  "archive_sha256": "6d460315a82fe3a0f5222d820537ceac33de64edc7c5d297e742efc83786387b",
+  "scanner_source_version": "0.4.0",
+  "files": [
+    {
+      "path": "include/audiohole/deep_scan.hpp",
+      "sha256": "570a2e90fd722e5f8e3a34b9dcf0755fd3c7abe6473eef1695f88aa6d87ba6d4"
+    },
+    {
+      "path": "include/audiohole/scan_utility.hpp",
+      "sha256": "6e52922b3d5c2dc0f5ad289cf199aa7c2b272ccbab08077bd13117fb9ae2d5cc"
+    },
+    {
+      "path": "include/audiohole/scanner.hpp",
+      "sha256": "2d3a4bc5189c528b7a10cb6715247fb719dee957385f3f18a156d2f606aa3018"
+    },
+    {
+      "path": "include/audiohole/scoped_scan.hpp",
+      "sha256": "7f6c1a3e60b8260e8c5a0ebecb4498f54f212a032843b274e00be73b5c623981"
+    },
+    {
+      "path": "include/audiohole/test_suite.hpp",
+      "sha256": "e48b29e7ab0b86407d139b3e3d97acf0be0726dbe31cfce7d209f1dbede7b4df"
+    },
+    {
+      "path": "src/scanner/atomic_file.cpp",
+      "sha256": "9b074e8cf5565400ef3ce9c0373ab760582d061e06c7be928465f231a3f15928"
+    },
+    {
+      "path": "src/scanner/deep_scan.cpp",
+      "sha256": "9acc45ff459917efb37c45ff26a9dc103e37812c7c5d335399eadc1ad1393ef3"
+    },
+    {
+      "path": "src/scanner/probe_process.cpp",
+      "sha256": "165bb52a56a16e4a11632af63b0e4037fd2c7c2085d023427a0afbf76f916d6d"
+    },
+    {
+      "path": "src/scanner/probe_windows.cpp",
+      "sha256": "3f115dac35a5f829d7fba5f6b5e3b839fe4a72bb4471a19317f1978206222a7f"
+    },
+    {
+      "path": "src/scanner/result_zip.cpp",
+      "sha256": "0b3a087c13bbac9b4fd1fa031d36d5afa453e5458b4d0a60aaeb5f9434f21250"
+    },
+    {
+      "path": "src/scanner/scan_utility.cpp",
+      "sha256": "0cedb8d91798e77d72edc08ba85ca7342181fd3acf8eb4b71ac169410ef3e56b"
+    },
+    {
+      "path": "src/scanner/scanner.cpp",
+      "sha256": "50174557ed3de0c40e8d491354ef8c0f33c191b5195c1d5b47b50cbd1e61a0db"
+    },
+    {
+      "path": "src/scanner/scoped_scan.cpp",
+      "sha256": "f0cbd076d85f1245db71a551452b5ef6151e4f9d1919f9af84701fad50b437af"
+    },
+    {
+      "path": "src/scanner/storage_internal.hpp",
+      "sha256": "77203baa294cea2b66979c5bd6cf001b4baeb2699f1efa695ed47de34ad22245"
+    },
+    {
+      "path": "src/scanner/store.cpp",
+      "sha256": "c80f7aedf2c20eb9d930e6beb5fabebc938d8bee70e1b7b81c5aabd6ee23d50f"
+    },
+    {
+      "path": "src/scanner/test_suite.cpp",
+      "sha256": "396cfacb8b7484bdce116e948ce26b40c28bb2abe73161fde1d9e4964afe871d"
+    },
+    {
+      "path": "src/scanner/windows_format.hpp",
+      "sha256": "94bbd14bebef74308c089cff0e239a3bb488101419380e5f7ec3860a6b0fd969"
+    },
+    {
+      "path": "src/scanner/windows_provider.cpp",
+      "sha256": "83b24c2b8c749a170259d29f05c8ad265f623fb9d3477f22dcfcf3a5119ec9b2"
+    },
+    {
+      "path": "tests/scanner_tests.cpp",
+      "sha256": "b669ef411c41b1fdf88ca486099de9995d80836a6227ed8a13095d65e76cf50c"
+    },
+    {
+      "path": "schemas/device-record-v2.schema.json",
+      "sha256": "6d2572eb2a33d3ae95e5295f0cdcbc7a872b9696cc5b7a8fd5ab457e7dfafa76"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(AudioHole VERSION 0.1.0 LANGUAGES CXX)
+project(AudioHole VERSION 0.1.0 LANGUAGES C CXX)
 
 option(AUDIOHOLE_MODEL_ONLY "Build portable simulator tests only (no application)" OFF)
 
@@ -35,6 +35,7 @@ set(AUDIOHOLE_AVATAR_BUILD_VIEWER OFF CACHE BOOL "Standalone avatar viewer" FORC
 set(AUDIOHOLE_AVATAR_BUILD_TESTS OFF CACHE BOOL "Standalone avatar validation" FORCE)
 include(cmake/AvatarValidation.cmake)
 add_subdirectory(assets/personalities/runtime)
+add_subdirectory(src/scanner)
 add_subdirectory(src/model)
 if(NOT AUDIOHOLE_MODEL_ONLY)
   add_subdirectory(src/platform/windows)

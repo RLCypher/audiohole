@@ -1,0 +1,55 @@
+# Imported scanner v0.4; retain the application's existing JSON and CRT settings.
+add_library(audiohole_scanner STATIC scanner.cpp scoped_scan.cpp store.cpp atomic_file.cpp
+  scan_utility.cpp deep_scan.cpp probe_process.cpp probe_windows.cpp windows_provider.cpp)
+target_include_directories(audiohole_scanner PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_compile_features(audiohole_scanner PUBLIC cxx_std_20)
+target_compile_definitions(audiohole_scanner PRIVATE AUDIOHOLE_SCANNER_VERSION="0.4.0")
+target_link_libraries(audiohole_scanner PUBLIC nlohmann_json::nlohmann_json)
+if(WIN32)
+  target_compile_definitions(audiohole_scanner PRIVATE UNICODE _UNICODE NOMINMAX
+    WIN32_LEAN_AND_MEAN _WIN32_WINNT=0x0A00)
+  target_link_libraries(audiohole_scanner PRIVATE ole32 uuid propsys setupapi cfgmgr32)
+endif()
+if(MSVC)
+  target_compile_options(audiohole_scanner PRIVATE /W4 /permissive- /utf-8)
+else()
+  target_compile_options(audiohole_scanner PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+# ZIP export is separate from the automated fixture runner. The GUI never links
+# the latter or executes its deliberate file-renaming/history-omission tests.
+include(FetchContent)
+FetchContent_Declare(miniz
+  URL https://codeload.github.com/richgel999/miniz/tar.gz/refs/tags/3.1.0
+  URL_HASH SHA256=09569fc19d060ac9f5999ba9356728c2494ebe6a24ac0eb0a6b6ae3d396cfea6
+  DOWNLOAD_EXTRACT_TIMESTAMP FALSE SOURCE_SUBDIR audiohole-no-upstream-cmake)
+FetchContent_MakeAvailable(miniz)
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated/miniz_export.h" "#pragma once\n#define MINIZ_EXPORT\n")
+add_library(audiohole_zip STATIC "${miniz_SOURCE_DIR}/miniz.c" "${miniz_SOURCE_DIR}/miniz_tdef.c"
+  "${miniz_SOURCE_DIR}/miniz_tinfl.c" "${miniz_SOURCE_DIR}/miniz_zip.c")
+target_include_directories(audiohole_zip PUBLIC "${miniz_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/generated")
+target_compile_definitions(audiohole_zip PUBLIC MINIZ_NO_STDIO MINIZ_NO_ZLIB_COMPATIBLE_NAMES)
+add_library(audiohole_scanner_export STATIC result_zip.cpp)
+target_link_libraries(audiohole_scanner_export PUBLIC audiohole_scanner PRIVATE audiohole_zip)
+if(MSVC)
+  target_compile_options(audiohole_scanner_export PRIVATE /W4 /permissive- /utf-8)
+endif()
+if(BUILD_TESTING)
+  file(READ "${nlohmann_json_SOURCE_DIR}/LICENSE.MIT" json_notice)
+  file(READ "${miniz_SOURCE_DIR}/LICENSE" miniz_notice)
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated/embedded_notices.hpp"
+    "#pragma once\n#include <string>\nnamespace audiohole::scanner { inline const std::string& embedded_notices() { static const std::string value = R\"AHnotice(nlohmann/json\n${json_notice}\nminiz 3.1.0\n${miniz_notice})AHnotice\"; return value; } }\n")
+  add_library(audiohole_scanner_test_suite STATIC test_suite.cpp)
+  target_compile_definitions(audiohole_scanner_test_suite PRIVATE AUDIOHOLE_SCANNER_VERSION="0.4.0")
+  target_include_directories(audiohole_scanner_test_suite PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+  target_link_libraries(audiohole_scanner_test_suite PUBLIC audiohole_scanner audiohole_scanner_export)
+  add_executable(audiohole_scanner_tests "${PROJECT_SOURCE_DIR}/tests/scanner_tests.cpp")
+  target_link_libraries(audiohole_scanner_tests PRIVATE audiohole_scanner_test_suite)
+  if(MSVC)
+    target_compile_options(audiohole_scanner_test_suite PRIVATE /W4 /permissive- /utf-8)
+    target_compile_options(audiohole_scanner_tests PRIVATE /W4 /permissive- /utf-8)
+  endif()
+  add_test(NAME Scanner.Contracts COMMAND audiohole_scanner_tests)
+  set_tests_properties(Scanner.Contracts PROPERTIES TIMEOUT 180)
+endif()
