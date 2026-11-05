@@ -119,6 +119,11 @@ class DeviceStore {
   // A user preference, not endpoint availability. Fresh read/merge plus checked
   // atomic replacement preserves external notes, extensions and identity.
   void set_hidden(const std::string& logical_id, bool hidden);
+  // User metadata only. The snapshot path/bytes reject stale editor writes.
+  // Rename never replaces another device. Failed writes attempt a checked path
+  // rollback; a concurrent external edit is retained and reported for recovery.
+  void edit_metadata(const std::string& logical_id, const std::string& display_name,
+    const std::string& notes, const std::string& expected_path, const std::string& expected_bytes);
   std::vector<ProbeTarget> probe_targets();
   void checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal);
   IdentityResolver identity_resolver();

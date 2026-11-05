@@ -522,6 +522,59 @@ void DeviceStore::set_hidden(const std::string& logical_id, bool hidden) {
   writer_->write(found->path, ordered_record(found->data).dump(2) + "\n", found->original);
 }
 
+void DeviceStore::edit_metadata(const std::string &logical_id, const std::string &display_name,
+                                const std::string &notes, const std::string &expected_path,
+                                const std::string &expected_bytes) {
+  if (display_name.empty() || display_name.size() > 180 ||
+      safe_filename(display_name) != display_name)
+    throw std::invalid_argument("Use a nonempty Windows-compatible device name (up to 180 UTF-8 "
+                                "bytes); avoid reserved names, slashes and trailing spaces/dots");
+  if (notes.size() > 65536)
+    throw std::invalid_argument("Device notes exceed 64 KiB");
+  detail::StoreLock portable_lock(portable_root_);
+  auto records = probe_records(portable_root_);
+  auto found = std::find_if(records.begin(), records.end(), [&](const auto &record) {
+    return text(record.data, "logical_id") == logical_id;
+  });
+  if (found == records.end())
+    throw std::runtime_error("Device no longer exists; reload saved devices");
+  if (path_utf8(found->path) != expected_path || found->original != expected_bytes)
+    throw std::runtime_error("Device changed externally since it was loaded; reload before saving");
+  const auto destination = found->path.parent_path() / utf8_path(display_name + ".json");
+  for (const auto &other : records)
+    if (text(other.data, "logical_id") != logical_id && same_filename(other.path, destination))
+      throw std::runtime_error(
+          "Another device already uses that filename; choose a different name");
+  const bool renamed = destination != found->path;
+  if (renamed && fs::exists(destination) && !fs::equivalent(found->path, destination))
+    throw std::runtime_error("Destination already exists; no file was replaced");
+  auto updated = found->data;
+  updated["display_name"] = display_name;
+  updated["notes"] = notes;
+  const auto bytes = ordered_record(updated).dump(2) + "\n";
+  // Move the single canonical record first, avoiding a duplicate logical ID.
+  // Contents are then atomically replaced; interruptions can retain the new
+  // filename with old notes. Never roll back over an intervening external edit.
+  if (renamed)
+    detail::move_no_replace(found->path, destination);
+  try {
+    writer_->write(destination, bytes, found->original);
+  } catch (const std::exception &error) {
+    if (renamed) {
+      try {
+        if (detail::read_optional(destination) != std::optional(found->original))
+          throw std::runtime_error("Renamed record was changed externally");
+        detail::move_no_replace(destination, found->path);
+      } catch (const std::exception &recovery) {
+        throw std::runtime_error(std::string(error.what()) +
+                                 "; rename rollback could not finish: " + recovery.what() +
+                                 ". Reload saved devices and inspect " + path_utf8(destination));
+      }
+    }
+    throw;
+  }
+}
+
 std::vector<ProbeTarget> DeviceStore::probe_targets() {
   detail::StoreLock portable_lock(portable_root_);
   detail::StoreLock local_lock(local_root_);

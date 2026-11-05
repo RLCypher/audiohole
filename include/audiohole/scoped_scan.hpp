@@ -11,6 +11,7 @@ struct ScopedReport {
   std::vector<std::string> selected_endpoint_ids;
   std::size_t metadata_updated = 0;
   bool inventory_complete = false;
+  bool selected_target_complete = false;
 };
 void to_json(Json& json, const ScopedReport& report);
 ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,

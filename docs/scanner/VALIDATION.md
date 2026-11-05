@@ -76,3 +76,30 @@ checks the shared menu's Close/Exit and capability gating, native system-menu
 entries and malformed shell-message rejection, without publishing Jump Lists in
 CI. Native CI and interactive taskbar behavior still need a new Windows run.
 The last owner-confirmed successful baseline remains e78eb64 (#88/#89).
+
+## Queued GUI refinements and analysis-bundle follow-up
+
+This revision adds draggable workspace panes, compact device status cells,
+editable scanner metadata, human-facing evidence summaries, decimal-second Deep
+controls and conditional console following. Per-device scans now live only in
+Devices context menus. It also corrects requested Deep scope in session reports,
+includes referenced raw histories (or explicit unavailable reasons), and separates
+selected-endpoint Basic completion from unrelated global enumeration warnings.
+The scanner's Deep verification criteria and the audio engine are unchanged.
+
+All **136 portable CTest entries pass in both Debug and Release**, including
+the imported scanner contracts and new exact-decimal, metadata rename/restart,
+stale-editor, conflict, rollback, case-only rename, evidence-summary and scoped
+completion checks. The six-scope integration test checks exported history files,
+requested Deep scope and ZIP-relative path separators. The Windows x64 MinGW
+cross-build compiles and links the application and test targets, including new
+native smoke checks for divider movement, pinned actions, decimal inputs and
+console scroll anchoring/follow resumption. The runtime installation matches all
+822 approved files, and canonical PE icon/avatar resource checks pass.
+
+These are local portable/cross-build results, not an executed MSVC or interactive
+Windows GUI pass. Windows Debug/Release CI, extracted-package smoke, mouse/keyboard
+context menus, tooltip/assistive-technology behavior, high DPI, local-time/DST
+rendering, filename operations on Windows and real hardware scans remain native
+validation tasks. See the appended manual checklist. No test is skipped and no
+existing test gate is weakened to produce a package.

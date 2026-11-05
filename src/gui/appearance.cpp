@@ -37,7 +37,8 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
     const bool editor = dynamic_cast<wxTextCtrl*>(window) || dynamic_cast<wxComboBox*>(window) ||
                         dynamic_cast<wxChoice*>(window) || dynamic_cast<wxListBox*>(window) ||
                         dynamic_cast<wxSpinCtrl*>(window) ||
-                        dynamic_cast<wxSpinCtrlDouble*>(window);
+                        dynamic_cast<wxSpinCtrlDouble*>(window) ||
+                        dynamic_cast<DeviceList*>(window);
     window->SetBackgroundColour(
         contrast ? wxSystemSettings::GetColour(editor ? wxSYS_COLOUR_WINDOW : wxSYS_COLOUR_BTNFACE)
         : editor ? input

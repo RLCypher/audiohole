@@ -370,3 +370,41 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] After exiting, stale Start/Stop/Close/Exit shortcuts do not create a new session
   or data root. Open follows normal startup preferences. Check paths with spaces and
   Unicode and verify shortcuts target the current running executable.
+
+## Queued scanner and workspace refinements
+
+- [ ] Drag the Profiles width divider and the Profiles/Notes/Holes height dividers.
+  Keep drafts intact, scroll each field independently and verify Save/Apply/Revert
+  remains visible. Repeat at compact, square and wide sizes and 100/150/200% DPI.
+- [ ] Drag the Devices column and Notes/Overview height dividers. Notes and evidence
+  wrap. Long names ellipsize; hover shows the full name. The lists have no unnecessary
+  horizontal scrollbar. Check keyboard navigation and status descriptions with a
+  screen reader and Windows high contrast.
+- [ ] Green means last observed available, gray unavailable, yellow attention or
+  unknown. A rejected candidate format or old inconclusive test alone must not
+  turn a device red or claim device-wide unusability. Hidden dividers remain
+  non-actionable and hidden IDs remain excluded from new configurator choices.
+- [ ] Edit a scanner device's name/notes, then Save. Confirm the filename changes
+  while ID, Windows name, hidden status, extensions and profile references survive
+  restart. Try invalid/reserved names, collisions, read-only files and external
+  changes after typing. Failures preserve the draft and report how to recover;
+  no existing other record is replaced. Explicit Reload can discard the draft.
+- [ ] Scanning offers only Update/Full. Device right-click or Shift+F10/Menu offers
+  Update and Deep update for that exact device. Check mouse and keyboard targeting.
+- [ ] Deep limits show seconds, default stream `2`, allow `2.001` and arrow steps
+  of 0.001 s. Reject excess precision, malformed/out-of-range values and attempt
+  limits less than stream duration plus 1 s. Attempt count stays integer.
+- [ ] **Ready to scan** identifies scope and suggests closing browsers, Steam/Epic,
+  Discord/Telegram and nonessential audio apps, retaining critical workflow apps.
+  It explains timing variation and sound/disruption; declining starts no worker.
+- [ ] Overview puts status/time/next action first, distinguishes configured and mix
+  formats, and retains exact tuple details in Reported formats. Check local time
+  and daylight-saving offsets against UTC JSON; unknown stays explicit. Historical
+  failures are distinguishable from the latest result; no health claim is invented.
+- [ ] While scanning, a console at the bottom follows new output. Scroll up and
+  confirm it stays anchored while output arrives. Return to bottom to resume;
+  test search/filter changes and bounded-log eviction without controller commands.
+- [ ] Export after each scope/depth combination. Check requested scope/ID, forward
+  slash ZIP-relative record references, included raw histories or explicit missing
+  reasons. Selected-device Basic completion may advance its date despite unrelated
+  enumeration errors, but the overall partial result and diagnostics remain visible.

@@ -137,10 +137,19 @@ Result ConfigurationController::update_endpoint(const Endpoint& edited) {
     const auto* original = endpoint(state_, edited.id);
     if (!original)
         return {false, "Saved device no longer exists."};
-    if (original->inspection)
-        return {false,
-                "Edit this device's JSON notes or rename its file, then Reload saved devices. "
-                "Scanner observations are read-only here."};
+    if (original->inspection) {
+        if (!edited.inspection || edited.windows_name != original->windows_name ||
+            edited.capture != original->capture)
+            return {false, "Device identity and direction are read-only."};
+        ScannerActionRequest request;
+        request.kind = ScannerActionKind::EditMetadata;
+        request.logical_id = edited.id;
+        request.display_name = edited.display_name;
+        request.notes = edited.notes;
+        request.expected_path = edited.inspection->path;
+        request.expected_bytes = edited.inspection->edit_bytes;
+        return scanner_action(request);
+    }
     if (edited.windows_name != original->windows_name || edited.capture != original->capture)
         return {false, "Device identity and direction are read-only; edit their saved record "
                        "explicitly outside the GUI."};
@@ -228,11 +237,12 @@ Result ConfigurationController::scanner_action(const ScannerActionRequest& reque
         state_.scanner.busy = true;
         scanner_job_is_scan_ = false;
         state_.scanner.result = "running";
-        state_.scanner.phase = request.kind == ScannerActionKind::Export      ? "exporting"
-                               : request.kind == ScannerActionKind::SetHidden ? "saving visibility"
-                               : request.kind == ScannerActionKind::RefreshAvailability
-                                   ? "refreshing availability"
-                                   : "loading inventory";
+        state_.scanner.phase =
+            request.kind == ScannerActionKind::EditMetadata          ? "saving device metadata"
+            : request.kind == ScannerActionKind::Export              ? "exporting"
+            : request.kind == ScannerActionKind::SetHidden           ? "saving visibility"
+            : request.kind == ScannerActionKind::RefreshAvailability ? "refreshing availability"
+                                                                     : "loading inventory";
         ++state_.revision;
         return {true, "Scanner operation accepted."};
     } catch (const std::exception& error) {

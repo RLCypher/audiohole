@@ -1868,3 +1868,13 @@ and is preserved beside names/identity in each scanner record. This is the
 owner-requested device visibility preference, not a production profile schema
 approval. Filename rename preserves logical identity. No destructive migration or
 resolution of O-004/O-006 is authorized by this increment.
+
+The Devices editor can now save scanner-owned name/notes changes through an
+isolated `EditMetadata` operation. The canonical filename remains the display-name
+authority; identity, hidden status, unknown fields and references are preserved.
+The service checks the originally loaded path/bytes, refuses filename collisions,
+and atomically replaces contents with a checked rename rollback on write failure.
+An interrupted rename/content sequence is recoverable by Reload, but is not a
+multi-file transaction. See SCANNER_TEST_MODE.md for the failure contract. Scan
+duration controls display decimal seconds; existing JSON/request fields remain
+integer milliseconds. No device/profile schema migration is introduced.

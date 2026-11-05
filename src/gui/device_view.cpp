@@ -1,83 +1,157 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <wx/datetime.h>
 
 namespace audiohole::gui {
+namespace {
+wxString local_times(const std::string& value) {
+    wxString result = text(value);
+    // Render local time only in human-facing views; raw JSON remains UTC.
+    for (std::size_t i = 0; i + 20 <= result.length(); ++i) {
+        if (result[i + 4] != '-' || result[i + 7] != '-' || result[i + 10] != 'T' ||
+            result[i + 19] != 'Z')
+            continue;
+        wxDateTime date;
+        if (!date.ParseISOCombined(result.Mid(i, 19)))
+            continue;
+        date.MakeFromTimezone(wxDateTime::UTC);
+        const auto replacement = date.Format("%Y-%m-%d %H:%M:%S %Z (UTC%z)");
+        result = result.Left(i) + replacement + result.Mid(i + 20);
+        i += replacement.length() - 1;
+    }
+    return result;
+}
+wxString device_status(const Endpoint& e) {
+    if (e.inspection && e.inspection->unusable)
+        return "Unusable";
+    if (e.availability == Availability::Ambiguous || (e.inspection && e.inspection->warning))
+        return "Error / attention";
+    if (e.availability == Availability::Available)
+        return "Available";
+    if (e.availability == Availability::Unavailable)
+        return "Unavailable";
+    return "Unknown / not tested";
+}
+} // namespace
 void Frame::build_devices() {
     auto* page = new wxPanel(notebook_);
-    auto* root = new wxBoxSizer(wxHORIZONTAL);
+    auto* layout = new wxBoxSizer(wxVERTICAL);
+    device_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                           wxSP_LIVE_UPDATE | wxSP_3D);
+    device_columns_->SetName("Resize device column width");
+    device_columns_->SetMinimumPaneSize(FromDIP(160));
+    device_columns_->SetSashGravity(0);
+    auto* browser = new wxPanel(device_columns_);
     auto* left = new wxBoxSizer(wxVERTICAL);
-    device_search_ = field(page, left, "Search devices");
-    auto list = [&](const char* title, wxListBox*& box, std::vector<std::string>& ids) {
-        label(page, left, title);
-        box = new wxListBox(page, wxID_ANY, wxDefaultPosition, wxSize(300, 120), 0, nullptr,
-                            wxLB_SINGLE | wxLB_HSCROLL);
-        box->SetMinSize(wxSize(300, 48)); // Both lists shrink independently on short windows.
+    device_search_ = field(browser, left, "Search devices");
+    auto list = [&](const char* title, DeviceList*& box, std::vector<std::string>& ids) {
+        label(browser, left, title);
+        box = new DeviceList(browser);
         box->SetName(text(title));
-        box->SetToolTip("Right-click a device for update scans and Hide / Unhide. Hidden devices "
-                        "remain saved.");
-        left->Add(box, 1, wxEXPAND | wxALL, 4);
+        box->SetToolTip(
+            "Status dots: green available; gray unavailable; yellow attention or unknown; red "
+            "explicitly unusable. Right-click for scans and Hide / Unhide.");
+        left->Add(box, 1, wxEXPAND | wxALL, 3);
         auto* control = box;
         auto* mapped_ids = &ids;
-        box->Bind(wxEVT_LISTBOX, [this, control, mapped_ids](wxCommandEvent&) {
+        box->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [this, control, mapped_ids](wxDataViewEvent&) {
+            if (populating_devices_)
+                return;
             const int index = control->GetSelection();
-            if (index >= 0 && !mapped_ids->at(static_cast<std::size_t>(index)).empty())
-                select_device(mapped_ids->at(static_cast<std::size_t>(index)));
-            else
-                populate_devices(); // A divider has no logical identity or action.
+            if (index >= 0 && static_cast<std::size_t>(index) < mapped_ids->size() &&
+                !mapped_ids->at(static_cast<std::size_t>(index)).empty()) {
+                const auto& id = mapped_ids->at(static_cast<std::size_t>(index));
+                if (id != device_id_)
+                    select_device(id);
+            } else
+                populate_devices();
         });
-        box->Bind(wxEVT_CONTEXT_MENU, [this, control, mapped_ids](wxContextMenuEvent& e) {
-            device_context(control, *mapped_ids, e);
+        box->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU,
+                  [this, control, mapped_ids](wxDataViewEvent& event) {
+                      const auto point = event.GetPosition() == wxDefaultPosition
+                                             ? wxDefaultPosition
+                                             : control->ClientToScreen(event.GetPosition());
+                      wxContextMenuEvent menu(wxEVT_CONTEXT_MENU, control->GetId(), point);
+                      device_context(control, *mapped_ids, menu);
+                  });
+        // Keyboard context requests arrive as the normal window event rather
+        // than the data view's mouse-only row context event on Windows.
+        box->Bind(wxEVT_CONTEXT_MENU, [this, control, mapped_ids](wxContextMenuEvent& event) {
+            device_context(control, *mapped_ids, event);
         });
     };
     list("Capture devices", capture_devices_, capture_device_ids_);
     list("Playback devices", playback_devices_, playback_device_ids_);
-    root->Add(left, 0, wxEXPAND);
+    browser->SetSizer(left);
+    auto* details = new wxPanel(device_columns_);
     auto* right = new wxBoxSizer(wxVERTICAL);
-    root->Add(right, 1, wxEXPAND | wxALL, 6);
-    device_name_ = field(page, right, "Display name");
-    device_notes_ = field(page, right, "Notes", wxTE_MULTILINE);
-    device_notes_->SetMinSize(wxSize(-1, 60));
-    device_detail_ = label(page, right, "Select a device.");
-    auto* actions = new wxBoxSizer(wxHORIZONTAL);
-    device_save_ = button(page, actions, "Save device", [this] {
+    auto* name_row = new wxBoxSizer(wxHORIZONTAL);
+    auto* name_column = new wxBoxSizer(wxVERTICAL);
+    device_name_ = field(details, name_column, "Display name");
+    name_row->Add(name_column, 1, wxEXPAND);
+    device_save_ = button(details, name_row, "Save device", [this] {
         if (const auto* e = endpoint(controller_->snapshot(), device_id_)) {
             auto edit = *e;
             edit.display_name = utf8(device_name_->GetValue());
             edit.notes = utf8(device_notes_->GetValue());
+            const bool scanner_owned = bool(e->inspection);
+            if (scanner_owned)
+                edit.inspection = device_edit_snapshot_;
             const auto result = controller_->update_endpoint(edit);
             if (!result.ok) {
                 show_result(result);
                 return;
             }
-            device_dirty_ = false;
-            populate_devices();
+            if (scanner_owned)
+                device_save_generation_ = controller_->snapshot().scanner.generation;
+            else {
+                device_dirty_ = false;
+                populate_devices();
+                present(presentation::Message::DeviceSaved);
+            }
             refresh();
-            present(presentation::Message::DeviceSaved);
         }
     });
-    device_update_ = button(page, actions, "Update device",
-                            [this] { request_scan(false, ScanScope::Selected, device_id_); });
-    device_deep_ = button(page, actions, "Deep update device",
-                          [this] { request_scan(true, ScanScope::Selected, device_id_); });
-    device_update_->SetToolTip("Refresh capabilities for this exact saved logical device only.");
-    device_deep_->SetToolTip("Refresh this device and request consent for bounded Deep stream "
-                             "tests. Uses the Scanning tab's limits.");
-    right->Add(actions);
-    device_view_ = new wxChoice(page, wxID_ANY);
+    device_save_->SetToolTip("Save the display name and notes. The JSON filename follows the name; "
+                             "logical identity and existing profile references stay unchanged.");
+    right->Add(name_row, 0, wxEXPAND);
+    device_detail_ =
+        label(details, right, "Select a device. Right-click its list entry to scan it.");
+    device_detail_->SetWindowStyleFlag(wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+    device_detail_->SetMinSize(wxSize(0, -1));
+    device_rows_ = new wxSplitterWindow(details, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                        wxSP_LIVE_UPDATE | wxSP_3D);
+    device_rows_->SetName("Resize device notes and overview heights");
+    device_rows_->SetMinimumPaneSize(FromDIP(72));
+    device_rows_->SetSashGravity(0.3);
+    auto* notes_panel = new wxPanel(device_rows_);
+    auto* notes_layout = new wxBoxSizer(wxVERTICAL);
+    device_notes_ = field(notes_panel, notes_layout, "Notes", wxTE_MULTILINE | wxTE_WORDWRAP);
+    notes_layout->GetItem(device_notes_)->SetProportion(1);
+    device_notes_->SetMinSize(wxSize(0, 24));
+    notes_panel->SetSizer(notes_layout);
+    auto* evidence_panel = new wxPanel(device_rows_);
+    auto* evidence_layout = new wxBoxSizer(wxVERTICAL);
+    device_view_ = new wxChoice(evidence_panel, wxID_ANY);
     for (const auto* view : inspection_view_names)
         device_view_->Append(text(view));
     device_view_->SetSelection(0);
     device_view_->SetName("Device evidence view");
-    right->Add(device_view_, 0, wxEXPAND | wxALL, 3);
-    device_evidence_ = new wxTextCtrl(page, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
-                                      wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
+    evidence_layout->Add(device_view_, 0, wxEXPAND | wxALL, 3);
+    device_evidence_ =
+        new wxTextCtrl(evidence_panel, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+                       wxTE_MULTILINE | wxTE_READONLY | wxTE_WORDWRAP);
     device_evidence_->SetName("Device evidence");
-    right->Add(device_evidence_, 1, wxEXPAND | wxALL, 3);
+    device_evidence_->SetMinSize(wxSize(0, 24));
+    evidence_layout->Add(device_evidence_, 1, wxEXPAND | wxALL, 3);
+    evidence_panel->SetSizer(evidence_layout);
+    device_rows_->SplitHorizontally(notes_panel, evidence_panel);
+    right->Add(device_rows_, 1, wxEXPAND);
     auto* maintenance = new wxBoxSizer(wxHORIZONTAL);
     for (const auto& item :
          {std::pair{"Reload saved devices", ScannerActionKind::Reload},
           std::pair{"Refresh availability", ScannerActionKind::RefreshAvailability}}) {
-        auto* action = button(page, maintenance, item.first, [this, kind = item.second] {
+        auto* action = button(details, maintenance, item.first, [this, kind = item.second] {
             if (device_dirty_ &&
                 wxMessageBox("Discard unsaved device edits?", "Device edits",
                              wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
@@ -88,14 +162,14 @@ void Frame::build_devices() {
             scanner_action(request);
         });
         action->SetToolTip(item.second == ScannerActionKind::Reload
-                               ? "Read externally edited device JSON and filename display names; "
-                                 "no hardware access."
-                               : "Refresh known-device Windows availability and bindings without "
-                                 "capability tests or creating new records.");
+                               ? "Reload external device JSON edits and filename changes without "
+                                 "querying hardware."
+                               : "Refresh known device availability without capability tests or "
+                                 "creating new records.");
         scanner_actions_.push_back(action);
     }
-    right->Add(maintenance);
-    auto* toggle = button(page, right, "Toggle availability", [this] {
+    right->Add(maintenance, 0, wxEXPAND);
+    auto* toggle = button(details, right, "Toggle availability", [this] {
         if (controller_->snapshot().operating_mode != OperatingMode::Preview)
             return;
         if (const auto* e = endpoint(controller_->snapshot(), device_id_)) {
@@ -113,12 +187,18 @@ void Frame::build_devices() {
         }
     });
     toggle->Show(controller_->snapshot().operating_mode == OperatingMode::Preview);
-    page->SetSizer(root);
+    details->SetSizer(right);
+    device_columns_->SplitVertically(browser, details, FromDIP(300));
+    layout->Add(device_columns_, 1, wxEXPAND | wxALL, 3);
+    page->SetSizer(layout);
     notebook_->AddPage(page, "Devices");
     device_search_->Bind(wxEVT_TEXT, [this](wxCommandEvent&) { populate_devices(); });
     device_view_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) { load_device(); });
     for (auto* editor : {device_name_, device_notes_})
-        editor->Bind(wxEVT_TEXT, [this](wxCommandEvent&) { device_dirty_ = true; });
+        editor->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
+            device_dirty_ = true;
+            refresh();
+        });
 }
 bool Frame::select_device(const std::string& id) {
     if (id != device_id_ && device_dirty_ &&
@@ -134,6 +214,11 @@ bool Frame::select_device(const std::string& id) {
     return true;
 }
 void Frame::populate_devices() {
+    if (populating_devices_)
+        return;
+    populating_devices_ = true;
+    capture_devices_->Freeze();
+    playback_devices_->Freeze();
     capture_devices_->Clear();
     playback_devices_->Clear();
     capture_device_ids_.clear();
@@ -154,26 +239,30 @@ void Frame::populate_devices() {
                     ids.push_back("");
                     divider = true;
                 }
-                box->Append(text(e.display_name + " — " + (e.inspection ? "last observed " : "") +
-                                 name(e.availability)));
+                box->Append(text(e.display_name), device_status(e));
                 ids.push_back(e.id);
-                if (e.id == device_id_)
-                    box->SetSelection(static_cast<int>(ids.size()) - 1);
             }
     }
     if (device_id_.empty()) {
         const auto& ids = capture_device_ids_.empty() ? playback_device_ids_ : capture_device_ids_;
         const auto first =
             std::find_if(ids.begin(), ids.end(), [](const auto& id) { return !id.empty(); });
-        if (first != ids.end()) {
+        if (first != ids.end())
             device_id_ = *first;
-            populate_devices();
-            return;
-        }
     }
+    for (bool capture : {true, false}) {
+        auto* box = capture ? capture_devices_ : playback_devices_;
+        const auto& ids = capture ? capture_device_ids_ : playback_device_ids_;
+        const auto selected = std::find(ids.begin(), ids.end(), device_id_);
+        box->SetSelection(selected == ids.end() ? wxNOT_FOUND
+                                                : static_cast<int>(selected - ids.begin()));
+    }
+    capture_devices_->Thaw();
+    playback_devices_->Thaw();
+    populating_devices_ = false;
     load_device();
 }
-void Frame::device_context(wxListBox* box, const std::vector<std::string>& ids,
+void Frame::device_context(DeviceList* box, const std::vector<std::string>& ids,
                            wxContextMenuEvent& event) {
     int index = box->GetSelection();
     if (event.GetPosition() != wxDefaultPosition)
@@ -208,6 +297,10 @@ void Frame::device_context(wxListBox* box, const std::vector<std::string>& ids,
     menu.Bind(
         wxEVT_MENU,
         [this, id, hidden](wxCommandEvent&) {
+            if (device_dirty_) {
+                show_result({false, "Save device edits before changing visibility."});
+                return;
+            }
             ScannerActionRequest request;
             request.kind = ScannerActionKind::SetHidden;
             request.logical_id = id;
@@ -219,16 +312,12 @@ void Frame::device_context(wxListBox* box, const std::vector<std::string>& ids,
 }
 void Frame::load_device() {
     const auto* e = endpoint(controller_->snapshot(), device_id_);
-    const bool editable = e && !e->inspection;
+    const bool editable = e && !controller_->snapshot().scanner.busy;
     device_name_->SetEditable(editable);
     device_notes_->SetEditable(editable);
-    device_save_->Enable(editable && !controller_->snapshot().scanner.busy);
-    const bool can_scan = e && controller_->snapshot().capabilities.scanning &&
-                          !controller_->snapshot().scanner.busy &&
-                          !controller_->snapshot().scanning;
-    device_update_->Enable(can_scan);
-    device_deep_->Enable(can_scan);
+    device_save_->Enable(editable && device_dirty_);
     if (!device_dirty_ || loaded_device_id_ != device_id_) {
+        device_edit_snapshot_ = e ? e->inspection : nullptr;
         device_name_->ChangeValue(e ? text(e->display_name) : wxString{});
         device_notes_->ChangeValue(e ? text(e->notes) : wxString{});
     }
@@ -238,25 +327,37 @@ void Frame::load_device() {
         device_evidence_->ChangeValue("");
         return;
     }
-    device_detail_->SetLabel(e->inspection
-                                 ? "Rename the device JSON file to change its display name. Edit "
-                                   "notes externally, then Reload."
-                                 : "Saved logical identity is independent of the display name.");
-    device_detail_->Wrap(600);
+    device_detail_->SetLabel(
+        e->inspection ? "Save changes the filename and notes while preserving device identity."
+                      : "Saved logical identity is independent of the display name.");
+    device_detail_->SetToolTip(device_detail_->GetLabel());
     std::string details;
     if (e->inspection)
         details = e->inspection->views.at(static_cast<std::size_t>(device_view_->GetSelection()));
     else {
-        details = "Logical ID: " + e->id + "\nWindows name: " + e->windows_name +
-                  "\nAvailability: " + name(e->availability) + "\n";
+        const bool preview = controller_->snapshot().operating_mode == OperatingMode::Preview;
+        details =
+            "Display name: " + e->display_name +
+            "\nDevice type: " + (e->capture ? "Capture / Recording" : "Playback") +
+            "\nAvailability: " + name(e->availability) + "\nSource: " +
+            (preview ? "Preview demonstration data" : "Legacy saved configuration, unverified") +
+            "\n\nRecorded formats:\n";
         for (const auto& f : e->formats)
-            details += f.label() + "\n";
-        details += controller_->snapshot().operating_mode == OperatingMode::Preview
-                       ? "Preview fixture; no hardware measurements."
-                       : "Legacy saved configuration; unverified, not scanner evidence.";
+            details += "  " + f.label() + "\n";
+        if (e->formats.empty())
+            details += "  Unknown / not tested.\n";
+        details += "\nWindows name: " + e->windows_name + "\nLogical ID: " + e->id +
+                   "\nHidden: " + (e->hidden ? "yes" : "no") + "\n\n" +
+                   (preview ? "Preview fixture; no hardware measurements."
+                            : "Legacy saved observations are unverified; scan hardware to collect "
+                              "current evidence.");
     }
-    if (device_evidence_->GetValue() != text(details))
-        device_evidence_->ChangeValue(text(details));
+    const auto rendered =
+        e->inspection && (device_view_->GetSelection() == 0 || device_view_->GetSelection() == 2)
+            ? local_times(details)
+            : text(details);
+    if (device_evidence_->GetValue() != rendered)
+        device_evidence_->ChangeValue(rendered);
 }
 void Frame::scanner_action(const ScannerActionRequest& request) {
     const auto result = controller_->scanner_action(request);

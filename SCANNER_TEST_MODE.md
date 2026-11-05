@@ -23,16 +23,22 @@ The Devices page has separate Capture and Playback lists. Each list puts hidden
 matches below `----- Hidden devices -----` only when there are hidden matches.
 The divider has no logical identity and cannot be acted on. Right-click a device
 (or use the Windows keyboard context-menu key / Shift+F10) for Update device,
-Deep update device and Hide/Unhide. The two per-device scan actions are also
-visible buttons. Deep actions share the Scanning tab's limits and consent path.
+Deep update device and Hide/Unhide. Per-device scans are offered only in that
+context menu; the Scanning page offers Update and Full. Deep actions share the
+Scanning tab's limits and confirmation path.
 
-Deep defaults are shared mode, eight attempts per device, 2,000 ms stream duration,
-10,000 ms attempt deadline, 120,000 ms per-device budget and 600,000 ms batch budget.
+Deep defaults are shared mode, eight attempts per device, 2 s stream duration,
+10 s attempt deadline, 120 s per-device budget and 600 s batch budget.
 The expandable controls expose shared/exclusive/both and all those limits. The
-scanner validates bounds before starting work. The attempt timeout must exceed
-the requested stream duration by at least 1,000 ms. Consent identifies the exact
-selected device, all eligible devices, or new devices only, and warns about sound
-and disruption. Consent is per request, never a saved authorization.
+duration fields accept decimal seconds with up to three fractional digits; their
+arrows step by 0.001 s. Parsing is exact, with the existing integer-millisecond
+backend limits unchanged. The attempt deadline must exceed stream duration by at
+least 1 s. **Ready to scan** identifies the exact device, all eligible devices, or
+new devices only, and warns about sound and disruption. It advises closing audio
+apps (including browsers, Steam/Epic and Discord/Telegram) while keeping anything
+critical to the workflow open. Timing depends on scan depth, device count,
+attempts, driver behavior and setup/cleanup. Authorization is per request, default
+No, never saved. Basic scanning does not authorize experimental streams.
 
 **Refresh availability** enumerates identities/states, without capability queries,
 new records or experimental streams. Debounced Windows device-change notifications
@@ -96,25 +102,40 @@ also accept optional `hidden`; Preview changes last only for the session.
 Display name is authoritative from the canonical filename stem. Rename that JSON
 file externally, then Reload. Logical ID and the original Windows name remain
 stable. Current Windows name/driver/state are separate observations. Scanner-owned
-name/notes controls are read-only in this first integration; edit JSON notes
-externally and Reload. The legacy editor remains editable. Unknown fields and
-notes are preserved by checked atomic replacement; external conflicts and invalid
-records fail visibly. Invalid reloads keep the prior usable inventory, explicitly
-marked with a failed result, rather than replacing it with an empty inventory.
+name/notes controls are now editable: **Save device** renames the canonical JSON
+and saves notes through the background scanner service. The editor retains the
+path and bytes it originally loaded, so intervening refreshes cannot silently
+rebase stale edits. Invalid/reserved names, collisions and external changes fail
+without replacing another record. A failed write attempts a checked filename
+rollback; if an external edit prevents recovery, the error names the path for
+inspection and Reload. The rename and content replacement are separate filesystem
+operations: an abrupt termination between them can leave the new filename with
+the prior notes, and Reload reflects that state. This is not a multi-file transaction.
+Unknown fields, hidden status, stable IDs, Windows names and profile references
+are preserved. Unsaved metadata must be saved or discarded before scanning or
+changing visibility. The legacy editor remains editable. Invalid reloads keep the
+prior usable inventory, explicitly marked with a failed result, rather than
+replacing it with an empty inventory.
 The inventory reader is bounded to 4,096 records / 128 MiB aggregate, in addition
 to the imported individual JSON/depth limits.
 
 This does not finalize production profile serialization, routing preference
 schemas, storage-root selection or destructive migration. O-004/O-006 remain open.
 Device-v1 normalization occurs in memory on Reload; an explicit subsequent scan or
-visibility write may serialize the handed-off normalized device-v2 record with a
+visibility or metadata write may serialize the handed-off normalized device-v2 record with a
 backup. Newer/invalid versions are refused. No bulk migration is run at startup.
 
 ## Evidence and exports
 
 The selector on Devices exposes Overview, Identity, Reported formats, Deep evidence,
 Driver, Scan history, Diagnostics, Device JSON and Local binding. Availability is
-labelled **last observed** with its UTC timestamp, not a current stream guarantee.
+labelled **last observed**, not a current stream guarantee. The human-facing
+Overview displays observation/scan timestamps in the computer's local timezone,
+with zone and UTC offset; stored/exported JSON remains UTC. The Overview starts
+with name/type, observed status/time and a suggested next action, then separates
+Windows-configured format, Windows mix format and reported support. Scan dates,
+latest versus historical Deep results and driver details precede technical IDs,
+source and path. Exact format/mode tuples remain available in Reported formats.
 Reported formats retain exact requested tuples and statuses; no Cartesian product
 of independent lists is inferred. Unknown/unavailable/unsupported values and raw
 HRESULT diagnostics remain inspectable. A driver change invalidates the currency
@@ -136,6 +157,30 @@ the separate JSONL has an explicit 64 MiB cap and reports truncation. Exports co
 identifiers, local bindings, notes and context; review before sharing. Export scan
 bundle archives the most recent session to a **new** ZIP; originals and existing
 archives are not overwritten. Clear diagnostics clears only the GUI log, not evidence.
+Deep reports identify the requested scope and logical target. Inventory paths use
+ZIP-relative forward slashes. Referenced raw probe histories are copied without
+rewriting the records; missing, unsafe or over-budget histories are explicitly
+listed as unavailable in `inventory.json` (16 MiB per file, 64 MiB total, 4,096
+references maximum). A completed selected-device Basic query can advance that
+device's scan date despite unrelated enumeration warnings; the overall report
+retains partial-inventory status and diagnostics and never infers other devices'
+absence.
+
+## Device presentation and console
+
+The Devices column width and Notes/Overview heights are draggable. Overview and
+notes wrap. Device lists show names with an accessible status dot and a full-name
+tooltip; names ellipsize rather than adding a horizontal scrollbar. Green means
+last observed available, gray unavailable, yellow attention/unknown, and red is
+reserved for explicit device-wide unusability evidence. The current scanner does
+not assert permanent device-wide unusability from a rejected candidate format or
+historical failed test. High contrast uses system colors and status descriptions.
+
+The scan console follows new output only when already at the bottom. Scrolling
+up preserves the visible evidence; returning to the bottom resumes following.
+When the bounded log evicts the visible line it shows the oldest retained text.
+Column and row sizes are session-only presentation state, with no new persistence
+schema or production-layout preferences.
 
 ## Thread/process boundary and limitations
 

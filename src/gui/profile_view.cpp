@@ -400,26 +400,44 @@ void Frame::build_profiles() {
     saves->Add(profile_edit_state_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, FromDIP(8));
     profile_actions_->SetSizer(saves);
     page_layout->Add(profile_actions_, 0, wxEXPAND | wxALL, FromDIP(3));
-    auto* horizontal = new wxBoxSizer(wxHORIZONTAL);
-    auto* sidebar = new wxPanel(page);
+    profile_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                            wxSP_LIVE_UPDATE | wxSP_3D);
+    profile_columns_->SetName("Resize profile column width");
+    profile_columns_->SetMinimumPaneSize(FromDIP(180));
+    profile_columns_->SetSashGravity(0);
+    auto* sidebar = new wxPanel(profile_columns_);
     profile_sidebar_ = sidebar;
     sidebar->SetName("Profile fields");
-    sidebar->SetMinSize(FromDIP(wxSize(280, -1)));
-    auto* left = new wxBoxSizer(wxVERTICAL);
-    sidebar->SetSizer(left);
-    horizontal->Add(sidebar, 0, wxEXPAND | wxALL, 4);
+    auto* sidebar_layout = new wxBoxSizer(wxVERTICAL);
+    profile_rows_ = new wxSplitterWindow(sidebar, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                         wxSP_LIVE_UPDATE | wxSP_3D);
+    profile_rows_->SetName("Resize profiles height");
+    profile_rows_->SetMinimumPaneSize(FromDIP(72));
+    profile_rows_->SetSashGravity(0.34);
+    profile_lower_rows_ = new wxSplitterWindow(profile_rows_, wxID_ANY, wxDefaultPosition,
+                                               wxDefaultSize, wxSP_LIVE_UPDATE | wxSP_3D);
+    profile_lower_rows_->SetName("Resize notes and holes heights");
+    profile_lower_rows_->SetMinimumPaneSize(FromDIP(72));
+    profile_lower_rows_->SetSashGravity(0.5);
+    profile_lower_rows_->SetMinSize(
+        wxSize(0, FromDIP(144) + profile_lower_rows_->GetSashSize() + 4));
+    auto* profile_panel = new wxPanel(profile_rows_);
+    auto* notes_panel = new wxPanel(profile_lower_rows_);
+    auto* holes_panel = new wxPanel(profile_lower_rows_);
+    auto* profile_layout = new wxBoxSizer(wxVERTICAL);
+    auto* notes_layout = new wxBoxSizer(wxVERTICAL);
+    auto* holes_layout = new wxBoxSizer(wxVERTICAL);
     auto* profile_heading = new wxBoxSizer(wxHORIZONTAL);
-    label(sidebar, profile_heading, "Profiles");
-    profiles_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
-                              wxLB_SINGLE | wxLB_HSCROLL | wxLB_NEEDED_SB);
+    label(profile_panel, profile_heading, "Profiles");
+    profiles_ = new wxListBox(profile_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+                              wxLB_SINGLE | wxLB_NEEDED_SB);
     profiles_->SetName("Profiles");
-    profiles_->SetMinSize(wxSize(FromDIP(260), profiles_->GetCharHeight() + FromDIP(8)));
-    profiles_->SetToolTip(
-        "Open a profile for editing. Selection alone does not change active "
-        "routing. Right-click or press Shift+F10 for Rename, Duplicate and Delete.");
+    profiles_->SetMinSize(wxSize(0, profiles_->GetCharHeight() + FromDIP(8)));
+    profiles_->SetToolTip("Open a profile for editing. Right-click or Shift+F10 for Rename, "
+                          "Duplicate and Delete. Drag pane dividers to resize.");
     profile_heading->AddStretchSpacer();
     profile_new_ =
-        add_control(sidebar, profile_heading, "New profile", "Create a new profile.", [this] {
+        add_control(profile_panel, profile_heading, "New profile", "Create a new profile.", [this] {
             if (!discard())
                 return;
             const auto id = controller_->create_profile("New profile");
@@ -428,34 +446,40 @@ void Frame::build_profiles() {
             else
                 select_profile(id);
         });
-    left->Add(profile_heading, 0, wxEXPAND);
-    left->Add(profiles_, 2, wxEXPAND | wxALL, 3);
-    label(sidebar, left, "Notes");
-    profile_notes_ = new wxTextCtrl(sidebar, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+    profile_layout->Add(profile_heading, 0, wxEXPAND);
+    profile_layout->Add(profiles_, 1, wxEXPAND | wxALL, 3);
+    label(notes_panel, notes_layout, "Notes");
+    profile_notes_ = new wxTextCtrl(notes_panel, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                                     wxTE_MULTILINE | wxTE_WORDWRAP);
     profile_notes_->SetName("Profile notes");
-    profile_notes_->SetMinSize(wxSize(FromDIP(260), profile_notes_->GetCharHeight() + FromDIP(12)));
-    profile_notes_->SetToolTip(
-        "Notes for the profile currently being edited. Save keeps staged changes.");
-    left->Add(profile_notes_, 2, wxEXPAND | wxALL, 3);
+    profile_notes_->SetMinSize(wxSize(0, profile_notes_->GetCharHeight() + FromDIP(8)));
+    profile_notes_->SetToolTip("Notes for the selected profile. Drag the dividers above/below to "
+                               "resize. Save keeps staged edits.");
+    notes_layout->Add(profile_notes_, 1, wxEXPAND | wxALL, 3);
     auto* hole_heading = new wxBoxSizer(wxHORIZONTAL);
-    label(sidebar, hole_heading, "Holes");
+    label(holes_panel, hole_heading, "Holes");
     hole_heading->AddStretchSpacer();
-    hole_new_ = add_control(sidebar, hole_heading, "Add hole",
+    hole_new_ = add_control(holes_panel, hole_heading, "Add hole",
                             "Add a hole to this profile's staged changes.", [this] { add_hole(); });
-    left->Add(hole_heading, 0, wxEXPAND);
-    holes_ = new wxListBox(sidebar, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
-                           wxLB_SINGLE | wxLB_HSCROLL | wxLB_NEEDED_SB);
+    holes_layout->Add(hole_heading, 0, wxEXPAND);
+    holes_ = new wxListBox(holes_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+                           wxLB_SINGLE | wxLB_NEEDED_SB);
     holes_->SetName("Holes");
-    holes_->SetMinSize(wxSize(FromDIP(260), holes_->GetCharHeight() + FromDIP(8)));
-    holes_->SetToolTip(
-        "Choose a hole to edit. Right-click or press Shift+F10 for Rename, Duplicate and Delete.");
-    left->Add(holes_, 3, wxEXPAND | wxALL, 3);
-    auto* editor = new wxScrolledWindow(page);
+    holes_->SetMinSize(wxSize(0, holes_->GetCharHeight() + FromDIP(8)));
+    holes_->SetToolTip("Choose a hole. Right-click or Shift+F10 for Rename, Duplicate and Delete.");
+    holes_layout->Add(holes_, 1, wxEXPAND | wxALL, 3);
+    profile_panel->SetSizer(profile_layout);
+    notes_panel->SetSizer(notes_layout);
+    holes_panel->SetSizer(holes_layout);
+    profile_lower_rows_->SplitHorizontally(notes_panel, holes_panel);
+    profile_rows_->SplitHorizontally(profile_panel, profile_lower_rows_);
+    sidebar_layout->Add(profile_rows_, 1, wxEXPAND);
+    sidebar->SetSizer(sidebar_layout);
+    auto* editor = new wxScrolledWindow(profile_columns_);
     editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
     editor->SetSizer(right);
-    horizontal->Add(editor, 1, wxEXPAND | wxALL, 3);
+    profile_columns_->SplitVertically(sidebar, editor, FromDIP(300));
     hole_heading_ = label(editor, right, "Select a hole");
     hole_heading_->SetWindowStyleFlag(wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
     hole_heading_->SetMinSize(wxSize(0, -1));
@@ -471,7 +495,7 @@ void Frame::build_profiles() {
     build_direction(editor, right, reverse_, "Reverse");
     path_status_ = label(editor, right, "No active paths.");
     build_hole_diagnostics(editor, right);
-    page_layout->Add(horizontal, 1, wxEXPAND);
+    page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
     page->SetSizer(page_layout);
     notebook_->AddPage(page, "Profiles");
     profiles_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {

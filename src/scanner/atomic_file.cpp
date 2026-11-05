@@ -11,10 +11,28 @@
 #include <fcntl.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#ifdef __linux__
+#include <sys/syscall.h>
+#include <linux/fs.h>
+#endif
 #include <unistd.h>
 #endif
 
 namespace audiohole::scanner::detail {
+void move_no_replace(const fs::path& source, const fs::path& destination) {
+#ifdef _WIN32
+  if (!MoveFileExW(source.c_str(), destination.c_str(), MOVEFILE_WRITE_THROUGH))
+    throw std::system_error(GetLastError(), std::system_category(), "Cannot rename device file");
+#elif defined(__linux__)
+  if (::syscall(SYS_renameat2, AT_FDCWD, source.c_str(), AT_FDCWD, destination.c_str(), RENAME_NOREPLACE) != 0)
+    throw std::system_error(errno, std::generic_category(), "Cannot rename device file");
+#else
+  fs::create_hard_link(source, destination);
+  try { fs::remove(source); }
+  catch (...) { std::error_code ignored; fs::remove(destination, ignored); throw; }
+#endif
+}
+
 Json parse_json(const std::string& bytes) {
   std::map<int, std::set<std::string>> keys;
   return Json::parse(bytes, [&](int depth, Json::parse_event_t event, Json& value) {

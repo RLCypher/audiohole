@@ -37,8 +37,9 @@ controls and handlers are retained; system dialogs/menus follow Windows styling.
 High contrast takes precedence. Disabled buttons desaturate. Header geometry is
 bounded independently of copy length, text scrolls within the padded rounded card,
 and the avatar follows that card. The routing detail pane scrolls; the left Profiles
-column is fixed, with independent list/notes scrolling and an always-visible
-Save/Apply/Revert bar. Context menus target stable profile/hole IDs, rename stays
+column has draggable width/row dividers, independent list/notes scrolling and an
+always-visible Save/Apply/Revert bar. Devices also has draggable width and
+Notes/Overview dividers. These sizes are session-only. Context menus target stable profile/hole IDs, rename stays
 staged, and duplicates receive fresh IDs. Glyph add buttons have explicit MSAA
 names as well as tooltips. Initial sizing prefers a work-area-bounded square.
 The dark status bar retains a readable foreground. No Windows appearance setting
@@ -87,6 +88,13 @@ assets/manifests are deployed inside the selected personality package.
 The two Devices lists, hidden-device behavior, evidence projections, scan scopes,
 limits, consent, storage and cancellation contracts are documented in
 [SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md).
+
+`DeviceList` uses accessible colored-dot cells and ellipsized device names; full
+names/status remain in hover help and Overview. `SecondsField` uses exact decimal
+conversion outside the GUI to retain millisecond precision without float rounding.
+`Frame::update_console` follows only an already-bottom viewport, anchoring an
+earlier visible line across append or bounded-log replacement. On Windows it
+counts LF lines instead of confusing wx string indices with native CRLF positions.
 
 `Frame::shell_menu` is shared by the tray and taskbar Controls task. The flat
 Windows Jump List also offers Close/Exit and available routing tasks directly.

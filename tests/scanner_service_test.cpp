@@ -45,6 +45,7 @@ struct Evidence {
     std::vector<scan::Endpoint> endpoints{device("Capture", "capture"), device("Playback")};
     std::vector<std::string> queried, probed;
     bool complete = true, block = false;
+    std::vector<scan::Diagnostic> diagnostics;
     std::atomic<bool> entered = false;
 };
 class Provider final : public scan::EndpointProvider {
@@ -70,6 +71,7 @@ class Provider final : public scan::EndpointProvider {
                               {}});
             }
         }
+        result.diagnostics = evidence_->diagnostics;
         result.cancelled = stop.stop_requested();
         result.complete = !result.cancelled && evidence_->complete;
         return result;
@@ -245,6 +247,19 @@ TEST_F(ScannerIntegration, AllSixScopeDepthCombinationsKeepDeepTargetsExactAndEx
             EXPECT_EQ(request.at("operating_context"), options.operating_context);
             EXPECT_EQ(request.at("source"), "injected_test_fixture");
             EXPECT_TRUE(std::filesystem::exists(session / "completion.json"));
+            if (deep && scope != ScanScope::Update) {
+                const auto report = Json::parse(bytes(session / "deep.json"));
+                EXPECT_EQ(report.at("scope"), scope == ScanScope::Selected ? "device" : "full");
+                const auto inventory = Json::parse(bytes(session / "inventory.json"));
+                ASSERT_FALSE(inventory.at("history_files").empty());
+                for (const auto& history : inventory.at("history_files")) {
+                    EXPECT_EQ(history.at("status"), "included");
+                    EXPECT_TRUE(std::filesystem::exists(
+                        session / scan::utf8_path(history.at("path").get<std::string>())));
+                }
+                for (const auto& saved : inventory.at("devices"))
+                    EXPECT_EQ(saved.at("record").get<std::string>().find('\\'), std::string::npos);
+            }
         }
     ScannerActionRequest export_request;
     export_request.kind = ScannerActionKind::Export;
@@ -254,6 +269,25 @@ TEST_F(ScannerIntegration, AllSixScopeDepthCombinationsKeepDeepTargetsExactAndEx
     ASSERT_FALSE(archive.empty());
     EXPECT_EQ(finish(*worker, worker->action(export_request)).result, "failed");
     EXPECT_EQ(bytes(export_request.output), archive);
+}
+TEST_F(ScannerIntegration, SelectedCapabilityCompletionSurvivesUnrelatedInventoryWarnings) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto before = store.inventory();
+    const auto id = before.devices.front().record.at("logical_id").get<std::string>();
+    const auto unrelated = bytes(before.devices.back().path);
+    evidence->complete = false;
+    evidence->diagnostics = {
+        {"endpoint_query_failed", "Windows endpoint name unavailable", "unrelated-ghost", {}}};
+    Provider provider(evidence);
+    const auto report = scan::run_scoped_basic(provider, store, "device", id);
+    EXPECT_EQ(report.scan.result, "partially_completed");
+    EXPECT_FALSE(report.inventory_complete);
+    EXPECT_TRUE(report.selected_target_complete);
+    const auto after = store.inventory();
+    ASSERT_TRUE(after.complete);
+    EXPECT_TRUE(after.devices.front().record.at("scan_history").at("last_scanned").is_string());
+    EXPECT_NE(after.devices.front().record.at("scan_history").at("last_scanned"), first);
+    EXPECT_EQ(bytes(before.devices.back().path), unrelated);
 }
 TEST_F(ScannerIntegration, DeepUpdateTestsOnlyNewTargetsAndAvailabilityRefreshNeverCreatesRecords) {
     ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
@@ -335,6 +369,173 @@ TEST_F(ScannerIntegration, CancellationCompletesOnlyWhenControllerConsumesWorker
         }));
     EXPECT_FALSE(controller.snapshot().scanner.busy);
     EXPECT_EQ(controller.snapshot().scanner.result, "interrupted");
+}
+TEST_F(ScannerIntegration,
+       MetadataSaveRenamesFileAndPreservesIdentityReferencesAndExtensionsAcrossRestart) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto original = store.inventory().devices.front();
+    auto data = original.record;
+    data["hidden"] = true;
+    data["extension"] = {{"keep", true}};
+    write(original.path, data);
+    ApplicationController controller(std::make_unique<ConfigurationController>(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service()));
+    finish(controller);
+    auto edited = controller.snapshot().endpoints.front();
+    const auto logical_id = edited.id, windows_name = edited.windows_name;
+    const auto profile_id = controller.create_profile("Rename references");
+    auto profile = *audiohole::profile(controller.snapshot(), profile_id);
+    auto hole = controller.make_hole();
+    hole.forward.source = logical_id;
+    hole.forward.destination = controller.snapshot().endpoints.back().id;
+    profile.holes.push_back(hole);
+    ASSERT_TRUE(controller.save(profile, false).ok);
+    auto consumer = controller.subscribe();
+    consumer.poll();
+    edited.display_name = "Desk microphone é";
+    edited.notes = "New notes\nUnicode Ω; spaces  stay.";
+    EXPECT_TRUE(controller.update_endpoint(edited).ok);
+    EXPECT_TRUE(controller.snapshot().scanner.busy);
+    const auto generation = controller.snapshot().scanner.generation;
+    finish(controller);
+    EXPECT_EQ(controller.snapshot().scanner.result, "completed");
+    const auto* saved = endpoint(controller.snapshot(), logical_id);
+    ASSERT_TRUE(saved);
+    EXPECT_EQ(saved->display_name, edited.display_name);
+    EXPECT_EQ(saved->notes, edited.notes);
+    EXPECT_EQ(saved->windows_name, windows_name);
+    EXPECT_TRUE(saved->hidden);
+    EXPECT_EQ(audiohole::profile(controller.snapshot(), profile_id)->holes.front().forward.source,
+              logical_id);
+    EXPECT_FALSE(std::filesystem::exists(original.path));
+    const auto new_path =
+        original.path.parent_path() / scan::utf8_path(edited.display_name + ".json");
+    const auto record = Json::parse(bytes(new_path));
+    EXPECT_TRUE(record["extension"]["keep"]);
+    EXPECT_EQ(record["logical_id"], logical_id);
+    EXPECT_EQ(controller.snapshot().scanner.completed_generation, generation);
+    const auto batch = consumer.poll();
+    EXPECT_TRUE(std::any_of(batch.results.begin(), batch.results.end(), [](const auto& result) {
+        return result.command == "scanner.action" && result.outcome == Outcome::Completed;
+    }));
+    ConfigurationController restarted(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service());
+    finish(restarted);
+    ASSERT_TRUE(endpoint(restarted.snapshot(), logical_id));
+    EXPECT_EQ(endpoint(restarted.snapshot(), logical_id)->display_name, edited.display_name);
+    EXPECT_EQ(endpoint(restarted.snapshot(), logical_id)->notes, edited.notes);
+}
+TEST_F(ScannerIntegration,
+       MetadataSaveRejectsStaleEditorsCollisionsAndInvalidNamesWithoutOverwriting) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto original = store.inventory().devices.front();
+    const auto id = original.record.at("logical_id").get<std::string>();
+    for (const auto* invalid : {"", "CON", "Name/escape", "Name.", "Name "})
+        EXPECT_THROW(store.edit_metadata(id, invalid, "", scan::path_utf8(original.path),
+                                         original.original_bytes),
+                     std::exception);
+    auto external = original.record;
+    external["notes"] = "Externally edited notes";
+    write(original.path, external);
+    EXPECT_THROW(store.edit_metadata(id, "Renamed", "stale", scan::path_utf8(original.path),
+                                     original.original_bytes),
+                 std::exception);
+    EXPECT_EQ(Json::parse(bytes(original.path))["notes"], "Externally edited notes");
+    const auto fresh = store.inventory().devices.front();
+    const auto conflict = fresh.path.parent_path() / "Taken.json";
+    auto other = fresh.record;
+    other["logical_id"] = "capture-other";
+    other["notes"] = "Another device, never overwrite";
+    write(conflict, other);
+    const auto conflict_bytes = bytes(conflict);
+    EXPECT_THROW(store.edit_metadata(id, "Taken", "notes", scan::path_utf8(fresh.path),
+                                     fresh.original_bytes),
+                 std::exception);
+    EXPECT_EQ(bytes(conflict), conflict_bytes);
+    EXPECT_EQ(bytes(fresh.path), fresh.original_bytes);
+}
+TEST_F(ScannerIntegration, RefreshDoesNotRebaseAnOlderMetadataEditorSnapshot) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto original = store.inventory().devices.front();
+    ApplicationController controller(std::make_unique<ConfigurationController>(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service()));
+    finish(controller);
+    auto draft = controller.snapshot().endpoints.front();
+    auto external = original.record;
+    external["notes"] = "Edited by another application";
+    write(original.path, external);
+    ASSERT_TRUE(controller.scanner_action(ScannerActionRequest{}).ok);
+    finish(controller);
+    EXPECT_EQ(endpoint(controller.snapshot(), draft.id)->notes, "Edited by another application");
+    draft.display_name = "Stale editor rename";
+    draft.notes = "Do not overwrite the external notes";
+    ASSERT_TRUE(controller.update_endpoint(draft).ok);
+    finish(controller);
+    EXPECT_EQ(controller.snapshot().scanner.result, "failed");
+    EXPECT_NE(controller.snapshot().scanner.detail.find("changed externally"), std::string::npos);
+    EXPECT_EQ(bytes(original.path), external.dump(2) + "\n");
+    EXPECT_FALSE(std::filesystem::exists(original.path.parent_path() / "Stale editor rename.json"));
+}
+class RejectMetadataWriter final : public scan::AtomicWriter {
+  public:
+    void write(const std::filesystem::path&, const std::string&,
+               const std::optional<std::string>&) override {
+        throw std::runtime_error("Injected metadata write failure");
+    }
+};
+TEST_F(ScannerIntegration, FailedMetadataWriteRestoresOriginalFilenameAndBytes) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto original = store.inventory().devices.front();
+    scan::DeviceStore failing(portable, local, std::make_shared<RejectMetadataWriter>());
+    EXPECT_THROW(failing.edit_metadata(original.record.at("logical_id"), "New name", "New notes",
+                                       scan::path_utf8(original.path), original.original_bytes),
+                 std::exception);
+    EXPECT_EQ(bytes(original.path), original.original_bytes);
+    EXPECT_FALSE(std::filesystem::exists(original.path.parent_path() / "New name.json"));
+    EXPECT_EQ(store.inventory().devices.size(), 2u);
+}
+TEST_F(ScannerIntegration, CaseOnlyRenameRetainsTheSameRecord) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto original = store.inventory().devices.front();
+    store.edit_metadata(original.record.at("logical_id"), "capture", "case rename",
+                        scan::path_utf8(original.path), original.original_bytes);
+    const auto loaded = store.inventory();
+    ASSERT_TRUE(loaded.complete);
+    ASSERT_EQ(loaded.devices.size(), 2u);
+    EXPECT_EQ(loaded.devices.front().record.at("display_name"), "capture");
+    EXPECT_EQ(loaded.devices.front().record.at("logical_id"), original.record.at("logical_id"));
+}
+TEST_F(ScannerIntegration, OverviewPrioritizesStatusAndDistinguishesFormatsAndHistoricalFailures) {
+    auto endpoint = evidence->endpoints.front();
+    const auto format = endpoint.reported_capabilities.at("default_mix_format");
+    endpoint.reported_capabilities["format_queries"] = Json::array({{{"configuration", format},
+                                                                     {"mode", "shared"},
+                                                                     {"support", "supported"},
+                                                                     {"hresult", "0x00000000"}}});
+    ASSERT_EQ(store.reconcile(discovery({endpoint}), first).result, "completed");
+    auto original = store.inventory().devices.front();
+    auto data = original.record;
+    data["probed_capabilities"]["latest_attempt_id"] = "recent";
+    data["probed_capabilities"]["test_attempts"] = Json::array(
+        {{{"attempt_id", "old"}, {"classification", "inconclusive"}, {"cleanup", "unknown"}},
+         {{"attempt_id", "recent"},
+          {"classification", "failed"},
+          {"support", "unsupported"},
+          {"cleanup", "completed"}}});
+    write(original.path, data);
+    auto worker = service();
+    const auto loaded = finish(*worker, worker->action(ScannerActionRequest{}));
+    ASSERT_EQ(loaded.devices.size(), 1u);
+    const auto& detail = *loaded.devices.front().inspection;
+    const auto& overview = detail.views[0];
+    EXPECT_LT(overview.find("Display name:"), overview.find("Logical ID:"));
+    EXPECT_LT(overview.find("Last observed availability:"),
+              overview.find("Windows-configured format:"));
+    EXPECT_NE(overview.find("32-bit float"), std::string::npos);
+    EXPECT_NE(overview.find("requested format unsupported"), std::string::npos);
+    EXPECT_FALSE(detail.warning);
+    EXPECT_FALSE(detail.unusable);
+    EXPECT_NE(detail.views[2].find("shared:"), std::string::npos);
 }
 TEST_F(ScannerIntegration, ControllerKeepsScannerRecordsSeparateAndCorrelatesHideCompletion) {
     ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");

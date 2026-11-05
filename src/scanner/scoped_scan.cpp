@@ -7,7 +7,7 @@ void to_json(Json& j, const ScopedReport& r) {
   j = Json{{"scope", r.scope}, {"basic_scan", r.scan}, {"identity_observations", r.observed},
     {"known_devices_skipped", r.known_skipped}, {"ambiguous_devices_skipped", r.ambiguous_skipped},
     {"selected_endpoint_ids", r.selected_endpoint_ids}, {"metadata_updated", r.metadata_updated},
-    {"inventory_complete", r.inventory_complete}};
+    {"inventory_complete", r.inventory_complete}, {"selected_target_complete", r.selected_target_complete}};
 }
 ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
     const std::string& scope, const std::string& logical_id, std::stop_token stop, const ProgressSink& progress) {
@@ -50,7 +50,18 @@ ScopedReport run_scoped_basic(EndpointProvider& provider, DeviceStore& store,
       report.scan.diagnostics.push_back({"target_unavailable_or_ambiguous", "Selected device was not uniquely identified; no substitute was scanned", logical_id, {}});
       return report;
     }
-    report.scan = store.reconcile(discovery, utc_now());
+    // An unrelated identity/name failure makes the global inventory incomplete,
+    // but does not erase a completed selected endpoint's capability timestamp.
+    // This scoped copy never establishes absence for unselected endpoints.
+    auto selected = discovery;
+    report.selected_target_complete = scope == "device" && discovery.endpoints.size() == 1 &&
+      discovery.endpoints.front().diagnostics.empty() &&
+      std::none_of(discovery.diagnostics.begin(), discovery.diagnostics.end(), [&](const auto& d) {
+        return d.context.empty() || d.context == discovery.endpoints.front().endpoint_id;
+      });
+    if (report.selected_target_complete) selected.complete = true;
+    report.scan = store.reconcile(selected, utc_now());
+    if (!discovery.complete && report.scan.result == "completed") report.scan.result = "partially_completed";
     if (report.scan.result == "completed" || report.scan.result == "partially_completed") {
       const auto refreshed = store.refresh_metadata(identities, utc_now());
       report.metadata_updated = refreshed.saved;

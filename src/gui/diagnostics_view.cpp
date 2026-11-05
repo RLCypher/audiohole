@@ -8,14 +8,13 @@ void Frame::build_scan() {
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* options = new wxBoxSizer(wxHORIZONTAL);
     scan_mode_ = choices(page, options, "Testing level", {"Basic / Easy", "Deep / Advanced"});
-    scan_scope_ =
-        choices(page, options, "Scope", {"Update (new devices)", "Full scan", "Selected device"});
+    scan_scope_ = choices(page, options, "Scope", {"Update (new devices)", "Full scan"});
     scan_mode_->SetToolTip(
         "Basic reads Windows-reported capabilities without experimental streams. Deep adds bounded "
         "stream tests with explicit consent. Preview simulates both.");
     scan_scope_->SetToolTip(
         "Update tests only newly discovered devices and refreshes known metadata. Full retests "
-        "all. Selected targets the exact saved logical device from Devices.");
+        "all. Per-device scans are available by right-clicking a device on Devices.");
     scan_mode_->Bind(wxEVT_CHOICE,
                      [this](wxCommandEvent&) { present(presentation::Message::ScanLevelChanged); });
     scan_scope_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
@@ -29,25 +28,28 @@ void Frame::build_scan() {
     deep_mode_->SetToolTip("Select shared, exclusive, or both for bounded Deep tests; exclusive "
                            "tests can conflict with other applications.");
     auto* budgets = new wxBoxSizer(wxHORIZONTAL);
-    auto spin = [&](const char* title, int minimum, int maximum, int initial) {
+    auto* attempts_column = new wxBoxSizer(wxVERTICAL);
+    label(pane, attempts_column, "Attempts / device");
+    deep_attempts_ = new wxSpinCtrl(pane, wxID_ANY, {}, wxDefaultPosition, wxSize(110, -1));
+    deep_attempts_->SetRange(1, 64);
+    deep_attempts_->SetValue(8);
+    deep_attempts_->SetToolTip("Maximum tested candidate combinations per device, from 1 to 64.");
+    attempts_column->Add(deep_attempts_, 0, wxALL, 3);
+    budgets->Add(attempts_column);
+    auto seconds = [&](const char* title, unsigned minimum, unsigned maximum, unsigned initial) {
         auto* column = new wxBoxSizer(wxVERTICAL);
         label(pane, column, title);
-        auto* control = new wxSpinCtrl(pane, wxID_ANY, {}, wxDefaultPosition, wxSize(110, -1));
-        control->SetRange(minimum, maximum);
-        control->SetValue(initial);
+        auto* control = new SecondsField(pane, minimum, maximum, initial);
         control->SetName(text(title));
-        control->SetToolTip(text(
-            std::string(title) + ": " + std::to_string(minimum) + "–" + std::to_string(maximum) +
-            ". Attempt timeout must exceed stream duration by at least 1000 ms."));
-        column->Add(control, 0, wxALL, 3);
-        budgets->Add(column);
+        control->editor()->SetName(text(title));
+        column->Add(control, 0, wxALL | wxEXPAND, 3);
+        budgets->Add(column, 1, wxEXPAND);
         return control;
     };
-    deep_attempts_ = spin("Attempts / device", 1, 64, 8);
-    deep_duration_ = spin("Stream ms", 250, 30000, 2000);
-    deep_attempt_timeout_ = spin("Attempt ms", 1250, 120000, 10000);
-    deep_device_timeout_ = spin("Device ms", 1000, 600000, 120000);
-    deep_system_timeout_ = spin("Batch ms", 1000, 3600000, 600000);
+    deep_duration_ = seconds("Stream (s)", 250, 30000, 2000);
+    deep_attempt_timeout_ = seconds("Attempt limit (s)", 1250, 120000, 10000);
+    deep_device_timeout_ = seconds("Device limit (s)", 1000, 600000, 120000);
+    deep_system_timeout_ = seconds("Scan limit (s)", 1000, 3600000, 600000);
     limits->Add(budgets);
     scan_context_ = field(pane, limits,
                           "Optional operating context (other apps, device setup, observed issue)");
@@ -71,11 +73,18 @@ void Frame::build_scan() {
     scan_progress_ = new wxGauge(page, wxID_ANY, 100);
     root->Add(scan_progress_, 0, wxEXPAND | wxALL, 4);
     scan_state_ = label(page, root, "No scan requested.");
-    severity_ = choices(page, root, "Diagnostic filter",
+    auto* filters = new wxBoxSizer(wxHORIZONTAL);
+    auto* severity_column = new wxBoxSizer(wxVERTICAL);
+    auto* search_column = new wxBoxSizer(wxVERTICAL);
+    severity_ = choices(page, severity_column, "Diagnostic filter",
                         {"All events", "Errors only", "Routing state only"});
-    log_search_ = field(page, root, "Search technical diagnostics");
+    log_search_ = field(page, search_column, "Search technical diagnostics");
+    filters->Add(severity_column, 0, wxEXPAND);
+    filters->Add(search_column, 1, wxEXPAND);
+    root->Add(filters, 0, wxEXPAND);
     console_ = new wxTextCtrl(page, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                               wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
+    console_->SetMinSize(wxSize(0, 24));
     root->Add(console_, 1, wxEXPAND | wxALL, 4);
     auto* export_row = new wxBoxSizer(wxHORIZONTAL);
     button(page, export_row, "Copy visible diagnostics", [this] {
@@ -130,13 +139,32 @@ void Frame::build_scan() {
 // Every entry point shares the same exact target and consent path. Widgets issue
 // typed requests; only the background scanner opens Windows devices or files.
 void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
+    if (device_dirty_) {
+        show_result({false, "Save device edits or reload/discard them before scanning."});
+        return;
+    }
     ScanOptions options;
     options.mode = utf8(deep_mode_->GetStringSelection());
     options.attempts = static_cast<unsigned>(deep_attempts_->GetValue());
-    options.duration_ms = static_cast<unsigned>(deep_duration_->GetValue());
-    options.attempt_timeout_ms = static_cast<unsigned>(deep_attempt_timeout_->GetValue());
-    options.device_timeout_ms = static_cast<unsigned>(deep_device_timeout_->GetValue());
-    options.system_timeout_ms = static_cast<unsigned>(deep_system_timeout_->GetValue());
+    const auto duration = deep_duration_->milliseconds(),
+               attempt = deep_attempt_timeout_->milliseconds(),
+               device = deep_device_timeout_->milliseconds(),
+               batch = deep_system_timeout_->milliseconds();
+    if (deep && (!duration || !attempt || !device || !batch)) {
+        show_result({false, "Enter seconds within each field's range, with up to three decimal "
+                            "places (for example 2 or 2.125)."});
+        return;
+    }
+    if (deep && *attempt < *duration + 1000) {
+        show_result(
+            {false,
+             "The attempt limit must be at least 1 second longer than the stream duration."});
+        return;
+    }
+    options.duration_ms = duration.value_or(2000);
+    options.attempt_timeout_ms = attempt.value_or(10000);
+    options.device_timeout_ms = device.value_or(120000);
+    options.system_timeout_ms = batch.value_or(600000);
     options.operating_context = utf8(scan_context_->GetValue());
     const auto* selected = endpoint(controller_->snapshot(), id);
     if (scope == ScanScope::Selected && !selected) {
@@ -148,18 +176,73 @@ void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
                             : scope == ScanScope::Full
                                 ? std::string("all eligible devices")
                                 : std::string("newly discovered devices only");
-        if (wxMessageBox(text("Deep scan target: " + target + "\nMode: " + options.mode +
-                              "\n\nTesting may interrupt audio or produce sound. Lower listening "
-                              "volume and prepare the device. "
-                              "Short stream evidence does not establish sustained reliability or "
-                              "recommended settings. Continue?"),
-                         "Deep scan consent", wxYES_NO | wxNO_DEFAULT | wxICON_WARNING,
-                         this) != wxYES)
+        if (wxMessageBox(
+                text(
+                    "Deep scan target: " + target + "\nMode: " + options.mode +
+                    "\n\nFor best results, close applications that may have active audio streams: "
+                    "browsers, "
+                    "game launchers such as Steam and Epic, and chat apps such as Discord and "
+                    "Telegram. "
+                    "Close other nonessential applications; keep anything critical to your audio "
+                    "workflow open. "
+                    "Record that setup in the operating-context field.\n\n"
+                    "Scan time varies with depth, number of devices, candidate attempts and "
+                    "device/driver behavior. "
+                    "Stream duration applies to each accepted test; setup and cleanup add time.\n\n"
+                    "Testing may interrupt audio or produce sound. Lower listening volume and "
+                    "prepare the device. "
+                    "Short tests provide limited stream evidence. Ready to begin?"),
+                "Ready to scan", wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
             return;
         options.consent = true;
     }
     controller_->scan(true, deep, scope, id, options);
     refresh();
+}
+void Frame::update_console(const wxString& output) {
+    const auto handle = static_cast<HWND>(console_->GetHandle());
+    SCROLLINFO info{};
+    info.cbSize = sizeof(info);
+    info.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
+    const bool known = GetScrollInfo(handle, SB_VERT, &info) != FALSE;
+    const bool follow = console_->IsEmpty() || !known ||
+                        info.nMax <= static_cast<int>(info.nPage) ||
+                        info.nPos >= std::max(0, info.nMax - static_cast<int>(info.nPage) + 1);
+    const auto first_line = static_cast<long>(SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+    const auto horizontal = ::GetScrollPos(handle, SB_HORZ);
+    const auto first_position = console_->XYToPosition(0, first_line);
+    const auto anchor =
+        first_position >= 0
+            ? console_->GetRange(first_position,
+                                 std::min(first_position + 200, console_->GetLastPosition()))
+            : wxString{};
+    long selection_start = 0, selection_end = 0;
+    console_->GetSelection(&selection_start, &selection_end);
+    const auto old = console_->GetValue();
+    console_->Freeze();
+    if (output.StartsWith(old))
+        console_->AppendText(output.Mid(old.length()));
+    else
+        console_->ChangeValue(output);
+    const auto last = console_->GetLastPosition();
+    console_->SetSelection(std::min(selection_start, last), std::min(selection_end, last));
+    if (follow)
+        console_->ShowPosition(last);
+    else {
+        long target_line = first_line;
+        const auto match = anchor.empty() ? wxNOT_FOUND : output.Find(anchor);
+        if (match != wxNOT_FOUND)
+            // wx strings use LF; native edit positions include CRLF. Count lines
+            // instead of passing a string offset to the Windows text control.
+            target_line = static_cast<long>(output.Left(match).Freq('\n'));
+        else
+            target_line =
+                0; // The bounded log evicted the old anchor; keep the oldest retained text visible.
+        const auto current = static_cast<long>(SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+        SendMessageW(handle, EM_LINESCROLL, horizontal - ::GetScrollPos(handle, SB_HORZ),
+                     target_line - current);
+    }
+    console_->Thaw();
 }
 void Frame::export_log() {
     wxFileDialog dialog(this, "Export technical diagnostics", {}, "AudioHole-diagnostics.txt",

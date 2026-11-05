@@ -449,6 +449,20 @@ Result ApplicationController::schedule(const std::string& id, int ms) {
 }
 Result ApplicationController::update_endpoint(const Endpoint& value) {
     require_owner();
+    if (value.inspection) {
+        const auto* original = endpoint(snapshot(), value.id);
+        if (!original || value.windows_name != original->windows_name ||
+            value.capture != original->capture)
+            return record("device.update", {false, "Device identity and direction are read-only."});
+        ScannerActionRequest request;
+        request.kind = ScannerActionKind::EditMetadata;
+        request.logical_id = value.id;
+        request.display_name = value.display_name;
+        request.notes = value.notes;
+        request.expected_path = value.inspection->path;
+        request.expected_bytes = value.inspection->edit_bytes;
+        return submit(ScannerAction{std::move(request)}).result;
+    }
     return record("device.update", backend_->update_endpoint(value));
 }
 void ApplicationController::fail_path(const std::string& id, bool reverse) {

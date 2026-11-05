@@ -1,6 +1,8 @@
 #pragma once
 #include "audiohole/avatar/wx_panel.hpp"
 #include "gui/branding.h"
+#include "gui/device_list.h"
+#include "gui/seconds_field.h"
 #include "gui/shell_actions.h"
 #include "model/build_preferences.h"
 #include "model/controller.h"
@@ -29,6 +31,7 @@
 #include <wx/snglinst.h>
 #include <wx/spinbutt.h>
 #include <wx/spinctrl.h>
+#include <wx/splitter.h>
 #include <wx/taskbar.h>
 #include <wx/tglbtn.h>
 #include <wx/wx.h>
@@ -185,7 +188,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
     wxPanel *profile_sidebar_{}, *profile_actions_{};
     wxStaticText *profile_edit_state_{}, *hole_heading_{};
-    wxListBox *profiles_{}, *holes_{}, *capture_devices_{}, *playback_devices_{};
+    wxListBox *profiles_{}, *holes_{};
+    DeviceList *capture_devices_{}, *playback_devices_{};
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
@@ -197,15 +201,20 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::vector<std::string> profile_ids_, capture_device_ids_, playback_device_ids_, beep_ids_;
     wxChoice* device_view_{};
     wxTextCtrl* device_evidence_{};
-    wxButton *device_save_{}, *device_update_{}, *device_deep_{};
+    wxButton* device_save_{};
+    wxSplitterWindow *profile_columns_{}, *profile_rows_{}, *profile_lower_rows_{},
+        *device_columns_{}, *device_rows_{};
     std::vector<wxButton*> scanner_actions_;
     std::uint64_t device_inventory_revision_ = 0;
     std::string loaded_device_id_;
-    bool device_dirty_ = false;
+    std::shared_ptr<const DeviceInspection> device_edit_snapshot_;
+    bool device_dirty_ = false, populating_devices_ = false;
+    std::uint64_t device_save_generation_ = 0;
     wxStaticText* scan_state_{};
     wxChoice* deep_mode_{};
-    wxSpinCtrl *deep_attempts_{}, *deep_duration_{}, *deep_attempt_timeout_{},
-        *deep_device_timeout_{}, *deep_system_timeout_{};
+    wxSpinCtrl* deep_attempts_{};
+    SecondsField *deep_duration_{}, *deep_attempt_timeout_{}, *deep_device_timeout_{},
+        *deep_system_timeout_{};
     wxTextCtrl* scan_context_{};
     std::chrono::steady_clock::time_point device_change_after_{};
     bool device_change_pending_ = false;
@@ -266,7 +275,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void populate_devices();
     void load_device();
     bool select_device(const std::string&);
-    void device_context(wxListBox*, const std::vector<std::string>&, wxContextMenuEvent&);
+    void device_context(DeviceList*, const std::vector<std::string>&, wxContextMenuEvent&);
     void request_scan(bool deep, ScanScope, const std::string&);
     void scanner_action(const ScannerActionRequest&);
     // Called on page change, hide/minimize, Stop, and shutdown. No sample ownership.
@@ -275,6 +284,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void show_result(const audiohole::Result&);
     void testing_notice();
     void export_log();
+    void update_console(const wxString&);
 };
 
 } // namespace audiohole::gui

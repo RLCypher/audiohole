@@ -186,6 +186,15 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     });
     tray_ = std::make_unique<Tray>(*this);
     initialize_shell_controls();
+    CallAfter([this] {
+        if (IsBeingDeleted())
+            return;
+        profile_columns_->SetSashPosition(FromDIP(300));
+        profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
+        profile_lower_rows_->SetSashPosition(profile_lower_rows_->GetClientSize().y / 2);
+        device_columns_->SetSashPosition(FromDIP(300));
+        device_rows_->SetSashPosition(device_rows_->GetClientSize().y / 3);
+    });
     Bind(
         wxEVT_TIMER,
         [this](wxTimerEvent&) {
@@ -477,6 +486,14 @@ void Frame::refresh() {
         profile_edit_state_->SetLabel(edit_state);
         profile_edit_state_->SetToolTip(edit_state);
     }
+    if (device_save_generation_ && s.scanner.completed_generation == device_save_generation_) {
+        device_save_generation_ = 0;
+        if (s.scanner.result == "completed") {
+            device_dirty_ = false;
+            loaded_device_id_.clear();
+            present(presentation::Message::DeviceSaved);
+        }
+    }
     if (s.scanner.inventory_revision != device_inventory_revision_) {
         device_inventory_revision_ = s.scanner.inventory_revision;
         capture_draft();
@@ -491,8 +508,9 @@ void Frame::refresh() {
     const bool scanner_idle = !s.scanner.busy && !s.scanning;
     scan_start_->Enable(s.capabilities.scanning && scanner_idle);
     const bool selected_device = endpoint(s, device_id_) != nullptr;
-    device_update_->Enable(s.capabilities.scanning && scanner_idle && selected_device);
-    device_deep_->Enable(s.capabilities.scanning && scanner_idle && selected_device);
+    device_save_->Enable(selected_device && scanner_idle && device_dirty_);
+    device_name_->SetEditable(selected_device && scanner_idle);
+    device_notes_->SetEditable(selected_device && scanner_idle);
     for (auto* action : scanner_actions_)
         action->Enable(s.scanner.available && scanner_idle);
     scan_cancel_->Enable(s.capabilities.scanning && (s.scanning || s.scanner.busy));
@@ -615,7 +633,7 @@ void Frame::refresh() {
             if (query.empty() || text(line).Lower().Contains(query))
                 logs += line + "\n";
     if (logs != last_log_) {
-        console_->ChangeValue(text(logs));
+        update_console(text(logs));
         last_log_ = logs;
     }
     for (const auto& e : s.events)
@@ -709,22 +727,34 @@ bool Frame::smoke(const wxString& directory) {
                         controller_->snapshot().revision == revision,
                     "Malformed shell request changed the controller");
         }
+        require(scan_scope_->GetCount() == 2 &&
+                    scan_scope_->FindString("Selected device") == wxNOT_FOUND,
+                "Scanning page still offers per-device scope");
+        require(device_evidence_->HasFlag(wxTE_WORDWRAP) &&
+                    !device_evidence_->HasFlag(wxTE_DONTWRAP),
+                "Device evidence does not wrap");
+        deep_duration_->editor()->ChangeValue("2.001");
+        require(deep_duration_->milliseconds() == 2001,
+                "Fractional seconds lost millisecond precision");
+        deep_duration_->editor()->ChangeValue("2.0001");
+        require(!deep_duration_->milliseconds(), "Excess seconds precision was silently rounded");
+        deep_duration_->editor()->ChangeValue("2");
         const auto check_profile_layout = [this, &require] {
             auto* page = notebook_->GetPage(0);
             page->Layout();
             require(dynamic_cast<wxScrolledWindow*>(profile_sidebar_) == nullptr,
                     "Profile column must not scroll as one section");
             require(page->GetClientRect().Contains(profile_actions_->GetRect()) &&
-                        profile_actions_->GetRect().GetBottom() <
-                            profile_sidebar_->GetRect().GetTop(),
+                        profile_actions_->GetScreenRect().GetBottom() <
+                            profile_sidebar_->GetScreenRect().GetTop(),
                     "Profile save bar is clipped or overlaps the editor fields");
             for (auto* action : {profile_save_, profile_apply_, profile_revert_})
                 require(action->IsShownOnScreen() &&
                             profile_actions_->GetClientRect().Contains(action->GetRect()),
                         "A profile save action is hidden or clipped");
             for (wxWindow* field : std::vector<wxWindow*>{profiles_, profile_notes_, holes_})
-                require(field->GetParent() == profile_sidebar_ &&
-                            profile_sidebar_->GetClientRect().Contains(field->GetRect()),
+                require(profile_sidebar_->IsDescendant(field) &&
+                            profile_sidebar_->GetScreenRect().Contains(field->GetScreenRect()),
                         "An independently scrolling profile field is clipped");
         };
         layout_header();
@@ -766,6 +796,63 @@ bool Frame::smoke(const wxString& directory) {
         holes_->Append(original_holes);
         holes_->SetSelection(selected_hole);
         profile_notes_->ChangeValue(original_notes);
+        // Exercise real splitter geometry without changing drafts or saved state.
+        for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_}) {
+            const int before = split->GetSashPosition();
+            split->SetSashPosition(before + FromDIP(12));
+            require(split->GetSashPosition() != before, "Profile divider cannot be adjusted");
+            check_profile_layout();
+            split->SetSashPosition(before);
+        }
+        require(profile_notes_->GetValue() == original_notes &&
+                    controller_->snapshot().revision == overflow_revision,
+                "Resizing profile fields changed editor or saved state");
+        notebook_->SetSelection(1);
+        notebook_->GetPage(1)->Layout();
+        for (auto* split : {device_columns_, device_rows_}) {
+            const int before = split->GetSashPosition();
+            split->SetSashPosition(before + FromDIP(12));
+            require(split->GetSashPosition() != before, "Device divider cannot be adjusted");
+            require(notebook_->GetPage(1)->GetScreenRect().Contains(device_save_->GetScreenRect()),
+                    "Resizing device fields hid Save");
+            split->SetSashPosition(before);
+        }
+        notebook_->SetSelection(2);
+        notebook_->GetPage(2)->Layout();
+        {
+            const auto original_console = console_->GetValue();
+            wxString lines;
+            for (int i = 0; i < 200; ++i)
+                lines += wxString::Format("Smoke console line %04d: incremental evidence\n", i);
+            console_->ChangeValue("");
+            update_console(lines);
+            const auto handle = static_cast<HWND>(console_->GetHandle());
+            const auto first_visible = [handle] {
+                return static_cast<long>(SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+            };
+            const long tail = first_visible();
+            require(tail > 50, "Console did not follow initial output to the bottom");
+            SendMessageW(handle, EM_LINESCROLL, 0, -50);
+            const long reading = first_visible();
+            require(reading < tail, "Console could not scroll up to earlier evidence");
+            lines += "Smoke console appended evidence\n";
+            update_console(lines);
+            require(first_visible() == reading, "New console output moved a scrolled-up reader");
+            // Bounded logs can lose old lines. Preserve the same visible content,
+            // including Windows CRLF/native-position differences.
+            lines = lines.Mid(lines.Find("Smoke console line 0040:"));
+            update_console(lines);
+            require(first_visible() == reading - 40,
+                    "Console lost its reading position when old log lines were evicted");
+            console_->ShowPosition(console_->GetLastPosition());
+            lines += "Smoke console resumed follow\n";
+            update_console(lines);
+            require(first_visible() > reading - 40,
+                    "Returning to the console bottom did not resume follow");
+            console_->ChangeValue(original_console);
+            console_->ShowPosition(console_->GetLastPosition());
+        }
+        notebook_->SetSelection(0);
         if (controller_->snapshot().operating_mode == OperatingMode::Test) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),

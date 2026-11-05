@@ -14,13 +14,14 @@ struct ScanOptions {
              device_timeout_ms = 120000, system_timeout_ms = 600000;
     bool consent = false;
 };
-enum class ScannerActionKind { Reload, RefreshAvailability, SetHidden, Export };
+enum class ScannerActionKind { Reload, RefreshAvailability, SetHidden, Export, EditMetadata };
 struct ScannerActionRequest {
     ScannerActionKind kind = ScannerActionKind::Reload;
     std::string logical_id;
     bool hidden = false;
     std::filesystem::path output;
     std::string operating_context;
+    std::string display_name, notes, expected_path, expected_bytes;
 };
 inline constexpr std::array<const char*, 9> inspection_view_names{
     "Overview",     "Identity",    "Reported formats", "Deep evidence", "Driver",
@@ -29,6 +30,10 @@ inline constexpr std::array<const char*, 9> inspection_view_names{
 // scanner JSON. Raw views retain explicit unknown values and exact evidence.
 struct DeviceInspection {
     std::string source, path, observed_state, last_observed;
+    std::string edit_bytes; // Opaque snapshot used only for checked metadata saves.
+    bool warning = false;
+    bool unusable =
+        false; // Reserved for explicit backend evidence; never inferred from one rejected tuple.
     std::array<std::string, 9> views;
 };
 struct ScannerStatus {

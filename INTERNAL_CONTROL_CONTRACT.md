@@ -22,7 +22,7 @@ same decorator. There is no second routing state store or audio/scanner rewrite.
 | RequestDiagnostics | diagnostics.get | Same snapshot's retained events; no invented measurements |
 | StartBeep | beep.start | Preview silent bounded simulation, overlap rejected; Test rejects |
 | CancelBeep | beep.cancel | Cancels Preview active beep and correlated pending request |
-| ScannerAction | scanner.action | Test queues Reload, RefreshAvailability, SetHidden or Export; Preview supports session-only SetHidden |
+| ScannerAction | scanner.action | Test queues Reload, RefreshAvailability, SetHidden, EditMetadata or Export; Preview supports session-only SetHidden |
 
 Existing configuration/create/remove/device-update/startup/clear methods are also
 recorded as named results. Simulation/recovery/observation publish authoritative
@@ -159,3 +159,15 @@ thread. No profile data, executable code, file paths or JSON command payloads ar
 accepted by that message. Disabled backend capabilities are rechecked at admission
 and execution. This adds no public transport, production schema, routing engine or
 permission to start routing after a session has exited. See TRAY.md.
+
+## Scanner metadata editing
+
+`update_endpoint` routes scanner-owned user name/notes edits through the same typed
+`ScannerAction` admission and generation-correlated completion as other scanner
+operations. Acceptance is not save completion. `EditMetadata` carries stable logical
+identity and the path/raw-byte snapshot that populated the editor; the GUI treats
+those bytes as opaque. Refreshing observations does not rebase an unsaved editor.
+The worker validates and renames the canonical JSON without replacing another
+device, preserves unknown fields, and reports stale edits or failed recovery.
+No routing action or format preference changes result from a metadata save.
+Existing machine-local bindings and profile references use the same ID.

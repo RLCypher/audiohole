@@ -1776,8 +1776,9 @@ identifies the edited profile and any unsaved changes. Save retains existing
 configuration behavior; Apply remains a separate routing action and is unavailable
 in Test Mode. Editing or scrolling cannot hide these actions.
 
-The left column is a fixed panel with separate native scrollable Profiles, Notes
-and Holes fields. They share the available vertical space; the routing detail pane
+The left column has a draggable width divider and separate native scrollable
+Profiles, Notes and Holes fields, with draggable height dividers between them.
+Resizing changes only session presentation state; the routing detail pane
 continues to scroll independently. Inline profile/hole name fields and repeated
 management buttons are removed. Each list has one compact **+** control with hover
 help and a descriptive accessibility name. Right-click or Shift+F10/Menu opens

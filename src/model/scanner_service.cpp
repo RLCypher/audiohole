@@ -10,6 +10,7 @@
 #include <map>
 #include <mutex>
 #include <optional>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -37,12 +38,84 @@ std::string diagnostic(const scan::Diagnostic& item) {
 std::string descriptor(const Json& format) {
     if (!format.is_object() || format.contains("status"))
         return value(format);
+    const auto sample = value(field(format, "sample_format"));
+    const auto representation =
+        sample == "float32"          ? std::string("32-bit float")
+        : sample == "pcm_s16"        ? std::string("16-bit integer PCM")
+        : sample == "pcm_s24_packed" ? std::string("24-bit integer PCM (packed)")
+        : sample == "pcm_s32" ? value(field(format, "valid_bits")) + "-bit integer PCM in a " +
+                                    value(field(format, "container_bits")) + "-bit container"
+                              : sample;
     return value(field(format, "sample_rate_hz")) + " Hz / " +
-           value(field(format, "channel_count")) + " channels / " +
-           value(field(format, "sample_format")) + " / container " +
-           value(field(format, "container_bits")) + ", valid " +
-           value(field(format, "valid_bits")) + " bits / channel mask " +
-           value(field(format, "channel_mask"));
+           value(field(format, "channel_count")) + " channels / " + representation;
+}
+std::string support_text(const Json& query) {
+    if (field(query, "hresult") == "0x00000001" && query.contains("closest_match"))
+        return "closest format offered: " + descriptor(query.at("closest_match"));
+    const auto support = value(field(query, "support"));
+    return support == "supported"     ? "Windows-reported support"
+           : support == "unsupported" ? "requested format unsupported"
+                                      : support;
+}
+std::string attempt_text(const Json& attempt) {
+    if (!attempt.is_object())
+        return "unknown";
+    const auto support = value(field(attempt, "support"));
+    if (field(attempt, "hresult") == "0x00000001")
+        return "closest format offered; exact request was not streamed";
+    if (support == "unsupported")
+        return "requested format unsupported";
+    const auto classification = value(field(attempt, "classification"));
+    return classification == "verified" ? "short stream processed (limited evidence)"
+                                        : classification;
+}
+const Json& latest_attempt(const Json& probed) {
+    const auto& attempts = field(probed, "test_attempts");
+    const auto& id = field(probed, "latest_attempt_id");
+    if (attempts.is_array()) {
+        for (const auto& attempt : attempts)
+            if (attempt.is_object() && field(attempt, "attempt_id") == id)
+                return attempt;
+        if (!attempts.empty())
+            return attempts.back();
+    }
+    return field(probed, "latest_attempt_id_missing");
+}
+std::string reported_formats(const Json& reported, bool compact) {
+    const auto& queries = field(reported, "format_queries");
+    if (!queries.is_array())
+        return "Unknown / not tested.\n";
+    std::string result;
+    std::set<std::string> shown;
+    unsigned count = 0;
+    for (const auto& query : queries) {
+        if (!query.is_object())
+            continue;
+        const auto& configuration = field(query, "configuration");
+        const auto mode = value(field(query, "mode"));
+        const auto line = mode + ": " + descriptor(configuration);
+        if (compact) {
+            if (field(query, "support") != "supported" || !shown.insert(line).second)
+                continue;
+            if (count++ >= 6)
+                continue;
+            result += "  " + line + "\n";
+        } else {
+            result += line + " — " + support_text(query) +
+                      "\n  Container: " + value(field(configuration, "container_bits")) +
+                      " bits; valid bits: " + value(field(configuration, "valid_bits")) +
+                      "; channel mask: " + value(field(configuration, "channel_mask")) +
+                      "; format tag: " + value(field(configuration, "format_tag")) +
+                      "; subformat: " + value(field(configuration, "subformat_guid")) +
+                      "\n  HRESULT: " + value(field(query, "hresult")) + "\n\n";
+        }
+    }
+    if (result.empty())
+        result = "No supported candidate recorded; coverage may be incomplete.\n";
+    if (compact)
+        result += count > 6 ? "  More formats and exact tuples: select Reported formats.\n"
+                            : "  Exact tuples and rejected candidates: select Reported formats.\n";
+    return result;
 }
 std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const std::string& source) {
     std::vector<Endpoint> result;
@@ -67,6 +140,7 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
         auto detail = std::make_shared<DeviceInspection>();
         detail->source = source;
         detail->path = scan::path_utf8(saved.path);
+        detail->edit_bytes = saved.original_bytes;
         detail->observed_state = value(field(saved.local_binding, "state"));
         detail->last_observed = value(field(saved.local_binding, "last_seen"));
         const auto& local_id = field(saved.local_binding, "endpoint_id");
@@ -78,31 +152,60 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
                                         detail->observed_state == "not_present"
                                     ? Availability::Unavailable
                                     : Availability::Unknown;
+        const auto& probed = field(record, "probed_capabilities");
+        const auto& latest = latest_attempt(probed);
+        const auto& diagnostics = field(record, "diagnostics");
+        detail->warning = ambiguous || (diagnostics.is_array() && !diagnostics.empty()) ||
+                          (latest.is_object() && (field(latest, "cleanup") == "unknown" ||
+                                                  (field(latest, "classification") == "failed" &&
+                                                   field(latest, "support") != "unsupported")));
+        const auto next_action =
+            ambiguous ? "Resolve the ambiguous binding before configuring a route."
+            : endpoint.availability == Availability::Unavailable
+                ? "Reconnect or enable the device, then Refresh availability."
+            : endpoint.availability == Availability::Unknown
+                ? "Refresh availability or run a Basic update from the device's right-click menu."
+            : detail->warning ? "Review Diagnostics and the latest Deep attempt; older history is "
+                                "retained separately."
+                              : "Inspect reported formats; use the device's right-click menu for "
+                                "an update or Deep test.";
         detail->views[0] =
-            "Source: " + source + "\nLogical ID: " + endpoint.id +
-            "\nDirection: " + (endpoint.capture ? "Capture / Recording" : "Playback") +
-            "\nOriginal Windows name: " + endpoint.windows_name +
-            "\nCurrent Windows name: " + value(field(identity, "current_device_name")) +
+            "Display name: " + endpoint.display_name +
+            "\nDevice type: " + (endpoint.capture ? "Capture / Recording" : "Playback") +
             "\nLast observed availability: " +
             (ambiguous ? "ambiguous binding" : detail->observed_state) +
-            "\nObservation time (UTC): " + detail->last_observed +
+            "\nObservation time: " + detail->last_observed + "\nNext action: " + next_action +
+            "\n\nWindows-configured format: " +
+            descriptor(field(reported, "configured_device_format")) +
+            "\nWindows mix format: " + descriptor(field(reported, "default_mix_format")) +
+            "\nWindows-reported support (summary):\n" + reported_formats(reported, true) +
             "\nLast completed Basic scan: " + value(field(history, "last_scanned")) +
+            "\nLast Basic attempt: " + value(field(history, "last_attempt")) +
             "\nLast Deep attempt: " + value(field(history, "last_advanced_scan")) +
+            "\nLatest Deep result: " + attempt_text(latest) +
+            "\nOlder attempts remain in Deep evidence; a rejected candidate does not establish "
+            "device unusability.\n" +
             "\nDriver: " + value(field(field(record, "driver"), "name")) +
             "\nDriver version: " + value(field(field(record, "driver"), "version")) +
+            "\n\nTechnical details\nOriginal Windows name: " + endpoint.windows_name +
+            "\nCurrent Windows name: " + value(field(identity, "current_device_name")) +
+            "\nLogical ID: " + endpoint.id + "\nSource: " +
+            (source == "real_windows_mmdevice_wasapi" ? "Windows — MMDevice / WASAPI" : source) +
             "\nHidden: " + (endpoint.hidden ? "yes" : "no") + "\nRecord: " + detail->path +
-            "\n\nWindows active is an availability observation, not proof of stream operation. "
-            "Reported format support and short Deep tests do not establish device health, physical "
-            "channel mapping, clock synchronization, or recommended routing settings.";
+            "\n\nScan evidence has limits. Windows availability and reported support, and short "
+            "Deep tests, "
+            "do not establish sustained streaming reliability, channel mapping or end-to-end "
+            "latency. See Deep evidence for v0.4 limitations.";
         detail->views[1] = identity.dump(2);
         detail->views[2] =
+            "Windows-reported format queries (bounded coverage, not exhaustive)\n\n" +
+            reported_formats(reported, false) +
             "Configured format: " + descriptor(field(reported, "configured_device_format")) +
-            "\nWindows mix format: " + descriptor(field(reported, "default_mix_format")) +
+            "\nMix format: " + descriptor(field(reported, "default_mix_format")) +
             "\nOEM format: " + descriptor(field(reported, "oem_device_format")) +
-            "\n\nReported periods / constraints:\n" + field(reported, "device_periods").dump(2) +
-            "\nShared engine periods:\n" + field(reported, "shared_engine_periods").dump(2) +
-            "\n\nExact query results (requested tuples, not inferred combinations):\n" +
-            field(reported, "format_queries").dump(2);
+            "\n\nReported periods / constraints (100 ns units or frames, as named):\n" +
+            field(reported, "device_periods").dump(2) + "\nShared engine periods:\n" +
+            field(reported, "shared_engine_periods").dump(2);
         detail->views[3] =
             "Scanner v0.4 Deep evidence is a limited stream test under recorded "
             "conditions. Its verified label has a known frame-progress weakness; do not treat it "
@@ -209,6 +312,12 @@ struct ScannerService::Impl {
                 final.detail = job.action.hidden
                                    ? "Device hidden; routing and saved references are unchanged."
                                    : "Device unhidden.";
+            } else if (job.action.kind == ScannerActionKind::EditMetadata) {
+                store.edit_metadata(job.action.logical_id, job.action.display_name,
+                                    job.action.notes, job.action.expected_path,
+                                    job.action.expected_bytes);
+                final.detail = "Device name and notes saved. Logical identity and profile "
+                               "references are unchanged.";
             } else if (job.action.kind == ScannerActionKind::RefreshAvailability) {
                 auto provider = make_provider();
                 scan::Discovery identities;
@@ -359,7 +468,10 @@ struct ScannerService::Impl {
                 const auto deep = scan::run_deep_scan_batch(
                     store, *runner, targets, limits, job.options.system_timeout_ms,
                     job.options.consent, job.stop, progress);
-                write_json(directory / "deep.json", deep);
+                Json document = deep;
+                document["scope"] = scope;
+                document["requested_logical_id"] = job.logical_id;
+                write_json(directory / "deep.json", document);
                 final.result = deep.result == "completed" ? final.result : deep.result;
                 final.detail +=
                     "\nDeep: " + deep.result + "; targets: " + std::to_string(targets.size()) +
@@ -388,9 +500,75 @@ struct ScannerService::Impl {
             file.flush();
             if (!file)
                 throw std::runtime_error("Could not snapshot a device record for analysis.");
+            auto archive_path = scan::path_utf8(relative);
+            std::replace(archive_path.begin(), archive_path.end(), '\\', '/');
             index["devices"].push_back({{"logical_id", device.record.at("logical_id")},
-                                        {"record", scan::path_utf8(relative)},
+                                        {"record", archive_path},
                                         {"local_binding", device.local_binding}});
+        }
+        index["history_files"] = Json::array();
+        std::set<std::string> histories;
+        std::uint64_t history_bytes = 0;
+        for (const auto& device : snapshot.devices) {
+            std::vector<const Json*> references;
+            const auto& capabilities = field(device.record, "probed_capabilities");
+            for (const auto* key :
+                 {"test_attempts", "verified_configurations", "accepted_configurations",
+                  "failed_configurations", "inconclusive_configurations"}) {
+                const auto& rows = field(capabilities, key);
+                if (rows.is_array())
+                    for (const auto& row : rows)
+                        references.push_back(&row);
+            }
+            for (const auto* row : references) {
+                const auto& attempt = *row;
+                const auto& reference = field(attempt, "history_file");
+                if (!reference.is_string())
+                    continue;
+                auto name = reference.get<std::string>();
+                std::replace(name.begin(), name.end(), '\\', '/');
+                if (!histories.insert(name).second)
+                    continue;
+                Json entry{{"path", name}, {"status", "unavailable"}};
+                const auto relative = scan::utf8_path(name);
+                const auto filename = scan::path_utf8(relative.filename());
+                if (relative.is_absolute() ||
+                    relative.parent_path() != std::filesystem::path("probe_history") ||
+                    filename.empty() || filename == "." || filename == ".." ||
+                    relative.extension() != ".json") {
+                    entry["reason"] =
+                        "Invalid history reference; no file outside probe_history was read.";
+                } else
+                    try {
+                        const auto source = options.portable_root / relative;
+                        if (std::filesystem::is_symlink(source.parent_path()) ||
+                            std::filesystem::is_symlink(source) ||
+                            !std::filesystem::is_regular_file(source))
+                            throw std::runtime_error(
+                                "Referenced history is missing or is not a regular file");
+                        const auto size = std::filesystem::file_size(source);
+                        if (size > 16 * 1024 * 1024 || history_bytes + size > 64 * 1024 * 1024 ||
+                            histories.size() > 4096)
+                            throw std::runtime_error("History snapshot budget reached");
+                        std::ifstream input(source, std::ios::binary);
+                        std::string bytes(static_cast<std::size_t>(size), '\0');
+                        input.read(bytes.data(), static_cast<std::streamsize>(size));
+                        if (!input || input.peek() != std::char_traits<char>::eof())
+                            throw std::runtime_error("History changed or could not be read");
+                        const auto destination = directory / relative;
+                        std::filesystem::create_directories(destination.parent_path());
+                        std::ofstream output(destination, std::ios::binary);
+                        output << bytes;
+                        output.flush();
+                        if (!output)
+                            throw std::runtime_error("Cannot snapshot raw history");
+                        history_bytes += size;
+                        entry["status"] = "included";
+                    } catch (const std::exception& error) {
+                        entry["reason"] = error.what();
+                    }
+                index["history_files"].push_back(std::move(entry));
+            }
         }
         write_json(directory / "inventory.json", index);
         write_json(directory / "result.json",
