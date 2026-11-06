@@ -1,0 +1,2 @@
+PASS: 699 byte-preserved approved RGBA operating PNGs and owned manifests/registries
+PASS: native decoder matches all 699 reference RGBA buffers

@@ -1,3 +1,6 @@
+> Current padding-removal revision: see [change and fresh validation](../../IDLE_PADDING_REMOVAL.md).
+> The earlier curated-package results below are retained as historical evidence.
+
 # Curated runtime validation
 
 The runtime code and all approved PNGs are copied without changes from the

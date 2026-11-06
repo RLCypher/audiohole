@@ -184,15 +184,6 @@
             "frames": [
               {
                 "path": "Generated/logo/happy/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/happy/0001.png",
                 "sha256": "59b0f094e8493b4dd0d5e4ea36d38e4445f27f215c849b8152e9251d9bd3757c",
                 "anchor": [
                   256,
@@ -201,7 +192,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0002.png",
+                "path": "Generated/logo/happy/0001.png",
                 "sha256": "446311a1eb4bff538449bbb365f0a82a4a972d8b9b1216de22c724ed57c10be7",
                 "anchor": [
                   256,
@@ -210,7 +201,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0003.png",
+                "path": "Generated/logo/happy/0002.png",
                 "sha256": "959e1cffff3cbd1e5ca8b06836b2751f1f77ba1abc4f2fd44d397e174a1dadbb",
                 "anchor": [
                   256,
@@ -219,7 +210,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0004.png",
+                "path": "Generated/logo/happy/0003.png",
                 "sha256": "0b22624fd69cfe6a7a2840be224faa2935894ed69c947f9ee03cb4c94d77e3bb",
                 "anchor": [
                   256,
@@ -228,7 +219,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0005.png",
+                "path": "Generated/logo/happy/0004.png",
                 "sha256": "822afae280cccf25acd218e6414e18d59385fd33eaac905a55dc888a4ece5ed1",
                 "anchor": [
                   256,
@@ -237,7 +228,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0006.png",
+                "path": "Generated/logo/happy/0005.png",
                 "sha256": "1f4f37ff14bcce72a4ebc60089b064a82ca2562a9ffbd498dc63f28824cb8dae",
                 "anchor": [
                   256,
@@ -246,7 +237,7 @@
                 "duration_ms": 260
               },
               {
-                "path": "Generated/logo/happy/0007.png",
+                "path": "Generated/logo/happy/0006.png",
                 "sha256": "e32276edccce072731eeb78010d2441a4be8401848731933a4026c1b6ce3a0ae",
                 "anchor": [
                   256,
@@ -255,7 +246,7 @@
                 "duration_ms": 180
               },
               {
-                "path": "Generated/logo/happy/0008.png",
+                "path": "Generated/logo/happy/0007.png",
                 "sha256": "36a117186c2dbc5cd7e9bc465eae25ca972915858469948aa3534f01ef727e84",
                 "anchor": [
                   256,
@@ -264,7 +255,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0009.png",
+                "path": "Generated/logo/happy/0008.png",
                 "sha256": "58ed197d993f1f2346b1b3518e14f785988a25eeb6006ddb4362b48365524984",
                 "anchor": [
                   256,
@@ -273,22 +264,13 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/happy/0010.png",
+                "path": "Generated/logo/happy/0009.png",
                 "sha256": "b17c49c0c1da34cbee57769010be0fa69f09eede3806a9374bc885c472851aff",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/happy/0011.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 150
               }
             ],
             "loop": false,
@@ -331,15 +313,6 @@
             "frames": [
               {
                 "path": "Generated/logo/thinking/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
-              },
-              {
-                "path": "Generated/logo/thinking/0001.png",
                 "sha256": "d0992bfac560f5b1658deca7ca1cf4b03d01395e31a3a23a60851771a5dd14d3",
                 "anchor": [
                   256,
@@ -348,7 +321,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0002.png",
+                "path": "Generated/logo/thinking/0001.png",
                 "sha256": "bdad79eeccff7804c48c87cda1f1f10eda23bb690394df9cb26127c2f8a60c48",
                 "anchor": [
                   256,
@@ -357,7 +330,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0003.png",
+                "path": "Generated/logo/thinking/0002.png",
                 "sha256": "2356e207c398c4ea577597b5d279c355aed55bd873313acd153f5996996a6436",
                 "anchor": [
                   256,
@@ -366,7 +339,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0004.png",
+                "path": "Generated/logo/thinking/0003.png",
                 "sha256": "d6e51906f388fb496e48f3726e5e3b4385338ebfcb0ecb6da87b0a3d4c244c01",
                 "anchor": [
                   256,
@@ -375,7 +348,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0005.png",
+                "path": "Generated/logo/thinking/0004.png",
                 "sha256": "8b6869269b1fc1ab396aa6daa21de140c80c03dd0656c2e4815ad149c57e8e32",
                 "anchor": [
                   256,
@@ -384,7 +357,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0006.png",
+                "path": "Generated/logo/thinking/0005.png",
                 "sha256": "201ac6d2deefdb45f2bccd351d729b34169c28afb3f8fd0730abd1b09d07a05f",
                 "anchor": [
                   256,
@@ -393,7 +366,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0007.png",
+                "path": "Generated/logo/thinking/0006.png",
                 "sha256": "13b1760a2a8cfbf221a3b83d73984d8d07fd050bed000c7aeca749b5b30dd43a",
                 "anchor": [
                   256,
@@ -402,7 +375,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0008.png",
+                "path": "Generated/logo/thinking/0007.png",
                 "sha256": "43c7680841560e409694237158d603ff0153e1c10ab5b48c8aebf57ef1694a36",
                 "anchor": [
                   256,
@@ -411,7 +384,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0009.png",
+                "path": "Generated/logo/thinking/0008.png",
                 "sha256": "8cedd32b881362c08dc65ac64051dc3681dbac6be087a8e2d317264ff0570ee8",
                 "anchor": [
                   256,
@@ -420,7 +393,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0010.png",
+                "path": "Generated/logo/thinking/0009.png",
                 "sha256": "c4de5c3fee2bf9dcbbb10765c1ac72cd5e6624ce995773b2b4fba7372584e3ca",
                 "anchor": [
                   256,
@@ -429,7 +402,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0011.png",
+                "path": "Generated/logo/thinking/0010.png",
                 "sha256": "ef560315cba50a78ae16e94a1e31e197dd673eecd8cf1e89ccb609d2b179cead",
                 "anchor": [
                   256,
@@ -438,7 +411,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0012.png",
+                "path": "Generated/logo/thinking/0011.png",
                 "sha256": "6dfcd1d6a93d9f798895ec4debe091dd17382eef71109fc335e8c83f8ef83caa",
                 "anchor": [
                   256,
@@ -447,7 +420,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0013.png",
+                "path": "Generated/logo/thinking/0012.png",
                 "sha256": "25ad54a387fafe542eb97f9cf179f673512fd8cd26062b080da77ef0dee5f3a6",
                 "anchor": [
                   256,
@@ -456,17 +429,8 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/thinking/0014.png",
+                "path": "Generated/logo/thinking/0013.png",
                 "sha256": "75c1e0a8004bcc3694f6af7c7cac92ddeae7b6cbc33ee22fce171a132ee031b3",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
-              },
-              {
-                "path": "Generated/logo/thinking/0015.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
                 "anchor": [
                   256,
                   704
@@ -514,15 +478,6 @@
             "frames": [
               {
                 "path": "Generated/logo/working/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 150
-              },
-              {
-                "path": "Generated/logo/working/0001.png",
                 "sha256": "c7a002abd8f46e24b3f656a1e59a26054a295b2adf51ad6cd45ebcd60ba9dbd4",
                 "anchor": [
                   256,
@@ -531,7 +486,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0002.png",
+                "path": "Generated/logo/working/0001.png",
                 "sha256": "b39c460c223cd422e85d0905c8762357f295b5d6056a9165e4cf82457c9cc773",
                 "anchor": [
                   256,
@@ -540,7 +495,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0003.png",
+                "path": "Generated/logo/working/0002.png",
                 "sha256": "d9d4cd8e9126581734ef81af89e7142d3f8341d8b5e88900259c3e4a46c59a4d",
                 "anchor": [
                   256,
@@ -549,7 +504,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0004.png",
+                "path": "Generated/logo/working/0003.png",
                 "sha256": "02649ce6b5820382a8e91aa48090bf8a6ba3d64aaed4a1e69487bc15099b0906",
                 "anchor": [
                   256,
@@ -558,7 +513,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0005.png",
+                "path": "Generated/logo/working/0004.png",
                 "sha256": "0229946257def8fb79d8eb02937c91e0eace12cd6b50f3784afa0b2a9572aeb5",
                 "anchor": [
                   256,
@@ -567,7 +522,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0006.png",
+                "path": "Generated/logo/working/0005.png",
                 "sha256": "d2e63a1ff7f571261e52393667741793d452b153f6b835fbe04937e0e6c1c2ed",
                 "anchor": [
                   256,
@@ -576,7 +531,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0007.png",
+                "path": "Generated/logo/working/0006.png",
                 "sha256": "ff132aa3db72d5640a68284a03df69cc8b29502d9ff3cfd6610874c26e1d1770",
                 "anchor": [
                   256,
@@ -585,7 +540,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0008.png",
+                "path": "Generated/logo/working/0007.png",
                 "sha256": "442c28b3fb6efe15078da77d9616a08031802610f13e063298d4d3a6ae85bfdd",
                 "anchor": [
                   256,
@@ -594,7 +549,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0009.png",
+                "path": "Generated/logo/working/0008.png",
                 "sha256": "47457cb776e3921ceb86267519d195d6bc9e5eae166fd7216989945ef3ca071a",
                 "anchor": [
                   256,
@@ -603,7 +558,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0010.png",
+                "path": "Generated/logo/working/0009.png",
                 "sha256": "265ba355fbe7d7b733c29db51383de3fa2447291199a16fe65d616af7b09811a",
                 "anchor": [
                   256,
@@ -612,7 +567,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0011.png",
+                "path": "Generated/logo/working/0010.png",
                 "sha256": "5521dc38f95822a4f2ee931169ed402cae4d34533c596c7658d4b72f737a86b5",
                 "anchor": [
                   256,
@@ -621,7 +576,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0012.png",
+                "path": "Generated/logo/working/0011.png",
                 "sha256": "5e787ed96cf818c91427fd38e9f6a7760dfdd44dcd11c2fd320e506104c00a7e",
                 "anchor": [
                   256,
@@ -630,7 +585,7 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0013.png",
+                "path": "Generated/logo/working/0012.png",
                 "sha256": "6d5d0df8ef8645d168e0ea3ecbeda76d9b433ff525bd5136d3d752d465d30ff2",
                 "anchor": [
                   256,
@@ -639,17 +594,8 @@
                 "duration_ms": 150
               },
               {
-                "path": "Generated/logo/working/0014.png",
+                "path": "Generated/logo/working/0013.png",
                 "sha256": "98db10f7a424112c0f2f51a403876a056ab239c80247d481aa0ea907f630aec5",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 150
-              },
-              {
-                "path": "Generated/logo/working/0015.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
                 "anchor": [
                   256,
                   704
@@ -697,15 +643,6 @@
             "frames": [
               {
                 "path": "Generated/logo/talking/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 100
-              },
-              {
-                "path": "Generated/logo/talking/0001.png",
                 "sha256": "e802c02dd15ac97b338b33d1f2f001f7fee14b51f18fbbe9b3fcb7c7744f0f00",
                 "anchor": [
                   256,
@@ -714,7 +651,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0002.png",
+                "path": "Generated/logo/talking/0001.png",
                 "sha256": "2cc1c62577b86c6155d206d85d16ffa9a4467049c69b13b375d530bffec690fa",
                 "anchor": [
                   256,
@@ -723,7 +660,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0003.png",
+                "path": "Generated/logo/talking/0002.png",
                 "sha256": "daa5bcc25fe1e5124ea6f672e76205635717b2751ac64f149d33958d3fed08b2",
                 "anchor": [
                   256,
@@ -732,7 +669,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0004.png",
+                "path": "Generated/logo/talking/0003.png",
                 "sha256": "f2487ec2004e67c0921b54fc91ed3f82e8fa7f4ab3891e474c154f48252c58b1",
                 "anchor": [
                   256,
@@ -741,7 +678,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0005.png",
+                "path": "Generated/logo/talking/0004.png",
                 "sha256": "2b17c334edf76b59bfcfb756a1e702389f50effa0112eb398015702cffded8bf",
                 "anchor": [
                   256,
@@ -750,7 +687,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0006.png",
+                "path": "Generated/logo/talking/0005.png",
                 "sha256": "59417cbbf8a2b65b3f3758d8ff26ed327010371f4f11f2095cf64aa1a5287f18",
                 "anchor": [
                   256,
@@ -759,7 +696,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0007.png",
+                "path": "Generated/logo/talking/0006.png",
                 "sha256": "e00abce079f5f641871890486822e201a86976a975f6874c33c4eb27067ecd5d",
                 "anchor": [
                   256,
@@ -768,7 +705,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0008.png",
+                "path": "Generated/logo/talking/0007.png",
                 "sha256": "55a0146d01724f2173c18aab0e591be2dd387eefa936104331dac0f4a156b102",
                 "anchor": [
                   256,
@@ -777,7 +714,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0009.png",
+                "path": "Generated/logo/talking/0008.png",
                 "sha256": "6aee7df1825c7f17b94ca1a7aaef0ff12d28e351906c1f5fe767396104495e60",
                 "anchor": [
                   256,
@@ -786,17 +723,8 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/talking/0010.png",
+                "path": "Generated/logo/talking/0009.png",
                 "sha256": "04af199cba5b9814324e5a402a3ff81c1c8618bd9fc3b5abb4f066aa057c17b1",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 100
-              },
-              {
-                "path": "Generated/logo/talking/0011.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
                 "anchor": [
                   256,
                   704
@@ -844,15 +772,6 @@
             "frames": [
               {
                 "path": "Generated/logo/confused/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 100
-              },
-              {
-                "path": "Generated/logo/confused/0001.png",
                 "sha256": "e9955704f216ee3ba8d436e99ca7b11735fbfdd7b6aceeb6a0c91a480af46174",
                 "anchor": [
                   256,
@@ -861,7 +780,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0002.png",
+                "path": "Generated/logo/confused/0001.png",
                 "sha256": "a91315da61fde37a5ffea1c775c62539c90d60f739c61d77aed48289faf62a67",
                 "anchor": [
                   256,
@@ -870,7 +789,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0003.png",
+                "path": "Generated/logo/confused/0002.png",
                 "sha256": "a0a69defeb5000f01bf9534c362e931c831d9752af94b806bdb5b4ab89785910",
                 "anchor": [
                   256,
@@ -879,7 +798,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0004.png",
+                "path": "Generated/logo/confused/0003.png",
                 "sha256": "46877c9767b0a961f14dc5d78c4070037a9dcea7c2f9dcbf424558f33fd885c2",
                 "anchor": [
                   256,
@@ -888,7 +807,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0005.png",
+                "path": "Generated/logo/confused/0004.png",
                 "sha256": "4e27bdfca8743a04a4bb5e1ba004995cfab859259db220d731041e416968f071",
                 "anchor": [
                   256,
@@ -897,7 +816,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0006.png",
+                "path": "Generated/logo/confused/0005.png",
                 "sha256": "7fe452c7aaf673fab2b2d67d7e6fcdac37321313ddb5296be6c2168700ec5404",
                 "anchor": [
                   256,
@@ -906,7 +825,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0007.png",
+                "path": "Generated/logo/confused/0006.png",
                 "sha256": "c68370f19264504d03714ffaa02b100810625f9b7f12b89f0cfee1c6ddf69d01",
                 "anchor": [
                   256,
@@ -915,7 +834,7 @@
                 "duration_ms": 300
               },
               {
-                "path": "Generated/logo/confused/0008.png",
+                "path": "Generated/logo/confused/0007.png",
                 "sha256": "01837e85a8d526922685d6d3e0cb0c76c66066b16949c082c561993a646dc753",
                 "anchor": [
                   256,
@@ -924,7 +843,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/confused/0009.png",
+                "path": "Generated/logo/confused/0008.png",
                 "sha256": "a7b357c8f5b3247731f0ee15b6debb754f5f864bf13eda2fc4a50cec7fc0dbbe",
                 "anchor": [
                   256,
@@ -933,7 +852,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0010.png",
+                "path": "Generated/logo/confused/0009.png",
                 "sha256": "8627174486f8a8cc71e0fc6449339d5b19e34ec03be43b01e54a56dd23949c58",
                 "anchor": [
                   256,
@@ -942,7 +861,7 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0011.png",
+                "path": "Generated/logo/confused/0010.png",
                 "sha256": "a7fef726a69859afdf85fe98db61473d2d5d7d4ef492550c44e38d68d3dfe9f2",
                 "anchor": [
                   256,
@@ -951,22 +870,13 @@
                 "duration_ms": 100
               },
               {
-                "path": "Generated/logo/confused/0012.png",
+                "path": "Generated/logo/confused/0011.png",
                 "sha256": "7c17f4805a110397f8aa13219f524d3d57f4c3b9eea272a3b6a13b7f45f68f34",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 100
-              },
-              {
-                "path": "Generated/logo/confused/0013.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
               }
             ],
             "loop": false,
@@ -1009,15 +919,6 @@
             "frames": [
               {
                 "path": "Generated/logo/concerned/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
-              },
-              {
-                "path": "Generated/logo/concerned/0001.png",
                 "sha256": "29880bf112c917d0e41017fe01295f795c375e2b258f31662112541b13fe437c",
                 "anchor": [
                   256,
@@ -1026,7 +927,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0002.png",
+                "path": "Generated/logo/concerned/0001.png",
                 "sha256": "84e2c85c40282fc3886cec9b3aaa6c822d46f04ff4e71e075f8198ea50a016b3",
                 "anchor": [
                   256,
@@ -1035,7 +936,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0003.png",
+                "path": "Generated/logo/concerned/0002.png",
                 "sha256": "8f9d8c7756b2ce300bf3f6b67ea6c68888901b8c52e79bb7ea2e149af21abd47",
                 "anchor": [
                   256,
@@ -1044,7 +945,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0004.png",
+                "path": "Generated/logo/concerned/0003.png",
                 "sha256": "857b1e9e2b14e3065d8b7e4f9f182b44eec214d968e40ef77b769b8e98caceae",
                 "anchor": [
                   256,
@@ -1053,7 +954,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0005.png",
+                "path": "Generated/logo/concerned/0004.png",
                 "sha256": "c218cfecd779d20985969d759339575d9eb5e75dfc164982b1f422b94aea1e60",
                 "anchor": [
                   256,
@@ -1062,7 +963,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0006.png",
+                "path": "Generated/logo/concerned/0005.png",
                 "sha256": "70f0a1709c1f73ca7723fd6777c2666825fc6a343b043d13022b4574357d73ed",
                 "anchor": [
                   256,
@@ -1071,7 +972,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0007.png",
+                "path": "Generated/logo/concerned/0006.png",
                 "sha256": "b60f6936b5a8055ca71a0bb6bc78e32f8e831d03779c404fbeb97d149df06c85",
                 "anchor": [
                   256,
@@ -1080,7 +981,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0008.png",
+                "path": "Generated/logo/concerned/0007.png",
                 "sha256": "bd1433f022fcd6cb0c2461826b0019383138ab328a0c30af7811e629af5d6731",
                 "anchor": [
                   256,
@@ -1089,7 +990,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0009.png",
+                "path": "Generated/logo/concerned/0008.png",
                 "sha256": "d1e49ebc67830a6c8f54e23107229c99c32bea9c19fdad7dc2e2f1aacd15ac78",
                 "anchor": [
                   256,
@@ -1098,7 +999,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0010.png",
+                "path": "Generated/logo/concerned/0009.png",
                 "sha256": "b2c233c242f7ba053ec9ec3a59463a3eca18383d72ea84e6d921b7afcd64398b",
                 "anchor": [
                   256,
@@ -1107,7 +1008,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0011.png",
+                "path": "Generated/logo/concerned/0010.png",
                 "sha256": "84bf5ead40cb373726e898c8ade24c103f301ed2f69f772b3fe20b79b89226e0",
                 "anchor": [
                   256,
@@ -1116,7 +1017,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0012.png",
+                "path": "Generated/logo/concerned/0011.png",
                 "sha256": "0ad4d5ee7239a566dca14e4760e3a8b8411fb9dbe881abb2f7b389985b72f9d9",
                 "anchor": [
                   256,
@@ -1125,7 +1026,7 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0013.png",
+                "path": "Generated/logo/concerned/0012.png",
                 "sha256": "db2f84068470fd31655faefb2515133c4677acf913a5ff97cd2a44f0eb475d49",
                 "anchor": [
                   256,
@@ -1134,17 +1035,8 @@
                 "duration_ms": 200
               },
               {
-                "path": "Generated/logo/concerned/0014.png",
+                "path": "Generated/logo/concerned/0013.png",
                 "sha256": "2dcec17deb3d2db2533cb824910d790d4a2333ca89e3243cedb1cb20fa1d6617",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
-              },
-              {
-                "path": "Generated/logo/concerned/0015.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
                 "anchor": [
                   256,
                   704
@@ -1192,15 +1084,6 @@
             "frames": [
               {
                 "path": "Generated/logo/error/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/error/0001.png",
                 "sha256": "02a86731e1aee5aaff98d2e663cde962509c3124e4b9d6dfe007ef47804f887d",
                 "anchor": [
                   256,
@@ -1209,7 +1092,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0002.png",
+                "path": "Generated/logo/error/0001.png",
                 "sha256": "98b58c6ff5960550b48026e1be5eaa53efd6ca8a56c7ad34b42a0b5b97fcbec7",
                 "anchor": [
                   256,
@@ -1218,7 +1101,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0003.png",
+                "path": "Generated/logo/error/0002.png",
                 "sha256": "f4d77ceb8f5d4b9e0bd769fc0d91db20de0dc8f48547b53985bd7b6814f59c8d",
                 "anchor": [
                   256,
@@ -1227,7 +1110,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0004.png",
+                "path": "Generated/logo/error/0003.png",
                 "sha256": "83d26e0837397d0573ff850980ad6348f4fc278bd4784d6261b8eea08f7afbf0",
                 "anchor": [
                   256,
@@ -1236,7 +1119,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0005.png",
+                "path": "Generated/logo/error/0004.png",
                 "sha256": "86d43218df03ccc5d2827809e5d678937e26269a4ce251ec7e78da22680007e9",
                 "anchor": [
                   256,
@@ -1245,7 +1128,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0006.png",
+                "path": "Generated/logo/error/0005.png",
                 "sha256": "8d80df1b2ec3ab5f016186fd3a9c09c53b9fd86f75fbba8dd9388ee842c364c0",
                 "anchor": [
                   256,
@@ -1254,7 +1137,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0007.png",
+                "path": "Generated/logo/error/0006.png",
                 "sha256": "983babef7054b4f1f4739d71e9f24aaec204b3352b36e60c9f82dd8e127b7036",
                 "anchor": [
                   256,
@@ -1263,7 +1146,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0008.png",
+                "path": "Generated/logo/error/0007.png",
                 "sha256": "7ab4b586357aa2acce39ca30109c922bdd9458cb285bdcf1024c6fa205607afa",
                 "anchor": [
                   256,
@@ -1272,7 +1155,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0009.png",
+                "path": "Generated/logo/error/0008.png",
                 "sha256": "a1015108c15df313e837b7e1e60c3c227ebfd0e916697437c800f2ccf4c74109",
                 "anchor": [
                   256,
@@ -1281,7 +1164,7 @@
                 "duration_ms": 270
               },
               {
-                "path": "Generated/logo/error/0010.png",
+                "path": "Generated/logo/error/0009.png",
                 "sha256": "b3ff958274f94c3e62198ec2552124ef58aca7281ea156dd131751bd50c29fff",
                 "anchor": [
                   256,
@@ -1290,7 +1173,7 @@
                 "duration_ms": 180
               },
               {
-                "path": "Generated/logo/error/0011.png",
+                "path": "Generated/logo/error/0010.png",
                 "sha256": "078ab8fe610369c5f60175991989451ba57e0ce71375e2ae70a192bfec87e024",
                 "anchor": [
                   256,
@@ -1299,7 +1182,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0012.png",
+                "path": "Generated/logo/error/0011.png",
                 "sha256": "1831a1c7ae6a0796dfff204719d340a478ba517a5d6a6e4fa3ee4e122e1af685",
                 "anchor": [
                   256,
@@ -1308,7 +1191,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0013.png",
+                "path": "Generated/logo/error/0012.png",
                 "sha256": "f39512d825e735bd769591ece825c52b170bebf9579d624c6f9bddaedc9a0988",
                 "anchor": [
                   256,
@@ -1317,7 +1200,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0014.png",
+                "path": "Generated/logo/error/0013.png",
                 "sha256": "0d78ac76682eba5935118ae5b3c1b38c5c904a2bfb97ea0a55763558bb16733e",
                 "anchor": [
                   256,
@@ -1326,7 +1209,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0015.png",
+                "path": "Generated/logo/error/0014.png",
                 "sha256": "fa661d2f91820e9f431c0b50f627375148b782b517a9067453d5316c61991085",
                 "anchor": [
                   256,
@@ -1335,22 +1218,13 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/error/0016.png",
+                "path": "Generated/logo/error/0015.png",
                 "sha256": "bcc55007ea51a7ee7c4aae8dd71e90b66194eea3324b1d9832051cd02ceb46c5",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/error/0017.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
               }
             ],
             "loop": false,
@@ -1393,15 +1267,6 @@
             "frames": [
               {
                 "path": "Generated/logo/angry/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/angry/0001.png",
                 "sha256": "c7566f2dc61dc2cbd6b0a91f1618b0f673e5d55edd5a1e4f2949ec359f16d79c",
                 "anchor": [
                   256,
@@ -1410,7 +1275,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0002.png",
+                "path": "Generated/logo/angry/0001.png",
                 "sha256": "3bb822705427e0b9f5f402149957c2a87749075f0597a99197a3a28ad3a48ec5",
                 "anchor": [
                   256,
@@ -1419,7 +1284,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0003.png",
+                "path": "Generated/logo/angry/0002.png",
                 "sha256": "4fb29d140cf88b4c89a9dbe9149e563ddfc90d56988fb648c625f59591cf58e8",
                 "anchor": [
                   256,
@@ -1428,7 +1293,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0004.png",
+                "path": "Generated/logo/angry/0003.png",
                 "sha256": "88d350b88f81384a8356bdd6b7bb44ba6e15f33a7e8edc15abb536eee9027359",
                 "anchor": [
                   256,
@@ -1437,7 +1302,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0005.png",
+                "path": "Generated/logo/angry/0004.png",
                 "sha256": "f90714d3be79001c1175518e4bffd899044b33ea08ecf73760138cb70eeb3868",
                 "anchor": [
                   256,
@@ -1446,7 +1311,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0006.png",
+                "path": "Generated/logo/angry/0005.png",
                 "sha256": "577407b801cfd67ecda2e4861b42adb47e5ef6b154febd3f100f98f5419b5cb3",
                 "anchor": [
                   256,
@@ -1455,7 +1320,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0007.png",
+                "path": "Generated/logo/angry/0006.png",
                 "sha256": "3b055dad25e902f06b4c5557b4979011ab8e1fb86940a7fdca496c4edd17340d",
                 "anchor": [
                   256,
@@ -1464,7 +1329,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0008.png",
+                "path": "Generated/logo/angry/0007.png",
                 "sha256": "ac6f0dbbd993d1b4f2ddc7f5c6a2c39c88668bc74e77683600668c1caba52cab",
                 "anchor": [
                   256,
@@ -1473,7 +1338,7 @@
                 "duration_ms": 270
               },
               {
-                "path": "Generated/logo/angry/0009.png",
+                "path": "Generated/logo/angry/0008.png",
                 "sha256": "773c213e44c6e972196c3e7d1377e4c29eb4a9e26782527ca874030fd0041556",
                 "anchor": [
                   256,
@@ -1482,7 +1347,7 @@
                 "duration_ms": 180
               },
               {
-                "path": "Generated/logo/angry/0010.png",
+                "path": "Generated/logo/angry/0009.png",
                 "sha256": "16bdf0f149a7a6301dd8bf310ba6502697cb03b21530c00f3f27e2efb6bf9caf",
                 "anchor": [
                   256,
@@ -1491,7 +1356,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0011.png",
+                "path": "Generated/logo/angry/0010.png",
                 "sha256": "a5ac59335cc5e00c90eb2ba3a211b7838428b81b87e1e1c823c91b46319e9529",
                 "anchor": [
                   256,
@@ -1500,7 +1365,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0012.png",
+                "path": "Generated/logo/angry/0011.png",
                 "sha256": "f2c38c5e2c0d7d045cad0caee64911e8f514403a940bfb4db55f05ffd3d148ac",
                 "anchor": [
                   256,
@@ -1509,7 +1374,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0013.png",
+                "path": "Generated/logo/angry/0012.png",
                 "sha256": "4d05eeee7bdb76c51da7ebb804df54beac0c034fa92cca05e913f522c0af1457",
                 "anchor": [
                   256,
@@ -1518,22 +1383,13 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/angry/0014.png",
+                "path": "Generated/logo/angry/0013.png",
                 "sha256": "d12497df6acf269529e5b52c4f3ac1cb8451703c07ba192e57f524884b8d2224",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/angry/0015.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 180
               }
             ],
             "loop": false,
@@ -1576,15 +1432,6 @@
             "frames": [
               {
                 "path": "Generated/logo/surprised/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 80
-              },
-              {
-                "path": "Generated/logo/surprised/0001.png",
                 "sha256": "7aa20c7c23791671524fa81bed58426d3eeff1fc70a4e357aaa48a34974f4522",
                 "anchor": [
                   256,
@@ -1593,7 +1440,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0002.png",
+                "path": "Generated/logo/surprised/0001.png",
                 "sha256": "227b9b5ff748c829bf77098588e5a0a17de0354f2e307907c9a1010895ed41c2",
                 "anchor": [
                   256,
@@ -1602,7 +1449,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0003.png",
+                "path": "Generated/logo/surprised/0002.png",
                 "sha256": "44d29a1bf51be5b6ea4e2e95cbba6d4c351ad8af89f82fa5ff14d4a762be5dfe",
                 "anchor": [
                   256,
@@ -1611,7 +1458,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0004.png",
+                "path": "Generated/logo/surprised/0003.png",
                 "sha256": "43b318a591f143b49bf2fe35d458b756faf0c67c2c7d378eb5b6cdad006fed52",
                 "anchor": [
                   256,
@@ -1620,7 +1467,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0005.png",
+                "path": "Generated/logo/surprised/0004.png",
                 "sha256": "20e09b48eceae39559b92076a8a2b65990e0e872cbbe04a175dc0597b0927405",
                 "anchor": [
                   256,
@@ -1629,7 +1476,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0006.png",
+                "path": "Generated/logo/surprised/0005.png",
                 "sha256": "7e6590ed0d851316777791f253e15841a1d502d9f9e17c26e9d443a51fdf208c",
                 "anchor": [
                   256,
@@ -1638,7 +1485,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0007.png",
+                "path": "Generated/logo/surprised/0006.png",
                 "sha256": "01abbb7390c0c4ce8d105bf29e24d32028f413c1226a614c1c387c6db072e533",
                 "anchor": [
                   256,
@@ -1647,7 +1494,7 @@
                 "duration_ms": 250
               },
               {
-                "path": "Generated/logo/surprised/0008.png",
+                "path": "Generated/logo/surprised/0007.png",
                 "sha256": "04de5435a8dabacfa8f69c467de63b5ce22d60b107b5a1add3208fe1e8d5b1bb",
                 "anchor": [
                   256,
@@ -1656,7 +1503,7 @@
                 "duration_ms": 170
               },
               {
-                "path": "Generated/logo/surprised/0009.png",
+                "path": "Generated/logo/surprised/0008.png",
                 "sha256": "286079d1f6fdce72c958c2280ca6fb3b66336754aef478b255798bff55d584bb",
                 "anchor": [
                   256,
@@ -1665,7 +1512,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0010.png",
+                "path": "Generated/logo/surprised/0009.png",
                 "sha256": "fae932f9a941d1238904492831a7f8be2162c8f77aa155e9b681660c733395f1",
                 "anchor": [
                   256,
@@ -1674,7 +1521,7 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0011.png",
+                "path": "Generated/logo/surprised/0010.png",
                 "sha256": "0738a689b5e2cc6aec05c0f1c3cf2b921546b4dd15f1dace5a21a8aaaa42171d",
                 "anchor": [
                   256,
@@ -1683,22 +1530,13 @@
                 "duration_ms": 80
               },
               {
-                "path": "Generated/logo/surprised/0012.png",
+                "path": "Generated/logo/surprised/0011.png",
                 "sha256": "fc809685445bd88ec2f4833250d40b981c08d8028b48ecf69a9c162a8b181d56",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 80
-              },
-              {
-                "path": "Generated/logo/surprised/0013.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 200
               }
             ],
             "loop": false,
@@ -1741,15 +1579,6 @@
             "frames": [
               {
                 "path": "Generated/logo/celebrating/0000.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/celebrating/0001.png",
                 "sha256": "772380955ef5f437f5c41bd79b01ad7a8b84ddaf55e5a496c50af31175ddb504",
                 "anchor": [
                   256,
@@ -1758,7 +1587,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0002.png",
+                "path": "Generated/logo/celebrating/0001.png",
                 "sha256": "407f62ca819fcddfb69a0c85ae0a8adc783079d0044fcc0816ae3b10f5a353f6",
                 "anchor": [
                   256,
@@ -1767,7 +1596,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0003.png",
+                "path": "Generated/logo/celebrating/0002.png",
                 "sha256": "780a803253109454b92bf6b67212c0c6aa89167cdf63d67c6b7f83bb1f5fbcd8",
                 "anchor": [
                   256,
@@ -1776,7 +1605,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0004.png",
+                "path": "Generated/logo/celebrating/0003.png",
                 "sha256": "cdc653aaf39db599f719836e5276b6186bc9aaa2968eb34db1d7ef22e4293873",
                 "anchor": [
                   256,
@@ -1785,7 +1614,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0005.png",
+                "path": "Generated/logo/celebrating/0004.png",
                 "sha256": "cab1a5d09f32c8aa41336c231a9cbb01a1a935c4e0e0356936832af09bc06e68",
                 "anchor": [
                   256,
@@ -1794,7 +1623,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0006.png",
+                "path": "Generated/logo/celebrating/0005.png",
                 "sha256": "150e3cebc8a5d4dcd72962530301a6ffa4262e3d85886b59e099d59f28a9fab0",
                 "anchor": [
                   256,
@@ -1803,7 +1632,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0007.png",
+                "path": "Generated/logo/celebrating/0006.png",
                 "sha256": "11973873a26032ddb55547c85f533cceae4112cd2369c49ab0165cc65d35065b",
                 "anchor": [
                   256,
@@ -1812,7 +1641,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0008.png",
+                "path": "Generated/logo/celebrating/0007.png",
                 "sha256": "2a7314dd8a9489c3c5d980982f4413b86364ec1a4f941982e605740fe952553e",
                 "anchor": [
                   256,
@@ -1821,7 +1650,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0009.png",
+                "path": "Generated/logo/celebrating/0008.png",
                 "sha256": "59e4b6b8e6265961e7f5cc290a8259430e84de40d367f461cf8f98c4dd1f22e9",
                 "anchor": [
                   256,
@@ -1830,7 +1659,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0010.png",
+                "path": "Generated/logo/celebrating/0009.png",
                 "sha256": "895e692aeaf506659ab49e6d0245cbc33e498c37cc8fc147a72cd57f0b3c6ab6",
                 "anchor": [
                   256,
@@ -1839,7 +1668,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0011.png",
+                "path": "Generated/logo/celebrating/0010.png",
                 "sha256": "c0a33e1924562b95a2b2fea10d2c1735e98c96fd1c389784afcb349b360bf975",
                 "anchor": [
                   256,
@@ -1848,7 +1677,7 @@
                 "duration_ms": 280
               },
               {
-                "path": "Generated/logo/celebrating/0012.png",
+                "path": "Generated/logo/celebrating/0011.png",
                 "sha256": "8befaf30e7aa9cc354e9108bd795ec32d39e32b4ca0a05b2ff933fb2e25a60b9",
                 "anchor": [
                   256,
@@ -1857,7 +1686,7 @@
                 "duration_ms": 180
               },
               {
-                "path": "Generated/logo/celebrating/0013.png",
+                "path": "Generated/logo/celebrating/0012.png",
                 "sha256": "be2c23054612a076ffc8357a20861be3c05ab5ba8ef7e3ead4d6ede91dceceaa",
                 "anchor": [
                   256,
@@ -1866,7 +1695,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0014.png",
+                "path": "Generated/logo/celebrating/0013.png",
                 "sha256": "87bc2ad9fcefe1cb6745ec612ec4930ae7d36300813c14b7679496f8c8a1059d",
                 "anchor": [
                   256,
@@ -1875,7 +1704,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0015.png",
+                "path": "Generated/logo/celebrating/0014.png",
                 "sha256": "a50deeefc481a1d7e147439148fb940e753775d526c426be116e6302484fc9a0",
                 "anchor": [
                   256,
@@ -1884,7 +1713,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0016.png",
+                "path": "Generated/logo/celebrating/0015.png",
                 "sha256": "b3a43bb7c3aba2a4584fc7e1a419529d741349247901d99a7c1f8442944938c5",
                 "anchor": [
                   256,
@@ -1893,7 +1722,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0017.png",
+                "path": "Generated/logo/celebrating/0016.png",
                 "sha256": "3830e65511d041682abad9eab9687a20ea6cba2dc6f124c03da4b623acd0e065",
                 "anchor": [
                   256,
@@ -1902,7 +1731,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0018.png",
+                "path": "Generated/logo/celebrating/0017.png",
                 "sha256": "ee8ef054190752e5b042dff4e6ce3ad9a109daa9cd964f56c72e77f8af0fe5b6",
                 "anchor": [
                   256,
@@ -1911,7 +1740,7 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0019.png",
+                "path": "Generated/logo/celebrating/0018.png",
                 "sha256": "a2ab133dc454d43ffe3dce4d78009db2541916084e53b10f26aae52ee95a2a62",
                 "anchor": [
                   256,
@@ -1920,22 +1749,13 @@
                 "duration_ms": 90
               },
               {
-                "path": "Generated/logo/celebrating/0020.png",
+                "path": "Generated/logo/celebrating/0019.png",
                 "sha256": "2d0712eb0ce67a796bf9ff6c41712b21405380f435828ad7e54439ac9fb65242",
                 "anchor": [
                   256,
                   704
                 ],
                 "duration_ms": 90
-              },
-              {
-                "path": "Generated/logo/celebrating/0021.png",
-                "sha256": "1888de3db15c1b76cee25dc2c8ff4d3bcf84e2c561f72e3e954a3badea6904e8",
-                "anchor": [
-                  256,
-                  704
-                ],
-                "duration_ms": 230
               }
             ],
             "loop": false,
