@@ -1,9 +1,48 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "model/configuration_bundle.h"
 #include <wx/datetime.h>
 #include <wx/ffile.h>
 
 namespace audiohole::gui {
+void Frame::bundle_dialog(bool profiles, bool importing) {
+    if (dirty_ || device_dirty_) {
+        show_result(
+            {false, "Save or revert pending profile/device edits before transferring a bundle."});
+        return;
+    }
+    const auto title =
+        wxString(importing ? "Import " : "Export ") + (profiles ? "profiles" : "devices");
+    wxFileDialog dialog(this, title, {},
+                        wxString("AudioHole-") + (profiles ? "profiles-" : "devices-") +
+                            wxDateTime::Now().Format("%Y%m%d-%H%M%S") + ".zip",
+                        "AudioHole bundles (*.zip)|*.zip",
+                        importing ? wxFD_OPEN | wxFD_FILE_MUST_EXIST : wxFD_SAVE);
+    if (dialog.ShowModal() != wxID_OK)
+        return;
+    if (!importing && wxFileExists(dialog.GetPath())) {
+        show_result({false, "That destination already exists. Choose a new filename to preserve "
+                            "the existing bundle."});
+        return;
+    }
+    ScannerActionRequest request;
+    request.kind =
+        importing
+            ? (profiles ? ScannerActionKind::InspectProfiles : ScannerActionKind::InspectDevices)
+            : (profiles ? ScannerActionKind::ExportProfiles : ScannerActionKind::ExportDevices);
+    request.output = std::filesystem::path(dialog.GetPath().ToStdWstring());
+    const auto result = controller_->scanner_action(request);
+    if (!result.ok) {
+        show_result(result);
+        return;
+    }
+    bundle_generation_ = controller_->snapshot().scanner.generation;
+    bundle_inspecting_ = importing;
+    bundle_importing_ = false;
+    // Freeze profile edits during a profile-file transaction/preview. Unfinished
+    // drafts cannot race the worker and then be discarded by the reload.
+    refresh();
+}
 void Frame::build_scan() {
     auto* page = new wxPanel(notebook_);
     auto* root = new wxBoxSizer(wxVERTICAL);
@@ -41,31 +80,52 @@ void Frame::build_scan() {
                            "tests can conflict with other applications.");
     auto* budgets = new wxGridSizer(1, 5, FromDIP(8), FromDIP(8));
     auto* attempts_column = new wxBoxSizer(wxVERTICAL);
-    label(pane, attempts_column, "Configurations / device");
+    auto title = [pane](wxSizer* column, const wxString& caption) {
+        auto* text = new wxStaticText(pane, wxID_ANY, caption, wxDefaultPosition, wxDefaultSize,
+                                      wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+        text->SetMinSize(wxSize(0, text->GetCharHeight() * 2));
+        column->Add(text, 0, wxEXPAND | wxALL, 3);
+    };
+    title(attempts_column, "Configurations / device");
     deep_attempts_ = new wxSpinCtrl(pane, wxID_ANY, {}, wxDefaultPosition, wxSize(110, -1));
     deep_attempts_->SetRange(1, 64);
     deep_attempts_->SetName("Configurations per device");
     deep_attempts_->SetValue(8);
-    deep_attempts_->SetToolTip("Maximum tested candidate combinations per device, from 1 to 64.");
+    deep_attempts_->SetToolTip(
+        "How many distinct format/mode combinations to test on each device. "
+        "More configurations broaden coverage and increase scan time; these are not retries.");
     attempts_column->Add(deep_attempts_, 0, wxALL | wxEXPAND, 3);
     budgets->Add(attempts_column, 1, wxEXPAND);
-    auto seconds = [&](const char* title, unsigned minimum, unsigned maximum, unsigned initial) {
+    auto seconds = [&](const char* caption, unsigned minimum, unsigned maximum, unsigned initial) {
         auto* column = new wxBoxSizer(wxVERTICAL);
-        label(pane, column, title);
+        title(column, text(caption));
         auto* control = new SecondsField(pane, minimum, maximum, initial);
-        control->SetName(text(title));
-        control->editor()->SetName(text(title));
+        control->SetName(text(caption));
+        control->editor()->SetName(text(caption));
         column->Add(control, 0, wxALL | wxEXPAND, 3);
         budgets->Add(column, 1, wxEXPAND);
         return control;
     };
-    deep_duration_ = seconds("Stream (s)", 250, 30000, 2000);
-    deep_attempt_timeout_ = seconds("Attempt limit (s)", 1250, 120000, 10000);
-    deep_device_timeout_ = seconds("Device limit (s)", 1000, 600000, 120000);
-    deep_system_timeout_ = seconds("Scan limit (s; 0 = unlimited)", 0, 3600000, 600000);
-    deep_system_timeout_->editor()->SetToolTip(
-        "Total Deep scan time in seconds; 0 disables the overall deadline. Per-device and "
-        "per-attempt limits and Cancel remain active.");
+    deep_duration_ = seconds("Stream (sec.)", 250, 30000, 2000);
+    deep_attempt_timeout_ = seconds("Attempt limit (sec.)", 1250, 120000, 10000);
+    deep_device_timeout_ = seconds("Device limit (sec.)", 1000, 600000, 120000);
+    deep_system_timeout_ = seconds("Scan limit (sec.)\n0 = unlimited", 0, 3600000, 600000);
+    const std::array<std::pair<SecondsField*, const char*>, 4> descriptions{
+        {{deep_duration_, "How long each accepted configuration processes audio buffers. Longer "
+                          "tests observe more activity but do not prove long-term stability."},
+         {deep_attempt_timeout_,
+          "Maximum worker time for one configuration, including stream setup, processing and "
+          "cleanup. Reporting/checkpoint time is separate."},
+         {deep_device_timeout_, "Total Deep test budget for one device. When used up, remaining "
+                                "configurations are left untested and scanning moves on safely."},
+         {deep_system_timeout_,
+          "Overall Deep scan budget across all selected devices. Zero disables this deadline; "
+          "individual attempt/device limits and Cancel remain active."}}};
+    for (const auto& [control, description] : descriptions) {
+        control->SetToolTip(description);
+        for (auto* child : control->GetChildren())
+            child->SetToolTip(description);
+    }
     const int control_height = deep_attempts_->GetBestSize().y;
     for (auto* control :
          {deep_duration_, deep_attempt_timeout_, deep_device_timeout_, deep_system_timeout_})
@@ -80,9 +140,17 @@ void Frame::build_scan() {
     root->Add(deep, 0, wxEXPAND | wxALL, 3);
     deep->Show(controller_->snapshot().operating_mode == OperatingMode::Test);
     deep->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [page](wxCollapsiblePaneEvent&) { page->Layout(); });
-    scan_progress_ = new wxGauge(page, wxID_ANY, 100);
+    scan_progress_ =
+        new wxGauge(page, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH);
     root->Add(scan_progress_, 0, wxEXPAND | wxALL, 4);
-    scan_state_ = label(page, root, "No scan requested.");
+    scan_state_ =
+        new wxTextCtrl(page, wxID_ANY, "No scan requested.", wxDefaultPosition, wxDefaultSize,
+                       wxTE_MULTILINE | wxTE_READONLY | wxTE_NO_VSCROLL | wxBORDER_NONE);
+    scan_state_->SetName("Current scan status");
+    const int status_height = scan_state_->GetCharHeight() * 3 + FromDIP(8);
+    scan_state_->SetMinSize(wxSize(0, status_height));
+    scan_state_->SetMaxSize(wxSize(-1, status_height));
+    root->Add(scan_state_, 0, wxEXPAND | wxALL, 4);
     auto* filters = new wxBoxSizer(wxHORIZONTAL);
     auto* severity_column = new wxBoxSizer(wxVERTICAL);
     auto* search_column = new wxBoxSizer(wxVERTICAL);

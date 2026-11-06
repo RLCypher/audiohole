@@ -211,3 +211,12 @@ after the last finite pass. Reduced motion stays static; new events, severity,
 identity changes and inactivity sleep remain authoritative interruptions. Optional
 build-preference fields `animation_loops` and `loop_until_event` persist these values.
 Artwork/manifests have not been pruned. See GUI_REVISION_NOTES.md for full behavior.
+
+## Owner-provided loopable art — PR #7
+
+The later owner-provided `feef4b0` art revision supersedes the earlier statement
+that operating art is unpruned. It removes neutral idle bookends while retaining
+699 operating PNGs with byte-preserved art and timing. Authored playback flags and
+application loop/count/hold behavior are unchanged. See
+[IDLE_PADDING_REMOVAL.md](assets/personalities/IDLE_PADDING_REMOVAL.md) and its
+before/after ledger for exact asset lineage. No additional pruning was performed.

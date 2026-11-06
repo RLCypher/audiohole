@@ -53,13 +53,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     auto* source_layout = new wxBoxSizer(wxVERTICAL);
     auto* destination_layout = new wxBoxSizer(wxVERTICAL);
     material_heading(capture, source_layout, "Source (Capture)", true);
-    w.source = new wxComboBox(capture, wxID_ANY);
+    w.source = new ThemedCombo(capture, wxID_ANY);
     w.source->SetMinSize(FromDIP(wxSize(120, -1)));
     source_layout->Add(w.source, 0, wxEXPAND | wxALL, FromDIP(8));
     w.source_detail = label(capture, source_layout, "Select a source");
     capture->set_content_sizer(source_layout);
     material_heading(playback, destination_layout, "Destination (Playback)", false);
-    w.destination = new wxComboBox(playback, wxID_ANY);
+    w.destination = new ThemedCombo(playback, wxID_ANY);
     w.destination->SetMinSize(FromDIP(wxSize(120, -1)));
     destination_layout->Add(w.destination, 0, wxEXPAND | wxALL, FromDIP(8));
     w.destination_detail = label(playback, destination_layout, "Select a destination");
@@ -70,7 +70,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.group->Add(endpoints, 0, wxEXPAND);
     w.summary = label(box, w.group, "Configuration");
     label(box, w.group, "Audio format");
-    w.format = new wxChoice(box, wxID_ANY);
+    w.format = new ThemedChoice(box, wxID_ANY);
     w.group->Add(w.format, 0, wxEXPAND | wxALL, 3);
     w.evidence = label(box, w.group, "Select endpoints to see a format recommendation.");
     w.evidence->Wrap(560);
@@ -98,14 +98,16 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                          "listed device to bind it.");
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
-    auto* advanced = new wxCollapsiblePane(box, wxID_ANY, "Advanced directional settings");
+    auto* advanced =
+        new wxCollapsiblePane(box, wxID_ANY, "Advanced directional settings", wxDefaultPosition,
+                              wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
     w.group->Add(advanced, 0, wxEXPAND | wxALL, 3);
     auto* pane = advanced->GetPane();
     auto* inner = new wxBoxSizer(wxVERTICAL);
     w.mode = choices(pane, inner, "Operating mode", {"Automatic", "Shared", "Exclusive"});
     w.mode->SetToolTip("Automatic chooses an operating preference. Shared cooperates with other "
                        "applications; Exclusive can reserve the endpoint. Changes wait for Apply.");
-    auto* fallback = new wxChoice(pane, wxID_ANY);
+    auto* fallback = new ThemedChoice(pane, wxID_ANY);
     fallback->Append(wxS("Fallback device / channel mapping — unavailable"));
     fallback->SetSelection(0);
     fallback->Disable();
@@ -404,6 +406,12 @@ void Frame::build_profiles() {
     saves->Add(profile_edit_state_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, FromDIP(8));
     profile_actions_->SetSizer(saves);
     page_layout->Add(profile_actions_, 0, wxEXPAND | wxALL, FromDIP(3));
+    auto* bundles = new wxBoxSizer(wxHORIZONTAL);
+    scanner_actions_.push_back(
+        button(page, bundles, "Export profiles…", [this] { bundle_dialog(true, false); }));
+    scanner_actions_.push_back(
+        button(page, bundles, "Import profiles…", [this] { bundle_dialog(true, true); }));
+    page_layout->Add(bundles, 0, wxEXPAND);
     profile_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                             wxSP_LIVE_UPDATE | wxSP_3D);
     profile_columns_->SetName("Resize profile column width");
@@ -433,8 +441,8 @@ void Frame::build_profiles() {
     auto* holes_layout = new wxBoxSizer(wxVERTICAL);
     auto* profile_heading = new wxBoxSizer(wxHORIZONTAL);
     label(profile_panel, profile_heading, "Profiles");
-    profiles_ = new wxListBox(profile_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
-                              wxLB_SINGLE | wxLB_NEEDED_SB);
+    profiles_ = new ThemedList(profile_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0,
+                               nullptr, wxLB_SINGLE | wxLB_NEEDED_SB | wxLB_OWNERDRAW);
     profiles_->SetName("Profiles");
     profiles_->SetMinSize(wxSize(0, profiles_->GetCharHeight() + FromDIP(8)));
     profiles_->SetToolTip("Open a profile for editing. Right-click or Shift+F10 for Rename, "
@@ -466,8 +474,8 @@ void Frame::build_profiles() {
     hole_new_ = add_control(holes_panel, hole_heading, "Add hole",
                             "Add a hole to this profile's staged changes.", [this] { add_hole(); });
     holes_layout->Add(hole_heading, 0, wxEXPAND);
-    holes_ = new wxListBox(holes_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
-                           wxLB_SINGLE | wxLB_NEEDED_SB);
+    holes_ = new ThemedList(holes_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+                            wxLB_SINGLE | wxLB_NEEDED_SB | wxLB_OWNERDRAW);
     holes_->SetName("Holes");
     holes_->SetMinSize(wxSize(0, holes_->GetCharHeight() + FromDIP(8)));
     holes_->SetToolTip("Choose a hole. Right-click or Shift+F10 for Rename, Duplicate and Delete.");
@@ -539,6 +547,27 @@ void Frame::build_profiles() {
         holes_->PopupMenu(menu.get());
         holes_->SetSelection(hole_index_);
     });
+    auto delete_selected = [this](bool profile, wxKeyEvent& event) {
+        if (event.GetKeyCode() != WXK_DELETE || event.HasAnyModifiers()) {
+            event.Skip();
+            return;
+        }
+        const int selected = profile ? profiles_->GetSelection() : holes_->GetSelection();
+        if (selected < 0)
+            return;
+        if (profile && static_cast<std::size_t>(selected) >= profile_ids_.size())
+            return;
+        if (!profile && static_cast<std::size_t>(selected) >= draft_.holes.size())
+            return;
+        auto menu =
+            profile ? profile_menu(profile_ids_[selected]) : hole_menu(draft_.holes[selected].id);
+        if (menu->IsEnabled(wxID_DELETE)) {
+            wxCommandEvent command(wxEVT_MENU, wxID_DELETE);
+            menu->ProcessEvent(command);
+        }
+    };
+    profiles_->Bind(wxEVT_KEY_DOWN, [delete_selected](wxKeyEvent& e) { delete_selected(true, e); });
+    holes_->Bind(wxEVT_KEY_DOWN, [delete_selected](wxKeyEvent& e) { delete_selected(false, e); });
     for (auto* f : {profile_notes_, hole_notes_})
         f->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
             if (!loading_)
@@ -898,7 +927,7 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     observation->Add(monitor_, 0, wxALL, 4);
     activity_ = label(box, observation, "Observation off.");
     label(box, observation, "Test Beep destination");
-    destination_test_ = new wxChoice(box, wxID_ANY);
+    destination_test_ = new ThemedChoice(box, wxID_ANY);
     observation->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
     destination_test_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         present(presentation::Message::BeepReady);

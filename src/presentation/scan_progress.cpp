@@ -108,6 +108,11 @@ std::string ScanProgressText::consume(const scanner::Progress& event) {
                " ms";
     if (phase == "deep_checkpoint_begin")
         return prefix + "Saving final evidence";
+    if (phase == "deep_summary_refresh")
+        return prefix + "Updating device summaries" +
+               (string(details, "phase") == "end"
+                    ? " — " + std::to_string(details.value("elapsed_ms", 0LL)) + " ms"
+                    : "");
     if (phase == "deep_device_started")
         return prefix + "Deep tests started";
     if (phase == "deep_device_finished")

@@ -66,3 +66,55 @@ devices and 244 typed format/mode observations, finds 36 active pairs with exact
 common tuples, and saves/reloads a prepared profile without hardware access.
 Native Windows GUI smoke and visual assessment remain CI/Windows checks; a
 cross-build is not evidence that those native tests ran here.
+
+## Ten-item polish revision and owner-provided PR #7 art
+
+All ten pending items are implemented in this revision:
+
+1. Delete on the focused Profiles/Holes list dispatches the same context-menu
+   action, including default-No confirmation and active/pending profile guards.
+   Text editors retain normal text deletion; modifier shortcuts are untouched.
+2. Shared owner painting pairs selection text/background for profile/hole lists,
+   choices and editable combos, including popup and disabled states. Devices and
+   those lists share blue selections, with white selected text in dark mode;
+   high contrast retains system colors. Disabled combo edit surfaces stay themed.
+3. Deep-limit hover text explains purpose and consequences. Field units now say
+   `sec.` and adjacent title/control rows retain uniform sizing.
+4. Scan status reserves three text lines with fixed height; changing details does
+   not relayout the console. Full visible status is also available as a tooltip.
+5. Native progress gauges use one explicit green fill in dark/light themes;
+   high contrast keeps Windows styling.
+6. Devices/Profiles have Export/Import bundle controls. Saved profiles include
+   their hole configurations and referenced device records. Imports preview,
+   preserve IDs/notes/extensions, reject conflicts, recheck external edits and
+   commit profile references last. See CONFIGURATION_BUNDLES.md for the engine
+   handoff, versioning, bounds and failure contract. No routing is started.
+7. Advanced directional panes use `wxCP_NO_TLW_RESIZE`; their content scrolls
+   inside the existing editor instead of resizing the top-level window.
+8. Authoritative device/attempt start and finish checkpoints remain durable.
+   Derived capture/playback summaries regenerate once per device run, rather
+   than per attempt. Direct checkpoint callers retain their old default behavior.
+   Summary refresh time is journaled separately. This reduces redundant summary
+   work; a new physical scan is still needed to measure wall-time improvement.
+9. `pcm_s24_in_32` is projected as a distinct supported tuple and described as
+   24-bit integer PCM in a 32-bit container, including exact valid/container bits.
+10. Save device is vertically centered beside the name input; the label sits
+    above their common row.
+
+Owner-provided PR #7 (`feef4b0`) is incorporated: 97 idle-padding frames removed
+from 34 sequences, 699 approved operating PNGs retained, with manifests,
+provenance, native RGBA reference and distribution allowlist updated together.
+Retained image bytes/timing and authored playback flags are preserved. Existing
+loop-count, continuous-loop, hold, reduced-motion and interruption policies remain
+in force. There is no additional manual pruning or image editing in this revision.
+
+Smart App Control/signing remains deferred. Production O-004/O-006 remain open.
+
+Validation: all 164 portable CTest cases pass in Debug and Release. The full
+Windows x64 cross-build, executable icon integrity, three PR #7 padding/art
+regression tests and the exact 729-file installed-runtime inventory pass. Bundle
+fixtures exercise Unicode names and explicit extended Windows paths; actual
+native Windows execution remains a CI check. Native smoke now checks declined
+Delete confirmations, fixed status/log geometry and unchanged top-level size
+when toggling Advanced panes. Dark/light popup/disabled painting still requires
+Windows visual assessment; cross-compilation does not prove those native checks.

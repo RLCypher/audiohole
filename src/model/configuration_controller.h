@@ -40,6 +40,7 @@ class ConfigurationController final : public Controller {
     Result scanner_action(const ScannerActionRequest&) override;
 
   private:
+    bool bundle_job_ = false;
     std::unique_ptr<ConfigurationPersistence> persistence_;
     std::unique_ptr<ScannerService> scanner_;
     std::vector<Endpoint> scanner_devices_;

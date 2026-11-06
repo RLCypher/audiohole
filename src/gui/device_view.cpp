@@ -37,6 +37,12 @@ wxString device_status(const Endpoint& e) {
 void Frame::build_devices() {
     auto* page = new wxPanel(notebook_);
     auto* layout = new wxBoxSizer(wxVERTICAL);
+    auto* bundles = new wxBoxSizer(wxHORIZONTAL);
+    scanner_actions_.push_back(
+        button(page, bundles, "Export devices…", [this] { bundle_dialog(false, false); }));
+    scanner_actions_.push_back(
+        button(page, bundles, "Import devices…", [this] { bundle_dialog(false, true); }));
+    layout->Add(bundles, 0, wxEXPAND);
     device_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                            wxSP_LIVE_UPDATE | wxSP_3D);
     device_columns_->SetName("Resize device column width");
@@ -91,10 +97,11 @@ void Frame::build_devices() {
     browser->SetSizer(left);
     auto* details = new wxPanel(device_columns_);
     auto* right = new wxBoxSizer(wxVERTICAL);
+    label(details, right, "Display name");
     auto* name_row = new wxBoxSizer(wxHORIZONTAL);
-    auto* name_column = new wxBoxSizer(wxVERTICAL);
-    device_name_ = field(details, name_column, "Display name");
-    name_row->Add(name_column, 1, wxEXPAND);
+    device_name_ = new wxTextCtrl(details, wxID_ANY);
+    device_name_->SetName("Display name");
+    name_row->Add(device_name_, 1, wxALIGN_CENTER_VERTICAL | wxALL, 3);
     device_save_ = button(details, name_row, "Save device", [this] {
         if (const auto* e = endpoint(controller_->snapshot(), device_id_)) {
             auto edit = *e;
@@ -138,7 +145,7 @@ void Frame::build_devices() {
     notes_panel->SetSizer(notes_layout);
     auto* evidence_panel = new wxPanel(device_rows_);
     auto* evidence_layout = new wxBoxSizer(wxVERTICAL);
-    device_view_ = new wxChoice(evidence_panel, wxID_ANY);
+    device_view_ = new ThemedChoice(evidence_panel, wxID_ANY);
     for (const auto* view : inspection_view_names)
         device_view_->Append(text(view));
     device_view_->SetSelection(0);

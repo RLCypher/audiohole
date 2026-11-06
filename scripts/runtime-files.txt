@@ -1,3 +1,4 @@
+CONFIGURATION_BUNDLES.md
 MANUAL_GUI_CHECKLIST.md
 assets/branding/audiohole-logo.png
 assets/branding/audiohole.ico

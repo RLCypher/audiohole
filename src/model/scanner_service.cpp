@@ -1,6 +1,7 @@
 #include "model/scanner_service.h"
 #include "audiohole/scoped_scan.hpp"
 #include "audiohole/test_suite.hpp"
+#include "model/configuration_bundle.h"
 #include "presentation/scan_progress.h"
 #include <algorithm>
 #include <atomic>
@@ -45,9 +46,10 @@ std::string descriptor(const Json& format) {
         sample == "float32"          ? std::string("32-bit float")
         : sample == "pcm_s16"        ? std::string("16-bit integer PCM")
         : sample == "pcm_s24_packed" ? std::string("24-bit integer PCM (packed)")
-        : sample == "pcm_s32" ? value(field(format, "valid_bits")) + "-bit integer PCM in a " +
-                                    value(field(format, "container_bits")) + "-bit container"
-                              : sample;
+        : sample == "pcm_s32" || sample == "pcm_s24_in_32"
+            ? value(field(format, "valid_bits")) + "-bit integer PCM in a " +
+                  value(field(format, "container_bits")) + "-bit container"
+            : sample;
     return value(field(format, "sample_rate_hz")) + " Hz / " +
            value(field(format, "channel_count")) + " channels / " + representation;
 }
@@ -137,7 +139,8 @@ std::optional<Format> routing_format(const Json& descriptor) {
         f.channels = number("channel_count", 1, 256);
         f.representation = descriptor.at("sample_format").get<std::string>();
         if (f.representation != "float32" && f.representation != "pcm_s16" &&
-            f.representation != "pcm_s24_packed" && f.representation != "pcm_s32")
+            f.representation != "pcm_s24_packed" && f.representation != "pcm_s32" &&
+            f.representation != "pcm_s24_in_32")
             return {};
         WaveFormat wave;
         wave.container_bits = number("container_bits", 8, 64);
@@ -368,7 +371,35 @@ struct ScannerService::Impl {
                 final.result = "interrupted";
             else if (job.scan)
                 run_scan(job, store, final);
-            else if (job.action.kind == ScannerActionKind::SetHidden) {
+            else if (job.action.kind == ScannerActionKind::ExportDevices ||
+                     job.action.kind == ScannerActionKind::ExportProfiles) {
+                const auto result = export_configuration_bundle(
+                    options.portable_root, options.local_root,
+                    job.action.kind == ScannerActionKind::ExportDevices ? BundleKind::Devices
+                                                                        : BundleKind::Profiles,
+                    job.action.output);
+                if (!result.ok)
+                    throw std::runtime_error(result.detail);
+                final.detail = result.detail;
+            } else if (job.action.kind == ScannerActionKind::InspectDevices ||
+                       job.action.kind == ScannerActionKind::InspectProfiles) {
+                const auto result = inspect_configuration_bundle(
+                    options.portable_root, options.local_root,
+                    job.action.kind == ScannerActionKind::InspectDevices ? BundleKind::Devices
+                                                                         : BundleKind::Profiles,
+                    job.action.output, final.import_plan);
+                if (!result.ok)
+                    throw std::runtime_error(result.detail);
+                final.detail = result.detail;
+            } else if (job.action.kind == ScannerActionKind::ImportBundle) {
+                if (!job.action.confirmed || !job.action.import_plan)
+                    throw std::runtime_error("Import requires a confirmed preview");
+                const auto result = import_configuration_bundle(*job.action.import_plan, job.stop);
+                if (!result.ok)
+                    throw std::runtime_error(result.detail);
+                final.detail = result.detail;
+                final.profiles_imported = true;
+            } else if (job.action.kind == ScannerActionKind::SetHidden) {
                 store.set_hidden(job.action.logical_id, job.action.hidden);
                 final.detail = job.action.hidden
                                    ? "Device hidden; routing and saved references are unchanged."

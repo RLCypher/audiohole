@@ -1,4 +1,5 @@
 #include "gui/device_list.h"
+#include "gui/palette.h"
 #include <windows.h>
 #include <wx/dc.h>
 #include <wx/settings.h>
@@ -27,6 +28,12 @@ class StatusDot final : public wxDataViewCustomRenderer {
     bool Render(wxRect rect, wxDC* dc, int state) override {
         if (status_.empty())
             return true;
+        if (state & wxDATAVIEW_CELL_SELECTED) {
+            dc->SetPen(*wxTRANSPARENT_PEN);
+            dc->SetBrush(
+                wxBrush(palette::selection(GetView()->GetBackgroundColour().GetLuminance() < 0.5)));
+            dc->DrawRectangle(rect);
+        }
         wxColour colour = status_ == "Available"     ? wxColour(40, 170, 105)
                           : status_ == "Unavailable" ? wxColour(145, 154, 168)
                           : status_ == "Unusable"    ? wxColour(230, 70, 70)
@@ -34,10 +41,15 @@ class StatusDot final : public wxDataViewCustomRenderer {
         HIGHCONTRASTW contrast{};
         contrast.cbSize = sizeof(contrast);
         if (SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
-            (contrast.dwFlags & HCF_HIGHCONTRASTON))
+            (contrast.dwFlags & HCF_HIGHCONTRASTON)) {
+            if (state & wxDATAVIEW_CELL_SELECTED) {
+                dc->SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
+                dc->DrawRectangle(rect);
+            }
             colour = wxSystemSettings::GetColour(state & wxDATAVIEW_CELL_SELECTED
                                                      ? wxSYS_COLOUR_HIGHLIGHTTEXT
                                                      : wxSYS_COLOUR_WINDOWTEXT);
+        }
         const auto glyph = wxString::FromUTF8("●");
         const auto size = dc->GetTextExtent(glyph);
         dc->SetTextForeground(colour);
@@ -76,6 +88,12 @@ class DeviceName final : public wxDataViewCustomRenderer {
             (contrast.dwFlags & HCF_HIGHCONTRASTON);
         const bool selected = state & wxDATAVIEW_CELL_SELECTED;
         const bool dark = GetView()->GetBackgroundColour().GetLuminance() < 0.5;
+        if (selected) {
+            dc->SetPen(*wxTRANSPARENT_PEN);
+            dc->SetBrush(wxBrush(system ? wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)
+                                        : palette::selection(dark)));
+            dc->DrawRectangle(rect);
+        }
         dc->SetTextForeground(system             ? wxSystemSettings::GetColour(selected
                                                                                    ? wxSYS_COLOUR_HIGHLIGHTTEXT
                                                                                    : wxSYS_COLOUR_WINDOWTEXT)

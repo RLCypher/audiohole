@@ -130,7 +130,11 @@ class DeviceStore {
   void edit_metadata(const std::string& logical_id, const std::string& display_name,
     const std::string& notes, const std::string& expected_path, const std::string& expected_bytes);
   std::vector<ProbeTarget> probe_targets();
-  void checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal);
+  void checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal,
+    bool refresh_summaries = true);
+  // Derived views are regenerated once per device run; authoritative attempt and
+  // device records remain durably checkpointed before/after each worker.
+  void refresh_probe_summaries();
   IdentityResolver identity_resolver();
  private:
   fs::path portable_root_;

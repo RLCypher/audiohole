@@ -2,9 +2,119 @@
 #include <windows.h>
 #include <wx/dcbuffer.h>
 #include <wx/filename.h>
+#include <wx/settings.h>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
+namespace {
+bool contrast_active() {
+    HIGHCONTRASTW settings{};
+    settings.cbSize = sizeof(settings);
+    return SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(settings), &settings, 0) &&
+           (settings.dwFlags & HCF_HIGHCONTRASTON);
+}
+bool paint_selection(wxWindow& control, const wxString& text, WXDRAWITEMSTRUCT* item) {
+    const auto& draw = *reinterpret_cast<DRAWITEMSTRUCT*>(item);
+    const bool selected = (draw.itemState & ODS_SELECTED) != 0;
+    const bool disabled = (draw.itemState & ODS_DISABLED) != 0 || !control.IsEnabled();
+    const bool dark = control.GetBackgroundColour().GetLuminance() < 0.5;
+    const bool system = contrast_active();
+    const auto background = system ? wxSystemSettings::GetColour(selected ? wxSYS_COLOUR_HIGHLIGHT
+                                                                          : wxSYS_COLOUR_WINDOW)
+                            : selected ? palette::selection(dark)
+                                       : control.GetBackgroundColour();
+    const auto foreground =
+        system             ? wxSystemSettings::GetColour(selected ? wxSYS_COLOUR_HIGHLIGHTTEXT
+                                                                  : wxSYS_COLOUR_WINDOWTEXT)
+        : disabled         ? wxColour(dark ? 155 : 105, dark ? 166 : 105, dark ? 179 : 105)
+        : selected && dark ? *wxWHITE
+                           : control.GetForegroundColour();
+    const auto saved = SaveDC(draw.hDC);
+    auto rgb = [](const wxColour& c) { return RGB(c.Red(), c.Green(), c.Blue()); };
+    const auto brush = CreateSolidBrush(rgb(background));
+    FillRect(draw.hDC, &draw.rcItem, brush);
+    DeleteObject(brush);
+    SetBkMode(draw.hDC, TRANSPARENT);
+    SetTextColor(draw.hDC, rgb(foreground));
+    auto rect = draw.rcItem;
+    rect.left += control.FromDIP(3);
+    DrawTextW(draw.hDC, text.wc_str(), static_cast<int>(text.length()), &rect,
+              DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
+    if (draw.itemState & ODS_FOCUS)
+        DrawFocusRect(draw.hDC, &draw.rcItem);
+    RestoreDC(draw.hDC, saved);
+    return true;
+}
+bool measure_selection(wxWindow& control, WXMEASUREITEMSTRUCT* item) {
+    auto* measure = reinterpret_cast<MEASUREITEMSTRUCT*>(item);
+    measure->itemHeight = static_cast<UINT>(control.GetCharHeight() + control.FromDIP(6));
+    return true;
+}
+} // namespace
+ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
+    Create(parent, id);
+}
+WXDWORD ThemedChoice::MSWGetStyle(long style, WXDWORD* extra) const {
+    return wxChoice::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+}
+bool ThemedChoice::MSWOnMeasure(WXMEASUREITEMSTRUCT* item) {
+    return measure_selection(*this, item);
+}
+bool ThemedChoice::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
+    const auto id = reinterpret_cast<DRAWITEMSTRUCT*>(item)->itemID;
+    return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+}
+WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||
+         message == WM_CTLCOLORLISTBOX) &&
+        GetBackgroundColour().IsOk()) {
+        const auto background = GetBackgroundColour();
+        const auto foreground = IsEnabled() ? GetForegroundColour()
+                                : contrast_active()
+                                    ? wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)
+                                    : wxColour(150, 160, 175);
+        input_brush_ = wxBrush(background);
+        const auto dc = reinterpret_cast<HDC>(wparam);
+        SetBkColor(dc, RGB(background.Red(), background.Green(), background.Blue()));
+        SetTextColor(dc, RGB(foreground.Red(), foreground.Green(), foreground.Blue()));
+        return reinterpret_cast<WXLRESULT>(input_brush_.GetResourceHandle());
+    }
+    return wxChoice::MSWWindowProc(message, wparam, lparam);
+}
+ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
+    Create(parent, id);
+}
+WXDWORD ThemedCombo::MSWGetStyle(long style, WXDWORD* extra) const {
+    return wxComboBox::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+}
+bool ThemedCombo::MSWOnMeasure(WXMEASUREITEMSTRUCT* item) {
+    return measure_selection(*this, item);
+}
+bool ThemedCombo::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
+    const auto id = reinterpret_cast<DRAWITEMSTRUCT*>(item)->itemID;
+    return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+}
+WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||
+         message == WM_CTLCOLORLISTBOX) &&
+        GetBackgroundColour().IsOk()) {
+        const auto background = GetBackgroundColour();
+        const auto foreground = IsEnabled() ? GetForegroundColour()
+                                : contrast_active()
+                                    ? wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)
+                                    : wxColour(150, 160, 175);
+        input_brush_ = wxBrush(background);
+        const auto dc = reinterpret_cast<HDC>(wparam);
+        SetBkColor(dc, RGB(background.Red(), background.Green(), background.Blue()));
+        SetTextColor(dc, RGB(foreground.Red(), foreground.Green(), foreground.Blue()));
+        return reinterpret_cast<WXLRESULT>(input_brush_.GetResourceHandle());
+    }
+    return wxComboBox::MSWWindowProc(message, wparam, lparam);
+}
+bool ThemedList::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
+    const auto id = reinterpret_cast<DRAWITEMSTRUCT*>(item)->itemID;
+    return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+}
 namespace {
 void bind_feedback(wxWindow* button) {
     button->Bind(wxEVT_ENTER_WINDOW, [button](wxMouseEvent& event) {
@@ -171,6 +281,18 @@ wxString button_help(const wxString& title) {
         {"Revert", "Discard unsaved edits and reload the saved profile after confirmation."},
         {"Save device",
          "Update the display name and notes. Windows name and logical identity remain unchanged."},
+        {"Export devices…",
+         "Export saved device records, identities, notes, capabilities and available probe "
+         "histories as a portable ZIP. Local Windows bindings are excluded."},
+        {"Import devices…",
+         "Preview a device bundle before adding records. Conflicting identities or filenames are "
+         "not overwritten; imported devices need an Update scan to resolve local bindings."},
+        {"Export profiles…",
+         "Export all saved profiles and hole settings with their referenced device records. Save "
+         "pending edits first; no runtime or startup authorization is exported."},
+        {"Import profiles…",
+         "Preview profiles and referenced devices before importing. Stable IDs, notes and settings "
+         "are retained; conflicting existing records are never silently replaced."},
         {"Toggle availability",
          "Change device availability in this evaluation scenario to exercise reconnection."},
         {"Start scan", "Scan the selected scope. Advanced testing requests confirmation first."},

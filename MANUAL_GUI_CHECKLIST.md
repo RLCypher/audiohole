@@ -444,3 +444,26 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Compare a real scan bundle before/after: checkpoint timings, complete raw stage
   histories and external notes/extensions must survive. Measure actual wall time;
   portable tests do not establish a hardware speedup or stronger verification.
+
+## Bundle and selection revision checks
+
+- In Test Mode, export devices and profiles. Open the ZIPs and verify readable
+  manifest/device/configuration JSON, stable IDs, notes and exact formats. Import
+  into a fresh Test root, review the default-No preview, confirm, restart and
+  inspect the restored profiles/holes. Import must never start routing or copy
+  local Windows bindings. A conflicting local edit must be reported and retained.
+- Check Profiles/Holes selection and every dropdown popup in Dark, Light and Follow
+  System, including selected/unselected/disabled rows and high contrast. Selected
+  dark rows use white text on blue. Empty source/destination edit surfaces stay
+  dark. Type/search/select endpoints and navigate all choices by keyboard.
+- With Profiles or Holes focused, press Delete and decline confirmation: no item
+  is removed. Confirm a staged hole removal separately; Save commits it. Delete
+  in Notes remains text editing. Active/pending profile deletion stays guarded.
+- Expand/collapse Advanced directional settings at compact size and scaled DPI:
+  the window size stays fixed and the right-hand editor scrolls as needed.
+- Scan status reserves three text lines: short/long details do not move or resize
+  the log. Dark/light progress fill is green. Deep-limit titles say sec. and hover
+  text explains what each limit controls. Name input and Save device share a row.
+- Exercise PR #7 reactions with finite loops, hold-final-frame and continuous
+  loops, then interrupt with a new event, warning, sleep and personality switch.
+  Expressions should retain their expressive final pose rather than idle padding.

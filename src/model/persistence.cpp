@@ -345,6 +345,44 @@ TestJsonPersistence::TestJsonPersistence(std::filesystem::path file)
     impl_->file = std::move(file);
 }
 TestJsonPersistence::~TestJsonPersistence() = default;
+Result validate_test_document(const std::string& bytes, ConfigurationRecords& output) {
+    try {
+        require(bytes.size() <= maximum_document);
+        output = decode(parse(bytes));
+        return {true, "Configuration validated."};
+    } catch (const std::exception& e) {
+        return {false, std::string("Invalid Test configuration: ") + e.what()};
+    }
+}
+Result merge_test_profiles(const std::optional<std::string>& existing, const std::string& incoming,
+                           std::string& output) {
+    try {
+        require(incoming.size() <= maximum_document);
+        auto added = parse(incoming);
+        auto current = existing ? parse(*existing) : encode(ConfigurationRecords{});
+        (void)decode(added);
+        (void)decode(current);
+        require(added.at("devices").empty());
+        for (const auto& item : added.at("profiles")) {
+            auto found =
+                std::find_if(current["profiles"].begin(), current["profiles"].end(),
+                             [&](const auto& old) { return old.at("id") == item.at("id"); });
+            if (found != current["profiles"].end()) {
+                if (nlohmann::json(*found) != nlohmann::json(item))
+                    return {false, "Conflicting profile: " + string(item, "display_name") +
+                                       ". Existing profile was not overwritten."};
+            } else
+                current["profiles"].push_back(item);
+        }
+        current["schema_version"] = 2;
+        (void)decode(current); // Also detects hole IDs colliding across profiles.
+        output = current.dump(2) + "\n";
+        require(output.size() <= maximum_document);
+        return {true, "Profiles validated; existing identities retained."};
+    } catch (const std::exception& e) {
+        return {false, std::string("Profile import validation failed: ") + e.what()};
+    }
+}
 Result TestJsonPersistence::load(ConfigurationRecords& output) {
     try {
         impl_->ready = false;

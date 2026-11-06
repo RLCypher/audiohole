@@ -25,6 +25,8 @@ struct ScannerUpdate {
     int percent = -1;
     std::string phase, result, detail, session_path;
     std::vector<Endpoint> devices;
+    std::shared_ptr<const BundleImportPlan> import_plan{};
+    bool profiles_imported = false;
 };
 // One owned worker, one operation at a time. Public calls are control-thread only;
 // producers never touch widgets/controller state. Progress is bounded; full rich

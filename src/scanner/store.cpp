@@ -697,7 +697,26 @@ IdentityResolver DeviceStore::identity_resolver() {
   };
 }
 
-void DeviceStore::checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal) {
+namespace {
+void write_probe_summaries(AtomicWriter& writer, const fs::path& portable, const fs::path& local, const std::vector<Record>& records) {
+  const auto bindings = probe_bindings(local);
+  for (const auto* direction : {"capture", "render"}) {
+    Json summary{{"generated", true}, {"source", "individual_device_records"}, {"schema_version", 2}, {"devices", Json::array()}};
+    for (const auto& record : records) {
+      if (text(record.data["identity"], "direction") != direction) continue;
+      auto item = record.data;
+      const auto id = text(item, "logical_id");
+      item["availability"] = bindings.contains(id) ? Json(text(bindings[id], "state")) : status("unknown");
+      summary["devices"].push_back(std::move(item));
+    }
+    const auto path = portable / "devices" /
+      (std::string(direction) == "capture" ? "recording_devices.json" : "playback_devices.json");
+    save(writer, path, summary, detail::read_optional(path));
+  }
+}
+}
+
+void DeviceStore::checkpoint_probe(const std::string& logical_id, const Json& attempt, bool terminal, bool refresh_summaries) {
   const auto attempt_id = text(attempt, "attempt_id");
   if (attempt_id.empty() || safe_filename(attempt_id) != attempt_id || text(attempt, "logical_id") != logical_id ||
       attempt.contains("endpoint_id")) throw std::runtime_error("Invalid portable probe checkpoint");
@@ -733,20 +752,15 @@ void DeviceStore::checkpoint_probe(const std::string& logical_id, const Json& at
   }
   save(*writer_, history_path, attempt, detail::read_optional(history_path));
   save(*writer_, match->path, ordered_record(data), match->original);
-  if (!terminal) return;
-  const auto bindings = probe_bindings(local_root_);
-  for (const auto* direction : {"capture", "render"}) {
-    Json summary{{"generated", true}, {"source", "individual_device_records"}, {"schema_version", 2}, {"devices", Json::array()}};
-    for (const auto& record : records) {
-      if (text(record.data["identity"], "direction") != direction) continue;
-      auto item = record.data;
-      const auto id = text(item, "logical_id");
-      item["availability"] = bindings.contains(id) ? Json(text(bindings[id], "state")) : status("unknown");
-      summary["devices"].push_back(std::move(item));
-    }
-    const auto path = portable_root_ / "devices" /
-      (std::string(direction) == "capture" ? "recording_devices.json" : "playback_devices.json");
-    save(*writer_, path, summary, detail::read_optional(path));
-  }
+  if (!terminal || !refresh_summaries) return;
+  // Keep direct callers' historical behavior. Deep scans defer these derived
+  // snapshots to the device boundary instead of rewriting both on every attempt.
+  write_probe_summaries(*writer_, portable_root_, local_root_, records);
+}
+void DeviceStore::refresh_probe_summaries() {
+  detail::StoreLock portable_lock(portable_root_);
+  detail::StoreLock local_lock(local_root_);
+  const auto records = probe_records(portable_root_);
+  write_probe_summaries(*writer_, portable_root_, local_root_, records);
 }
 }  // namespace audiohole::scanner

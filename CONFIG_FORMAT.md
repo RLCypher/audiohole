@@ -1912,3 +1912,14 @@ prepared request for a future engine. See
 and [the Test example](docs/test-profile-example.json). Production O-004/O-006,
 endpoint-specific negotiation and final file layout remain unresolved. No load-time
 or destructive production migration is introduced.
+
+### Provisional device/profile transfer bundles
+
+Owner-authorized Test bundle transport v1 wraps the existing canonical Test
+configuration (reader 1/2) and scanner device-v2 records. It preserves identities,
+notes, hidden state and unknown fields; local Windows bindings and startup
+permission are excluded. Imports preview and reject conflicting records, then
+atomically commit profile references after new device records. This is not a final
+production schema or a cross-file transaction. See
+[CONFIGURATION_BUNDLES.md](CONFIGURATION_BUNDLES.md) for exact contents and failure
+behavior, and the control-side audio-engine handoff boundary.

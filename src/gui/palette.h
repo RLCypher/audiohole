@@ -14,4 +14,7 @@ inline wxColour charcoal() {
 inline wxColour input() {
     return {21, 35, 43};
 }
+inline wxColour selection(bool dark) {
+    return dark ? wxColour(18, 54, 78) : wxColour(204, 232, 255);
+}
 } // namespace audiohole::gui::palette

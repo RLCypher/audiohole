@@ -155,7 +155,7 @@ void to_json(Json& j, const DeepReport& r) {
     {"verification_scope", "bounded_buffer_processing_only"}, {"signal_verification", "not_tested"},
     {"diagnostics", r.diagnostics}, {"attempts", r.attempts}};
 }
-DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTarget& target,
+static DeepReport run_deep_scan_impl(DeviceStore& store, ProbeRunner& runner, const ProbeTarget& target,
                          const DeepLimits& limits, bool consent, std::stop_token stop, const ProgressSink& progress) {
   DeepReport report; report.logical_id = target.logical_id;
   try {
@@ -188,7 +188,7 @@ DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTar
       attempt["stages"] = Json::array();
       const auto attempt_started = std::chrono::steady_clock::now();
       if (progress) progress({"deep_attempt_preparing", target.endpoint_id, report.attempted, candidates.size(), probe_job_json(job)});
-      store.checkpoint_probe(target.logical_id, attempt, false);
+      store.checkpoint_probe(target.logical_id, attempt, false, false);
       const auto worker_started = std::chrono::steady_clock::now();
       attempt["initial_checkpoint_ms"] = std::chrono::duration_cast<std::chrono::milliseconds>(worker_started - attempt_started).count();
       ++report.attempted;
@@ -239,7 +239,7 @@ DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTar
       attempt["finished_utc"] = utc_now();
       const auto checkpoint_started = std::chrono::steady_clock::now();
       if (progress) progress({"deep_checkpoint_begin", target.endpoint_id, report.attempted, candidates.size(), Json::object()});
-      store.checkpoint_probe(target.logical_id, attempt, true);
+      store.checkpoint_probe(target.logical_id, attempt, true, false);
       if (progress) progress({"deep_checkpoint_finished", target.endpoint_id, report.attempted, candidates.size(),
         {{"checkpoint_ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - checkpoint_started).count()},
          {"attempt_wall_ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - attempt_started).count()}}});
@@ -267,6 +267,23 @@ DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTar
   return report;
 }
 
+DeepReport run_deep_scan(DeviceStore& store, ProbeRunner& runner, const ProbeTarget& target,
+                         const DeepLimits& limits, bool consent, std::stop_token stop, const ProgressSink& progress) {
+  auto report = run_deep_scan_impl(store, runner, target, limits, consent, stop, progress);
+  if (report.attempted) {
+    const auto started = std::chrono::steady_clock::now();
+    try {
+      if (progress) progress({"deep_summary_refresh", target.endpoint_id, 0, 0, {{"phase", "begin"}}});
+      store.refresh_probe_summaries();
+      if (progress) progress({"deep_summary_refresh", target.endpoint_id, 0, 0,
+        {{"phase", "end"}, {"elapsed_ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count()}}});
+    } catch (const std::exception& error) {
+      if (report.result == "completed") report.result = "partially_completed";
+      report.diagnostics.push_back({"summary_refresh_failed", error.what(), target.logical_id, {}});
+    }
+  }
+  return report;
+}
 void to_json(Json& j, const DeepBatchReport& r) {
   j = {{"result", r.result}, {"scope", "all_active_endpoints"}, {"devices_selected", r.devices.size()},
     {"devices_processed", 0}, {"devices_completed", 0}, {"devices_not_tested", 0},

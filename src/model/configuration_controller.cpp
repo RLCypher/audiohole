@@ -53,6 +53,8 @@ Result ConfigurationController::unavailable(const std::string& operation) {
     return {false, detail};
 }
 Result ConfigurationController::commit(ConfigurationRecords records, const std::string& detail) {
+    if (bundle_job_ && state_.scanner.busy)
+        return {false, "Wait for the configuration bundle operation before saving."};
     if (!loaded_)
         return {false, edit_error_};
     // Scanner device-v2 records remain authoritative in their own files. Never
@@ -229,6 +231,7 @@ void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, con
         state_.scanner.generation = generation;
         state_.scanner.busy = state_.scanning = scanner_job_is_scan_ = true;
         state_.scanner.result = "running";
+        state_.scanner.import_plan.reset();
         state_.scanner.phase = "starting";
         state_.scan_percent = -1;
         event("scan-start", deep ? "Deep scan started with explicit consent and bounded limits."
@@ -259,12 +262,19 @@ Result ConfigurationController::scanner_action(const ScannerActionRequest& reque
         state_.scanner.generation = generation;
         state_.scanner.busy = true;
         scanner_job_is_scan_ = false;
+        bundle_job_ = request.kind == ScannerActionKind::ExportDevices ||
+                      request.kind == ScannerActionKind::ExportProfiles ||
+                      request.kind == ScannerActionKind::InspectDevices ||
+                      request.kind == ScannerActionKind::InspectProfiles ||
+                      request.kind == ScannerActionKind::ImportBundle;
+        state_.scanner.import_plan.reset();
         state_.scanner.result = "running";
         state_.scanner.phase =
-            request.kind == ScannerActionKind::ClearInventory ? "clearing device scan information"
-            : request.kind == ScannerActionKind::EditMetadata ? "saving device metadata"
-            : request.kind == ScannerActionKind::Export       ? "exporting"
-            : request.kind == ScannerActionKind::SetHidden    ? "saving visibility"
+            bundle_job_                                         ? "configuration bundle"
+            : request.kind == ScannerActionKind::ClearInventory ? "clearing device scan information"
+            : request.kind == ScannerActionKind::EditMetadata   ? "saving device metadata"
+            : request.kind == ScannerActionKind::Export         ? "exporting"
+            : request.kind == ScannerActionKind::SetHidden      ? "saving visibility"
             : request.kind == ScannerActionKind::RefreshAvailability ? "refreshing availability"
                                                                      : "loading inventory";
         ++state_.revision;
@@ -306,6 +316,25 @@ void ConfigurationController::advance(int) {
         state_.scanner.completed_generation = update.generation;
         state_.scanner.result = update.result;
         state_.scanner.session_path = update.session_path;
+        state_.scanner.import_plan = std::move(update.import_plan);
+        if (update.profiles_imported) {
+            ConfigurationRecords loaded;
+            const auto result = persistence_->load(loaded);
+            if (result.ok) {
+                state_.profiles = std::move(loaded.profiles);
+                state_.endpoints = std::move(loaded.devices);
+                for (const auto& saved : state_.profiles) {
+                    used_ids_.insert(saved.id);
+                    for (const auto& hole : saved.holes)
+                        used_ids_.insert(hole.id);
+                }
+            } else {
+                loaded_ = false;
+                edit_error_ = result.detail;
+                state_.scanner.result = "failed";
+                event("configuration-save-failed", result.detail);
+            }
+        }
         if (update.inventory_valid) {
             scanner_devices_ = std::move(update.devices);
             merge_scanner_devices();

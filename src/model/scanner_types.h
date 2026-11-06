@@ -2,9 +2,11 @@
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <string>
 
 namespace audiohole {
+struct BundleImportPlan;
 // Provisional GUI scan limits, revalidated by the scanner before any Deep worker.
 // These are inspection requests, never routing preferences or capability claims.
 struct ScanOptions {
@@ -20,7 +22,12 @@ enum class ScannerActionKind {
     SetHidden,
     Export,
     EditMetadata,
-    ClearInventory
+    ClearInventory,
+    ExportDevices,
+    ExportProfiles,
+    InspectDevices,
+    InspectProfiles,
+    ImportBundle
 };
 struct ScannerActionRequest {
     ScannerActionKind kind = ScannerActionKind::Reload;
@@ -30,6 +37,7 @@ struct ScannerActionRequest {
     std::filesystem::path output;
     std::string operating_context;
     std::string display_name, notes, expected_path, expected_bytes;
+    std::shared_ptr<const BundleImportPlan> import_plan{};
 };
 inline constexpr std::array<const char*, 9> inspection_view_names{
     "Overview",     "Identity",    "Reported formats", "Deep evidence", "Driver",
@@ -48,5 +56,6 @@ struct ScannerStatus {
     bool busy = false, available = false;
     std::uint64_t generation = 0, completed_generation = 0, inventory_revision = 0;
     std::string phase, result = "unavailable", detail, session_path;
+    std::shared_ptr<const BundleImportPlan> import_plan{};
 };
 } // namespace audiohole

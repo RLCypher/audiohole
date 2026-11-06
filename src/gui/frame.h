@@ -213,8 +213,10 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool device_dirty_ = false, populating_devices_ = false;
     std::uint64_t device_save_generation_ = 0;
     bool scanner_clock_active_ = false;
+    std::uint64_t bundle_generation_ = 0;
+    bool bundle_inspecting_ = false, bundle_importing_ = false;
     std::chrono::steady_clock::time_point scanner_clock_started_{};
-    wxStaticText* scan_state_{};
+    wxTextCtrl* scan_state_{};
     wxChoice* deep_mode_{};
     wxSpinCtrl* deep_attempts_{};
     SecondsField *deep_duration_{}, *deep_attempt_timeout_{}, *deep_device_timeout_{},
@@ -282,6 +284,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void device_context(DeviceList*, const std::vector<std::string>&, wxContextMenuEvent&);
     void request_scan(bool deep, ScanScope, const std::string&);
     void scanner_action(const ScannerActionRequest&);
+    void bundle_dialog(bool profiles, bool importing);
     // Called on page change, hide/minimize, Stop, and shutdown. No sample ownership.
     void end_observation();
     void present(presentation::Message);

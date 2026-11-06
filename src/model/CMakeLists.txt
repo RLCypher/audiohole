@@ -1,5 +1,5 @@
-add_library(audiohole_model STATIC ../presentation/scan_text.cpp ../presentation/scan_progress.cpp ../presentation/avatar_host.cpp controller.cpp application_controller.cpp persistence.cpp configuration_controller.cpp scanner_service.cpp build_preferences.cpp ../presentation/text_layout.cpp ../presentation/messages.cpp ../presentation/packages.cpp ../presentation/icon_outline.cpp ../presentation/sleep_commentary.cpp)
-target_link_libraries(audiohole_model PUBLIC audiohole::avatar audiohole_scanner PRIVATE audiohole_scanner_export nlohmann_json::nlohmann_json)
+add_library(audiohole_model STATIC ../presentation/scan_text.cpp ../presentation/scan_progress.cpp ../presentation/avatar_host.cpp controller.cpp application_controller.cpp persistence.cpp configuration_controller.cpp scanner_service.cpp configuration_bundle.cpp build_preferences.cpp ../presentation/text_layout.cpp ../presentation/messages.cpp ../presentation/packages.cpp ../presentation/icon_outline.cpp ../presentation/sleep_commentary.cpp)
+target_link_libraries(audiohole_model PUBLIC audiohole::avatar audiohole_scanner PRIVATE audiohole_scanner_export audiohole_zip nlohmann_json::nlohmann_json)
 target_include_directories(audiohole_model PUBLIC "${PROJECT_SOURCE_DIR}/src")
 if(MSVC)
   target_compile_options(audiohole_model PRIVATE /W4 /permissive- /utf-8)

@@ -1,10 +1,12 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
 #include "model/application_controller.h"
+#include "model/configuration_bundle.h"
 #include "model/configuration_controller.h"
 #include "presentation/text_layout.h"
 #include <cstdio>
 #include <wx/display.h>
+#include <wx/modalhook.h>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
@@ -310,6 +312,14 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
 }
 int Frame::FilterEvent(wxEvent& event) {
     const auto type = event.GetEventType();
+    if (bundle_generation_ &&
+        (type == wxEVT_KEY_DOWN || type == wxEVT_CHAR_HOOK || type == wxEVT_CHAR ||
+         type == wxEVT_LEFT_DOWN || type == wxEVT_LEFT_DCLICK || type == wxEVT_RIGHT_DOWN)) {
+        auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
+        if (window &&
+            (window == notebook_->GetPage(0) || notebook_->GetPage(0)->IsDescendant(window)))
+            return wxEventFilter::Event_Processed;
+    }
     if (type == wxEVT_MENU) {
         // Native popup-menu commands are not child-window mouse events.
         avatar_host_->activity(avatar::monotonic_ms());
@@ -484,14 +494,43 @@ void Frame::end_observation() {
 // number gates commentary, so repainting/telemetry cannot consume more variants.
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
+    if (bundle_generation_ && s.scanner.completed_generation == bundle_generation_) {
+        const bool inspecting = bundle_inspecting_, importing = bundle_importing_;
+        bundle_generation_ = 0;
+        bundle_inspecting_ = bundle_importing_ = false;
+        if (s.scanner.result == "completed" && inspecting && s.scanner.import_plan) {
+            const auto plan = s.scanner.import_plan;
+            if (wxMessageBox(text(plan->summary), "Import configuration bundle?",
+                             wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) == wxYES) {
+                ScannerActionRequest request;
+                request.kind = ScannerActionKind::ImportBundle;
+                request.confirmed = true;
+                request.import_plan = plan;
+                const auto result = controller_->scanner_action(request);
+                if (!result.ok)
+                    show_result(result);
+                else {
+                    bundle_generation_ = controller_->snapshot().scanner.generation;
+                    bundle_importing_ = true;
+                }
+            }
+        } else if (s.scanner.result == "completed" && importing) {
+            const auto id = profile(s, viewed_)  ? viewed_
+                            : s.profiles.empty() ? std::string{}
+                                                 : s.profiles.front().id;
+            select_profile(id);
+            return;
+        } else if (s.scanner.result != "completed")
+            show_result({false, s.scanner.detail});
+    }
     avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
     const bool preview = s.operating_mode == OperatingMode::Preview;
     start_->Enable(s.capabilities.routing);
     arm_ready_->Enable(s.capabilities.routing);
     stop_->Enable(s.capabilities.routing);
     profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
-    profile_save_->Enable(!viewed_.empty());
-    profile_revert_->Enable(!viewed_.empty() && dirty_);
+    profile_save_->Enable(!viewed_.empty() && !bundle_generation_);
+    profile_revert_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
     profile_notes_->SetEditable(!viewed_.empty());
     hole_new_->Enable(!viewed_.empty());
     const auto edit_state =
@@ -635,10 +674,10 @@ void Frame::refresh() {
         scan_status += "\n" + text(s.scanner.detail).Left(380);
     } else
         scan_status = s.scanning ? "Preview scan in progress" : "No scan in progress";
-    if (scan_state_->GetLabel() != scan_status) {
-        scan_state_->SetLabel(scan_status);
-        scan_state_->Wrap(900);
-        scan_state_->GetParent()->Layout();
+    if (scan_state_->GetValue() != scan_status) {
+        scan_state_->ChangeValue(scan_status);
+        scan_state_->SetToolTip(scan_status);
+        scan_state_->ShowPosition(0);
     }
     const auto query = log_search_->GetValue().Lower();
     std::string logs;
@@ -722,6 +761,30 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        auto decline_delete = [&](wxListBox* list) {
+            capture_draft();
+            class Decline final : public wxModalDialogHook {
+              public:
+                bool asked = false;
+                int Enter(wxDialog* dialog) override {
+                    if (dialog->GetTitle() == "Confirm profile deletion" ||
+                        dialog->GetTitle() == "Confirm hole removal") {
+                        asked = true;
+                        return wxID_NO;
+                    }
+                    return wxID_NONE;
+                }
+            } hook;
+            hook.Register();
+            const auto before = controller_->snapshot().profiles;
+            const auto draft = draft_;
+            wxKeyEvent key(wxEVT_KEY_DOWN);
+            key.m_keyCode = WXK_DELETE;
+            key.SetEventObject(list);
+            list->GetEventHandler()->ProcessEvent(key);
+            require(hook.asked && controller_->snapshot().profiles == before && draft_ == draft,
+                    "Delete shortcut must use confirmation and preserve state when declined");
+        };
         {
             auto menu = shell_menu();
             const int close = menu->FindItem("Close window"),
@@ -759,6 +822,28 @@ bool Frame::smoke(const wxString& directory) {
         require(scan_scope_->GetCount() == 2 &&
                     scan_scope_->FindString("Selected device") == wxNOT_FOUND,
                 "Scanning page still offers per-device scope");
+        {
+            auto* page = scan_state_->GetParent();
+            page->Layout();
+            const auto text = scan_state_->GetValue();
+            const auto size = scan_state_->GetSize();
+            const auto console_size = console_->GetSize();
+            scan_state_->ChangeValue("One line");
+            page->Layout();
+            scan_state_->ChangeValue("First line\nSecond line\nThird line");
+            page->Layout();
+            require(scan_state_->GetSize() == size && console_->GetSize() == console_size,
+                    "Scan status changes resized the console");
+            scan_state_->ChangeValue(text);
+            const auto window_size = GetSize();
+            for (auto* child : forward_.group->GetStaticBox()->GetChildren())
+                if (auto* pane = dynamic_cast<wxCollapsiblePane*>(child)) {
+                    const bool collapsed = pane->IsCollapsed();
+                    pane->Collapse(!collapsed);
+                    pane->Collapse(collapsed);
+                }
+            require(GetSize() == window_size, "Advanced directional settings resized the window");
+        }
         {
             auto* deep = wxWindow::FindWindowByName("Deep scan settings", this);
             auto* layout = scan_start_->GetParent()->GetSizer();
@@ -991,6 +1076,8 @@ bool Frame::smoke(const wxString& directory) {
             const auto persistent_hole_id = draft_.holes.front().id;
             rename_hole("Persistent named hole");
             save(false);
+            decline_delete(profiles_);
+            decline_delete(holes_);
             profile_notes_->ChangeValue("Other draft edits must remain unsaved");
             forward_.buffer->SetValue(14);
             acknowledge_buffer(forward_);
@@ -1031,6 +1118,8 @@ bool Frame::smoke(const wxString& directory) {
         }
         require(capture_devices_ && playback_devices_ && capture_devices_ != playback_devices_,
                 "Devices must have separate capture and playback lists");
+        decline_delete(profiles_);
+        decline_delete(holes_);
         const auto hidden_id = draft_.holes.front().forward.source;
         require(!hidden_id.empty(), "Preview source fixture is missing");
         const auto before_hide = draft_.holes.front().forward;

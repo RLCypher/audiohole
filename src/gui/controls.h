@@ -8,6 +8,39 @@
 #include <wx/wx.h>
 
 namespace audiohole::gui {
+// Keep Windows keyboard/accessibility behavior while painting matched selection
+// foregrounds and surfaces for lists and popup/editable combo boxes.
+class ThemedChoice final : public wxChoice {
+  public:
+    ThemedChoice(wxWindow*, wxWindowID = wxID_ANY);
+    bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+    bool MSWOnMeasure(WXMEASUREITEMSTRUCT*) override;
+    WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;
+
+  protected:
+    WXDWORD MSWGetStyle(long, WXDWORD*) const override;
+
+  private:
+    wxBrush input_brush_;
+};
+class ThemedCombo final : public wxComboBox {
+  public:
+    ThemedCombo(wxWindow*, wxWindowID = wxID_ANY);
+    bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+    bool MSWOnMeasure(WXMEASUREITEMSTRUCT*) override;
+    WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;
+
+  protected:
+    WXDWORD MSWGetStyle(long, WXDWORD*) const override;
+
+  private:
+    wxBrush input_brush_;
+};
+class ThemedList final : public wxListBox {
+  public:
+    using wxListBox::wxListBox;
+    bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+};
 // Native buttons retain Windows keyboard, command, and accessibility semantics.
 // Only application-palette painting is replaced; high contrast uses wx/Windows.
 class ActionButton final : public wxButton {
@@ -66,7 +99,7 @@ inline wxTextCtrl* field(wxWindow* parent, wxSizer* layout, const wxString& titl
 inline wxChoice* choices(wxWindow* parent, wxSizer* layout, const wxString& title,
                          std::initializer_list<const char*> values) {
     label(parent, layout, title);
-    auto* control = new wxChoice(parent, wxID_ANY);
+    auto* control = new ThemedChoice(parent);
     for (const auto* value : values)
         control->Append(wxString::FromUTF8(value));
     control->SetName(title);

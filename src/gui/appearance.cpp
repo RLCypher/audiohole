@@ -1,7 +1,9 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
 #include "gui/native_theme.h"
+#include <commctrl.h>
 #include <dwmapi.h>
+#include <uxtheme.h>
 #include <wx/settings.h>
 #include <wx/tglbtn.h>
 
@@ -113,6 +115,15 @@ void Frame::apply_appearance() {
     prepare_native_theme(dark_appearance_, contrast);
     apply_palette(this, dark_appearance_, contrast);
     native_theme(this, dark_appearance_, contrast);
+    if (!contrast) {
+        // Explicit colors require the documented unthemed native gauge path.
+        const auto handle = static_cast<HWND>(scan_progress_->GetHandle());
+        SetWindowTheme(handle, L"", L"");
+        SendMessageW(handle, PBM_SETBARCOLOR, 0, RGB(6, 176, 37));
+        const auto background = dark_appearance_ ? palette::input() : wxColour(230, 233, 238);
+        SendMessageW(handle, PBM_SETBKCOLOR, 0,
+                     RGB(background.Red(), background.Green(), background.Blue()));
+    }
     if (!contrast) {
         for (auto* primary : {start_, profile_save_}) {
             primary->SetBackgroundColour(palette::mint());

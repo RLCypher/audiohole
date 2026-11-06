@@ -736,11 +736,15 @@ TEST_F(ScannerIntegration, UnlimitedBatchDoesNotExpireTheControllerAndRemainsCan
 class CountingWriter final : public scan::AtomicWriter {
   public:
     unsigned writes = 0;
+    unsigned summaries = 0;
     bool delay_next_write = false;
     std::shared_ptr<scan::AtomicWriter> actual = scan::make_atomic_writer();
     void write(const std::filesystem::path& path, const std::string& data,
                const std::optional<std::string>& expected) override {
         ++writes;
+        if (path.filename() == "recording_devices.json" ||
+            path.filename() == "playback_devices.json")
+            ++summaries;
         if (delay_next_write) {
             delay_next_write = false;
             std::this_thread::sleep_for(800ms);
@@ -959,5 +963,62 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     EXPECT_EQ(profile(restarted.snapshot(), id)->holes[0].forward.source, h.forward.source);
     EXPECT_EQ(profile(restarted.snapshot(), id)->holes[0].forward.destination,
               h.forward.destination);
+}
+TEST_F(ScannerIntegration, DeepSummariesRefreshOncePerDeviceWhileEachAttemptRemainsDurable) {
+    auto writer = std::make_shared<CountingWriter>();
+    scan::DeviceStore counted(portable, local, writer);
+    ASSERT_EQ(counted.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto target = counted.probe_targets().front();
+    writer->writes = writer->summaries = 0;
+    ManyStages runner;
+    scan::DeepLimits limits;
+    limits.max_attempts = 4;
+    limits.mode = "both";
+    const auto report = scan::run_deep_scan(counted, runner, target, limits, true);
+    ASSERT_EQ(report.attempted, 4u);
+    EXPECT_EQ(writer->summaries, 2u);
+    EXPECT_EQ(writer->writes, 4u * report.attempted + 2u);
+    for (const auto& attempt : report.attempts) {
+        const auto history = portable / "probe_history" /
+                             scan::utf8_path(attempt["attempt_id"].get<std::string>() + ".json");
+        EXPECT_EQ(Json::parse(bytes(history))["stages"].size(), 80u);
+    }
+    const auto inventory = counted.inventory();
+    const auto& device =
+        *std::find_if(inventory.devices.begin(), inventory.devices.end(),
+                      [&](const auto& d) { return d.record["logical_id"] == target.logical_id; });
+    const auto summary = Json::parse(bytes(portable / "devices" / "recording_devices.json"));
+    const auto row =
+        std::find_if(summary["devices"].begin(), summary["devices"].end(),
+                     [&](const auto& d) { return d["logical_id"] == target.logical_id; });
+    ASSERT_NE(row, summary["devices"].end());
+    EXPECT_EQ((*row)["probed_capabilities"], device.record["probed_capabilities"]);
+}
+TEST_F(ScannerIntegration, PackedAndContainer24BitFormatsRemainDistinctAndReadable) {
+    for (auto& e : evidence->endpoints) {
+        auto format = e.reported_capabilities["default_mix_format"];
+        format["sample_format"] = "pcm_s24_in_32";
+        format["valid_bits"] = 24;
+        format["subformat_guid"] = "{00000001-0000-0010-8000-00AA00389B71}";
+        e.reported_capabilities["format_queries"] = Json::array({{{"configuration", format},
+                                                                  {"mode", "shared"},
+                                                                  {"support", "supported"},
+                                                                  {"hresult", "0x00000000"}}});
+    }
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    auto worker = service();
+    Snapshot snapshot;
+    snapshot.endpoints = finish(*worker, worker->action(ScannerActionRequest{})).devices;
+    Direction d;
+    for (const auto& e : snapshot.endpoints) {
+        (e.capture ? d.source : d.destination) = e.id;
+        EXPECT_NE(e.inspection->views[2].find("24-bit integer PCM in a 32-bit container"),
+                  std::string::npos);
+    }
+    const auto choices = recommend(snapshot, d);
+    ASSERT_EQ(choices.compatible.size(), 1u);
+    EXPECT_EQ(choices.compatible[0].representation, "pcm_s24_in_32");
+    EXPECT_EQ(choices.compatible[0].wave->valid_bits, 24);
+    EXPECT_EQ(choices.compatible[0].wave->container_bits, 32);
 }
 } // namespace audiohole
