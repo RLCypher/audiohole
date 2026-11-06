@@ -31,8 +31,12 @@ try {
     # Explicit runtime allowlist: never copy a build tree, tests, or sources.
     $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt'))
     $relative = @($files | ForEach-Object { $_.FullName.Substring($stage.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
-    if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
-        throw 'Unexpected Runtime component contents; audit the package allowlist before distributing.'
+    $difference = @(Compare-Object ($expected | Sort-Object) ($relative | Sort-Object))
+    if ($difference.Count -ne 0) {
+        $missing = @($difference | Where-Object SideIndicator -eq '<=' | ForEach-Object InputObject)
+        $unexpected = @($difference | Where-Object SideIndicator -eq '=>' | ForEach-Object InputObject)
+        throw ("Unexpected Runtime component contents; audit the package allowlist before distributing.`n" +
+            "Missing: $($missing -join ', ')`nUnexpected: $($unexpected -join ', ')")
     }
     $runUrl = if ($env:GITHUB_ACTIONS -eq 'true') {
         "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
@@ -56,8 +60,8 @@ Source has uncommitted changes: $dirty
 CI: $runUrl
 
 Purpose: Preview Build GUI and isolated configuration evaluation, not a formal release.
-Launch audiohole.exe to evaluate the native GUI with authored simulated devices.
-No real audio capture/render or endpoint enumeration. Preview uses simulated records; Test persists isolated configuration.
+Launch audiohole.exe. Preview uses authored simulated devices; Test offers real Windows device scanning and isolated persistent configuration.
+No routing/playback backend is included. Device/profile bundle transfer and the engine handoff are described in CONFIGURATION_BUNDLES.md.
 Use MANUAL_GUI_CHECKLIST.md for evaluation workflows.
 The Release package is preferred for ordinary manual testing.
 

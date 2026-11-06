@@ -127,9 +127,11 @@ For a local package after building/testing, or to audit it on Windows:
 ```
 
 Packaging refuses to overwrite an existing ZIP: move it aside or choose another
-`-OutputDirectory`. Only `audiohole.exe`, the manual GUI checklist, wxWidgets and nlohmann/json license
-texts, `personalities/default.json`, `personalities/uwu.json`, the personality format
-guide, `README.txt`, and `build-info.json` are included. Tests, source trees, symbols, SDKs, and GoogleTest are excluded.
+`-OutputDirectory`. The authoritative Runtime contents are listed in
+`scripts/runtime-files.txt`: application/probe executables, bundled personality
+folders/art, branding, notices and evaluation/handoff documents. Packaging adds
+`README.txt` and `build-info.json`. Tests, source trees, symbols, SDKs and
+GoogleTest are excluded.
 The native smoke-test script requires clean metadata and a VS installation for
 the import audit; end users need neither to launch the executable. GitHub creates
 the downloadable ZIP from the already-tested package contents, avoiding a
@@ -137,7 +139,12 @@ second ZIP to extract.
 
 `tests/scripts/Test-DistributionTools.ps1` exercises packaging metadata, archive
 contents, overwrite protection, unexpected-runtime rejection, and cleanup using
-inert temporary fixtures. CI runs it in addition to the application/COM tests
+inert temporary fixtures. Its CMake installer is generated from the allowlist,
+including root-level documents, so additions cannot leave its positive fixture
+incomplete. A separate injected test executable must still be rejected, and
+the real Runtime component is independently audited during packaging. Missing
+handoff documents are also injected to verify diagnostics and cleanup. CI runs
+these checks in addition to the application/COM tests
 and actual extracted-package launch; fixture tests do not establish Windows
 application behavior.
 
