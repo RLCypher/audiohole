@@ -1,0 +1,1 @@
+PASS: 699 native-decoded RGBA buffers match Pillow byte-for-byte.

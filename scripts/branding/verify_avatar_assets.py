@@ -19,7 +19,7 @@ for relative, expected in ledger['files'].items():
         assert int.from_bytes(data[16:20], 'big') == 512, relative
         assert int.from_bytes(data[20:24], 'big') == 768, relative
         assert data[24:26] == bytes((8, 6)), relative  # 8-bit RGBA
-assert pngs == ledger['approved_png_count'] == 796
+assert pngs == ledger['approved_png_count']
 print(f'PASS: {pngs} byte-preserved approved RGBA operating PNGs and owned manifests/registries')
 
 parser = argparse.ArgumentParser()
@@ -30,4 +30,4 @@ if args.decoded_report:
     actual = json.loads(args.decoded_report.read_text(encoding="utf-8"))
     assert actual['failed'] == 0, actual
     assert actual['decoded_rgba_sha256'] == reference['decoded_rgba_sha256'], 'Native decoded RGBA differs from approved validation'
-    print('PASS: native decoder matches all 796 reference RGBA buffers')
+    print(f'PASS: native decoder matches all {pngs} reference RGBA buffers')

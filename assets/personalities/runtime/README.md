@@ -1,3 +1,6 @@
+> Current artwork revision: 97 IDLE padding frames removed; 699 operating PNGs remain.
+> See [padding removal and validation](../IDLE_PADDING_REMOVAL.md). Historical delivery counts below describe PR6.
+
 # AudioHole avatar engine and standalone viewer
 
 This is the native C++20 animation module for the formally accepted Norm,

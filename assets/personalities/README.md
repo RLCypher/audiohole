@@ -1,3 +1,5 @@
+> Current artwork update: [IDLE padding removed from 34 sequences](IDLE_PADDING_REMOVAL.md); 699 operating PNGs remain.
+
 > Main-app integration update: operating art/manifests now live in each owned
 > `personalities/<id>/avatar/pack/` folder. This directory holds shared runtime,
 > upstream validation and historical handoff. See [current integration](../../AVATAR_INTEGRATION.md).

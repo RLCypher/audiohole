@@ -7,7 +7,7 @@ remain for the primary agent's Windows environment.
 
 1. Configure/build x64 with CMake/VS 2022 and the existing wx/JSON/static-CRT
    settings. Run CTest and inspect the native test report.
-2. Run `tests/verify_native_pixels.py` against the native report: all 796 WIC
+2. Run `tests/verify_native_pixels.py` against the native report: all current deployed WIC
    RGBA buffers should match Pillow. Do not accept a skipped/partial decode.
 3. Run `tests/gui_smoke.py` with the built viewer. The Windows screenshot is BMP
    because the parent wx configuration disables PNG encoding; operating art
