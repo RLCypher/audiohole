@@ -41,7 +41,9 @@ std::string ScanProgressText::consume(const scanner::Progress& event) {
         return "Discovery " + std::to_string(event.completed) + ": " + names_[event.endpoint_id] +
                " — " + string(details, "state", "unknown") +
                (string(details, "capability_queries") == "selected"
-                    ? "; selected for Basic queries"
+                    ? "; selected for live Basic capability queries"
+                : string(details, "capability_queries") == "metadata_only"
+                    ? "; cached metadata only; live capability queries skipped"
                     : "; retained without retesting");
     }
     if (phase == "deep_plan") {
@@ -68,6 +70,21 @@ std::string ScanProgressText::consume(const scanner::Progress& event) {
         const auto known = names_.find(event.endpoint_id);
         prefix += (known == names_.end() ? "Device being identified" : known->second) + " | ";
     }
+    if (phase == "absent_endpoint_observation" || phase == "endpoint_lookup_failed")
+        return prefix +
+               (phase == "absent_endpoint_observation"
+                    ? "Absent historical endpoint: cached metadata unavailable; no live tests "
+                      "attempted | "
+                    : "Endpoint lookup failed | ") +
+               string(details, "message") +
+               (string(details, "native_code").empty() ? ""
+                                                       : " | " + string(details, "native_code"));
+    if (phase == "selected_endpoint_observation")
+        return prefix + (string(details, "state") == "active"
+                             ? "Basic capability observation recorded"
+                             : "Cached metadata observation recorded | state: " +
+                                   string(details, "state", "unknown") +
+                                   "; live capability queries skipped");
     if (phase == "deep_attempt_started" || phase == "deep_attempt_preparing") {
         configuration_ = string(details, "mode") + " / " +
                          format(details.value("format", scanner::Json::object()));

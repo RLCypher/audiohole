@@ -49,6 +49,23 @@ access. Ambiguous matching is reported; this increment does not offer an explici
 physical binding confirmation dialog. Resolve conflicting evidence explicitly;
 no name-based automatic rebind is introduced.
 
+Inactive endpoints can expose cached properties without being usable for live
+queries. Discovery and observation messages now say **cached metadata only; live
+capability queries skipped** for those endpoints. The existing active-state guard
+still prevents live Basic capability calls and Deep stream jobs for inactive
+targets. Lookup failures retain the observed endpoint state (or `unknown`), API
+and HRESULT. Only a positively `not_present` endpoint with a known ID/direction
+and a missing cached name/property store is treated as an expected absence
+observation. Its structured diagnostic remains in the progress journal/export;
+no nameless placeholder or new logical ID is manufactured. A complete Full
+inventory can mark its existing saved binding absent without deleting its record.
+Permission, identity, invalid-property and active/unknown-state errors still make
+discovery incomplete and prevent unsafe absence inference. Scoped scans retain
+their existing restriction against marking unrelated records missing.
+
+The scan-status area starts at three lines and can be resized independently of
+the console. Its full detail text is scrollable and no longer character-truncated.
+
 ## Data roots and file contracts
 
 These paths are relative to the existing user-local `PreviewBuild` preference

@@ -217,6 +217,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool bundle_inspecting_ = false, bundle_importing_ = false;
     std::chrono::steady_clock::time_point scanner_clock_started_{};
     wxTextCtrl* scan_state_{};
+    wxSplitterWindow* scan_output_split_{};
     wxChoice* deep_mode_{};
     wxSpinCtrl* deep_attempts_{};
     SecondsField *deep_duration_{}, *deep_attempt_timeout_{}, *deep_device_timeout_{},

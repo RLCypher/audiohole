@@ -143,27 +143,53 @@ void Frame::build_scan() {
     scan_progress_ =
         new wxGauge(page, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH);
     root->Add(scan_progress_, 0, wxEXPAND | wxALL, 4);
-    scan_state_ =
-        new wxTextCtrl(page, wxID_ANY, "No scan requested.", wxDefaultPosition, wxDefaultSize,
-                       wxTE_MULTILINE | wxTE_READONLY | wxTE_NO_VSCROLL | wxBORDER_NONE);
+    scan_output_split_ = new wxSplitterWindow(
+        page, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(400, 240)), wxSP_LIVE_UPDATE | wxSP_3D);
+    scan_output_split_->SetName("Resize scan status height");
+    scan_output_split_->SetToolTip(
+        "Drag the divider below the status to resize it. Long status text can also scroll.");
+    scan_output_split_->SetSashGravity(0);
+    scan_output_split_->SetMinimumPaneSize(FromDIP(48));
+    scan_output_split_->SetMinSize(FromDIP(wxSize(0, 120)));
+    auto* status_panel = new wxPanel(scan_output_split_);
+    auto* status_layout = new wxBoxSizer(wxVERTICAL);
+    auto* log_panel = new wxPanel(scan_output_split_);
+    auto* log_layout = new wxBoxSizer(wxVERTICAL);
+    scan_state_ = new wxTextCtrl(status_panel, wxID_ANY, "No scan requested.", wxDefaultPosition,
+                                 wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxBORDER_NONE);
     scan_state_->SetName("Current scan status");
     const int status_height = scan_state_->GetCharHeight() * 3 + FromDIP(8);
-    scan_state_->SetMinSize(wxSize(0, status_height));
-    scan_state_->SetMaxSize(wxSize(-1, status_height));
-    root->Add(scan_state_, 0, wxEXPAND | wxALL, 4);
+    scan_state_->SetMinSize(wxSize(0, scan_state_->GetCharHeight() + FromDIP(8)));
+    status_layout->Add(scan_state_, 1, wxEXPAND | wxALL, FromDIP(4));
+    status_panel->SetSizer(status_layout);
     auto* filters = new wxBoxSizer(wxHORIZONTAL);
     auto* severity_column = new wxBoxSizer(wxVERTICAL);
     auto* search_column = new wxBoxSizer(wxVERTICAL);
-    severity_ = choices(page, severity_column, "Diagnostic filter",
+    severity_ = choices(log_panel, severity_column, "Diagnostic filter",
                         {"All events", "Errors only", "Routing state only"});
-    log_search_ = field(page, search_column, "Search technical diagnostics");
+    log_search_ = field(log_panel, search_column, "Search technical diagnostics");
     filters->Add(severity_column, 0, wxEXPAND);
     filters->Add(search_column, 1, wxEXPAND);
-    root->Add(filters, 0, wxEXPAND);
-    console_ = new wxTextCtrl(page, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+    log_layout->Add(filters, 0, wxEXPAND);
+    console_ = new wxTextCtrl(log_panel, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                               wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
     console_->SetMinSize(wxSize(0, 24));
-    root->Add(console_, 1, wxEXPAND | wxALL, 4);
+    log_layout->Add(console_, 1, wxEXPAND | wxALL, FromDIP(4));
+    log_panel->SetSizer(log_layout);
+    scan_output_split_->SplitHorizontally(status_panel, log_panel, status_height + FromDIP(8));
+    scan_output_split_->Bind(wxEVT_SPLITTER_DOUBLECLICKED,
+                             [](wxSplitterEvent& event) { event.Veto(); });
+    scan_output_split_->Bind(
+        wxEVT_SPLITTER_SASH_POS_CHANGING, [this, log_layout](wxSplitterEvent& event) {
+            // The status can be compact, but dragging must leave the log's filter
+            // controls and at least its minimum text area available.
+            const int maximum = scan_output_split_->GetClientSize().y -
+                                scan_output_split_->GetSashSize() - log_layout->GetMinSize().y;
+            if (maximum >= scan_output_split_->GetMinimumPaneSize())
+                event.SetSashPosition(std::clamp(
+                    event.GetSashPosition(), scan_output_split_->GetMinimumPaneSize(), maximum));
+        });
+    root->Add(scan_output_split_, 1, wxEXPAND | wxALL, FromDIP(4));
     auto* export_row = new wxBoxSizer(wxHORIZONTAL);
     button(page, export_row, "Copy visible diagnostics", [this] {
         if (!wxTheClipboard->Open()) {

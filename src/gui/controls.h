@@ -79,13 +79,21 @@ inline std::string utf8(const wxString& value) {
 }
 inline wxStaticText* label(wxWindow* parent, wxSizer* layout, const wxString& value) {
     auto* control = new wxStaticText(parent, wxID_ANY, value);
-    layout->Add(control, 0, wxEXPAND | wxALL, 4);
+    const auto* row = dynamic_cast<wxBoxSizer*>(layout);
+    const int alignment = row && row->GetOrientation() == wxHORIZONTAL
+                              ? static_cast<int>(wxALIGN_CENTER_VERTICAL)
+                              : static_cast<int>(wxEXPAND);
+    layout->Add(control, 0, alignment | wxALL, parent->FromDIP(4));
     return control;
 }
 inline wxButton* button(wxWindow* parent, wxSizer* layout, const wxString& title,
                         std::function<void()> action) {
     auto* control = new ActionButton(parent, title);
-    layout->Add(control, 0, wxALL, 3);
+    const auto* row = dynamic_cast<wxBoxSizer*>(layout);
+    layout->Add(control, 0,
+                wxALL |
+                    (row && row->GetOrientation() == wxHORIZONTAL ? wxALIGN_CENTER_VERTICAL : 0),
+                parent->FromDIP(4));
     control->Bind(wxEVT_BUTTON, [action](wxCommandEvent&) { action(); });
     return control;
 }
@@ -93,7 +101,7 @@ inline wxTextCtrl* field(wxWindow* parent, wxSizer* layout, const wxString& titl
     label(parent, layout, title);
     auto* control = new wxTextCtrl(parent, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, style);
     control->SetName(title); // Stable functional name for assistive technology.
-    layout->Add(control, 0, wxEXPAND | wxALL, 3);
+    layout->Add(control, 0, wxEXPAND | wxALL, parent->FromDIP(4));
     return control;
 }
 inline wxChoice* choices(wxWindow* parent, wxSizer* layout, const wxString& title,
@@ -105,7 +113,11 @@ inline wxChoice* choices(wxWindow* parent, wxSizer* layout, const wxString& titl
     control->SetName(title);
     if (control->GetCount() > 0)
         control->SetSelection(0);
-    layout->Add(control, 0, wxEXPAND | wxALL, 3);
+    const auto* row = dynamic_cast<wxBoxSizer*>(layout);
+    const int alignment = row && row->GetOrientation() == wxHORIZONTAL
+                              ? static_cast<int>(wxALIGN_CENTER_VERTICAL)
+                              : static_cast<int>(wxEXPAND);
+    layout->Add(control, 0, wxALL | alignment, parent->FromDIP(4));
     return control;
 }
 

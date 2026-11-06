@@ -70,6 +70,25 @@ std::string safe_filename(const std::string& name) {
 void to_json(Json& j, const Diagnostic& d) {
   j = Json{{"code", d.code}, {"message", d.message}, {"context", d.context}};
   if (!d.native_code.empty()) j["native_code"] = d.native_code;
+  if (!d.endpoint_state.empty()) j["endpoint_state"] = d.endpoint_state;
+  if (!d.api.empty()) j["api"] = d.api;
+}
+Diagnostic endpoint_lookup_failure(const Endpoint& endpoint, const std::string& api,
+    const std::string& native_code, const std::string& message, bool missing_name) {
+  const auto state = endpoint.state.empty() ? "unknown" : endpoint.state;
+  const bool name_api = api == "IPropertyStore::GetValue(PKEY_Device_FriendlyName)";
+  const bool metadata_api = api == "IMMDevice::OpenPropertyStore" ||
+    name_api;
+  // HRESULT_FROM_WIN32(ERROR_NOT_FOUND / ERROR_DEVICE_NOT_CONNECTED), then
+  // AUDCLNT_E_DEVICE_INVALIDATED. Access denied and arbitrary errors are excluded.
+  const bool missing = native_code == "0x80070490" || native_code == "0x8007048F" ||
+    native_code == "0x88890004" ||
+    (missing_name && native_code == "0x00000000" && name_api);
+  const bool absent = state == "not_present" && !endpoint.endpoint_id.empty() &&
+    (endpoint.direction == "capture" || endpoint.direction == "render") && metadata_api && missing;
+  return {absent ? "absent_endpoint_metadata_unavailable" : "endpoint_query_failed",
+    api + " | state: " + state + " | " + message,
+    endpoint.endpoint_id, native_code, state, api};
 }
 void to_json(Json& j, const ScanReport& r) {
   j = Json{{"result", r.result}, {"discovered", r.discovered}, {"saved", r.saved},

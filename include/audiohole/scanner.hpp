@@ -25,6 +25,8 @@ struct Diagnostic {
   std::string message;
   std::string context;
   std::string native_code;
+  // Optional observation context, omitted from JSON when older callers lack it.
+  std::string endpoint_state{}, api{};
 };
 void to_json(Json& json, const Diagnostic& diagnostic);
 
@@ -40,6 +42,13 @@ struct Endpoint {
   Json reported_capabilities = Json::object();
   std::vector<Diagnostic> diagnostics;
 };
+// Only positively absent endpoints with missing cached metadata qualify as an
+// expected observation. Active/unknown states and access/identity failures remain
+// errors. missing_name denotes a successful but empty/absent name property,
+// never a malformed property type. This pure classifier does no I/O; the provider
+// decides inventory completeness and records the resulting observation/error.
+Diagnostic endpoint_lookup_failure(const Endpoint&, const std::string& api,
+  const std::string& native_code, const std::string& message, bool missing_name = false);
 
 struct Progress {
   std::string phase;

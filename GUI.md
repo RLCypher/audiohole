@@ -1821,3 +1821,11 @@ wordmark, type-colored device cards, Material heading icons, reaction repeat con
 and local validation/export error recovery. Actual operational warnings retain
 priority. Native visual/DPI/high-contrast assessment remains necessary; older
 Windows theme capabilities have a native fallback. Animation pruning is deferred.
+
+The subsequent owner-authorized follow-up makes the scan-status height draggable,
+starting at three lines and retaining the chosen height across updates. Full
+details remain scrollable. Shared form helpers align horizontal row contents with
+consistent DPI-scaled padding. Settings presents Appearance/Tray and Startup in
+two columns, followed by Personality/Animation, Advanced, then Preview Build
+Environment. Reflow and vertical scrolling keep the same window size; these
+presentation adjustments do not alter saved preferences or routing behavior.

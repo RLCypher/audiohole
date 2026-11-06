@@ -49,3 +49,53 @@ TEST(ScanProgress, NamesAndRealPlanCountsReplaceEndpointCodes) {
         text.describe({"endpoint_query_failed", "Name unavailable", secret, {}}).find("PS5 Mic"),
         std::string::npos);
 }
+
+TEST(ScanProgress, InactiveDevicesNeverClaimLiveCapabilityQueries) {
+    ScanProgressText text;
+    for (const auto* state : {"not_present", "unplugged", "disabled", "unknown"}) {
+        const auto discovery = text.consume({"scope_selection",
+                                             "private-id",
+                                             1,
+                                             0,
+                                             {{"device_name", "Katana"},
+                                              {"direction", "capture"},
+                                              {"state", state},
+                                              {"capability_queries", "metadata_only"}}});
+        EXPECT_NE(discovery.find("Katana"), std::string::npos);
+        EXPECT_NE(discovery.find("cached metadata only"), std::string::npos);
+        EXPECT_NE(discovery.find("live capability queries skipped"), std::string::npos);
+        EXPECT_EQ(discovery.find("selected for live"), std::string::npos);
+        const auto observation =
+            text.consume({"selected_endpoint_observation", "private-id", 0, 1, {{"state", state}}});
+        EXPECT_NE(observation.find("Cached metadata observation"), std::string::npos);
+        EXPECT_NE(observation.find(state), std::string::npos);
+        EXPECT_EQ(observation.find("private-id"), std::string::npos);
+    }
+}
+
+TEST(ScanProgress, LookupFailuresKeepApiStateAndErrorWithoutExposingRawIds) {
+    ScanProgressText text;
+    audiohole::scanner::Endpoint endpoint;
+    endpoint.endpoint_id = "private-id";
+    endpoint.direction = "render";
+    endpoint.state = "not_present";
+    const auto diagnostic = audiohole::scanner::endpoint_lookup_failure(
+        endpoint, "IMMDevice::OpenPropertyStore", "0x80070490", "Metadata unavailable");
+    const auto absent =
+        text.consume({"absent_endpoint_observation", endpoint.endpoint_id, 1, 1, diagnostic});
+    EXPECT_NE(absent.find("Absent historical endpoint"), std::string::npos);
+    EXPECT_NE(absent.find("no live tests attempted"), std::string::npos);
+    EXPECT_NE(absent.find("state: not_present"), std::string::npos);
+    EXPECT_NE(absent.find("IMMDevice::OpenPropertyStore"), std::string::npos);
+    EXPECT_NE(absent.find("0x80070490"), std::string::npos);
+    EXPECT_EQ(absent.find(endpoint.endpoint_id), std::string::npos);
+    endpoint.state = "active";
+    const auto failure = audiohole::scanner::endpoint_lookup_failure(
+        endpoint, "IMMDevice::OpenPropertyStore", "0x80070005", "Access denied");
+    const auto failed =
+        text.consume({"endpoint_lookup_failed", endpoint.endpoint_id, 1, 1, failure});
+    EXPECT_NE(failed.find("Endpoint lookup failed"), std::string::npos);
+    EXPECT_NE(failed.find("state: active"), std::string::npos);
+    EXPECT_NE(failed.find("0x80070005"), std::string::npos);
+    EXPECT_EQ(failed.find("Absent historical endpoint"), std::string::npos);
+}

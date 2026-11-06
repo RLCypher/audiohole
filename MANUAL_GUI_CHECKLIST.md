@@ -467,3 +467,19 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - Exercise PR #7 reactions with finite loops, hold-final-frame and continuous
   loops, then interrupt with a new event, warning, sleep and personality switch.
   Expressions should retain their expressive final pose rather than idle padding.
+
+### End-of-night layout and discovery follow-up
+
+- Drag the divider below Current scan status taller/shorter, including with Deep
+  settings expanded. Successive short and long statuses preserve the chosen height
+  and log bounds. Long details remain scrollable; double-click cannot hide a pane.
+  The initial status area reserves three lines. Check compact/wide windows and
+  scaled DPI, and verify console auto-follow still respects a scrolled-up reader.
+- Settings: Appearance/Tray and Startup share two columns. Personality/Animation
+  immediately precedes Advanced; Preview Build Environment is last. Check keyboard
+  order, wrapped action rows and long data paths, including Vanilla hiding DFA.
+- With a physically disconnected saved device, Basic output says cached metadata
+  only/live queries skipped. Inspect state/API/HRESULT in exported failed-lookup
+  evidence. An absent endpoint with no cached name is an absence observation;
+  existing records, names, notes and logical IDs survive. Active-device failures
+  and unknown state remain visible errors. Reconnect and verify identity retention.

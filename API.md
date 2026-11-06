@@ -1009,3 +1009,11 @@ severity/events, bounded RAII pull subscriptions and explicit unavailable teleme
 It fronts the existing Preview simulator or isolated Test configuration backend.
 No production audio/scanner, network transport, CLI, OBS, Stream Deck or avatar
 integration is implied. These C++ contracts are not approved external JSON schemas.
+
+The integrated Test scanner's internal `Diagnostic` can additionally carry
+`endpoint_state` and `api`; empty optional fields are omitted from its existing
+JSON representation. Native lookup failures preserve the HRESULT in `native_code`
+and the raw endpoint ID in structured `context`, while visible progress uses
+known names. `endpoint_lookup_failure` centralizes the conservative expected-
+absence policy documented in [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md). This
+adds evidence context, not a production transport or configuration schema.

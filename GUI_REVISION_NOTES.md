@@ -1,6 +1,8 @@
 # GUI and scanner refinement revision
 
-This implements the owner-authorized active backlog. Animation artwork pruning/import remains deferred; the approved PNGs and animation manifests are unchanged.
+This records successive owner-authorized backlog revisions. The later PR #7 art
+section supersedes the initial animation-pruning deferral; the final section
+describes the current four-item follow-up.
 
 ## Scanner duration and progress
 
@@ -118,3 +120,34 @@ native Windows execution remains a CI check. Native smoke now checks declined
 Delete confirmations, fixed status/log geometry and unchanged top-level size
 when toggling Advanced panes. Dark/light popup/disabled painting still requires
 Windows visual assessment; cross-compilation does not prove those native checks.
+
+## End-of-night four-item follow-up
+
+- The scan status/log divider is draggable. Status starts at three lines, keeps
+  its chosen height during updates and can scroll longer details. The full detail
+  string is retained; the previous 380-character display truncation is removed.
+  Resizing is session presentation only and does not change saved scan limits.
+- Inactive endpoints explicitly report cached metadata observations and skipped
+  live capability queries. Windows lookup failures include state, API and HRESULT
+  in structured evidence. Positively `not_present` endpoints whose cached name or
+  property store is missing produce an absence observation instead of a generic
+  query failure. No placeholder device is created. Existing saved records/notes
+  remain; active/unknown state, permission, identity and malformed-property errors
+  remain errors and still block inference from an incomplete inventory.
+- Shared labels, buttons, fields and choices now use consistent DPI-scaled
+  padding; controls and labels in horizontal rows are vertically centered.
+- Settings starts with two columns: Appearance/Tray and Startup. Personality and
+  Animation has its own full-width group immediately above Advanced. Preview Build
+  Environment is last; long explanatory text and paths wrap. Startup and catalog
+  action rows wrap when space is limited. Preference semantics are unchanged.
+
+Portable regressions cover absence classification, diagnostic serialization,
+human-readable inactive-device progress and saved-record preservation. Native
+smoke checks the adjustable status/log divider, stable heights under long updates
+and Settings grouping/order. Native Windows visual/DPI assessment remains required.
+
+Executed validation: all 168 portable CTest entries pass in Debug and Release;
+all Windows x64 application/test targets cross-compile and link. PowerShell
+distribution regression checks and actual Runtime packaging pass, with the exact
+729-file allowlist plus two package documents and all 699 avatar PNG hashes
+preserved. Native Windows GUI smoke was compiled, not executed in this Linux host.

@@ -76,7 +76,7 @@ void error(Endpoint& endpoint, const std::string& operation, HRESULT hr) {
   if (message) LocalFree(message);
   while (!description.empty() && (description.back() == '\r' || description.back() == '\n')) description.pop_back();
   endpoint.diagnostics.push_back({"windows_query_failed", operation + (description.empty() ? "" : ": " + description),
-                                  endpoint.endpoint_id, hex_code(hr)});
+                                  endpoint.endpoint_id, hex_code(hr), endpoint.state, operation});
 }
 std::string property_string(IPropertyStore* store, const PROPERTYKEY& key) {
   Prop prop;
@@ -376,33 +376,54 @@ class WindowsProvider final : public EndpointProvider {
     for (UINT i = 0; i < count; ++i) {
       if (stop.stop_requested()) { result.complete = false; result.cancelled = true; break; }
       Endpoint endpoint;
+      std::string operation = "IMMDeviceCollection::Item";
+      bool missing_name = false;
+      bool direct_api = true;
+      hr = S_OK;
       try {
         ComPtr<IMMDevice> device;
         hr = collection->Item(i, device.put());
         if (FAILED(hr)) throw std::runtime_error("Read endpoint failed: " + hex_code(hr));
         TaskMemory id;
+        operation = "IMMDevice::GetId";
         hr = device->GetId(reinterpret_cast<LPWSTR*>(&id.pointer));
         if (FAILED(hr)) throw std::runtime_error("GetId failed: " + hex_code(hr));
         endpoint.endpoint_id = utf8(static_cast<LPCWSTR>(id.pointer));
         ComPtr<IMMEndpoint> direction;
+        operation = "IMMDevice::QueryInterface(IMMEndpoint)";
         hr = device->QueryInterface(__uuidof(IMMEndpoint), reinterpret_cast<void**>(direction.put()));
         if (FAILED(hr)) throw std::runtime_error("Read endpoint direction failed: " + hex_code(hr));
         EDataFlow flow = eAll;
+        operation = "IMMEndpoint::GetDataFlow";
         hr = direction->GetDataFlow(&flow);
         if (FAILED(hr) || (flow != eCapture && flow != eRender)) throw std::runtime_error("Invalid endpoint direction");
         endpoint.direction = flow == eCapture ? "capture" : "render";
         DWORD state = 0;
+        operation = "IMMDevice::GetState";
         hr = device->GetState(&state);
         endpoint.state = SUCCEEDED(hr) ? state == DEVICE_STATE_ACTIVE ? "active" : state == DEVICE_STATE_DISABLED
           ? "disabled" : state == DEVICE_STATE_NOTPRESENT ? "not_present" : state == DEVICE_STATE_UNPLUGGED
           ? "unplugged" : "unknown" : "unknown";
         if (FAILED(hr)) error(endpoint, "GetState", hr);
         ComPtr<IPropertyStore> properties;
+        operation = "IMMDevice::OpenPropertyStore";
         hr = device->OpenPropertyStore(STGM_READ, properties.put());
         if (FAILED(hr)) throw std::runtime_error("OpenPropertyStore failed: " + hex_code(hr));
-        endpoint.device_name = property_string(properties.get(), PKEY_Device_FriendlyName);
-        if (endpoint.device_name.empty()) throw std::runtime_error("Windows endpoint name unavailable");
+        operation = "IPropertyStore::GetValue(PKEY_Device_FriendlyName)";
+        Prop friendly_name;
+        hr = properties->GetValue(PKEY_Device_FriendlyName, &friendly_name.value);
+        if (FAILED(hr)) throw std::runtime_error("Windows endpoint name query failed");
+        if (friendly_name.value.vt == VT_LPWSTR)
+          endpoint.device_name = utf8(friendly_name.value.pwszVal);
+        if (endpoint.device_name.empty()) {
+          missing_name = friendly_name.value.vt == VT_EMPTY || friendly_name.value.vt == VT_NULL ||
+            friendly_name.value.vt == VT_LPWSTR;
+          throw std::runtime_error("Windows endpoint name unavailable; property type " +
+            std::to_string(friendly_name.value.vt));
+        }
         if (progress) progress({"querying", endpoint.endpoint_id, i, count});
+        operation = "Read endpoint identity properties";
+        direct_api = false;
         endpoint.local_identity["container_id"] = property_guid(properties.get(), PKEY_Device_ContainerId);
         // StableId is optional (Windows 11 24H2+). Use its published key so
         // Windows 10 builds do not require the newest SDK's symbolic constant.
@@ -418,6 +439,7 @@ class WindowsProvider final : public EndpointProvider {
         endpoint.fingerprint["endpoint"]["role"] =
           string_or_unavailable(property_string(properties.get(), PKEY_AudioEndpoint_Association));
         if (progress) progress({"api_begin", endpoint.endpoint_id, i, count, {{"api", "Read hardware and driver properties"}}});
+        operation = "Read hardware and driver properties";
         hardware_properties(device.get(), enumerator.get(), property_string(properties.get(), PKEY_Device_InstanceId), endpoint);
         if (filter && !filter(endpoint)) {
           result.full_inventory = false;
@@ -430,6 +452,7 @@ class WindowsProvider final : public EndpointProvider {
           {"default_mix_format", status("unavailable")}, {"device_periods", status("unavailable")},
           {"shared_engine_periods", status("unavailable")}, {"current_shared_engine", status("unavailable")},
           {"format_queries", status("not_tested")}};
+        operation = "Read cached audio format properties";
         endpoint.reported_capabilities["configured_device_format"] =
           property_format(properties.get(), PKEY_AudioEngine_DeviceFormat, endpoint);
         endpoint.reported_capabilities["oem_device_format"] =
@@ -439,11 +462,24 @@ class WindowsProvider final : public EndpointProvider {
         if (SUCCEEDED(properties->GetValue(PKEY_AudioEndpoint_Supports_EventDriven_Mode, &event_mode.value)) &&
             event_mode.value.vt == VT_UI4)
           endpoint.reported_capabilities["event_driven_mode"] = event_mode.value.ulVal ? "supported" : "unsupported";
-        if (state == DEVICE_STATE_ACTIVE && !stop.stop_requested()) capabilities(device.get(), endpoint, stop, progress);
+        if (state == DEVICE_STATE_ACTIVE && !stop.stop_requested()) {
+          operation = "Read active endpoint capabilities";
+          capabilities(device.get(), endpoint, stop, progress);
+        }
         result.endpoints.push_back(std::move(endpoint));
       } catch (const std::exception& e) {
-        result.complete = false;
-        result.diagnostics.push_back({"endpoint_query_failed", e.what(), endpoint.endpoint_id, {}});
+        const auto diagnostic = endpoint_lookup_failure(endpoint, operation,
+          direct_api ? hex_code(hr) : "", e.what(), missing_name);
+        const bool absent = diagnostic.code == "absent_endpoint_metadata_unavailable";
+        if (progress) progress({absent ? "absent_endpoint_observation" : "endpoint_lookup_failed",
+          endpoint.endpoint_id, i + 1, count, Json(diagnostic)});
+        // A positively absent endpoint with no cached name is not a new device.
+        // Omitting it from a complete full inventory still marks its retained
+        // binding not_present. Other states/errors keep absence inference blocked.
+        if (!absent) {
+          result.complete = false;
+          result.diagnostics.push_back(diagnostic);
+        }
       }
       if (progress) progress({"enumerating", {}, i + 1, count});
     }

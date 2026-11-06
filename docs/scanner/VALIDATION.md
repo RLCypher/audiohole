@@ -124,6 +124,17 @@ Windows x64 successfully; native smoke execution was not available locally.
 
 ## Active-backlog revision
 
+For the latest four-item GUI/scanner follow-up, all **168 portable CTest entries**
+pass in Debug and Release. Tests distinguish positively absent metadata from
+active/unknown/permission/identity failures, preserve structured API/state/HRESULT
+context, and check inactive Full-scan progress and retained IDs/names/notes.
+All Windows x64 application/test targets cross-build and canonical executable
+branding checks pass. PowerShell distribution-tool regressions and actual Runtime
+packaging pass the exact 729-file allowlist (731 ZIP files with metadata/README),
+with all 699 avatar PNG hashes preserved. Native GUI smoke compiles with status
+divider and Settings-order checks; native Windows execution and physical-device
+assessment remain outstanding. The older counts below describe prior revisions.
+
 The owner-authorized follow-up implements the active GUI backlog plus unlimited
 overall Deep time at zero and local recovery for invalid numeric input. See
 [GUI_REVISION_NOTES.md](../../GUI_REVISION_NOTES.md) for behavior, persistence and

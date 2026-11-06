@@ -553,10 +553,10 @@ struct ScannerService::Impl {
             scan::run_scoped_basic(*provider, store, scope, job.logical_id, job.stop, progress);
         write_json(directory / "basic.json", basic);
         final.result = basic.scan.result;
-        final.detail =
-            "Basic: " + basic.scan.result +
-            "; selected capability queries: " + std::to_string(basic.selected_endpoint_ids.size()) +
-            "; known identities refreshed: " + std::to_string(basic.metadata_updated) + ".";
+        final.detail = "Basic: " + basic.scan.result + "; selected endpoint observations: " +
+                       std::to_string(basic.selected_endpoint_ids.size()) +
+                       "; known identities refreshed: " + std::to_string(basic.metadata_updated) +
+                       ".";
         for (const auto& item : basic.scan.diagnostics)
             final.detail += "\n" + visible_progress.describe(item);
         if (job.deep && (final.result == "completed" || final.result == "partially_completed") &&

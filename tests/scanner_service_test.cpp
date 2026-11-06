@@ -8,6 +8,52 @@
 #include <thread>
 
 namespace audiohole {
+TEST(ScannerLookup, OnlyPositiveAbsenceAndMissingMetadataAreExpected) {
+    scanner::Endpoint endpoint;
+    endpoint.endpoint_id = "transient-id";
+    endpoint.direction = "capture";
+    endpoint.state = "not_present";
+    const std::string api = "IPropertyStore::GetValue(PKEY_Device_FriendlyName)";
+    for (const auto* code : {"0x80070490", "0x8007048F", "0x88890004"}) {
+        const auto diagnostic =
+            scanner::endpoint_lookup_failure(endpoint, api, code, "Unavailable");
+        EXPECT_EQ(diagnostic.code, "absent_endpoint_metadata_unavailable");
+        const scanner::Json json = diagnostic;
+        EXPECT_EQ(json.at("endpoint_state"), "not_present");
+        EXPECT_EQ(json.at("api"), api);
+        EXPECT_EQ(json.at("native_code"), code);
+        EXPECT_EQ(json.at("context"), endpoint.endpoint_id);
+    }
+    EXPECT_EQ(scanner::endpoint_lookup_failure(endpoint, api, "0x00000000", "Empty", true).code,
+              "absent_endpoint_metadata_unavailable");
+    EXPECT_EQ(
+        scanner::endpoint_lookup_failure(endpoint, api, "0x00000000", "Wrong property type").code,
+        "endpoint_query_failed");
+    EXPECT_EQ(scanner::endpoint_lookup_failure(endpoint, api, "0x80070005", "Access denied").code,
+              "endpoint_query_failed");
+    EXPECT_EQ(
+        scanner::endpoint_lookup_failure(endpoint, "IMMDevice::GetId", "0x80070490", "No ID").code,
+        "endpoint_query_failed");
+    for (const auto* state : {"active", "disabled", "unplugged", "unknown", ""}) {
+        endpoint.state = state;
+        const auto diagnostic =
+            scanner::endpoint_lookup_failure(endpoint, api, "0x80070490", "Unavailable");
+        EXPECT_EQ(diagnostic.code, "endpoint_query_failed") << state;
+        EXPECT_FALSE(diagnostic.endpoint_state.empty());
+    }
+    endpoint.state = "not_present";
+    endpoint.direction.clear();
+    EXPECT_EQ(scanner::endpoint_lookup_failure(endpoint, api, "0x80070490", "Unavailable").code,
+              "endpoint_query_failed");
+    endpoint.direction = "capture";
+    endpoint.endpoint_id.clear();
+    EXPECT_EQ(scanner::endpoint_lookup_failure(endpoint, api, "0x80070490", "Unavailable").code,
+              "endpoint_query_failed");
+    // Existing callers and old reports do not acquire empty optional fields.
+    const scanner::Json legacy = scanner::Diagnostic{"old", "message", "context", {}};
+    EXPECT_FALSE(legacy.contains("endpoint_state"));
+    EXPECT_FALSE(legacy.contains("api"));
+}
 namespace {
 namespace scan = scanner;
 using Json = scan::Json;
@@ -187,6 +233,43 @@ TEST_F(ScannerIntegration, UpdateRefreshesKnownAvailabilityWithoutRepeatingCapab
     EXPECT_EQ(found->record.at("scan_history").at("last_scanned"), first);
     EXPECT_EQ(found->record.at("reported_capabilities"),
               before.devices[0].record.at("reported_capabilities"));
+}
+TEST_F(ScannerIntegration, InactiveFullScanKeepsSavedIdentityAndReportsMetadataOnly) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto before = store.inventory();
+    const auto capture =
+        std::find_if(before.devices.begin(), before.devices.end(), [](const auto& d) {
+            return d.record.at("identity").at("direction") == "capture";
+        });
+    ASSERT_NE(capture, before.devices.end());
+    auto record = capture->record;
+    record["notes"] = "Keep the disconnected microphone";
+    record["extension"] = {{"owned_by_user", true}};
+    write(capture->path, record);
+    evidence->endpoints[0].state = "not_present";
+    Provider provider(evidence);
+    std::vector<scan::Progress> events;
+    const auto report =
+        scan::run_scoped_basic(provider, store, "full", {}, {},
+                               [&](const scan::Progress& event) { events.push_back(event); });
+    ASSERT_EQ(report.scan.result, "completed");
+    const auto selected = std::find_if(events.begin(), events.end(), [](const auto& event) {
+        return event.phase == "scope_selection" && event.endpoint_id == "Capture";
+    });
+    ASSERT_NE(selected, events.end());
+    EXPECT_EQ(selected->details.at("capability_queries"), "metadata_only");
+    const auto after = store.inventory();
+    ASSERT_TRUE(after.complete);
+    ASSERT_EQ(after.devices.size(), 2u);
+    const auto retained =
+        std::find_if(after.devices.begin(), after.devices.end(), [&](const auto& d) {
+            return d.record.at("logical_id") == record.at("logical_id");
+        });
+    ASSERT_NE(retained, after.devices.end());
+    EXPECT_EQ(retained->record.at("device_name"), record.at("device_name"));
+    EXPECT_EQ(retained->record.at("notes"), record.at("notes"));
+    EXPECT_EQ(retained->record.at("extension"), record.at("extension"));
+    EXPECT_EQ(retained->local_binding.at("state"), "not_present");
 }
 TEST_F(ScannerIntegration, SelectedRefreshDoesNotTouchUnrelatedRecordsOrInferAbsence) {
     ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");

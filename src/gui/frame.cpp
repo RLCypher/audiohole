@@ -671,7 +671,7 @@ void Frame::refresh() {
                                      std::chrono::duration_cast<std::chrono::seconds>(
                                          std::chrono::steady_clock::now() - scanner_clock_started_)
                                          .count()));
-        scan_status += "\n" + text(s.scanner.detail).Left(380);
+        scan_status += "\n" + text(s.scanner.detail);
     } else
         scan_status = s.scanning ? "Preview scan in progress" : "No scan in progress";
     if (scan_state_->GetValue() != scan_status) {
@@ -823,8 +823,9 @@ bool Frame::smoke(const wxString& directory) {
                     scan_scope_->FindString("Selected device") == wxNOT_FOUND,
                 "Scanning page still offers per-device scope");
         {
-            auto* page = scan_state_->GetParent();
+            auto* page = notebook_->GetPage(2);
             page->Layout();
+            scan_output_split_->UpdateSize();
             const auto text = scan_state_->GetValue();
             const auto size = scan_state_->GetSize();
             const auto console_size = console_->GetSize();
@@ -962,9 +963,10 @@ bool Frame::smoke(const wxString& directory) {
         // legal sash travel. Verify movement with deliberate spare space, then
         // restore the original compact layout and verify its bounds again.
         const auto workspace_client = GetClientSize();
-        const std::array<wxSplitterWindow*, 5> dividers{
-            profile_columns_, profile_rows_, profile_lower_rows_, device_columns_, device_rows_};
-        std::array<int, 5> original_sashes{};
+        const std::array<wxSplitterWindow*, 6> dividers{profile_columns_,    profile_rows_,
+                                                        profile_lower_rows_, device_columns_,
+                                                        device_rows_,        scan_output_split_};
+        std::array<int, 6> original_sashes{};
         for (std::size_t i = 0; i < dividers.size(); ++i)
             original_sashes[i] = dividers[i]->GetSashPosition();
         SetClientSize(FromDIP(wxSize(1000, 1000)));
@@ -1005,6 +1007,52 @@ bool Frame::smoke(const wxString& directory) {
         }
         notebook_->SetSelection(2);
         notebook_->GetPage(2)->Layout();
+        {
+            const auto original_status = scan_state_->GetValue();
+            scan_output_split_->SetSashPosition(scan_output_split_->GetClientSize().y / 3);
+            move_divider(scan_output_split_);
+            const auto chosen_sash = scan_output_split_->GetSashPosition();
+            const auto status_size = scan_state_->GetSize();
+            const auto console_size = console_->GetSize();
+            const wxString long_status = "Scan status detail " + wxString('x', 600);
+            scan_state_->ChangeValue("Short status");
+            notebook_->GetPage(2)->Layout();
+            scan_state_->ChangeValue(long_status + "\nSecond line\nThird line\nFourth line");
+            notebook_->GetPage(2)->Layout();
+            require(scan_state_->GetValue().Contains(long_status) &&
+                        scan_output_split_->GetSashPosition() == chosen_sash &&
+                        scan_state_->GetSize() == status_size &&
+                        console_->GetSize() == console_size,
+                    "Scan status lost details or changed the chosen status/log heights");
+            scan_state_->ChangeValue(original_status);
+        }
+        {
+            auto* settings = notebook_->GetPage(3);
+            auto* appearance = wxWindow::FindWindowByName("Appearance and tray settings", settings);
+            auto* startup = wxWindow::FindWindowByName("Startup settings", settings);
+            auto* personality =
+                wxWindow::FindWindowByName("Personality and animation settings", settings);
+            auto* advanced = wxWindow::FindWindowByName("Advanced settings", settings);
+            require(appearance && startup && personality && advanced &&
+                        theme_choice_->GetParent() == appearance &&
+                        notifications_->GetParent() == appearance &&
+                        startup_->GetParent() == startup && delay_->GetParent() == startup &&
+                        hold_expressions_->GetParent() == personality &&
+                        animation_loops_->GetParent() == personality,
+                    "Settings controls escaped their functional groups");
+            auto* layout = settings->GetSizer();
+            require(layout->GetItemCount() == 4 && layout->GetItem(std::size_t{0})->IsSizer(),
+                    "Settings no longer starts with the two-column layout");
+            auto* columns =
+                dynamic_cast<wxFlexGridSizer*>(layout->GetItem(std::size_t{0})->GetSizer());
+            require(
+                columns && columns->GetCols() == 2 && columns->GetItemCount() == 2 &&
+                    personality->GetContainingSizer() == layout->GetItem(1U)->GetSizer() &&
+                    advanced->GetContainingSizer() == layout->GetItem(2U)->GetSizer() &&
+                    preview_mode_->GetParent()->GetContainingSizer() ==
+                        layout->GetItem(3U)->GetSizer(),
+                "Settings group order changed: Personality, Advanced, then Preview environment");
+        }
         {
             const auto original_console = console_->GetValue();
             wxString lines;

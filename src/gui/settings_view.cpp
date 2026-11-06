@@ -8,69 +8,112 @@ void Frame::build_settings() {
     auto* page = new wxScrolledWindow(notebook_);
     page->SetScrollRate(0, 16);
     auto* root = new wxBoxSizer(wxVERTICAL);
-    auto* preview_settings = new wxStaticBoxSizer(wxVERTICAL, page, "Preview Build environment");
-    auto* environment_box = preview_settings->GetStaticBox();
-    preview_mode_ = new wxCheckBox(environment_box, wxID_ANY,
-                                   "Preview Mode (load preview profiles and devices)");
-    preview_mode_->SetValue(preferences_->values().preview_mode);
-    preview_mode_->SetToolTip(
-        "Select the environment for the next launch. Preview uses demonstration records; Test uses "
-        "isolated persisted configuration. Restart is required.");
-    show_preview_dialog_ =
-        new wxCheckBox(environment_box, wxID_ANY, "Show preview dialog on startup");
-    show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
-    show_preview_dialog_->SetToolTip(
-        "Offer Preview Mode or Test Mode on startup. When disabled, the saved environment starts "
-        "directly; Settings can still change the next launch.");
-    preview_settings->Add(preview_mode_, 0, wxALL, 4);
-    preview_settings->Add(show_preview_dialog_, 0, wxALL, 4);
-    auto save_environment = [this](wxCommandEvent&) {
+    std::vector<std::pair<wxStaticText*, wxString>> wrapping_notes;
+    auto* columns = new wxFlexGridSizer(1, 2, FromDIP(12), FromDIP(12));
+    columns->AddGrowableCol(0, 1);
+    columns->AddGrowableCol(1, 1);
+    auto* appearance_group = new wxStaticBoxSizer(wxVERTICAL, page, "Appearance and tray");
+    auto* appearance_box = appearance_group->GetStaticBox();
+    appearance_box->SetName("Appearance and tray settings");
+    auto* startup_group = new wxStaticBoxSizer(wxVERTICAL, page, "Startup behavior");
+    auto* startup_box = startup_group->GetStaticBox();
+    startup_box->SetName("Startup settings");
+    columns->Add(appearance_group, 1, wxEXPAND);
+    columns->Add(startup_group, 1, wxEXPAND);
+    root->Add(columns, 0, wxEXPAND | wxALL, FromDIP(4));
+    theme_choice_ =
+        choices(appearance_box, appearance_group, "Appearance", {"Dark", "Light", "Follow System"});
+    theme_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         auto next = preferences_->values();
-        next.preview_mode = preview_mode_->GetValue();
-        next.show_preview_dialog = show_preview_dialog_->GetValue();
+        next.appearance = theme_choice_->GetSelection() == 0   ? "dark"
+                          : theme_choice_->GetSelection() == 1 ? "light"
+                                                               : "system";
         const auto result = preferences_->update(next);
-        if (!result.ok) {
-            preview_mode_->SetValue(preferences_->values().preview_mode);
-            show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
+        if (!result.ok)
             show_result(result);
-        }
-    };
-    preview_mode_->Bind(wxEVT_CHECKBOX, save_environment);
-    show_preview_dialog_->Bind(wxEVT_CHECKBOX, save_environment);
-    label(environment_box, preview_settings,
-          controller_->snapshot().operating_mode == OperatingMode::Preview
-              ? "Active: Preview Mode. Environment changes take effect after restart."
-              : "Active: Test Mode (persistent configuration and real device scanning). "
-                "Environment changes take "
-                "effect after restart.");
-    label(environment_box, preview_settings,
-          wxS("Test data: ") + wxString(preferences_->test_configuration().wstring()));
-    auto* restart_button = button(environment_box, preview_settings, "Restart AudioHole", [this] {
-        if (!discard())
-            return;
-        if (restart_)
-            restart_();
-        else
-            show_result({false, "Restart is unavailable for this host."});
+        apply_appearance();
     });
-    restart_button->SetToolTip(
-        "Close this session cleanly and launch the saved environment after the current process "
-        "exits. Saved settings/data are preserved; unsaved edits require confirmation.");
-    root->Add(preview_settings, 0, wxEXPAND | wxALL, 4);
-    personality_choice_ = choices(page, root, "Personality", {});
-    personality_notice_ = label(page, root, "");
+    theme_choice_->SetSelection(preferences_->values().appearance == "dark"    ? 0
+                                : preferences_->values().appearance == "light" ? 1
+                                                                               : 2);
+    theme_choice_->SetToolTip("Follow Windows app appearance, or save a Light/Dark preference. "
+                              "Windows high contrast takes precedence.");
+    notifications_ = choices(appearance_box, appearance_group, "Tray notifications",
+                             {"Important changes only", "All routine events", "None"});
+    startup_ = choices(startup_box, startup_group, "Startup", {"Manual", "Immediate", "Delayed"});
+    startup_target_ = choices(startup_box, startup_group, "Startup target", {});
+    label(startup_box, startup_group, "Startup delay (seconds)");
+    delay_ = new wxSpinCtrl(startup_box, wxID_ANY, "5", wxDefaultPosition, FromDIP(wxSize(75, -1)),
+                            wxSP_ARROW_KEYS, 0, 300, 5);
+    startup_group->Add(delay_, 0, wxALL, FromDIP(4));
+    notifications_->SetSelection(preferences_->values().notifications);
+    startup_->SetSelection(preferences_->values().startup_mode);
+    delay_->SetValue(preferences_->values().startup_delay_seconds);
+    auto save_startup = [this] {
+        auto next = preferences_->values();
+        next.notifications = notifications_->GetSelection();
+        next.startup_mode = startup_->GetSelection();
+        next.startup_delay_seconds = delay_->GetValue();
+        const int target = startup_target_->GetSelection();
+        if (target >= 0 && static_cast<std::size_t>(target) < profile_ids_.size())
+            next.startup_profile_id = profile_ids_[static_cast<std::size_t>(target)];
+        show_result(preferences_->update(next));
+    };
+    for (auto* choice : {notifications_, startup_, startup_target_})
+        choice->Bind(wxEVT_CHOICE, [save_startup](wxCommandEvent&) { save_startup(); });
+    delay_->Bind(wxEVT_SPINCTRL, [save_startup](wxSpinEvent&) { save_startup(); });
+    auto* row = new wxWrapSizer(wxHORIZONTAL);
+    auto* startup_preview = button(startup_box, row, "Preview startup", [this] {
+        if (startup_->GetSelection() == 0) {
+            controller_->stop();
+            refresh();
+            return;
+        }
+        const int i = startup_target_->GetSelection();
+        if (i < 0) {
+            show_result({false, "Select a startup profile."});
+            return;
+        }
+        show_result(
+            controller_->schedule(profile_ids_.at(static_cast<std::size_t>(i)),
+                                  startup_->GetSelection() == 1 ? 0 : delay_->GetValue() * 1000));
+        refresh();
+    });
+    auto* cancel_startup = button(startup_box, row, "Cancel pending activation", [this] {
+        controller_->stop();
+        present(presentation::Message::Cancelled);
+        refresh();
+    });
+    startup_group->Add(row, 0, wxEXPAND);
+    const bool preview_environment =
+        controller_->snapshot().operating_mode == OperatingMode::Preview;
+    for (auto* control :
+         std::vector<wxWindow*>{startup_preview, cancel_startup, startup_, startup_target_, delay_})
+        control->Enable(preview_environment);
+    button(appearance_box, appearance_group, "Replay Tutorial", [this] {
+        wxMessageBox("Tutorial not yet implemented, please enjoy this placeholder message.",
+                     wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
+    });
+    auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and animation");
+    auto* personality_box = personality_group->GetStaticBox();
+    personality_box->SetName("Personality and animation settings");
+    personality_choice_ = choices(personality_box, personality_group, "Personality", {});
+    personality_notice_ = label(personality_box, personality_group, "");
     auto* playback = new wxWrapSizer(wxHORIZONTAL);
-    hold_expressions_ = new wxCheckBox(page, wxID_ANY, "Hold expressions between events");
-    animation_loops_ = new wxSpinCtrl(page, wxID_ANY, "1", wxDefaultPosition,
+    hold_expressions_ =
+        new wxCheckBox(personality_box, wxID_ANY, "Hold expressions between events");
+    animation_loops_ = new wxSpinCtrl(personality_box, wxID_ANY, "1", wxDefaultPosition,
                                       FromDIP(wxSize(75, -1)), wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER,
                                       1, 20, preferences_->values().animation_loops);
     animation_loops_->SetName("Animation loop count");
-    loop_until_event_ = new wxCheckBox(page, wxID_ANY, "Loop until next event");
+    loop_until_event_ = new wxCheckBox(personality_box, wxID_ANY, "Loop until next event");
     playback->Add(hold_expressions_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
-    label(page, playback, "Animation loop count");
-    playback->Add(animation_loops_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    auto* loop_count = new wxBoxSizer(wxHORIZONTAL);
+    label(personality_box, loop_count, "Animation loop count");
+    loop_count->Add(animation_loops_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    playback->Add(loop_count, 0, wxALIGN_CENTER_VERTICAL);
     playback->Add(loop_until_event_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
-    root->Add(playback, 0, wxEXPAND);
+    personality_group->Add(playback, 0, wxEXPAND);
     hold_expressions_->SetToolTip(
         "Hold the last frame after the final repeat. Otherwise hold it for two extra seconds. "
         "Warnings, new events and inactivity sleep can interrupt.");
@@ -121,9 +164,10 @@ void Frame::build_settings() {
         if (selected >= 0)
             select_personality(personality_ids_.at(static_cast<std::size_t>(selected)));
     });
-    auto* catalogs = new wxBoxSizer(wxHORIZONTAL);
-    button(page, catalogs, "Reload personality files", [this] { reload_personalities(); });
-    button(page, catalogs, "Load custom personality…", [this] {
+    auto* catalogs = new wxWrapSizer(wxHORIZONTAL);
+    button(personality_box, catalogs, "Reload personality files",
+           [this] { reload_personalities(); });
+    button(personality_box, catalogs, "Load custom personality…", [this] {
         wxFileDialog dialog(this, "Load personality", {}, {}, "JSON files (*.json)|*.json",
                             wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if (dialog.ShowModal() != wxID_OK)
@@ -136,83 +180,13 @@ void Frame::build_settings() {
         notebook_->GetPage(3)->Layout();
         static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
     });
-    root->Add(catalogs);
-    theme_choice_ = choices(page, root, "Appearance", {"Dark", "Light", "Follow System"});
-    theme_choice_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        auto next = preferences_->values();
-        next.appearance = theme_choice_->GetSelection() == 0   ? "dark"
-                          : theme_choice_->GetSelection() == 1 ? "light"
-                                                               : "system";
-        const auto result = preferences_->update(next);
-        if (!result.ok)
-            show_result(result);
-        apply_appearance();
-    });
-    theme_choice_->SetSelection(preferences_->values().appearance == "dark"    ? 0
-                                : preferences_->values().appearance == "light" ? 1
-                                                                               : 2);
-    theme_choice_->SetToolTip("Follow Windows app appearance, or save a Light/Dark preference. "
-                              "Windows high contrast takes precedence.");
+    personality_group->Add(catalogs, 0, wxEXPAND);
     personality_choice_->SetToolTip("Choose optional commentary. Vanilla keeps facts only; "
                                     "switching personality never changes routing.");
-    notifications_ = choices(page, root, "Tray notifications",
-                             {"Important changes only", "All routine events", "None"});
-    startup_ = choices(page, root, "Startup", {"Manual", "Immediate", "Delayed"});
-    startup_target_ = choices(page, root, "Startup target", {});
-    label(page, root, "Startup delay (seconds)");
-    delay_ = new wxSpinCtrl(page, wxID_ANY, "5", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS,
-                            0, 300, 5);
-    root->Add(delay_, 0, wxALL, 3);
-    notifications_->SetSelection(preferences_->values().notifications);
-    startup_->SetSelection(preferences_->values().startup_mode);
-    delay_->SetValue(preferences_->values().startup_delay_seconds);
-    auto save_startup = [this] {
-        auto next = preferences_->values();
-        next.notifications = notifications_->GetSelection();
-        next.startup_mode = startup_->GetSelection();
-        next.startup_delay_seconds = delay_->GetValue();
-        const int target = startup_target_->GetSelection();
-        if (target >= 0 && static_cast<std::size_t>(target) < profile_ids_.size())
-            next.startup_profile_id = profile_ids_[static_cast<std::size_t>(target)];
-        show_result(preferences_->update(next));
-    };
-    for (auto* choice : {notifications_, startup_, startup_target_})
-        choice->Bind(wxEVT_CHOICE, [save_startup](wxCommandEvent&) { save_startup(); });
-    delay_->Bind(wxEVT_SPINCTRL, [save_startup](wxSpinEvent&) { save_startup(); });
-    auto* row = new wxBoxSizer(wxHORIZONTAL);
-    auto* startup_preview = button(page, row, "Preview startup", [this] {
-        if (startup_->GetSelection() == 0) {
-            controller_->stop();
-            refresh();
-            return;
-        }
-        const int i = startup_target_->GetSelection();
-        if (i < 0) {
-            show_result({false, "Select a startup profile."});
-            return;
-        }
-        show_result(
-            controller_->schedule(profile_ids_.at(static_cast<std::size_t>(i)),
-                                  startup_->GetSelection() == 1 ? 0 : delay_->GetValue() * 1000));
-        refresh();
-    });
-    auto* cancel_startup = button(page, row, "Cancel pending activation", [this] {
-        controller_->stop();
-        present(presentation::Message::Cancelled);
-        refresh();
-    });
-    root->Add(row);
-    const bool preview_environment =
-        controller_->snapshot().operating_mode == OperatingMode::Preview;
-    for (auto* control :
-         std::vector<wxWindow*>{startup_preview, cancel_startup, startup_, startup_target_, delay_})
-        control->Enable(preview_environment);
-    button(page, root, "Replay Tutorial", [this] {
-        wxMessageBox("Tutorial not yet implemented, please enjoy this placeholder message.",
-                     wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
-    });
+    root->Add(personality_group, 0, wxEXPAND | wxALL, FromDIP(4));
     auto* advanced = new wxStaticBoxSizer(wxVERTICAL, page, "Advanced");
     auto* box = advanced->GetStaticBox();
+    box->SetName("Advanced settings");
     dfa_ = button(box, advanced, "DFA", [this] { present_dfa(presentation::Message::Dfa); });
     dfa_->SetToolTip("Working as intended.");
     auto* slider_label = label(box, advanced, "DFA level");
@@ -280,6 +254,75 @@ void Frame::build_settings() {
     dfa_value_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     dfa_stepper_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     root->Add(advanced, 0, wxEXPAND | wxALL, 4);
+    auto* preview_settings = new wxStaticBoxSizer(wxVERTICAL, page, "Preview Build environment");
+    auto* environment_box = preview_settings->GetStaticBox();
+    preview_mode_ = new wxCheckBox(environment_box, wxID_ANY,
+                                   "Preview Mode (load preview profiles and devices)");
+    preview_mode_->SetValue(preferences_->values().preview_mode);
+    preview_mode_->SetToolTip(
+        "Select the environment for the next launch. Preview uses demonstration records; Test uses "
+        "isolated persisted configuration. Restart is required.");
+    show_preview_dialog_ =
+        new wxCheckBox(environment_box, wxID_ANY, "Show preview dialog on startup");
+    show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
+    show_preview_dialog_->SetToolTip(
+        "Offer Preview Mode or Test Mode on startup. When disabled, the saved environment starts "
+        "directly; Settings can still change the next launch.");
+    preview_settings->Add(preview_mode_, 0, wxALL, 4);
+    preview_settings->Add(show_preview_dialog_, 0, wxALL, 4);
+    auto save_environment = [this](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.preview_mode = preview_mode_->GetValue();
+        next.show_preview_dialog = show_preview_dialog_->GetValue();
+        const auto result = preferences_->update(next);
+        if (!result.ok) {
+            preview_mode_->SetValue(preferences_->values().preview_mode);
+            show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
+            show_result(result);
+        }
+    };
+    preview_mode_->Bind(wxEVT_CHECKBOX, save_environment);
+    show_preview_dialog_->Bind(wxEVT_CHECKBOX, save_environment);
+    auto* environment_note =
+        label(environment_box, preview_settings,
+              controller_->snapshot().operating_mode == OperatingMode::Preview
+                  ? "Active: Preview Mode. Environment changes take effect after restart."
+                  : "Active: Test Mode (persistent configuration and real device scanning). "
+                    "Environment changes take "
+                    "effect after restart.");
+    auto* data_note =
+        label(environment_box, preview_settings,
+              wxS("Test data: ") + wxString(preferences_->test_configuration().wstring()));
+    for (auto* note : {environment_note, data_note}) {
+        wrapping_notes.emplace_back(note, note->GetLabel());
+        note->SetMinSize(wxSize(0, -1));
+        note->SetToolTip(note->GetLabel());
+    }
+    auto* restart_button = button(environment_box, preview_settings, "Restart AudioHole", [this] {
+        if (!discard())
+            return;
+        if (restart_)
+            restart_();
+        else
+            show_result({false, "Restart is unavailable for this host."});
+    });
+    restart_button->SetToolTip(
+        "Close this session cleanly and launch the saved environment after the current process "
+        "exits. Saved settings/data are preserved; unsaved edits require confirmation.");
+    root->Add(preview_settings, 0, wxEXPAND | wxALL, FromDIP(4));
+    page->Bind(wxEVT_SIZE, [page, wrapping_notes, last_width = 0](wxSizeEvent& event) mutable {
+        const int width = page->GetClientSize().x;
+        if (width > 0 && width != last_width) {
+            last_width = width;
+            for (const auto& [note, original] : wrapping_notes) {
+                note->SetLabel(original);
+                note->Wrap(std::max(1, width - page->FromDIP(32)));
+            }
+            page->Layout();
+            page->FitInside();
+        }
+        event.Skip();
+    });
     page->SetSizer(root);
     notebook_->AddPage(page, "Settings");
     reload_personalities();
