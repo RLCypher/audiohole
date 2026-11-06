@@ -5,6 +5,7 @@
 #include <chrono>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
 
 namespace {
 using namespace audiohole;
@@ -128,9 +129,9 @@ TEST_F(PersistenceTest, MalformedNewerDuplicateAndFractionalInputNeverGetsOverwr
         EXPECT_EQ(read(), text);
     }
     auto newer = valid;
-    const auto version = newer.find("\"schema_version\": 1");
+    const auto version = newer.find("\"schema_version\": 2");
     ASSERT_NE(version, std::string::npos);
-    newer.replace(version, 19, "\"schema_version\": 2");
+    newer.replace(version, 19, "\"schema_version\": 3");
     write(newer);
     TestJsonPersistence store(file);
     ConfigurationRecords data;
@@ -298,9 +299,9 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
     const auto valid = read();
     for (const auto& invalid : {"1.5", "18446744073709551615"}) {
         auto broken = valid;
-        const auto position = broken.find("\"schema_version\": 1");
+        const auto position = broken.find("\"schema_version\": 2");
         ASSERT_NE(position, std::string::npos);
-        broken.replace(position, std::string("\"schema_version\": 1").size(),
+        broken.replace(position, std::string("\"schema_version\": 2").size(),
                        std::string("\"schema_version\": ") + invalid);
         write(broken);
         TestJsonPersistence provider(file);
@@ -332,5 +333,86 @@ TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngi
     EXPECT_FALSE(application.submit(UpdateBuffer{"hole-1", false, 12, "profile-1"}).result.ok);
     EXPECT_EQ(read(), prior + " ");
     EXPECT_EQ(*profile(application.snapshot(), "profile-1"), expected);
+}
+TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBeforeUpgrade) {
+    seed();
+    auto legacy = read();
+    const auto version = legacy.find("\"schema_version\": 2");
+    ASSERT_NE(version, std::string::npos);
+    legacy.replace(version, 19, "\"schema_version\": 1");
+    write(legacy);
+    TestJsonPersistence provider(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(provider.load(records).ok);
+    EXPECT_EQ(read(), legacy);
+    EXPECT_FALSE(std::filesystem::exists(file.string() + ".v1.bak"));
+    ASSERT_TRUE(provider.save(records).ok);
+    std::ifstream backup(file.string() + ".v1.bak", std::ios::binary);
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), legacy);
+    EXPECT_NE(read().find("\"schema_version\": 2"), std::string::npos);
+    const auto bytes = read();
+    EXPECT_LT(bytes.find("\"profiles\""), bytes.find("\"devices\""));
+    EXPECT_LT(bytes.find("\"display_name\""), bytes.find("\"notes\""));
+    EXPECT_LT(bytes.find("\"notes\""), bytes.find("\"id\""));
+}
+TEST_F(PersistenceTest, ExactDescriptorRoundTripsAndInvalidEditsPreserveOriginal) {
+    seed();
+    TestJsonPersistence provider(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(provider.load(records).ok);
+    auto& d = records.profiles[0].holes[0].forward;
+    d.source_name = "Microphone";
+    d.destination_name = "Four channel output";
+    d.settings.automatic = false;
+    d.settings.format = {
+        48000, 4, "pcm_s32",
+        WaveFormat{32, 24, 65534, 51, "{00000001-0000-0010-8000-00AA00389B71}", 16, 768000}};
+    ASSERT_TRUE(provider.save(records).ok);
+    TestJsonPersistence restarted(file);
+    ConfigurationRecords loaded;
+    ASSERT_TRUE(restarted.load(loaded).ok);
+    EXPECT_EQ(records.profiles, loaded.profiles);
+    auto original = read();
+    d.settings.format.wave->block_align_bytes = 8;
+    EXPECT_FALSE(provider.save(records).ok);
+    EXPECT_EQ(read(), original);
+    d.settings.format.wave->block_align_bytes = 16;
+    d.settings.format.wave->channel_mask.reset();
+    ASSERT_TRUE(provider.save(records).ok);
+    TestJsonPersistence unknown(file);
+    ASSERT_TRUE(unknown.load(loaded).ok);
+    EXPECT_FALSE(loaded.profiles[0].holes[0].forward.settings.format.wave->channel_mask);
+}
+TEST_F(PersistenceTest, ConflictingV1BackupBlocksUpgradeWithoutChangingEitherFile) {
+    seed();
+    auto legacy = read();
+    legacy.replace(legacy.find("\"schema_version\": 2"), 19, "\"schema_version\": 1");
+    write(legacy);
+    const auto backup = file.string() + ".v1.bak";
+    std::ofstream(backup, std::ios::binary) << "Earlier user backup";
+    TestJsonPersistence provider(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(provider.load(records).ok);
+    EXPECT_FALSE(provider.save(records).ok);
+    EXPECT_EQ(read(), legacy);
+    std::ifstream input(backup, std::ios::binary);
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(input), {}), "Earlier user backup");
+}
+TEST_F(PersistenceTest, V1FormatExtensionsSurviveExplicitUpgrade) {
+    seed();
+    auto old = nlohmann::ordered_json::parse(read());
+    old["schema_version"] = 1;
+    auto& f = old["devices"][0]["formats"][0];
+    f.erase("wave");
+    f["user_annotation"] = "Keep my external format notes";
+    write(old.dump(2));
+    TestJsonPersistence provider(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(provider.load(records).ok);
+    ASSERT_TRUE(provider.save(records).ok);
+    const auto saved = nlohmann::ordered_json::parse(read());
+    EXPECT_EQ(saved["devices"][0]["formats"][0]["user_annotation"],
+              "Keep my external format notes");
+    EXPECT_TRUE(saved["devices"][0]["formats"][0]["wave"].is_null());
 }
 } // namespace

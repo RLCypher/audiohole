@@ -35,3 +35,34 @@ Invalid input and recoverable save/export failures use local dismissible feedbac
 ## Validation
 
 The focused regression tests cover repeated/continuous playback, reduced motion, warnings/sleep, preference restart/default/range checks, real progress counts/names, confirmed clear/isolation/profile-reference preservation, unlimited batch completion/cancellation/controller lifetime, stage retention/external edits and bounded checkpoint writes. Existing GUI smoke additionally exercises recoverable numeric feedback and continuous-checkbox precedence. No actual hardware performance improvement or native GUI pass is claimed from portable tests or cross-compilation. See docs/scanner/VALIDATION.md and MANUAL_GUI_CHECKLIST.md for executed results and pending Windows assessment.
+
+
+## Scanner-backed profile configuration and pending visual fixes
+
+- Test profile endpoint choices now come from nonhidden scanner records; Preview
+  retains fixture choices. Duplicate names have an ID suffix, hidden/missing saved
+  references keep their identities, and current names appear beside IDs in JSON.
+- Exact format/mode capabilities reach the editor through typed worker projections.
+  Mode changes rebuild the choices without discarding manual overrides. No support
+  is invented from mix formats, closest matches or independent rate/channel lists.
+- Ordered provisional Test schema 2 retains full Windows format descriptors;
+  names/notes come first and scanner history remains separate. Version 1 loads
+  without writes, and an explicit upgrade save preserves the original backup.
+- Shared control-side preparation creates minimal typed routing requests; Test
+  continues to disable actual routing, monitoring, beep and live-engine Apply.
+- Start/Cancel scan now appear above Deep settings.
+- Empty Hole Notes stays enabled/read-only with the normal themed surface.
+  Inactive directional inputs are disabled individually, keeping container labels
+  enabled so Windows does not emboss their text. Empty Profile Notes follows the
+  same read-only approach. Native smoke checks the inactive-editor contract and
+  scan-action ordering without pixel-sensitive assertions.
+
+Animation pruning and Smart App Control/signing work remain deferred as requested.
+
+Validation for this increment: all 153 portable CTest cases pass in Debug and
+Release; the complete Windows x64 cross-build and executable branding integrity
+check pass. Replaying a copy of the owner's physical-system report projects 22
+devices and 244 typed format/mode observations, finds 36 active pairs with exact
+common tuples, and saves/reloads a prepared profile without hardware access.
+Native Windows GUI smoke and visual assessment remain CI/Windows checks; a
+cross-build is not evidence that those native tests ran here.

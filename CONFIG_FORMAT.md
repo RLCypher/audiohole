@@ -1895,3 +1895,20 @@ wall times. These are measured processing timings, not audio latency guarantees.
 No profile/device format is finalized. Explicit Clear device list intentionally
 removes scanner identities/data; saved profile references remain and may require
 rebinding. See GUI_REVISION_NOTES.md for confirmation and failure behavior.
+
+
+### Scanner-backed provisional Test profiles (v2)
+
+The owner clarified the control-side preparation boundary and minimal routing
+intent: readable hole/profile names and notes, stable devices and format/settings.
+The Test provider now writes ordered schema 2 and reads 1/2; first explicit v1 save
+preserves an exact `.v1.bak` before upgrading. This adds readable device-name hints
+and complete Windows descriptors without embedding scan histories or local bindings.
+Names never override logical identity. Scanned, nonhidden devices supply new
+choices; existing hidden/missing references remain preserved. Exact tuple/mode
+matching happens in the shared control model, with a separate minimal typed
+prepared request for a future engine. See
+[PROVISIONAL_TEST_PERSISTENCE.md](PROVISIONAL_TEST_PERSISTENCE.md#scanner-backed-configuration-increment)
+and [the Test example](docs/test-profile-example.json). Production O-004/O-006,
+endpoint-specific negotiation and final file layout remain unresolved. No load-time
+or destructive production migration is introduced.

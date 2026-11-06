@@ -492,7 +492,7 @@ void Frame::refresh() {
     profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
     profile_save_->Enable(!viewed_.empty());
     profile_revert_->Enable(!viewed_.empty() && dirty_);
-    profile_notes_->Enable(!viewed_.empty());
+    profile_notes_->SetEditable(!viewed_.empty());
     hole_new_->Enable(!viewed_.empty());
     const auto edit_state =
         text(viewed_.empty()
@@ -759,6 +759,36 @@ bool Frame::smoke(const wxString& directory) {
         require(scan_scope_->GetCount() == 2 &&
                     scan_scope_->FindString("Selected device") == wxNOT_FOUND,
                 "Scanning page still offers per-device scope");
+        {
+            auto* deep = wxWindow::FindWindowByName("Deep scan settings", this);
+            auto* layout = scan_start_->GetParent()->GetSizer();
+            int actions_position = -1, settings_position = -1;
+            for (unsigned i = 0; i < layout->GetItemCount(); ++i) {
+                const auto* item = layout->GetItem(i);
+                if (item->GetSizer() == scan_start_->GetContainingSizer())
+                    actions_position = static_cast<int>(i);
+                if (item->GetWindow() == deep)
+                    settings_position = static_cast<int>(i);
+            }
+            require(actions_position >= 0 && settings_position > actions_position,
+                    "Scan actions must precede Deep settings");
+            const int selected = hole_index_;
+            load_hole(-1);
+            require(hole_notes_->IsEnabled() && !hole_notes_->IsEditable() &&
+                        !forward_.source->IsEnabled() && !forward_.buffer_apply->IsEnabled() &&
+                        forward_.source_detail->IsEnabled() && forward_.summary->IsEnabled() &&
+                        forward_.group->GetStaticBox()->IsEnabled(),
+                    "Empty hole editor must keep themed notes and crisp labels without enabling "
+                    "inputs");
+            Direction unknown_mode;
+            unknown_mode.settings.mode = "Future mode (unrecognized)";
+            populate_direction(forward_, unknown_mode);
+            Direction retained_mode;
+            read_direction(forward_, retained_mode);
+            require(retained_mode.settings.mode == unknown_mode.settings.mode,
+                    "Editing silently replaced an unrecognized saved mode");
+            load_hole(selected);
+        }
         require(device_evidence_->HasFlag(wxTE_WORDWRAP) &&
                     !device_evidence_->HasFlag(wxTE_DONTWRAP),
                 "Device evidence does not wrap");

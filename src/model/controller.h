@@ -12,13 +12,27 @@ enum class State { Stopped, Ready, Starting, Running, Degraded, Recovering, Fail
 const char* name(State state);
 enum class Availability { Available, Unavailable, Ambiguous, Untested, Unknown };
 const char* name(Availability availability);
-// Complete fixture format tuple. Channel layout/mask is deliberately not inferred
-// from the channel count; production negotiation belongs to Milestone 1+.
+// Exact Windows descriptor when supplied by the scanner. An absent mask remains
+// unknown; channel count alone never establishes speaker positions.
+struct WaveFormat {
+    int container_bits = 0, valid_bits = 0, format_tag = 0;
+    std::optional<std::uint32_t> channel_mask;
+    std::string subformat_guid;
+    int block_align_bytes = 0, average_bytes_per_second = 0;
+    bool operator==(const WaveFormat&) const = default;
+};
 struct Format {
     int rate = 48000, channels = 2;
     std::string representation = "float32";
+    std::optional<WaveFormat> wave{};
     bool operator==(const Format&) const = default;
     std::string label() const;
+};
+enum class FormatSupport { Unknown, Supported, Unsupported };
+struct FormatCapability {
+    Format format;
+    std::string mode; // Shared or Exclusive; never a union of both modes.
+    FormatSupport support = FormatSupport::Unknown;
 };
 struct Endpoint {
     std::string id, display_name, windows_name, notes;
@@ -27,6 +41,7 @@ struct Endpoint {
     std::vector<Format> formats;
     bool hidden = false;
     std::shared_ptr<const DeviceInspection> inspection{};
+    std::vector<FormatCapability> capabilities{};
 };
 struct Settings {
     bool automatic = true;
@@ -38,6 +53,8 @@ struct Settings {
 struct Direction {
     std::string source, destination;
     Settings settings;
+    // Readable hints only. Logical IDs remain authoritative after a rename.
+    std::string source_name{}, destination_name{};
     bool operator==(const Direction&) const = default;
 };
 struct Hole {
@@ -99,13 +116,34 @@ struct Recommendation {
     std::vector<Format> compatible;
     std::string explanation;
 };
+// Prepared on the control side. No scan matrices, notes, JSON, widget state or
+// guessed identity matching enter an engine start request. The future supervisor
+// must resolve logical IDs to unambiguous local bindings and initialize streams.
+struct RoutingPathRequest {
+    std::string hole_id, source, destination, mode;
+    bool reverse = false;
+    Format format;
+    int buffer_ms = 0;
+};
+struct PreparedProfile {
+    std::string profile_id;
+    std::vector<RoutingPathRequest> paths;
+};
+// Returns a complete request on success; leaves output unchanged on failure.
+Result prepare_profile(const Snapshot&, const Profile&, PreparedProfile&);
+// Full-save enrichment of name hints and cached automatic candidates. Does not
+// change IDs, manual overrides or drafts without matching evidence.
+void describe_profile(const Snapshot&, Profile&);
 const Endpoint* endpoint(const Snapshot&, const std::string& id);
+// Offered new bindings. Existing references are resolved separately, including
+// hidden/missing records. Borrowed pointers expire when the snapshot mutates.
+std::vector<const Endpoint*> configuration_devices(const Snapshot&);
 const Profile* profile(const Snapshot&, const std::string& id);
 Recommendation recommend(const Snapshot&, const Direction&);
 Result validate(const Snapshot&, const Profile&);
 // Internal, in-process GUI seam; not API.md's final public schema/transport.
-// All calls and snapshots currently belong to the GUI thread. There are no worker
-// threads or locks. A real backend must marshal commands/events at this boundary;
+// Calls and snapshots belong to the control/GUI thread. The scanner owns its
+// worker and marshals immutable updates back through this boundary;
 // it must not run audio callbacks on the GUI thread or expose their buffers here.
 // Commands return explicit failures rather than silently substituting endpoints.
 class Controller {

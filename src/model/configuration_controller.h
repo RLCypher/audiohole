@@ -20,6 +20,7 @@ class ConfigurationController final : public Controller {
         return edit_error_;
     }
     Result save(Profile, bool apply) override;
+    Result update_buffer(const std::string&, const std::string&, bool, int) override;
     std::string create_profile(const std::string&, const std::string& copy_from = {}) override;
     Result remove_profile(const std::string&) override;
     Hole make_hole() override;

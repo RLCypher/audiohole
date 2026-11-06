@@ -10,6 +10,17 @@ constexpr int stop_duration_ms = 100;
 constexpr int beep_duration_ms = 1000;
 constexpr int scan_ms_per_percent = 30;
 constexpr std::size_t maximum_diagnostic_events = 500;
+bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
+    bool supported = false;
+    for (const auto& capability : device.capabilities) {
+        if (capability.mode != mode || capability.format != format)
+            continue;
+        if (capability.support == FormatSupport::Unsupported)
+            return false; // Conflicting observations need a rescan, not a guess.
+        supported = supported || capability.support == FormatSupport::Supported;
+    }
+    return supported;
+}
 } // namespace
 
 const char* name(State s) {
@@ -23,12 +34,26 @@ const char* name(Availability a) {
     return names.at(static_cast<std::size_t>(a));
 }
 std::string Format::label() const {
-    return std::to_string(rate) + " Hz / " + std::to_string(channels) + " ch / " + representation;
+    auto result =
+        std::to_string(rate) + " Hz / " + std::to_string(channels) + " ch / " + representation;
+    if (wave)
+        result += " / " + std::to_string(wave->valid_bits) + " valid bits in " +
+                  std::to_string(wave->container_bits) + " / layout " +
+                  (wave->channel_mask ? std::to_string(*wave->channel_mask) : "unknown");
+    return result;
 }
 const Endpoint* endpoint(const Snapshot& snapshot, const std::string& id) {
     auto found = std::find_if(snapshot.endpoints.begin(), snapshot.endpoints.end(),
                               [&](const auto& device) { return device.id == id; });
     return found == snapshot.endpoints.end() ? nullptr : &*found;
+}
+std::vector<const Endpoint*> configuration_devices(const Snapshot& snapshot) {
+    std::vector<const Endpoint*> devices;
+    for (const auto& device : snapshot.endpoints)
+        if (!device.hidden &&
+            (snapshot.operating_mode == OperatingMode::Preview || device.inspection))
+            devices.push_back(&device);
+    return devices;
 }
 const Profile* profile(const Snapshot& snapshot, const std::string& id) {
     auto found = std::find_if(snapshot.profiles.begin(), snapshot.profiles.end(),
@@ -40,26 +65,113 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
     const auto* source = endpoint(snapshot, direction.source);
     const auto* destination = endpoint(snapshot, direction.destination);
     if (!source || !destination) {
-        recommendation.explanation =
-            "Conservative 48000 Hz / 2 ch / float32 placeholder. Select both "
-            "endpoints; compatibility is unverified.";
+        recommendation.explanation = "Select a capture source and playback destination. No format "
+                                     "is established until both devices have matching evidence.";
         return recommendation;
     }
-    for (const auto& format : source->formats)
-        if (std::find(destination->formats.begin(), destination->formats.end(), format) !=
-            destination->formats.end())
-            recommendation.compatible.push_back(format);
-    recommendation.explanation =
-        recommendation.compatible.empty()
-            ? "No common format in the source and destination capability lists. Select another "
-              "pair."
-            : "Both endpoints list this format; 48 kHz is preferred when available to avoid "
-              "unnecessary format conversion. A common format does not establish a shared clock.";
-    auto preferred =
-        std::find(recommendation.compatible.begin(), recommendation.compatible.end(), Format{});
-    if (preferred != recommendation.compatible.end())
-        std::rotate(recommendation.compatible.begin(), preferred, preferred + 1);
+    if (source->inspection || destination->inspection || !source->capabilities.empty() ||
+        !destination->capabilities.empty()) {
+        for (const auto& candidate : source->capabilities) {
+            if (candidate.support != FormatSupport::Supported ||
+                (candidate.mode != "Shared" && candidate.mode != "Exclusive") ||
+                (direction.settings.mode != "Automatic" &&
+                 candidate.mode != direction.settings.mode))
+                continue;
+            const bool supported = supports(*source, candidate.format, candidate.mode) &&
+                                   supports(*destination, candidate.format, candidate.mode);
+            if (supported &&
+                std::find(recommendation.compatible.begin(), recommendation.compatible.end(),
+                          candidate.format) == recommendation.compatible.end())
+                recommendation.compatible.push_back(candidate.format);
+        }
+        recommendation.explanation =
+            recommendation.compatible.empty()
+                ? "No exact format is reported supported by both devices in the selected mode. Run "
+                  "a "
+                  "Basic device update or choose another pair/mode. Drafts can still be saved. "
+                  "Different channel layouts need explicit mapping; none is inferred."
+                : "Exact Windows-reported tuples shared by both devices in the selected mode. "
+                  "Automatic favors Shared, then 48 kHz float when listed. This is not a verified "
+                  "route or measured "
+                  "latency; unknown channel layouts remain unknown. Buffer is a requested "
+                  "duration, "
+                  "not a negotiated engine period.";
+    } else {
+        for (const auto& format : source->formats)
+            if (std::find(destination->formats.begin(), destination->formats.end(), format) !=
+                destination->formats.end())
+                recommendation.compatible.push_back(format);
+        recommendation.explanation =
+            recommendation.compatible.empty()
+                ? "No common format in the source and destination capability lists. Select another "
+                  "pair."
+                : "Both endpoints list this format; 48 kHz is preferred when available to avoid "
+                  "unnecessary format conversion. A common format does not establish a shared "
+                  "clock.";
+    }
+    auto rank = [&](const Format& format) {
+        const bool prefer_shared = direction.settings.mode == "Automatic" &&
+                                   supports(*source, format, "Shared") &&
+                                   supports(*destination, format, "Shared");
+        return (prefer_shared ? 0 : 2) +
+               (format.rate == 48000 && format.representation == "float32" ? 0 : 1);
+    };
+    std::stable_sort(recommendation.compatible.begin(), recommendation.compatible.end(),
+                     [&](const auto& a, const auto& b) { return rank(a) < rank(b); });
     return recommendation;
+}
+void describe_profile(const Snapshot& snapshot, Profile& candidate) {
+    for (auto& hole : candidate.holes)
+        for (auto* direction : {&hole.forward, &hole.reverse}) {
+            if (direction->source.empty())
+                direction->source_name.clear();
+            if (direction->destination.empty())
+                direction->destination_name.clear();
+            if (const auto* device = endpoint(snapshot, direction->source))
+                direction->source_name = device->display_name;
+            if (const auto* device = endpoint(snapshot, direction->destination))
+                direction->destination_name = device->display_name;
+            const auto options = recommend(snapshot, *direction);
+            if (direction->settings.automatic && !options.compatible.empty())
+                direction->settings.format = options.compatible.front();
+        }
+}
+Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
+                       PreparedProfile& output) {
+    const auto valid = validate(snapshot, candidate);
+    if (!valid.ok)
+        return valid;
+    PreparedProfile prepared;
+    prepared.profile_id = candidate.id;
+    for (const auto& hole : candidate.holes) {
+        if (!hole.enabled)
+            continue;
+        for (bool reverse : {false, true}) {
+            if (reverse && !hole.duplex)
+                continue;
+            const auto& d = reverse ? hole.reverse : hole.forward;
+            const auto* source = endpoint(snapshot, d.source);
+            const auto* destination = endpoint(snapshot, d.destination);
+            if (source->availability != Availability::Available ||
+                destination->availability != Availability::Available)
+                return {false, "A selected device is unavailable or its identity is unresolved."};
+            const auto choices = recommend(snapshot, d);
+            const auto format =
+                d.settings.automatic ? choices.compatible.front() : d.settings.format;
+            std::string mode = d.settings.mode;
+            if (mode == "Automatic") {
+                mode = "Shared";
+                if (source->inspection || !source->capabilities.empty()) {
+                    if (!supports(*source, format, mode) || !supports(*destination, format, mode))
+                        mode = "Exclusive";
+                }
+            }
+            prepared.paths.push_back(
+                {hole.id, d.source, d.destination, mode, reverse, format, d.settings.buffer_ms});
+        }
+    }
+    output = std::move(prepared);
+    return {true, "Routing requests prepared; runtime endpoint initialization is still required."};
 }
 Result validate(const Snapshot& snapshot, const Profile& candidate) {
     if (candidate.display_name.empty())
@@ -81,8 +193,16 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
             if (!source || !destination || !source->capture || destination->capture)
                 return {false, "Select a saved capture source and playback destination for each "
                                "enabled direction."};
+            if (snapshot.operating_mode == OperatingMode::Test &&
+                (!source->inspection || !destination->inspection))
+                return {
+                    false,
+                    "Choose devices from the scanned inventory for Test Mode routing requests."};
             if (direction->settings.buffer_ms < 1 || direction->settings.buffer_ms > 100)
                 return {false, "Buffer must be between 1 and 100 ms."};
+            if (direction->settings.mode != "Automatic" && direction->settings.mode != "Shared" &&
+                direction->settings.mode != "Exclusive")
+                return {false, "Choose Automatic, Shared or Exclusive operating mode."};
             const auto recommendation = recommend(snapshot, *direction);
             if (recommendation.compatible.empty())
                 return {false,

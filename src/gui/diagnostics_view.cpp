@@ -22,7 +22,18 @@ void Frame::build_scan() {
         present(presentation::Message::ScanScopeChanged);
     });
     root->Add(options, 0, wxEXPAND);
+    auto* row = new wxBoxSizer(wxHORIZONTAL);
+    scan_start_ = button(page, row, "Start scan", [this] {
+        request_scan(scan_mode_->GetSelection() == 1,
+                     static_cast<ScanScope>(scan_scope_->GetSelection()), device_id_);
+    });
+    scan_cancel_ = button(page, row, "Cancel scan", [this] {
+        controller_->scan(false);
+        refresh();
+    });
+    root->Add(row);
     auto* deep = new wxCollapsiblePane(page, wxID_ANY, "Deep scan limits and test context");
+    deep->SetName("Deep scan settings");
     auto* pane = deep->GetPane();
     auto* limits = new wxBoxSizer(wxVERTICAL);
     deep_mode_ = choices(pane, limits, "Operating mode", {"shared", "exclusive", "both"});
@@ -69,16 +80,6 @@ void Frame::build_scan() {
     root->Add(deep, 0, wxEXPAND | wxALL, 3);
     deep->Show(controller_->snapshot().operating_mode == OperatingMode::Test);
     deep->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [page](wxCollapsiblePaneEvent&) { page->Layout(); });
-    auto* row = new wxBoxSizer(wxHORIZONTAL);
-    scan_start_ = button(page, row, "Start scan", [this] {
-        request_scan(scan_mode_->GetSelection() == 1,
-                     static_cast<ScanScope>(scan_scope_->GetSelection()), device_id_);
-    });
-    scan_cancel_ = button(page, row, "Cancel scan", [this] {
-        controller_->scan(false);
-        refresh();
-    });
-    root->Add(row);
     scan_progress_ = new wxGauge(page, wxID_ANY, 100);
     root->Add(scan_progress_, 0, wxEXPAND | wxALL, 4);
     scan_state_ = label(page, root, "No scan requested.");

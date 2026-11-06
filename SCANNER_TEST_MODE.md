@@ -146,7 +146,11 @@ frame-progress validation. It is shown only as limited short-stream evidence, ne
 as Healthy/Recommended or proof of sustained operation, channel mapping, clock
 synchronization, signal presence or endpoint limits. Busy/permission/policy denial
 is not recast as unsupported. No recommendation is fabricated from these results.
-The routing configurator's richer evidence-to-preference design is future work.
+The Test configurator now uses a conservative exact-tuple/same-mode projection
+of affirmative Basic queries, documented in
+[PROVISIONAL_TEST_PERSISTENCE.md](PROVISIONAL_TEST_PERSISTENCE.md#scanner-backed-configuration-increment).
+Endpoint-independent negotiation, channel mapping and richer recommendation
+policies remain future work; Deep history does not imply a verified route.
 
 Each scan writes `request.json` (scope, depth, logical ID, budgets, consent, source,
 UTC time and optional operating context), `progress.jsonl`, `basic.json`, optional

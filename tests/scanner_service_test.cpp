@@ -817,4 +817,147 @@ TEST_F(ScannerIntegration, CheckpointLatencyDoesNotLaunchWorkerAfterDeviceBudget
     EXPECT_NE(report.attempts[0]["reason"].get<std::string>().find("budget exhausted"),
               std::string::npos);
 }
+TEST_F(ScannerIntegration, RoutingChoicesUseExactModeSpecificDescriptorsAndPreserveUnknownLayout) {
+    for (auto& e : evidence->endpoints) {
+        auto format = e.reported_capabilities.at("default_mix_format");
+        format["channel_mask"] = Json{{"status", "unknown"}};
+        e.reported_capabilities["format_queries"] = Json::array({{{"configuration", format},
+                                                                  {"mode", "shared"},
+                                                                  {"support", "supported"},
+                                                                  {"hresult", "0x00000000"}}});
+    }
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    auto worker = service();
+    const auto loaded = finish(*worker, worker->action(ScannerActionRequest{}));
+    Snapshot snapshot;
+    snapshot.operating_mode = OperatingMode::Test;
+    snapshot.endpoints = loaded.devices;
+    ASSERT_EQ(snapshot.endpoints.size(), 2u);
+    Direction d;
+    for (const auto& e : snapshot.endpoints)
+        (e.capture ? d.source : d.destination) = e.id;
+    auto options = recommend(snapshot, d);
+    ASSERT_EQ(options.compatible.size(), 1u);
+    ASSERT_TRUE(options.compatible[0].wave);
+    EXPECT_FALSE(options.compatible[0].wave->channel_mask);
+    Profile p{"profile", "Microphone monitoring", "User note", {Hole{}}};
+    p.holes.front().id = "hole";
+    p.holes.front().forward = d;
+    PreparedProfile plan;
+    ASSERT_TRUE(prepare_profile(snapshot, p, plan).ok);
+    ASSERT_EQ(plan.paths.size(), 1u);
+    EXPECT_EQ(plan.paths[0].mode, "Shared");
+    EXPECT_EQ(plan.paths[0].format, options.compatible[0]);
+    auto shared_preferred = snapshot;
+    for (auto& e : shared_preferred.endpoints) {
+        e.capabilities[0].mode = "Exclusive";
+        auto shared = e.capabilities[0];
+        shared.mode = "Shared";
+        shared.format.rate = 96000;
+        shared.format.wave->average_bytes_per_second *= 2;
+        e.capabilities.push_back(shared);
+    }
+    EXPECT_EQ(recommend(shared_preferred, d).compatible.front().rate, 96000);
+    PreparedProfile shared_plan;
+    ASSERT_TRUE(prepare_profile(shared_preferred, p, shared_plan).ok);
+    EXPECT_EQ(shared_plan.paths[0].mode, "Shared");
+    const auto original = plan.paths;
+    d.settings.mode = "Exclusive";
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty());
+    p.holes.front().forward = d;
+    EXPECT_FALSE(prepare_profile(snapshot, p, plan).ok);
+    EXPECT_EQ(plan.paths.size(), original.size()); // Failure never publishes a partial plan.
+    EXPECT_EQ(plan.paths[0].mode, original[0].mode);
+    d.settings.mode = "Automatic";
+    snapshot.endpoints.back().capabilities[0].mode = "Exclusive";
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // No union across modes.
+    snapshot.endpoints.back().capabilities[0].mode = "Shared";
+    snapshot.endpoints.back().capabilities[0].format.wave->channel_mask = 3;
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // Unknown is not stereo.
+    snapshot.endpoints.back().capabilities[0].format.wave->channel_mask.reset();
+    snapshot.endpoints.back().capabilities[0].format.wave->valid_bits = 24;
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // Not just rate/channels/sample type.
+    snapshot.endpoints.back().capabilities[0].format.wave->valid_bits = 32;
+    auto rejected = snapshot.endpoints.back().capabilities[0];
+    rejected.support = FormatSupport::Unsupported;
+    snapshot.endpoints.back().capabilities.push_back(rejected);
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // Conflicting reports require rescan.
+}
+TEST_F(ScannerIntegration, ClosestMatchesAndMixFormatsNeverBecomeSupportedRequests) {
+    for (auto& e : evidence->endpoints) {
+        const auto format = e.reported_capabilities.at("default_mix_format");
+        e.reported_capabilities["format_queries"] = Json::array({{{"configuration", format},
+                                                                  {"mode", "shared"},
+                                                                  {"support", "supported"},
+                                                                  {"hresult", "0x00000001"},
+                                                                  {"closest_match", format}},
+                                                                 {{"configuration", format},
+                                                                  {"mode", "exclusive"},
+                                                                  {"support", "unsupported"},
+                                                                  {"hresult", "0x88890008"}}});
+    }
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    auto worker = service();
+    Snapshot snapshot;
+    snapshot.endpoints = finish(*worker, worker->action(ScannerActionRequest{})).devices;
+    Direction d;
+    for (const auto& e : snapshot.endpoints) {
+        (e.capture ? d.source : d.destination) = e.id;
+        EXPECT_TRUE(e.formats.empty()); // No flattened mode-independent capability claims.
+        ASSERT_EQ(e.capabilities.size(), 2u);
+        EXPECT_EQ(e.capabilities[0].support, FormatSupport::Unknown);
+        EXPECT_EQ(e.capabilities[1].support, FormatSupport::Unsupported);
+    }
+    EXPECT_TRUE(recommend(snapshot, d).compatible.empty());
+}
+TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnavailableDevices) {
+    for (auto& e : evidence->endpoints) {
+        const auto format = e.reported_capabilities.at("default_mix_format");
+        e.reported_capabilities["format_queries"] = Json::array({{{"configuration", format},
+                                                                  {"mode", "shared"},
+                                                                  {"support", "supported"},
+                                                                  {"hresult", "0x00000000"}}});
+    }
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    const auto file = portable / "configuration.json";
+    ConfigurationController controller(std::make_unique<TestJsonPersistence>(file), service());
+    finish(controller);
+    const auto id = controller.create_profile("Voice → headphones");
+    ASSERT_FALSE(id.empty());
+    auto p = *profile(controller.snapshot(), id);
+    auto h = controller.make_hole();
+    h.notes = "Keep my channel layout and identity";
+    for (const auto& e : controller.snapshot().endpoints)
+        (e.capture ? h.forward.source : h.forward.destination) = e.id;
+    p.holes.push_back(h);
+    ASSERT_TRUE(controller.save(p, false).ok);
+    const auto saved = *profile(controller.snapshot(), id);
+    ASSERT_TRUE(saved.holes[0].forward.settings.format.wave);
+    EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
+    const auto json = Json::parse(bytes(file));
+    EXPECT_TRUE(json.at("devices").empty());
+    EXPECT_EQ(json.at("schema_version"), 2);
+    EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
+    EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);
+    auto device = store.inventory().devices.front();
+    store.set_hidden(device.record.at("logical_id"), true);
+    std::filesystem::rename(device.path,
+                            device.path.parent_path() / "Renamed outside AudioHole.json");
+    evidence->endpoints.clear();
+    ASSERT_EQ(store.reconcile(discovery({}), second).result, "completed");
+    ConfigurationController restarted(std::make_unique<TestJsonPersistence>(file), service());
+    finish(restarted);
+    EXPECT_EQ(*profile(restarted.snapshot(), id), saved);
+    EXPECT_EQ(configuration_devices(restarted.snapshot()).size(), 1u);
+    auto with_legacy = restarted.snapshot();
+    with_legacy.endpoints.push_back(Endpoint{});
+    EXPECT_EQ(configuration_devices(with_legacy).size(),
+              1u); // Legacy Test fixtures are not offered.
+    PreparedProfile prepared;
+    EXPECT_FALSE(prepare_profile(restarted.snapshot(), saved, prepared).ok);
+    EXPECT_TRUE(restarted.save(saved, false).ok); // Missing devices do not prevent saving drafts.
+    EXPECT_EQ(profile(restarted.snapshot(), id)->holes[0].forward.source, h.forward.source);
+    EXPECT_EQ(profile(restarted.snapshot(), id)->holes[0].forward.destination,
+              h.forward.destination);
+}
 } // namespace audiohole

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cstdio>
 #include <fstream>
@@ -20,7 +21,7 @@
 
 namespace audiohole {
 namespace {
-using Json = nlohmann::json;
+using Json = nlohmann::ordered_json;
 constexpr std::size_t maximum_document = 2 * 1024 * 1024;
 void require(bool condition) {
     if (!condition)
@@ -74,15 +75,59 @@ Format format(const Json& value) {
     f.representation = string(value, "representation", 64);
     require(f.rate > 0 && f.rate <= 768000 && f.channels > 0 && f.channels <= 256 &&
             !f.representation.empty());
+    if (value.contains("wave") && !value.at("wave").is_null()) {
+        const auto& v = value.at("wave");
+        WaveFormat wave;
+        wave.container_bits = integer(v, "container_bits", 8, 64);
+        wave.valid_bits = integer(v, "valid_bits", 1, wave.container_bits);
+        wave.format_tag = integer(v, "format_tag", 1, 65535);
+        wave.subformat_guid = string(v, "subformat_guid", 64);
+        std::transform(wave.subformat_guid.begin(), wave.subformat_guid.end(),
+                       wave.subformat_guid.begin(),
+                       [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        wave.block_align_bytes = integer(v, "block_align_bytes", 1, 65535);
+        wave.average_bytes_per_second = integer(v, "average_bytes_per_second", 1, 2147483647);
+        const auto& mask = v.at("channel_mask");
+        if (mask.is_number_integer()) {
+            const auto n = mask.get<std::int64_t>();
+            require(n >= 0 && n <= 0xffffffffLL);
+            wave.channel_mask = static_cast<std::uint32_t>(n);
+        } else
+            require(mask.is_object() && mask.at("status") == "unknown");
+        require(!wave.subformat_guid.empty() && wave.container_bits % 8 == 0 &&
+                wave.block_align_bytes == f.channels * wave.container_bits / 8 &&
+                static_cast<std::int64_t>(wave.block_align_bytes) * f.rate ==
+                    wave.average_bytes_per_second);
+        f.wave = std::move(wave);
+    }
     return f;
 }
 Json encode(const Format& f) {
-    return {{"rate", f.rate}, {"channels", f.channels}, {"representation", f.representation}};
+    Json result{{"rate", f.rate},
+                {"channels", f.channels},
+                {"representation", f.representation},
+                {"wave", nullptr}};
+    if (f.wave) {
+        const auto& w = *f.wave;
+        result["wave"] = {
+            {"container_bits", w.container_bits},
+            {"valid_bits", w.valid_bits},
+            {"channel_mask", w.channel_mask ? Json(*w.channel_mask) : Json{{"status", "unknown"}}},
+            {"format_tag", w.format_tag},
+            {"subformat_guid", w.subformat_guid},
+            {"block_align_bytes", w.block_align_bytes},
+            {"average_bytes_per_second", w.average_bytes_per_second}};
+    }
+    return result;
 }
 Direction direction(const Json& value) {
     Direction d;
     d.source = string(value, "source", 128);
     d.destination = string(value, "destination", 128);
+    if (value.contains("source_name"))
+        d.source_name = string(value, "source_name");
+    if (value.contains("destination_name"))
+        d.destination_name = string(value, "destination_name");
     const auto& settings = value.at("settings");
     d.settings.automatic = settings.at("automatic").get<bool>();
     d.settings.buffer_ms = integer(settings, "buffer_ms", 1, 100);
@@ -92,19 +137,21 @@ Direction direction(const Json& value) {
     return d;
 }
 Json encode(const Direction& d) {
-    return {{"source", d.source},
+    return {{"source_name", d.source_name},
+            {"source", d.source},
+            {"destination_name", d.destination_name},
             {"destination", d.destination},
             {"settings",
              {{"automatic", d.settings.automatic},
-              {"buffer_ms", d.settings.buffer_ms},
+              {"format", encode(d.settings.format)},
               {"mode", d.settings.mode},
-              {"format", encode(d.settings.format)}}}};
+              {"buffer_ms", d.settings.buffer_ms}}}};
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 1},
-                   {"devices", Json::array()},
-                   {"profiles", Json::array()}};
+                   {"schema_version", 2},
+                   {"profiles", Json::array()},
+                   {"devices", Json::array()}};
     for (const auto& d : records.devices) {
         Json formats = Json::array();
         for (const auto& f : d.formats)
@@ -122,21 +169,21 @@ Json encode(const ConfigurationRecords& records) {
     for (const auto& p : records.profiles) {
         Json holes = Json::array();
         for (const auto& h : p.holes)
-            holes.push_back({{"id", h.id},
-                             {"display_name", h.display_name},
+            holes.push_back({{"display_name", h.display_name},
                              {"notes", h.notes},
+                             {"id", h.id},
                              {"enabled", h.enabled},
                              {"duplex", h.duplex},
                              {"forward", encode(h.forward)},
                              {"reverse", encode(h.reverse)}});
         result["profiles"].push_back(
-            {{"id", p.id}, {"display_name", p.display_name}, {"notes", p.notes}, {"holes", holes}});
+            {{"display_name", p.display_name}, {"notes", p.notes}, {"id", p.id}, {"holes", holes}});
     }
     return result;
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 1) == 1);
+            integer(root, "schema_version", 1, 2) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -194,9 +241,12 @@ ConfigurationRecords decode(const Json& root) {
 // explicit removals stay removed. New known values take precedence.
 Json merge(const Json& old, const Json& current) {
     if (old.is_object() && current.is_object()) {
-        auto result = old;
+        auto result = Json::object();
         for (const auto& [key, value] : current.items())
             result[key] = old.contains(key) ? merge(old.at(key), value) : value;
+        for (const auto& [key, value] : old.items())
+            if (!current.contains(key))
+                result[key] = value;
         return result;
     }
     if (old.is_array() && current.is_array()) {
@@ -209,6 +259,11 @@ Json merge(const Json& old, const Json& current) {
                 });
             else if (item.is_object())
                 previous = std::find_if(old.begin(), old.end(), [&](const auto& original) {
+                    if (item.contains("rate") && item.contains("channels") &&
+                        item.contains("representation") && original.is_object() &&
+                        original.contains("rate") && original.contains("channels") &&
+                        original.contains("representation"))
+                        return format(original) == format(item);
                     return original.is_object() &&
                            std::all_of(item.items().begin(), item.items().end(),
                                        [&](const auto& field) {
@@ -314,6 +369,24 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
+        if (impl_->expected && impl_->original.at("schema_version") == 1) {
+            // No load-time migration. The first explicit save keeps the exact
+            // v1 original; never overwrite a different earlier backup.
+            if (read_document(impl_->file) != impl_->expected)
+                return {false,
+                        "File changed externally. Reload before saving; no data was overwritten."};
+            auto backup = impl_->file;
+            backup += ".v1.bak";
+            const auto existing = read_document(backup);
+            if (existing && existing != impl_->expected)
+                return {false, "A different v1 backup already exists. Preserve it and choose a new "
+                               "configuration destination before upgrading."};
+            if (!existing) {
+                const auto result = replace_document(backup, *impl_->expected, std::nullopt);
+                if (!result.ok)
+                    return result;
+            }
+        }
         auto result = replace_document(impl_->file, bytes, impl_->expected);
         if (result.ok) {
             impl_->expected = bytes;

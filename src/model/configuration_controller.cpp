@@ -126,6 +126,7 @@ Result ConfigurationController::remove_profile(const std::string& id) {
 Result ConfigurationController::save(Profile edited, bool apply) {
     if (apply)
         return unavailable("Applying a live routing plan; use Save for configuration-only changes");
+    describe_profile(state_, edited);
     ConfigurationRecords records{state_.endpoints, state_.profiles};
     const auto found = std::find_if(records.profiles.begin(), records.profiles.end(),
                                     [&](const auto& record) { return record.id == edited.id; });
@@ -134,6 +135,26 @@ Result ConfigurationController::save(Profile edited, bool apply) {
     *found = std::move(edited);
     return commit(std::move(records),
                   "Profile saved to Test configuration. No engine values were applied.");
+}
+Result ConfigurationController::update_buffer(const std::string& profile_id,
+                                              const std::string& hole_id, bool reverse,
+                                              int milliseconds) {
+    if (milliseconds < 1 || milliseconds > 100)
+        return {false, "Buffer must be between 1 and 100 milliseconds."};
+    ConfigurationRecords records{state_.endpoints, state_.profiles};
+    const auto selected = std::find_if(records.profiles.begin(), records.profiles.end(),
+                                       [&](const auto& p) { return p.id == profile_id; });
+    if (selected == records.profiles.end())
+        return {false, "Save or select a profile before applying its buffer preference."};
+    const auto hole = std::find_if(selected->holes.begin(), selected->holes.end(),
+                                   [&](const auto& h) { return h.id == hole_id; });
+    if (hole == selected->holes.end() || (reverse && !hole->duplex))
+        return {false, "Save this hole and direction before applying its buffer preference."};
+    // An individual Apply must not refresh names or resolve formats elsewhere in
+    // the profile. Those changes belong to an explicit full-profile Save.
+    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    return commit(std::move(records),
+                  "Direction buffer preference saved; no engine values were applied.");
 }
 Result ConfigurationController::update_endpoint(const Endpoint& edited) {
     const auto* original = endpoint(state_, edited.id);

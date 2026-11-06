@@ -4,6 +4,7 @@
 #include "presentation/scan_progress.h"
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <condition_variable>
 #include <deque>
@@ -118,6 +119,57 @@ std::string reported_formats(const Json& reported, bool compact) {
                             : "  Exact tuples and rejected candidates: select Reported formats.\n";
     return result;
 }
+// Project only complete descriptors. Default/mix formats and S_FALSE closest
+// matches are observations, not affirmative support for the requested tuple.
+std::optional<Format> routing_format(const Json& descriptor) {
+    try {
+        auto number = [&](const char* key, int minimum, int maximum) {
+            const auto& v = descriptor.at(key);
+            if (!v.is_number_integer())
+                throw std::invalid_argument("Noninteger descriptor");
+            const auto n = v.get<std::int64_t>();
+            if (n < minimum || n > maximum)
+                throw std::invalid_argument("Descriptor out of range");
+            return static_cast<int>(n);
+        };
+        Format f;
+        f.rate = number("sample_rate_hz", 1, 768000);
+        f.channels = number("channel_count", 1, 256);
+        f.representation = descriptor.at("sample_format").get<std::string>();
+        if (f.representation != "float32" && f.representation != "pcm_s16" &&
+            f.representation != "pcm_s24_packed" && f.representation != "pcm_s32")
+            return {};
+        WaveFormat wave;
+        wave.container_bits = number("container_bits", 8, 64);
+        wave.valid_bits = number("valid_bits", 1, wave.container_bits);
+        wave.format_tag = number("format_tag", 1, 65535);
+        wave.subformat_guid = descriptor.at("subformat_guid").get<std::string>();
+        if (wave.subformat_guid.empty() || wave.subformat_guid.size() > 64)
+            return {};
+        std::transform(wave.subformat_guid.begin(), wave.subformat_guid.end(),
+                       wave.subformat_guid.begin(),
+                       [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        wave.block_align_bytes = number("block_align_bytes", 1, 65535);
+        wave.average_bytes_per_second = number("average_bytes_per_second", 1, 2147483647);
+        const auto& mask = descriptor.at("channel_mask");
+        if (mask.is_number_integer()) {
+            const auto n = mask.get<std::int64_t>();
+            if (n < 0 || n > 0xffffffffLL)
+                return {};
+            wave.channel_mask = static_cast<std::uint32_t>(n);
+        } else if (!mask.is_object() || mask.value("status", "") != "unknown")
+            return {};
+        if (wave.container_bits % 8 ||
+            wave.block_align_bytes != f.channels * wave.container_bits / 8 ||
+            static_cast<std::int64_t>(wave.block_align_bytes) * f.rate !=
+                wave.average_bytes_per_second)
+            return {};
+        f.wave = std::move(wave);
+        return f;
+    } catch (const std::exception&) {
+        return {};
+    }
+}
 std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const std::string& source) {
     std::vector<Endpoint> result;
     std::map<std::string, unsigned> claims;
@@ -138,6 +190,22 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
         endpoint.notes = value(field(record, "notes"));
         endpoint.capture = field(identity, "direction") == "capture";
         endpoint.hidden = record.value("hidden", false);
+        const auto& queries = field(reported, "format_queries");
+        if (queries.is_array())
+            for (const auto& query : queries) {
+                const auto mode = field(query, "mode");
+                const auto format = routing_format(field(query, "configuration"));
+                if (!format || (mode != "shared" && mode != "exclusive"))
+                    continue;
+                auto support = FormatSupport::Unknown;
+                if (field(query, "support") == "supported" &&
+                    field(query, "hresult") == "0x00000000")
+                    support = FormatSupport::Supported;
+                else if (field(query, "support") == "unsupported")
+                    support = FormatSupport::Unsupported;
+                endpoint.capabilities.push_back(
+                    {*format, mode == "shared" ? "Shared" : "Exclusive", support});
+            }
         auto detail = std::make_shared<DeviceInspection>();
         detail->source = source;
         detail->path = scan::path_utf8(saved.path);

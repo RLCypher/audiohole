@@ -134,9 +134,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (!loading_)
             dirty_ = true;
     });
-    w.mode->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        if (!loading_)
-            dirty_ = true;
+    w.mode->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
+        if (loading_ || hole_index_ < 0)
+            return;
+        capture_draft();
+        const auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+        populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+        dirty_ = true;
     });
     w.buffer->Bind(wxEVT_SPINCTRL, [this, &w](wxSpinEvent&) { acknowledge_buffer(w); });
     w.buffer->Bind(wxEVT_TEXT_ENTER, [this, &w](wxCommandEvent&) { acknowledge_buffer(w); });
@@ -569,8 +573,8 @@ void Frame::build_profiles() {
         refresh();
     });
 }
-// Capability lists are authored fixtures, not results from IsFormatSupported or
-// runtime stream initialization. Rebuilding must not silently erase a manual choice.
+// Test uses exact worker-projected scanner tuples; Preview uses authored fixtures.
+// Rebuilding must not silently erase a manual choice or invent runtime evidence.
 void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& d) {
     const bool old_loading = loading_;
     loading_ = true;
@@ -581,11 +585,15 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.retained_source = d.source;
     w.retained_destination = d.destination;
     wxArrayString source_search, dest_search;
-    for (const auto& e : controller_->snapshot().endpoints) {
-        if (e.hidden)
-            continue;
-        const auto caption =
-            text(e.display_name + " [" + e.id + "] — " + audiohole::name(e.availability));
+    const auto offered_devices = configuration_devices(controller_->snapshot());
+    for (const auto* offered : offered_devices) {
+        const auto& e = *offered;
+        const bool duplicate_name =
+            std::count_if(offered_devices.begin(), offered_devices.end(), [&](const auto* other) {
+                return other->capture == e.capture && other->display_name == e.display_name;
+            }) > 1;
+        const auto caption = text(e.display_name + (duplicate_name ? " [" + e.id + "]" : "") +
+                                  " — " + audiohole::name(e.availability));
         auto* list = e.capture ? w.source : w.destination;
         auto& ids = e.capture ? w.sources : w.destinations;
         list->Append(caption);
@@ -598,10 +606,15 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     // A configured hidden/missing binding remains visible as field text, never
     // as an offered list item. Saving unrelated edits retains its exact ID.
+    auto retained_caption = [&](const std::string& id, const std::string& saved_name) {
+        const auto* device = endpoint(controller_->snapshot(), id);
+        const auto display_name = device ? device->display_name : saved_name;
+        return text("Saved binding (hidden or missing): " + display_name + " [" + id + "]");
+    };
     if (w.source->GetSelection() == wxNOT_FOUND && !d.source.empty())
-        w.source->SetValue(text("Saved binding (hidden or missing): " + d.source));
+        w.source->SetValue(retained_caption(d.source, d.source_name));
     if (w.destination->GetSelection() == wxNOT_FOUND && !d.destination.empty())
-        w.destination->SetValue(text("Saved binding (hidden or missing): " + d.destination));
+        w.destination->SetValue(retained_caption(d.destination, d.destination_name));
     w.retained_source_caption = w.source->GetValue();
     w.retained_destination_caption = w.destination->GetValue();
     w.source->AutoComplete(source_search);
@@ -612,7 +625,7 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     // Keep the literal branch a wxString too; mixed types are ambiguous on MSVC.
     w.format->Append(r.compatible.empty()
                          ? wxString(wxS("Automatic — unverified compatibility"))
-                         : wxS("Recommended — ") + text(r.compatible.front().label()) + "");
+                         : wxS("Automatic — ") + text(r.compatible.front().label()) + "");
     int selection = 0;
     for (const auto& f : r.compatible) {
         w.format->Append(text(f.label()) + "");
@@ -621,7 +634,8 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     if (!d.settings.automatic && !selection) {
         w.formats.push_back(d.settings.format);
-        w.format->Append(text(d.settings.format.label()) + " [UNSUPPORTED override retained]");
+        w.format->Append(text(d.settings.format.label()) +
+                         " [not supported by current evidence; retained]");
         selection = static_cast<int>(w.format->GetCount()) - 1;
     }
     w.format->SetSelection(selection);
@@ -630,6 +644,11 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.evidence->Wrap(570);
     w.buffer->SetValue(d.settings.buffer_ms);
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
+    w.mode->Clear();
+    for (const auto* mode : {"Automatic", "Shared", "Exclusive"})
+        w.mode->Append(mode);
+    if (w.mode->FindString(text(d.settings.mode)) == wxNOT_FOUND)
+        w.mode->Append(text(d.settings.mode)); // Preserve externally authored unknown requests.
     w.mode->SetStringSelection(text(d.settings.mode));
     loading_ = old_loading;
 }
@@ -801,12 +820,21 @@ void Frame::load_hole(int index) {
     duplex_->SetValue(h.duplex);
     activity_direction_->SetSelection(0);
     activity_direction_->Enable(index >= 0 && h.duplex);
-    for (wxWindow* widget : std::vector<wxWindow*>{hole_notes_, enabled_, duplex_})
+    hole_notes_->SetEditable(index >= 0);
+    for (wxWindow* widget : std::vector<wxWindow*>{enabled_, duplex_})
         widget->Enable(index >= 0);
     populate_direction(forward_, h.forward);
     populate_direction(reverse_, h.reverse);
-    forward_.group->GetStaticBox()->Enable(index >= 0);
-    reverse_.group->GetStaticBox()->Enable(index >= 0);
+    // Keep containers and captions enabled: disabling the whole static box makes
+    // Windows emboss every label and paints inactive edit fields white.
+    for (auto* direction : {&forward_, &reverse_}) {
+        for (wxWindow* input :
+             std::vector<wxWindow*>{direction->source, direction->destination, direction->format,
+                                    direction->mode, direction->buffer})
+            input->Enable(index >= 0);
+        if (index < 0)
+            direction->buffer_apply->Disable();
+    }
     reverse_.group->ShowItems(h.duplex && index >= 0);
     update_beep_destinations();
     loading_ = false;
