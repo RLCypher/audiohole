@@ -1258,6 +1258,18 @@ bool Frame::smoke(const wxString& directory) {
         for (std::size_t i = 0; i < dividers.size(); ++i)
             dividers[i]->SetSashPosition(original_sashes[i]);
         check_profile_layout();
+        // Check both environments before the Test-only branch returns. Include
+        // the control identity so future omissions are immediately actionable.
+        const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
+            if (dynamic_cast<wxButton*>(window) &&
+                (!window->GetToolTip() || window->GetToolTip()->GetTip().empty()))
+                throw std::runtime_error("Button lacks explanatory hover help: label='" +
+                                         utf8(window->GetLabel()) + "', name='" +
+                                         utf8(window->GetName()) + "'");
+            for (auto* child : window->GetChildren())
+                self(self, child);
+        };
+        check_button_help(check_button_help, this);
         if (controller_->snapshot().operating_mode == OperatingMode::Test) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),
@@ -1436,14 +1448,6 @@ bool Frame::smoke(const wxString& directory) {
         load_holes();
         load_hole(hole_before_menu);
         refresh();
-        const auto check_button_help = [&](const auto& self, wxWindow* window) -> void {
-            if (dynamic_cast<wxButton*>(window))
-                require(window->GetToolTip() && !window->GetToolTip()->GetTip().empty(),
-                        "An action or navigation button lacks explanatory hover help");
-            for (auto* child : window->GetChildren())
-                self(self, child);
-        };
-        check_button_help(check_button_help, this);
         for (auto* tab : navigation_)
             require(tab->GetToolTip() == nullptr, "Navigation must not have generic hover text");
         require(!forward_.buffer_apply->IsEnabled() && !reverse_.buffer_apply->IsEnabled(),

@@ -337,6 +337,10 @@ wxString button_help(const wxString& title) {
         {"Save", "Save editor changes without changing the active routing plan."},
         {"Apply", "Validate, save and activate the edited profile."},
         {"Revert", "Discard unsaved edits and reload the saved profile after confirmation."},
+        {"Reset to Automatic",
+         "Reset this direction's format, channel mapping, access mode and buffer to Automatic. "
+         "Endpoint assignments and the other direction stay unchanged. Save / Apply keeps the "
+         "change."},
         {"Save device",
          "Update the display name and notes. Windows name and logical identity remain unchanged."},
         {"Export devices…",
