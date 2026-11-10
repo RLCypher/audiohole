@@ -1391,3 +1391,8 @@ shutdown completion. Persisted Start/Stop/Close/Exit shortcuts do not launch a n
 session if no GUI exists. Open/Controls can use the ordinary startup workflow.
 This OS shell adapter is not a public external-control transport or a new production
 configuration format. Unattended smoke tests never publish persistent Jump Lists.
+
+
+Current direction-status captions use Forward and Return, matching Profiles and
+monitoring/beep selectors. This is display wording only; internal `reverse`
+identifiers remain unchanged. The shared taskbar controls inherit these captions.

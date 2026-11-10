@@ -319,8 +319,8 @@ wxString button_help(const wxString& title) {
                       "test immediately."},
         {"Cancel Test Beep", "End the current destination test."},
         {"Forward failure", "Exercise a forward-direction failure in this evaluation scenario."},
-        {"Reverse failure",
-         "Exercise a reverse-direction failure while preserving the forward direction."},
+        {"Return failure",
+         "Exercise a return-direction failure while preserving the forward direction."},
         {"Recover", "Retry unavailable directions without restarting healthy paths."},
     };
     for (const auto& [label, explanation] : help)

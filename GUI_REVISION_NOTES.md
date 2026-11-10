@@ -210,3 +210,35 @@ identify the failing property; width failures include before/after/min/max sizes
 and disclosure state. The Windows cross-build passes; the three existing portable
 beep tests pass in both Debug and Release. Native Windows execution remains a CI
 check and is not claimed from this Linux host.
+
+
+## Direction information overlap, Return labels and folder/delete controls
+
+The shared simplex/duplex summary and evidence labels could outgrow their stale
+layout until toggling Advanced Tuning forced a reflow. Both directions now use a
+defined eight-line read-only, wrapped viewport with scrolling for full details.
+Changing actual endpoint details explicitly updates group/editor layout; stable
+polling does not repeatedly relayout or reset the information reading position.
+
+Visible Reverse captions become Return across the GUI and shared shell menu;
+existing JSON keys and internal directional identity remain unchanged. Test-only
+Open Devices Folder opens `devices/`; Open Profiles Folder opens the directory
+containing the existing shared `configuration.json`. Missing directories are
+created only on a click, Preview keeps session-only controls disabled, and local
+OS errors do not trap the personality panel. No storage schema is changed.
+
+Both profile/hole lists have a − beside +, with descriptive accessible names and
+hover help. These and Delete key dispatch the existing context command, retaining
+default-No confirmations, protected active/pending profiles and staged hole removal.
+Native smoke exercises information updates without tuning in simplex/duplex
+layouts, full evidence/height/containment, Return captions, and declined keyboard/
+minus-button confirmations. OS folder launching and visual/DPI assessment require
+manual Windows checks; smoke does not open Explorer windows.
+
+Validation for this increment: the full Windows x64 cross-build and executable
+branding checks pass; six routing/profile round-trip regressions pass in each of
+Debug and Release. Actual Runtime packaging matches the exact 729-file allowlist
+plus metadata/README, with all 699 avatar hashes and current packaged checklist/
+handoff bytes preserved. Native smoke checks compile; Windows visual, DPI and
+Explorer-launch assessment remain unexecuted here and must be checked in CI or
+on Windows. No native success is inferred from cross-compilation.

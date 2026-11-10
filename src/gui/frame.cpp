@@ -541,6 +541,11 @@ void Frame::refresh() {
     profile_revert_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
     profile_notes_->SetEditable(!viewed_.empty());
     hole_new_->Enable(!viewed_.empty());
+    profile_remove_->Enable(!viewed_.empty() && !(s.armed && viewed_ == s.active_profile) &&
+                            viewed_ != s.pending_profile);
+    hole_remove_->Enable(hole_index_ >= 0);
+    profiles_folder_->Enable(!preview);
+    devices_folder_->Enable(!preview);
     const auto edit_state =
         text(viewed_.empty()
                  ? std::string("No profile selected")
@@ -625,7 +630,7 @@ void Frame::refresh() {
     update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)
-        paths += p.hole_id + (p.reverse ? " reverse: " : " forward: ") + audiohole::name(p.state) +
+        paths += p.hole_id + (p.reverse ? " return: " : " forward: ") + audiohole::name(p.state) +
                  " — " + p.detail + "\n";
     path_status_->SetLabel(text(paths.empty() ? "No active directions." : paths));
     path_status_->Wrap(620);
@@ -782,7 +787,48 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        auto exercise_information = [&] {
+            const auto window_size = GetSize();
+            const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+            require(!advanced_tuning_->GetValue(), "Information regression needs Automatic policy");
+            for (bool duplex : {false, true}) {
+                reverse_.group->ShowItems(duplex);
+                for (auto* widgets : {&forward_, &reverse_}) {
+                    if (widgets == &reverse_ && !duplex)
+                        continue;
+                    auto candidate = widgets == &forward_ ? original.forward : original.reverse;
+                    const int height = widgets->information->GetMinSize().y;
+                    for (const auto* destination : {"legacy-out", "vr-out", ""}) {
+                        candidate.source = "mixer-in";
+                        candidate.destination = destination;
+                        populate_direction(*widgets, candidate);
+                        auto effective = candidate;
+                        effective.settings = Settings{};
+                        const auto explanation =
+                            text(recommend(controller_->snapshot(), effective).explanation);
+                        require(widgets->information->GetSize().y == height &&
+                                    widgets->information->GetMaxSize().y == height &&
+                                    !widgets->information->IsEditable() &&
+                                    widgets->information->HasFlag(wxTE_WORDWRAP) &&
+                                    widgets->information->GetValue().Contains(explanation),
+                                "Direction information resized, lost evidence or became editable");
+                        require(widgets->group->GetStaticBox()->GetScreenRect().Contains(
+                                    widgets->information->GetScreenRect()),
+                                "Direction information extends outside its group before a tuning "
+                                "toggle");
+                        require(GetSize() == window_size && !advanced_tuning_->GetValue(),
+                                "Endpoint information changed window size or enabled tuning");
+                    }
+                }
+            }
+            load_hole(hole_index_); // Restore the original draft's endpoints and duplex visibility.
+            require(reverse_.group->GetStaticBox()->GetLabel() == "Return" &&
+                        reverse_.tuning_group->GetStaticBox()->GetLabel() == "Return tuning" &&
+                        activity_direction_->GetString(1).Contains("Return"),
+                    "Duplex captions must say Return");
+        };
         auto exercise_tuning = [&] {
+            exercise_information();
             require(hole_index_ >= 0 && !advanced_tuning_->GetValue() &&
                         !advanced_panel_->IsShown() && signal_tools_->IsCollapsed(),
                     "Ordinary configuration must start Automatic with tuning/tools hidden");
@@ -823,7 +869,7 @@ bool Frame::smoke(const wxString& directory) {
             tuning_timer_.Stop();
             require(GetSize() == window_size, "Tuning disclosure resized the top-level window");
         };
-        auto decline_delete = [&](wxListBox* list) {
+        auto decline_delete = [&](wxListBox* list, wxButton* remove = nullptr) {
             capture_draft();
             class Decline final : public wxModalDialogHook {
               public:
@@ -840,12 +886,17 @@ bool Frame::smoke(const wxString& directory) {
             hook.Register();
             const auto before = controller_->snapshot().profiles;
             const auto draft = draft_;
-            wxKeyEvent key(wxEVT_KEY_DOWN);
-            key.m_keyCode = WXK_DELETE;
-            key.SetEventObject(list);
-            list->GetEventHandler()->ProcessEvent(key);
+            if (remove) {
+                wxCommandEvent click(wxEVT_BUTTON, remove->GetId());
+                remove->GetEventHandler()->ProcessEvent(click);
+            } else {
+                wxKeyEvent key(wxEVT_KEY_DOWN);
+                key.m_keyCode = WXK_DELETE;
+                key.SetEventObject(list);
+                list->GetEventHandler()->ProcessEvent(key);
+            }
             require(hook.asked && controller_->snapshot().profiles == before && draft_ == draft,
-                    "Delete shortcut must use confirmation and preserve state when declined");
+                    "Delete controls must use confirmation and preserve state when declined");
         };
         {
             auto menu = shell_menu();
@@ -884,6 +935,15 @@ bool Frame::smoke(const wxString& directory) {
         require(scan_scope_->GetCount() == 2 &&
                     scan_scope_->FindString("Selected device") == wxNOT_FOUND,
                 "Scanning page still offers per-device scope");
+        const bool persistent_folders =
+            controller_->snapshot().operating_mode == OperatingMode::Test;
+        require(profiles_folder_->IsEnabled() == persistent_folders &&
+                    devices_folder_->IsEnabled() == persistent_folders,
+                "Data-folder actions must match the active persistent Test environment");
+        require(profile_remove_->GetLabel() == wxS("−") && hole_remove_->GetLabel() == wxS("−") &&
+                    profile_remove_->GetName() == "Delete profile" &&
+                    hole_remove_->GetName() == "Delete hole",
+                "Minus controls must have readable functional names");
         {
             auto* page = notebook_->GetPage(2);
             page->Layout();
@@ -924,7 +984,7 @@ bool Frame::smoke(const wxString& directory) {
             load_hole(-1);
             require(hole_notes_->IsEnabled() && !hole_notes_->IsEditable() &&
                         !forward_.source->IsEnabled() && !forward_.buffer_apply->IsEnabled() &&
-                        forward_.source_detail->IsEnabled() && forward_.summary->IsEnabled() &&
+                        forward_.source_detail->IsEnabled() && forward_.information->IsEnabled() &&
                         forward_.group->GetStaticBox()->IsEnabled(),
                     "Empty hole editor must keep themed notes and crisp labels without enabling "
                     "inputs");
@@ -1163,7 +1223,7 @@ bool Frame::smoke(const wxString& directory) {
                         controller_->snapshot().capabilities.scanning && !beep_button_->IsEnabled(),
                     "Test Mode enabled unsupported hardware controls");
             require(wxWindow::FindWindowByLabel("Forward failure", this) == nullptr &&
-                        wxWindow::FindWindowByLabel("Reverse failure", this) == nullptr &&
+                        wxWindow::FindWindowByLabel("Return failure", this) == nullptr &&
                         wxWindow::FindWindowByLabel("Simulate Errors", this) == nullptr,
                     "Test Mode contains simulation controls");
             auto* create = profile_new_;
@@ -1190,6 +1250,8 @@ bool Frame::smoke(const wxString& directory) {
             save(false);
             decline_delete(profiles_);
             decline_delete(holes_);
+            decline_delete(profiles_, profile_remove_);
+            decline_delete(holes_, hole_remove_);
             profile_notes_->ChangeValue("Other draft edits must remain unsaved");
             forward_.buffer->SetValue(14);
             acknowledge_buffer(forward_);
@@ -1232,6 +1294,8 @@ bool Frame::smoke(const wxString& directory) {
                 "Devices must have separate capture and playback lists");
         decline_delete(profiles_);
         decline_delete(holes_);
+        decline_delete(profiles_, profile_remove_);
+        decline_delete(holes_, hole_remove_);
         const auto hidden_id = draft_.holes.front().forward.source;
         require(!hidden_id.empty(), "Preview source fixture is missing");
         const auto before_hide = draft_.holes.front().forward;
@@ -1530,7 +1594,8 @@ bool Frame::smoke(const wxString& directory) {
                 "GUI Start did not reach Running");
         require(controller_->snapshot().paths.size() == 2, "Duplex directions missing");
         auto active_profile_context = profile_menu(viewed_);
-        require(!active_profile_context->FindItem(wxID_DELETE)->IsEnabled(),
+        require(!profile_remove_->IsEnabled() &&
+                    !active_profile_context->FindItem(wxID_DELETE)->IsEnabled(),
                 "Context menu enabled deletion of an armed active profile");
         const auto before_avatar_ticks = controller_->snapshot().revision;
         wxTimerEvent avatar_tick(avatar_timer_);

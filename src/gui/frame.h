@@ -64,7 +64,9 @@ struct DirectionWidgets {
         buffer_apply{}; // Commits one buffer preference; backend reports any live confirmation.
     wxStaticText* buffer_state{};
     int acknowledged_buffer_ms = 6; // GUI-only deduplication, reset when loading a direction.
-    wxStaticText *evidence{}, *source_detail{}, *destination_detail{}, *summary{};
+    wxTextCtrl* information{};      // Fixed-height, wrapped, scrollable summary and evidence.
+    wxStaticText *source_detail{}, *destination_detail{};
+    wxString source_detail_copy, destination_detail_copy;
     std::vector<std::string> sources, destinations;
     std::string retained_source,
         retained_destination; // Hidden/missing saved bindings, never dropdown options.
@@ -192,6 +194,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxButton* arm_ready_{};
     wxButton* profile_apply_{};
     wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
+    wxButton *profile_remove_{}, *hole_remove_{}, *profiles_folder_{}, *devices_folder_{};
     wxPanel *profile_sidebar_{}, *profile_actions_{};
     wxStaticText *profile_edit_state_{}, *hole_heading_{};
     wxListBox *profiles_{}, *holes_{};
@@ -276,6 +279,9 @@ class Frame final : public wxFrame, private wxEventFilter {
     void populate_direction(DirectionWidgets&, const audiohole::Direction&);
     void read_direction(DirectionWidgets&, audiohole::Direction&);
     void update_direction_details(DirectionWidgets&, const audiohole::Direction&);
+    void layout_direction(DirectionWidgets&);
+    void delete_selection(bool profile);
+    void open_data_folder(bool profiles);
     // Acknowledge a committed editor change once; never changes controller/live state.
     void acknowledge_buffer(DirectionWidgets&);
     void apply_buffer(DirectionWidgets&);

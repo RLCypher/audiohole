@@ -1780,8 +1780,9 @@ The left column has a draggable width divider and separate native scrollable
 Profiles, Notes and Holes fields, with draggable height dividers between them.
 Resizing changes only session presentation state; the routing detail pane
 continues to scroll independently. Inline profile/hole name fields and repeated
-management buttons are removed. Each list has one compact **+** control with hover
-help and a descriptive accessibility name. Right-click or Shift+F10/Menu opens
+management buttons are removed. Each list has compact **+** and **−** controls with hover
+help and descriptive accessibility names. The minus action shares the context-menu
+delete command and default-No confirmation. Right-click or Shift+F10/Menu opens
 Rename, Duplicate and Delete for the targeted item. Merely opening/cancelling a
 menu preserves edits and restores the editor's selection. Acting on a different
 profile retains the existing unsaved-navigation confirmation.
@@ -1871,3 +1872,28 @@ only **Automatic**. The request is retained in Test profile JSON. Opening/changi
 this control does not initialize, select an implementation, benchmark or start
 routing. Future engine IDs are preserved as unavailable saved requests, not
 silently substituted; Automatic policy ignores them while retaining them.
+
+
+### Direction information and data-folder access refinement
+
+Both simplex and duplex directions use a defined eight-line, read-only wrapped
+information viewport for their policy summary and evidence explanation. Longer
+text scrolls and can be copied; changing endpoints must not clip or overlap later
+controls. Viewport height stays stable, while actual endpoint-detail changes
+relayout the editor and its virtual extent immediately. Unchanged polling does
+not reset text/scroll position or repeatedly relayout. Advanced Tuning is not a
+prerequisite for correct initial layout.
+
+Visible duplex language uses **Forward** and **Return** throughout direction and
+tuning headings, monitoring/beep choices, simulated failure controls and shared
+tray/taskbar status. Existing `reverse` model identifiers and JSON keys retain
+compatibility; no data migration or routing change accompanies the wording.
+
+Devices offers **Open Devices Folder**, targeting the active Test data root's
+`devices` directory. Profiles offers **Open Profiles Folder**, targeting the folder
+containing the shared Test `configuration.json`, not a new storage format. A click
+creates a missing directory and asks Windows to open it; errors stay local and
+no draft is saved or scan started. Both controls are disabled in session-only
+Preview Mode, with explanatory hover help. Profiles and Holes show **−** next to
+**+**, sharing confirmed deletion with keyboard/context actions. Active/pending
+profile guards and staged hole removal remain unchanged.

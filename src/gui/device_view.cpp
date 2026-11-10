@@ -42,6 +42,11 @@ void Frame::build_devices() {
         button(page, bundles, "Export devices…", [this] { bundle_dialog(false, false); }));
     scanner_actions_.push_back(
         button(page, bundles, "Import devices…", [this] { bundle_dialog(false, true); }));
+    devices_folder_ =
+        button(page, bundles, "Open Devices Folder", [this] { open_data_folder(false); });
+    devices_folder_->SetName("Open Devices Folder");
+    devices_folder_->SetToolTip("Open the Test scanner devices folder, including capture/playback "
+                                "JSON records. Preview devices are session-only.");
     layout->Add(bundles, 0, wxEXPAND);
     device_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                            wxSP_LIVE_UPDATE | wxSP_3D);

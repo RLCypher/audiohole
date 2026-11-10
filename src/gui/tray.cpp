@@ -54,7 +54,7 @@ std::unique_ptr<wxMenu> Frame::shell_menu() {
     auto* holes = new wxMenu;
     for (const auto& p : s.paths)
         holes
-            ->Append(wxID_ANY, text(p.hole_id + (p.reverse ? " reverse: " : " forward: ") +
+            ->Append(wxID_ANY, text(p.hole_id + (p.reverse ? " return: " : " forward: ") +
                                     audiohole::name(p.state)))
             ->Enable(false);
     if (s.paths.empty())

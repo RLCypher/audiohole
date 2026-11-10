@@ -6,9 +6,9 @@ namespace audiohole::gui {
 namespace {
 #if wxUSE_ACCESSIBILITY
 // A glyph's native button caption is not a useful screen-reader name.
-class AddAccessible final : public wxWindowAccessible {
+class ListActionAccessible final : public wxWindowAccessible {
   public:
-    explicit AddAccessible(wxWindow* window) : wxWindowAccessible(window) {}
+    explicit ListActionAccessible(wxWindow* window) : wxWindowAccessible(window) {}
     wxAccStatus GetName(int child, wxString* name) override {
         if (child != 0)
             return wxACC_NOT_IMPLEMENTED;
@@ -27,12 +27,12 @@ std::optional<int> buffer_value(const wxSpinCtrl* control) {
     return static_cast<int>(value);
 }
 wxButton* add_control(wxWindow* parent, wxSizer* row, const wxString& name, const wxString& help,
-                      std::function<void()> action) {
-    auto* control = new ActionButton(parent, "+", wxBU_EXACTFIT);
+                      std::function<void()> action, const wxString& glyph = wxS("+")) {
+    auto* control = new ActionButton(parent, glyph, wxBU_EXACTFIT);
     control->SetMinSize(parent->FromDIP(wxSize(32, 32)));
     control->SetName(name);
 #if wxUSE_ACCESSIBILITY
-    control->SetAccessible(new AddAccessible(control)); // Owned by the wx window.
+    control->SetAccessible(new ListActionAccessible(control)); // Owned by the wx window.
 #endif
     control->SetToolTip(help);
     row->Add(control, 0, wxALL, parent->FromDIP(3));
@@ -71,9 +71,17 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     label(box, endpoints, "→");
     endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));
     w.group->Add(endpoints, 0, wxEXPAND);
-    w.summary = label(box, w.group, "Configuration");
-    w.evidence = label(box, w.group, "Select endpoints to see a format recommendation.");
-    w.evidence->Wrap(560);
+    w.information = new wxTextCtrl(
+        box, wxID_ANY, "Select endpoints to see a format recommendation.", wxDefaultPosition,
+        wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxTE_WORDWRAP | wxBORDER_NONE);
+    w.information->SetName(title + " configuration information");
+    // A defined eight-line viewport prevents asynchronous status text from
+    // outgrowing a stale static-label allocation. Longer content stays scrollable.
+    const int information_height = w.information->GetCharHeight() * 8 + FromDIP(12);
+    w.information->SetMinSize(wxSize(0, information_height));
+    w.information->SetMaxSize(wxSize(-1, information_height));
+    w.information->SetSize(wxSize(w.information->GetSize().x, information_height));
+    w.group->Add(w.information, 0, wxEXPAND | wxALL, FromDIP(4));
     auto* tuning = new wxStaticBoxSizer(wxVERTICAL, advanced_panel_, title + " tuning");
     w.tuning_group = tuning;
     advanced_panel_->GetSizer()->Add(tuning, 0, wxEXPAND | wxALL, FromDIP(4));
@@ -401,6 +409,41 @@ void Frame::remove_hole() {
                   : std::min(hole_index_, static_cast<int>(draft_.holes.size()) - 1));
     refresh();
 }
+// Reuse the context-menu command so keyboard and glyph actions share targeting,
+// default-No confirmation, staged hole removal and active-profile protection.
+void Frame::delete_selection(bool profile) {
+    const int selected = profile ? profiles_->GetSelection() : holes_->GetSelection();
+    if (selected < 0 || (profile && static_cast<std::size_t>(selected) >= profile_ids_.size()) ||
+        (!profile && static_cast<std::size_t>(selected) >= draft_.holes.size()))
+        return;
+    auto menu = profile ? profile_menu(profile_ids_[static_cast<std::size_t>(selected)])
+                        : hole_menu(draft_.holes[static_cast<std::size_t>(selected)].id);
+    if (menu->IsEnabled(wxID_DELETE)) {
+        wxCommandEvent command(wxEVT_MENU, wxID_DELETE);
+        menu->ProcessEvent(command);
+    }
+}
+// Test records share configuration.json; device scan JSON lives in devices/.
+// Opening a folder never saves a draft, scans hardware or changes configuration.
+void Frame::open_data_folder(bool profiles) {
+    if (controller_->snapshot().operating_mode != OperatingMode::Test) {
+        show_result({false, "Preview profiles and devices are session-only. Saved data folders are "
+                            "available in Test Mode."});
+        return;
+    }
+    auto directory = preferences_->test_configuration().parent_path();
+    if (!profiles)
+        directory /= "devices";
+    std::error_code error;
+    std::filesystem::create_directories(directory, error);
+    if (error) {
+        show_result({false, "Could not open the data folder: " + error.message()});
+        return;
+    }
+    if (!wxLaunchDefaultApplication(wxString(directory.wstring())))
+        show_result({false, "Windows could not open the data folder. Path: " +
+                                utf8(wxString(directory.wstring()))});
+}
 void Frame::build_profiles() {
     auto* page = new wxPanel(notebook_);
     auto* page_layout = new wxBoxSizer(wxVERTICAL);
@@ -433,6 +476,11 @@ void Frame::build_profiles() {
         button(page, bundles, "Export profiles…", [this] { bundle_dialog(true, false); }));
     scanner_actions_.push_back(
         button(page, bundles, "Import profiles…", [this] { bundle_dialog(true, true); }));
+    profiles_folder_ =
+        button(page, bundles, "Open Profiles Folder", [this] { open_data_folder(true); });
+    profiles_folder_->SetName("Open Profiles Folder");
+    profiles_folder_->SetToolTip("Open the Test data folder containing saved profiles in "
+                                 "configuration.json. Preview profiles are session-only.");
     page_layout->Add(bundles, 0, wxEXPAND);
     profile_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                             wxSP_LIVE_UPDATE | wxSP_3D);
@@ -480,6 +528,11 @@ void Frame::build_profiles() {
             else
                 select_profile(id);
         });
+    profile_remove_ = add_control(
+        profile_panel, profile_heading, "Delete profile",
+        "Delete the selected saved profile after confirmation. Active or pending profiles must be "
+        "stopped first.",
+        [this] { delete_selection(true); }, wxS("−"));
     profile_layout->Add(profile_heading, 0, wxEXPAND);
     profile_layout->Add(profiles_, 1, wxEXPAND | wxALL, 3);
     label(notes_panel, notes_layout, "Notes");
@@ -495,6 +548,10 @@ void Frame::build_profiles() {
     hole_heading->AddStretchSpacer();
     hole_new_ = add_control(holes_panel, hole_heading, "Add hole",
                             "Add a hole to this profile's staged changes.", [this] { add_hole(); });
+    hole_remove_ = add_control(
+        holes_panel, hole_heading, "Delete hole",
+        "Remove the selected hole after confirmation. Save keeps the staged removal.",
+        [this] { delete_selection(false); }, wxS("−"));
     holes_layout->Add(hole_heading, 0, wxEXPAND);
     holes_ = new ThemedList(holes_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
                             wxLB_SINGLE | wxLB_NEEDED_SB | wxLB_OWNERDRAW);
@@ -542,7 +599,7 @@ void Frame::build_profiles() {
         }
     });
     build_direction(editor, right, forward_, "Forward");
-    build_direction(editor, right, reverse_, "Reverse");
+    build_direction(editor, right, reverse_, "Return");
     advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Enable Advanced Tuning");
     advanced_tuning_->SetName("Enable Advanced Tuning");
     advanced_tuning_->SetToolTip("Allow retained manual overrides for this hole. Save / Apply is "
@@ -599,19 +656,7 @@ void Frame::build_profiles() {
             event.Skip();
             return;
         }
-        const int selected = profile ? profiles_->GetSelection() : holes_->GetSelection();
-        if (selected < 0)
-            return;
-        if (profile && static_cast<std::size_t>(selected) >= profile_ids_.size())
-            return;
-        if (!profile && static_cast<std::size_t>(selected) >= draft_.holes.size())
-            return;
-        auto menu =
-            profile ? profile_menu(profile_ids_[selected]) : hole_menu(draft_.holes[selected].id);
-        if (menu->IsEnabled(wxID_DELETE)) {
-            wxCommandEvent command(wxEVT_MENU, wxID_DELETE);
-            menu->ProcessEvent(command);
-        }
+        delete_selection(profile);
     };
     profiles_->Bind(wxEVT_KEY_DOWN, [delete_selected](wxKeyEvent& e) { delete_selected(true, e); });
     holes_->Bind(wxEVT_KEY_DOWN, [delete_selected](wxKeyEvent& e) { delete_selected(false, e); });
@@ -722,12 +767,6 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     w.format->SetSelection(selection);
     update_direction_details(w, d);
-    auto effective = d;
-    if (!advanced_tuning_->GetValue())
-        effective.settings = Settings{};
-    w.evidence->SetLabel(
-        text(audiohole::recommend(controller_->snapshot(), effective).explanation));
-    w.evidence->Wrap(570);
     w.buffer->SetValue(d.settings.buffer_ms);
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
     w.mode->Clear();
@@ -737,6 +776,8 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
         w.mode->Append(text(d.settings.mode)); // Preserve externally authored unknown requests.
     w.mode->SetStringSelection(text(d.settings.mode));
     loading_ = old_loading;
+    if (!loading_)
+        layout_direction(w);
 }
 // Read-only display of requested settings and available endpoint records; never
 // label these as negotiated runtime measurements or verified hardware evidence.
@@ -813,10 +854,19 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                             (compatible ? "Candidate: " + selected.label() : "Format unverified")
                       : std::string("No endpoint selected");
     };
-    w.source_detail->SetLabel(text(detail(d.source)));
-    w.source_detail->Wrap(260);
-    w.destination_detail->SetLabel(text(detail(d.destination)));
-    w.destination_detail->Wrap(260);
+    const auto update_detail = [](wxStaticText* control, wxString& previous,
+                                  const wxString& value) {
+        if (previous == value)
+            return false;
+        previous = value;
+        control->SetLabel(value);
+        control->Wrap(260);
+        return true;
+    };
+    const bool source_changed =
+        update_detail(w.source_detail, w.source_detail_copy, text(detail(d.source)));
+    const bool destination_changed =
+        update_detail(w.destination_detail, w.destination_detail_copy, text(detail(d.destination)));
     std::string summary;
     if (d.source.empty() || d.destination.empty())
         summary = "Automatic configuration — awaiting endpoint selection.";
@@ -847,10 +897,22 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         draft_.holes.at(static_cast<std::size_t>(hole_index_)).routing_engine != "automatic")
         summary += " Saved Routing Engine choice is retained but inactive; effective engine policy "
                    "is Automatic.";
-    w.summary->SetLabel(text(summary));
-    w.summary->Wrap(600);
-    w.evidence->SetLabel(text(recommendation.explanation));
-    w.evidence->Wrap(600);
+    const auto information = text(summary + "\n\n" + recommendation.explanation);
+    const bool information_changed = w.information->GetValue() != information;
+    if (information_changed) {
+        w.information->ChangeValue(information);
+        w.information->ShowPosition(0);
+    }
+    if (!loading_ && (source_changed || destination_changed || information_changed))
+        layout_direction(w);
+}
+// Relayout only after actual content/selection changes, never on unchanged
+// polling. FitInside updates the editor's virtual extent without resizing Frame.
+void Frame::layout_direction(DirectionWidgets& widgets) {
+    widgets.group->Layout();
+    auto* editor = static_cast<wxScrolledWindow*>(widgets.group->GetStaticBox()->GetParent());
+    editor->FitInside();
+    editor->Layout(); // Use the updated virtual extent in this same UI action.
 }
 // Only an explicit list selection becomes a logical binding. Free text used for
 // searching is never guessed as a device identity; validation reports missing IDs.
@@ -944,6 +1006,7 @@ void Frame::load_hole(int index) {
     duplex_->SetValue(h.duplex);
     advanced_tuning_->SetValue(index >= 0 && h.advanced_tuning);
     advanced_tuning_->Enable(index >= 0);
+    hole_remove_->Enable(index >= 0);
     advanced_panel_->Show(index >= 0 && h.advanced_tuning);
     routing_engine_->SetSelection(h.routing_engine == "automatic" ? 0 : wxNOT_FOUND);
     routing_engine_->Enable(index >= 0);
@@ -975,8 +1038,8 @@ void Frame::load_hole(int index) {
     update_beep_destinations();
     loading_ = false;
     auto* editor = dynamic_cast<wxScrolledWindow*>(hole_heading_->GetParent());
-    editor->Layout();
     editor->FitInside();
+    editor->Layout();
 }
 void Frame::save(bool apply) {
     tuning_timer_.Stop();
@@ -1034,7 +1097,7 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     auto* box = observation->GetStaticBox();
     groups->Add(observation, 0, wxEXPAND | wxALL, FromDIP(4));
     activity_direction_ = choices(box, observation, "Monitor direction",
-                                  {"Forward source", "Reverse source (duplex only)"});
+                                  {"Forward source", "Return source (duplex only)"});
     activity_direction_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         end_observation();
         refresh();
@@ -1116,7 +1179,7 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
                                    false);
         refresh();
     });
-    button(simulation_box, failures, "Reverse failure", [this] {
+    button(simulation_box, failures, "Return failure", [this] {
         if (hole_index_ >= 0 && draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex)
             controller_->fail_path(draft_.holes.at(static_cast<std::size_t>(hole_index_)).id, true);
         refresh();
@@ -1148,7 +1211,7 @@ void Frame::update_beep_destinations() {
                 if (e->hidden)
                     continue;
                 destination_test_->Append(
-                    text(std::string(d == &hole.forward ? "Forward → " : "Reverse → ") +
+                    text(std::string(d == &hole.forward ? "Forward → " : "Return → ") +
                          e->display_name + " [" + e->id + "]"));
                 beep_ids_.push_back(e->id);
             }

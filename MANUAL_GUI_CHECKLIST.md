@@ -525,3 +525,23 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   monitoring-tools expansion. Start/cancel, expand/collapse during a simulated
   test, then let it finish: button width stays unchanged and idle text returns.
   Check at supported DPI settings with both captions fully readable.
+
+
+### Information overlap, Return terminology and data-folder controls
+
+- From a fresh launch, select/change endpoints in a simplex hole before touching
+  Advanced Tuning. The summary and full evidence share an eight-line viewport,
+  with no overlap over the checkbox. Repeat with both duplex directions, unknown/
+  incompatible/compatible pairs, long names and window/DPI changes. Long text
+  scrolls/copies completely; unchanged polling preserves its reading position.
+- Direction/tuning titles, source-monitor choices, beep destination choices,
+  failure controls and tray/taskbar direction status say Forward/Return. Save,
+  restart and bundle transfer preserve existing `reverse` JSON/identity data.
+- Test Mode: Open Devices Folder opens `test/devices`; Open Profiles Folder opens
+  the folder containing `configuration.json`. Test a fresh missing directory and
+  an inaccessible path. Opening either must not save staged edits or start scans.
+  Preview disables these buttons and explains its session-only records.
+- Use − beside Profiles/Holes +: decline the default-No confirmation and verify
+  no deletion; confirm on disposable records. Profile deletion respects active/
+  pending guards; hole deletion remains staged until Save. Compare context menu
+  and Delete key behavior. Verify tooltips and screen-reader names for glyphs.
