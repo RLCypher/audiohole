@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <stdexcept>
 
 namespace audiohole {
 namespace {
@@ -30,6 +31,13 @@ bool supports(const Endpoint& device, const Format& format, const std::string& m
 }
 } // namespace
 
+void Settings::set_buffer_preference(int milliseconds) {
+    if (milliseconds < 0 || milliseconds > 100)
+        throw std::invalid_argument(
+            "Buffer must be Automatic (0) or between 1 and 100 milliseconds.");
+    buffer_ms = milliseconds;
+    preferences.common.buffer_ms = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
+}
 std::string unique_name(const std::string& base, const std::vector<std::string>& used) {
     auto free = [&](const std::string& name) {
         return std::none_of(used.begin(), used.end(), [&](const auto& other) {
@@ -452,11 +460,7 @@ Result Controller::update_buffer(const std::string& profile_id, const std::strin
                                    [&](const auto& value) { return value.id == hole_id; });
     if (hole == edited.holes.end() || (reverse && !hole->duplex))
         return {false, "Save this direction before applying its buffer preference."};
-    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
-    auto& preference =
-        (reverse ? hole->reverse : hole->forward).settings.preferences.common.buffer_ms;
-    if (preference)
-        preference = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
+    (reverse ? hole->reverse : hole->forward).settings.set_buffer_preference(milliseconds);
     const auto result = save(std::move(edited), false);
     return result.ok ? Result{true, "Buffer preference saved. No live engine buffer was applied."}
                      : result;
@@ -657,11 +661,7 @@ Result SimulatedController::update_buffer(const std::string& profile_id, const s
         !saved_hole->advanced_tuning)
         return {true, "Buffer preference retained. Automatic policy or unapplied policy changes "
                       "keep it inactive."};
-    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
-    auto& preference =
-        (reverse ? hole->reverse : hole->forward).settings.preferences.common.buffer_ms;
-    if (preference)
-        preference = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
+    (reverse ? hole->reverse : hole->forward).settings.set_buffer_preference(milliseconds);
     refresh_paths();
     const auto path =
         std::find_if(state_.paths.begin(), state_.paths.end(), [&](const auto& value) {

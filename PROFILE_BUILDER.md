@@ -87,7 +87,10 @@ eligible. “Reset to Automatic” clears that direction's format/mode/buffer/ma
 endpoint preferences explicitly. It leaves endpoint assignments and the other
 direction intact. Routing Engine remains an independent per-hole backend request;
 only `automatic` is currently available. Save stages configuration; Apply remains
-explicit. Automatic access initially requests Shared and does not silently fall
+explicit. Buffer-only Apply updates the compatibility field and canonical buffer
+preference together in saved records and the matching Preview live direction,
+including the first override from Automatic. It leaves unrelated editor changes
+staged and does not modify the other direction. Automatic access initially requests Shared and does not silently fall
 back to Exclusive in Test preparation.
 
 `PreparedProfile` is built on the control side. Its Test paths explicitly mark

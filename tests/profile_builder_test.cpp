@@ -222,6 +222,38 @@ TEST(ProfileBuilder, BufferOnlyApplyUpdatesExistingCanonicalPreference) {
     EXPECT_EQ(saved.forward.settings.buffer_ms, 14);
     EXPECT_EQ(saved.forward.settings.preferences.common.buffer_ms, 14);
 }
+TEST(ProfileBuilder, BufferApplyFromAutomaticMatchesEditorAndPreservesTheOtherDirection) {
+    for (bool reverse : {false, true}) {
+        SCOPED_TRACE(reverse ? "Return" : "Forward");
+        SimulatedController controller;
+        auto candidate = *profile(controller.snapshot(), "profile-duplex");
+        candidate.holes.front().advanced_tuning = true;
+        ASSERT_TRUE(controller.save(candidate, false).ok);
+        ASSERT_TRUE(controller.activate(candidate.id).ok);
+        controller.advance(300);
+        const auto hole_id = candidate.holes.front().id;
+        for (int milliseconds : {13, 0}) {
+            auto editor = *profile(controller.snapshot(), candidate.id);
+            auto& settings =
+                (reverse ? editor.holes.front().reverse : editor.holes.front().forward).settings;
+            settings.buffer_ms = milliseconds;
+            settings.preferences.common.buffer_ms =
+                milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
+            ASSERT_TRUE(controller.update_buffer(candidate.id, hole_id, reverse, milliseconds).ok);
+            // The GUI uses this comparison to clear its unsaved marker after a
+            // buffer-only Apply. Matching intent must have matching storage.
+            const auto& stored = profile(controller.snapshot(), candidate.id)->holes.front();
+            const auto& stored_settings = (reverse ? stored.reverse : stored.forward).settings;
+            EXPECT_EQ(stored_settings.buffer_ms, settings.buffer_ms);
+            EXPECT_EQ(stored_settings.preferences.common.buffer_ms,
+                      settings.preferences.common.buffer_ms);
+            EXPECT_EQ(*profile(controller.snapshot(), candidate.id), editor);
+            for (const auto& path : controller.snapshot().paths)
+                EXPECT_EQ(path.applied_buffer_ms,
+                          path.reverse == reverse && milliseconds ? milliseconds : 6);
+        }
+    }
+}
 TEST(ProfileBuilder, DerivesTransportDetailsAndNeverGuessesChannelLayout) {
     EndpointPreferences p;
     p.sample_rate_hz = 48000;

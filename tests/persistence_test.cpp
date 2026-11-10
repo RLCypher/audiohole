@@ -409,6 +409,7 @@ TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngi
     ASSERT_TRUE(restarted.load(records).ok);
     auto expected = original;
     expected.holes.front().reverse.settings.buffer_ms = 19;
+    expected.holes.front().reverse.settings.preferences.common.buffer_ms = 19;
     EXPECT_EQ(records.profiles.front(), expected);
     const auto prior = read();
     write(prior + " "); // External edit must remain protected on this command path too.

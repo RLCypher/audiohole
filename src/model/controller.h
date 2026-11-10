@@ -65,6 +65,9 @@ struct Settings {
     int buffer_ms = 0; // Zero requests Automatic, not a zero-length engine buffer.
     std::string mode = "Automatic";
     Preferences preferences;
+    // Keep the compatibility field and canonical preference synchronized.
+    // Zero requests Automatic; invalid durations throw before changing either.
+    void set_buffer_preference(int milliseconds);
     bool operator==(const Settings&) const = default;
 };
 struct Direction {

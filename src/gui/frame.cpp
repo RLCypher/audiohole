@@ -1668,10 +1668,13 @@ bool Frame::smoke(const wxString& directory) {
                 "Edited buffer did not enable its Apply button");
         wxCommandEvent buffer_apply(wxEVT_BUTTON, forward_.buffer_apply->GetId());
         forward_.buffer_apply->GetEventHandler()->ProcessEvent(buffer_apply);
-        require(!forward_.buffer_apply->IsEnabled() && !dirty_ &&
-                    controller_->snapshot().paths[0].applied_buffer_ms == 13 &&
-                    controller_->snapshot().paths[1].applied_buffer_ms == 6,
-                "Buffer Apply failed confirmation or changed its sibling direction");
+        require(!forward_.buffer_apply->IsEnabled(),
+                "Buffer Apply remained enabled after its saved value matched the editor");
+        require(!dirty_, "Buffer-only Apply left an otherwise unchanged profile marked unsaved");
+        require(controller_->snapshot().paths[0].applied_buffer_ms == 13,
+                "Buffer Apply did not confirm the edited forward buffer of 13 ms");
+        require(controller_->snapshot().paths[1].applied_buffer_ms == 6,
+                "Forward Buffer Apply changed the Return direction's simulated 6 ms buffer");
         duplex_->SetValue(false);
         wxCommandEvent duplex_change(wxEVT_CHECKBOX, duplex_->GetId());
         duplex_->GetEventHandler()->ProcessEvent(duplex_change);

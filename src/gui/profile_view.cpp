@@ -1084,12 +1084,10 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
     if (f > 0 && static_cast<std::size_t>(f) <= w.formats.size())
         d.settings.format = w.formats[static_cast<std::size_t>(f - 1)];
     if (const auto parsed = buffer_value(w.buffer))
-        d.settings.buffer_ms = *parsed;
+        d.settings.set_buffer_preference(*parsed);
     d.settings.mode = utf8(w.mode->GetStringSelection());
     d.settings.preferences.common.mode =
         d.settings.mode == "Automatic" ? std::nullopt : std::optional<std::string>(d.settings.mode);
-    d.settings.preferences.common.buffer_ms =
-        d.settings.buffer_ms == 0 ? std::nullopt : std::optional<int>(d.settings.buffer_ms);
 }
 void Frame::capture_draft() {
     if (loading_)

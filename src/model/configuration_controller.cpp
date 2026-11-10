@@ -157,7 +157,7 @@ Result ConfigurationController::update_buffer(const std::string& profile_id,
         return {false, "Save this hole and direction before applying its buffer preference."};
     // An individual Apply must not refresh names or resolve formats elsewhere in
     // the profile. Those changes belong to an explicit full-profile Save.
-    (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    (reverse ? hole->reverse : hole->forward).settings.set_buffer_preference(milliseconds);
     return commit(std::move(records),
                   "Direction buffer preference saved; no engine values were applied.");
 }

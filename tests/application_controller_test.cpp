@@ -176,6 +176,7 @@ TEST(Communication, BufferApplyUpdatesOnlySelectedDirectionAndConfirmsSimulation
     EXPECT_TRUE(controller.snapshot().paths.empty());
     auto expected = original;
     expected.holes.front().reverse.settings.buffer_ms = 17;
+    expected.holes.front().reverse.settings.preferences.common.buffer_ms = 17;
     EXPECT_EQ(*profile(controller.snapshot(), original.id), expected);
     ASSERT_TRUE(controller.activate(original.id).ok);
     controller.advance(300);
