@@ -521,3 +521,7 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   is preserved and explained, ignored while tuning is off and rejected on Apply
   while tuning is on. Explicitly choosing Automatic resolves it without starting
   audio or changing endpoint IDs.
+- From a fresh launch, exercise the Test Beep control before and after the first
+  monitoring-tools expansion. Start/cancel, expand/collapse during a simulated
+  test, then let it finish: button width stays unchanged and idle text returns.
+  Check at supported DPI settings with both captions fully readable.

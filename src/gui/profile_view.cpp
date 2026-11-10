@@ -1074,9 +1074,16 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
                                   : ""));
         refresh();
     });
+    // This starts inside a collapsed pane: a minimum alone does not resize the
+    // native window until its first layout. Reserve both captions and initialize
+    // the actual size too, so disclosure/label changes cannot change its width.
+    auto beep_size = beep_button_->GetEffectiveMinSize();
     beep_button_->SetLabel("Cancel Beep");
-    beep_button_->SetMinSize(beep_button_->GetBestSize());
+    beep_size.IncTo(beep_button_->GetEffectiveMinSize());
     beep_button_->SetLabel("Test Beep");
+    beep_button_->SetMinSize(beep_size);
+    beep_button_->SetMaxSize(wxSize(beep_size.x, -1));
+    beep_button_->SetSize(beep_size);
     beep_group->Add(beep);
     beep_status_ = label(box, beep_group, "Test Beep inactive.");
     auto* performance = new wxStaticBoxSizer(wxVERTICAL, pane, "Performance Diagnostics");

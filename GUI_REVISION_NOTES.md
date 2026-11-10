@@ -194,3 +194,19 @@ operation-preserving disclosure checks. It was not executed on Windows here.
 The existing push-triggered GitHub Actions matrix retains native Debug/Release
 CTest, packaging and extracted-package smoke gates. Actions-page access from this
 environment returns HTTP 404, so native CI results cannot be verified here.
+
+## Test Beep width after first disclosure layout
+
+The supplied Windows Debug log passed 187/188 entries, including Test Mode smoke;
+Preview smoke failed its combined natural-completion/button-width assertion.
+The beep button was created inside an initially collapsed pane, with only a
+minimum size reserved. Its actual native size could change on the first expanded
+layout, invalidating the earlier width baseline. Construction now measures both
+captions, fixes the width and initializes the actual size before any disclosure.
+
+Native smoke retains the state, caption and width requirements, checking width
+at every expansion/collapse, start, cancel and completion. Separate failures now
+identify the failing property; width failures include before/after/min/max sizes
+and disclosure state. The Windows cross-build passes; the three existing portable
+beep tests pass in both Debug and Release. Native Windows execution remains a CI
+check and is not claimed from this Linux host.

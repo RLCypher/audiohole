@@ -1850,6 +1850,8 @@ Activity (direction, observation, clear status), Test Beep (explicit destination
 fixed-width start/cancel, status), and Performance Diagnostics (unavailable values
 when no measurements exist). Expanding/collapsing changes presentation only; ongoing
 source observation and Test Beep persist and are indicated in the collapsed header.
+Reserve the wider beep caption before the initially hidden pane's first layout;
+start, cancel, completion and disclosure changes retain the same button width.
 Leaving Profiles, changing the observed hole/direction, hiding/closing the window,
 Stop and shutdown retain existing cancellation rules. Clearing source observation
 is an explicit action and does not cancel a separate beep. No real audio operation

@@ -1350,12 +1350,25 @@ bool Frame::smoke(const wxString& directory) {
         refresh();
         require(beep_button_->IsEnabled(), "Available beep target must enable the test button");
         const auto beep_width = beep_button_->GetSize().x;
+        require(beep_width == beep_button_->GetMinSize().x &&
+                    beep_width == beep_button_->GetMaxSize().x,
+                "Collapsed beep button must start at its reserved fixed width");
+        const auto require_beep_width = [&](const char* phase) {
+            const auto width = beep_button_->GetSize().x;
+            if (width != beep_width)
+                throw std::runtime_error(
+                    std::string(phase) + ": beep width changed from " + std::to_string(beep_width) +
+                    " to " + std::to_string(width) +
+                    "; min=" + std::to_string(beep_button_->GetMinSize().x) +
+                    "; max=" + std::to_string(beep_button_->GetMaxSize().x) +
+                    "; collapsed=" + (signal_tools_->IsCollapsed() ? "true" : "false"));
+        };
         wxCommandEvent beep_click(wxEVT_BUTTON, beep_button_->GetId());
         beep_button_->GetEventHandler()->ProcessEvent(beep_click);
         require(controller_->snapshot().beep_destination == "vr-out" &&
                     beep_button_->GetLabel() == "Cancel Beep",
                 "Beep label must follow the controller's active test state");
-        require(beep_button_->GetSize().x == beep_width, "Beep label changes button width");
+        require_beep_width("Starting Test Beep");
         controller_->monitor(true);
         refresh();
         const auto disclosure_revision = controller_->snapshot().revision;
@@ -1364,6 +1377,8 @@ bool Frame::smoke(const wxString& directory) {
             signal_tools_->Collapse(collapsed);
             wxCollapsiblePaneEvent disclosure(signal_tools_, signal_tools_->GetId(), collapsed);
             signal_tools_->GetEventHandler()->ProcessEvent(disclosure);
+            require_beep_width(collapsed ? "Collapsing monitoring tools"
+                                         : "Expanding monitoring tools");
         }
         require(controller_->snapshot().monitoring &&
                     controller_->snapshot().beep_destination == "vr-out" &&
@@ -1378,13 +1393,15 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().beep_destination.empty() &&
                     beep_button_->GetLabel() == "Test Beep",
                 "Second click must cancel the current beep");
+        require_beep_width("Cancelling Test Beep");
         beep_button_->GetEventHandler()->ProcessEvent(beep_click);
         controller_->advance(1000);
         refresh();
-        require(controller_->snapshot().beep_destination.empty() &&
-                    beep_button_->GetLabel() == "Test Beep" &&
-                    beep_button_->GetSize().x == beep_width,
-                "Natural beep completion must restore the fixed-width idle button");
+        require(controller_->snapshot().beep_destination.empty(),
+                "Natural beep completion left the simulated test active");
+        require(beep_button_->GetLabel() == "Test Beep",
+                "Natural beep completion did not restore the idle button caption");
+        require_beep_width("Natural beep completion");
         show_result({false, "Operational warning retained."}, true);
         const auto warning_occurrence = occurrence_;
         bother();
