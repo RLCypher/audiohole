@@ -874,10 +874,14 @@ bool Frame::smoke(const wxString& directory) {
                 advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
                 require(advanced_panel_->IsShown() == show_tuning_->GetValue(),
                         "Override policy changed control visibility");
+                require(GetSize() == window_size,
+                        "Changing override eligibility resized the top-level window");
             };
             show_tuning_->SetValue(true);
             wxCommandEvent show_controls(wxEVT_CHECKBOX, show_tuning_->GetId());
             show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
+            require(advanced_panel_->IsShown() && GetSize() == window_size,
+                    "Showing advanced tuning resized the top-level window");
             choose(true);
             forward_.buffer->SetValue(19);
             reverse_.buffer->SetValue(23);
@@ -900,8 +904,8 @@ bool Frame::smoke(const wxString& directory) {
             show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
             capture_draft();
             require(draft_.holes.at(static_cast<std::size_t>(hole_index_)) == before_hiding &&
-                        !advanced_panel_->IsShown(),
-                    "Hiding tuning changed retained intent");
+                        !advanced_panel_->IsShown() && GetSize() == window_size,
+                    "Hiding tuning changed retained intent or resized the window");
             draft_.holes.at(static_cast<std::size_t>(hole_index_)) = before;
             load_hole(hole_index_);
             choose(true); // The following buffer-Apply smoke explicitly opts into tuning.
@@ -998,13 +1002,12 @@ bool Frame::smoke(const wxString& directory) {
                     "Scan status changes resized the console");
             scan_state_->ChangeValue(text);
             const auto window_size = GetSize();
-            for (auto* child : forward_.group->GetStaticBox()->GetChildren())
-                if (auto* pane = dynamic_cast<wxCollapsiblePane*>(child)) {
-                    const bool collapsed = pane->IsCollapsed();
-                    pane->Collapse(!collapsed);
-                    pane->Collapse(collapsed);
-                }
-            require(GetSize() == window_size, "Advanced directional settings resized the window");
+            const bool collapsed = signal_tools_->IsCollapsed();
+            for (bool next : {!collapsed, collapsed}) {
+                signal_tools_->Collapse(next);
+                require(signal_tools_->IsCollapsed() == next && GetSize() == window_size,
+                        "Signal tools disclosure resized the top-level window");
+            }
         }
         {
             auto* deep = wxWindow::FindWindowByName("Deep scan settings", this);

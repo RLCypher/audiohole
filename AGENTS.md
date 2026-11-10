@@ -1300,3 +1300,20 @@ profile storage and GUI changes documented in PROFILE_BUILDER.md, including
 compatibility migration from v3. Showing advanced controls no longer changes the
 separate retained override-enable policy. This supersedes earlier conflicting
 Test GUI/persistence instructions; it does not select a permanent audio engine.
+
+## GUI smoke review before pushing
+
+For every GUI change, review the affected native smoke assertions in the same
+commit before pushing. Check changed labels, accessibility names, shared button
+help, event bindings, disclosure behavior, default states and pane geometry in
+both Preview and Test Mode. Exercise the current controls directly; a traversal
+that finds no matching controls does not verify behavior. Keep identity,
+persistence, confirmation and operation-state checks intact.
+
+Run available builds and relevant tests before pushing. A cross-build does not
+execute Windows smoke tests: explicitly report native validation as pending when
+Windows execution is unavailable. Windows CI runs both GUI smoke modes before
+the remaining suite and publishes a package only after all checks pass. Do not
+weaken or remove meaningful assertions to make a build pass; update obsolete
+assumptions to match the intended behavior and make failures identify the control
+and condition involved.
