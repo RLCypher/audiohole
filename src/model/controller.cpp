@@ -9,7 +9,12 @@ constexpr int transition_duration_ms = 200;
 constexpr int stop_duration_ms = 100;
 constexpr int beep_duration_ms = 1000;
 constexpr int scan_ms_per_percent = 30;
+constexpr int simulated_automatic_buffer_ms = 6; // Fixture choice, never a hardware recommendation.
 constexpr std::size_t maximum_diagnostic_events = 500;
+bool manual_settings(const Direction& direction) {
+    return !direction.settings.automatic || direction.settings.buffer_ms != 0 ||
+           direction.settings.mode != "Automatic";
+}
 bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
     bool supported = false;
     for (const auto& capability : device.capabilities) {
@@ -120,6 +125,12 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
                      [&](const auto& a, const auto& b) { return rank(a) < rank(b); });
     return recommendation;
 }
+Direction effective_direction(const Hole& hole, bool reverse) {
+    auto direction = reverse ? hole.reverse : hole.forward;
+    if (!hole.advanced_tuning)
+        direction.settings = Settings{};
+    return direction;
+}
 void describe_profile(const Snapshot& snapshot, Profile& candidate) {
     for (auto& hole : candidate.holes)
         for (auto* direction : {&hole.forward, &hole.reverse}) {
@@ -131,7 +142,10 @@ void describe_profile(const Snapshot& snapshot, Profile& candidate) {
                 direction->source_name = device->display_name;
             if (const auto* device = endpoint(snapshot, direction->destination))
                 direction->destination_name = device->display_name;
-            const auto options = recommend(snapshot, *direction);
+            auto effective = *direction;
+            if (!hole.advanced_tuning)
+                effective.settings = Settings{};
+            const auto options = recommend(snapshot, effective);
             if (direction->settings.automatic && !options.compatible.empty())
                 direction->settings.format = options.compatible.front();
         }
@@ -149,7 +163,7 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
         for (bool reverse : {false, true}) {
             if (reverse && !hole.duplex)
                 continue;
-            const auto& d = reverse ? hole.reverse : hole.forward;
+            const auto d = effective_direction(hole, reverse);
             const auto* source = endpoint(snapshot, d.source);
             const auto* destination = endpoint(snapshot, d.destination);
             if (source->availability != Availability::Available ||
@@ -168,6 +182,8 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
             }
             prepared.paths.push_back(
                 {hole.id, d.source, d.destination, mode, reverse, format, d.settings.buffer_ms});
+            prepared.paths.back().routing_engine =
+                hole.advanced_tuning ? hole.routing_engine : "automatic";
         }
     }
     output = std::move(prepared);
@@ -185,9 +201,14 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
         if (!hole.enabled)
             continue;
         ++enabled;
-        for (const Direction* direction : {&hole.forward, hole.duplex ? &hole.reverse : nullptr}) {
-            if (!direction)
+        if (hole.advanced_tuning && hole.routing_engine != "automatic")
+            return {false, "The requested Routing Engine is unavailable in this build. Select "
+                           "Automatic or disable Advanced Tuning to retain it inactive."};
+        for (const bool reverse : {false, true}) {
+            if (reverse && !hole.duplex)
                 continue;
+            const auto effective = effective_direction(hole, reverse);
+            const auto* direction = &effective;
             const auto* source = endpoint(snapshot, direction->source);
             const auto* destination = endpoint(snapshot, direction->destination);
             if (!source || !destination || !source->capture || destination->capture)
@@ -198,8 +219,8 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
                 return {
                     false,
                     "Choose devices from the scanned inventory for Test Mode routing requests."};
-            if (direction->settings.buffer_ms < 1 || direction->settings.buffer_ms > 100)
-                return {false, "Buffer must be between 1 and 100 ms."};
+            if (direction->settings.buffer_ms < 0 || direction->settings.buffer_ms > 100)
+                return {false, "Buffer must be Automatic (0) or between 1 and 100 ms."};
             if (direction->settings.mode != "Automatic" && direction->settings.mode != "Shared" &&
                 direction->settings.mode != "Exclusive")
                 return {false, "Choose Automatic, Shared or Exclusive operating mode."};
@@ -225,8 +246,8 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
 // Never interpret these strings or transitions as evidence of real stream operation.
 Result Controller::update_buffer(const std::string& profile_id, const std::string& hole_id,
                                  bool reverse, int milliseconds) {
-    if (milliseconds < 1 || milliseconds > 100)
-        return {false, "Buffer must be between 1 and 100 milliseconds."};
+    if (milliseconds < 0 || milliseconds > 100)
+        return {false, "Buffer must be Automatic (0) or between 1 and 100 milliseconds."};
     const auto* saved = profile(snapshot(), profile_id);
     if (!saved)
         return {false, "Save or select a profile before applying its buffer preference."};
@@ -393,6 +414,14 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
         return {false, "Required resources unavailable. Existing route retained. Use Arm "
                        "Ready explicitly to replace it."};
     live_ = *candidate;
+    pending_manual_ack_ = std::any_of(live_.holes.begin(), live_.holes.end(), [](const auto& hole) {
+        return hole.enabled && hole.advanced_tuning &&
+               (manual_settings(hole.forward) || (hole.duplex && manual_settings(hole.reverse)));
+    });
+    for (auto& hole : live_.holes) {
+        hole.forward = effective_direction(hole);
+        hole.reverse = effective_direction(hole, true);
+    }
     state_.active_profile = id;
     state_.pending_profile.clear();
     state_.pending_ms = 0;
@@ -418,22 +447,36 @@ Result SimulatedController::update_buffer(const std::string& profile_id, const s
                                    [&](const auto& value) { return value.id == hole_id; });
     if (hole == live_.holes.end() || (reverse && !hole->duplex))
         return saved;
+    const auto* saved_profile = profile(state_, profile_id);
+    const auto saved_hole = std::find_if(saved_profile->holes.begin(), saved_profile->holes.end(),
+                                         [&](const auto& item) { return item.id == hole_id; });
+    if (!hole->advanced_tuning || saved_hole == saved_profile->holes.end() ||
+        !saved_hole->advanced_tuning)
+        return {true, "Buffer preference retained. Automatic policy or unapplied policy changes "
+                      "keep it inactive."};
     (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
     refresh_paths();
     const auto path =
         std::find_if(state_.paths.begin(), state_.paths.end(), [&](const auto& value) {
             return value.hole_id == hole_id && value.reverse == reverse;
         });
-    const bool confirmed = path != state_.paths.end() && path->applied_buffer_ms == milliseconds;
+    const bool confirmed = path != state_.paths.end() && path->applied_buffer_ms &&
+                           (!milliseconds || path->applied_buffer_ms == milliseconds);
     const auto detail =
         confirmed
             ? "Buffer preference saved; active Preview direction confirmed " +
-                  std::to_string(milliseconds) + " ms (simulated)."
+                  (milliseconds ? std::to_string(milliseconds) + " ms"
+                                : std::string("Automatic buffer selection")) +
+                  " (simulated)."
             : "Buffer preference saved; Preview request updated, awaiting a running direction.";
     event("buffer-updated", detail);
+    if (confirmed && milliseconds)
+        event("manual-override-applied",
+              "Manual buffer override applied to the simulated Preview route.");
     return {true, detail};
 }
 void SimulatedController::stop() {
+    pending_manual_ack_ = false;
     state_.armed = false;
     state_.pending_profile.clear();
     state_.pending_ms = 0;
@@ -496,9 +539,12 @@ void SimulatedController::refresh_paths(bool reconnecting) {
                                                       : State::Running;
                     ++running;
                 }
-                path.requested_buffer_ms = direction.settings.buffer_ms;
+                if (direction.settings.buffer_ms)
+                    path.requested_buffer_ms = direction.settings.buffer_ms;
                 if (path.state == State::Running)
-                    path.applied_buffer_ms = direction.settings.buffer_ms;
+                    path.applied_buffer_ms = direction.settings.buffer_ms
+                                                 ? direction.settings.buffer_ms
+                                                 : simulated_automatic_buffer_ms;
                 state_.paths.push_back(path);
             }
         }
@@ -537,6 +583,19 @@ void SimulatedController::advance(int ms) {
             } else
                 refresh_paths();
             event("state", std::string("Routing state: ") + name(state_.state));
+            if (pending_manual_ack_) {
+                pending_manual_ack_ = false;
+                if (std::any_of(state_.paths.begin(), state_.paths.end(), [&](const auto& path) {
+                        const auto hole =
+                            std::find_if(live_.holes.begin(), live_.holes.end(),
+                                         [&](const auto& item) { return item.id == path.hole_id; });
+                        return path.state == State::Running && hole != live_.holes.end() &&
+                               hole->advanced_tuning &&
+                               manual_settings(path.reverse ? hole->reverse : hole->forward);
+                    }))
+                    event("manual-override-applied",
+                          "Manual overrides applied to the simulated Preview route.");
+            }
         }
     }
     if (beep_ms_ > 0) {

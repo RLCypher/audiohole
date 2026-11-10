@@ -536,3 +536,16 @@ snoring text without submitting an avatar reaction or changing operational state
 Warnings and input wake/remove this overlay; the awake response is retained.
 Vanilla and custom packages without dream text remain quiet. See GUI.md for timing
 and personalities/README.md for the existing schema-2 metadata format.
+
+## Owner-authorized tuning events
+
+Add centralized `advanced_tuning_enabled`, `manual_override_applied` and
+`automatic_configuration_restored` events. Norm is a technically competent,
+mildly disapproving engineer; Horu is enthusiastic, mischievous and suggestive,
+using authored variants. Vanilla remains deterministic information only. Metadata
+uses owned expressions and existing fallback/repetition rules. Policy reactions
+are debounced for deliberate settled actions, never repaint/telemetry. Enabling
+only acknowledges staged eligibility; manual-applied information requires actual
+simulated application and explicitly disclaims hardware confirmation. No catalog
+can change policy, validation or controller state. Expanding/collapsing Signal
+Testing & Monitoring produces no reaction and does not alter operations.

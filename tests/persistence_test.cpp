@@ -85,6 +85,88 @@ TEST_F(PersistenceTest, RoundTripPreservesIdsUnicodeIndependentDirectionsAndUnkn
     EXPECT_EQ(hole.reverse.settings.buffer_ms, 39);
     EXPECT_EQ(hole.reverse.settings.format.rate, 96000);
 }
+TEST_F(PersistenceTest, LegacyPolicyMigratesExplicitlyAndInactiveManualValuesSurviveRestart) {
+    seed();
+    auto legacy = nlohmann::ordered_json::parse(read());
+    legacy["schema_version"] = 2;
+    auto& hole = legacy["profiles"][0]["holes"][0];
+    hole.erase("advanced_tuning");
+    hole["extension"] = {{"keep", "user data"}};
+    hole["forward"]["settings"]["mode"] = "Exclusive";
+    hole["forward"]["settings"]["automatic"] = false;
+    hole["forward"]["settings"]["custom"] = {{"keep", true}};
+    const auto original = legacy.dump(2) + "\n";
+    write(original);
+    TestJsonPersistence provider(file);
+    ConfigurationRecords loaded;
+    ASSERT_TRUE(provider.load(loaded).ok);
+    EXPECT_EQ(read(), original);
+    ASSERT_TRUE(loaded.profiles[0].holes[0].advanced_tuning);
+    const auto retained = loaded.profiles[0].holes[0].forward;
+    loaded.profiles[0].holes[0].advanced_tuning = false;
+    ASSERT_TRUE(provider.save(loaded).ok);
+    std::ifstream backup(file.string() + ".v2.bak", std::ios::binary);
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), original);
+    TestJsonPersistence restarted(file);
+    ASSERT_TRUE(restarted.load(loaded).ok);
+    EXPECT_FALSE(loaded.profiles[0].holes[0].advanced_tuning);
+    EXPECT_EQ(loaded.profiles[0].holes[0].forward, retained);
+    const auto json = nlohmann::ordered_json::parse(read());
+    EXPECT_EQ(json.at("schema_version"), 3);
+    EXPECT_EQ(json["profiles"][0]["holes"][0]["extension"], hole["extension"]);
+    EXPECT_TRUE(json["profiles"][0]["holes"][0]["forward"]["settings"]["custom"]["keep"]);
+}
+TEST_F(PersistenceTest, V3RequiresAnExplicitBooleanTuningPolicyAndPreservesInvalidInput) {
+    seed();
+    const auto valid = nlohmann::ordered_json::parse(read());
+    for (const auto& value : {nlohmann::ordered_json("yes"), nlohmann::ordered_json(1),
+                              nlohmann::ordered_json(nullptr)}) {
+        auto invalid = valid;
+        invalid["profiles"][0]["holes"][0]["advanced_tuning"] = value;
+        const auto bytes = invalid.dump();
+        write(bytes);
+        TestJsonPersistence provider(file);
+        ConfigurationRecords loaded;
+        EXPECT_FALSE(provider.load(loaded).ok);
+        EXPECT_EQ(read(), bytes);
+    }
+    auto missing = valid;
+    missing["profiles"][0]["holes"][0].erase("advanced_tuning");
+    write(missing.dump());
+    TestJsonPersistence provider(file);
+    ConfigurationRecords loaded;
+    EXPECT_FALSE(provider.load(loaded).ok);
+}
+TEST_F(PersistenceTest, RoutingEngineDefaultsRoundTripsAndRejectsMalformedTypes) {
+    seed();
+    auto json = nlohmann::ordered_json::parse(read());
+    auto& hole = json["profiles"][0]["holes"][0];
+    EXPECT_EQ(hole.at("routing_engine"), "automatic");
+    hole.erase("routing_engine");
+    write(json.dump());
+    TestJsonPersistence provider(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(provider.load(records).ok);
+    EXPECT_EQ(records.profiles[0].holes[0].routing_engine, "automatic");
+    records.profiles[0].holes[0].routing_engine = "future-test-engine";
+    records.profiles[0].holes[0].advanced_tuning = false;
+    ASSERT_TRUE(provider.save(records).ok);
+    TestJsonPersistence restarted(file);
+    ASSERT_TRUE(restarted.load(records).ok);
+    EXPECT_EQ(records.profiles[0].holes[0].routing_engine, "future-test-engine");
+    EXPECT_FALSE(records.profiles[0].holes[0].advanced_tuning);
+    const auto saved = read();
+    for (const auto& invalid :
+         {nlohmann::ordered_json(2), nlohmann::ordered_json(""), nlohmann::ordered_json(nullptr)}) {
+        auto broken = nlohmann::ordered_json::parse(saved);
+        broken["profiles"][0]["holes"][0]["routing_engine"] = invalid;
+        const auto bytes = broken.dump();
+        write(bytes);
+        TestJsonPersistence rejected(file);
+        EXPECT_FALSE(rejected.load(records).ok);
+        EXPECT_EQ(read(), bytes);
+    }
+}
 TEST_F(PersistenceTest, ControllerActuallyPersistsCreateEditDeleteAndDeviceChangesAcrossInstances) {
     seed();
     std::string created;
@@ -129,9 +211,9 @@ TEST_F(PersistenceTest, MalformedNewerDuplicateAndFractionalInputNeverGetsOverwr
         EXPECT_EQ(read(), text);
     }
     auto newer = valid;
-    const auto version = newer.find("\"schema_version\": 2");
+    const auto version = newer.find("\"schema_version\": 3");
     ASSERT_NE(version, std::string::npos);
-    newer.replace(version, 19, "\"schema_version\": 3");
+    newer.replace(version, 19, "\"schema_version\": 4");
     write(newer);
     TestJsonPersistence store(file);
     ConfigurationRecords data;
@@ -299,9 +381,9 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
     const auto valid = read();
     for (const auto& invalid : {"1.5", "18446744073709551615"}) {
         auto broken = valid;
-        const auto position = broken.find("\"schema_version\": 2");
+        const auto position = broken.find("\"schema_version\": 3");
         ASSERT_NE(position, std::string::npos);
-        broken.replace(position, std::string("\"schema_version\": 2").size(),
+        broken.replace(position, std::string("\"schema_version\": 3").size(),
                        std::string("\"schema_version\": ") + invalid);
         write(broken);
         TestJsonPersistence provider(file);
@@ -337,7 +419,7 @@ TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngi
 TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBeforeUpgrade) {
     seed();
     auto legacy = read();
-    const auto version = legacy.find("\"schema_version\": 2");
+    const auto version = legacy.find("\"schema_version\": 3");
     ASSERT_NE(version, std::string::npos);
     legacy.replace(version, 19, "\"schema_version\": 1");
     write(legacy);
@@ -349,7 +431,7 @@ TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBefo
     ASSERT_TRUE(provider.save(records).ok);
     std::ifstream backup(file.string() + ".v1.bak", std::ios::binary);
     EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), legacy);
-    EXPECT_NE(read().find("\"schema_version\": 2"), std::string::npos);
+    EXPECT_NE(read().find("\"schema_version\": 3"), std::string::npos);
     const auto bytes = read();
     EXPECT_LT(bytes.find("\"profiles\""), bytes.find("\"devices\""));
     EXPECT_LT(bytes.find("\"display_name\""), bytes.find("\"notes\""));
@@ -386,7 +468,7 @@ TEST_F(PersistenceTest, ExactDescriptorRoundTripsAndInvalidEditsPreserveOriginal
 TEST_F(PersistenceTest, ConflictingV1BackupBlocksUpgradeWithoutChangingEitherFile) {
     seed();
     auto legacy = read();
-    legacy.replace(legacy.find("\"schema_version\": 2"), 19, "\"schema_version\": 1");
+    legacy.replace(legacy.find("\"schema_version\": 3"), 19, "\"schema_version\": 1");
     write(legacy);
     const auto backup = file.string() + ".v1.bak";
     std::ofstream(backup, std::ios::binary) << "Earlier user backup";

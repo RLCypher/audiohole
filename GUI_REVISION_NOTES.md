@@ -151,3 +151,46 @@ all Windows x64 application/test targets cross-compile and link. PowerShell
 distribution regression checks and actual Runtime packaging pass, with the exact
 729-file allowlist plus two package documents and all 699 avatar PNG hashes
 preserved. Native Windows GUI smoke was compiled, not executed in this Linux host.
+
+
+## Automatic configuration, Advanced Tuning and monitoring refinement
+
+- New holes default to Automatic with one per-hole Advanced Tuning checkbox.
+  Basic directional endpoints and evidence summaries remain visible; format,
+  mode, buffer/Apply and unsupported mapping/fallback controls share a hidden
+  panel. Each applicable parameter has an Automatic value. Buffer 0 is an
+  engine-managed request, not a zero-length buffer or hardware measurement.
+- Disabling tuning preserves both directions' manual data and excludes it from
+  effective requests. Enabling only stages eligibility; saved/live copies stay
+  separate until explicit Apply/Activate. Unsupported applicable overrides fail
+  clearly. Buffer-only Apply cannot enable an Automatic live route's policy.
+- Routing Engine is a per-hole dropdown inside that panel, offering Automatic
+  only. Test JSON stores `routing_engine: "automatic"`. Future IDs are retained
+  as unavailable requests, ignored when tuning is disabled and rejected when
+  eligible; the GUI never pretends they are usable backends.
+- Setup Tools becomes a collapsed Signal Testing & Monitoring disclosure with
+  Source Activity, explicit-destination Test Beep and unavailable Performance
+  Diagnostics. Disclosure changes preserve active operations and commentary;
+  the header indicates ongoing monitoring/beep. Clearing observation does not
+  cancel a separate beep. Preview observations remain explicitly simulated.
+- Authored Norm/Horu pools and deterministic Vanilla facts cover enabling tuning,
+  confirmed simulated manual application and returning to Automatic. Settled
+  policy reactions use a 650-ms quiet period; repaint, telemetry and disclosure
+  changes do not select reactions. Warnings retain priority.
+- Provisional Test v3 stores the policy near hole identity and keeps existing
+  direction-specific settings in place. Legacy missing flags preserve the old
+  active-tuning behavior. Loading writes nothing; explicit save preserves an
+  immutable versioned backup before upgrade. Unknown fields and bundle identities
+  survive. Missing engine selectors default to Automatic. Production schema,
+  actual routing, engine choice and synchronization decisions remain Open.
+
+Validation: all 179 portable CTest entries pass in Debug and Release. The full
+Windows x64 application/test cross-build and executable branding checks pass.
+PowerShell distribution safeguards pass, and actual Runtime packaging matches the
+729-file allowlist (731 ZIP files with metadata/README). All 699 avatar PNGs and
+current dialogue/handoff/checklist hashes match source. Native smoke compiles
+with explicit manual-policy opt-in, retained-value, routing-engine option and
+operation-preserving disclosure checks. It was not executed on Windows here.
+The existing push-triggered GitHub Actions matrix retains native Debug/Release
+CTest, packaging and extracted-package smoke gates. Actions-page access from this
+environment returns HTTP 404, so native CI results cannot be verified here.

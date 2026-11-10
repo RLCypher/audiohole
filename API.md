@@ -1017,3 +1017,12 @@ and the raw endpoint ID in structured `context`, while visible progress uses
 known names. `endpoint_lookup_failure` centralizes the conservative expected-
 absence policy documented in [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md). This
 adds evidence context, not a production transport or configuration schema.
+
+
+The current GUI/simulator refinement adds per-hole Advanced Tuning and a Routing
+Engine request. In-process request preparation excludes inactive overrides,
+validates eligible requests, carries `automatic` as the only supported engine
+selector and leaves buffer selection engine-managed when its request is zero.
+Neither a checkbox nor a dropdown initializes a backend. See
+PROVISIONAL_TEST_PERSISTENCE.md for Test-only v3 defaults/migration. This does not
+finalize production configuration or create a public engine-selection protocol.

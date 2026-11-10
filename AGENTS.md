@@ -1277,3 +1277,17 @@ No real routing or persistence is authorized. Follow System is now the default;
 DFA spans 0.00–11.00 with minimum response at zero. Keep its ownership and inertness
 contracts. Explanatory hover/F1 help, readable dark hover states, and an accessible
 routing-state dot are acceptance requirements for this iteration.
+
+## Subsequent owner-authorized Automatic / Advanced Tuning amendment
+
+Implement the per-hole policy and presentation documented in GUI.md, PROFILES.md
+and PROVISIONAL_TEST_PERSISTENCE.md. New holes default to Automatic; inactive
+manual values are retained, not validated as effective overrides. Legacy Test
+holes missing a policy retain their old active-tuning behavior on read. Production
+schemas and engine/synchronization decisions remain Open. This amendment authorizes
+GUI, deterministic simulator and provisional Test compatibility only, not routing.
+
+Signal Testing & Monitoring disclosure collapse explicitly preserves monitoring
+and an active simulated Test Beep. It is not a panel/workspace closure for the
+earlier temporary-monitoring guardrail. Navigation, observed-target changes,
+window hide/close, Stop and shutdown retain existing cancellation semantics.

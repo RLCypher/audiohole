@@ -141,8 +141,8 @@ Result ConfigurationController::save(Profile edited, bool apply) {
 Result ConfigurationController::update_buffer(const std::string& profile_id,
                                               const std::string& hole_id, bool reverse,
                                               int milliseconds) {
-    if (milliseconds < 1 || milliseconds > 100)
-        return {false, "Buffer must be between 1 and 100 milliseconds."};
+    if (milliseconds < 0 || milliseconds > 100)
+        return {false, "Buffer must be Automatic (0) or between 1 and 100 milliseconds."};
     ConfigurationRecords records{state_.endpoints, state_.profiles};
     const auto selected = std::find_if(records.profiles.begin(), records.profiles.end(),
                                        [&](const auto& p) { return p.id == profile_id; });

@@ -952,6 +952,7 @@ TEST_F(ScannerIntegration, RoutingChoicesUseExactModeSpecificDescriptorsAndPrese
     d.settings.mode = "Exclusive";
     EXPECT_TRUE(recommend(snapshot, d).compatible.empty());
     p.holes.front().forward = d;
+    p.holes.front().advanced_tuning = true;
     EXPECT_FALSE(prepare_profile(snapshot, p, plan).ok);
     EXPECT_EQ(plan.paths.size(), original.size()); // Failure never publishes a partial plan.
     EXPECT_EQ(plan.paths[0].mode, original[0].mode);
@@ -1023,7 +1024,7 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
     const auto json = Json::parse(bytes(file));
     EXPECT_TRUE(json.at("devices").empty());
-    EXPECT_EQ(json.at("schema_version"), 2);
+    EXPECT_EQ(json.at("schema_version"), 3);
     EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
     EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);
     auto device = store.inventory().devices.front();

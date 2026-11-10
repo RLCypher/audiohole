@@ -182,3 +182,17 @@ execution failures remain `scan-failed`. An unlimited Deep request uses zero ove
 budget and an internal no-deadline pending-command sentinel; authoritative terminal
 completion and cancellation still settle it. No polling timeout implies cancellation.
 See GUI_REVISION_NOTES.md for durable checkpoints and the stage-journal contract.
+
+
+## Advanced Tuning and Routing Engine requests
+
+A hole owns `advanced_tuning` plus retained directional settings and a
+`routing_engine` request. New holes use Automatic; effective-direction resolution
+copies basic endpoint assignments and gates overrides without mutating saved
+values. Apply/Activate validates effective requests before changing the simulator
+live copy. Save and policy edits do not reconfigure it. A directional buffer save
+cannot activate a live policy change. Zero is an Automatic buffer request; the
+fixture's separately confirmed 6-ms choice is simulation, not a hardware policy.
+Only the `automatic` engine selector is admitted when tuning is eligible; unknown
+future IDs survive as inactive configuration or fail explicitly when requested.
+Prepared path requests include the effective selector, never a loaded backend.

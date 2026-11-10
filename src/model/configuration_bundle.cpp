@@ -360,13 +360,16 @@ Result inspect_configuration_bundle(const fs::path& portable, const fs::path& lo
                 merge_test_profiles(previous, files.at("configuration.json"), combined);
             if (!merged.ok)
                 throw std::runtime_error(merged.detail);
-            if (previous && scan::detail::parse_json(*previous).at("schema_version") == 1) {
+            const int previous_version =
+                previous ? scan::detail::parse_json(*previous).at("schema_version").get<int>() : 3;
+            if (previous && previous_version < 3) {
                 auto backup = path;
-                backup += ".v1.bak";
+                backup += ".v" + std::to_string(previous_version) + ".bak";
                 const auto old_backup = read(backup);
                 data->observed[backup] = old_backup;
                 if (old_backup && old_backup != previous)
-                    throw std::runtime_error("Conflicting v1 backup; import would not replace it");
+                    throw std::runtime_error(
+                        "Conflicting legacy backup; import would not replace it");
                 if (!old_backup)
                     data->writes.push_back({backup, *previous, {}});
             }

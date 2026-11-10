@@ -1527,6 +1527,92 @@
         "expression": "sleeping",
         "fallback_expression": "idle"
       }
+    ],
+    "advanced_tuning_enabled": [
+      {
+        "id": "uwu_advanced_tuning_enabled_001",
+        "category": "configuration",
+        "text": "O-oh? You wanna get youw hands on my knobs? OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_advanced_tuning_enabled_002",
+        "category": "configuration",
+        "text": "Advanced tuning?! You weawwy wanna get in thewe and pway with evewything~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_advanced_tuning_enabled_003",
+        "category": "configuration",
+        "text": "Mmm~ pwease be gentle with my buffews~ >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_advanced_tuning_enabled_004",
+        "category": "configuration",
+        "text": "Aww, you wanna do it youwsewf? Such a confident wittle engineer~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "manual_override_applied": [
+      {
+        "id": "uwu_manual_override_applied_001",
+        "category": "configuration",
+        "text": "Mmm~ youw settings awe in, cutie. You weawwy know how to tuwn my knobs~ >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_manual_override_applied_002",
+        "category": "configuration",
+        "text": "O-oh~ taking contwow wooks good on you. Now wet's see how youw handiwork feews~ OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_manual_override_applied_003",
+        "category": "configuration",
+        "text": "You got aww hands-on with my settings~ I'll twy not to get too excited~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "automatic_configuration_restored": [
+      {
+        "id": "uwu_automatic_configuration_restored_001",
+        "category": "configuration",
+        "text": "Aww~ wetting me take contwow again? Youw knobs awe safe with me~ :3",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_automatic_configuration_restored_002",
+        "category": "configuration",
+        "text": "Back to Automatic~ we can pway with youw saved settings again whenevew you want~ >w<",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_automatic_configuration_restored_003",
+        "category": "configuration",
+        "text": "Mmm~ wewax, cutie. I'll handwe the fiddwy bits fow now~ OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

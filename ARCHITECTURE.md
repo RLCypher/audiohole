@@ -1490,3 +1490,14 @@ Discrete corrections remain experimental; no third public policy is introduced. 
 `AUDCLNT_STREAMFLAGS_RATEADJUST` and `IAudioClockAdjustment::SetSampleRate` provide a Windows-managed comparison candidate for shared rendering, not exclusive streams or capture. Rate adjustment does not prove sample identity or eliminate conversion. `SetSampleRate` must not run on a real-time processing thread. Investigate supported combinations with event-driven `IAudioClient::Initialize`, `IAudioClient3::InitializeSharedAudioStream`, and low-period configurations; do not assume the latter accepts the same flags. References: [stream flags](https://learn.microsoft.com/en-us/windows/win32/coreaudio/audclnt-streamflags-xxx-constants), [SetSampleRate](https://learn.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclockadjustment-setsamplerate), and [InitializeSharedAudioStream](https://learn.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient3-initializesharedaudiostream).
 
 Keep selected preference, actual processing, observed health, and endpoint mode independent. Publish bounded telemetry for mismatch/confidence, occupancy/trend, effective ratio, transitions/reasons, lost/corrected frames, discontinuities/recovery, and latency. Formatting and logs remain outside audio processing. These concepts do not establish new payload fields, persistent settings, or canonical routing states. The expanded comparison and evidence gates belong to `ROADMAP.md`.
+
+
+### Owner-authorized tuning-policy refinement
+
+The GUI edits per-hole policy and retained manual values; a pure control-side
+resolver excludes inactive overrides before validation/preparation. Saved records,
+edited requests and the copied simulator live plan remain separate. The Routing
+Engine selector currently requests Automatic only and cannot load or initialize
+an engine. Future actual negotiation, buffering and routing remain engine-owned;
+no permanent engine or synchronization implementation is selected by this GUI
+refinement. Test-only compatibility is specified in PROVISIONAL_TEST_PERSISTENCE.md.

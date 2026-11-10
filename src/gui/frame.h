@@ -56,6 +56,7 @@ class Tray final : public wxTaskBarIcon {
 // ID and format vectors map visible selections to typed controller values.
 struct DirectionWidgets {
     wxStaticBoxSizer* group{};
+    wxStaticBoxSizer* tuning_group{};
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{};
     wxSpinCtrl* buffer{};
@@ -84,6 +85,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         wxEvtHandler::RemoveFilter(this);
         RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
+        tuning_timer_.Stop();
         stop_avatar();
         if (tray_)
             tray_->RemoveIcon();
@@ -99,6 +101,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     }
     void exit() {
         timer_.Stop();
+        tuning_timer_.Stop();
         stop_avatar();
         if (controller_->snapshot().scanning || controller_->snapshot().scanner.busy)
             controller_->scan(false);
@@ -137,6 +140,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::unique_ptr<Tray> tray_;
     wxTimer timer_;
     wxTimer avatar_timer_;
+    wxTimer tuning_timer_; // One settled policy reaction; never a controller command.
     std::unique_ptr<presentation::AvatarHost> avatar_host_;
     std::vector<std::string> avatar_diagnostics_, last_avatar_diagnostics_;
     presentation::SleepCommentary sleep_commentary_{
@@ -195,6 +199,11 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
+    wxCheckBox* advanced_tuning_{};
+    wxChoice* routing_engine_{};
+    wxStaticText* routing_engine_notice_{};
+    wxPanel* advanced_panel_{};
+    wxCollapsiblePane* signal_tools_{};
     wxChoice *activity_direction_{}, *personality_choice_{}, *destination_test_{}, *scan_mode_{},
         *scan_scope_{}, *severity_{}, *startup_{}, *startup_target_{}, *notifications_{};
     wxSpinCtrl* delay_{};
@@ -262,6 +271,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void update_navigation();
     WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;
     void build_direction(wxWindow*, wxSizer*, DirectionWidgets&, const wxString&);
+    void tuning_changed();
     // Rebuilds evidence while retaining explicit unsupported overrides for correction.
     void populate_direction(DirectionWidgets&, const audiohole::Direction&);
     void read_direction(DirectionWidgets&, audiohole::Direction&);

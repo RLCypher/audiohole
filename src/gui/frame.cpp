@@ -15,12 +15,20 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1000, 1000)),
       controller_(std::make_unique<ApplicationController>(std::move(controller))),
       preferences_(std::move(preferences)), restart_(std::move(restart)), timer_(this),
-      avatar_timer_(this), smoke_(smoke) {
+      avatar_timer_(this), tuning_timer_(this), smoke_(smoke) {
     if (!preferences_) {
         preferences_ = std::make_shared<BuildPreferences>(std::filesystem::path{}, true);
         preferences_->load();
     }
     personality_ = preferences_->values().personality_id;
+    Bind(
+        wxEVT_TIMER,
+        [this](wxTimerEvent&) {
+            if (hole_index_ >= 0 && !operational_warning_visible_)
+                present(advanced_tuning_->GetValue() ? presentation::Message::AdvancedTuningEnabled
+                                                     : presentation::Message::AutomaticRestored);
+        },
+        tuning_timer_.GetId());
     SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
     // A stable window property supports second-launch focus across build titles.
     // It is removed before the native window is destroyed (see the destructor).
@@ -575,7 +583,8 @@ void Frame::refresh() {
     activity_direction_->Enable(s.capabilities.monitoring && hole_index_ >= 0 &&
                                 draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex);
     if (hole_index_ >= 0) {
-        Direction forward, reverse;
+        auto forward = draft_.holes.at(static_cast<std::size_t>(hole_index_)).forward;
+        auto reverse = draft_.holes.at(static_cast<std::size_t>(hole_index_)).reverse;
         read_direction(forward_, forward);
         read_direction(reverse_, reverse);
         update_direction_details(forward_, forward);
@@ -628,16 +637,26 @@ void Frame::refresh() {
                path.state == audiohole::State::Running;
     });
     monitor_->SetValue(s.monitoring);
+    const auto tools_title = wxString("Signal Testing & Monitoring") +
+                             (s.monitoring ? " — source monitoring active" : "") +
+                             (!s.beep_destination.empty() ? " — Test Beep active" : "");
+    if (signal_tools_->GetLabel() != tools_title)
+        signal_tools_->SetLabel(tools_title);
     activity_->SetLabel(
-        s.monitoring ? (running ? "Source activity detected. Destination audibility is untested."
-                                : "No source activity. Silence does not establish disconnection.")
-                     : "Observation off.");
+        !s.capabilities.monitoring ? "Source monitoring unavailable in Test Mode."
+        : s.monitoring
+            ? (running
+                   ? "Source activity detected (simulated). Destination audibility is untested."
+                   : "No source activity (simulated). Silence does not establish disconnection.")
+            : "Observation off.");
     // MSVC requires both branches to be wxString: its pointer conversions make
     // a mixed literal/wxString conditional ambiguous.
     beep_status_->SetLabel(
         s.beep_destination.empty()
-            ? wxString(wxS("Test Beep inactive."))
-            : text("Test Beep active: " + s.beep_destination + ". Cancel immediately if needed."));
+            ? wxString(s.capabilities.beep ? wxS("Test Beep inactive.")
+                                           : wxS("Test Beep unavailable in Test Mode."))
+            : text("Test Beep active (simulated; no sound): " + s.beep_destination +
+                   ". Cancel immediately if needed."));
     beep_button_->SetLabel(s.beep_destination.empty() ? "Test Beep" : "Cancel Beep");
     const int beep_selection = destination_test_->GetSelection();
     const auto* beep_target =
@@ -714,6 +733,8 @@ void Frame::refresh() {
                 message = presentation::Message::ScanCancelled;
             else if (e.type == "scan-failed")
                 message = presentation::Message::ScanFailed;
+            else if (e.type == "manual-override-applied")
+                message = presentation::Message::ManualOverrideApplied;
             else if (e.type == "activated")
                 message = presentation::Message::Activated;
             else if (e.type == "stopped")
@@ -760,6 +781,47 @@ bool Frame::smoke(const wxString& directory) {
         auto require = [](bool ok, const char* detail) {
             if (!ok)
                 throw std::runtime_error(detail);
+        };
+        auto exercise_tuning = [&] {
+            require(hole_index_ >= 0 && !advanced_tuning_->GetValue() &&
+                        !advanced_panel_->IsShown() && signal_tools_->IsCollapsed(),
+                    "Ordinary configuration must start Automatic with tuning/tools hidden");
+            require(routing_engine_->GetCount() == 1 &&
+                        routing_engine_->GetString(0) == "Automatic" &&
+                        routing_engine_->GetSelection() == 0,
+                    "Routing Engine must offer only Automatic in this build");
+            const auto revision = controller_->snapshot().revision;
+            const auto occurrence = occurrence_;
+            const auto before = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+            const auto window_size = GetSize();
+            wxCommandEvent toggle(wxEVT_CHECKBOX, advanced_tuning_->GetId());
+            auto choose = [&](bool enabled) {
+                advanced_tuning_->SetValue(enabled);
+                advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
+                require(advanced_panel_->IsShown() == enabled,
+                        "Tuning visibility differs from policy");
+            };
+            choose(true);
+            forward_.buffer->SetValue(19);
+            reverse_.buffer->SetValue(23);
+            capture_draft();
+            choose(false);
+            require(
+                draft_.holes.at(static_cast<std::size_t>(hole_index_)).forward.settings.buffer_ms ==
+                        19 &&
+                    draft_.holes.at(static_cast<std::size_t>(hole_index_))
+                            .reverse.settings.buffer_ms == 23,
+                "Disabling tuning discarded independent overrides");
+            choose(true);
+            require(forward_.buffer->GetValue() == 19 && reverse_.buffer->GetValue() == 23 &&
+                        controller_->snapshot().revision == revision && occurrence_ == occurrence,
+                    "Policy toggles altered operational state or spammed immediate commentary");
+            tuning_timer_.Stop();
+            draft_.holes.at(static_cast<std::size_t>(hole_index_)) = before;
+            load_hole(hole_index_);
+            choose(true); // The following buffer-Apply smoke explicitly opts into tuning.
+            tuning_timer_.Stop();
+            require(GetSize() == window_size, "Tuning disclosure resized the top-level window");
         };
         auto decline_delete = [&](wxListBox* list) {
             capture_draft();
@@ -870,6 +932,7 @@ bool Frame::smoke(const wxString& directory) {
             unknown_mode.settings.mode = "Future mode (unrecognized)";
             populate_direction(forward_, unknown_mode);
             Direction retained_mode;
+            advanced_tuning_->SetValue(true); // Explicitly read manual inputs for this check.
             read_direction(forward_, retained_mode);
             require(retained_mode.settings.mode == unknown_mode.settings.mode,
                     "Editing silently replaced an unrecognized saved mode");
@@ -1122,6 +1185,7 @@ bool Frame::smoke(const wxString& directory) {
             load_holes();
             load_hole(0);
             const auto persistent_hole_id = draft_.holes.front().id;
+            exercise_tuning();
             rename_hole("Persistent named hole");
             save(false);
             decline_delete(profiles_);
@@ -1277,6 +1341,8 @@ bool Frame::smoke(const wxString& directory) {
             require(tab->GetToolTip() == nullptr, "Navigation must not have generic hover text");
         require(!forward_.buffer_apply->IsEnabled() && !reverse_.buffer_apply->IsEnabled(),
                 "Unchanged buffer preferences must keep Apply disabled");
+        exercise_tuning();
+        save(false);
         require(console_->GetToolTip() == nullptr, "Diagnostic log must not have hover text");
         const auto target = std::find(beep_ids_.begin(), beep_ids_.end(), "vr-out");
         require(target != beep_ids_.end(), "Preview beep destination missing");
@@ -1290,6 +1356,24 @@ bool Frame::smoke(const wxString& directory) {
                     beep_button_->GetLabel() == "Cancel Beep",
                 "Beep label must follow the controller's active test state");
         require(beep_button_->GetSize().x == beep_width, "Beep label changes button width");
+        controller_->monitor(true);
+        refresh();
+        const auto disclosure_revision = controller_->snapshot().revision;
+        const auto disclosure_occurrence = occurrence_;
+        for (bool collapsed : {false, true}) {
+            signal_tools_->Collapse(collapsed);
+            wxCollapsiblePaneEvent disclosure(signal_tools_, signal_tools_->GetId(), collapsed);
+            signal_tools_->GetEventHandler()->ProcessEvent(disclosure);
+        }
+        require(controller_->snapshot().monitoring &&
+                    controller_->snapshot().beep_destination == "vr-out" &&
+                    controller_->snapshot().revision == disclosure_revision &&
+                    occurrence_ == disclosure_occurrence &&
+                    signal_tools_->GetLabel().Contains("source monitoring active") &&
+                    signal_tools_->GetLabel().Contains("Test Beep active"),
+                "Monitoring disclosure changed a test/observation or generated commentary");
+        controller_->monitor(false);
+        refresh();
         beep_button_->GetEventHandler()->ProcessEvent(beep_click);
         require(controller_->snapshot().beep_destination.empty() &&
                     beep_button_->GetLabel() == "Test Beep",
@@ -1418,6 +1502,9 @@ bool Frame::smoke(const wxString& directory) {
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");
         select_profile("profile-duplex");
+        advanced_tuning_->SetValue(true);
+        tuning_changed();
+        save(false); // Buffer-Apply checks below deliberately opt into manual tuning.
         wxCommandEvent start(wxEVT_BUTTON, start_->GetId());
         start_->GetEventHandler()->ProcessEvent(start);
         controller_->advance(300);

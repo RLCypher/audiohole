@@ -46,7 +46,7 @@ struct Endpoint {
 struct Settings {
     bool automatic = true;
     Format format;
-    int buffer_ms = 6;
+    int buffer_ms = 0; // Zero requests Automatic, not a zero-length engine buffer.
     std::string mode = "Automatic";
     bool operator==(const Settings&) const = default;
 };
@@ -61,6 +61,8 @@ struct Hole {
     std::string id, display_name, notes;
     bool enabled = true, duplex = false;
     Direction forward, reverse;
+    bool advanced_tuning = false; // Policy gate; retained manual values are never erased.
+    std::string routing_engine = "automatic"; // Requested selector, not an initialized backend.
     bool operator==(const Hole&) const = default;
 };
 struct Profile {
@@ -123,7 +125,8 @@ struct RoutingPathRequest {
     std::string hole_id, source, destination, mode;
     bool reverse = false;
     Format format;
-    int buffer_ms = 0;
+    int buffer_ms = 0; // Zero leaves buffer selection to the future engine.
+    std::string routing_engine = "automatic";
 };
 struct PreparedProfile {
     std::string profile_id;
@@ -140,6 +143,9 @@ const Endpoint* endpoint(const Snapshot&, const std::string& id);
 std::vector<const Endpoint*> configuration_devices(const Snapshot&);
 const Profile* profile(const Snapshot&, const std::string& id);
 Recommendation recommend(const Snapshot&, const Direction&);
+// Copy the requested direction with inactive manual overrides excluded. Never
+// mutate the saved/draft values. Automatic buffer selection remains engine-owned.
+Direction effective_direction(const Hole&, bool reverse = false);
 Result validate(const Snapshot&, const Profile&);
 // Internal, in-process GUI seam; not API.md's final public schema/transport.
 // Calls and snapshots belong to the control/GUI thread. The scanner owns its
@@ -241,6 +247,7 @@ class SimulatedController final : public Controller {
     std::vector<std::string> failures_;
     std::uint64_t next_id_ = 10, sequence_ = 0;
     int transition_ms_ = 0, beep_ms_ = 0, scan_ms_ = 0;
+    bool pending_manual_ack_ = false;
     void event(std::string type, std::string detail);
     void refresh_paths(bool reconnecting = false);
 };

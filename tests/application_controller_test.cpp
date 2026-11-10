@@ -166,7 +166,9 @@ TEST(Communication, BufferApplyUpdatesOnlySelectedDirectionAndConfirmsSimulation
     auto controller = preview();
     auto subscription = controller.subscribe();
     subscription.poll();
-    const auto original = *profile(controller.snapshot(), "profile-duplex");
+    auto original = *profile(controller.snapshot(), "profile-duplex");
+    original.holes.front().advanced_tuning = true;
+    ASSERT_TRUE(controller.save(original, false).ok);
     const auto hole = original.holes.front().id;
     const auto saved = controller.submit(UpdateBuffer{hole, true, 17, original.id});
     ASSERT_EQ(saved.outcome, Outcome::Completed);

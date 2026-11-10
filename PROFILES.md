@@ -1457,3 +1457,27 @@ Device matching is conservative and explainable. Local bindings remain subject t
 One engine resolves synchronization independently for each direction, preserving D-053's shared-default inheritance and explicit overrides. Automatic is the proposed prototype default, not a finalized algorithm. Compare unchanged transfer, application-managed compensation, and Windows-managed shared-render adjustment where available. A processing change in one direction must respect existing healthy-direction isolation; no new coupled-failure values are defined.
 
 Strict preservation remains internal/experimental, not a required public profile feature. Its candidate semantics reject incompatible formats and prohibit intentional modification, insertion, duplication, dropping, or resampling of captured PCM frames. Inability to continue is reported; restart/rebuffer is explicit, never silent compensation. Emergency recovery and upstream discontinuities cannot be hidden as preservation. O-004/O-005 remain Open: no new profile fields, enums, defaults in persisted files, or public actions are finalized. Concrete experimental controls do not become production configuration by implication.
+
+## Owner-authorized per-hole tuning policy
+
+New holes default to Automatic. Advanced Tuning is a configuration policy per
+hole, independently gating both directions' retained manual settings. Disabled
+settings remain stored and ignored for effective requests/validation; enabling
+makes explicit overrides eligible, leaving individual Automatic fields managed.
+Unsupported applicable settings fail clearly. Basic assignments and stable IDs
+survive toggling. Editing or saving a policy never changes the copied live plan;
+explicit validated Apply/Activate is required. Requested/saved/runtime values stay
+separate. A buffer-only update cannot silently enable a live route's policy.
+
+The Test-only v3 representation preserves directional settings in place and
+migrates missing legacy flags conservatively to the previous active-tuning policy.
+See PROVISIONAL_TEST_PERSISTENCE.md for backup, restart, unknown-field and import
+contracts. This does not close O-004/O-006 or implement production persistence,
+real negotiation, channel mapping, fallback or clock synchronization algorithms.
+
+
+Routing Engine is a per-hole requested selector, shared by the duplex directions.
+Only Automatic is offered now. Its Test JSON identifier is `routing_engine` with
+`automatic` as default, including when absent in older files. It obeys the Advanced
+Tuning gate; future unavailable requests are preserved inactive or explicitly
+rejected when eligible, never silently mapped to a different implementation.

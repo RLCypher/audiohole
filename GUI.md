@@ -1829,3 +1829,43 @@ consistent DPI-scaled padding. Settings presents Appearance/Tray and Startup in
 two columns, followed by Personality/Animation, Advanced, then Preview Build
 Environment. Reflow and vertical scrolling keep the same window size; these
 presentation adjustments do not alter saved preferences or routing behavior.
+
+## Owner-authorized Automatic / Advanced Tuning refinement
+
+Profiles presents hole identity/notes, both directional Source/Destination cards,
+and concise evidence-grounded Automatic summaries first. New holes have **Enable
+Advanced Tuning** unchecked. The checkbox reveals one panel containing each
+participating direction's format, buffer/Apply, operating mode and unavailable
+mapping/fallback controls. There is no extra directional disclosure. Each supported
+parameter offers Automatic. Turning tuning off retains manual values but excludes
+them from effective policy; turning it on stages eligibility and never starts or
+restarts routing. Save / Apply remain explicit. Inactive overrides are identified;
+requested overrides and confirmed Preview/engine values are labelled separately.
+Recommendations remain visible outside the panel; matching nominal rates do not
+establish route verification. Missing evidence stays unverified/unavailable.
+
+**Signal Testing & Monitoring** replaces Setup Tools. Its ordinary disclosure is
+initially collapsed and uses no top-level resize. Expanded groups are Source
+Activity (direction, observation, clear status), Test Beep (explicit destination,
+fixed-width start/cancel, status), and Performance Diagnostics (unavailable values
+when no measurements exist). Expanding/collapsing changes presentation only; ongoing
+source observation and Test Beep persist and are indicated in the collapsed header.
+Leaving Profiles, changing the observed hole/direction, hiding/closing the window,
+Stop and shutdown retain existing cancellation rules. Clearing source observation
+is an explicit action and does not cancel a separate beep. No real audio operation
+is added. Collapsing this disclosure is not closing the observation workspace.
+
+Keyboard focus returns to the checkbox/disclosure before a focused child is hidden.
+Native tab order follows basic routing, policy, tuning, then testing. Shared theme,
+DPI sizing and scrolling are retained. Settled policy actions select one authored
+reaction after 650 ms of quiet, not on telemetry/repaint. Navigation/save cancels
+pending reactions. Warnings retain priority. A manual-applied reaction requires a
+confirmed simulated application; merely enabling tuning, saving Test configuration,
+or requesting all-Automatic parameters cannot generate it.
+
+
+Advanced Tuning includes a per-hole **Routing Engine** dropdown, initially offering
+only **Automatic**. The request is retained in Test profile JSON. Opening/changing
+this control does not initialize, select an implementation, benchmark or start
+routing. Future engine IDs are preserved as unavailable saved requests, not
+silently substituted; Automatic policy ignores them while retaining them.

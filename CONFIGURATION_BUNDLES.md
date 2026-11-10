@@ -98,7 +98,7 @@ no real routing backend. The bundle does not finalize production configuration.
   change requires a fresh preview. The GUI blocks racing profile edits, and the
   controller rejects configuration commits during bundle operations.
 - Validated new device/history files are atomically written first; profiles are
-  atomically committed last. A v1 upgrade retains the original `.v1.bak`. Differing
+  atomically committed last. An explicit legacy save retains `.v1.bak` or `.v2.bak`. Differing
   existing device/history files are never replaced. On a caught write failure or
   cancellation, newly created files are removed only if their bytes still match
   the import. Concurrently edited files are retained and reported.
@@ -114,3 +114,14 @@ serialization and writes live in `model/configuration_bundle.*`, invoked by the
 owned worker and reusable by a future CLI. Tests cover round trips, restart,
 unknown fields, hidden devices, conflicts, edits after preview, cancellation,
 write-failure rollback, unsafe archives, idempotence and background publication.
+
+
+Profile payloads now use Test configuration v3 with per-hole `advanced_tuning` and
+zero meaning Automatic for buffer requests. Import accepts legacy v1/v2 and v3;
+legacy missing tuning flags retain the old active-manual policy before merging.
+No new bundle transport version or production persistence contract is introduced.
+Retained inactive overrides travel with profiles; actual engine observations do not.
+
+Profile payloads also retain the per-hole `routing_engine` request (default
+`automatic`). Inactive future choices survive import/export; current request
+preparation admits only Automatic, without initializing an engine.

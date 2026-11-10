@@ -130,8 +130,7 @@ Direction direction(const Json& value) {
         d.destination_name = string(value, "destination_name");
     const auto& settings = value.at("settings");
     d.settings.automatic = settings.at("automatic").get<bool>();
-    d.settings.buffer_ms = integer(settings, "buffer_ms", 1, 100);
-    require(d.settings.buffer_ms >= 1 && d.settings.buffer_ms <= 100);
+    d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
     d.settings.mode = string(settings, "mode", 64);
     d.settings.format = format(settings.at("format"));
     return d;
@@ -149,7 +148,7 @@ Json encode(const Direction& d) {
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 2},
+                   {"schema_version", 3},
                    {"profiles", Json::array()},
                    {"devices", Json::array()}};
     for (const auto& d : records.devices) {
@@ -172,6 +171,8 @@ Json encode(const ConfigurationRecords& records) {
             holes.push_back({{"display_name", h.display_name},
                              {"notes", h.notes},
                              {"id", h.id},
+                             {"advanced_tuning", h.advanced_tuning},
+                             {"routing_engine", h.routing_engine},
                              {"enabled", h.enabled},
                              {"duplex", h.duplex},
                              {"forward", encode(h.forward)},
@@ -183,7 +184,7 @@ Json encode(const ConfigurationRecords& records) {
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 2) >= 1);
+            integer(root, "schema_version", 1, 3) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -231,6 +232,14 @@ ConfigurationRecords decode(const Json& root) {
             h.duplex = x.at("duplex").get<bool>();
             h.forward = direction(x.at("forward"));
             h.reverse = direction(x.at("reverse"));
+            // Legacy files always used their saved tuning. Loading is read-only;
+            // an explicit save materializes this compatibility policy in v3.
+            require(x.contains("advanced_tuning") || root.at("schema_version") != 3);
+            h.advanced_tuning =
+                x.contains("advanced_tuning") ? x.at("advanced_tuning").get<bool>() : true;
+            h.routing_engine =
+                x.contains("routing_engine") ? string(x, "routing_engine", 64) : "automatic";
+            require(!h.routing_engine.empty());
             p.holes.push_back(std::move(h));
         }
         records.profiles.push_back(std::move(p));
@@ -360,8 +369,8 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
         require(incoming.size() <= maximum_document);
         auto added = parse(incoming);
         auto current = existing ? parse(*existing) : encode(ConfigurationRecords{});
-        (void)decode(added);
-        (void)decode(current);
+        added = merge(added, encode(decode(added)));
+        current = merge(current, encode(decode(current)));
         require(added.at("devices").empty());
         for (const auto& item : added.at("profiles")) {
             auto found =
@@ -374,7 +383,7 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
             } else
                 current["profiles"].push_back(item);
         }
-        current["schema_version"] = 2;
+        current["schema_version"] = 3;
         (void)decode(current); // Also detects hole IDs colliding across profiles.
         output = current.dump(2) + "\n";
         require(output.size() <= maximum_document);
@@ -407,18 +416,20 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
-        if (impl_->expected && impl_->original.at("schema_version") == 1) {
+        if (impl_->expected && impl_->original.at("schema_version") != 3) {
             // No load-time migration. The first explicit save keeps the exact
-            // v1 original; never overwrite a different earlier backup.
+            // legacy original; never overwrite a different earlier backup.
             if (read_document(impl_->file) != impl_->expected)
                 return {false,
                         "File changed externally. Reload before saving; no data was overwritten."};
             auto backup = impl_->file;
-            backup += ".v1.bak";
+            const auto version = impl_->original.at("schema_version").get<int>();
+            backup += ".v" + std::to_string(version) + ".bak";
             const auto existing = read_document(backup);
             if (existing && existing != impl_->expected)
-                return {false, "A different v1 backup already exists. Preserve it and choose a new "
-                               "configuration destination before upgrading."};
+                return {false,
+                        "A different legacy backup already exists. Preserve it and choose a new "
+                        "configuration destination before upgrading."};
             if (!existing) {
                 const auto result = replace_document(backup, *impl_->expected, std::nullopt);
                 if (!result.ok)

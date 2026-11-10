@@ -1,4 +1,4 @@
-# Preview Build persistence (provisional v2)
+# Preview Build persistence (provisional v3)
 
 The owner authorized real isolated Test persistence while production schemas remain
 Open (O-004/O-006). This provider is **not a production format, historical importer,
@@ -53,14 +53,14 @@ A future production serializer can replace the provider. Richer domain records
 will also be needed for production fingerprint/evidence/inheritance/request
 concepts; the current fixture structs do not specify those schemas.
 
-## Test v2 shape and limits
+## Test v3 shape and limits
 
 One UTF-8 two-space-indented document, final newline:
 
 ```json
 {
   "format": "audiohole-test-configuration",
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": [],
   "devices": []
 }
@@ -71,7 +71,7 @@ Arrays use the existing structs:
 - Device: `id`, `display_name`, `windows_name`, `notes`, `capture`, `availability`,
   `formats` (complete `rate`, `channels`, `representation` tuples).
 - Profile: `display_name`, `notes`, `id`, `holes`.
-- Hole: `display_name`, `notes`, `id`, `enabled`, `duplex`, `forward`, `reverse`.
+- Hole: `display_name`, `notes`, `id`, `advanced_tuning`, `routing_engine`, `enabled`, `duplex`, `forward`, `reverse`.
 - Direction: readable `source_name`, stable `source` ID, readable `destination_name`,
   stable `destination` ID and `settings` containing
   `automatic`, `format`, `buffer_ms`, `mode`. Both directions always round-trip,
@@ -90,7 +90,7 @@ fields cannot express every production status object; this is a documented limit
 
 Maximum document 2 MiB, nesting16; devices512, profiles256, holes/profile128,
 formats/device256. IDs128 UTF-8 bytes, notes/names64 KiB; format rate1..768000,
-channels1..256, buffer1..100 ms. Bounds are test-provider validation limits, not
+channels1..256, buffer0..100 ms (0 requests Automatic). Bounds are test-provider validation limits, not
 hardware capabilities. Invalid fractional/overflow numeric fields and duplicate
 JSON keys/IDs/format tuples are rejected. Invalid/newer documents block saves and
 remain untouched. Startup reports the problem; repair externally and restart.
@@ -188,10 +188,10 @@ negotiation or a guarantee: preparation resolves against current scanned evidenc
 No matching tuple leaves the draft saveable and the editor explains the gap.
 See [the sample](docs/test-profile-example.json) for the emitted relevance order.
 
-Both v1 and v2 load. Merely loading v1 never rewrites it. Its first explicit save
-preserves its exact original bytes in `configuration.json.v1.bak` before emitting
-v2. A conflicting existing backup blocks the upgrade rather than being replaced.
-Older v1-only applications reject v2, protecting its exact-descriptor semantics.
+Versions 1, 2 and 3 load. Loading never rewrites a document. The first explicit
+save of a legacy document preserves its exact original bytes in
+`configuration.json.v1.bak` or `.v2.bak` before emitting v3. A conflicting existing backup blocks the upgrade rather than being replaced.
+Older applications reject v3, protecting the tuning-policy and Automatic-buffer semantics.
 Unsupported newer versions and malformed descriptors block saves; unknown fields
 still survive recognized edits. Full Save refreshes display hints/cached automatic
 candidates; the small buffer Apply intentionally changes only its target buffer.
@@ -204,3 +204,50 @@ subset; differing channel layouts such as 10-channel RODE output versus a stereo
 source require explicit mapping/conversion work rather than fabricated compatibility.
 Buffer milliseconds remain a requested preference; no hardware period, latency or
 stability recommendation is inferred from that value. Preview behavior is retained.
+
+## Advanced Tuning policy (provisional Test v3)
+
+Each hole has an explicit boolean `advanced_tuning` near its identity, before its
+forward/reverse assignments. New holes use false. False resolves both directions
+with Automatic format, mode and buffer; stored manual fields do not participate
+in routing validation/preparation and are not erased. True makes each direction's
+`settings` eligible; format `automatic: true`, mode `Automatic`, and `buffer_ms: 0`
+remain independently Automatic. Unsupported applicable overrides fail validation
+without falling back silently. Buffer 0 requests selection, not a zero-length
+stream. Preview uses a labelled simulated 6-ms choice; Test has no applied engine
+value. Preparation carries a zero Automatic buffer request to the future engine.
+
+The existing `forward.settings` and `reverse.settings` objects are retained as the
+direction-specific advanced data, avoiding an unnecessary nesting migration. This
+is the provisional equivalent of the amendment's illustrative `advanced_settings`
+object, not approval of production field names or nesting. Manual format bytes,
+notes, IDs and unknown fields survive toggling, switching and Test restart. Cached
+formats marked Automatic may refresh from effective-policy evidence on a full
+save; they are not manual overrides or runtime confirmations.
+
+For legacy v1/v2 holes missing the flag, loading sets it true, preserving the old
+behavior where saved tuning always participated. An explicitly present boolean is
+honored; v3 requires the flag and rejects missing/wrong-type values. No load-time
+migration occurs. Explicit save emits v3 with a non-overwriting legacy backup;
+external-edit and conflicting-backup protection remain. Bundle merges normalize
+legacy policies before combining records while preserving unknown data and IDs.
+
+Checkbox changes stage editor policy only. Save does not reconfigure a live copy;
+profile Apply/Activate remains explicit. A directional buffer Apply cannot opt an
+automatic live route into Advanced Tuning or bypass an unapplied policy change.
+Production O-004/O-006 and actual negotiation/synchronization remain Open.
+
+### Routing Engine request
+
+Test v3 holes also store `routing_engine: "automatic"` next to
+`advanced_tuning`. The Advanced Tuning selector displays **Routing Engine** with
+**Automatic** as its sole offered option. It is a per-hole request shared by its
+two directions, not an initialized engine or performance claim. Missing fields
+load as `automatic`, including legacy files. Nonempty strings up to 64 UTF-8 bytes
+round-trip unchanged, preserving future engine identifiers. A choice unavailable
+in this build is not offered as a functioning option: its saved value is explained
+and retained until the user explicitly chooses Automatic. It blocks activation
+when Advanced Tuning is enabled; with tuning disabled it remains stored and the
+effective request is Automatic. Wrong types/empty values reject the document
+without modifying it. Profile bundle transfer retains the selector and policy.
+No permanent engine implementation or public production schema is selected.

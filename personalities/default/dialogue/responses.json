@@ -1500,6 +1500,92 @@
         "expression": "sleeping",
         "fallback_expression": "idle"
       }
+    ],
+    "advanced_tuning_enabled": [
+      {
+        "id": "default_advanced_tuning_enabled_001",
+        "category": "configuration",
+        "text": "Oh, we're doing this manually? Alright. Try not to make it worse.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_advanced_tuning_enabled_002",
+        "category": "configuration",
+        "text": "You know, I had that handled.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_advanced_tuning_enabled_003",
+        "category": "configuration",
+        "text": "Fine. Touch the knobs. See what happens.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_advanced_tuning_enabled_004",
+        "category": "configuration",
+        "text": "I see we're ignoring perfectly reasonable defaults today.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "manual_override_applied": [
+      {
+        "id": "default_manual_override_applied_001",
+        "category": "configuration",
+        "text": "Your settings. Your responsibility. I'll keep an eye on it.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_manual_override_applied_002",
+        "category": "configuration",
+        "text": "The knobs are where you wanted them. Let's see how that goes.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_manual_override_applied_003",
+        "category": "configuration",
+        "text": "Manual settings are in. Resist the urge to change six things at once.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "automatic_configuration_restored": [
+      {
+        "id": "default_automatic_configuration_restored_001",
+        "category": "configuration",
+        "text": "Back to Automatic. A sensible decision. Eventually.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_automatic_configuration_restored_002",
+        "category": "configuration",
+        "text": "I'll take the knobs from here. Your settings are still there if you miss them.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_automatic_configuration_restored_003",
+        "category": "configuration",
+        "text": "Defaults again. We could have saved ourselves a conversation.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

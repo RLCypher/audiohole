@@ -483,3 +483,41 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   evidence. An absent endpoint with no cached name is an absence observation;
   existing records, names, notes and logical IDs survive. Active-device failures
   and unknown state remain visible errors. Reconnect and verify identity retention.
+
+
+### Automatic configuration and Advanced Tuning refinement
+
+- New simplex/duplex holes start Automatic with tuning unchecked/hidden. Choose
+  Source/Destination; concise summaries and recommendation evidence remain visible.
+  Test unknown evidence stays unverified; no stream/clock/latency claim appears.
+- Enable tuning: direction-specific format, mode and buffer controls appear in one
+  panel. Buffer 0 means Automatic. Set different duplex overrides, disable tuning,
+  confirm retained-but-inactive summary, reenable and verify both values return.
+  Save, switch profiles and restart Test; policy and values must survive.
+- Load a disposable legacy v1/v2 file missing the flag: old active-manual behavior
+  is retained. Loading writes nothing. Explicit save produces v3 with the exact
+  original in the corresponding non-overwriting backup; unknown fields survive.
+  Older application versions reject v3. Test bundle export/import preserves policy.
+- Disabling tuning excludes an unsupported retained format/mode from effective
+  requests. Enabling rejects unsupported overrides on Apply with clear diagnostics.
+  Save/checkbox changes never start/reconfigure routing; explicit Apply is required.
+  Individual Automatic fields remain managed while other fields are manual.
+- Signal Testing & Monitoring starts collapsed. In Preview, explicitly monitor a
+  source and start a beep at a selected destination; collapse/expand repeatedly.
+  Operations persist, collapsed header indicates activity, and no new commentary
+  occurs. Clear observation stops it without cancelling the beep. Test Mode keeps
+  unsupported actions disabled and performance measurements unavailable.
+- Norm/Horu react once to settled policy changes with different authored variants;
+  Vanilla has facts only. Rapid toggles do not spam reactions. Merely enabling or
+  saving Test configuration cannot acknowledge an applied manual override. Preview
+  acknowledgement follows a confirmed running application, with simulation explicit.
+- Keyboard-tab through basic fields, checkbox, revealed controls and disclosure.
+  Hide a focused tuning/tool child: focus remains usable. Assess compact/wide
+  windows, dark/light/high contrast and 100/150/200% DPI without top-level resizing.
+
+- Advanced Tuning's Routing Engine dropdown offers exactly Automatic. Save/restart
+  and profile bundle transfer retain `routing_engine: "automatic"`. Missing fields
+  default to it. With disposable externally edited data, an unknown future choice
+  is preserved and explained, ignored while tuning is off and rejected on Apply
+  while tuning is on. Explicitly choosing Automatic resolves it without starting
+  audio or changing endpoint IDs.

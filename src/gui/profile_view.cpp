@@ -17,9 +17,12 @@ class AddAccessible final : public wxWindowAccessible {
     }
 };
 #endif
+std::string buffer_caption(int milliseconds) {
+    return milliseconds ? std::to_string(milliseconds) + " ms" : "Automatic";
+}
 std::optional<int> buffer_value(const wxSpinCtrl* control) {
     long value = 0;
-    if (!control->GetTextValue().ToLong(&value) || value < 1 || value > 100)
+    if (!control->GetTextValue().ToLong(&value) || value < 0 || value > 100)
         return {};
     return static_cast<int>(value);
 }
@@ -69,14 +72,18 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));
     w.group->Add(endpoints, 0, wxEXPAND);
     w.summary = label(box, w.group, "Configuration");
-    label(box, w.group, "Audio format");
-    w.format = new ThemedChoice(box, wxID_ANY);
-    w.group->Add(w.format, 0, wxEXPAND | wxALL, 3);
     w.evidence = label(box, w.group, "Select endpoints to see a format recommendation.");
     w.evidence->Wrap(560);
-    label(box, w.group, "Buffer (ms)");
-    w.buffer = new wxSpinCtrl(box, wxID_ANY, "6", wxDefaultPosition, wxDefaultSize,
-                              wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 1, 100, 6);
+    auto* tuning = new wxStaticBoxSizer(wxVERTICAL, advanced_panel_, title + " tuning");
+    w.tuning_group = tuning;
+    advanced_panel_->GetSizer()->Add(tuning, 0, wxEXPAND | wxALL, FromDIP(4));
+    box = tuning->GetStaticBox();
+    label(box, tuning, "Audio format");
+    w.format = new ThemedChoice(box, wxID_ANY);
+    tuning->Add(w.format, 0, wxEXPAND | wxALL, 3);
+    label(box, tuning, "Buffer (ms; 0 = Automatic)");
+    w.buffer = new wxSpinCtrl(box, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
+                              wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
     auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
     buffer_row->Add(w.buffer, 0, wxALL, 3);
     w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
@@ -85,39 +92,28 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         "Save just this direction's buffer preference. A matching active Preview direction also "
         "updates its simulated buffer. Test Mode saves configuration only; no hardware buffer is "
         "applied.");
-    w.group->Add(buffer_row, 0, wxEXPAND);
-    w.buffer_state = label(box, w.group, "Edited/saved preferences; engine values unavailable.");
+    tuning->Add(buffer_row, 0, wxEXPAND);
+    w.buffer_state = label(box, tuning, "Edited/saved preferences; engine values unavailable.");
     w.buffer_state->SetMinSize(wxSize(1, -1));
-    w.buffer->SetToolTip("Buffer duration in milliseconds. Smaller values can reduce latency but "
+    w.buffer->SetToolTip("Use 0 for Automatic, or request a duration in milliseconds. Smaller "
+                         "values can reduce latency but "
                          "increase dropout risk. This is an edited preference, not a measured or "
                          "confirmed hardware buffer. Apply saves this preference; status shows any "
                          "simulated confirmation.");
     w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
-                         "evidence below explains the recommendation.");
+                         "visible evidence explains the recommendation.");
     w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
                          "listed device to bind it.");
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
-    auto* advanced =
-        new wxCollapsiblePane(box, wxID_ANY, "Advanced directional settings", wxDefaultPosition,
-                              wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
-    w.group->Add(advanced, 0, wxEXPAND | wxALL, 3);
-    auto* pane = advanced->GetPane();
-    auto* inner = new wxBoxSizer(wxVERTICAL);
-    w.mode = choices(pane, inner, "Operating mode", {"Automatic", "Shared", "Exclusive"});
-    w.mode->SetToolTip("Automatic chooses an operating preference. Shared cooperates with other "
-                       "applications; Exclusive can reserve the endpoint. Changes wait for Apply.");
-    auto* fallback = new ThemedChoice(pane, wxID_ANY);
+    w.mode = choices(box, tuning, "Operating mode", {"Automatic", "Shared", "Exclusive"});
+    w.mode->SetToolTip("Automatic uses available evidence. Shared cooperates with other apps; "
+                       "Exclusive can reserve a device. Changes wait for explicit Apply.");
+    auto* fallback = new ThemedChoice(box, wxID_ANY);
     fallback->Append(wxS("Fallback device / channel mapping — unavailable"));
     fallback->SetSelection(0);
     fallback->Disable();
-    inner->Add(fallback, 0, wxEXPAND | wxALL, 3);
-    pane->SetSizer(inner);
-    advanced->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [parent](wxCollapsiblePaneEvent&) {
-        parent->Layout();
-        if (auto* scroll = dynamic_cast<wxScrolledWindow*>(parent))
-            scroll->FitInside();
-    });
+    tuning->Add(fallback, 0, wxEXPAND | wxALL, FromDIP(4));
     auto changed = [this, &w](bool source) {
         if (loading_ || hole_index_ < 0)
             return;
@@ -157,6 +153,30 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         }
     });
 }
+// The checkbox stages a policy change, preserving the last valid hidden values.
+// A single delayed reaction follows settled intent; rapid toggles restart it.
+void Frame::tuning_changed() {
+    if (loading_ || hole_index_ < 0)
+        return;
+    auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+    const bool enabled = advanced_tuning_->GetValue();
+    advanced_tuning_->SetValue(hole.advanced_tuning);
+    capture_draft();
+    advanced_tuning_->SetValue(enabled);
+    hole.advanced_tuning = enabled;
+    auto* focused = wxWindow::FindFocus();
+    if (!enabled && focused && advanced_panel_->IsDescendant(focused))
+        advanced_tuning_->SetFocus();
+    advanced_panel_->Show(enabled);
+    populate_direction(forward_, hole.forward);
+    populate_direction(reverse_, hole.reverse);
+    auto* editor = static_cast<wxScrolledWindow*>(advanced_panel_->GetParent());
+    editor->Layout();
+    editor->FitInside();
+    dirty_ = true;
+    tuning_timer_.StartOnce(650);
+    refresh();
+}
 // Spin, Enter, and focus loss can describe the same edit. Compare the settled value
 // so polling, loading, and duplicate native notifications never consume commentary.
 void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
@@ -176,11 +196,13 @@ void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
     refresh();
 }
 void Frame::apply_buffer(DirectionWidgets& widgets) {
+    tuning_timer_.Stop();
     if (loading_ || hole_index_ < 0 || static_cast<std::size_t>(hole_index_) >= draft_.holes.size())
         return;
     const auto parsed = buffer_value(widgets.buffer);
     if (!parsed) {
-        show_result({false, "Enter a whole buffer value from 1 to 100 milliseconds."});
+        show_result(
+            {false, "Enter 0 for Automatic or a whole buffer value from 1 to 100 milliseconds."});
         return;
     }
     capture_draft();
@@ -503,8 +525,33 @@ void Frame::build_profiles() {
     toggles->Add(duplex_, 0, wxALL, 4);
     right->Add(toggles);
     hole_notes_ = field(editor, right, "Hole notes");
+    advanced_panel_ = new wxPanel(editor);
+    advanced_panel_->SetSizer(new wxBoxSizer(wxVERTICAL));
+    routing_engine_ =
+        choices(advanced_panel_, advanced_panel_->GetSizer(), "Routing Engine", {"Automatic"});
+    routing_engine_->SetToolTip("Requested engine selection for this hole. Only Automatic is "
+                                "available; no engine is selected or started by this control.");
+    routing_engine_notice_ = label(advanced_panel_, advanced_panel_->GetSizer(), "");
+    routing_engine_notice_->SetMinSize(wxSize(0, -1));
+    routing_engine_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        if (!loading_) {
+            capture_draft();
+            routing_engine_notice_->SetLabel("");
+            dirty_ = true;
+            refresh();
+        }
+    });
     build_direction(editor, right, forward_, "Forward");
     build_direction(editor, right, reverse_, "Reverse");
+    advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Enable Advanced Tuning");
+    advanced_tuning_->SetName("Enable Advanced Tuning");
+    advanced_tuning_->SetToolTip("Allow retained manual overrides for this hole. Save / Apply is "
+                                 "explicit; toggling never starts routing.");
+    right->Add(advanced_tuning_, 0, wxALL, FromDIP(4));
+    right->Add(advanced_panel_, 0, wxEXPAND);
+    advanced_panel_->MoveAfterInTabOrder(advanced_tuning_);
+    advanced_panel_->Hide();
+    advanced_tuning_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { tuning_changed(); });
     path_status_ = label(editor, right, "No active paths.");
     build_hole_diagnostics(editor, right);
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
@@ -585,6 +632,7 @@ void Frame::build_profiles() {
             activity_direction_->SetSelection(0);
         end_observation();
         reverse_.group->ShowItems(duplex_->GetValue());
+        reverse_.tuning_group->ShowItems(duplex_->GetValue());
         editor->FitInside();
         editor->Layout();
         present(duplex_->GetValue() ? presentation::Message::Duplex
@@ -593,8 +641,13 @@ void Frame::build_profiles() {
     monitor_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
         controller_->monitor(monitor_->GetValue());
         const auto& paths = controller_->snapshot().paths;
-        const bool running = std::any_of(paths.begin(), paths.end(), [](const auto& path) {
-            return path.state == audiohole::State::Running;
+        const auto observed_hole = hole_index_ >= 0
+                                       ? draft_.holes.at(static_cast<std::size_t>(hole_index_)).id
+                                       : std::string{};
+        const bool reverse = activity_direction_->GetSelection() == 1;
+        const bool running = std::any_of(paths.begin(), paths.end(), [&](const auto& path) {
+            return path.hole_id == observed_hole && path.reverse == reverse &&
+                   path.state == audiohole::State::Running;
         });
         present(!monitor_->GetValue() ? presentation::Message::Cancelled
                 : running             ? presentation::Message::Signal
@@ -669,7 +722,11 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     w.format->SetSelection(selection);
     update_direction_details(w, d);
-    w.evidence->SetLabel(text(r.explanation));
+    auto effective = d;
+    if (!advanced_tuning_->GetValue())
+        effective.settings = Settings{};
+    w.evidence->SetLabel(
+        text(audiohole::recommend(controller_->snapshot(), effective).explanation));
     w.evidence->Wrap(570);
     w.buffer->SetValue(d.settings.buffer_ms);
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
@@ -696,8 +753,7 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         const auto hole = std::find_if(stored->holes.begin(), stored->holes.end(),
                                        [&](const auto& record) { return record.id == selected; });
         if (hole != stored->holes.end() && (!reverse || hole->duplex)) {
-            saved = std::to_string((reverse ? hole->reverse : hole->forward).settings.buffer_ms) +
-                    " ms";
+            saved = buffer_caption((reverse ? hole->reverse : hole->forward).settings.buffer_ms);
             saved_direction = true;
         }
     }
@@ -714,13 +770,14 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         path == snapshot.paths.end() ? std::optional<int>{} : path->requested_buffer_ms;
     const auto confirmed =
         path == snapshot.paths.end() ? std::optional<int>{} : path->applied_buffer_ms;
-    const bool saved_changed = saved != std::to_string(d.settings.buffer_ms) + " ms";
+    const bool saved_changed = saved != buffer_caption(d.settings.buffer_ms);
     const bool active_changed =
         snapshot.capabilities.live_buffer && requested && *requested != d.settings.buffer_ms;
     const auto parsed = buffer_value(w.buffer);
-    w.buffer_apply->Enable(saved_direction && parsed && (saved_changed || active_changed));
+    w.buffer_apply->Enable(advanced_tuning_->GetValue() && saved_direction && parsed &&
+                           (saved_changed || active_changed));
     const wxString buffer_help =
-        !parsed ? "Enter a whole buffer value from 1 to 100 milliseconds."
+        !parsed ? "Enter 0 for Automatic or a whole buffer value from 1 to 100 milliseconds."
         : !saved_direction
             ? "Save this profile and direction before applying an individual buffer preference."
         : !saved_changed && !active_changed
@@ -732,36 +789,68 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     auto value = [](std::optional<int> buffer) {
         return buffer ? std::to_string(*buffer) + " ms" : "unavailable";
     };
-    w.buffer_state->SetLabel(text(
-        "Edited: " + (parsed ? std::to_string(*parsed) + " ms" : "invalid (1–100 ms)") +
-        " | Saved: " + saved + "\n" +
-        (snapshot.capabilities.simulated ? "Preview requested: " + value(requested) +
-                                               " | confirmed: " + value(confirmed) + " (simulated)"
-                                         : "Engine requested/applied: unavailable")));
-    const auto r = audiohole::recommend(controller_->snapshot(), d);
-    const auto selected = !d.settings.automatic   ? d.settings.format
-                          : !r.compatible.empty() ? r.compatible.front()
-                                                  : d.settings.format;
-    const bool known = !d.settings.automatic || !r.compatible.empty();
+    w.buffer_state->SetLabel(
+        text("Edited: " + (parsed ? buffer_caption(*parsed) : "invalid (0 = Automatic; 1–100 ms)") +
+             " | Saved: " + saved + "\n" +
+             (snapshot.capabilities.simulated
+                  ? "Preview requested: " +
+                        (path != snapshot.paths.end() && !requested ? std::string("Automatic")
+                                                                    : value(requested)) +
+                        " | confirmed: " + value(confirmed) + " (simulated)"
+                  : "Engine requested/applied: unavailable")));
+    auto effective = d;
+    const bool advanced = advanced_tuning_->GetValue();
+    if (!advanced)
+        effective.settings = Settings{};
+    const auto recommendation = audiohole::recommend(snapshot, effective);
+    const bool compatible = !recommendation.compatible.empty();
+    const auto selected = !effective.settings.automatic ? effective.settings.format
+                          : compatible                  ? recommendation.compatible.front()
+                                                        : Format{};
     auto detail = [&](const std::string& id) {
-        const auto* device = endpoint(controller_->snapshot(), id);
+        const auto* device = endpoint(snapshot, id);
         return device ? std::string(name(device->availability)) + " | " +
-                            (known ? "Selected: " + selected.label()
-                                   : std::string("Format unavailable"))
+                            (compatible ? "Candidate: " + selected.label() : "Format unverified")
                       : std::string("No endpoint selected");
     };
     w.source_detail->SetLabel(text(detail(d.source)));
     w.source_detail->Wrap(260);
     w.destination_detail->SetLabel(text(detail(d.destination)));
     w.destination_detail->Wrap(260);
-    w.summary->SetLabel(text(
-        std::string(d.settings.automatic ? "Automatic configuration: " : "Manual configuration: ") +
-        selected.label() + " | Mode: " + d.settings.mode + " | Buffer: " +
-        std::to_string(d.settings.buffer_ms) + " ms | Sync: unavailable; processing unavailable"));
-    if (!known)
-        w.summary->SetLabel("Automatic configuration: no compatible format established. Review "
-                            "endpoint selection.");
+    std::string summary;
+    if (d.source.empty() || d.destination.empty())
+        summary = "Automatic configuration — awaiting endpoint selection.";
+    else if (!compatible)
+        summary = "Automatic configuration unavailable for the selected endpoints. Format "
+                  "compatibility is unverified.";
+    else
+        summary = "Compatible format identified from available endpoint evidence. Runtime "
+                  "negotiation remains unverified.";
+    if (advanced) {
+        summary =
+            "Advanced Tuning requested — Format: " +
+            (d.settings.automatic ? std::string("Automatic") : d.settings.format.label()) +
+            " | Mode: " + d.settings.mode + " | Buffer: " +
+            (d.settings.buffer_ms ? std::to_string(d.settings.buffer_ms) + " ms" : "Automatic") +
+            ". Save / Apply is explicit; engine values are shown separately.";
+    } else if (!d.settings.automatic || d.settings.buffer_ms != 0 ||
+               d.settings.mode != "Automatic") {
+        summary +=
+            " Automatic policy active in this draft — retained manual settings are inactive.";
+    }
+    if (advanced && !d.settings.automatic &&
+        std::find(recommendation.compatible.begin(), recommendation.compatible.end(),
+                  d.settings.format) == recommendation.compatible.end())
+        summary += " Requested format is unsupported by current evidence; change the override "
+                   "before Apply.";
+    if (!advanced && hole_index_ >= 0 &&
+        draft_.holes.at(static_cast<std::size_t>(hole_index_)).routing_engine != "automatic")
+        summary += " Saved Routing Engine choice is retained but inactive; effective engine policy "
+                   "is Automatic.";
+    w.summary->SetLabel(text(summary));
     w.summary->Wrap(600);
+    w.evidence->SetLabel(text(recommendation.explanation));
+    w.evidence->Wrap(600);
 }
 // Only an explicit list selection becomes a logical binding. Free text used for
 // searching is never guessed as a device identity; validation reports missing IDs.
@@ -776,6 +865,8 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
     d.source = read_id(w.source, w.sources, w.retained_source, w.retained_source_caption);
     d.destination = read_id(w.destination, w.destinations, w.retained_destination,
                             w.retained_destination_caption);
+    if (!advanced_tuning_->GetValue())
+        return;
     const int f = w.format->GetSelection();
     d.settings.automatic = f <= 0;
     if (f > 0 && static_cast<std::size_t>(f) <= w.formats.size())
@@ -794,6 +885,9 @@ void Frame::capture_draft() {
     h.notes = utf8(hole_notes_->GetValue());
     h.enabled = enabled_->GetValue();
     h.duplex = duplex_->GetValue();
+    h.advanced_tuning = advanced_tuning_->GetValue();
+    if (h.advanced_tuning && routing_engine_->GetSelection() == 0)
+        h.routing_engine = "automatic";
     read_direction(forward_, h.forward);
     read_direction(reverse_, h.reverse);
 }
@@ -836,6 +930,7 @@ void Frame::load_holes() {
     }
 }
 void Frame::load_hole(int index) {
+    tuning_timer_.Stop();
     loading_ = true;
     end_observation(); // An observation never follows navigation to a different source implicitly.
     hole_index_ = index;
@@ -847,6 +942,17 @@ void Frame::load_hole(int index) {
     hole_notes_->ChangeValue(text(h.notes));
     enabled_->SetValue(h.enabled);
     duplex_->SetValue(h.duplex);
+    advanced_tuning_->SetValue(index >= 0 && h.advanced_tuning);
+    advanced_tuning_->Enable(index >= 0);
+    advanced_panel_->Show(index >= 0 && h.advanced_tuning);
+    routing_engine_->SetSelection(h.routing_engine == "automatic" ? 0 : wxNOT_FOUND);
+    routing_engine_->Enable(index >= 0);
+    routing_engine_notice_->SetLabel(
+        h.routing_engine == "automatic"
+            ? wxString{}
+            : text("Saved Routing Engine unavailable in this build: " + h.routing_engine +
+                   ". Retained until you explicitly select Automatic."));
+    routing_engine_notice_->Wrap(560);
     activity_direction_->SetSelection(0);
     activity_direction_->Enable(index >= 0 && h.duplex);
     hole_notes_->SetEditable(index >= 0);
@@ -865,6 +971,7 @@ void Frame::load_hole(int index) {
             direction->buffer_apply->Disable();
     }
     reverse_.group->ShowItems(h.duplex && index >= 0);
+    reverse_.tuning_group->ShowItems(h.duplex && index >= 0);
     update_beep_destinations();
     loading_ = false;
     auto* editor = dynamic_cast<wxScrolledWindow*>(hole_heading_->GetParent());
@@ -872,15 +979,20 @@ void Frame::load_hole(int index) {
     editor->FitInside();
 }
 void Frame::save(bool apply) {
-    if (hole_index_ >= 0 && (!buffer_value(forward_.buffer) ||
-                             (duplex_->GetValue() && !buffer_value(reverse_.buffer)))) {
-        show_result({false, "Enter whole buffer values from 1 to 100 milliseconds before saving."});
+    tuning_timer_.Stop();
+    if (hole_index_ >= 0 && advanced_tuning_->GetValue() &&
+        (!buffer_value(forward_.buffer) ||
+         (duplex_->GetValue() && !buffer_value(reverse_.buffer)))) {
+        show_result({false, "Enter 0 for Automatic or whole buffer values from 1 to 100 "
+                            "milliseconds before saving."});
         return;
     }
     capture_draft();
     const auto r = controller_->save(draft_, apply);
     show_result(r);
     if (r.ok) {
+        if (const auto* saved = profile(controller_->snapshot(), viewed_))
+            draft_ = *saved; // Include controller-enriched evidence/name hints in the clean draft.
         dirty_ = false;
         const auto item = std::find(profile_ids_.begin(), profile_ids_.end(), viewed_);
         if (item != profile_ids_.end()) {
@@ -911,9 +1023,16 @@ namespace audiohole::gui {
 // Temporary tools are independent from passive monitoring: the beep always
 // needs an explicit destination and remains a no-sound simulation in this build.
 void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
-    auto* observation = new wxStaticBoxSizer(wxVERTICAL, parent, wxS("Setup tools"));
+    signal_tools_ =
+        new wxCollapsiblePane(parent, wxID_ANY, "Signal Testing & Monitoring", wxDefaultPosition,
+                              wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
+    signal_tools_->SetName("Signal Testing & Monitoring");
+    layout->Add(signal_tools_, 0, wxEXPAND | wxALL, FromDIP(4));
+    auto* pane = signal_tools_->GetPane();
+    auto* groups = new wxBoxSizer(wxVERTICAL);
+    auto* observation = new wxStaticBoxSizer(wxVERTICAL, pane, "Source Activity");
     auto* box = observation->GetStaticBox();
-    layout->Add(observation, 0, wxEXPAND | wxALL, 4);
+    groups->Add(observation, 0, wxEXPAND | wxALL, FromDIP(4));
     activity_direction_ = choices(box, observation, "Monitor direction",
                                   {"Forward source", "Reverse source (duplex only)"});
     activity_direction_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
@@ -926,9 +1045,16 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
         "monitoring off; source activity does not prove destination audibility.");
     observation->Add(monitor_, 0, wxALL, 4);
     activity_ = label(box, observation, "Observation off.");
-    label(box, observation, "Test Beep destination");
+    button(box, observation, "Clear observation status", [this] {
+        controller_->monitor(false);
+        refresh();
+    })->SetToolTip("Stop temporary source observation and clear its displayed status.");
+    auto* beep_group = new wxStaticBoxSizer(wxVERTICAL, pane, "Test Beep");
+    groups->Add(beep_group, 0, wxEXPAND | wxALL, FromDIP(4));
+    box = beep_group->GetStaticBox();
+    label(box, beep_group, "Test Beep destination");
     destination_test_ = new ThemedChoice(box, wxID_ANY);
-    observation->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
+    beep_group->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
     destination_test_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         present(presentation::Message::BeepReady);
         refresh();
@@ -951,9 +1077,24 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     beep_button_->SetLabel("Cancel Beep");
     beep_button_->SetMinSize(beep_button_->GetBestSize());
     beep_button_->SetLabel("Test Beep");
-    observation->Add(beep);
-    beep_status_ = label(box, observation, "Test Beep inactive.");
-    label(box, observation, "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    beep_group->Add(beep);
+    beep_status_ = label(box, beep_group, "Test Beep inactive.");
+    auto* performance = new wxStaticBoxSizer(wxVERTICAL, pane, "Performance Diagnostics");
+    groups->Add(performance, 0, wxEXPAND | wxALL, FromDIP(4));
+    label(performance->GetStaticBox(), performance,
+          "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    pane->SetSizer(groups);
+    signal_tools_->Collapse(true);
+    signal_tools_->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [this, parent](wxCollapsiblePaneEvent&) {
+        // Disclosure is presentation only; do not stop monitoring or a beep.
+        auto* focused = wxWindow::FindFocus();
+        if (signal_tools_->IsCollapsed() && focused &&
+            signal_tools_->GetPane()->IsDescendant(focused))
+            signal_tools_->SetFocus();
+        parent->Layout();
+        static_cast<wxScrolledWindow*>(parent)->FitInside();
+        refresh();
+    });
     if (controller_->snapshot().operating_mode != OperatingMode::Preview)
         return;
     auto* simulation = new wxStaticBoxSizer(wxVERTICAL, parent, "Simulate Errors");

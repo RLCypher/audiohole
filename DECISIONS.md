@@ -1610,3 +1610,18 @@ without subtitles. This supersedes the older displayed names recorded in D-056
 above; that wording is retained as history. Vanilla's name, stable catalog IDs,
 filenames, default selection, authored response pools, behavior and configuration
 conventions are unchanged. This naming refinement resolves no Open owner decision.
+
+
+## Owner-authorized GUI policy amendment: Advanced Tuning
+
+The owner authorized Automatic for new holes with an opt-in per-hole Advanced
+Tuning policy. Disabling it preserves manual settings but excludes them from
+requested configuration; enabling it only stages their eligibility. Explicit
+validated application remains required. Signal Testing & Monitoring disclosure
+collapse preserves operations and is distinct from leaving/closing the workspace.
+Routing Engine is a retained per-hole request with Automatic as its only current
+option, providing space for future controlled engine comparisons without choosing
+an implementation now. The provisional Test v3 compatibility rule preserves legacy
+active tuning and unknown data with explicit-save backups. O-004/O-006, actual
+engine selection, routing and synchronization choices remain Open. GUI.md,
+PROFILES.md and PROVISIONAL_TEST_PERSISTENCE.md document the implemented scope.

@@ -1916,10 +1916,33 @@ or destructive production migration is introduced.
 ### Provisional device/profile transfer bundles
 
 Owner-authorized Test bundle transport v1 wraps the existing canonical Test
-configuration (reader 1/2) and scanner device-v2 records. It preserves identities,
+configuration (reader 1/2/3) and scanner device-v2 records. It preserves identities,
 notes, hidden state and unknown fields; local Windows bindings and startup
 permission are excluded. Imports preview and reject conflicting records, then
 atomically commit profile references after new device records. This is not a final
 production schema or a cross-file transaction. See
 [CONFIGURATION_BUNDLES.md](CONFIGURATION_BUNDLES.md) for exact contents and failure
 behavior, and the control-side audio-engine handoff boundary.
+
+
+## Owner-authorized Advanced Tuning amendment
+
+A per-hole Advanced Tuning policy gates retained manual overrides. New holes are
+Automatic; disabling tuning ignores overrides without deleting them. Enabling it
+makes explicit overrides eligible, while each Automatic parameter stays managed.
+Validate applicable overrides before activation and preserve independent duplex
+settings. Checkbox changes do not themselves apply or start routing. Requested,
+saved and confirmed runtime values are distinct.
+
+`advanced_tuning` and an `advanced_settings` object in the owner's example express
+policy and readable organization, not final production serialization. O-004/O-006
+remain Open. The implemented Test-only v3 compatibility rule and current directional
+nesting are specified in [PROVISIONAL_TEST_PERSISTENCE.md](PROVISIONAL_TEST_PERSISTENCE.md).
+Legacy manual profiles are not silently converted to Automatic. Stable logical
+IDs, unknown fields and inactive overrides must survive future migrations.
+
+
+The owner additionally authorizes a Routing Engine request in profile JSON for
+future engine comparison. The current Test field is per-hole `routing_engine`,
+default `automatic`, with only Automatic offered. This is a policy placeholder,
+not selection of a permanent backend or a completed benchmark mechanism.

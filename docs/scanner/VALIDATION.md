@@ -156,3 +156,21 @@ pass. Native MSVC Debug/Release GUI smoke,
 extracted-package execution, theme/selection/Material rendering at multiple DPIs,
 Windows file-operation failure cases and real hardware timing remain required.
 No automated test deletes actual user scan data or performs unconsented probing.
+
+
+## Advanced Tuning / Automatic policy and Routing Engine GUI refinement
+
+All 179 portable CTest entries pass in Debug and Release, including policy-gated
+requests, independent duplex overrides, copied live-plan isolation, deferred
+simulation acknowledgments, legacy v1/v2 compatibility, versioned original-byte
+backups, Test restart, unknown engine preservation and configuration bundle
+transfer/migration. Current Windows x64 application/test targets cross-build;
+canonical executable branding, distribution-tool safeguards and actual Runtime
+packaging pass with the exact 729-file inventory plus metadata/README. All 699
+avatar PNG hashes and updated dialogue/handoff/checklist bytes are preserved.
+Native smoke adds checkbox/disclosure/engine-selector checks and explicitly opts
+into manual tuning for older buffer checks. Native Windows execution remains a
+CI requirement, not a claim from this Linux host. GitHub Actions page access
+returned HTTP 404 here; pushing the existing development branch uses its existing
+Debug/Release native and package-smoke workflow. No real routing or new hardware
+capability/benchmark conclusion is inferred from these tests.

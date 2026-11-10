@@ -138,6 +138,48 @@ TEST_F(ConfigurationBundle, DeviceOnlyBundleLeavesProfilesAndUnrelatedDataUntouc
     EXPECT_EQ(bytes(target / "configuration.json"), "Not touched by device-only import");
     EXPECT_EQ(bytes(target / "user-file.txt"), "Keep me");
 }
+TEST_F(ConfigurationBundle, InactiveTuningAndFutureEngineRequestTravelWithProfiles) {
+    const auto file = source / "configuration.json";
+    auto document = Json::parse(bytes(file));
+    auto& hole = document["profiles"][0]["holes"][0];
+    hole["advanced_tuning"] = false;
+    hole["routing_engine"] = "future-test-engine";
+    write(file, document.dump(2));
+    export_profiles();
+    auto plan = preview();
+    ASSERT_TRUE(plan);
+    ASSERT_TRUE(import_configuration_bundle(*plan).ok);
+    ConfigurationController restarted(
+        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+    const auto& saved = restarted.snapshot().profiles.front().holes.front();
+    EXPECT_FALSE(saved.advanced_tuning);
+    EXPECT_EQ(saved.routing_engine, "future-test-engine");
+    EXPECT_FALSE(saved.forward.settings.automatic);
+    EXPECT_FALSE(restarted.snapshot().armed);
+    EXPECT_TRUE(restarted.snapshot().paths.empty());
+}
+TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyExplicit) {
+    auto legacy = Json::parse(bytes(source / "configuration.json"));
+    legacy["schema_version"] = 2;
+    legacy["profiles"][0]["id"] = "legacy-profile";
+    legacy["profiles"][0]["holes"][0]["id"] = "legacy-hole";
+    legacy["profiles"][0]["holes"][0].erase("advanced_tuning");
+    legacy["profiles"][0]["holes"][0].erase("routing_engine");
+    const auto original = legacy.dump(2);
+    write(target / "configuration.json", original);
+    export_profiles();
+    auto plan = preview();
+    ASSERT_TRUE(plan);
+    ASSERT_TRUE(import_configuration_bundle(*plan).ok);
+    EXPECT_EQ(bytes(target / "configuration.json.v2.bak"), original);
+    ConfigurationController restarted(
+        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+    const auto* old = profile(restarted.snapshot(), "legacy-profile");
+    ASSERT_TRUE(old);
+    EXPECT_TRUE(old->holes.front().advanced_tuning);
+    EXPECT_EQ(old->holes.front().routing_engine, "automatic");
+    EXPECT_FALSE(restarted.snapshot().armed);
+}
 TEST_F(ConfigurationBundle, ConflictingIdentityIsRejectedBeforeAnyReplacement) {
     export_profiles();
     ASSERT_TRUE(import_configuration_bundle(*preview()).ok);

@@ -86,6 +86,9 @@ enum class Message {
     DfaAboveMaximum,
     Bother,
     Dream,
+    AdvancedTuningEnabled,
+    ManualOverrideApplied,
+    AutomaticRestored,
     Count
 };
 struct Variant {
