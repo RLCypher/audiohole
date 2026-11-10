@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstdio>
 #include <fstream>
+#include <map>
 #include <nlohmann/json.hpp>
 #include <set>
 #include <stdexcept>
@@ -23,11 +24,30 @@ namespace audiohole {
 namespace {
 using Json = nlohmann::ordered_json;
 constexpr std::size_t maximum_document = 2 * 1024 * 1024;
+std::string profile_filename(std::string name);
 void require(bool condition) {
     if (!condition)
         throw std::invalid_argument("Invalid provisional configuration");
 }
+void check_storage_path(const std::filesystem::path& file) {
+    auto current = std::filesystem::absolute(file).lexically_normal();
+    while (!current.empty()) {
+#ifdef _WIN32
+        const auto attributes = GetFileAttributesW(current.c_str());
+        require(attributes == INVALID_FILE_ATTRIBUTES ||
+                !(attributes & FILE_ATTRIBUTE_REPARSE_POINT));
+#else
+        std::error_code error;
+        const auto status = std::filesystem::symlink_status(current, error);
+        require(!std::filesystem::is_symlink(status));
+#endif
+        if (current == current.parent_path())
+            break;
+        current = current.parent_path();
+    }
+}
 std::optional<std::string> read_document(const std::filesystem::path& file) {
+    check_storage_path(file);
     if (!std::filesystem::exists(file))
         return std::nullopt;
     require(!std::filesystem::is_symlink(file) && std::filesystem::is_regular_file(file));
@@ -120,7 +140,56 @@ Json encode(const Format& f) {
     }
     return result;
 }
-Direction direction(const Json& value) {
+Json encode(const EndpointPreferences& p) {
+    Json j{{"sample_rate_hz", nullptr},
+           {"channel_count", nullptr},
+           {"sample_format", nullptr},
+           {"mode", nullptr},
+           {"buffer_ms", nullptr}};
+    if (p.sample_rate_hz)
+        j["sample_rate_hz"] = *p.sample_rate_hz;
+    if (p.channel_count)
+        j["channel_count"] = *p.channel_count;
+    if (p.sample_format)
+        j["sample_format"] = *p.sample_format;
+    if (p.mode)
+        j["mode"] = *p.mode;
+    if (p.buffer_ms)
+        j["buffer_ms"] = *p.buffer_ms;
+    return j;
+}
+EndpointPreferences endpoint_preferences(const Json& j) {
+    require(j.is_object());
+    EndpointPreferences p;
+    auto automatic = [&](const char* key) {
+        return !j.contains(key) || j.at(key).is_null() || j.at(key) == "" ||
+               j.at(key) == "Automatic";
+    };
+    if (!automatic("sample_rate_hz"))
+        p.sample_rate_hz = integer(j, "sample_rate_hz", 1, 768000);
+    if (!automatic("channel_count"))
+        p.channel_count = integer(j, "channel_count", 1, 256);
+    if (!automatic("buffer_ms")) {
+        const auto value = integer(j, "buffer_ms", 0, 100);
+        if (value)
+            p.buffer_ms = value;
+    }
+    if (!automatic("sample_format"))
+        p.sample_format = string(j, "sample_format", 32);
+    if (!automatic("mode"))
+        p.mode = string(j, "mode", 32);
+    return p;
+}
+Json encode(const Preferences& p) {
+    Json map = Json::array();
+    for (const auto& r : p.channel_map)
+        map.push_back({{"source", r.source}, {"destination", r.destination}});
+    return {{"common", encode(p.common)},
+            {"source", encode(p.source)},
+            {"destination", encode(p.destination)},
+            {"channel_map", map}};
+}
+Direction direction(const Json& value, int version) {
     Direction d;
     d.source = string(value, "source", 128);
     d.destination = string(value, "destination", 128);
@@ -128,11 +197,62 @@ Direction direction(const Json& value) {
         d.source_name = string(value, "source_name");
     if (value.contains("destination_name"))
         d.destination_name = string(value, "destination_name");
+    if (version >= 4 && !value.contains("settings"))
+        return d;
     const auto& settings = value.at("settings");
-    d.settings.automatic = settings.at("automatic").get<bool>();
-    d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
-    d.settings.mode = string(settings, "mode", 64);
-    d.settings.format = format(settings.at("format"));
+    require(settings.is_object());
+    if (version < 4) {
+        d.settings.automatic = settings.at("automatic").get<bool>();
+        d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
+        d.settings.mode = string(settings, "mode", 64);
+        d.settings.format = format(settings.at("format"));
+    } else {
+        d.settings.automatic = settings.value("automatic", true);
+        if (settings.contains("buffer_ms") && !settings.at("buffer_ms").is_null() &&
+            settings.at("buffer_ms") != "")
+            d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
+        if (settings.contains("mode") && !settings.at("mode").is_null() &&
+            settings.at("mode") != "")
+            d.settings.mode = string(settings, "mode", 64);
+        if (settings.contains("format") && !settings.at("format").is_null())
+            require(settings.at("format").is_object());
+        if (settings.contains("format") && !settings.at("format").is_null() &&
+            !settings.at("format").empty())
+            d.settings.format = format(settings.at("format"));
+        else
+            require(d.settings.automatic);
+        const auto p = settings.value("preferences", Json::object());
+        require(p.is_object());
+        d.settings.preferences.common = endpoint_preferences(p.value("common", Json::object()));
+        d.settings.preferences.source = endpoint_preferences(p.value("source", Json::object()));
+        d.settings.preferences.destination =
+            endpoint_preferences(p.value("destination", Json::object()));
+        if (p.contains("channel_map")) {
+            require(p.at("channel_map").is_array() && p.at("channel_map").size() <= 256);
+            for (const auto& r : p.at("channel_map"))
+                d.settings.preferences.channel_map.push_back(
+                    {integer(r, "source", 0, 255), integer(r, "destination", 0, 255)});
+        }
+    }
+    if (version < 4 && !d.settings.automatic) {
+        auto& common = d.settings.preferences.common;
+        common.sample_rate_hz = d.settings.format.rate;
+        common.channel_count = d.settings.format.channels;
+        auto representation = d.settings.format.representation;
+        if (representation == "int16" || representation == "PCM16")
+            representation = "pcm_s16";
+        if (representation == "int24" || representation == "PCM24")
+            representation = "pcm_s24_packed";
+        if (representation == "int32" || representation == "PCM32")
+            representation = "pcm_s32";
+        if (representation == "float32" || representation == "pcm_s16" ||
+            representation == "pcm_s24_packed" || representation == "pcm_s24_in_32" ||
+            representation == "pcm_s32")
+            common.sample_format = representation;
+        // Unrecognized legacy representations remain in the exact retained
+        // format; do not discard the profile merely because tuning is inactive.
+    }
+    require(validate_preferences(d.settings.preferences).ok);
     return d;
 }
 Json encode(const Direction& d) {
@@ -141,14 +261,15 @@ Json encode(const Direction& d) {
             {"destination_name", d.destination_name},
             {"destination", d.destination},
             {"settings",
-             {{"automatic", d.settings.automatic},
-              {"format", encode(d.settings.format)},
+             {{"preferences", encode(d.settings.preferences)},
               {"mode", d.settings.mode},
-              {"buffer_ms", d.settings.buffer_ms}}}};
+              {"buffer_ms", d.settings.buffer_ms},
+              {"automatic", d.settings.automatic},
+              {"format", encode(d.settings.format)}}}};
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 3},
+                   {"schema_version", 4},
                    {"profiles", Json::array()},
                    {"devices", Json::array()}};
     for (const auto& d : records.devices) {
@@ -184,7 +305,7 @@ Json encode(const ConfigurationRecords& records) {
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 3) >= 1);
+            integer(root, "schema_version", 1, 4) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -230,11 +351,14 @@ ConfigurationRecords decode(const Json& root) {
             h.notes = string(x, "notes");
             h.enabled = x.at("enabled").get<bool>();
             h.duplex = x.at("duplex").get<bool>();
-            h.forward = direction(x.at("forward"));
-            h.reverse = direction(x.at("reverse"));
+            h.forward = direction(x.at("forward"), root.at("schema_version").get<int>());
+            if (root.at("schema_version") >= 4 && !x.contains("reverse"))
+                h.reverse = Direction{};
+            else
+                h.reverse = direction(x.at("reverse"), root.at("schema_version").get<int>());
             // Legacy files always used their saved tuning. Loading is read-only;
             // an explicit save materializes this compatibility policy in v3.
-            require(x.contains("advanced_tuning") || root.at("schema_version") != 3);
+            require(x.contains("advanced_tuning") || root.at("schema_version") < 3);
             h.advanced_tuning =
                 x.contains("advanced_tuning") ? x.at("advanced_tuning").get<bool>() : true;
             h.routing_engine =
@@ -383,7 +507,16 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
             } else
                 current["profiles"].push_back(item);
         }
-        current["schema_version"] = 3;
+        current["schema_version"] = 4;
+        std::set<std::string> filenames;
+        for (const auto& profile : current.at("profiles")) {
+            auto filename = profile_filename(string(profile, "display_name"));
+            std::transform(filename.begin(), filename.end(), filename.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
+            if (!filenames.insert(filename).second)
+                throw std::runtime_error("Profile filename conflict: " + filename +
+                                         ". Rename a profile before importing.");
+        }
         (void)decode(current); // Also detects hole IDs colliding across profiles.
         output = current.dump(2) + "\n";
         require(output.size() <= maximum_document);
@@ -416,7 +549,7 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
-        if (impl_->expected && impl_->original.at("schema_version") != 3) {
+        if (impl_->expected && impl_->original.at("schema_version") != 4) {
             // No load-time migration. The first explicit save keeps the exact
             // legacy original; never overwrite a different earlier backup.
             if (read_document(impl_->file) != impl_->expected)
@@ -445,5 +578,255 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
     } catch (const std::exception&) {
         return {false, "Invalid test configuration; no data written."};
     }
+}
+namespace {
+using ProfileFiles = std::map<std::filesystem::path, std::string>;
+// Whole-directory staging keeps a rename/delete from exposing a partially updated
+// set. Previous generations are retained under local/profile-backups. A crash
+// between the two directory renames is recovered by restoring .profiles-previous.
+void recover_profiles(const std::filesystem::path& root) {
+    check_storage_path(root / "profiles");
+    check_storage_path(root / ".profiles-previous");
+    const auto folder = root / "profiles", previous = root / ".profiles-previous";
+    require(!std::filesystem::is_symlink(folder) && !std::filesystem::is_symlink(previous));
+    if (!std::filesystem::exists(folder) && std::filesystem::exists(previous))
+        std::filesystem::rename(previous, folder);
+}
+ProfileFiles profile_files(const std::filesystem::path& root) {
+    ProfileFiles files;
+    const auto folder = root / "profiles";
+    require(!std::filesystem::is_symlink(folder));
+    if (!std::filesystem::exists(folder))
+        return files;
+    std::size_t total_bytes = 0;
+    for (const auto& entry : std::filesystem::directory_iterator(folder)) {
+        require(files.size() < 258 && entry.path().extension() == ".json");
+        const auto bytes = read_document(entry.path());
+        require(bytes.has_value());
+        total_bytes += bytes->size();
+        require(total_bytes <= maximum_document + 128 * 1024);
+        files.emplace(entry.path().filename(), *bytes);
+    }
+    return files;
+}
+Json assembled_profiles(const ProfileFiles& files) {
+    auto root = encode(ConfigurationRecords{});
+    if (const auto state = files.find(".state.json"); state != files.end()) {
+        root = parse(state->second);
+        require(root.at("profiles").empty());
+    }
+    for (const auto& [path, bytes] : files) {
+        if (path == ".state.json")
+            continue;
+        auto document = parse(bytes);
+        const auto records = decode(document);
+        require(records.profiles.size() == 1 && records.devices.empty());
+        root["profiles"].push_back(document.at("profiles").at(0));
+    }
+    require(root.dump().size() <= maximum_document);
+    (void)decode(root);
+    return root;
+}
+std::string profile_filename(std::string name) {
+    for (auto& c : name)
+        if (static_cast<unsigned char>(c) < 32 ||
+            std::string("<>:\"/\\|?*").find(c) != std::string::npos)
+            c = '_';
+    while (!name.empty() && (name.back() == '.' || name.back() == ' '))
+        name.pop_back();
+    require(!name.empty() && name.size() <= 180 && name != ".state");
+    auto upper = name;
+    std::transform(upper.begin(), upper.end(), upper.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+    auto stem = upper.substr(0, upper.find('.'));
+    if (stem == "CON" || stem == "PRN" || stem == "AUX" || stem == "NUL" ||
+        (stem.size() == 4 && (stem.starts_with("COM") || stem.starts_with("LPT")) &&
+         stem[3] >= '1' && stem[3] <= '9'))
+        name = "_" + name;
+    return name + ".json";
+}
+} // namespace
+struct ProfileDirectoryPersistence::Impl {
+    std::filesystem::path file;
+    ProfileFiles observed;
+    std::optional<std::string> legacy;
+    Json original;
+    bool directory = false, ready = false;
+    std::function<Result(const std::filesystem::path&, const std::string&,
+                         const std::optional<std::string>&)>
+        writer = replace_document;
+};
+ProfileDirectoryPersistence::ProfileDirectoryPersistence(std::filesystem::path file)
+    : impl_(std::make_unique<Impl>()) {
+    impl_->file = std::move(file);
+}
+ProfileDirectoryPersistence::~ProfileDirectoryPersistence() = default;
+Result ProfileDirectoryPersistence::load(ConfigurationRecords& output) {
+    try {
+        impl_->ready = false;
+        const auto root = impl_->file.parent_path();
+        recover_profiles(root);
+        impl_->directory = std::filesystem::exists(root / "profiles" / ".state.json");
+        impl_->observed = profile_files(root);
+        impl_->legacy = read_document(impl_->file);
+        auto document = impl_->directory || !impl_->observed.empty()
+                            ? assembled_profiles(impl_->observed)
+                        : impl_->legacy ? parse(*impl_->legacy)
+                                        : encode(ConfigurationRecords{});
+        output = decode(document);
+        impl_->original = std::move(document);
+        impl_->ready = true;
+        return {true, "Profiles loaded."};
+    } catch (const std::exception& e) {
+        return {false,
+                std::string("Profile folder is invalid; existing files retained: ") + e.what()};
+    }
+}
+Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
+    if (!impl_->ready)
+        return {false, "Load valid profiles before saving."};
+    const auto root = impl_->file.parent_path();
+    const auto folder = root / "profiles", next = root / ".profiles-next",
+               previous = root / ".profiles-previous";
+    bool created_next = false;
+    try {
+        auto document = merge(impl_->original, encode(records));
+        require(document.dump().size() <= maximum_document);
+        (void)decode(document);
+        require(profile_files(root) == impl_->observed &&
+                read_document(impl_->file) == impl_->legacy);
+        if (impl_->legacy) {
+            const auto backup = root / "local" / "legacy-profiles" / impl_->file.filename();
+            const auto existing = read_document(backup);
+            require(!existing || existing == impl_->legacy);
+            if (!existing) {
+                const auto saved = replace_document(backup, *impl_->legacy, {});
+                if (!saved.ok)
+                    throw std::runtime_error(saved.detail);
+            }
+        }
+        if (std::filesystem::exists(next)) {
+            require(!std::filesystem::is_symlink(next));
+            const auto abandoned =
+                root / "local" / "profile-backups" /
+                ("uncommitted-" +
+                 std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+            check_storage_path(abandoned);
+            std::filesystem::create_directories(abandoned.parent_path());
+            std::filesystem::rename(next, abandoned);
+        }
+        if (std::filesystem::exists(previous)) {
+            const auto backup =
+                root / "local" / "profile-backups" /
+                std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+            check_storage_path(backup);
+            std::filesystem::create_directories(backup.parent_path());
+            std::filesystem::rename(previous, backup);
+        }
+        std::filesystem::create_directories(next);
+        created_next = true;
+        std::set<std::string> names;
+        for (const auto& profile : document.at("profiles")) {
+            auto name = profile_filename(string(profile, "display_name"));
+            auto key = name;
+            std::transform(key.begin(), key.end(), key.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
+            if (!names.insert(key).second)
+                throw std::runtime_error("Another profile uses filename " + name +
+                                         ". Choose a different display name.");
+            auto single = encode(ConfigurationRecords{});
+            single["profiles"].push_back(profile);
+            const auto result = impl_->writer(
+                next / std::filesystem::path(std::u8string(
+                           reinterpret_cast<const char8_t*>(name.data()), name.size())),
+                single.dump(2) + "\n", {});
+            if (!result.ok)
+                throw std::runtime_error(result.detail);
+        }
+        auto state = document;
+        state["profiles"] = Json::array();
+        const auto stored = impl_->writer(next / ".state.json", state.dump(2) + "\n", {});
+        if (!stored.ok)
+            throw std::runtime_error(stored.detail);
+        require(profile_files(root) == impl_->observed &&
+                read_document(impl_->file) == impl_->legacy);
+        if (std::filesystem::exists(folder))
+            std::filesystem::rename(folder, previous);
+        try {
+            std::filesystem::rename(next, folder);
+        } catch (...) {
+            if (std::filesystem::exists(previous))
+                std::filesystem::rename(previous, folder);
+            throw;
+        }
+        // A complete named generation is durable before legacy input is archived.
+        if (impl_->legacy) {
+            auto backup = root / "local" / "legacy-profiles" / impl_->file.filename();
+            const auto existing = read_document(backup);
+            if (!existing)
+                (void)replace_document(backup, *impl_->legacy, {});
+            if (read_document(backup) == impl_->legacy &&
+                read_document(impl_->file) == impl_->legacy)
+                std::filesystem::remove(impl_->file);
+        }
+        for (int version : {1, 2, 3}) {
+            auto old = impl_->file;
+            old += ".v" + std::to_string(version) + ".bak";
+            if (const auto bytes = read_document(old)) {
+                const auto backup = root / "local" / "legacy-profiles" / old.filename();
+                if (!read_document(backup))
+                    (void)replace_document(backup, *bytes, {});
+                if (read_document(backup) == bytes && read_document(old) == bytes)
+                    std::filesystem::remove(old);
+            }
+        }
+        ConfigurationRecords loaded;
+        const auto refreshed = load(loaded);
+        return refreshed.ok ? Result{true, "Profiles saved in named files."} : refreshed;
+    } catch (const std::exception& e) {
+        std::error_code ignored;
+        if (created_next)
+            std::filesystem::remove_all(next, ignored);
+        return {false,
+                std::string("Profile save blocked; check external edits or filename conflicts: ") +
+                    e.what()};
+    }
+}
+Result read_profile_document(const std::filesystem::path& file, std::string& output) {
+    ProfileDirectoryPersistence provider(file);
+    ConfigurationRecords records;
+    const auto result = provider.load(records);
+    if (!result.ok)
+        return result;
+    // Assembly retains unknown fields, rather than re-encoding typed records.
+    const auto files = profile_files(file.parent_path());
+    output = !files.empty() ? assembled_profiles(files).dump(2) + "\n"
+                            : read_document(file).value_or(encode(records).dump(2) + "\n");
+    return {true, "Profiles read."};
+}
+Result write_profile_document(const std::filesystem::path& file, const std::string& bytes,
+                              const std::string& expected,
+                              std::function<Result(const std::filesystem::path&, const std::string&,
+                                                   const std::optional<std::string>&)>
+                                  writer) {
+    ProfileDirectoryPersistence provider(file);
+    ConfigurationRecords records;
+    auto result = provider.load(records);
+    if (!result.ok)
+        return result;
+    std::string actual;
+    result = read_profile_document(file, actual);
+    if (!result.ok || parse(actual) != parse(expected))
+        return {false, "Profiles changed after preview."};
+    result = validate_test_document(bytes, records);
+    if (!result.ok)
+        return result;
+    // Keep imported extension data when saving the merged typed records.
+    // Merge through each profile's full document is implemented by loading an
+    // isolated aggregate; the directory provider below receives that original.
+    provider.impl_->original = parse(bytes);
+    if (writer)
+        provider.impl_->writer = std::move(writer);
+    return provider.save(records);
 }
 } // namespace audiohole

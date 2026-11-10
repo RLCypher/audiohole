@@ -1,7 +1,10 @@
 #include "gui/controls.h"
+#include "gui/native_theme.h"
+#include <dwmapi.h>
 #include <windows.h>
 #include <wx/dcbuffer.h>
 #include <wx/filename.h>
+#include <wx/generic/msgdlgg.h>
 #include <wx/settings.h>
 #include <wx/stdpaths.h>
 
@@ -112,9 +115,64 @@ WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM l
     return wxComboBox::MSWWindowProc(message, wparam, lparam);
 }
 bool ThemedList::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
-    const auto id = reinterpret_cast<DRAWITEMSTRUCT*>(item)->itemID;
-    return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+    auto* draw = reinterpret_cast<DRAWITEMSTRUCT*>(item);
+    const auto id = draw->itemID;
+    if (id >= status_colours.size())
+        return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+    auto text_rect = *draw;
+    text_rect.rcItem.left += FromDIP(24);
+    paint_selection(*this, "", item);
+    paint_selection(*this, GetString(id), reinterpret_cast<WXDRAWITEMSTRUCT*>(&text_rect));
+    const int saved = SaveDC(draw->hDC);
+    const auto c = contrast_active() ? GetForegroundColour() : status_colours[id];
+    SetTextColor(draw->hDC, RGB(c.Red(), c.Green(), c.Blue()));
+    SetBkMode(draw->hDC, TRANSPARENT);
+    auto rect = draw->rcItem;
+    rect.right = rect.left + FromDIP(24);
+    DrawTextW(draw->hDC, L"●", 1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    RestoreDC(draw->hDC, saved);
+    return true;
 }
+void theme_dialog(wxWindow* window) {
+    // wxGenericMessageDialog constructs its native children lazily in ShowModal.
+    // Apply only once InitDialog has created them, before the first visible paint.
+    if (!window->GetHandle()) {
+        window->Bind(wxEVT_INIT_DIALOG, [window](wxInitDialogEvent& event) {
+            theme_dialog(window);
+            event.Skip();
+        });
+        return;
+    }
+    DWORD light = 1, size = sizeof(light);
+    RegGetValueW(HKEY_CURRENT_USER,
+                 L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                 L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &light, &size);
+    const bool contrast = contrast_active(), dark = !light && !contrast;
+    std::function<void(wxWindow*)> paint = [&](wxWindow* child) {
+        if (!contrast) {
+            child->SetBackgroundColour(dark ? palette::charcoal() : wxColour(245, 247, 250));
+            child->SetForegroundColour(dark ? *wxWHITE : *wxBLACK);
+        }
+        for (auto* next : child->GetChildren())
+            paint(next);
+    };
+    paint(window);
+    native_theme(window, dark, contrast);
+    const BOOL title_dark = dark ? TRUE : FALSE;
+    (void)DwmSetWindowAttribute(static_cast<HWND>(window->GetHandle()), 20, &title_dark,
+                                sizeof(title_dark));
+}
+int themed_message_box(const wxString& message, const wxString& caption, long style,
+                       wxWindow* parent) {
+    wxGenericMessageDialog dialog(parent, message, caption, style);
+    theme_dialog(&dialog);
+    const auto result = dialog.ShowModal();
+    return result == wxID_YES      ? wxYES
+           : result == wxID_NO     ? wxNO
+           : result == wxID_CANCEL ? wxCANCEL
+                                   : wxOK;
+}
+
 namespace {
 void bind_feedback(wxWindow* button) {
     button->Bind(wxEVT_ENTER_WINDOW, [button](wxMouseEvent& event) {
@@ -128,8 +186,8 @@ void bind_feedback(wxWindow* button) {
     // F1 exposes the same explanation without requiring a pointing device.
     button->Bind(wxEVT_HELP, [button](wxHelpEvent&) {
         if (button->GetToolTip())
-            wxMessageBox(button->GetToolTip()->GetTip(), button->GetLabel(),
-                         wxOK | wxICON_INFORMATION, button);
+            themed_message_box(button->GetToolTip()->GetTip(), button->GetLabel(),
+                               wxOK | wxICON_INFORMATION, button);
     });
 }
 // wx 3.2's MSW themed owner-draw path can paint a white hot-state surface

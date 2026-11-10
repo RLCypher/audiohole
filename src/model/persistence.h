@@ -1,6 +1,7 @@
 #pragma once
 #include "model/controller.h"
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -42,4 +43,27 @@ Result replace_document(const std::filesystem::path&, const std::string& bytes,
 Result validate_test_document(const std::string&, ConfigurationRecords&);
 Result merge_test_profiles(const std::optional<std::string>& existing, const std::string& incoming,
                            std::string& merged);
+// Named profiles are authoritative; the aggregate representation is retained for
+// transfer and legacy loading. No migration happens until an explicit save.
+class ProfileDirectoryPersistence final : public ConfigurationPersistence {
+  public:
+    explicit ProfileDirectoryPersistence(std::filesystem::path legacy_file);
+    ~ProfileDirectoryPersistence();
+    Result load(ConfigurationRecords&) override;
+    Result save(const ConfigurationRecords&) override;
+
+  private:
+    friend Result
+    write_profile_document(const std::filesystem::path&, const std::string&, const std::string&,
+                           std::function<Result(const std::filesystem::path&, const std::string&,
+                                                const std::optional<std::string>&)>);
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+};
+Result read_profile_document(const std::filesystem::path& legacy_file, std::string& document);
+Result write_profile_document(const std::filesystem::path& legacy_file, const std::string& document,
+                              const std::string& expected,
+                              std::function<Result(const std::filesystem::path&, const std::string&,
+                                                   const std::optional<std::string>&)>
+                                  writer = {});
 } // namespace audiohole

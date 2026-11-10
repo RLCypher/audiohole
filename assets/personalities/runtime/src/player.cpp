@@ -173,8 +173,8 @@ Presentation Player::tick(std::int64_t now) {
     result.holding =
         active_ && finite_ && !inspecting_ && !loop_until_event_ &&
         position >= (duration ? duration : clip->behavior.static_hold_ms) * reaction_loops_;
-    if (reduced_) {
-        result.image = clip->still ? clip->still : clip->frames.front();
+    if (reduced_ || first_frame_only_) {
+        result.image = first_frame_only_ ? clip->frames.front() : clip->still ? clip->still : clip->frames.front();
         result.source = "reduced_motion_static";
         return result;
     }

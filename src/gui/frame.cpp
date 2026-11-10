@@ -207,9 +207,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             return;
         profile_columns_->SetSashPosition(FromDIP(300));
         profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
-        profile_lower_rows_->SetSashPosition(profile_lower_rows_->GetClientSize().y / 2);
+        profile_lower_rows_->SetSashPosition(
+            std::max(FromDIP(72), profile_lower_rows_->GetClientSize().y -
+                                      profile_notes_->GetCharHeight() * 3 - FromDIP(36)));
         device_columns_->SetSashPosition(FromDIP(300));
-        device_rows_->SetSashPosition(device_rows_->GetClientSize().y / 3);
+        device_rows_->SetSashPosition(std::max(FromDIP(72), device_rows_->GetClientSize().y -
+                                                                device_notes_->GetCharHeight() * 3 -
+                                                                FromDIP(36)));
     });
     Bind(
         wxEVT_TIMER,
@@ -242,7 +246,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             e.Veto();
         } else {
             e.Veto();
-            wxMessageBox(
+            themed_message_box(
                 "The tray icon is unavailable. Use Exit AudioHole to stop and close safely.",
                 "AudioHole", wxOK | wxICON_INFORMATION, this);
         }
@@ -454,6 +458,14 @@ void Frame::layout_header() {
                         avatar_host_->enabled() &&
                         avatar_host_->baseline().expression == "sleeping";
     wrap(technical_, asleep ? std::string{} : technical_copy_);
+    technical_->SetToolTip(text(technical_copy_));
+    if (!operational_warning_visible_ && !asleep && technical_->GetLabel().Freq('\n') > 1) {
+        const auto lines = wxSplit(technical_->GetLabel(), '\n');
+        wxClientDC dc(technical_);
+        dc.SetFont(technical_->GetFont());
+        technical_->SetLabel(lines[0] + "\n" +
+                             wxControl::Ellipsize(lines[1] + "…", dc, wxELLIPSIZE_END, width));
+    }
     wrap(commentary_, asleep ? sleep_copy_ : commentary_copy_);
     wrap(fallback_notice_, asleep ? std::string{} : fallback_copy_);
     const auto* selected = messages_.package(personality_);
@@ -470,8 +482,8 @@ void Frame::show_result(const audiohole::Result& result, bool operational) {
     // a persistent operational warning or suppress cosmetic interactions.
     if (!result.ok && !operational) {
         if (!smoke_)
-            wxMessageBox(text(result.detail), "AudioHole — action unavailable",
-                         wxOK | wxICON_INFORMATION, this);
+            themed_message_box(text(result.detail), "AudioHole — action unavailable",
+                               wxOK | wxICON_INFORMATION, this);
         return;
     }
     if (result.ok && operational_warning_visible_ && !operational)
@@ -482,16 +494,16 @@ void Frame::show_result(const audiohole::Result& result, bool operational) {
     technical_copy_ = result.detail;
     layout_header();
     if (!result.ok && !smoke_)
-        wxMessageBox(text(result.detail), wxS("AudioHole — action unavailable"),
-                     wxOK | wxICON_WARNING, this);
+        themed_message_box(text(result.detail), wxS("AudioHole — action unavailable"),
+                           wxOK | wxICON_WARNING, this);
 }
 bool Frame::discard() {
     if (!dirty_)
         return true;
-    return wxMessageBox("Discard unsaved editor changes? Saved profiles and the active "
-                        "route will be retained.",
-                        "Unsaved changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
-                        this) == wxYES;
+    return themed_message_box("Discard unsaved editor changes? Saved profiles and the active "
+                              "route will be retained.",
+                              "Unsaved changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
+                              this) == wxYES;
 }
 void Frame::end_observation() {
     controller_->monitor(false);
@@ -508,8 +520,8 @@ void Frame::refresh() {
         bundle_inspecting_ = bundle_importing_ = false;
         if (s.scanner.result == "completed" && inspecting && s.scanner.import_plan) {
             const auto plan = s.scanner.import_plan;
-            if (wxMessageBox(text(plan->summary), "Import configuration bundle?",
-                             wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) == wxYES) {
+            if (themed_message_box(text(plan->summary), "Import configuration bundle?",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) == wxYES) {
                 ScannerActionRequest request;
                 request.kind = ScannerActionKind::ImportBundle;
                 request.confirmed = true;
@@ -594,6 +606,22 @@ void Frame::refresh() {
         read_direction(reverse_, reverse);
         update_direction_details(forward_, forward);
         update_direction_details(reverse_, reverse);
+    }
+    if (holes_->GetCount() == draft_.holes.size()) {
+        auto* list = static_cast<ThemedList*>(holes_);
+        std::vector<wxColour> colours;
+        for (const auto& hole : draft_.holes) {
+            const bool failed = std::any_of(s.paths.begin(), s.paths.end(), [&](const auto& path) {
+                return path.hole_id == hole.id && path.state == State::Failed;
+            });
+            colours.push_back(failed         ? wxColour(230, 70, 70)
+                              : hole.enabled ? wxColour(40, 170, 105)
+                                             : wxColour(145, 154, 168));
+        }
+        if (colours != list->status_colours) {
+            list->status_colours = std::move(colours);
+            list->Refresh();
+        }
     }
     const auto* active = audiohole::profile(s, s.active_profile);
     std::string status =
@@ -761,8 +789,8 @@ void Frame::refresh() {
             if (routine)
                 present(message);
             if (e.type == "scanner-action-failed" && !smoke_)
-                wxMessageBox(text(e.detail), "Device / export operation", wxOK | wxICON_ERROR,
-                             this);
+                themed_message_box(text(e.detail), "Device / export operation", wxOK | wxICON_ERROR,
+                                   this);
             if (e.type == "error" || e.type == "scan-failed" || e.severity == Severity::Error ||
                 e.severity == Severity::Critical) {
                 operational_warning_visible_ = true;
@@ -844,9 +872,12 @@ bool Frame::smoke(const wxString& directory) {
             auto choose = [&](bool enabled) {
                 advanced_tuning_->SetValue(enabled);
                 advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
-                require(advanced_panel_->IsShown() == enabled,
-                        "Tuning visibility differs from policy");
+                require(advanced_panel_->IsShown() == show_tuning_->GetValue(),
+                        "Override policy changed control visibility");
             };
+            show_tuning_->SetValue(true);
+            wxCommandEvent show_controls(wxEVT_CHECKBOX, show_tuning_->GetId());
+            show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
             choose(true);
             forward_.buffer->SetValue(19);
             reverse_.buffer->SetValue(23);
@@ -863,6 +894,14 @@ bool Frame::smoke(const wxString& directory) {
                         controller_->snapshot().revision == revision && occurrence_ == occurrence,
                     "Policy toggles altered operational state or spammed immediate commentary");
             tuning_timer_.Stop();
+            capture_draft();
+            const auto before_hiding = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+            show_tuning_->SetValue(false);
+            show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
+            capture_draft();
+            require(draft_.holes.at(static_cast<std::size_t>(hole_index_)) == before_hiding &&
+                        !advanced_panel_->IsShown(),
+                    "Hiding tuning changed retained intent");
             draft_.holes.at(static_cast<std::size_t>(hole_index_)) = before;
             load_hole(hole_index_);
             choose(true); // The following buffer-Apply smoke explicitly opts into tuning.
@@ -1046,7 +1085,7 @@ bool Frame::smoke(const wxString& directory) {
         layout_header();
         check_profile_layout();
         require(profile_new_->GetLabel() == "+" && hole_new_->GetLabel() == "+" &&
-                    profile_new_->GetName() == "New profile" && hole_new_->GetName() == "Add hole",
+                    profile_new_->GetName() == "New Profile" && hole_new_->GetName() == "Add hole",
                 "Compact add controls lost their labels or accessible names");
         require(wxWindow::FindWindowByName("Profile display name", this) == nullptr &&
                     wxWindow::FindWindowByName("Hole display name", this) == nullptr,
@@ -1095,7 +1134,9 @@ bool Frame::smoke(const wxString& directory) {
         SetClientSize(FromDIP(wxSize(1000, 1000)));
         layout_header();
         profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
-        profile_lower_rows_->SetSashPosition(profile_lower_rows_->GetClientSize().y / 2);
+        profile_lower_rows_->SetSashPosition(
+            std::max(FromDIP(72), profile_lower_rows_->GetClientSize().y -
+                                      profile_notes_->GetCharHeight() * 3 - FromDIP(36)));
         auto move_divider = [this](wxSplitterWindow* split) {
             split->UpdateSize();
             const int before = split->GetSashPosition();
@@ -1121,7 +1162,9 @@ bool Frame::smoke(const wxString& directory) {
                 "Resizing profile fields changed editor or saved state");
         notebook_->SetSelection(1);
         notebook_->GetPage(1)->Layout();
-        device_rows_->SetSashPosition(device_rows_->GetClientSize().y / 3);
+        device_rows_->SetSashPosition(std::max(FromDIP(72), device_rows_->GetClientSize().y -
+                                                                device_notes_->GetCharHeight() * 3 -
+                                                                FromDIP(36)));
         for (auto* split : {device_columns_, device_rows_}) {
             const int before = move_divider(split);
             require(notebook_->GetPage(1)->GetScreenRect().Contains(device_save_->GetScreenRect()),
@@ -1151,10 +1194,10 @@ bool Frame::smoke(const wxString& directory) {
         }
         {
             auto* settings = notebook_->GetPage(3);
-            auto* appearance = wxWindow::FindWindowByName("Appearance and tray settings", settings);
-            auto* startup = wxWindow::FindWindowByName("Startup settings", settings);
+            auto* appearance = wxWindow::FindWindowByName("Application & Tray settings", settings);
+            auto* startup = wxWindow::FindWindowByName("Routing Activation settings", settings);
             auto* personality =
-                wxWindow::FindWindowByName("Personality and animation settings", settings);
+                wxWindow::FindWindowByName("Personality & animation settings", settings);
             auto* advanced = wxWindow::FindWindowByName("Advanced settings", settings);
             require(appearance && startup && personality && advanced &&
                         theme_choice_->GetParent() == appearance &&
@@ -1263,7 +1306,7 @@ bool Frame::smoke(const wxString& directory) {
                     "Buffer-only save lost other staged edits");
             const auto saved_id = viewed_;
             ConfigurationController restarted(
-                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()));
+                std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()));
             const auto* loaded = audiohole::profile(restarted.snapshot(), saved_id);
             require(loaded && loaded->display_name == "Restart persistence check" &&
                         loaded->holes.front().id == persistent_hole_id &&

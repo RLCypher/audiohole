@@ -141,10 +141,11 @@ void Frame::build_devices() {
                                         wxSP_LIVE_UPDATE | wxSP_3D);
     device_rows_->SetName("Resize device notes and overview heights");
     device_rows_->SetMinimumPaneSize(FromDIP(72));
-    device_rows_->SetSashGravity(0.3);
+    device_rows_->SetSashGravity(1.0);
     auto* notes_panel = new wxPanel(device_rows_);
     auto* notes_layout = new wxBoxSizer(wxVERTICAL);
-    device_notes_ = field(notes_panel, notes_layout, "Notes", wxTE_MULTILINE | wxTE_WORDWRAP);
+    device_notes_ =
+        field(notes_panel, notes_layout, "Device Notes", wxTE_MULTILINE | wxTE_WORDWRAP);
     notes_layout->GetItem(device_notes_)->SetProportion(1);
     device_notes_->SetMinSize(wxSize(0, 24));
     notes_panel->SetSizer(notes_layout);
@@ -163,7 +164,7 @@ void Frame::build_devices() {
     device_evidence_->SetMinSize(wxSize(0, 24));
     evidence_layout->Add(device_evidence_, 1, wxEXPAND | wxALL, 3);
     evidence_panel->SetSizer(evidence_layout);
-    device_rows_->SplitHorizontally(notes_panel, evidence_panel);
+    device_rows_->SplitHorizontally(evidence_panel, notes_panel);
     right->Add(device_rows_, 1, wxEXPAND);
     auto* maintenance = new wxWrapSizer(wxHORIZONTAL);
     for (const auto& item :
@@ -171,8 +172,8 @@ void Frame::build_devices() {
           std::pair{"Refresh availability", ScannerActionKind::RefreshAvailability}}) {
         auto* action = button(details, maintenance, item.first, [this, kind = item.second] {
             if (device_dirty_ &&
-                wxMessageBox("Discard unsaved device edits?", "Device edits",
-                             wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+                themed_message_box("Discard unsaved device edits?", "Device edits",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
                 return;
             device_dirty_ = false;
             ScannerActionRequest request;
@@ -187,7 +188,7 @@ void Frame::build_devices() {
         scanner_actions_.push_back(action);
     }
     auto* clear = button(details, maintenance, "Clear device list…", [this] {
-        if (wxMessageBox(
+        if (themed_message_box(
                 "Delete all Test Mode device scan records, including device names, notes, hidden "
                 "preferences, probe histories, local bindings and saved scan sessions?\n\n"
                 "Saved profiles remain, but their devices may need to be selected again after "
@@ -239,8 +240,8 @@ void Frame::build_devices() {
 }
 bool Frame::select_device(const std::string& id) {
     if (id != device_id_ && device_dirty_ &&
-        wxMessageBox("Discard unsaved device edits?", "Device edits",
-                     wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES) {
+        themed_message_box("Discard unsaved device edits?", "Device edits",
+                           wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES) {
         populate_devices();
         return false;
     }

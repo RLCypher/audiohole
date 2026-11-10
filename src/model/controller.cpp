@@ -1,6 +1,7 @@
 #include "model/controller.h"
 #include <algorithm>
 #include <array>
+#include <cctype>
 
 namespace audiohole {
 namespace {
@@ -13,7 +14,8 @@ constexpr int simulated_automatic_buffer_ms = 6; // Fixture choice, never a hard
 constexpr std::size_t maximum_diagnostic_events = 500;
 bool manual_settings(const Direction& direction) {
     return !direction.settings.automatic || direction.settings.buffer_ms != 0 ||
-           direction.settings.mode != "Automatic";
+           direction.settings.mode != "Automatic" ||
+           direction.settings.preferences != Preferences{};
 }
 bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
     bool supported = false;
@@ -28,6 +30,84 @@ bool supports(const Endpoint& device, const Format& format, const std::string& m
 }
 } // namespace
 
+std::string unique_name(const std::string& base, const std::vector<std::string>& used) {
+    auto free = [&](const std::string& name) {
+        return std::none_of(used.begin(), used.end(), [&](const auto& other) {
+            if (name.size() != other.size())
+                return false;
+            return std::equal(name.begin(), name.end(), other.begin(),
+                              [](unsigned char a, unsigned char b) {
+                                  return std::tolower(a) == std::tolower(b);
+                              });
+        });
+    };
+    if (free(base))
+        return base;
+    for (unsigned i = 1;; ++i) {
+        auto next = base + " (" + std::to_string(i) + ")";
+        if (free(next))
+            return next;
+    }
+}
+std::optional<Format> derive_pcm_format(const EndpointPreferences& p) {
+    if (!p.sample_rate_hz || !p.channel_count || !p.sample_format)
+        return {};
+    const auto rate = *p.sample_rate_hz, channels = *p.channel_count;
+    if (rate < 1 || rate > 768000 || channels < 1 || channels > 256)
+        return {};
+    int container = 32, valid = 32;
+    bool floating = *p.sample_format == "float32";
+    if (*p.sample_format == "pcm_s16")
+        container = valid = 16;
+    else if (*p.sample_format == "pcm_s24_packed")
+        container = valid = 24;
+    else if (*p.sample_format == "pcm_s24_in_32")
+        valid = 24;
+    else if (*p.sample_format != "pcm_s32" && !floating)
+        return {};
+    const int alignment = channels * (container / 8);
+    return Format{rate, channels, *p.sample_format,
+                  WaveFormat{container,
+                             valid,
+                             65534,
+                             {},
+                             floating ? "{00000003-0000-0010-8000-00AA00389B71}"
+                                      : "{00000001-0000-0010-8000-00AA00389B71}",
+                             alignment,
+                             rate * alignment}};
+}
+Result validate_preferences(const Preferences& p) {
+    for (const auto* e : {&p.common, &p.source, &p.destination}) {
+        if ((e->sample_rate_hz && (*e->sample_rate_hz < 1 || *e->sample_rate_hz > 768000)) ||
+            (e->channel_count && (*e->channel_count < 1 || *e->channel_count > 256)) ||
+            (e->buffer_ms && (*e->buffer_ms < 1 || *e->buffer_ms > 100)))
+            return {false, "Invalid rate, channel count or buffer preference."};
+        if (e->sample_format && *e->sample_format != "float32" && *e->sample_format != "pcm_s16" &&
+            *e->sample_format != "pcm_s24_packed" && *e->sample_format != "pcm_s24_in_32" &&
+            *e->sample_format != "pcm_s32")
+            return {false, "Unknown sample format preference."};
+        if (e->mode && *e->mode != "Shared" && *e->mode != "Exclusive")
+            return {false, "Unknown access mode preference."};
+    }
+    if (p.channel_map.size() > 256)
+        return {false, "Too many channel routes."};
+    std::vector<int> destinations;
+    const auto source_count =
+        p.source.channel_count ? p.source.channel_count : p.common.channel_count;
+    const auto destination_count =
+        p.destination.channel_count ? p.destination.channel_count : p.common.channel_count;
+    for (const auto& route : p.channel_map) {
+        if (route.source < 0 || route.source >= 256 || route.destination < 0 ||
+            route.destination >= 256 || (source_count && route.source >= *source_count) ||
+            (destination_count && route.destination >= *destination_count) ||
+            std::find(destinations.begin(), destinations.end(), route.destination) !=
+                destinations.end())
+            return {false, "Channel map indexes must fit the selected channel counts; each output "
+                           "has one source."};
+        destinations.push_back(route.destination);
+    }
+    return {true, "Preferences are valid."};
+}
 const char* name(State s) {
     constexpr std::array names{"Stopped",  "Ready",      "Starting", "Running",
                                "Degraded", "Recovering", "Failed",   "Stopping"};
@@ -91,10 +171,10 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
         }
         recommendation.explanation =
             recommendation.compatible.empty()
-                ? "No exact format is reported supported by both devices in the selected mode. Run "
-                  "a "
-                  "Basic device update or choose another pair/mode. Drafts can still be saved. "
-                  "Different channel layouts need explicit mapping; none is inferred."
+                ? "No identical format is recorded for both endpoints. The engine must negotiate "
+                  "each endpoint and perform any required conversion. Unknown support is not a "
+                  "failed route. Channel maps use frame indexes; hardware bus intent is not "
+                  "inferred."
                 : "Exact Windows-reported tuples shared by both devices in the selected mode. "
                   "Automatic favors Shared, then 48 kHz float when listed. This is not a verified "
                   "route or measured "
@@ -114,6 +194,31 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
                   "unnecessary format conversion. A common format does not establish a shared "
                   "clock.";
     }
+    auto matches = [](const Format& format, const EndpointPreferences& p) {
+        const auto representation =
+            format.representation == "PCM16" || format.representation == "int16"
+                ? std::string("pcm_s16")
+                : format.representation;
+        return (!p.sample_rate_hz || format.rate == *p.sample_rate_hz) &&
+               (!p.channel_count || format.channels == *p.channel_count) &&
+               (!p.sample_format || representation == *p.sample_format);
+    };
+    const auto& preferences = direction.settings.preferences;
+    auto inherit = [&](const EndpointPreferences& specific) {
+        auto resolved = preferences.common;
+        if (specific.sample_rate_hz)
+            resolved.sample_rate_hz = specific.sample_rate_hz;
+        if (specific.channel_count)
+            resolved.channel_count = specific.channel_count;
+        if (specific.sample_format)
+            resolved.sample_format = specific.sample_format;
+        return resolved;
+    };
+    const auto source_preferences = inherit(preferences.source);
+    const auto destination_preferences = inherit(preferences.destination);
+    std::erase_if(recommendation.compatible, [&](const auto& format) {
+        return !matches(format, source_preferences) || !matches(format, destination_preferences);
+    });
     auto rank = [&](const Format& format) {
         const bool prefer_shared = direction.settings.mode == "Automatic" &&
                                    supports(*source, format, "Shared") &&
@@ -129,6 +234,12 @@ Direction effective_direction(const Hole& hole, bool reverse) {
     auto direction = reverse ? hole.reverse : hole.forward;
     if (!hole.advanced_tuning)
         direction.settings = Settings{};
+    else {
+        if (direction.settings.preferences.common.mode)
+            direction.settings.mode = *direction.settings.preferences.common.mode;
+        if (direction.settings.preferences.common.buffer_ms)
+            direction.settings.buffer_ms = *direction.settings.preferences.common.buffer_ms;
+    }
     return direction;
 }
 void describe_profile(const Snapshot& snapshot, Profile& candidate) {
@@ -166,22 +277,50 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
             const auto d = effective_direction(hole, reverse);
             const auto* source = endpoint(snapshot, d.source);
             const auto* destination = endpoint(snapshot, d.destination);
-            if (source->availability != Availability::Available ||
+            if (!source || !destination || source->availability != Availability::Available ||
                 destination->availability != Availability::Available)
                 return {false, "A selected device is unavailable or its identity is unresolved."};
             const auto choices = recommend(snapshot, d);
             const auto format =
-                d.settings.automatic ? choices.compatible.front() : d.settings.format;
+                d.settings.automatic
+                    ? (choices.compatible.empty() ? Format{} : choices.compatible.front())
+                    : d.settings.format;
             std::string mode = d.settings.mode;
             if (mode == "Automatic") {
                 mode = "Shared";
                 if (source->inspection || !source->capabilities.empty()) {
                     if (!supports(*source, format, mode) || !supports(*destination, format, mode))
-                        mode = "Exclusive";
+                        mode =
+                            snapshot.operating_mode == OperatingMode::Test ? "Shared" : "Exclusive";
                 }
             }
-            prepared.paths.push_back(
-                {hole.id, d.source, d.destination, mode, reverse, format, d.settings.buffer_ms});
+            RoutingPathRequest path;
+            path.hole_id = hole.id;
+            path.source = d.source;
+            path.destination = d.destination;
+            path.mode = mode;
+            path.reverse = reverse;
+            path.format = format;
+            path.buffer_ms = d.settings.buffer_ms;
+            prepared.paths.push_back(std::move(path));
+            auto& request = prepared.paths.back();
+            request.runtime_negotiation = snapshot.operating_mode == OperatingMode::Test;
+            request.preferences = d.settings.preferences;
+            if (!d.settings.automatic) {
+                auto& preference = request.preferences.common;
+                if (!preference.sample_rate_hz)
+                    preference.sample_rate_hz = d.settings.format.rate;
+                if (!preference.channel_count)
+                    preference.channel_count = d.settings.format.channels;
+                if (!preference.sample_format)
+                    preference.sample_format = d.settings.format.representation;
+            }
+            if (!request.preferences.common.mode && d.settings.mode != "Automatic")
+                request.preferences.common.mode = d.settings.mode;
+            if (!request.preferences.common.buffer_ms && d.settings.buffer_ms)
+                request.preferences.common.buffer_ms = d.settings.buffer_ms;
+            request.mode = request.preferences.common.mode.value_or(mode);
+            request.buffer_ms = request.preferences.common.buffer_ms.value_or(d.settings.buffer_ms);
             prepared.paths.back().routing_engine =
                 hole.advanced_tuning ? hole.routing_engine : "automatic";
         }
@@ -211,6 +350,16 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
             const auto* direction = &effective;
             const auto* source = endpoint(snapshot, direction->source);
             const auto* destination = endpoint(snapshot, direction->destination);
+            if (snapshot.operating_mode == OperatingMode::Test && !direction->source.empty() &&
+                !direction->destination.empty() &&
+                ((!source || source->capture) && (!destination || !destination->capture)) &&
+                (!source || !destination)) {
+                const auto result = validate_preferences(direction->settings.preferences);
+                if (!result.ok)
+                    return result;
+                continue; // Portable references can be valid while this machine cannot resolve
+                          // them.
+            }
             if (!source || !destination || !source->capture || destination->capture)
                 return {false, "Select a saved capture source and playback destination for each "
                                "enabled direction."};
@@ -224,6 +373,53 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
             if (direction->settings.mode != "Automatic" && direction->settings.mode != "Shared" &&
                 direction->settings.mode != "Exclusive")
                 return {false, "Choose Automatic, Shared or Exclusive operating mode."};
+            const auto preference_result = validate_preferences(direction->settings.preferences);
+            if (!preference_result.ok)
+                return preference_result;
+            if (snapshot.operating_mode == OperatingMode::Test) {
+                // Unknown/absent scan evidence is not evidence of unsupported
+                // intent. Runtime initialization owns negotiation and readiness.
+                if (!direction->settings.automatic) {
+                    for (const auto* device : {source, destination})
+                        for (const auto& capability : device->capabilities)
+                            if (capability.mode == (direction->settings.mode == "Automatic"
+                                                        ? "Shared"
+                                                        : direction->settings.mode) &&
+                                capability.format == direction->settings.format &&
+                                capability.support == FormatSupport::Unsupported)
+                                return {false, "The explicit legacy format was reported "
+                                               "unsupported. Change it or reset to Automatic."};
+                }
+                for (const auto* device : {source, destination}) {
+                    auto preference = direction->settings.preferences.common;
+                    const auto& specific = device == source
+                                               ? direction->settings.preferences.source
+                                               : direction->settings.preferences.destination;
+                    if (specific.sample_rate_hz)
+                        preference.sample_rate_hz = specific.sample_rate_hz;
+                    if (specific.channel_count)
+                        preference.channel_count = specific.channel_count;
+                    if (specific.sample_format)
+                        preference.sample_format = specific.sample_format;
+                    if (specific.mode)
+                        preference.mode = specific.mode;
+                    bool rejected = false, supported = false;
+                    if (preference.sample_rate_hz && preference.channel_count &&
+                        preference.sample_format)
+                        for (const auto& capability : device->capabilities)
+                            if (capability.mode == preference.mode.value_or("Shared") &&
+                                capability.format.rate == *preference.sample_rate_hz &&
+                                capability.format.channels == *preference.channel_count &&
+                                capability.format.representation == *preference.sample_format) {
+                                supported |= capability.support == FormatSupport::Supported;
+                                rejected |= capability.support == FormatSupport::Unsupported;
+                            }
+                    if (rejected && !supported)
+                        return {false, "An explicit format override was reported unsupported. "
+                                       "Change it or reset to Automatic."};
+                }
+                continue;
+            }
             const auto recommendation = recommend(snapshot, *direction);
             if (recommendation.compatible.empty())
                 return {false,
@@ -257,6 +453,10 @@ Result Controller::update_buffer(const std::string& profile_id, const std::strin
     if (hole == edited.holes.end() || (reverse && !hole->duplex))
         return {false, "Save this direction before applying its buffer preference."};
     (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    auto& preference =
+        (reverse ? hole->reverse : hole->forward).settings.preferences.common.buffer_ms;
+    if (preference)
+        preference = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
     const auto result = save(std::move(edited), false);
     return result.ok ? Result{true, "Buffer preference saved. No live engine buffer was applied."}
                      : result;
@@ -342,7 +542,7 @@ void SimulatedController::event(std::string type, std::string detail) {
 Hole SimulatedController::make_hole() {
     Hole hole;
     hole.id = "hole-" + std::to_string(next_id_++);
-    hole.display_name = "New hole";
+    hole.display_name = "New Hole";
     return hole;
 }
 std::string SimulatedController::create_profile(const std::string& title, const std::string& from) {
@@ -350,7 +550,10 @@ std::string SimulatedController::create_profile(const std::string& title, const 
     if (const auto* original = profile(state_, from))
         created = *original;
     created.id = "profile-" + std::to_string(next_id_++);
-    created.display_name = title.empty() ? "New profile" : title;
+    std::vector<std::string> names;
+    for (const auto& item : state_.profiles)
+        names.push_back(item.display_name);
+    created.display_name = unique_name(title.empty() ? "New Profile" : title, names);
     for (auto& hole : created.holes)
         hole.id = make_hole().id;
     state_.profiles.push_back(created);
@@ -455,6 +658,10 @@ Result SimulatedController::update_buffer(const std::string& profile_id, const s
         return {true, "Buffer preference retained. Automatic policy or unapplied policy changes "
                       "keep it inactive."};
     (reverse ? hole->reverse : hole->forward).settings.buffer_ms = milliseconds;
+    auto& preference =
+        (reverse ? hole->reverse : hole->forward).settings.preferences.common.buffer_ms;
+    if (preference)
+        preference = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
     refresh_paths();
     const auto path =
         std::find_if(state_.paths.begin(), state_.paths.end(), [&](const auto& value) {

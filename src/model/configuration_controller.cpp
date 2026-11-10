@@ -90,7 +90,7 @@ std::string ConfigurationController::new_id(const std::string& prefix) {
 Hole ConfigurationController::make_hole() {
     Hole hole;
     hole.id = new_id("hole-");
-    hole.display_name = "New hole";
+    hole.display_name = "New Hole";
     return hole;
 }
 std::string ConfigurationController::create_profile(const std::string& title,
@@ -107,7 +107,10 @@ std::string ConfigurationController::create_profile(const std::string& title,
         created = *source;
     }
     created.id = new_id("profile-");
-    created.display_name = title.empty() ? "New profile" : title;
+    std::vector<std::string> names;
+    for (const auto& item : state_.profiles)
+        names.push_back(item.display_name);
+    created.display_name = unique_name(title.empty() ? "New Profile" : title, names);
     for (auto& hole : created.holes)
         hole.id = make_hole().id;
     const auto id = created.id;

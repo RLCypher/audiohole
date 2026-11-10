@@ -102,9 +102,11 @@ void Frame::update_navigation() {
     }
 }
 void Frame::apply_appearance() {
+    avatar_host_->first_frame_only(preferences_->values().low_motion);
     BOOL client_animation = TRUE;
     if (avatar_host_ && SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &client_animation, 0))
-        avatar_host_->reduced_motion(client_animation == FALSE);
+        avatar_host_->reduced_motion(preferences_->values().low_motion ||
+                                     client_animation == FALSE);
     const bool contrast = high_contrast();
     // Keep these indices aligned with the Dark/Light/Follow System selector.
     constexpr int dark_choice = 0;

@@ -82,7 +82,7 @@ Diagnostic endpoint_lookup_failure(const Endpoint& endpoint, const std::string& 
   // HRESULT_FROM_WIN32(ERROR_NOT_FOUND / ERROR_DEVICE_NOT_CONNECTED), then
   // AUDCLNT_E_DEVICE_INVALIDATED. Access denied and arbitrary errors are excluded.
   const bool missing = native_code == "0x80070490" || native_code == "0x8007048F" ||
-    native_code == "0x88890004" ||
+    native_code == "0x88890004" || native_code == "0xE000020B" || native_code == "0x800F020B" ||
     (missing_name && native_code == "0x00000000" && name_api);
   const bool absent = state == "not_present" && !endpoint.endpoint_id.empty() &&
     (endpoint.direction == "capture" || endpoint.direction == "render") && metadata_api && missing;

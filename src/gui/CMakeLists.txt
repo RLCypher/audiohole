@@ -29,6 +29,7 @@ install(TARGETS audiohole RUNTIME DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
   "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt"
   "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
+  "${PROJECT_SOURCE_DIR}/PROFILE_BUILDER.md"
   "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION . COMPONENT Runtime)
 
 add_custom_target(audiohole_personality_files ALL

@@ -1291,3 +1291,12 @@ Signal Testing & Monitoring disclosure collapse explicitly preserves monitoring
 and an active simulated Test Beep. It is not a panel/workspace closure for the
 earlier temporary-monitoring guardrail. Navigation, observed-target changes,
 window hide/close, Stop and shutdown retain existing cancellation semantics.
+
+
+## Subsequent owner-authorized Test v4 profile-builder increment
+
+The November 10 assignment authorizes the provisional profile preferences, named
+profile storage and GUI changes documented in PROFILE_BUILDER.md, including
+compatibility migration from v3. Showing advanced controls no longer changes the
+separate retained override-enable policy. This supersedes earlier conflicting
+Test GUI/persistence instructions; it does not select a permanent audio engine.

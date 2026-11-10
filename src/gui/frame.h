@@ -58,7 +58,8 @@ struct DirectionWidgets {
     wxStaticBoxSizer* group{};
     wxStaticBoxSizer* tuning_group{};
     wxComboBox *source{}, *destination{};
-    wxChoice *format{}, *mode{};
+    wxChoice *format{}, *mode{}, *representation{};
+    wxTextCtrl *rate{}, *channels{}, *source_channels{}, *destination_channels{}, *channel_map{};
     wxSpinCtrl* buffer{};
     wxButton*
         buffer_apply{}; // Commits one buffer preference; backend reports any live confirmation.
@@ -167,7 +168,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
     wxCheckBox *preview_mode_{}, *show_preview_dialog_{}, *hold_expressions_{};
-    wxCheckBox* loop_until_event_{};
+    wxCheckBox *loop_until_event_{}, *low_motion_{};
     wxSpinCtrl* animation_loops_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
     wxSlider* dfa_slider_{};
@@ -202,7 +203,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
-    wxCheckBox* advanced_tuning_{};
+    wxCheckBox *advanced_tuning_{}, *show_tuning_{};
     wxChoice* routing_engine_{};
     wxStaticText* routing_engine_notice_{};
     wxPanel* advanced_panel_{};

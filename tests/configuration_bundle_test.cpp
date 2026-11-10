@@ -12,10 +12,24 @@ namespace {
 namespace scan = scanner;
 using Json = scan::Json;
 std::string bytes(const std::filesystem::path& path) {
+    if (path.filename() == "configuration.json" &&
+        std::filesystem::exists(path.parent_path() / "profiles" / ".state.json")) {
+        std::string result;
+        if (!read_profile_document(path, result).ok)
+            throw std::runtime_error("Cannot read profiles");
+        return result;
+    }
     std::ifstream input(path, std::ios::binary);
     return {std::istreambuf_iterator<char>(input), {}};
 }
 void write(const std::filesystem::path& path, const std::string& content) {
+    if (path.filename() == "configuration.json" &&
+        std::filesystem::exists(path.parent_path() / "profiles" / ".state.json")) {
+        auto previous = bytes(path);
+        if (!write_profile_document(path, content, previous).ok)
+            throw std::runtime_error("Cannot edit profiles");
+        return;
+    }
     std::filesystem::create_directories(path.parent_path());
     std::ofstream(path, std::ios::binary) << content;
 }
@@ -110,7 +124,7 @@ TEST_F(ConfigurationBundle,
     EXPECT_TRUE(device.local_binding.empty());
     EXPECT_FALSE(std::filesystem::exists(local / "device_bindings.json"));
     ConfigurationController restarted(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     const auto& p = restarted.snapshot().profiles.front();
     EXPECT_EQ(p.holes[0].forward.source, device_id);
     EXPECT_EQ(p.holes[0].notes, "Keep this hole's notes");
@@ -150,7 +164,7 @@ TEST_F(ConfigurationBundle, InactiveTuningAndFutureEngineRequestTravelWithProfil
     ASSERT_TRUE(plan);
     ASSERT_TRUE(import_configuration_bundle(*plan).ok);
     ConfigurationController restarted(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     const auto& saved = restarted.snapshot().profiles.front().holes.front();
     EXPECT_FALSE(saved.advanced_tuning);
     EXPECT_EQ(saved.routing_engine, "future-test-engine");
@@ -162,6 +176,7 @@ TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyE
     auto legacy = Json::parse(bytes(source / "configuration.json"));
     legacy["schema_version"] = 2;
     legacy["profiles"][0]["id"] = "legacy-profile";
+    legacy["profiles"][0]["display_name"] = "Legacy profile";
     legacy["profiles"][0]["holes"][0]["id"] = "legacy-hole";
     legacy["profiles"][0]["holes"][0].erase("advanced_tuning");
     legacy["profiles"][0]["holes"][0].erase("routing_engine");
@@ -171,9 +186,9 @@ TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyE
     auto plan = preview();
     ASSERT_TRUE(plan);
     ASSERT_TRUE(import_configuration_bundle(*plan).ok);
-    EXPECT_EQ(bytes(target / "configuration.json.v2.bak"), original);
+    EXPECT_EQ(bytes(target / "local" / "legacy-profiles" / "configuration.json"), original);
     ConfigurationController restarted(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     const auto* old = profile(restarted.snapshot(), "legacy-profile");
     ASSERT_TRUE(old);
     EXPECT_TRUE(old->holes.front().advanced_tuning);
@@ -211,7 +226,7 @@ TEST_F(ConfigurationBundle,
        FailedProfileCommitRollsBackNewDeviceFilesAndKeepsOriginalConfiguration) {
     export_profiles();
     ConfigurationController existing(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     ASSERT_FALSE(existing.create_profile("Existing local profile").empty());
     // Avoid the deliberately identical generated profile ID from two fresh roots.
     auto config = Json::parse(bytes(target / "configuration.json"));
@@ -224,7 +239,7 @@ TEST_F(ConfigurationBundle,
     const auto result = import_configuration_bundle(
         *plan, {}, [&](const auto& path, const auto& content, const auto& expected) {
             ++writes;
-            if (path.filename() == "configuration.json")
+            if (path.extension() == ".json" && path.parent_path().filename() == ".profiles-next")
                 return Result{false, "Injected disk failure"};
             return replace_document(path, content, expected);
         });
@@ -299,7 +314,7 @@ TEST_F(ConfigurationBundle,
        BackgroundImportPublishesProfilesAndRefreshesPersistenceAndIdAllocation) {
     export_profiles();
     ConfigurationController controller(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"),
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"),
         std::make_unique<ScannerService>(
             ScannerServiceOptions{target, local, {}, "bundle-fixture"}));
     auto finish = [&] {
@@ -332,7 +347,7 @@ TEST_F(ConfigurationBundle,
     EXPECT_FALSE(next.empty());
     EXPECT_NE(next, prior);
     ConfigurationController restarted(
-        std::make_unique<TestJsonPersistence>(target / "configuration.json"));
+        std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     EXPECT_EQ(restarted.snapshot().profiles.size(), 2u);
 }
 TEST_F(ConfigurationBundle, LinkedDeviceDirectoriesAreRejectedWithoutFollowingThem) {

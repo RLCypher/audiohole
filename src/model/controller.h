@@ -43,11 +43,28 @@ struct Endpoint {
     std::shared_ptr<const DeviceInspection> inspection{};
     std::vector<FormatCapability> capabilities{};
 };
+// Optional preferences express intent, not negotiated endpoint parameters.
+// Omission means Automatic. Channel indexes are zero-based PCM frame indexes.
+struct EndpointPreferences {
+    std::optional<int> sample_rate_hz, channel_count, buffer_ms;
+    std::optional<std::string> sample_format, mode;
+    bool operator==(const EndpointPreferences&) const = default;
+};
+struct ChannelRoute {
+    int source = 0, destination = 0;
+    bool operator==(const ChannelRoute&) const = default;
+};
+struct Preferences {
+    EndpointPreferences common, source, destination;
+    std::vector<ChannelRoute> channel_map;
+    bool operator==(const Preferences&) const = default;
+};
 struct Settings {
     bool automatic = true;
     Format format;
     int buffer_ms = 0; // Zero requests Automatic, not a zero-length engine buffer.
     std::string mode = "Automatic";
+    Preferences preferences;
     bool operator==(const Settings&) const = default;
 };
 struct Direction {
@@ -127,6 +144,11 @@ struct RoutingPathRequest {
     Format format;
     int buffer_ms = 0; // Zero leaves buffer selection to the future engine.
     std::string routing_engine = "automatic";
+    Preferences preferences;
+    // The legacy format above is a candidate only when runtime_negotiation is
+    // true. An engine must resolve each endpoint independently before opening.
+    bool runtime_negotiation = false;
+    std::string channel_policy = "index_order_silence_unmapped";
 };
 struct PreparedProfile {
     std::string profile_id;
@@ -146,6 +168,12 @@ Recommendation recommend(const Snapshot&, const Direction&);
 // Copy the requested direction with inactive manual overrides excluded. Never
 // mutate the saved/draft values. Automatic buffer selection remains engine-owned.
 Direction effective_direction(const Hole&, bool reverse = false);
+// Validates portable intent without demanding a connected device or scan result.
+Result validate_preferences(const Preferences&);
+// Construct PCM transport details from ordinary preferences. Incomplete
+// preferences return no descriptor; runtime negotiation still owns selection.
+std::optional<Format> derive_pcm_format(const EndpointPreferences&);
+std::string unique_name(const std::string& base, const std::vector<std::string>& used);
 Result validate(const Snapshot&, const Profile&);
 // Internal, in-process GUI seam; not API.md's final public schema/transport.
 // Calls and snapshots belong to the control/GUI thread. The scanner owns its

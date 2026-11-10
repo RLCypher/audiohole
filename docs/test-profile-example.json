@@ -1,6 +1,6 @@
 {
   "format": "audiohole-test-configuration",
-  "schema_version": 2,
+  "schema_version": 4,
   "profiles": [
     {
       "display_name": "Microphone monitoring",
@@ -19,6 +19,18 @@
             "destination_name": "Headphones",
             "destination": "render-example",
             "settings": {
+              "preferences": {
+                "common": {
+                  "sample_rate_hz": null,
+                  "channel_count": null,
+                  "sample_format": null,
+                  "mode": null,
+                  "buffer_ms": null
+                },
+                "source": {},
+                "destination": {},
+                "channel_map": []
+              },
               "automatic": true,
               "format": {
                 "rate": 48000,
@@ -35,7 +47,7 @@
                 }
               },
               "mode": "Automatic",
-              "buffer_ms": 6
+              "buffer_ms": 0
             }
           },
           "reverse": {
@@ -44,6 +56,18 @@
             "destination_name": "",
             "destination": "",
             "settings": {
+              "preferences": {
+                "common": {
+                  "sample_rate_hz": null,
+                  "channel_count": null,
+                  "sample_format": null,
+                  "mode": null,
+                  "buffer_ms": null
+                },
+                "source": {},
+                "destination": {},
+                "channel_map": []
+              },
               "automatic": true,
               "format": {
                 "rate": 48000,
@@ -52,9 +76,11 @@
                 "wave": null
               },
               "mode": "Automatic",
-              "buffer_ms": 6
+              "buffer_ms": 0
             }
-          }
+          },
+          "advanced_tuning": false,
+          "routing_engine": "automatic"
         }
       ]
     }

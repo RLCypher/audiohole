@@ -189,6 +189,8 @@ struct BundleImportPlan::Data {
         std::optional<std::string> expected;
     };
     std::vector<Write> writes;
+    std::string profile_previous, profile_combined;
+    std::set<fs::path> profile_paths;
     std::map<fs::path, std::optional<std::string>> observed;
     std::set<fs::path> inventory_paths;
 };
@@ -206,9 +208,12 @@ Result export_configuration_bundle(const fs::path& portable, const fs::path& loc
         Files files;
         std::set<std::string> needed;
         if (kind == BundleKind::Profiles) {
-            const auto config = read(portable / "configuration.json", 2 * 1024 * 1024);
-            if (!config)
-                throw std::runtime_error("Save a profile before exporting profiles");
+            std::string profile_bytes;
+            const auto loaded =
+                read_profile_document(portable / "configuration.json", profile_bytes);
+            if (!loaded.ok)
+                throw std::runtime_error(loaded.detail);
+            const auto config = std::optional<std::string>(profile_bytes);
             ConfigurationRecords records;
             const auto valid = validate_test_document(*config, records);
             if (!valid.ok)
@@ -353,28 +358,21 @@ Result inspect_configuration_bundle(const fs::path& portable, const fs::path& lo
                 throw std::runtime_error("Invalid profile bundle configuration");
             profiles = records.profiles.size();
             const auto path = portable / "configuration.json";
-            const auto previous = read(path, 2 * 1024 * 1024);
-            data->observed[path] = previous;
-            std::string combined;
-            const auto merged =
-                merge_test_profiles(previous, files.at("configuration.json"), combined);
+            std::string previous;
+            const auto loaded = read_profile_document(path, previous);
+            if (!loaded.ok)
+                throw std::runtime_error(loaded.detail);
+            data->observed[path] = read(path);
+            if (fs::exists(portable / "profiles"))
+                for (const auto& entry : fs::directory_iterator(portable / "profiles")) {
+                    data->profile_paths.insert(entry.path());
+                    data->observed[entry.path()] = read(entry.path());
+                }
+            const auto merged = merge_test_profiles(previous, files.at("configuration.json"),
+                                                    data->profile_combined);
             if (!merged.ok)
                 throw std::runtime_error(merged.detail);
-            const int previous_version =
-                previous ? scan::detail::parse_json(*previous).at("schema_version").get<int>() : 3;
-            if (previous && previous_version < 3) {
-                auto backup = path;
-                backup += ".v" + std::to_string(previous_version) + ".bak";
-                const auto old_backup = read(backup);
-                data->observed[backup] = old_backup;
-                if (old_backup && old_backup != previous)
-                    throw std::runtime_error(
-                        "Conflicting legacy backup; import would not replace it");
-                if (!old_backup)
-                    data->writes.push_back({backup, *previous, {}});
-            }
-            data->writes.push_back(
-                {path, std::move(combined), previous}); // Commit profile references last.
+            data->profile_previous = previous;
         }
         auto preview = std::make_shared<BundleImportPlan>();
         preview->data = std::move(data);
@@ -432,6 +430,14 @@ Result import_configuration_bundle(const BundleImportPlan& plan, std::stop_token
                     return Result{false, e.what()};
                 }
             };
+        if (!data.profile_combined.empty()) {
+            std::set<fs::path> current_paths;
+            if (fs::exists(data.portable / "profiles"))
+                for (const auto& entry : fs::directory_iterator(data.portable / "profiles"))
+                    current_paths.insert(entry.path());
+            if (current_paths != data.profile_paths)
+                throw std::runtime_error("Profile folder changed after preview");
+        }
         for (const auto& write : data.writes) {
             if (stop.stop_requested())
                 throw std::runtime_error("Import canceled");
@@ -441,6 +447,15 @@ Result import_configuration_bundle(const BundleImportPlan& plan, std::stop_token
             // Device/history records have the scanner's 16 MiB budget; profile
             // serialization has its stricter 2 MiB limit already validated.
             const auto result = writer(write.path, write.bytes, write.expected);
+            if (!result.ok)
+                throw std::runtime_error(result.detail);
+        }
+        if (!data.profile_combined.empty()) {
+            if (stop.stop_requested())
+                throw std::runtime_error("Import canceled before profile commit");
+            const auto result =
+                write_profile_document(data.portable / "configuration.json", data.profile_combined,
+                                       data.profile_previous, writer);
             if (!result.ok)
                 throw std::runtime_error(result.detail);
         }

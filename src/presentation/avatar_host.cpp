@@ -32,6 +32,7 @@ void AvatarHost::select(const Personality* package, std::int64_t now) {
     session_ = std::make_unique<avatar::Session>(package->avatar_registry.parent_path(), decoder_);
     session_->select(personality_, style_, now);
     session_->player().reduced_motion(reduced_);
+    session_->player().first_frame_only(first_frame_only_);
     session_->player().hold_expressions(hold_expressions_);
     session_->player().reaction_playback(reaction_loops_, loop_until_event_);
     baseline_ = {awake_baseline_.expression, awake_baseline_.priority, revision_};
@@ -112,6 +113,11 @@ avatar::Presentation AvatarHost::tick(std::int64_t now) {
         return session_->tick(now);
     }
     return frame;
+}
+void AvatarHost::first_frame_only(bool enabled) {
+    first_frame_only_ = enabled;
+    if (session_)
+        session_->player().first_frame_only(enabled);
 }
 void AvatarHost::reduced_motion(bool enabled) {
     reduced_ = enabled;

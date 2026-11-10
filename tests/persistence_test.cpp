@@ -112,7 +112,7 @@ TEST_F(PersistenceTest, LegacyPolicyMigratesExplicitlyAndInactiveManualValuesSur
     EXPECT_FALSE(loaded.profiles[0].holes[0].advanced_tuning);
     EXPECT_EQ(loaded.profiles[0].holes[0].forward, retained);
     const auto json = nlohmann::ordered_json::parse(read());
-    EXPECT_EQ(json.at("schema_version"), 3);
+    EXPECT_EQ(json.at("schema_version"), 4);
     EXPECT_EQ(json["profiles"][0]["holes"][0]["extension"], hole["extension"]);
     EXPECT_TRUE(json["profiles"][0]["holes"][0]["forward"]["settings"]["custom"]["keep"]);
 }
@@ -211,9 +211,9 @@ TEST_F(PersistenceTest, MalformedNewerDuplicateAndFractionalInputNeverGetsOverwr
         EXPECT_EQ(read(), text);
     }
     auto newer = valid;
-    const auto version = newer.find("\"schema_version\": 3");
+    const auto version = newer.find("\"schema_version\": 4");
     ASSERT_NE(version, std::string::npos);
-    newer.replace(version, 19, "\"schema_version\": 4");
+    newer.replace(version, 19, "\"schema_version\": 5");
     write(newer);
     TestJsonPersistence store(file);
     ConfigurationRecords data;
@@ -381,9 +381,9 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
     const auto valid = read();
     for (const auto& invalid : {"1.5", "18446744073709551615"}) {
         auto broken = valid;
-        const auto position = broken.find("\"schema_version\": 3");
+        const auto position = broken.find("\"schema_version\": 4");
         ASSERT_NE(position, std::string::npos);
-        broken.replace(position, std::string("\"schema_version\": 3").size(),
+        broken.replace(position, std::string("\"schema_version\": 4").size(),
                        std::string("\"schema_version\": ") + invalid);
         write(broken);
         TestJsonPersistence provider(file);
@@ -419,7 +419,7 @@ TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngi
 TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBeforeUpgrade) {
     seed();
     auto legacy = read();
-    const auto version = legacy.find("\"schema_version\": 3");
+    const auto version = legacy.find("\"schema_version\": 4");
     ASSERT_NE(version, std::string::npos);
     legacy.replace(version, 19, "\"schema_version\": 1");
     write(legacy);
@@ -431,7 +431,7 @@ TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBefo
     ASSERT_TRUE(provider.save(records).ok);
     std::ifstream backup(file.string() + ".v1.bak", std::ios::binary);
     EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), legacy);
-    EXPECT_NE(read().find("\"schema_version\": 3"), std::string::npos);
+    EXPECT_NE(read().find("\"schema_version\": 4"), std::string::npos);
     const auto bytes = read();
     EXPECT_LT(bytes.find("\"profiles\""), bytes.find("\"devices\""));
     EXPECT_LT(bytes.find("\"display_name\""), bytes.find("\"notes\""));
@@ -468,7 +468,7 @@ TEST_F(PersistenceTest, ExactDescriptorRoundTripsAndInvalidEditsPreserveOriginal
 TEST_F(PersistenceTest, ConflictingV1BackupBlocksUpgradeWithoutChangingEitherFile) {
     seed();
     auto legacy = read();
-    legacy.replace(legacy.find("\"schema_version\": 3"), 19, "\"schema_version\": 1");
+    legacy.replace(legacy.find("\"schema_version\": 4"), 19, "\"schema_version\": 1");
     write(legacy);
     const auto backup = file.string() + ".v1.bak";
     std::ofstream(backup, std::ios::binary) << "Earlier user backup";

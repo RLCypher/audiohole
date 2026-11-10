@@ -220,20 +220,23 @@ void Frame::build_scan() {
         present(presentation::Message::DiagnosticsCleared);
     });
     auto* bundle = button(page, export_row, "Export scan bundle…", [this] {
-        if (wxMessageBox("The bundle includes device identifiers, local bindings, notes and test "
-                         "context. Review it before sharing.",
-                         "Analysis bundle", wxOK | wxCANCEL | wxICON_INFORMATION, this) != wxOK)
+        if (themed_message_box(
+                "The bundle includes device identifiers, local bindings, notes and test "
+                "context. Review it before sharing.",
+                "Analysis bundle", wxOK | wxCANCEL | wxICON_INFORMATION, this) != wxOK)
             return;
         const auto filename =
             wxS("AudioHole-scan-") + wxDateTime::Now().Format("%Y%m%d-%H%M%S") + wxS(".zip");
         wxFileDialog dialog(this, "Export last scan session", {}, filename,
                             "ZIP archives (*.zip)|*.zip", wxFD_SAVE);
+        theme_dialog(&dialog);
         if (dialog.ShowModal() != wxID_OK)
             return;
         while (wxFileExists(dialog.GetPath())) {
-            wxMessageBox(
+            themed_message_box(
                 "That ZIP already exists. Choose a different name to preserve the existing bundle.",
                 "Export scan bundle", wxOK | wxICON_INFORMATION, this);
+            theme_dialog(&dialog);
             if (dialog.ShowModal() != wxID_OK)
                 return;
         }
@@ -300,10 +303,11 @@ void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
                             : scope == ScanScope::Full
                                 ? std::string("all eligible devices")
                                 : std::string("newly discovered devices only");
-        if (wxMessageBox(
+        if (themed_message_box(
                 text(
-                    "Deep scan target: " + target + "\nMode: " + options.mode +
-                    "\nOverall scan limit: " +
+                    "Power on all devices you want to use, including headsets, monitors, mixers "
+                    "and VR devices. Ensure they are operational.\n\nDeep scan target: " +
+                    target + "\nMode: " + options.mode + "\nOverall scan limit: " +
                     (options.system_timeout_ms == 0
                          ? std::string("Unlimited (attempt/device limits remain active)")
                          : std::to_string(options.system_timeout_ms / 1000) + " seconds") +

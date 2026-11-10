@@ -12,12 +12,12 @@ void Frame::build_settings() {
     auto* columns = new wxFlexGridSizer(1, 2, FromDIP(12), FromDIP(12));
     columns->AddGrowableCol(0, 1);
     columns->AddGrowableCol(1, 1);
-    auto* appearance_group = new wxStaticBoxSizer(wxVERTICAL, page, "Appearance and tray");
+    auto* appearance_group = new wxStaticBoxSizer(wxVERTICAL, page, "Application & Tray");
     auto* appearance_box = appearance_group->GetStaticBox();
-    appearance_box->SetName("Appearance and tray settings");
-    auto* startup_group = new wxStaticBoxSizer(wxVERTICAL, page, "Startup behavior");
+    appearance_box->SetName("Application & Tray settings");
+    auto* startup_group = new wxStaticBoxSizer(wxVERTICAL, page, "Routing Activation");
     auto* startup_box = startup_group->GetStaticBox();
-    startup_box->SetName("Startup settings");
+    startup_box->SetName("Routing Activation settings");
     columns->Add(appearance_group, 1, wxEXPAND);
     columns->Add(startup_group, 1, wxEXPAND);
     root->Add(columns, 0, wxEXPAND | wxALL, FromDIP(4));
@@ -40,31 +40,40 @@ void Frame::build_settings() {
                               "Windows high contrast takes precedence.");
     notifications_ = choices(appearance_box, appearance_group, "Tray notifications",
                              {"Important changes only", "All routine events", "None"});
-    startup_ = choices(startup_box, startup_group, "Startup", {"Manual", "Immediate", "Delayed"});
-    startup_target_ = choices(startup_box, startup_group, "Startup target", {});
-    label(startup_box, startup_group, "Startup delay (seconds)");
+    startup_ = choices(startup_box, startup_group, "Routing on startup",
+                       {"Immediately", "After Delay", "Manual"});
+    startup_target_ = choices(startup_box, startup_group, "Profile on startup", {});
+    label(startup_box, startup_group, "Routing activation delay (seconds)");
     delay_ = new wxSpinCtrl(startup_box, wxID_ANY, "5", wxDefaultPosition, FromDIP(wxSize(75, -1)),
                             wxSP_ARROW_KEYS, 0, 300, 5);
     startup_group->Add(delay_, 0, wxALL, FromDIP(4));
     notifications_->SetSelection(preferences_->values().notifications);
-    startup_->SetSelection(preferences_->values().startup_mode);
+    startup_->SetSelection((preferences_->values().startup_mode + 2) % 3);
     delay_->SetValue(preferences_->values().startup_delay_seconds);
-    auto save_startup = [this] {
+    auto sync_delay = [this] {
+        const bool delayed = startup_->GetSelection() == 1;
+        delay_->SetValue(delayed ? preferences_->values().startup_delay_seconds : 0);
+        delay_->Enable(delayed && controller_->snapshot().operating_mode == OperatingMode::Preview);
+    };
+    sync_delay();
+    auto save_startup = [this, sync_delay] {
         auto next = preferences_->values();
         next.notifications = notifications_->GetSelection();
-        next.startup_mode = startup_->GetSelection();
-        next.startup_delay_seconds = delay_->GetValue();
+        next.startup_mode = (startup_->GetSelection() + 1) % 3;
+        if (startup_->GetSelection() == 1)
+            next.startup_delay_seconds = delay_->GetValue();
         const int target = startup_target_->GetSelection();
         if (target >= 0 && static_cast<std::size_t>(target) < profile_ids_.size())
             next.startup_profile_id = profile_ids_[static_cast<std::size_t>(target)];
         show_result(preferences_->update(next));
+        sync_delay();
     };
     for (auto* choice : {notifications_, startup_, startup_target_})
         choice->Bind(wxEVT_CHOICE, [save_startup](wxCommandEvent&) { save_startup(); });
     delay_->Bind(wxEVT_SPINCTRL, [save_startup](wxSpinEvent&) { save_startup(); });
     auto* row = new wxWrapSizer(wxHORIZONTAL);
     auto* startup_preview = button(startup_box, row, "Preview startup", [this] {
-        if (startup_->GetSelection() == 0) {
+        if (startup_->GetSelection() == 2) {
             controller_->stop();
             refresh();
             return;
@@ -76,7 +85,7 @@ void Frame::build_settings() {
         }
         show_result(
             controller_->schedule(profile_ids_.at(static_cast<std::size_t>(i)),
-                                  startup_->GetSelection() == 1 ? 0 : delay_->GetValue() * 1000));
+                                  startup_->GetSelection() == 0 ? 0 : delay_->GetValue() * 1000));
         refresh();
     });
     auto* cancel_startup = button(startup_box, row, "Cancel pending activation", [this] {
@@ -90,13 +99,51 @@ void Frame::build_settings() {
     for (auto* control :
          std::vector<wxWindow*>{startup_preview, cancel_startup, startup_, startup_target_, delay_})
         control->Enable(preview_environment);
+    sync_delay();
+    auto* windows_startup = new wxWrapSizer(wxHORIZONTAL);
+    auto* launch = new wxCheckBox(appearance_box, wxID_ANY, "Start with Windows");
+    auto* minimized = new wxCheckBox(appearance_box, wxID_ANY, "Start minimized");
+    launch->SetValue(preferences_->values().start_with_windows);
+    minimized->SetValue(preferences_->values().start_minimized);
+    minimized->SetToolTip("Launch minimized using the saved Preview/Test environment, without the "
+                          "environment prompt.");
+    windows_startup->Add(launch, 0, wxALL, FromDIP(4));
+    windows_startup->Add(minimized, 0, wxALL, FromDIP(4));
+    appearance_group->Add(windows_startup, 0, wxEXPAND);
+    auto save_launch = [this, launch, minimized](wxCommandEvent&) {
+        auto next = preferences_->values();
+        const bool previous = next.start_with_windows;
+        if (launch->GetValue() != previous && !smoke_) {
+            const auto result = configure_windows_startup(launch->GetValue());
+            if (!result.ok) {
+                launch->SetValue(previous);
+                show_result(result);
+                return;
+            }
+        }
+        next.start_with_windows = launch->GetValue();
+        next.start_minimized = minimized->GetValue();
+        const auto result = preferences_->update(next);
+        if (!result.ok) {
+            if (!smoke_)
+                (void)configure_windows_startup(previous);
+            launch->SetValue(previous);
+            minimized->SetValue(preferences_->values().start_minimized);
+            show_result(result);
+        }
+    };
+    launch->Bind(wxEVT_CHECKBOX, save_launch);
+    minimized->Bind(wxEVT_CHECKBOX, save_launch);
     button(appearance_box, appearance_group, "Replay Tutorial", [this] {
-        wxMessageBox("Tutorial not yet implemented, please enjoy this placeholder message.",
-                     wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
+        if (themed_message_box("AudioHole will restart in Tutorial mode", "Replay Tutorial?",
+                               wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+            return;
+        themed_message_box("Tutorial not yet implemented, please enjoy this placeholder message.",
+                           wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
     });
-    auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and animation");
+    auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality & animation");
     auto* personality_box = personality_group->GetStaticBox();
-    personality_box->SetName("Personality and animation settings");
+    personality_box->SetName("Personality & animation settings");
     personality_choice_ = choices(personality_box, personality_group, "Personality", {});
     personality_notice_ = label(personality_box, personality_group, "");
     auto* playback = new wxWrapSizer(wxHORIZONTAL);
@@ -113,6 +160,21 @@ void Frame::build_settings() {
     loop_count->Add(animation_loops_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     playback->Add(loop_count, 0, wxALIGN_CENTER_VERTICAL);
     playback->Add(loop_until_event_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    low_motion_ = new wxCheckBox(personality_box, wxID_ANY, "Low motion");
+    low_motion_->SetValue(preferences_->values().low_motion);
+    low_motion_->SetToolTip(
+        "Show the first animation frame. Windows reduced-motion settings also take precedence.");
+    playback->Add(low_motion_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    low_motion_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.low_motion = low_motion_->GetValue();
+        const auto result = preferences_->update(next);
+        low_motion_->SetValue(preferences_->values().low_motion);
+        if (!result.ok)
+            show_result(result);
+        apply_appearance();
+        poll_avatar();
+    });
     personality_group->Add(playback, 0, wxEXPAND);
     hold_expressions_->SetToolTip(
         "Hold the last frame after the final repeat. Otherwise hold it for two extra seconds. "
@@ -136,8 +198,8 @@ void Frame::build_settings() {
     auto save_playback = [this, sync_playback] {
         long count = 0;
         if (!animation_loops_->GetTextValue().ToLong(&count) || count < 1 || count > 20) {
-            wxMessageBox("Enter a total play count from 1 to 20.", "Animation loop count",
-                         wxOK | wxICON_INFORMATION, this);
+            themed_message_box("Enter a total play count from 1 to 20.", "Animation loop count",
+                               wxOK | wxICON_INFORMATION, this);
             sync_playback();
             return;
         }
@@ -170,6 +232,7 @@ void Frame::build_settings() {
     button(personality_box, catalogs, "Load custom personality…", [this] {
         wxFileDialog dialog(this, "Load personality", {}, {}, "JSON files (*.json)|*.json",
                             wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        theme_dialog(&dialog);
         if (dialog.ShowModal() != wxID_OK)
             return;
         const auto loaded =
@@ -329,7 +392,7 @@ void Frame::build_settings() {
 }
 void Frame::testing_notice() {
     if (controller_->snapshot().operating_mode == OperatingMode::Test) {
-        wxMessageBox(
+        themed_message_box(
             "Test Mode saves isolated configuration and reads real Windows device evidence. "
             "Basic scans do not open experimental streams. Deep scans require consent and can "
             "interrupt audio. "
@@ -338,7 +401,7 @@ void Frame::testing_notice() {
             "AudioHole Test Mode", wxOK | wxICON_INFORMATION, this);
         return;
     }
-    wxMessageBox(
+    themed_message_box(
         "AudioHole Preview Build\n\n"
         "All devices, capabilities, routing, scans, activity and recovery in this version "
         "are simulated. No real devices are opened and no audio is captured or played. "

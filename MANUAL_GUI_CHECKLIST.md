@@ -545,3 +545,27 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   no deletion; confirm on disposable records. Profile deletion respects active/
   pending guards; hole deletion remains staged until Save. Compare context menu
   and Delete key behavior. Verify tooltips and screen-reader names for glyphs.
+
+
+## November 10 profile-builder and GUI checks
+
+- Load a copy of a v3 configuration: no load-time writes. Save creates named
+  profiles and preserves the original in local/legacy-profiles. Rename, restart,
+  delete, import/export; verify IDs, independent directions, notes and extensions.
+- Create multiple profiles/holes; verify numbered default names and live green/gray
+  enabled dots. Runtime failures use red. Resize device lists: names expand.
+- Select only channels, leaving rate/format/mode/buffer Automatic. Save/restart.
+  Map UI channels 1:3,2:4 and verify JSON indexes 0:2,1:3. Invalid input cannot save.
+- Collapse/show advanced controls: intent and live routing state do not change.
+  Override enable and Reset to Automatic are separate explicit actions.
+- Device/Profile Notes start at three rows at the bottom; resizing remains usable.
+- Check Application & Tray ordering, Windows startup checkbox and uninstall opt-out,
+  minimized launch, Routing Activation labels/disabled zero delay, tutorial default
+  No and placeholder Yes. Confirm all message popups follow Windows appearance.
+- Low motion shows each animation's first frame, including after personality change.
+  Routine system copy uses two lines; warnings remain readable and complete.
+- Monitor direction retains its natural height; Material direction chevron and
+  return-channel wording render at 100/150/200% DPI.
+- Deep confirmation mentions powered-on headsets/monitors/mixers/VR devices.
+- Native Windows GUI, Explorer/registry, rendering, and audio hardware acceptance
+  cannot be established by a Linux cross-build. Test Mode still has no streaming.

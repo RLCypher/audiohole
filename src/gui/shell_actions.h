@@ -1,4 +1,5 @@
 #pragma once
+#include "model/controller.h"
 #include <cstdint>
 #include <optional>
 #include <string_view>
@@ -23,4 +24,5 @@ bool forward_shell_action(HWND, ShellAction);
 // GUI STA only. Uses system COM shell APIs; failure leaves the native system-menu
 // controls usable. Smoke mode never publishes persistent Jump List tasks.
 HRESULT publish_shell_tasks(bool routing_available);
+Result configure_windows_startup(bool enabled);
 } // namespace audiohole::gui

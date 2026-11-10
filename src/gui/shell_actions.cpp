@@ -173,4 +173,26 @@ HRESULT publish_shell_tasks(bool routing_available) {
     transaction.committed = SUCCEEDED(result);
     return result;
 }
+Result configure_windows_startup(bool enabled) {
+    // Explicit user opt-in, current user only. No elevation or scheduled task.
+    std::wstring executable(32768, L'\0');
+    const auto count =
+        GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
+    if (!count || count == executable.size())
+        return {false, "Cannot resolve the application path for Windows startup."};
+    executable.resize(count);
+    const auto command = L"\"" + executable + L"\"";
+    HKEY key = nullptr;
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0,
+                        nullptr, 0, KEY_SET_VALUE, nullptr, &key, nullptr) != ERROR_SUCCESS)
+        return {false, "Windows startup preference could not be changed."};
+    const auto result =
+        enabled ? RegSetValueExW(key, L"AudioHole", 0, REG_SZ,
+                                 reinterpret_cast<const BYTE*>(command.c_str()),
+                                 static_cast<DWORD>((command.size() + 1) * sizeof(wchar_t)))
+                : RegDeleteValueW(key, L"AudioHole");
+    RegCloseKey(key);
+    return {result == ERROR_SUCCESS || (!enabled && result == ERROR_FILE_NOT_FOUND),
+            "Windows startup preference updated."};
+}
 } // namespace audiohole::gui

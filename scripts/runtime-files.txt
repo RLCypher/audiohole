@@ -727,3 +727,4 @@ personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
 wxWidgets-LGPL.txt
 wxWidgets-LICENSE.txt
+PROFILE_BUILDER.md

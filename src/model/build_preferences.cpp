@@ -96,6 +96,9 @@ Result BuildPreferences::load() {
             values.preview_mode = document.at("preview_mode").get<bool>();
             values.show_preview_dialog = document.at("show_preview_dialog").get<bool>();
             values.hold_expressions = document.value("hold_expressions", false);
+            values.low_motion = document.value("low_motion", false);
+            values.start_with_windows = document.value("start_with_windows", false);
+            values.start_minimized = document.value("start_minimized", false);
             values.loop_until_event = document.value("loop_until_event", false);
             values.animation_loops = optional_integer(document, "animation_loops", 1);
             values.personality_id = document.value("personality_id", std::string("default"));
@@ -136,6 +139,9 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["preview_mode"] = values.preview_mode;
         document["show_preview_dialog"] = values.show_preview_dialog;
         document["hold_expressions"] = values.hold_expressions;
+        document["low_motion"] = values.low_motion;
+        document["start_with_windows"] = values.start_with_windows;
+        document["start_minimized"] = values.start_minimized;
         document["loop_until_event"] = values.loop_until_event;
         document["animation_loops"] = values.animation_loops;
         document["personality_id"] = values.personality_id;

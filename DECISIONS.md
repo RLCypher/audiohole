@@ -1625,3 +1625,25 @@ an implementation now. The provisional Test v3 compatibility rule preserves lega
 active tuning and unknown data with explicit-save backups. O-004/O-006, actual
 engine selection, routing and synchronization choices remain Open. GUI.md,
 PROFILES.md and PROVISIONAL_TEST_PERSISTENCE.md document the implemented scope.
+
+
+## November 10, 2026 — owner-authorized profile builder and GUI increment
+
+The owner authorized implementation of the pending GUI refinements, named
+per-profile files and partial routing preferences after review with the audio
+engine agent. [PROFILE_BUILDER.md](PROFILE_BUILDER.md) specifies the implemented
+Test v4 contract, migration/backups, channel indexes/default mapping, independent
+endpoint preferences, Shared-first Automatic policy and runtime handoff. It
+supersedes older Test v3 persistence and advanced-control visibility descriptions.
+The retained override-enable policy is distinct from showing its controls.
+Production backend, conversion and synchronization algorithms remain unselected.
+
+GUI refinements include bottom three-line Device/Profile Notes, Application & Tray
+with opt-in current-user Windows startup and minimized launch, renamed Routing
+Activation controls with inactive delay shown as zero, tutorial confirmation with
+placeholder-only continuation, Windows-themed message dialogs, Low motion using
+the first animation frame, viewport-width device names, immediate hole status
+dots, Material chevrons, Enable return channel, two-line routine status summaries
+(full copy in tooltips; warnings stay complete), normal monitor selector height,
+and powered-on-device guidance before Deep scans. Positive not-present metadata
+failures also recognize SPAPI no-such-device-instance codes E000020B/800F020B.

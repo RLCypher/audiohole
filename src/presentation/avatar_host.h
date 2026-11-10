@@ -19,6 +19,7 @@ class AvatarHost {
     avatar::Decision react(Message, const Copy&, std::uint64_t occurrence, std::int64_t now);
     avatar::Presentation tick(std::int64_t now);
     void reduced_motion(bool enabled);
+    void first_frame_only(bool enabled);
     void hold_expressions(bool enabled);
     void reaction_playback(int count, bool until_event);
     void shutdown();
@@ -39,7 +40,7 @@ class AvatarHost {
     std::int64_t last_activity_ms_ = 0;
     bool sleeping_ = false, hold_expressions_ = false;
     int reaction_loops_ = 1;
-    bool loop_until_event_ = false;
+    bool loop_until_event_ = false, first_frame_only_ = false;
     State state_ = State::Stopped;
     bool scanning_ = false, warning_ = false, reduced_ = false;
     std::string active_profile_;

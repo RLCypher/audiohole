@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <sstream>
 #include <wx/access.h>
 
 namespace audiohole::gui {
@@ -25,6 +26,51 @@ std::optional<int> buffer_value(const wxSpinCtrl* control) {
     if (!control->GetTextValue().ToLong(&value) || value < 0 || value > 100)
         return {};
     return static_cast<int>(value);
+}
+// UI channel numbers are one-based; JSON and engine frame indexes are zero-based.
+bool read_preferences(const DirectionWidgets& w, Preferences& p) {
+    auto number = [](wxTextCtrl* control, std::optional<int>& out, long maximum) {
+        auto value = control->GetValue();
+        value.Trim(true).Trim(false);
+        if (value.empty() || value.CmpNoCase("Automatic") == 0) {
+            out.reset();
+            return true;
+        }
+        long n = 0;
+        if (!value.ToLong(&n) || n < 1 || n > maximum)
+            return false;
+        out = static_cast<int>(n);
+        return true;
+    };
+    if (!number(w.rate, p.common.sample_rate_hz, 768000) ||
+        !number(w.channels, p.common.channel_count, 256) ||
+        !number(w.source_channels, p.source.channel_count, 256) ||
+        !number(w.destination_channels, p.destination.channel_count, 256))
+        return false;
+    const auto representation = utf8(w.representation->GetStringSelection());
+    p.common.sample_format =
+        representation == "Automatic" ? std::nullopt : std::optional<std::string>(representation);
+    p.channel_map.clear();
+    auto raw_map = w.channel_map->GetValue();
+    raw_map.Trim(true).Trim(false);
+    auto map = utf8(raw_map);
+    std::istringstream input(map);
+    std::string token;
+    while (std::getline(input, token, ',')) {
+        std::istringstream pair(token);
+        int source = 0, destination = 0;
+        char colon = 0;
+        if (!(pair >> source >> colon >> destination) || colon != ':' || source < 1 ||
+            destination < 1)
+            return false;
+        pair >> std::ws;
+        if (!pair.eof())
+            return false;
+        p.channel_map.push_back({source - 1, destination - 1});
+    }
+    if (!map.empty() && map.back() == ',')
+        return false;
+    return validate_preferences(p).ok;
 }
 wxButton* add_control(wxWindow* parent, wxSizer* row, const wxString& name, const wxString& help,
                       std::function<void()> action, const wxString& glyph = wxS("+")) {
@@ -68,7 +114,9 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.destination_detail = label(playback, destination_layout, "Select a destination");
     playback->set_content_sizer(destination_layout);
     endpoints->Add(capture, 1, wxEXPAND | wxALL, FromDIP(5));
-    label(box, endpoints, "→");
+    auto* chevron = label(box, endpoints, wxString::FromUTF8("\xEE\x97\x8C"));
+    chevron->SetFont(wxFont(wxFontInfo(26).FaceName("Material Icons")));
+    chevron->SetName("Direction to playback");
     endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));
     w.group->Add(endpoints, 0, wxEXPAND);
     w.information = new wxTextCtrl(
@@ -86,9 +134,49 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.tuning_group = tuning;
     advanced_panel_->GetSizer()->Add(tuning, 0, wxEXPAND | wxALL, FromDIP(4));
     box = tuning->GetStaticBox();
-    label(box, tuning, "Audio format");
+    label(box, tuning, "Complete format preset (optional)");
     w.format = new ThemedChoice(box, wxID_ANY);
     tuning->Add(w.format, 0, wxEXPAND | wxALL, 3);
+    auto* preferences = new wxFlexGridSizer(2, FromDIP(6), FromDIP(8));
+    preferences->AddGrowableCol(1, 1);
+    label(box, preferences, "Sample rate (Hz; blank = Automatic)");
+    w.rate = new wxTextCtrl(box, wxID_ANY);
+    preferences->Add(w.rate, 1, wxEXPAND);
+    label(box, preferences, "Stream channels, both endpoints (blank = Automatic)");
+    w.channels = new wxTextCtrl(box, wxID_ANY);
+    preferences->Add(w.channels, 1, wxEXPAND);
+    label(box, preferences, "Source channels (blank = inherit)");
+    w.source_channels = new wxTextCtrl(box, wxID_ANY);
+    preferences->Add(w.source_channels, 1, wxEXPAND);
+    label(box, preferences, "Destination channels (blank = inherit)");
+    w.destination_channels = new wxTextCtrl(box, wxID_ANY);
+    preferences->Add(w.destination_channels, 1, wxEXPAND);
+    w.channels->SetToolTip("Requests the endpoint stream channel count, not a channel selection. "
+                           "Use source/destination overrides for different counts; use the map to "
+                           "choose specific channels.");
+    label(box, preferences, "Sample format");
+    w.representation = new ThemedChoice(box);
+    for (const auto* value :
+         {"Automatic", "float32", "pcm_s16", "pcm_s24_packed", "pcm_s24_in_32", "pcm_s32"})
+        w.representation->Append(value);
+    preferences->Add(w.representation, 1, wxEXPAND);
+    label(box, preferences, "Channel map (source:destination)");
+    w.channel_map = new wxTextCtrl(box, wxID_ANY);
+    preferences->Add(w.channel_map, 1, wxEXPAND);
+    w.channel_map->SetToolTip(
+        "One-based channel numbers, for example 1:3, 2:4. Blank maps matching channel indexes; "
+        "extra outputs are silent. No hardware bus is inferred.");
+    tuning->Add(preferences, 0, wxEXPAND | wxALL, FromDIP(4));
+    button(box, tuning, "Reset to Automatic", [this, &w] {
+        if (hole_index_ < 0)
+            return;
+        capture_draft();
+        auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+        (&w == &forward_ ? hole.forward : hole.reverse).settings = Settings{};
+        populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+        dirty_ = true;
+        refresh();
+    });
     label(box, tuning, "Buffer (ms; 0 = Automatic)");
     w.buffer = new wxSpinCtrl(box, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
@@ -115,10 +203,20 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
     w.mode = choices(box, tuning, "Operating mode", {"Automatic", "Shared", "Exclusive"});
-    w.mode->SetToolTip("Automatic uses available evidence. Shared cooperates with other apps; "
+    w.mode->SetToolTip("Automatic initially uses Shared access. Shared cooperates with other apps; "
                        "Exclusive can reserve a device. Changes wait for explicit Apply.");
+    for (auto* field :
+         {w.rate, w.channels, w.source_channels, w.destination_channels, w.channel_map})
+        field->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
+            if (!loading_)
+                dirty_ = true;
+        });
+    w.representation->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        if (!loading_)
+            dirty_ = true;
+    });
     auto* fallback = new ThemedChoice(box, wxID_ANY);
-    fallback->Append(wxS("Fallback device / channel mapping — unavailable"));
+    fallback->Append(wxS("Fallback device — unavailable"));
     fallback->SetSelection(0);
     fallback->Disable();
     tuning->Add(fallback, 0, wxEXPAND | wxALL, FromDIP(4));
@@ -136,9 +234,23 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     };
     w.source->Bind(wxEVT_COMBOBOX, [changed](wxCommandEvent&) { changed(true); });
     w.destination->Bind(wxEVT_COMBOBOX, [changed](wxCommandEvent&) { changed(false); });
-    w.format->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        if (!loading_)
-            dirty_ = true;
+    w.format->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
+        if (loading_)
+            return;
+        const auto selected = w.format->GetSelection();
+        if (selected > 0 && static_cast<std::size_t>(selected) <= w.formats.size()) {
+            const auto& f = w.formats[selected - 1];
+            w.rate->ChangeValue(std::to_string(f.rate));
+            w.channels->ChangeValue(std::to_string(f.channels));
+            auto representation =
+                f.representation == "PCM16" ? std::string("pcm_s16") : f.representation;
+            w.representation->SetStringSelection(text(representation));
+        } else {
+            w.rate->ChangeValue("");
+            w.channels->ChangeValue("");
+            w.representation->SetSelection(0);
+        }
+        dirty_ = true;
     });
     w.mode->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
         if (loading_ || hole_index_ < 0)
@@ -175,7 +287,7 @@ void Frame::tuning_changed() {
     auto* focused = wxWindow::FindFocus();
     if (!enabled && focused && advanced_panel_->IsDescendant(focused))
         advanced_tuning_->SetFocus();
-    advanced_panel_->Show(enabled);
+    // Showing controls is independent of whether retained overrides participate.
     populate_direction(forward_, hole.forward);
     populate_direction(reverse_, hole.reverse);
     auto* editor = static_cast<wxScrolledWindow*>(advanced_panel_->GetParent());
@@ -254,6 +366,7 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
                 return;
             wxTextEntryDialog dialog(this, "Profile name", "Rename profile",
                                      text(draft_.display_name));
+            theme_dialog(&dialog);
             if (dialog.ShowModal() == wxID_OK)
                 rename_profile(utf8(dialog.GetValue()));
         },
@@ -278,8 +391,8 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
         [this, choose](wxCommandEvent&) {
             if (!choose())
                 return;
-            if (wxMessageBox("Delete this saved profile?", "Confirm profile deletion",
-                             wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
+            if (themed_message_box("Delete this saved profile?", "Confirm profile deletion",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this) != wxYES)
                 return;
             const auto result = controller_->remove_profile(viewed_);
             show_result(result);
@@ -317,6 +430,7 @@ std::unique_ptr<wxMenu> Frame::hole_menu(const std::string& id) {
             wxTextEntryDialog dialog(
                 this, "Hole name", "Rename hole",
                 text(draft_.holes[static_cast<std::size_t>(hole_index_)].display_name));
+            theme_dialog(&dialog);
             if (dialog.ShowModal() == wxID_OK)
                 rename_hole(utf8(dialog.GetValue()));
         },
@@ -372,7 +486,12 @@ void Frame::add_hole() {
     if (viewed_.empty())
         return;
     capture_draft();
-    draft_.holes.push_back(controller_->make_hole());
+    auto created = controller_->make_hole();
+    std::vector<std::string> names;
+    for (const auto& hole : draft_.holes)
+        names.push_back(hole.display_name);
+    created.display_name = unique_name("New Hole", names);
+    draft_.holes.push_back(std::move(created));
     dirty_ = true;
     load_holes();
     load_hole(static_cast<int>(draft_.holes.size()) - 1);
@@ -396,9 +515,9 @@ void Frame::duplicate_hole() {
 void Frame::remove_hole() {
     if (hole_index_ < 0)
         return;
-    if (wxMessageBox("Remove this hole from the editor? Save keeps the change; Apply changes "
-                     "active routing.",
-                     "Confirm hole removal", wxYES_NO | wxNO_DEFAULT, this) != wxYES)
+    if (themed_message_box("Remove this hole from the editor? Save keeps the change; Apply changes "
+                           "active routing.",
+                           "Confirm hole removal", wxYES_NO | wxNO_DEFAULT, this) != wxYES)
         return;
     capture_draft();
     draft_.holes.erase(draft_.holes.begin() + hole_index_);
@@ -423,7 +542,7 @@ void Frame::delete_selection(bool profile) {
         menu->ProcessEvent(command);
     }
 }
-// Test records share configuration.json; device scan JSON lives in devices/.
+// Named profile files live in profiles/; device scan JSON lives in devices/.
 // Opening a folder never saves a draft, scans hardware or changes configuration.
 void Frame::open_data_folder(bool profiles) {
     if (controller_->snapshot().operating_mode != OperatingMode::Test) {
@@ -431,9 +550,8 @@ void Frame::open_data_folder(bool profiles) {
                             "available in Test Mode."});
         return;
     }
-    auto directory = preferences_->test_configuration().parent_path();
-    if (!profiles)
-        directory /= "devices";
+    auto directory =
+        preferences_->test_configuration().parent_path() / (profiles ? "profiles" : "devices");
     std::error_code error;
     std::filesystem::create_directories(directory, error);
     if (error) {
@@ -479,8 +597,8 @@ void Frame::build_profiles() {
     profiles_folder_ =
         button(page, bundles, "Open Profiles Folder", [this] { open_data_folder(true); });
     profiles_folder_->SetName("Open Profiles Folder");
-    profiles_folder_->SetToolTip("Open the Test data folder containing saved profiles in "
-                                 "configuration.json. Preview profiles are session-only.");
+    profiles_folder_->SetToolTip("Open the profiles folder containing one named JSON per profile. "
+                                 "Preview profiles are session-only.");
     page_layout->Add(bundles, 0, wxEXPAND);
     profile_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                             wxSP_LIVE_UPDATE | wxSP_3D);
@@ -500,7 +618,7 @@ void Frame::build_profiles() {
                                                wxDefaultSize, wxSP_LIVE_UPDATE | wxSP_3D);
     profile_lower_rows_->SetName("Resize notes and holes heights");
     profile_lower_rows_->SetMinimumPaneSize(FromDIP(72));
-    profile_lower_rows_->SetSashGravity(0.5);
+    profile_lower_rows_->SetSashGravity(1.0);
     profile_lower_rows_->SetMinSize(
         wxSize(0, FromDIP(144) + profile_lower_rows_->GetSashSize() + 4));
     auto* profile_panel = new wxPanel(profile_rows_);
@@ -519,10 +637,10 @@ void Frame::build_profiles() {
                           "Duplicate and Delete. Drag pane dividers to resize.");
     profile_heading->AddStretchSpacer();
     profile_new_ =
-        add_control(profile_panel, profile_heading, "New profile", "Create a new profile.", [this] {
+        add_control(profile_panel, profile_heading, "New Profile", "Create a new profile.", [this] {
             if (!discard())
                 return;
-            const auto id = controller_->create_profile("New profile");
+            const auto id = controller_->create_profile("New Profile");
             if (id.empty())
                 show_result({false, controller_->last_edit_error()});
             else
@@ -535,7 +653,7 @@ void Frame::build_profiles() {
         [this] { delete_selection(true); }, wxS("−"));
     profile_layout->Add(profile_heading, 0, wxEXPAND);
     profile_layout->Add(profiles_, 1, wxEXPAND | wxALL, 3);
-    label(notes_panel, notes_layout, "Notes");
+    label(notes_panel, notes_layout, "Profile Notes");
     profile_notes_ = new wxTextCtrl(notes_panel, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                                     wxTE_MULTILINE | wxTE_WORDWRAP);
     profile_notes_->SetName("Profile notes");
@@ -562,7 +680,7 @@ void Frame::build_profiles() {
     profile_panel->SetSizer(profile_layout);
     notes_panel->SetSizer(notes_layout);
     holes_panel->SetSizer(holes_layout);
-    profile_lower_rows_->SplitHorizontally(notes_panel, holes_panel);
+    profile_lower_rows_->SplitHorizontally(holes_panel, notes_panel);
     profile_rows_->SplitHorizontally(profile_panel, profile_lower_rows_);
     sidebar_layout->Add(profile_rows_, 1, wxEXPAND);
     sidebar->SetSizer(sidebar_layout);
@@ -577,7 +695,7 @@ void Frame::build_profiles() {
     hole_heading_->SetFont(hole_heading_->GetFont().Bold());
     auto* toggles = new wxBoxSizer(wxHORIZONTAL);
     enabled_ = new wxCheckBox(editor, wxID_ANY, "Enabled");
-    duplex_ = new wxCheckBox(editor, wxID_ANY, "Duplex (independent directions)");
+    duplex_ = new wxCheckBox(editor, wxID_ANY, "Enable return channel");
     toggles->Add(enabled_, 0, wxALL, 4);
     toggles->Add(duplex_, 0, wxALL, 4);
     right->Add(toggles);
@@ -600,7 +718,14 @@ void Frame::build_profiles() {
     });
     build_direction(editor, right, forward_, "Forward");
     build_direction(editor, right, reverse_, "Return");
-    advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Enable Advanced Tuning");
+    show_tuning_ = new wxCheckBox(editor, wxID_ANY, "Show advanced tuning");
+    right->Add(show_tuning_, 0, wxALL, FromDIP(4));
+    show_tuning_->Bind(wxEVT_CHECKBOX, [this, editor](wxCommandEvent&) {
+        advanced_panel_->Show(show_tuning_->GetValue());
+        editor->Layout();
+        editor->FitInside();
+    });
+    advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Use advanced overrides");
     advanced_tuning_->SetName("Enable Advanced Tuning");
     advanced_tuning_->SetToolTip("Allow retained manual overrides for this hole. Save / Apply is "
                                  "explicit; toggling never starts routing.");
@@ -666,6 +791,9 @@ void Frame::build_profiles() {
                 dirty_ = true;
         });
     enabled_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
+        capture_draft();
+        load_holes();
+        holes_->SetSelection(hole_index_);
         dirty_ = true;
         present(enabled_->GetValue() ? presentation::Message::Enabled
                                      : presentation::Message::Disabled);
@@ -767,14 +895,33 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     w.format->SetSelection(selection);
     update_direction_details(w, d);
-    w.buffer->SetValue(d.settings.buffer_ms);
+    const auto& preference = d.settings.preferences;
+    w.rate->ChangeValue(
+        preference.common.sample_rate_hz ? std::to_string(*preference.common.sample_rate_hz) : "");
+    w.channels->ChangeValue(
+        preference.common.channel_count ? std::to_string(*preference.common.channel_count) : "");
+    w.source_channels->ChangeValue(
+        preference.source.channel_count ? std::to_string(*preference.source.channel_count) : "");
+    w.destination_channels->ChangeValue(preference.destination.channel_count
+                                            ? std::to_string(*preference.destination.channel_count)
+                                            : "");
+    w.representation->SetStringSelection(
+        text(preference.common.sample_format.value_or("Automatic")));
+    std::string mapping;
+    for (const auto& route : preference.channel_map) {
+        if (!mapping.empty())
+            mapping += ", ";
+        mapping += std::to_string(route.source + 1) + ":" + std::to_string(route.destination + 1);
+    }
+    w.channel_map->ChangeValue(text(mapping));
+    w.buffer->SetValue(d.settings.preferences.common.buffer_ms.value_or(d.settings.buffer_ms));
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
     w.mode->Clear();
     for (const auto* mode : {"Automatic", "Shared", "Exclusive"})
         w.mode->Append(mode);
     if (w.mode->FindString(text(d.settings.mode)) == wxNOT_FOUND)
         w.mode->Append(text(d.settings.mode)); // Preserve externally authored unknown requests.
-    w.mode->SetStringSelection(text(d.settings.mode));
+    w.mode->SetStringSelection(text(d.settings.preferences.common.mode.value_or(d.settings.mode)));
     loading_ = old_loading;
     if (!loading_)
         layout_direction(w);
@@ -871,8 +1018,8 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     if (d.source.empty() || d.destination.empty())
         summary = "Automatic configuration — awaiting endpoint selection.";
     else if (!compatible)
-        summary = "Automatic configuration unavailable for the selected endpoints. Format "
-                  "compatibility is unverified.";
+        summary = "Automatic configuration awaits runtime negotiation. Source and destination may "
+                  "use different formats.";
     else
         summary = "Compatible format identified from available endpoint evidence. Runtime "
                   "negotiation remains unverified.";
@@ -930,12 +1077,19 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
     if (!advanced_tuning_->GetValue())
         return;
     const int f = w.format->GetSelection();
-    d.settings.automatic = f <= 0;
+    d.settings.automatic = true; // Explicit per-property preferences are authoritative in v4.
+    auto preference = d.settings.preferences;
+    if (read_preferences(w, preference))
+        d.settings.preferences = std::move(preference);
     if (f > 0 && static_cast<std::size_t>(f) <= w.formats.size())
         d.settings.format = w.formats[static_cast<std::size_t>(f - 1)];
     if (const auto parsed = buffer_value(w.buffer))
         d.settings.buffer_ms = *parsed;
     d.settings.mode = utf8(w.mode->GetStringSelection());
+    d.settings.preferences.common.mode =
+        d.settings.mode == "Automatic" ? std::nullopt : std::optional<std::string>(d.settings.mode);
+    d.settings.preferences.common.buffer_ms =
+        d.settings.buffer_ms == 0 ? std::nullopt : std::optional<int>(d.settings.buffer_ms);
 }
 void Frame::capture_draft() {
     if (loading_)
@@ -985,8 +1139,16 @@ void Frame::select_profile(const std::string& id) {
 }
 void Frame::load_holes() {
     holes_->Clear();
+    auto* list = static_cast<ThemedList*>(holes_);
+    list->status_colours.clear();
     for (const auto& h : draft_.holes) {
-        std::string caption = h.enabled ? "[enabled] " : "[disabled] ";
+        const bool failed = std::any_of(
+            controller_->snapshot().paths.begin(), controller_->snapshot().paths.end(),
+            [&](const auto& path) { return path.hole_id == h.id && path.state == State::Failed; });
+        list->status_colours.push_back(failed      ? wxColour(230, 70, 70)
+                                       : h.enabled ? wxColour(40, 170, 105)
+                                                   : wxColour(145, 154, 168));
+        std::string caption;
         caption += h.display_name + (h.duplex ? " — duplex" : " — simplex");
         holes_->Append(text(caption));
     }
@@ -1005,9 +1167,10 @@ void Frame::load_hole(int index) {
     enabled_->SetValue(h.enabled);
     duplex_->SetValue(h.duplex);
     advanced_tuning_->SetValue(index >= 0 && h.advanced_tuning);
+    show_tuning_->Enable(index >= 0);
     advanced_tuning_->Enable(index >= 0);
     hole_remove_->Enable(index >= 0);
-    advanced_panel_->Show(index >= 0 && h.advanced_tuning);
+    advanced_panel_->Show(index >= 0 && show_tuning_->GetValue());
     routing_engine_->SetSelection(h.routing_engine == "automatic" ? 0 : wxNOT_FOUND);
     routing_engine_->Enable(index >= 0);
     routing_engine_notice_->SetLabel(
@@ -1030,6 +1193,11 @@ void Frame::load_hole(int index) {
              std::vector<wxWindow*>{direction->source, direction->destination, direction->format,
                                     direction->mode, direction->buffer})
             input->Enable(index >= 0);
+        for (wxWindow* input :
+             std::vector<wxWindow*>{direction->rate, direction->channels, direction->representation,
+                                    direction->source_channels, direction->destination_channels,
+                                    direction->channel_map})
+            input->Enable(index >= 0);
         if (index < 0)
             direction->buffer_apply->Disable();
     }
@@ -1049,6 +1217,16 @@ void Frame::save(bool apply) {
         show_result({false, "Enter 0 for Automatic or whole buffer values from 1 to 100 "
                             "milliseconds before saving."});
         return;
+    }
+    if (hole_index_ >= 0 && advanced_tuning_->GetValue()) {
+        Preferences forward = draft_.holes[hole_index_].forward.settings.preferences;
+        Preferences back = draft_.holes[hole_index_].reverse.settings.preferences;
+        if (!read_preferences(forward_, forward) ||
+            (duplex_->GetValue() && !read_preferences(reverse_, back))) {
+            show_result({false, "Check sample rate, channel count and channel map. Channel maps "
+                                "use source:destination pairs, starting at 1."});
+            return;
+        }
     }
     capture_draft();
     const auto r = controller_->save(draft_, apply);
@@ -1098,6 +1276,7 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
     groups->Add(observation, 0, wxEXPAND | wxALL, FromDIP(4));
     activity_direction_ = choices(box, observation, "Monitor direction",
                                   {"Forward source", "Return source (duplex only)"});
+    activity_direction_->SetMinSize(wxSize(0, activity_direction_->GetBestSize().y));
     activity_direction_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         end_observation();
         refresh();

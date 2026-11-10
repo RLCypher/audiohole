@@ -1,5 +1,10 @@
 # Preview Build persistence (provisional v3)
 
+Current Test profile storage is v4 with named files. See
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) for the current contract; earlier version
+sections below remain compatibility history. Bundle envelope version remains 1.
+
+
 The owner authorized real isolated Test persistence while production schemas remain
 Open (O-004/O-006). This provider is **not a production format, historical importer,
 or resolution of those decisions**. See the separate
@@ -251,3 +256,25 @@ when Advanced Tuning is enabled; with tuning disabled it remains stored and the
 effective request is Automatic. Wrong types/empty values reject the document
 without modifying it. Profile bundle transfer retains the selector and policy.
 No permanent engine implementation or public production schema is selected.
+
+
+## November 10, 2026 — owner-authorized profile builder and GUI increment
+
+The owner authorized implementation of the pending GUI refinements, named
+per-profile files and partial routing preferences after review with the audio
+engine agent. [PROFILE_BUILDER.md](PROFILE_BUILDER.md) specifies the implemented
+Test v4 contract, migration/backups, channel indexes/default mapping, independent
+endpoint preferences, Shared-first Automatic policy and runtime handoff. It
+supersedes older Test v3 persistence and advanced-control visibility descriptions.
+The retained override-enable policy is distinct from showing its controls.
+Production backend, conversion and synchronization algorithms remain unselected.
+
+GUI refinements include bottom three-line Device/Profile Notes, Application & Tray
+with opt-in current-user Windows startup and minimized launch, renamed Routing
+Activation controls with inactive delay shown as zero, tutorial confirmation with
+placeholder-only continuation, Windows-themed message dialogs, Low motion using
+the first animation frame, viewport-width device names, immediate hole status
+dots, Material chevrons, Enable return channel, two-line routine status summaries
+(full copy in tooltips; warnings stay complete), normal monitor selector height,
+and powered-on-device guidance before Deep scans. Positive not-present metadata
+failures also recognize SPAPI no-such-device-instance codes E000020B/800F020B.

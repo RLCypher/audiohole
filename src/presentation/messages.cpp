@@ -88,13 +88,9 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"dfa_above_maximum", "DFA must be at most 11.00. Previous value retained."},
     {"bother", "Personality interaction. Routing settings are unchanged."},
     {"dream", ""}, // Cosmetic sleep text has no technical/operational claim.
-    {"advanced_tuning_enabled", "Advanced Tuning enabled in the editor. Manual settings are "
-                                "eligible after explicit Save / Apply."},
-    {"manual_override_applied",
-     "Manual overrides applied to the simulated Preview route. Hardware values remain unverified."},
-    {"automatic_configuration_restored",
-     "Automatic configuration restored in the editor. Manual settings are retained but inactive; "
-     "Save / Apply is explicit."},
+    {"advanced_tuning_enabled", "Overrides enabled. Save / Apply to use them."},
+    {"manual_override_applied", "Overrides applied to Preview (simulated)."},
+    {"automatic_configuration_restored", "Automatic selected. Saved overrides are inactive."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;

@@ -42,6 +42,7 @@ class Player {
     Presentation tick(std::int64_t now);
     void pause(bool value, std::int64_t now);
     void speed(double multiplier, std::int64_t now);
+    void first_frame_only(bool value) { first_frame_only_ = value; }
     void reduced_motion(bool value) {
         reduced_ = value;
     }
@@ -80,7 +81,7 @@ class Player {
     int baseline_priority_ = 0, active_priority_ = 0;
     int active_hold_ms_ = 0;
     int reaction_loops_ = 1;
-    bool loop_until_event_ = false;
+    bool loop_until_event_ = false, first_frame_only_ = false;
     std::int64_t last_now_ = 0;
     bool clock_valid_ = false, finite_ = false, inspecting_ = false, paused_ = false,
          reduced_ = false, hold_expressions_ = false;

@@ -40,6 +40,7 @@ class ThemedList final : public wxListBox {
   public:
     using wxListBox::wxListBox;
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
+    std::vector<wxColour> status_colours;
 };
 // Native buttons retain Windows keyboard, command, and accessibility semantics.
 // Only application-palette painting is replaced; high contrast uses wx/Windows.
@@ -56,6 +57,11 @@ class NavigationButton final : public wxToggleButton {
     bool use_native_colours = false;
 };
 // GUI-thread only. Helpers own no windows or GDI resources beyond a paint call.
+// Generic wx dialogs avoid Windows' light-only message-box body. The palette
+// follows Windows app appearance, retaining native high-contrast presentation.
+void theme_dialog(wxWindow*);
+int themed_message_box(const wxString& message, const wxString& caption = "AudioHole",
+                       long style = wxOK, wxWindow* parent = nullptr);
 wxString button_help(const wxString& title);
 wxColour routing_colour(audiohole::State state);
 // Decorative Material glyph next to the authoritative accessible text label.

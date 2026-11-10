@@ -73,7 +73,10 @@ class DeviceName final : public wxDataViewCustomRenderer {
         return true;
     }
     wxSize GetSize() const override {
-        return GetView()->FromDIP(wxSize(100, 22));
+        const auto* view = GetView();
+        const int width = view && view->GetColumnCount() > 1 ? view->GetColumn(1)->GetWidth() : 100;
+        return wxSize(std::max(1, width - (view ? view->FromDIP(6) : 6)),
+                      view ? view->FromDIP(22) : 22);
     }
 #if wxUSE_ACCESSIBILITY
     wxString GetAccessibleDescription() const override {
@@ -115,14 +118,16 @@ DeviceList::DeviceList(wxWindow* parent)
     AppendColumn(new wxDataViewColumn("Status", new StatusDot, 0, FromDIP(30), wxALIGN_CENTER, 0));
     auto* renderer = new DeviceName;
     AppendColumn(new wxDataViewColumn("Device name", renderer, 1, 260, wxALIGN_LEFT, 0));
-    Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
-        const int width = GetClientSize().x;
-        GetColumn(1)->SetWidth(
-            std::max(1, width - FromDIP(42) - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X)));
-        event.Skip();
-    });
     // Windows uses the generic data view's child window for row mouse events.
     auto* client = GetMainWindow();
+    client->Bind(wxEVT_SIZE, [this, client](wxSizeEvent& event) {
+        const int width =
+            std::max(1, client->GetClientSize().x - GetColumn(0)->GetWidth() - FromDIP(6));
+        if (GetColumn(1)->GetWidth() != width)
+            GetColumn(1)->SetWidth(width);
+        client->Refresh();
+        event.Skip();
+    });
     client->Bind(wxEVT_MOTION, [this, client](wxMouseEvent& event) {
         const auto row = HitTest(ScreenToClient(client->ClientToScreen(event.GetPosition())));
         const auto tip = row >= 0 ? GetTextValue(static_cast<unsigned>(row), 0) + ": " +

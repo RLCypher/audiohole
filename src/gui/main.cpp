@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <shobjidl.h>
 #include <string_view>
+#include <wx/generic/msgdlgg.h>
 #include <wx/stdpaths.h>
 
 namespace {
@@ -114,9 +115,10 @@ class App final : public wxApp {
                 return false;
         }
         if (restart_parent && !wait_for_restart_parent(restart_parent)) {
-            wxMessageBox("The previous AudioHole process did not shut down cleanly. No second "
-                         "session was started.",
-                         "AudioHole restart", wxOK | wxICON_ERROR);
+            themed_message_box(
+                "The previous AudioHole process did not shut down cleanly. No second "
+                "session was started.",
+                "AudioHole restart", wxOK | wxICON_ERROR);
             return false;
         }
         smoke_ = smoke;
@@ -137,8 +139,8 @@ class App final : public wxApp {
         apartment_ = std::make_unique<audiohole::windows::ComApartment>(
             audiohole::windows::ApartmentModel::single_threaded);
         if (!apartment_->initialized()) {
-            wxMessageBox("COM initialization failed. AudioHole cannot start safely.", "AudioHole",
-                         wxOK | wxICON_ERROR);
+            themed_message_box("COM initialization failed. AudioHole cannot start safely.",
+                               "AudioHole", wxOK | wxICON_ERROR);
             return false;
         }
         if (!smoke) {
@@ -185,11 +187,12 @@ class App final : public wxApp {
         preferences_ = std::make_shared<BuildPreferences>(root, smoke);
         const auto preferences_result = preferences_->load();
         if (!preferences_result.ok && !smoke)
-            wxMessageBox(text(preferences_result.detail), "AudioHole preferences",
-                         wxOK | wxICON_WARNING);
+            themed_message_box(text(preferences_result.detail), "AudioHole preferences",
+                               wxOK | wxICON_WARNING);
         bool preview = !test_mode_smoke && (smoke || preferences_->values().preview_mode);
-        if (!smoke && preferences_->values().show_preview_dialog) {
-            wxMessageDialog dialog(
+        if (!smoke && preferences_->values().show_preview_dialog &&
+            !preferences_->values().start_minimized) {
+            wxGenericMessageDialog dialog(
                 nullptr,
                 "Preview Mode loads demonstration profiles/devices and "
                 "simulates operations; Test Beep is silent.\n\n"
@@ -201,6 +204,7 @@ class App final : public wxApp {
                 wxS("AudioHole — Preview Build"),
                 wxYES_NO | wxCANCEL | wxICON_INFORMATION | (preview ? 0 : wxNO_DEFAULT));
             dialog.SetYesNoLabels("Preview Mode", "Test Mode");
+            theme_dialog(&dialog);
             const auto choice = dialog.ShowModal();
             if (choice == wxID_CANCEL)
                 return false;
@@ -209,7 +213,8 @@ class App final : public wxApp {
             next.preview_mode = preview;
             const auto saved = preferences_->update(next);
             if (!saved.ok)
-                wxMessageBox(text(saved.detail), "AudioHole preferences", wxOK | wxICON_WARNING);
+                themed_message_box(text(saved.detail), "AudioHole preferences",
+                                   wxOK | wxICON_WARNING);
         }
         std::unique_ptr<Controller> controller;
         if (preview)
@@ -224,7 +229,7 @@ class App final : public wxApp {
                     .parent_path() /
                 "audiohole-probe.exe";
             controller = std::make_unique<ConfigurationController>(
-                std::make_unique<TestJsonPersistence>(preferences_->test_configuration()),
+                std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()),
                 std::make_unique<ScannerService>(std::move(scanner)));
         }
         auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
@@ -233,6 +238,8 @@ class App final : public wxApp {
         });
         SetTopWindow(frame);
         frame->Show();
+        if (!smoke && preferences_->values().start_minimized)
+            frame->Iconize(true);
         if (shell_action == ShellAction::Controls)
             frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::Controls); });
         if (smoke)
@@ -259,9 +266,10 @@ class App final : public wxApp {
             instance_.reset();
             apartment_.reset();
             if (!launch_restart(smoke_, screenshot_dir_)) {
-                wxMessageBox("AudioHole closed safely, but could not relaunch. Start it normally; "
-                             "saved files are preserved.",
-                             "AudioHole restart", wxOK | wxICON_ERROR);
+                themed_message_box(
+                    "AudioHole closed safely, but could not relaunch. Start it normally; "
+                    "saved files are preserved.",
+                    "AudioHole restart", wxOK | wxICON_ERROR);
                 return 1;
             }
         }

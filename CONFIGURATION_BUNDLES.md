@@ -1,5 +1,10 @@
 # Device and profile bundles — provisional Test transport v1
 
+Current Test profile storage is v4 with named files. See
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) for the current contract; earlier version
+sections below remain compatibility history. Bundle envelope version remains 1.
+
+
 This implements the owner's development transfer/backup workflow. It is an envelope
 around existing Test records, not approval of the final production schema, storage
 roots or routing-engine API (O-004/O-006).
@@ -62,27 +67,25 @@ Illustrative manifest:
 }
 ```
 
-`configuration.json` reuses the Test provider's version 1/2 format; new app saves
-use version 2. The legacy `devices` array is empty in exports because separate
-scanner files are authoritative. Profile/hole names, notes, independent directions,
-stable device IDs, readable hints and complete format descriptors round-trip,
-including unknown fields. See [the sample](docs/test-profile-example.json) and
-[persistence contract](PROVISIONAL_TEST_PERSISTENCE.md). Import uses the same
-validation and adds profiles while preserving other local configuration.
+`configuration.json` is the aggregate Test v4 transfer representation. Imports also
+accept legacy v1/v2/v3 and normalize their retained override policies. Application
+storage uses named per-profile v4 files under `profiles/`; the exporter assembles
+them without including local bindings. See [PROFILE_BUILDER.md](PROFILE_BUILDER.md).
 
 ## Audio-engine handoff
 
 Read configuration as routing **intent** on the application control side. Resolve
 IDs through the device registry and local binding service; names never select
 devices. `prepare_profile` demonstrates conversion into a minimal typed
-`PreparedProfile`: enabled directions, hole identity, device IDs, exact format/mode
-and requested buffer duration. The engine receives prepared requests, not scan
+`PreparedProfile`: enabled directions, hole identity, device IDs, independent
+endpoint preferences, mapping and requested buffer policy. Test paths explicitly
+mark runtime negotiation; their legacy format member is advisory. The engine receives prepared requests, not scan
 matrices/history, and still initializes and validates streams at runtime.
 
 Automatic settings are preferences, not negotiated values. Drafts, missing or
 ambiguous devices and unknown layouts must not become guessed successful routes.
-Current preparation covers exact common tuple/same-mode paths; independent endpoint
-conversion/mapping remains future work. `pcm_s24_in_32` preserves 24 valid bits in
+Preparation accepts independent endpoint preferences without requiring identical
+cached tuples. Actual conversion, mapping and synchronization remain engine work. `pcm_s24_in_32` preserves 24 valid bits in
 a 32-bit container and differs from packed 24-bit PCM. This Test build still has
 no real routing backend. The bundle does not finalize production configuration.
 
@@ -125,3 +128,25 @@ Retained inactive overrides travel with profiles; actual engine observations do 
 Profile payloads also retain the per-hole `routing_engine` request (default
 `automatic`). Inactive future choices survive import/export; current request
 preparation admits only Automatic, without initializing an engine.
+
+
+## November 10, 2026 — owner-authorized profile builder and GUI increment
+
+The owner authorized implementation of the pending GUI refinements, named
+per-profile files and partial routing preferences after review with the audio
+engine agent. [PROFILE_BUILDER.md](PROFILE_BUILDER.md) specifies the implemented
+Test v4 contract, migration/backups, channel indexes/default mapping, independent
+endpoint preferences, Shared-first Automatic policy and runtime handoff. It
+supersedes older Test v3 persistence and advanced-control visibility descriptions.
+The retained override-enable policy is distinct from showing its controls.
+Production backend, conversion and synchronization algorithms remain unselected.
+
+GUI refinements include bottom three-line Device/Profile Notes, Application & Tray
+with opt-in current-user Windows startup and minimized launch, renamed Routing
+Activation controls with inactive delay shown as zero, tutorial confirmation with
+placeholder-only continuation, Windows-themed message dialogs, Low motion using
+the first animation frame, viewport-width device names, immediate hole status
+dots, Material chevrons, Enable return channel, two-line routine status summaries
+(full copy in tooltips; warnings stay complete), normal monitor selector height,
+and powered-on-device guidance before Deep scans. Positive not-present metadata
+failures also recognize SPAPI no-such-device-instance codes E000020B/800F020B.

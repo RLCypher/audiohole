@@ -21,6 +21,19 @@ av::Player player() {
     result.install_baseline(clip("idle", true), 1, 0);
     return result;
 }
+TEST(AvatarReactionHold, LowMotionUsesFirstFrameInsteadOfAuthoredStillAndCanResume) {
+    auto playback = player();
+    auto reaction = clip("happy", true);
+    ASSERT_TRUE(playback.react(reaction, {"happy", "event", 1, 0, 2000, 10, 2000}, 0).accepted);
+    playback.first_frame_only(true);
+    EXPECT_EQ(playback.tick(150).image, reaction->frames.front());
+    playback.reduced_motion(true);
+    EXPECT_EQ(playback.tick(200).image, reaction->frames.front());
+    playback.first_frame_only(false);
+    EXPECT_EQ(playback.tick(220).image, reaction->still);
+    playback.reduced_motion(false);
+    EXPECT_EQ(playback.tick(250).image, reaction->frames.back());
+}
 TEST(AvatarReactionHold, KeepsFinalFrameThenResumesLatestBaselineAtDeadline) {
     // Includes a looping idle clip used as an owned reaction fallback.
     for (bool loop : {false, true}) {
