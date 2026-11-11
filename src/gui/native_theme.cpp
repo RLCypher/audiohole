@@ -1,8 +1,68 @@
 #include "gui/native_theme.h"
+#include <algorithm>
+#include <commctrl.h>
 #include <uxtheme.h>
 #include <windows.h>
 namespace audiohole::gui {
 namespace {
+constexpr UINT_PTR border_subclass = 0x41484244;
+// Paint integral physical-pixel outlines after native paint. Only application
+// input/list/group frames participate; high contrast keeps Windows' own chrome.
+LRESULT CALLBACK border_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lparam, UINT_PTR id,
+                             DWORD_PTR policy) {
+    if (message == WM_NCDESTROY) {
+        RemoveWindowSubclass(handle, border_proc, id);
+        return DefSubclassProc(handle, message, wparam, lparam);
+    }
+    const auto result = DefSubclassProc(handle, message, wparam, lparam);
+    if (message == WM_SETFOCUS || message == WM_KILLFOCUS)
+        RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
+    if ((message != WM_PAINT && message != WM_NCPAINT) || (policy & 2))
+        return result;
+    RECT bounds{};
+    GetWindowRect(handle, &bounds);
+    OffsetRect(&bounds, -bounds.left, -bounds.top);
+    const auto dc = GetWindowDC(handle);
+    if (!dc)
+        return result;
+    const int saved = SaveDC(dc);
+    // GetDpiForWindow is optional on early Windows 10 versions. Do not add an
+    // unconditional loader dependency merely to draw application outlines.
+    using WindowDpi = UINT(WINAPI*)(HWND);
+    static const auto window_dpi = reinterpret_cast<WindowDpi>(
+        GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"));
+    const int dpi =
+        window_dpi ? static_cast<int>(window_dpi(handle)) : GetDeviceCaps(dc, LOGPIXELSX);
+    const int thickness = std::max(2, MulDiv(2, dpi ? dpi : 96, 96));
+    if (policy & 4) {
+        // A native group box's top border passes through its caption's baseline.
+        const auto font = reinterpret_cast<HFONT>(SendMessageW(handle, WM_GETFONT, 0, 0));
+        if (font)
+            SelectObject(dc, font);
+        TEXTMETRICW metric{};
+        GetTextMetricsW(dc, &metric);
+        wchar_t caption[256]{};
+        GetWindowTextW(handle, caption, 256);
+        SIZE text{};
+        GetTextExtentPoint32W(dc, caption, lstrlenW(caption), &text);
+        bounds.top += metric.tmHeight / 2;
+        const int inset = MulDiv(8, dpi ? dpi : 96, 96);
+        ExcludeClipRect(dc, inset / 2, 0, inset + text.cx, metric.tmHeight);
+    }
+    const bool dark = policy & 1;
+    const auto colour = GetFocus() == handle ? RGB(40, 170, 145)
+                        : dark               ? RGB(96, 120, 132)
+                                             : RGB(110, 127, 140);
+    const auto brush = CreateSolidBrush(colour);
+    for (int pixel = 0; pixel < thickness; ++pixel) {
+        FrameRect(dc, &bounds, brush);
+        InflateRect(&bounds, -1, -1);
+    }
+    DeleteObject(brush);
+    RestoreDC(dc, saved);
+    ReleaseDC(handle, dc);
+    return result;
+}
 using AllowWindow = bool(WINAPI*)(HWND, bool);
 using PreferredMode = int(WINAPI*)(int);
 struct ThemeApi {
@@ -38,6 +98,15 @@ void apply(HWND handle, bool dark, bool contrast) {
     wchar_t name[64]{};
     GetClassNameW(handle, name, 64);
     const bool combo = wcscmp(name, L"ComboBox") == 0;
+    const bool group = wcscmp(name, L"Button") == 0 &&
+                       (GetWindowLongPtrW(handle, GWL_STYLE) & BS_TYPEMASK) == BS_GROUPBOX;
+    const auto style = GetWindowLongPtrW(handle, GWL_STYLE);
+    const bool framed_child =
+        (style & WS_CHILD) &&
+        ((style & WS_BORDER) || (GetWindowLongPtrW(handle, GWL_EXSTYLE) & WS_EX_CLIENTEDGE));
+    if (combo || group || framed_child)
+        SetWindowSubclass(handle, border_proc, border_subclass,
+                          (dark ? 1 : 0) | (contrast ? 2 : 0) | (group ? 4 : 0));
     SetWindowTheme(handle,
                    contrast ? nullptr
                    : dark   ? (combo ? L"DarkMode_CFD" : L"DarkMode_Explorer")
@@ -49,6 +118,8 @@ void apply(HWND handle, bool dark, bool contrast) {
         if (GetComboBoxInfo(handle, &info) && info.hwndList && info.hwndList != handle) {
             if (api().allow)
                 api().allow(info.hwndList, dark && !contrast);
+            SetWindowSubclass(info.hwndList, border_proc, border_subclass,
+                              (dark ? 1 : 0) | (contrast ? 2 : 0));
             SetWindowTheme(info.hwndList,
                            contrast ? nullptr
                            : dark   ? L"DarkMode_Explorer"

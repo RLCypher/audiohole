@@ -1,89 +1,60 @@
 {
-  "format": "audiohole-test-configuration",
-  "schema_version": 4,
-  "profiles": [
-    {
-      "display_name": "Microphone monitoring",
-      "notes": "Illustrative provisional Test configuration; device IDs must exist in the separate scanned inventory.",
-      "id": "profile-example",
-      "holes": [
-        {
-          "display_name": "Desk microphone to headphones",
-          "notes": "Names are readable hints; logical device IDs identify the devices. Buffer is a requested duration.",
-          "id": "hole-example",
-          "enabled": true,
-          "duplex": false,
-          "forward": {
-            "source_name": "Desk microphone",
-            "source": "capture-example",
-            "destination_name": "Headphones",
-            "destination": "render-example",
-            "settings": {
-              "preferences": {
-                "common": {
-                  "sample_rate_hz": null,
-                  "channel_count": null,
-                  "sample_format": null,
-                  "mode": null,
-                  "buffer_ms": null
-                },
-                "source": {},
-                "destination": {},
-                "channel_map": []
+  "format": "audiohole-profile",
+  "schema_version": 1,
+  "profile": {
+    "display_name": "Microphone monitoring",
+    "notes": "Illustrative provisional Test configuration; device IDs must exist in the separate scanned inventory.",
+    "id": "profile-example",
+    "holes": [
+      {
+        "display_name": "Desk microphone to headphones",
+        "notes": "Names are readable hints; logical device IDs identify the devices. Buffer is a requested duration.",
+        "id": "hole-example",
+        "enabled": true,
+        "duplex": false,
+        "forward": {
+          "source_name": "Desk microphone",
+          "source": "capture-example",
+          "destination_name": "Headphones",
+          "destination": "render-example",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
               },
-              "automatic": true,
-              "format": {
-                "rate": 48000,
-                "channels": 2,
-                "representation": "float32",
-                "wave": {
-                  "container_bits": 32,
-                  "valid_bits": 32,
-                  "channel_mask": 3,
-                  "format_tag": 65534,
-                  "subformat_guid": "{00000003-0000-0010-8000-00AA00389B71}",
-                  "block_align_bytes": 8,
-                  "average_bytes_per_second": 384000
-                }
-              },
-              "mode": "Automatic",
-              "buffer_ms": 0
+              "source": {},
+              "destination": {},
+              "channel_map": []
             }
-          },
-          "reverse": {
-            "source_name": "",
-            "source": "",
-            "destination_name": "",
-            "destination": "",
-            "settings": {
-              "preferences": {
-                "common": {
-                  "sample_rate_hz": null,
-                  "channel_count": null,
-                  "sample_format": null,
-                  "mode": null,
-                  "buffer_ms": null
-                },
-                "source": {},
-                "destination": {},
-                "channel_map": []
+          }
+        },
+        "reverse": {
+          "source_name": "",
+          "source": "",
+          "destination_name": "",
+          "destination": "",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
               },
-              "automatic": true,
-              "format": {
-                "rate": 48000,
-                "channels": 2,
-                "representation": "float32",
-                "wave": null
-              },
-              "mode": "Automatic",
-              "buffer_ms": 0
+              "source": {},
+              "destination": {},
+              "channel_map": []
             }
-          },
-          "advanced_tuning": false,
-          "routing_engine": "automatic"
-        }
-      ]
-    }
-  ],
-  "devices": []
+          }
+        },
+        "advanced_tuning": false,
+        "routing_engine": "automatic"
+      }
+    ]
+  }
 }

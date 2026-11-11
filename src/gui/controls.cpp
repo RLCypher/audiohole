@@ -85,7 +85,7 @@ WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM 
     return wxChoice::MSWWindowProc(message, wparam, lparam);
 }
 ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
-    Create(parent, id);
+    Create(parent, id, {}, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxTE_PROCESS_ENTER);
 }
 WXDWORD ThemedCombo::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxComboBox::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
@@ -219,7 +219,11 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     brush = CreateSolidBrush(rgb(selected ? wxColour(75, 146, 210)
                                  : dark   ? wxColour(76, 88, 104)
                                           : wxColour(170, 183, 198)));
-    FrameRect(draw->hDC, &draw->rcItem, brush);
+    auto border_rect = draw->rcItem;
+    for (int pixel = 0; pixel < std::max(2, button.FromDIP(2)); ++pixel) {
+        FrameRect(draw->hDC, &border_rect, brush);
+        InflateRect(&border_rect, -1, -1);
+    }
     DeleteObject(brush);
     const int saved = SaveDC(draw->hDC);
     SelectObject(draw->hDC, reinterpret_cast<HFONT>(SendMessageW(
@@ -256,9 +260,10 @@ SurfacePanel::SurfacePanel(wxWindow* parent, const wxString& role)
         const auto border = role == "capture-card" || role == "commentary-card" ? palette::magenta()
                             : role == "playback-card"                           ? palette::mint()
                                                       : wxColour(81, 108, 120);
-        dc.SetPen(wxPen(use_system_colours ? GetForegroundColour() : border, FromDIP(1)));
+        const int thickness = std::max(2, FromDIP(2));
+        dc.SetPen(wxPen(use_system_colours ? GetForegroundColour() : border, thickness));
         dc.SetBrush(wxBrush(GetBackgroundColour()));
-        dc.DrawRoundedRectangle(GetClientRect().Deflate(1), FromDIP(10));
+        dc.DrawRoundedRectangle(GetClientRect().Deflate((thickness + 1) / 2), FromDIP(10));
     });
 }
 void SurfacePanel::set_content_sizer(wxSizer* contents) {

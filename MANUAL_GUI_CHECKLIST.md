@@ -569,3 +569,31 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - Deep confirmation mentions powered-on headsets/monitors/mixers/VR devices.
 - Native Windows GUI, Explorer/registry, rendering, and audio hardware acceptance
   cannot be established by a Linux cross-build. Test Mode still has no streaming.
+
+
+## Current profile contract, Enter and border checks
+
+- [ ] Create basic simplex and return-channel profiles. Save/restart/export/import:
+  named files use `audiohole-profile` record v1; bundle payload uses transfer v5.
+  Direction settings contain preferences, no duplicate legacy audio settings.
+- [ ] Enable overrides, set different source/destination channel requirements and
+  mappings. Hide/reopen tuning: values and eligibility stay unchanged. Disable
+  overrides: settings and mapping become inactive but saved values remain.
+  Reset one direction: the sibling and assignments remain intact.
+- [ ] Inherited fields use endpoint → common → Automatic. Null/blank stays
+  inherited. An unsupported explicit tuple gives feedback without substitution;
+  absent scan evidence does not forbid an Automatic draft. Unknown saved engines
+  are unavailable independently of the override switch.
+- [ ] Rename a device and press Enter: name saves, identity/references do not
+  change. Enter in profile rate/channel/map/buffer saves staged intent, never live
+  Apply. Enter on a checkbox/choice commits the settled selection. Invalid fields
+  show feedback without saving malformed values. Unresolved endpoint search text
+  does not erase an existing assignment.
+- [ ] Enter in Device Notes, Profile Notes and Hole Notes inserts a newline,
+  without saving. Settings numeric entries commit on Enter. Enter in scanner
+  limits/search never starts a scan or saves an unrelated profile.
+- [ ] Inspect buttons, list/input/dropdown/group frames and rounded cards in
+  Light, Dark and Follow System at 100%, 125%, 150%, 200% DPI. Outlines are thicker
+  with readable content/focus/selection, including popup lists; resize/move the
+  window and check for shimmer. Confirm high contrast retains usable native
+  borders. Keep screenshots and Windows smoke results with the assessment.

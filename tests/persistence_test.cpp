@@ -54,12 +54,42 @@ class PersistenceTest : public testing::Test {
         hole.display_name = "Duplex";
         hole.duplex = true;
         hole.forward.source = device.id;
-        hole.forward.settings.buffer_ms = 17;
-        hole.reverse.settings.buffer_ms = 39;
-        hole.reverse.settings.format = {96000, 4, "float32"};
+        hole.forward.settings.set_buffer_preference(17);
+        hole.reverse.settings.set_buffer_preference(39);
+        hole.reverse.settings.preferences.common.sample_rate_hz = 96000;
+        hole.reverse.settings.preferences.common.channel_count = 4;
+        hole.reverse.settings.preferences.common.sample_format = "float32";
+        hole.reverse.settings.refresh_projection();
         record.holes.push_back(hole);
         data.profiles.push_back(record);
         return data;
+    }
+    nlohmann::ordered_json legacy_json(int version) {
+        auto json = nlohmann::ordered_json::parse(read());
+        json["schema_version"] = version;
+        for (auto& profile : json["profiles"])
+            for (auto& hole : profile["holes"])
+                for (const auto* which : {"forward", "reverse"}) {
+                    auto& settings = hole[which]["settings"];
+                    const auto common = settings["preferences"]["common"];
+                    settings["automatic"] = common["sample_rate_hz"].is_null();
+                    settings["format"] = {
+                        {"rate", common["sample_rate_hz"].is_null()
+                                     ? 48000
+                                     : common["sample_rate_hz"].get<int>()},
+                        {"channels", common["channel_count"].is_null()
+                                         ? 2
+                                         : common["channel_count"].get<int>()},
+                        {"representation", common["sample_format"].is_null()
+                                               ? std::string("float32")
+                                               : common["sample_format"].get<std::string>()},
+                        {"wave", nullptr}};
+                    settings["buffer_ms"] =
+                        common["buffer_ms"].is_null() ? 0 : common["buffer_ms"].get<int>();
+                    settings["mode"] = common["mode"].is_null() ? std::string("Automatic")
+                                                                : common["mode"].get<std::string>();
+                }
+        return json;
     }
     void seed() {
         TestJsonPersistence store(file);
@@ -87,8 +117,7 @@ TEST_F(PersistenceTest, RoundTripPreservesIdsUnicodeIndependentDirectionsAndUnkn
 }
 TEST_F(PersistenceTest, LegacyPolicyMigratesExplicitlyAndInactiveManualValuesSurviveRestart) {
     seed();
-    auto legacy = nlohmann::ordered_json::parse(read());
-    legacy["schema_version"] = 2;
+    auto legacy = legacy_json(2);
     auto& hole = legacy["profiles"][0]["holes"][0];
     hole.erase("advanced_tuning");
     hole["extension"] = {{"keep", "user data"}};
@@ -112,7 +141,7 @@ TEST_F(PersistenceTest, LegacyPolicyMigratesExplicitlyAndInactiveManualValuesSur
     EXPECT_FALSE(loaded.profiles[0].holes[0].advanced_tuning);
     EXPECT_EQ(loaded.profiles[0].holes[0].forward, retained);
     const auto json = nlohmann::ordered_json::parse(read());
-    EXPECT_EQ(json.at("schema_version"), 4);
+    EXPECT_EQ(json.at("schema_version"), 5);
     EXPECT_EQ(json["profiles"][0]["holes"][0]["extension"], hole["extension"]);
     EXPECT_TRUE(json["profiles"][0]["holes"][0]["forward"]["settings"]["custom"]["keep"]);
 }
@@ -211,9 +240,9 @@ TEST_F(PersistenceTest, MalformedNewerDuplicateAndFractionalInputNeverGetsOverwr
         EXPECT_EQ(read(), text);
     }
     auto newer = valid;
-    const auto version = newer.find("\"schema_version\": 4");
+    const auto version = newer.find("\"schema_version\": 5");
     ASSERT_NE(version, std::string::npos);
-    newer.replace(version, 19, "\"schema_version\": 5");
+    newer.replace(version, 19, "\"schema_version\": 6");
     write(newer);
     TestJsonPersistence store(file);
     ConfigurationRecords data;
@@ -381,9 +410,9 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
     const auto valid = read();
     for (const auto& invalid : {"1.5", "18446744073709551615"}) {
         auto broken = valid;
-        const auto position = broken.find("\"schema_version\": 4");
+        const auto position = broken.find("\"schema_version\": 5");
         ASSERT_NE(position, std::string::npos);
-        broken.replace(position, std::string("\"schema_version\": 4").size(),
+        broken.replace(position, std::string("\"schema_version\": 5").size(),
                        std::string("\"schema_version\": ") + invalid);
         write(broken);
         TestJsonPersistence provider(file);
@@ -419,10 +448,7 @@ TEST_F(PersistenceTest, DirectionBufferApplyPersistsAloneWithoutActivatingAnEngi
 }
 TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBeforeUpgrade) {
     seed();
-    auto legacy = read();
-    const auto version = legacy.find("\"schema_version\": 4");
-    ASSERT_NE(version, std::string::npos);
-    legacy.replace(version, 19, "\"schema_version\": 1");
+    auto legacy = legacy_json(1).dump(2);
     write(legacy);
     TestJsonPersistence provider(file);
     ConfigurationRecords records;
@@ -432,44 +458,38 @@ TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBefo
     ASSERT_TRUE(provider.save(records).ok);
     std::ifstream backup(file.string() + ".v1.bak", std::ios::binary);
     EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), legacy);
-    EXPECT_NE(read().find("\"schema_version\": 4"), std::string::npos);
+    EXPECT_NE(read().find("\"schema_version\": 5"), std::string::npos);
     const auto bytes = read();
     EXPECT_LT(bytes.find("\"profiles\""), bytes.find("\"devices\""));
     EXPECT_LT(bytes.find("\"display_name\""), bytes.find("\"notes\""));
     EXPECT_LT(bytes.find("\"notes\""), bytes.find("\"id\""));
 }
-TEST_F(PersistenceTest, ExactDescriptorRoundTripsAndInvalidEditsPreserveOriginal) {
+TEST_F(PersistenceTest,
+       PreferencesRoundTripWithoutPersistingNativeCandidatesAndRejectInvalidOverrides) {
     seed();
     TestJsonPersistence provider(file);
     ConfigurationRecords records;
     ASSERT_TRUE(provider.load(records).ok);
-    auto& d = records.profiles[0].holes[0].forward;
-    d.source_name = "Microphone";
-    d.destination_name = "Four channel output";
-    d.settings.automatic = false;
-    d.settings.format = {
-        48000, 4, "pcm_s32",
-        WaveFormat{32, 24, 65534, 51, "{00000001-0000-0010-8000-00AA00389B71}", 16, 768000}};
+    auto& direction = records.profiles[0].holes[0].forward;
+    direction.settings.preferences.common = {48000, 4, {}, "pcm_s24_in_32", {}};
+    direction.settings.refresh_projection();
     ASSERT_TRUE(provider.save(records).ok);
-    TestJsonPersistence restarted(file);
+    const auto json = nlohmann::ordered_json::parse(read());
+    const auto& settings = json["profiles"][0]["holes"][0]["forward"]["settings"];
+    EXPECT_FALSE(settings.contains("format"));
+    EXPECT_FALSE(settings.contains("automatic"));
+    TestJsonPersistence restart(file);
     ConfigurationRecords loaded;
-    ASSERT_TRUE(restarted.load(loaded).ok);
-    EXPECT_EQ(records.profiles, loaded.profiles);
-    auto original = read();
-    d.settings.format.wave->block_align_bytes = 8;
+    ASSERT_TRUE(restart.load(loaded).ok);
+    EXPECT_EQ(loaded.profiles, records.profiles);
+    const auto original = read();
+    direction.settings.preferences.common.channel_count = 0;
     EXPECT_FALSE(provider.save(records).ok);
     EXPECT_EQ(read(), original);
-    d.settings.format.wave->block_align_bytes = 16;
-    d.settings.format.wave->channel_mask.reset();
-    ASSERT_TRUE(provider.save(records).ok);
-    TestJsonPersistence unknown(file);
-    ASSERT_TRUE(unknown.load(loaded).ok);
-    EXPECT_FALSE(loaded.profiles[0].holes[0].forward.settings.format.wave->channel_mask);
 }
 TEST_F(PersistenceTest, ConflictingV1BackupBlocksUpgradeWithoutChangingEitherFile) {
     seed();
-    auto legacy = read();
-    legacy.replace(legacy.find("\"schema_version\": 4"), 19, "\"schema_version\": 1");
+    auto legacy = legacy_json(1).dump(2);
     write(legacy);
     const auto backup = file.string() + ".v1.bak";
     std::ofstream(backup, std::ios::binary) << "Earlier user backup";
@@ -483,8 +503,7 @@ TEST_F(PersistenceTest, ConflictingV1BackupBlocksUpgradeWithoutChangingEitherFil
 }
 TEST_F(PersistenceTest, V1FormatExtensionsSurviveExplicitUpgrade) {
     seed();
-    auto old = nlohmann::ordered_json::parse(read());
-    old["schema_version"] = 1;
+    auto old = legacy_json(1);
     auto& f = old["devices"][0]["formats"][0];
     f.erase("wave");
     f["user_annotation"] = "Keep my external format notes";

@@ -1,27 +1,56 @@
-# Profile builder and engine handoff — provisional Test v4
+# Profile builder and engine handoff
 
-Owner-authorized November 10, 2026. This implements portable routing intent and
-GUI/storage changes. It does not select a streaming backend, implement conversion
-or synchronization, or claim successful hardware routing. Test Mode has no audio
-engine. These rules supersede earlier Test v3 descriptions where stated below.
+This is the current development contract, authorized by the owner after review
+with the engine agent. It replaces the earlier Test v4 contract. The owner will
+regenerate development profiles; compatibility with older development builds is
+not an acceptance requirement. Production storage decisions O-004/O-006 and the
+streaming backend remain open. Test Mode does not route audio.
 
-## Saved intent
+## Canonical storage boundary
 
-Each profile retains its display name, notes, stable ID and ordered holes. Each
-hole retains its name/notes/ID, enabled flag, return-channel flag (`duplex`),
-`routing_engine`, override policy (`advanced_tuning`), and independent `forward`
-and `reverse` directions. The visible caption is Return; the JSON key remains
-`reverse`. Source/destination IDs refer to the device registry. Names are readable
-hints; renames do not change identities. Hidden devices are excluded from new
-choices while existing references survive.
+`profiles/<display name>.json` is an **individual profile record**:
 
-Basic mode requires endpoint assignments and simplex/return selection only.
-No successful Deep test or identical source/destination format is required to
-prepare Automatic intent. Disconnected/unresolved references remain saveable;
-validity, availability and operational success are separate. Runtime initialization
-still rejects unresolved bindings and must report actual failures.
+```json
+{
+  "format": "audiohole-profile",
+  "schema_version": 1,
+  "profile": {
+    "display_name": "Desktop audio",
+    "notes": "User notes",
+    "id": "stable-profile-id",
+    "holes": []
+  }
+}
+```
 
-Version 4 extends `settings` with `preferences`:
+See [the complete example](docs/test-profile-example.json). Record version 1 is
+independent of the **aggregate transfer wrapper** used inside profile bundles:
+`audiohole-test-configuration`, `schema_version: 5`, `profiles: [...]`,
+`devices: []`. The wrapper can also carry `profile_record_extensions`, an opaque
+map of individual-envelope extensions keyed by profile ID. It is transfer
+metadata, not routing intent. `validate_profile_record` validates individual
+records; `validate_test_document` validates the aggregate. They are not
+interchangeable. Unknown/newer record versions reject without rewriting files.
+
+Profiles retain names, notes, stable IDs and ordered holes. Each hole retains
+its name/notes/ID, `enabled`, `duplex`, `advanced_tuning`, `routing_engine`, and
+independent `forward` and `reverse` directions. The GUI calls `reverse` Return.
+Logical device IDs reference the separate scanned registry; names are readable
+hints. Hidden devices are excluded from new choices, but existing references
+survive hiding, disconnection and renaming. Profiles do not embed scan matrices,
+current Windows bindings, negotiated formats, health or actual buffer values.
+
+Basic configuration needs endpoint assignments and simplex/return selection
+only. Missing devices can remain in valid saved drafts. Scan/deep-test success
+is not a prerequisite for saving or preparing Automatic intent. Starting a route
+still requires unambiguous local bindings and successful runtime initialization.
+
+## Authoritative preferences
+
+Each direction's `settings` writes **only `preferences`**, plus retained opaque
+extensions. No duplicate `automatic`, `format`, `mode` or `buffer_ms` settings are
+emitted. Current preferences never fall back to those obsolete fields, including
+when properties or the entire preferences object are omitted.
 
 ```json
 "preferences": {
@@ -34,107 +63,107 @@ Version 4 extends `settings` with `preferences`:
   },
   "source": {},
   "destination": {},
-  "channel_map": [
-    { "source": 0, "destination": 2 },
-    { "source": 1, "destination": 3 }
-  ]
+  "channel_map": []
 }
 ```
 
-`common`, `source`, and `destination` accept the same five preference keys.
-Source/destination values override common values independently. Missing, null,
-empty-string or `Automatic` values mean no override at that scope. They inherit
-common values or Automatic policy. Buffer zero also means Automatic for legacy
-compatibility; never allocate a zero-sized buffer. Canonical output writes null
-for automatic known properties. Invalid types, fractional integers, out-of-range
-values, malformed maps and unknown sample-format/mode identifiers are rejected.
-Rates: 1–768000 Hz; channel counts: 1–256; explicit buffers: 1–100 ms. These are
-serialization bounds, not claims about hardware support.
+Each of `common`, `source`, `destination` accepts the same five keys. With
+advanced overrides enabled, resolve **each property independently**:
 
-Sample-format IDs: `float32`, `pcm_s16`, `pcm_s24_packed`, `pcm_s24_in_32`, `pcm_s32`.
-The last two 24-bit forms have different transport containers. Native tags, GUIDs,
-block alignment and byte rates can be derived by `derive_pcm_format`; channel
-layout remains unknown unless established separately. Users do not supply these
-transport details to express a preference.
+1. Explicit endpoint value.
+2. Explicit common value.
+3. Application Automatic policy.
 
-The legacy `automatic` flag covers the legacy whole-format preset only; it is
-not a direction-wide mode/buffer switch. Legacy `format` is advisory when true;
-when false it remains an exact retained override. In v4, omitted settings and an omitted unused Return direction use Automatic draft defaults.
-GUI v4 edits use per-property
-preferences and set that flag true. `settings.mode` and `settings.buffer_ms` are
-retained compatibility preferences, used when the corresponding common preference
-is absent. GUI edits keep them consistent. More specific endpoint preferences
-remain independent and round-trip even though the GUI currently edits common
-preferences, endpoint channel counts and mapping. Cached format/WAVE values must not force negotiation.
+`null` means **inherit**, not unknown capability. Missing properties/objects and
+empty strings or `Automatic` normalize to inheritance. Buffer zero also normalizes
+to inheritance; it must never allocate a zero-sized buffer. Canonical output
+writes null for inherited known properties. Rates are integer 1–768000 Hz;
+channel counts integer 1–256; explicit buffers integer 1–100 milliseconds.
+Access modes are `Shared` and `Exclusive`. Sample formats are `float32`,
+`pcm_s16`, `pcm_s24_packed`, `pcm_s24_in_32`, `pcm_s32`. Malformed types,
+fractional integers, invalid enums and out-of-range values reject separately from
+Automatic. These are serialization limits, not promises about hardware support.
 
-## Channel rules
+Explicit settings are **requirements**, with no silent fallback. Explain known
+unsupported tuples and runtime initialization failures. Missing/inconclusive scan
+evidence is not rejection. Native tags, GUIDs, block alignment and byte rate are
+derived and validated from effective formats; users do not enter them. Channel
+layout remains unknown until independently established.
 
-JSON indexes are zero-based interleaved PCM frame indexes. The GUI uses one-based
-numbers (`1:3, 2:4`) and translates them explicitly. One output can have one source;
-a source can feed multiple outputs. This is selection/copy, not summing/mixing.
-Unmapped outputs are silent. An empty map uses matching frame indexes up to the
-smaller endpoint channel count and silences additional outputs; it does not infer
-hardware bus labels, duplicate mono to stereo, or downmix multichannel audio.
-Runtime must check every explicit index against the actual negotiated channel
-counts before starting. Endpoint-specific channel counts can differ.
+## Independent policy controls
 
-## Advanced controls and application
+- **Use advanced overrides** (`advanced_tuning`): off retains saved preferences
+  and maps but resolves all of them automatically. On applies saved values, with
+  unspecified values inheriting. This includes channel mapping.
+- **Show advanced tuning**: visibility only; showing/hiding never changes intent
+  or a running route.
+- **Reset to Automatic**: explicitly clears the selected direction's preferences
+  and mapping, preserving assignments and the sibling direction.
+- **Enabled**: enables the hole independently of overrides.
+- **Routing Engine**: independent per-hole backend request. Only `automatic` is
+  available. An unknown saved engine remains visible as unavailable and prevents
+  activating that enabled hole even with overrides off. Choosing Automatic is
+  explicit; no fallback engine is silently substituted.
 
-“Show advanced tuning” only shows/hides controls. It does not change overrides,
-mark the draft dirty, or affect a running route. “Use advanced overrides” retains
-v3's separate policy: off ignores retained manual preferences; on makes them
-eligible. “Reset to Automatic” clears that direction's format/mode/buffer/map and
-endpoint preferences explicitly. It leaves endpoint assignments and the other
-direction intact. Routing Engine remains an independent per-hole backend request;
-only `automatic` is currently available. Save stages configuration; Apply remains
-explicit. Buffer-only Apply updates the compatibility field and canonical buffer
-preference together in saved records and the matching Preview live direction,
-including the first override from Automatic. It leaves unrelated editor changes
-staged and does not modify the other direction. Automatic access initially requests Shared and does not silently fall
-back to Exclusive in Test preparation.
+Save persists intent. Apply remains a separate operation. Enter in an editable
+configuration field saves through its existing Save action, never live Apply.
+Notes are multiline and Enter inserts a newline. Directional buffer Apply saves
+only that buffer preference, preserving other staged edits and the sibling.
 
-`PreparedProfile` is built on the control side. Its Test paths explicitly mark
-`runtime_negotiation: true` and carry preferences/channel policy. The legacy
-`format` member is only a candidate for these paths, never a mandatory engine
-format. The engine resolves capture/playback independently, applies supported
-conversion/mapping and its buffering/synchronization policy, then publishes actual
-formats, periods, backend/modes and explanations as runtime status. JSON parsing,
-registry lookup and scan processing stay outside real-time callbacks. Known
-explicit rejection is reported; absent/inconclusive evidence is not a rejection.
-No full engine-status implementation is introduced by this GUI increment.
+## Channel mapping
 
-## Named profile files and migration
+`channel_count` is stream width, not channel selection. Maps use zero-based PCM
+frame indexes in JSON. The GUI uses one-based pairs, e.g. `1:3, 2:4`.
 
-Application Test storage now uses `profiles/<display name>.json`. Each file uses
-the v4 Test envelope with exactly one profile and an empty devices array. A hidden
-`profiles/.state.json` preserves aggregate extensions and legacy fixture devices;
-scanner device records remain authoritative in `devices/`. Filenames sanitize
-Windows-forbidden characters and reserved names; collisions are rejected rather
-than overwriting another profile. A rename replaces the filename while retaining
-IDs, notes, references and unknown extension data. Newly created profiles/holes
-use the next available `(1)`, `(2)`, etc. name suffix.
+- Empty `channel_map: []` means **automatic default index mapping**, not no audio:
+  connect matching indexes up to the smaller channel count, silence additional
+  outputs, and discard unmatched source channels.
+- A nonempty map connects the specified indexes; unmapped outputs are silent and
+  unmatched sources are discarded. One output has one source; a source may feed
+  several outputs. This does not sum/mix channels.
+- Indexes must be 0–255 and fit explicit channel counts; runtime validates them
+  against negotiated counts. There are at most 256 routes.
 
-Existing v1/v2/v3 aggregate configuration loads without rewriting. The first
-explicit save writes named v4 files and preserves the exact aggregate under
-`local/legacy-profiles/configuration.json`; older `.v1.bak`, `.v2.bak`, `.v3.bak`
-files are moved there when a matching safe backup can be made. Conflicting
-migration backups block the save. Legacy manual tuning stays active if it was
-active; false gates remain false. Legacy explicit format fields become common
-preferences. IDs, notes and unknown data survive. Newer or malformed data blocks
-saving. Old builds cannot read the new v4 files.
+This does not identify physical mixer buses, duplicate mono automatically, or
+infer a multichannel downmix. Forward and Return, and each endpoint's requirements,
+remain independent through preparation, failure and recovery.
 
-Each save stages a complete sibling folder, rechecks the loaded file set/bytes,
-then swaps directory names. `.profiles-previous` is the recoverable preceding
-generation; a later save archives it under `local/profile-backups/`. An interrupted
-swap restores the previous folder on load if the current folder is absent.
-Abandoned staging folders are archived on the next save. This is recoverable
-multi-file replacement, not an OS-level compare-and-swap against an external
-writer racing the final recheck, or a guarantee against power loss. Links and
-Windows reparse points are rejected. Files are not deleted before a complete
-replacement has been staged.
+## Engine boundary
 
-Profile exports retain the aggregate `configuration.json` transfer payload for
-bundle compatibility. Exports assemble named files; imports validate and preview
-conflicts, import referenced device/history records, and commit named profiles
-last. A failed profile stage rolls back newly created device/history files.
-Imported profiles do not start routing or authorize Windows startup.
+`prepare_profile` builds typed requests on the control thread, leaving its output
+unchanged on failure. Test requests carry `runtime_negotiation: true`, effective
+`preferences`, inherited `source_requirements` / `destination_requirements`, and
+`channel_policy` (`default_index_mapping` or `explicit_index_mapping`). Transient
+legacy UI projection fields and the prepared `format` candidate are advisory;
+only effective preferences impose requirements. Do not persist these candidates.
+
+Automatic initially favors shared access and conservative engine-selected
+buffering. It never silently escalates to disruptive exclusive access. The engine
+must resolve endpoints independently, apply its supported conversion/mapping and
+clock-synchronization policy, and publish actual formats, buffers, modes, backend,
+health and selection explanations through runtime status. No engine or conversion
+algorithm is selected by this GUI work. JSON, registry/scanner work, allocation
+and GUI updates stay outside real-time callbacks.
+
+## Filenames and preservation
+
+Display names determine filenames; IDs determine identity. Windows-forbidden
+characters/reserved names are sanitized. Filename collisions reject instead of
+overwriting records. Renames preserve IDs, references, notes and unknown nested
+extensions. New Profile/New Hole names receive the next free `(1)`, `(2)`, etc.
+
+`.state.json` preserves aggregate extensions and legacy fixture data. Envelope
+extensions survive rename and bundle transfer through the ID-keyed transport map.
+A save stages a complete sibling folder, rechecks original bytes/file sets, then
+swaps directories. The previous generation is recoverable; older generations are
+archived under `local/profile-backups/`. Links/reparse points and conflicting
+external edits reject. This is recoverable multi-file replacement, not a promise
+of an OS-level compare-and-swap or power-loss atomicity.
+
+The existing reader still accepts development aggregate versions 1–4. On an
+explicit save, old manual settings translate once into preferences; Automatic's
+cached format is never promoted to an override. Current preferences never consult
+legacy fields. Original aggregates are archived under `local/legacy-profiles/`.
+Unknown old format annotations move under `legacy_format_extensions`, with no
+operational meaning; conflicting annotations block replacement. This existing
+read path is a convenience, not a commitment to support older development builds.

@@ -79,10 +79,8 @@ class ConfigurationBundle : public testing::Test {
         h.notes = "Keep this hole's notes";
         h.forward.source = device_id;
         h.forward.destination = "render-not-yet-configured";
-        h.forward.settings.automatic = false;
-        h.forward.settings.format = {
-            48000, 2, "pcm_s24_in_32",
-            WaveFormat{32, 24, 65534, 3, "{00000001-0000-0010-8000-00AA00389B71}", 8, 384000}};
+        h.forward.settings.preferences.common = {48000, 2, {}, "pcm_s24_in_32", {}};
+        h.forward.settings.refresh_projection();
         p.holes.push_back(h);
         ASSERT_TRUE(controller.save(p, false).ok);
         auto config = Json::parse(bytes(source / "configuration.json"));
@@ -128,7 +126,7 @@ TEST_F(ConfigurationBundle,
     const auto& p = restarted.snapshot().profiles.front();
     EXPECT_EQ(p.holes[0].forward.source, device_id);
     EXPECT_EQ(p.holes[0].notes, "Keep this hole's notes");
-    EXPECT_EQ(p.holes[0].forward.settings.format.wave->valid_bits, 24);
+    EXPECT_EQ(p.holes[0].forward.settings.preferences.common.sample_format, "pcm_s24_in_32");
     EXPECT_EQ(
         Json::parse(bytes(target / "configuration.json"))["profiles"][0]["custom_profile_data"],
         "preserve");
@@ -175,6 +173,16 @@ TEST_F(ConfigurationBundle, InactiveTuningAndFutureEngineRequestTravelWithProfil
 TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyExplicit) {
     auto legacy = Json::parse(bytes(source / "configuration.json"));
     legacy["schema_version"] = 2;
+    for (const auto* which : {"forward", "reverse"}) {
+        auto& settings = legacy["profiles"][0]["holes"][0][which]["settings"];
+        settings["automatic"] = which == std::string("reverse");
+        settings["format"] = {{"rate", 48000},
+                              {"channels", 2},
+                              {"representation", "pcm_s24_in_32"},
+                              {"wave", nullptr}};
+        settings["buffer_ms"] = 0;
+        settings["mode"] = "Automatic";
+    }
     legacy["profiles"][0]["id"] = "legacy-profile";
     legacy["profiles"][0]["display_name"] = "Legacy profile";
     legacy["profiles"][0]["holes"][0]["id"] = "legacy-hole";

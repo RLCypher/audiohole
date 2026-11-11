@@ -11,7 +11,8 @@ TEST(AdvancedTuning, NewHolesIgnoreRetainedUnsupportedOverridesUntilExplicitlyEn
     auto& hole = candidate.holes.front();
     EXPECT_FALSE(controller.make_hole().advanced_tuning);
     EXPECT_FALSE(hole.advanced_tuning);
-    hole.forward.settings = {false, {96000, 2, "float32"}, 20, "Exclusive"};
+    hole.forward.settings.preferences.common = {96000, 2, 20, "float32", "Exclusive"};
+    hole.forward.settings.refresh_projection();
     const auto retained = hole.forward;
     PreparedProfile request;
     ASSERT_TRUE(prepare_profile(controller.snapshot(), candidate, request).ok);
@@ -34,8 +35,9 @@ TEST(AdvancedTuning, DuplexDirectionsKeepIndependentOverridesAndIndividualAutoma
     auto candidate = controller.snapshot().profiles[1];
     auto& hole = candidate.holes.front();
     hole.advanced_tuning = true;
-    hole.forward.settings.buffer_ms = 11;
-    hole.forward.settings.mode = "Exclusive";
+    hole.forward.settings.set_buffer_preference(11);
+    hole.forward.settings.preferences.common.mode = "Exclusive";
+    hole.forward.settings.refresh_projection();
     // Reverse remains format/mode/buffer Automatic, independently of Forward.
     PreparedProfile prepared;
     ASSERT_TRUE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
@@ -61,7 +63,7 @@ TEST(AdvancedTuning, SavingPolicyDoesNotStartOrReconfigureTheLiveCopy) {
     controller.advance(300);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 6);
     candidate.holes.front().advanced_tuning = true;
-    candidate.holes.front().forward.settings.buffer_ms = 17;
+    candidate.holes.front().forward.settings.set_buffer_preference(17);
     ASSERT_TRUE(controller.save(candidate, false).ok);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 6);
     // A directional update cannot opt an automatic live route into Advanced.
@@ -97,7 +99,7 @@ TEST(AdvancedTuning, ManualAcknowledgmentRequiresAConfirmedSimulatedApplication)
     ASSERT_TRUE(controller.activate(candidate.id).ok); // All parameters Automatic.
     controller.advance(300);
     EXPECT_EQ(count(), 0);
-    candidate.holes.front().forward.settings.buffer_ms = 15;
+    candidate.holes.front().forward.settings.set_buffer_preference(15);
     ASSERT_TRUE(controller.save(candidate, true).ok);
     EXPECT_EQ(count(), 0);
     controller.advance(300);
@@ -126,7 +128,7 @@ TEST(AdvancedTuning, AuthoredPersonalityReactionsKeepFactsAndConfigurationIndepe
     }
     EXPECT_EQ(controller.snapshot().profiles, original);
 }
-TEST(AdvancedTuning, RoutingEngineIsAnInertAutomaticRequestAndUnknownChoicesStayInactive) {
+TEST(AdvancedTuning, RoutingEngineSelectionIsIndependentOfOverrideEligibility) {
     SimulatedController controller;
     auto candidate = controller.snapshot().profiles.front();
     auto& hole = candidate.holes.front();
@@ -135,8 +137,7 @@ TEST(AdvancedTuning, RoutingEngineIsAnInertAutomaticRequestAndUnknownChoicesStay
     ASSERT_TRUE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
     EXPECT_EQ(prepared.paths.front().routing_engine, "automatic");
     hole.routing_engine = "future-test-engine";
-    ASSERT_TRUE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
-    EXPECT_EQ(prepared.paths.front().routing_engine, "automatic");
+    EXPECT_FALSE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
     EXPECT_EQ(hole.routing_engine, "future-test-engine");
     hole.advanced_tuning = true;
     const auto unavailable = prepare_profile(controller.snapshot(), candidate, prepared);

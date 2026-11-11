@@ -60,6 +60,8 @@ struct Preferences {
     bool operator==(const Preferences&) const = default;
 };
 struct Settings {
+    // Transient UI projection only. Persistent and runtime intent comes solely
+    // from preferences; legacy documents are translated by the loader.
     bool automatic = true;
     Format format;
     int buffer_ms = 0; // Zero requests Automatic, not a zero-length engine buffer.
@@ -68,7 +70,10 @@ struct Settings {
     // Keep the compatibility field and canonical preference synchronized.
     // Zero requests Automatic; invalid durations throw before changing either.
     void set_buffer_preference(int milliseconds);
-    bool operator==(const Settings&) const = default;
+    void refresh_projection();
+    bool operator==(const Settings& other) const {
+        return preferences == other.preferences;
+    }
 };
 struct Direction {
     std::string source, destination;
@@ -148,10 +153,13 @@ struct RoutingPathRequest {
     int buffer_ms = 0; // Zero leaves buffer selection to the future engine.
     std::string routing_engine = "automatic";
     Preferences preferences;
+    EndpointPreferences source_requirements, destination_requirements;
     // The legacy format above is a candidate only when runtime_negotiation is
     // true. An engine must resolve each endpoint independently before opening.
     bool runtime_negotiation = false;
-    std::string channel_policy = "index_order_silence_unmapped";
+    // Default maps equal zero-based indexes, silences extra destination channels
+    // and discards unmatched sources. Explicit maps never infer physical buses.
+    std::string channel_policy = "default_index_mapping";
 };
 struct PreparedProfile {
     std::string profile_id;
@@ -159,8 +167,8 @@ struct PreparedProfile {
 };
 // Returns a complete request on success; leaves output unchanged on failure.
 Result prepare_profile(const Snapshot&, const Profile&, PreparedProfile&);
-// Full-save enrichment of name hints and cached automatic candidates. Does not
-// change IDs, manual overrides or drafts without matching evidence.
+// Full-save enrichment of name hints and transient UI projections. Never copies
+// scan candidates into saved intent or changes IDs and explicit preferences.
 void describe_profile(const Snapshot&, Profile&);
 const Endpoint* endpoint(const Snapshot&, const std::string& id);
 // Offered new bindings. Existing references are resolved separately, including
@@ -173,6 +181,8 @@ Recommendation recommend(const Snapshot&, const Direction&);
 Direction effective_direction(const Hole&, bool reverse = false);
 // Validates portable intent without demanding a connected device or scan result.
 Result validate_preferences(const Preferences&);
+EndpointPreferences inherit_preferences(const EndpointPreferences& common,
+                                        const EndpointPreferences& endpoint);
 // Construct PCM transport details from ordinary preferences. Incomplete
 // preferences return no descriptor; runtime negotiation still owns selection.
 std::optional<Format> derive_pcm_format(const EndpointPreferences&);

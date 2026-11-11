@@ -45,7 +45,7 @@ void Frame::build_settings() {
     startup_target_ = choices(startup_box, startup_group, "Profile on startup", {});
     label(startup_box, startup_group, "Routing activation delay (seconds)");
     delay_ = new wxSpinCtrl(startup_box, wxID_ANY, "5", wxDefaultPosition, FromDIP(wxSize(75, -1)),
-                            wxSP_ARROW_KEYS, 0, 300, 5);
+                            wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 300, 5);
     startup_group->Add(delay_, 0, wxALL, FromDIP(4));
     notifications_->SetSelection(preferences_->values().notifications);
     startup_->SetSelection((preferences_->values().startup_mode + 2) % 3);
@@ -71,6 +71,14 @@ void Frame::build_settings() {
     for (auto* choice : {notifications_, startup_, startup_target_})
         choice->Bind(wxEVT_CHOICE, [save_startup](wxCommandEvent&) { save_startup(); });
     delay_->Bind(wxEVT_SPINCTRL, [save_startup](wxSpinEvent&) { save_startup(); });
+    delay_->Bind(wxEVT_TEXT_ENTER, [this, save_startup](wxCommandEvent&) {
+        long value = 0;
+        if (!delay_->GetTextValue().ToLong(&value) || value < 0 || value > 300) {
+            show_result({false, "Enter a routing activation delay from 0 to 300 seconds."});
+            return;
+        }
+        save_startup();
+    });
     auto* row = new wxWrapSizer(wxHORIZONTAL);
     auto* startup_preview = button(startup_box, row, "Preview startup", [this] {
         if (startup_->GetSelection() == 2) {

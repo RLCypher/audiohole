@@ -1036,8 +1036,9 @@ bool Frame::smoke(const wxString& directory) {
             Direction retained_mode;
             advanced_tuning_->SetValue(true); // Explicitly read manual inputs for this check.
             read_direction(forward_, retained_mode);
-            require(retained_mode.settings.mode == unknown_mode.settings.mode,
-                    "Editing silently replaced an unrecognized saved mode");
+            require(!retained_mode.settings.preferences.common.mode &&
+                        retained_mode.settings.mode == "Automatic",
+                    "A transient legacy mode overrode current inherited preferences");
             load_hole(selected);
         }
         require(device_evidence_->HasFlag(wxTE_WORDWRAP) &&
@@ -1306,6 +1307,35 @@ bool Frame::smoke(const wxString& directory) {
             exercise_tuning();
             rename_hole("Persistent named hole");
             save(false);
+            {
+                const auto original_notes = profile_notes_->GetValue();
+                const auto original_revision = controller_->snapshot().revision;
+                profile_notes_->AppendText("\nStaged note");
+                require(controller_->snapshot().revision == original_revision &&
+                            profile_notes_->HasFlag(wxTE_MULTILINE) &&
+                            hole_notes_->HasFlag(wxTE_MULTILINE),
+                        "Editing notes unexpectedly saved or lost multiline input");
+                forward_.rate->SetValue("44100");
+                wxCommandEvent enter(wxEVT_TEXT_ENTER, forward_.rate->GetId());
+                forward_.rate->GetEventHandler()->ProcessEvent(enter);
+                wxTheApp->ProcessPendingEvents();
+                const auto* saved = profile(controller_->snapshot(), viewed_);
+                require(
+                    saved &&
+                        saved->holes.front().forward.settings.preferences.common.sample_rate_hz ==
+                            44100 &&
+                        !dirty_,
+                    "Enter did not save profile tuning and staged notes");
+                profile_notes_->ChangeValue(original_notes);
+                forward_.rate->SetValue("");
+                forward_.rate->GetEventHandler()->ProcessEvent(enter);
+                wxTheApp->ProcessPendingEvents();
+                require(!profile(controller_->snapshot(), viewed_)
+                                ->holes.front()
+                                .forward.settings.preferences.common.sample_rate_hz &&
+                            !dirty_,
+                        "Enter did not save an inherited Automatic value");
+            }
             decline_delete(profiles_);
             decline_delete(holes_);
             decline_delete(profiles_, profile_remove_);
@@ -1350,6 +1380,25 @@ bool Frame::smoke(const wxString& directory) {
         }
         require(capture_devices_ && playback_devices_ && capture_devices_ != playback_devices_,
                 "Devices must have separate capture and playback lists");
+        {
+            const auto* selected = endpoint(controller_->snapshot(), device_id_);
+            require(selected != nullptr, "Enter-save device fixture missing");
+            const auto original = *selected;
+            device_name_->SetValue("Enter-save device fixture");
+            wxCommandEvent enter(wxEVT_TEXT_ENTER, device_name_->GetId());
+            device_name_->GetEventHandler()->ProcessEvent(enter);
+            wxTheApp->ProcessPendingEvents();
+            const auto* saved = endpoint(controller_->snapshot(), original.id);
+            require(saved && saved->display_name == "Enter-save device fixture" &&
+                        saved->windows_name == original.windows_name && !device_dirty_,
+                    "Enter failed to save a device name or changed identity");
+            device_name_->SetValue(text(original.display_name));
+            device_name_->GetEventHandler()->ProcessEvent(enter);
+            wxTheApp->ProcessPendingEvents();
+            require(endpoint(controller_->snapshot(), original.id)->display_name ==
+                        original.display_name,
+                    "Enter-save device fixture did not restore its name");
+        }
         decline_delete(profiles_);
         decline_delete(holes_);
         decline_delete(profiles_, profile_remove_);

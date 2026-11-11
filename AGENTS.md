@@ -1317,3 +1317,15 @@ the remaining suite and publishes a package only after all checks pass. Do not
 weaken or remove meaningful assertions to make a build pass; update obsolete
 assumptions to match the intended behavior and make failures identify the control
 and condition involved.
+
+
+## Owner-authorized profile authority and GUI refinements
+
+The current owner assignment authorizes the contract in PROFILE_BUILDER.md:
+preferences-only current intent, independent override eligibility and visibility,
+endpoint inheritance, independent engine selection, individual record v1 versus
+transfer wrapper v5, thicker DPI-aware outlines and Enter-to-save outside notes.
+This supersedes conflicting earlier Test v4 rules. The owner will regenerate
+profiles; do not expand compatibility work for old development versions.
+Production architecture decisions remain Open. Review affected native smoke
+checks before pushing and report native execution as pending when unavailable.

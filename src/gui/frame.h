@@ -153,6 +153,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     void poll_avatar();
     void stop_avatar();
     bool smoke_ = false, loading_ = false, dirty_ = false;
+    bool enter_save_pending_ = false;
+    void queue_field_save(bool device);
     audiohole::Profile draft_;
     int hole_index_ = -1;
     std::string viewed_, device_id_;

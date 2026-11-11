@@ -1919,3 +1919,39 @@ dots, Material chevrons, Enable return channel, two-line routine status summarie
 (full copy in tooltips; warnings stay complete), normal monitor selector height,
 and powered-on-device guidance before Deep scans. Positive not-present metadata
 failures also recognize SPAPI no-such-device-instance codes E000020B/800F020B.
+
+
+## Current development profile contract
+
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) supersedes the earlier Test v4 rules:
+individual `audiohole-profile` records use version 1; aggregate
+`audiohole-test-configuration` transfer payloads use version 5. The ZIP bundle
+manifest remains version 1. Current settings write only authoritative
+`preferences`; missing/null values never revive obsolete format/mode/buffer
+fields. With overrides enabled, each property inherits endpoint → common →
+Automatic policy. With overrides disabled, retained settings **and mappings** are
+inactive. Visibility changes neither policy nor values. Hole enable and routing
+engine selection are independent. Empty maps use default index mapping, silence
+extra outputs and discard unmatched sources. Explicit requirements do not fall
+back silently. Native descriptors and runtime results are not saved intent.
+
+The owner will regenerate development profiles; older-build compatibility is not
+an acceptance requirement. The existing legacy reader remains a convenience.
+Production O-004/O-006 and backend/conversion/synchronization decisions remain open.
+
+
+## Border and Enter refinements
+
+Application buttons, input/dropdown/list frames and rounded cards use outlines
+at least two physical pixels thick, scaled from two DIPs. Integral-pixel native
+outlines avoid fractional-width strokes. Windows high contrast retains native
+input chrome. This change requires native visual inspection at multiple DPIs;
+a successful cross-build does not establish that shimmer is eliminated.
+
+Enter saves editable device/profile fields through their existing Save action,
+without starting routing or applying live profile changes. Profile/hole rename
+dialog acceptance saves the renamed draft. Notes remain multiline: Enter inserts
+a newline. Endpoint search text must be resolved to a listed device before saving;
+no identity is guessed. Repeated queued Enter events coalesce and cannot save a
+different record after navigation. Settings entries commit their existing setting;
+scan/search controls do not acquire an implicit Start or unrelated Save action.

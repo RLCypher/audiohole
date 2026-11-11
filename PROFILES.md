@@ -1503,3 +1503,22 @@ dots, Material chevrons, Enable return channel, two-line routine status summarie
 (full copy in tooltips; warnings stay complete), normal monitor selector height,
 and powered-on-device guidance before Deep scans. Positive not-present metadata
 failures also recognize SPAPI no-such-device-instance codes E000020B/800F020B.
+
+
+## Current development profile contract
+
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) supersedes the earlier Test v4 rules:
+individual `audiohole-profile` records use version 1; aggregate
+`audiohole-test-configuration` transfer payloads use version 5. The ZIP bundle
+manifest remains version 1. Current settings write only authoritative
+`preferences`; missing/null values never revive obsolete format/mode/buffer
+fields. With overrides enabled, each property inherits endpoint → common →
+Automatic policy. With overrides disabled, retained settings **and mappings** are
+inactive. Visibility changes neither policy nor values. Hole enable and routing
+engine selection are independent. Empty maps use default index mapping, silence
+extra outputs and discard unmatched sources. Explicit requirements do not fall
+back silently. Native descriptors and runtime results are not saved intent.
+
+The owner will regenerate development profiles; older-build compatibility is not
+an acceptance requirement. The existing legacy reader remains a convenience.
+Production O-004/O-006 and backend/conversion/synchronization decisions remain open.

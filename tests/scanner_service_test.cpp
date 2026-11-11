@@ -950,7 +950,8 @@ TEST_F(ScannerIntegration, RoutingChoicesUseExactModeSpecificDescriptorsAndPrese
     ASSERT_TRUE(prepare_profile(shared_preferred, p, shared_plan).ok);
     EXPECT_EQ(shared_plan.paths[0].mode, "Shared");
     const auto original = plan.paths;
-    d.settings.mode = "Exclusive";
+    d.settings.preferences.common.mode = "Exclusive";
+    d.settings.refresh_projection();
     EXPECT_TRUE(recommend(snapshot, d).compatible.empty());
     p.holes.front().forward = d;
     p.holes.front().advanced_tuning = true;
@@ -964,7 +965,8 @@ TEST_F(ScannerIntegration, RoutingChoicesUseExactModeSpecificDescriptorsAndPrese
     EXPECT_FALSE(prepare_profile(snapshot, p, plan).ok);
     EXPECT_EQ(plan.paths[0].mode, before_unavailable[0].mode);
     snapshot.endpoints.front().availability = Availability::Available;
-    d.settings.mode = "Automatic";
+    d.settings.preferences.common.mode.reset();
+    d.settings.refresh_projection();
     snapshot.endpoints.back().capabilities[0].mode = "Exclusive";
     EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // No union across modes.
     snapshot.endpoints.back().capabilities[0].mode = "Shared";
@@ -1028,12 +1030,17 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     p.holes.push_back(h);
     ASSERT_TRUE(controller.save(p, false).ok);
     const auto saved = *profile(controller.snapshot(), id);
-    ASSERT_TRUE(saved.holes[0].forward.settings.format.wave);
+    EXPECT_EQ(saved.holes[0].forward.settings.preferences, Preferences{});
+    for (const auto& endpoint : controller.snapshot().endpoints) {
+        ASSERT_FALSE(endpoint.capabilities.empty());
+        ASSERT_TRUE(endpoint.capabilities.front().format.wave);
+    }
     EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
     const auto json = Json::parse(bytes(file));
     EXPECT_TRUE(json.at("devices").empty());
-    EXPECT_EQ(json.at("schema_version"), 4);
+    EXPECT_EQ(json.at("schema_version"), 5);
     EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
+    EXPECT_FALSE(json["profiles"][0]["holes"][0]["forward"]["settings"].contains("format"));
     EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);
     auto device = store.inventory().devices.front();
     store.set_hidden(device.record.at("logical_id"), true);

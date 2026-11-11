@@ -201,75 +201,71 @@ Direction direction(const Json& value, int version) {
         return d;
     const auto& settings = value.at("settings");
     require(settings.is_object());
-    if (version < 4) {
-        d.settings.automatic = settings.at("automatic").get<bool>();
-        d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
-        d.settings.mode = string(settings, "mode", 64);
-        d.settings.format = format(settings.at("format"));
-    } else {
-        d.settings.automatic = settings.value("automatic", true);
-        if (settings.contains("buffer_ms") && !settings.at("buffer_ms").is_null() &&
-            settings.at("buffer_ms") != "")
-            d.settings.buffer_ms = integer(settings, "buffer_ms", 0, 100);
-        if (settings.contains("mode") && !settings.at("mode").is_null() &&
-            settings.at("mode") != "")
-            d.settings.mode = string(settings, "mode", 64);
-        if (settings.contains("format") && !settings.at("format").is_null())
-            require(settings.at("format").is_object());
-        if (settings.contains("format") && !settings.at("format").is_null() &&
-            !settings.at("format").empty())
-            d.settings.format = format(settings.at("format"));
-        else
-            require(d.settings.automatic);
-        const auto p = settings.value("preferences", Json::object());
-        require(p.is_object());
-        d.settings.preferences.common = endpoint_preferences(p.value("common", Json::object()));
-        d.settings.preferences.source = endpoint_preferences(p.value("source", Json::object()));
-        d.settings.preferences.destination =
-            endpoint_preferences(p.value("destination", Json::object()));
-        if (p.contains("channel_map")) {
-            require(p.at("channel_map").is_array() && p.at("channel_map").size() <= 256);
-            for (const auto& r : p.at("channel_map"))
-                d.settings.preferences.channel_map.push_back(
-                    {integer(r, "source", 0, 255), integer(r, "destination", 0, 255)});
+    const auto p = version >= 4 ? settings.value("preferences", Json::object()) : Json::object();
+    require(p.is_object());
+    d.settings.preferences.common = endpoint_preferences(p.value("common", Json::object()));
+    d.settings.preferences.source = endpoint_preferences(p.value("source", Json::object()));
+    d.settings.preferences.destination =
+        endpoint_preferences(p.value("destination", Json::object()));
+    if (p.contains("channel_map")) {
+        require(p.at("channel_map").is_array() && p.at("channel_map").size() <= 256);
+        for (const auto& route : p.at("channel_map"))
+            d.settings.preferences.channel_map.push_back(
+                {integer(route, "source", 0, 255), integer(route, "destination", 0, 255)});
+    }
+    if (version < 5) {
+        // Translate legacy intent once. In particular, Automatic's cached format
+        // is never an override, even if its descriptor looks complete.
+        const bool automatic =
+            version < 4 ? settings.at("automatic").get<bool>() : settings.value("automatic", true);
+        auto& common = d.settings.preferences.common;
+        if (!automatic) {
+            const auto legacy = format(settings.at("format"));
+            if (!common.sample_rate_hz)
+                common.sample_rate_hz = legacy.rate;
+            if (!common.channel_count)
+                common.channel_count = legacy.channels;
+            if (!common.sample_format) {
+                auto representation = legacy.representation;
+                if (representation == "int16" || representation == "PCM16")
+                    representation = "pcm_s16";
+                if (representation == "int24" || representation == "PCM24")
+                    representation = legacy.wave && legacy.wave->container_bits == 32
+                                         ? "pcm_s24_in_32"
+                                         : "pcm_s24_packed";
+                if (representation == "int32" || representation == "PCM32")
+                    representation = "pcm_s32";
+                common.sample_format = representation;
+            }
+        }
+        if (!common.mode && settings.contains("mode") && settings.at("mode") != "" &&
+            !settings.at("mode").is_null()) {
+            const auto mode = string(settings, "mode", 64);
+            if (mode != "Automatic")
+                common.mode = mode;
+        }
+        if (!common.buffer_ms && settings.contains("buffer_ms") && settings.at("buffer_ms") != "" &&
+            !settings.at("buffer_ms").is_null()) {
+            const auto buffer = integer(settings, "buffer_ms", 0, 100);
+            if (buffer)
+                common.buffer_ms = buffer;
         }
     }
-    if (version < 4 && !d.settings.automatic) {
-        auto& common = d.settings.preferences.common;
-        common.sample_rate_hz = d.settings.format.rate;
-        common.channel_count = d.settings.format.channels;
-        auto representation = d.settings.format.representation;
-        if (representation == "int16" || representation == "PCM16")
-            representation = "pcm_s16";
-        if (representation == "int24" || representation == "PCM24")
-            representation = "pcm_s24_packed";
-        if (representation == "int32" || representation == "PCM32")
-            representation = "pcm_s32";
-        if (representation == "float32" || representation == "pcm_s16" ||
-            representation == "pcm_s24_packed" || representation == "pcm_s24_in_32" ||
-            representation == "pcm_s32")
-            common.sample_format = representation;
-        // Unrecognized legacy representations remain in the exact retained
-        // format; do not discard the profile merely because tuning is inactive.
-    }
     require(validate_preferences(d.settings.preferences).ok);
+    d.settings.refresh_projection();
     return d;
 }
+
 Json encode(const Direction& d) {
     return {{"source_name", d.source_name},
             {"source", d.source},
             {"destination_name", d.destination_name},
             {"destination", d.destination},
-            {"settings",
-             {{"preferences", encode(d.settings.preferences)},
-              {"mode", d.settings.mode},
-              {"buffer_ms", d.settings.buffer_ms},
-              {"automatic", d.settings.automatic},
-              {"format", encode(d.settings.format)}}}};
+            {"settings", {{"preferences", encode(d.settings.preferences)}}}};
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 4},
+                   {"schema_version", 5},
                    {"profiles", Json::array()},
                    {"devices", Json::array()}};
     for (const auto& d : records.devices) {
@@ -305,7 +301,7 @@ Json encode(const ConfigurationRecords& records) {
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 4) >= 1);
+            integer(root, "schema_version", 1, 5) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -370,6 +366,25 @@ ConfigurationRecords decode(const Json& root) {
     }
     return records;
 }
+// Legacy transport descriptors no longer belong to profile intent. Preserve
+// only opaque annotations under an explicitly non-operational extension key.
+Json legacy_format_extensions(const Json& settings) {
+    if (!settings.contains("format") || !settings.at("format").is_object())
+        return Json::object();
+    auto extension = settings.at("format");
+    for (const auto* key : {"rate", "channels", "representation"})
+        extension.erase(key);
+    if (extension.contains("wave") && extension.at("wave").is_object()) {
+        auto& wave = extension["wave"];
+        for (const auto* key : {"container_bits", "valid_bits", "channel_mask", "format_tag",
+                                "subformat_guid", "block_align_bytes", "average_bytes_per_second"})
+            wave.erase(key);
+        if (wave.empty())
+            extension.erase("wave");
+    } else
+        extension.erase("wave");
+    return extension;
+}
 // Preserve unrecognized fields recursively. Record arrays match by stable ID;
 // explicit removals stay removed. New known values take precedence.
 Json merge(const Json& old, const Json& current) {
@@ -378,8 +393,21 @@ Json merge(const Json& old, const Json& current) {
         for (const auto& [key, value] : current.items())
             result[key] = old.contains(key) ? merge(old.at(key), value) : value;
         for (const auto& [key, value] : old.items())
-            if (!current.contains(key))
+            if (!current.contains(key)) {
+                if (current.contains("preferences") &&
+                    (key == "automatic" || key == "format" || key == "mode" || key == "buffer_ms"))
+                    continue;
                 result[key] = value;
+            }
+        if (current.contains("preferences")) {
+            const auto extension = legacy_format_extensions(old);
+            if (!extension.empty()) {
+                if (result.contains("legacy_format_extensions"))
+                    require(result.at("legacy_format_extensions") == extension);
+                else
+                    result["legacy_format_extensions"] = extension;
+            }
+        }
         return result;
     }
     if (old.is_array() && current.is_array()) {
@@ -507,7 +535,18 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
             } else
                 current["profiles"].push_back(item);
         }
-        current["schema_version"] = 4;
+        if (added.contains("profile_record_extensions")) {
+            require(added.at("profile_record_extensions").is_object());
+            if (!current.contains("profile_record_extensions"))
+                current["profile_record_extensions"] = Json::object();
+            for (const auto& [id, extension] : added.at("profile_record_extensions").items()) {
+                require(extension.is_object());
+                if (current["profile_record_extensions"].contains(id))
+                    require(current["profile_record_extensions"].at(id) == extension);
+                current["profile_record_extensions"][id] = extension;
+            }
+        }
+        current["schema_version"] = 5;
         std::set<std::string> filenames;
         for (const auto& profile : current.at("profiles")) {
             auto filename = profile_filename(string(profile, "display_name"));
@@ -549,7 +588,7 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
-        if (impl_->expected && impl_->original.at("schema_version") != 4) {
+        if (impl_->expected && impl_->original.at("schema_version") != 5) {
             // No load-time migration. The first explicit save keeps the exact
             // legacy original; never overwrite a different earlier backup.
             if (read_document(impl_->file) != impl_->expected)
@@ -609,20 +648,61 @@ ProfileFiles profile_files(const std::filesystem::path& root) {
     }
     return files;
 }
+// Individual records and aggregate transfer wrappers have independent versions.
+// Envelope extensions travel through an explicitly identified transport map.
+Json current_document(const Json& document) {
+    return merge(document, encode(decode(document)));
+}
+Json record_document(const Json& record) {
+    require(record.at("format") == "audiohole-profile" &&
+            integer(record, "schema_version", 1, 1) == 1);
+    auto wrapper = encode(ConfigurationRecords{});
+    wrapper["profiles"].push_back(record.at("profile"));
+    return current_document(wrapper);
+}
 Json assembled_profiles(const ProfileFiles& files) {
     auto root = encode(ConfigurationRecords{});
     if (const auto state = files.find(".state.json"); state != files.end()) {
-        root = parse(state->second);
+        root = current_document(parse(state->second));
         require(root.at("profiles").empty());
     }
+    auto envelopes = root.value("profile_record_extensions", Json::object());
+    require(envelopes.is_object());
     for (const auto& [path, bytes] : files) {
         if (path == ".state.json")
             continue;
         auto document = parse(bytes);
-        const auto records = decode(document);
+        Json current;
+        if (document.value("format", "") == "audiohole-profile") {
+            current = record_document(document);
+            auto extensions = document;
+            extensions.erase("format");
+            extensions.erase("schema_version");
+            extensions.erase("profile");
+            if (!extensions.empty())
+                envelopes[string(document.at("profile"), "id", 128)] = extensions;
+        } else {
+            current = current_document(document);
+            auto extension = document;
+            for (const auto* key : {"format", "schema_version", "profiles", "devices"})
+                extension.erase(key);
+            if (!extension.empty()) {
+                const auto id = string(current.at("profiles").at(0), "id", 128);
+                auto envelope = envelopes.value(id, Json::object());
+                require(envelope.is_object());
+                if (envelope.contains("legacy_wrapper_extensions"))
+                    require(envelope.at("legacy_wrapper_extensions") == extension);
+                else
+                    envelope["legacy_wrapper_extensions"] = extension;
+                envelopes[id] = std::move(envelope);
+            }
+        }
+        const auto records = decode(current);
         require(records.profiles.size() == 1 && records.devices.empty());
-        root["profiles"].push_back(document.at("profiles").at(0));
+        root["profiles"].push_back(current.at("profiles").at(0));
     }
+    if (!envelopes.empty())
+        root["profile_record_extensions"] = std::move(envelopes);
     require(root.dump().size() <= maximum_document);
     (void)decode(root);
     return root;
@@ -646,6 +726,16 @@ std::string profile_filename(std::string name) {
     return name + ".json";
 }
 } // namespace
+Result validate_profile_record(const std::string& bytes, Profile& output) {
+    try {
+        require(bytes.size() <= maximum_document);
+        const auto records = decode(record_document(parse(bytes)));
+        output = records.profiles.front();
+        return {true, "Profile record validated."};
+    } catch (const std::exception& error) {
+        return {false, std::string("Invalid profile record: ") + error.what()};
+    }
+}
 struct ProfileDirectoryPersistence::Impl {
     std::filesystem::path file;
     ProfileFiles observed;
@@ -726,6 +816,7 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
         std::filesystem::create_directories(next);
         created_next = true;
         std::set<std::string> names;
+        Json active_envelopes = Json::object();
         for (const auto& profile : document.at("profiles")) {
             auto name = profile_filename(string(profile, "display_name"));
             auto key = name;
@@ -734,8 +825,18 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
             if (!names.insert(key).second)
                 throw std::runtime_error("Another profile uses filename " + name +
                                          ". Choose a different display name.");
-            auto single = encode(ConfigurationRecords{});
-            single["profiles"].push_back(profile);
+            const auto id = string(profile, "id", 128);
+            const auto envelopes = document.value("profile_record_extensions", Json::object());
+            require(envelopes.is_object());
+            const auto extension = envelopes.value(id, Json::object());
+            require(extension.is_object());
+            if (!extension.empty())
+                active_envelopes[id] = extension;
+            Json single{
+                {"format", "audiohole-profile"}, {"schema_version", 1}, {"profile", profile}};
+            for (const auto& [key, value] : extension.items())
+                if (!single.contains(key))
+                    single[key] = value;
             const auto result = impl_->writer(
                 next / std::filesystem::path(std::u8string(
                            reinterpret_cast<const char8_t*>(name.data()), name.size())),
@@ -745,6 +846,9 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
         }
         auto state = document;
         state["profiles"] = Json::array();
+        state.erase("profile_record_extensions");
+        if (!active_envelopes.empty())
+            state["profile_record_extensions"] = active_envelopes;
         const auto stored = impl_->writer(next / ".state.json", state.dump(2) + "\n", {});
         if (!stored.ok)
             throw std::runtime_error(stored.detail);
@@ -769,7 +873,7 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
                 read_document(impl_->file) == impl_->legacy)
                 std::filesystem::remove(impl_->file);
         }
-        for (int version : {1, 2, 3}) {
+        for (int version : {1, 2, 3, 4}) {
             auto old = impl_->file;
             old += ".v" + std::to_string(version) + ".bak";
             if (const auto bytes = read_document(old)) {

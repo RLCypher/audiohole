@@ -14,9 +14,7 @@ constexpr int scan_ms_per_percent = 30;
 constexpr int simulated_automatic_buffer_ms = 6; // Fixture choice, never a hardware recommendation.
 constexpr std::size_t maximum_diagnostic_events = 500;
 bool manual_settings(const Direction& direction) {
-    return !direction.settings.automatic || direction.settings.buffer_ms != 0 ||
-           direction.settings.mode != "Automatic" ||
-           direction.settings.preferences != Preferences{};
+    return direction.settings.preferences != Preferences{};
 }
 bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
     bool supported = false;
@@ -31,12 +29,34 @@ bool supports(const Endpoint& device, const Format& format, const std::string& m
 }
 } // namespace
 
+EndpointPreferences inherit_preferences(const EndpointPreferences& common,
+                                        const EndpointPreferences& endpoint) {
+    auto result = common;
+    if (endpoint.sample_rate_hz)
+        result.sample_rate_hz = endpoint.sample_rate_hz;
+    if (endpoint.channel_count)
+        result.channel_count = endpoint.channel_count;
+    if (endpoint.sample_format)
+        result.sample_format = endpoint.sample_format;
+    if (endpoint.mode)
+        result.mode = endpoint.mode;
+    if (endpoint.buffer_ms)
+        result.buffer_ms = endpoint.buffer_ms;
+    return result;
+}
+void Settings::refresh_projection() {
+    buffer_ms = preferences.common.buffer_ms.value_or(0);
+    mode = preferences.common.mode.value_or("Automatic");
+    const auto explicit_format = derive_pcm_format(preferences.common);
+    automatic = !explicit_format;
+    format = explicit_format.value_or(Format{});
+}
 void Settings::set_buffer_preference(int milliseconds) {
     if (milliseconds < 0 || milliseconds > 100)
         throw std::invalid_argument(
             "Buffer must be Automatic (0) or between 1 and 100 milliseconds.");
-    buffer_ms = milliseconds;
     preferences.common.buffer_ms = milliseconds ? std::optional<int>(milliseconds) : std::nullopt;
+    refresh_projection();
 }
 std::string unique_name(const std::string& base, const std::vector<std::string>& used) {
     auto free = [&](const std::string& name) {
@@ -162,13 +182,17 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
                                      "is established until both devices have matching evidence.";
         return recommendation;
     }
+    const auto source_requirements = inherit_preferences(direction.settings.preferences.common,
+                                                         direction.settings.preferences.source);
+    const auto destination_requirements = inherit_preferences(
+        direction.settings.preferences.common, direction.settings.preferences.destination);
     if (source->inspection || destination->inspection || !source->capabilities.empty() ||
         !destination->capabilities.empty()) {
         for (const auto& candidate : source->capabilities) {
             if (candidate.support != FormatSupport::Supported ||
                 (candidate.mode != "Shared" && candidate.mode != "Exclusive") ||
-                (direction.settings.mode != "Automatic" &&
-                 candidate.mode != direction.settings.mode))
+                (source_requirements.mode && candidate.mode != *source_requirements.mode) ||
+                (destination_requirements.mode && candidate.mode != *destination_requirements.mode))
                 continue;
             const bool supported = supports(*source, candidate.format, candidate.mode) &&
                                    supports(*destination, candidate.format, candidate.mode);
@@ -212,23 +236,14 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
                (!p.sample_format || representation == *p.sample_format);
     };
     const auto& preferences = direction.settings.preferences;
-    auto inherit = [&](const EndpointPreferences& specific) {
-        auto resolved = preferences.common;
-        if (specific.sample_rate_hz)
-            resolved.sample_rate_hz = specific.sample_rate_hz;
-        if (specific.channel_count)
-            resolved.channel_count = specific.channel_count;
-        if (specific.sample_format)
-            resolved.sample_format = specific.sample_format;
-        return resolved;
-    };
-    const auto source_preferences = inherit(preferences.source);
-    const auto destination_preferences = inherit(preferences.destination);
+    const auto source_preferences = inherit_preferences(preferences.common, preferences.source);
+    const auto destination_preferences =
+        inherit_preferences(preferences.common, preferences.destination);
     std::erase_if(recommendation.compatible, [&](const auto& format) {
         return !matches(format, source_preferences) || !matches(format, destination_preferences);
     });
     auto rank = [&](const Format& format) {
-        const bool prefer_shared = direction.settings.mode == "Automatic" &&
+        const bool prefer_shared = !preferences.common.mode &&
                                    supports(*source, format, "Shared") &&
                                    supports(*destination, format, "Shared");
         return (prefer_shared ? 0 : 2) +
@@ -242,12 +257,7 @@ Direction effective_direction(const Hole& hole, bool reverse) {
     auto direction = reverse ? hole.reverse : hole.forward;
     if (!hole.advanced_tuning)
         direction.settings = Settings{};
-    else {
-        if (direction.settings.preferences.common.mode)
-            direction.settings.mode = *direction.settings.preferences.common.mode;
-        if (direction.settings.preferences.common.buffer_ms)
-            direction.settings.buffer_ms = *direction.settings.preferences.common.buffer_ms;
-    }
+    direction.settings.refresh_projection();
     return direction;
 }
 void describe_profile(const Snapshot& snapshot, Profile& candidate) {
@@ -261,12 +271,7 @@ void describe_profile(const Snapshot& snapshot, Profile& candidate) {
                 direction->source_name = device->display_name;
             if (const auto* device = endpoint(snapshot, direction->destination))
                 direction->destination_name = device->display_name;
-            auto effective = *direction;
-            if (!hole.advanced_tuning)
-                effective.settings = Settings{};
-            const auto options = recommend(snapshot, effective);
-            if (direction->settings.automatic && !options.compatible.empty())
-                direction->settings.format = options.compatible.front();
+            direction->settings.refresh_projection();
         }
 }
 Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
@@ -290,18 +295,10 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
                 return {false, "A selected device is unavailable or its identity is unresolved."};
             const auto choices = recommend(snapshot, d);
             const auto format =
-                d.settings.automatic
-                    ? (choices.compatible.empty() ? Format{} : choices.compatible.front())
-                    : d.settings.format;
-            std::string mode = d.settings.mode;
-            if (mode == "Automatic") {
-                mode = "Shared";
-                if (source->inspection || !source->capabilities.empty()) {
-                    if (!supports(*source, format, mode) || !supports(*destination, format, mode))
-                        mode =
-                            snapshot.operating_mode == OperatingMode::Test ? "Shared" : "Exclusive";
-                }
-            }
+                choices.compatible.empty()
+                    ? derive_pcm_format(d.settings.preferences.common).value_or(Format{})
+                    : choices.compatible.front();
+            const auto mode = d.settings.preferences.common.mode.value_or("Shared");
             RoutingPathRequest path;
             path.hole_id = hole.id;
             path.source = d.source;
@@ -314,23 +311,16 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
             auto& request = prepared.paths.back();
             request.runtime_negotiation = snapshot.operating_mode == OperatingMode::Test;
             request.preferences = d.settings.preferences;
-            if (!d.settings.automatic) {
-                auto& preference = request.preferences.common;
-                if (!preference.sample_rate_hz)
-                    preference.sample_rate_hz = d.settings.format.rate;
-                if (!preference.channel_count)
-                    preference.channel_count = d.settings.format.channels;
-                if (!preference.sample_format)
-                    preference.sample_format = d.settings.format.representation;
-            }
-            if (!request.preferences.common.mode && d.settings.mode != "Automatic")
-                request.preferences.common.mode = d.settings.mode;
-            if (!request.preferences.common.buffer_ms && d.settings.buffer_ms)
-                request.preferences.common.buffer_ms = d.settings.buffer_ms;
-            request.mode = request.preferences.common.mode.value_or(mode);
-            request.buffer_ms = request.preferences.common.buffer_ms.value_or(d.settings.buffer_ms);
-            prepared.paths.back().routing_engine =
-                hole.advanced_tuning ? hole.routing_engine : "automatic";
+            request.channel_policy = request.preferences.channel_map.empty()
+                                         ? "default_index_mapping"
+                                         : "explicit_index_mapping";
+            request.source_requirements =
+                inherit_preferences(request.preferences.common, request.preferences.source);
+            request.destination_requirements =
+                inherit_preferences(request.preferences.common, request.preferences.destination);
+            request.mode = mode;
+            request.buffer_ms = request.preferences.common.buffer_ms.value_or(0);
+            request.routing_engine = hole.routing_engine;
         }
     }
     output = std::move(prepared);
@@ -348,9 +338,9 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
         if (!hole.enabled)
             continue;
         ++enabled;
-        if (hole.advanced_tuning && hole.routing_engine != "automatic")
+        if (hole.routing_engine != "automatic")
             return {false, "The requested Routing Engine is unavailable in this build. Select "
-                           "Automatic or disable Advanced Tuning to retain it inactive."};
+                           "Automatic. Engine selection is independent of audio overrides."};
         for (const bool reverse : {false, true}) {
             if (reverse && !hole.duplex)
                 continue;
@@ -387,30 +377,12 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
             if (snapshot.operating_mode == OperatingMode::Test) {
                 // Unknown/absent scan evidence is not evidence of unsupported
                 // intent. Runtime initialization owns negotiation and readiness.
-                if (!direction->settings.automatic) {
-                    for (const auto* device : {source, destination})
-                        for (const auto& capability : device->capabilities)
-                            if (capability.mode == (direction->settings.mode == "Automatic"
-                                                        ? "Shared"
-                                                        : direction->settings.mode) &&
-                                capability.format == direction->settings.format &&
-                                capability.support == FormatSupport::Unsupported)
-                                return {false, "The explicit legacy format was reported "
-                                               "unsupported. Change it or reset to Automatic."};
-                }
                 for (const auto* device : {source, destination}) {
-                    auto preference = direction->settings.preferences.common;
                     const auto& specific = device == source
                                                ? direction->settings.preferences.source
                                                : direction->settings.preferences.destination;
-                    if (specific.sample_rate_hz)
-                        preference.sample_rate_hz = specific.sample_rate_hz;
-                    if (specific.channel_count)
-                        preference.channel_count = specific.channel_count;
-                    if (specific.sample_format)
-                        preference.sample_format = specific.sample_format;
-                    if (specific.mode)
-                        preference.mode = specific.mode;
+                    const auto preference =
+                        inherit_preferences(direction->settings.preferences.common, specific);
                     bool rejected = false, supported = false;
                     if (preference.sample_rate_hz && preference.channel_count &&
                         preference.sample_format)
@@ -432,11 +404,6 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
             if (recommendation.compatible.empty())
                 return {false,
                         "No common endpoint format is available. Select another endpoint pair."};
-            if (!direction->settings.automatic &&
-                std::find(recommendation.compatible.begin(), recommendation.compatible.end(),
-                          direction->settings.format) == recommendation.compatible.end())
-                return {false, "Manual format is unsupported by this endpoint pair; "
-                               "change the override explicitly."};
         }
     }
     if (enabled > 8)

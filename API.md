@@ -1026,3 +1026,18 @@ selector and leaves buffer selection engine-managed when its request is zero.
 Neither a checkbox nor a dropdown initializes a backend. See
 PROVISIONAL_TEST_PERSISTENCE.md for Test-only v3 defaults/migration. This does not
 finalize production configuration or create a public engine-selection protocol.
+
+## Current development profile request boundary
+
+The control-thread `PreparedProfile` contract is specified in
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md). Its Test paths carry effective
+preferences plus endpoint-specific inherited requirements. Null inherits endpoint
+→ common → Automatic; inactive overrides also suppress explicit channel maps.
+Engine selection remains independent of override eligibility. Current JSON intent
+uses individual profile record v1 or aggregate transfer wrapper v5, with no
+operational fallback to obsolete cached settings. Prepared format candidates are
+advisory while `runtime_negotiation` is true. Channel policy distinguishes default
+index mapping from explicit indexes; both silence unmapped outputs and discard
+unmatched sources. No scan data, notes or widgets enter an audio callback. This
+remains an in-process development seam, not a finalized external API or a selected
+streaming backend.

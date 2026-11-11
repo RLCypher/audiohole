@@ -104,7 +104,9 @@ void Frame::build_devices() {
     auto* right = new wxBoxSizer(wxVERTICAL);
     label(details, right, "Display name");
     auto* name_row = new wxBoxSizer(wxHORIZONTAL);
-    device_name_ = new wxTextCtrl(details, wxID_ANY);
+    device_name_ =
+        new wxTextCtrl(details, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    device_name_->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent&) { queue_field_save(true); });
     device_name_->SetName("Display name");
     name_row->Add(device_name_, 1, wxALIGN_CENTER_VERTICAL | wxALL, 3);
     device_save_ = button(details, name_row, "Save device", [this] {
