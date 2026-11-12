@@ -1,11 +1,12 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "gui/welcome.h"
 #include "model/configuration_controller.h"
+#include "model/first_run.h"
 #include <cstdio>
 #include <cstdlib>
 #include <shobjidl.h>
 #include <string_view>
-#include <wx/generic/msgdlgg.h>
 #include <wx/stdpaths.h>
 
 namespace {
@@ -190,21 +191,16 @@ class App final : public wxApp {
             themed_message_box(text(preferences_result.detail), "AudioHole preferences",
                                wxOK | wxICON_WARNING);
         bool preview = !test_mode_smoke && (smoke || preferences_->values().preview_mode);
-        if (!smoke && preferences_->values().show_preview_dialog &&
-            !preferences_->values().start_minimized) {
-            wxGenericMessageDialog dialog(
-                nullptr,
-                "Preview Mode loads demonstration profiles/devices and "
-                "simulates operations; Test Beep is silent.\n\n"
-                "Test Mode reads and saves real configuration under an isolated "
-                "Test data root using a provisional JSON format. Scans read real Windows "
-                "devices; Deep testing requires consent. Routing and playback are unavailable.\n\n"
-                "Choose the environment for this session. Startup preferences "
-                "and restart controls are in Settings.",
-                wxS("AudioHole — Preview Build"),
-                wxYES_NO | wxCANCEL | wxICON_INFORMATION | (preview ? 0 : wxNO_DEFAULT));
-            dialog.SetYesNoLabels("Preview Mode", "Test Mode");
-            theme_dialog(&dialog);
+        bool first_time = false;
+        if (!smoke) {
+            const auto checked = first_run_needed(first_run_marker_path(), first_time);
+            if (!checked.ok)
+                themed_message_box(text(checked.detail), "AudioHole welcome",
+                                   wxOK | wxICON_WARNING);
+        }
+        if (!smoke && (first_time || (preferences_->values().show_preview_dialog &&
+                                      !preferences_->values().start_minimized))) {
+            WelcomeDialog dialog(first_time || preview);
             const auto choice = dialog.ShowModal();
             if (choice == wxID_CANCEL)
                 return false;
@@ -215,6 +211,11 @@ class App final : public wxApp {
             if (!saved.ok)
                 themed_message_box(text(saved.detail), "AudioHole preferences",
                                    wxOK | wxICON_WARNING);
+        }
+        if (!smoke) {
+            const auto marked = mark_first_run(first_run_marker_path());
+            if (!marked.ok)
+                themed_message_box(text(marked.detail), "AudioHole welcome", wxOK | wxICON_WARNING);
         }
         std::unique_ptr<Controller> controller;
         if (preview)

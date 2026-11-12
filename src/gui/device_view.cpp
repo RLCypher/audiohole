@@ -324,6 +324,20 @@ void Frame::device_context(DeviceList* box, const std::vector<std::string>& ids,
               hide = wxWindow::NewControlId();
     menu.Append(update, "Update device");
     menu.Append(deep, "Deep update device");
+    const auto reveal = wxWindow::NewControlId();
+    menu.Append(reveal, "Show in Explorer", "Open the folder and select this device's saved JSON.");
+    menu.Enable(reveal, bool(device->inspection));
+    menu.Bind(
+        wxEVT_MENU,
+        [this, id](wxCommandEvent&) {
+            const auto* current = endpoint(controller_->snapshot(), id);
+            if (current && current->inspection)
+                show_result(show_in_explorer(
+                    std::filesystem::path(text(current->inspection->path).ToStdWstring())));
+            else
+                show_result({false, "This device has no saved scanner JSON file."});
+        },
+        reveal);
     menu.AppendSeparator();
     menu.Append(hide, hidden ? "Unhide device" : "Hide device");
     const bool idle = !controller_->snapshot().scanner.busy && !controller_->snapshot().scanning;

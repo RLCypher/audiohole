@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "model/first_run.h"
 #include "presentation/text_layout.h"
 #include <wx/wrapsizer.h>
 
@@ -146,8 +147,25 @@ void Frame::build_settings() {
         if (themed_message_box("AudioHole will restart in Tutorial mode", "Replay Tutorial?",
                                wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
             return;
-        themed_message_box("Tutorial not yet implemented, please enjoy this placeholder message.",
-                           wxS("AudioHole — Tutorial"), wxOK | wxICON_WARNING, this);
+        if (!discard())
+            return;
+        if (device_dirty_ &&
+            themed_message_box("Discard unsaved device edits before restarting? Saved device "
+                               "records will be retained.",
+                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
+                               this) != wxYES)
+            return;
+        // CI never changes the installed marker or launches a replay child.
+        // The filesystem reset contract is exercised by portable tests.
+        if (smoke_)
+            return;
+        const auto result = reset_first_run(first_run_marker_path());
+        if (!result.ok) {
+            show_result(result);
+            return;
+        }
+        if (restart_)
+            restart_();
     });
     auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality & animation");
     auto* personality_box = personality_group->GetStaticBox();
@@ -333,11 +351,11 @@ void Frame::build_settings() {
     preview_mode_->SetToolTip(
         "Select the environment for the next launch. Preview uses demonstration records; Test uses "
         "isolated persisted configuration. Restart is required.");
-    show_preview_dialog_ =
-        new wxCheckBox(environment_box, wxID_ANY, "Show preview dialog on startup");
+    show_preview_dialog_ = new wxCheckBox(environment_box, wxID_ANY, "Show welcome on startup");
     show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
     show_preview_dialog_->SetToolTip(
-        "Offer Preview Mode or Test Mode on startup. When disabled, the saved environment starts "
+        "Show the welcome and environment choices on startup. A missing first-run marker always "
+        "shows it. Otherwise the saved environment starts "
         "directly; Settings can still change the next launch.");
     preview_settings->Add(preview_mode_, 0, wxALL, 4);
     preview_settings->Add(show_preview_dialog_, 0, wxALL, 4);

@@ -91,6 +91,9 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"advanced_tuning_enabled", "Overrides enabled. Save / Apply to use them."},
     {"manual_override_applied", "Overrides applied to Preview (simulated)."},
     {"automatic_configuration_restored", "Automatic selected. Saved overrides are inactive."},
+    {"device_connected", "Device connected."},
+    {"device_disconnected", "Device disconnected."},
+    {"device_unavailable", "Device became unavailable."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;

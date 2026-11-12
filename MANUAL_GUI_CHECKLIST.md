@@ -597,3 +597,29 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   with readable content/focus/selection, including popup lists; resize/move the
   window and check for shimmer. Confirm high contrast retains usable native
   borders. Keep screenshots and Windows smoke results with the assessment.
+
+
+## Workflow refinement acceptance
+
+- [ ] Forward and Return each have a separate Advanced tuning disclosure beneath
+  their endpoints/information. Open one without opening the other or resizing the
+  window. Return's entire section disappears for simplex. Use advanced tuning
+  controls eligibility independently; hiding preserves every saved value.
+- [ ] Exercise Automatic / Force exclusive mode / Force shared mode separately
+  in both directions with Exclusive mode preferred on/off. Forced modes win.
+  Save/restart/bundle transfer retains hole-level preference and lowercase routing
+  choice. All four engine choices save intent; Test still cannot start an engine.
+- [ ] Save different clock choices in Forward and Return. Labels clearly say
+  reserved/no current effect. Disabling/re-enabling tuning retains both choices.
+- [ ] Right-click saved profiles/devices and Show in Explorer. The actual JSON is
+  selected, including Unicode/spaces and after rename. Missing files give useful
+  feedback; Preview fixture actions are disabled. No shell launch occurs in CI.
+- [ ] On an isolated copied installation, remove AudioHole.has-run and launch.
+  Check exact welcome copy, Norm artwork, theme, DPI, long-text scrolling and all
+  three button targets. Cancel leaves the marker absent. Accepted launch creates
+  it. Replay Tutorial confirms, preserves saved data, resets marker and restarts
+  back to welcome. Check unwritable marker error feedback without elevation.
+- [ ] With saved devices, unplug/reconnect hardware and disable an endpoint.
+  Check named factual messages in Vanilla and authored responses in Norm/UwU.
+  Repeated polling, initial loading, renames, hiding and clearing do not repeat
+  responses. Unavailable does not imply a successful stream or a physical unplug.

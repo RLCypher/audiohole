@@ -1994,3 +1994,17 @@ unavailable or untested capability; device evidence retains its explicit status
 semantics. The individual record and aggregate schemas/version numbers are
 separate. IDs, notes, human-readable filenames and opaque extensions retain the
 preservation and external-edit protections in PROFILE_BUILDER.md.
+
+
+## Owner-authorized workflow refinements
+
+The current implementation contract is [PROFILE_BUILDER.md](PROFILE_BUILDER.md):
+individual profile record **version 2**, aggregate transfer wrapper **version 6**,
+ZIP manifest still version 1. Current profiles write hole-level `routing` and
+`exclusive_mode_preferred`, plus per-direction preferences including reserved
+`preferred_clock_device`. Supported routing values are automatic/wasapi/miniaudio/
+experimental. Forced access mode takes precedence over the exclusive preference;
+clock preference currently has no engine effect. Separate Forward/Return tuning
+panels are disclosures only and sit beneath their respective direction groups.
+This supersedes earlier record-v1/transfer-v5 and single-panel UI descriptions.
+These changes do not add a streaming backend or settle production architecture.

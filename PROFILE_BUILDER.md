@@ -1,7 +1,7 @@
 # Profile builder and engine handoff
 
 This is the current development contract, authorized by the owner after review
-with the engine agent. It replaces the earlier Test v4 contract. The owner will
+with the engine agent. It replaces the earlier Test v4 contract. The owner may
 regenerate development profiles; compatibility with older development builds is
 not an acceptance requirement. Production storage decisions O-004/O-006 and the
 streaming backend remain open. Test Mode does not route audio.
@@ -13,7 +13,7 @@ streaming backend remain open. Test Mode does not route audio.
 ```json
 {
   "format": "audiohole-profile",
-  "schema_version": 1,
+  "schema_version": 2,
   "profile": {
     "display_name": "Desktop audio",
     "notes": "User notes",
@@ -23,9 +23,9 @@ streaming backend remain open. Test Mode does not route audio.
 }
 ```
 
-See [the complete example](docs/test-profile-example.json). Record version 1 is
+See [the complete example](docs/test-profile-example.json). Record version 2 is
 independent of the **aggregate transfer wrapper** used inside profile bundles:
-`audiohole-test-configuration`, `schema_version: 5`, `profiles: [...]`,
+`audiohole-test-configuration`, `schema_version: 6`, `profiles: [...]`,
 `devices: []`. The wrapper can also carry `profile_record_extensions`, an opaque
 map of individual-envelope extensions keyed by profile ID. It is transfer
 metadata, not routing intent. `validate_profile_record` validates individual
@@ -33,7 +33,7 @@ records; `validate_test_document` validates the aggregate. They are not
 interchangeable. Unknown/newer record versions reject without rewriting files.
 
 Profiles retain names, notes, stable IDs and ordered holes. Each hole retains
-its name/notes/ID, `enabled`, `duplex`, `advanced_tuning`, `routing_engine`, and
+its name/notes/ID, `enabled`, `duplex`, `advanced_tuning`, `routing`, `exclusive_mode_preferred`, and
 independent `forward` and `reverse` directions. The GUI calls `reverse` Return.
 Logical device IDs reference the separate scanned registry; names are readable
 hints. Hidden devices are excluded from new choices, but existing references
@@ -63,7 +63,8 @@ when properties or the entire preferences object are omitted.
   },
   "source": {},
   "destination": {},
-  "channel_map": []
+  "channel_map": [],
+  "preferred_clock_device": "automatic"
 }
 ```
 
@@ -92,18 +93,33 @@ layout remains unknown until independently established.
 
 ## Independent policy controls
 
-- **Use advanced overrides** (`advanced_tuning`): off retains saved preferences
+- **Use advanced tuning** (`advanced_tuning`): off retains saved preferences
   and maps but resolves all of them automatically. On applies saved values, with
   unspecified values inheriting. This includes channel mapping.
-- **Show advanced tuning**: visibility only; showing/hiding never changes intent
-  or a running route.
+- **Advanced tuning**: separate collapsible panels directly beneath Forward and
+  Return. Each contains only its own direction's settings. Return and its panel
+  are hidden for simplex holes. Disclosures never change intent, eligibility, the
+  sibling panel, a running route or the top-level window size.
 - **Reset to Automatic**: explicitly clears the selected direction's preferences
   and mapping, preserving assignments and the sibling direction.
 - **Enabled**: enables the hole independently of overrides.
-- **Routing Engine**: independent per-hole backend request. Only `automatic` is
-  available. An unknown saved engine remains visible as unavailable and prevents
-  activating that enabled hole even with overrides off. Choosing Automatic is
-  explicit; no fallback engine is silently substituted.
+- **Routing Engine**: independent per-hole request, serialized in `routing` as
+  `automatic`, `wasapi`, `miniaudio` or `experimental`. The labels are Automatic,
+  WASAPI, Miniaudio and Experimental. Unknown identifiers remain unavailable and
+  block preparation of an enabled hole, independently of tuning eligibility.
+  Test Mode still has no streaming backend; selection saves intent only.
+- **Exclusive mode preferred**: per-hole `exclusive_mode_preferred` boolean,
+  default false, placed above the first tuning disclosure. It applies to both
+  directions in Automatic access mode. An active explicit source/destination or
+  common access-mode requirement takes precedence, including Force shared mode.
+  With tuning disabled, retained forced settings are inactive and the preference
+  applies to Automatic. This flag is a preference, not a forced-mode requirement; a rejected exclusive
+  configuration does not forbid an otherwise usable Automatic shared candidate.
+- **Preferred clock device**: each direction saves `preferred_clock_device` in
+  `settings.preferences`, using `automatic` (default), `capture` or `playback`.
+  GUI labels are Automatic, Capture and Playback. This is reserved metadata with
+  no current streaming effect. Disabling tuning excludes it from effective
+  preferences while retaining the saved selection.
 
 Save persists intent. Apply remains a separate operation. Enter in an editable
 configuration field saves through its existing Save action, never live Apply.
@@ -138,7 +154,10 @@ legacy UI projection fields and the prepared `format` candidate are advisory;
 only effective preferences impose requirements. Do not persist these candidates.
 
 Automatic initially favors shared access and conservative engine-selected
-buffering. It never silently escalates to disruptive exclusive access. The engine
+buffering. Exclusive mode preferred requests exclusive-first selection explicitly;
+forced modes are requirements and supersede that preference. Unset endpoint mode
+requirements remain unset; the prepared common `mode` is only an Automatic policy
+candidate when no explicit mode requirement exists. The engine
 must resolve endpoints independently, apply its supported conversion/mapping and
 clock-synchronization policy, and publish actual formats, buffers, modes, backend,
 health and selection explanations through runtime status. No engine or conversion
@@ -160,10 +179,29 @@ archived under `local/profile-backups/`. Links/reparse points and conflicting
 external edits reject. This is recoverable multi-file replacement, not a promise
 of an OS-level compare-and-swap or power-loss atomicity.
 
-The existing reader still accepts development aggregate versions 1–4. On an
+The existing reader still accepts development aggregate versions 1–5 and
+individual record version 1. Older `routing_engine` keys translate to `routing` on
+an explicit save. Missing exclusive preference defaults false; missing clock
+preference defaults Automatic. On an
 explicit save, old manual settings translate once into preferences; Automatic's
 cached format is never promoted to an override. Current preferences never consult
 legacy fields. Original aggregates are archived under `local/legacy-profiles/`.
 Unknown old format annotations move under `legacy_format_extensions`, with no
 operational meaning; conflicting annotations block replacement. This existing
 read path is a convenience, not a commitment to support older development builds.
+
+
+## Current UI labels and Explorer
+
+Access choices are Automatic, Force exclusive mode and Force shared mode. They
+serialize as null, Exclusive and Shared respectively; display wording is not an
+engine enum. Each direction retains independent preferences and mapping. The
+hole-wide Routing Engine and Use advanced tuning controls remain outside those
+panels so they cannot disagree between directions.
+
+Profile/device context menus offer Show in Explorer for saved JSON. Profiles are
+located by stable ID in the current named folder, including after rename; device
+paths come from the scanner's opaque edit snapshot. The Windows shell API selects
+the actual file without constructing an Explorer command line. Preview fixture
+records have no saved file and the action is disabled. Missing files show feedback
+without creating records or guessing a filename.

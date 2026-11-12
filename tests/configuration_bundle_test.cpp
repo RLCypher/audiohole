@@ -155,7 +155,7 @@ TEST_F(ConfigurationBundle, InactiveTuningAndFutureEngineRequestTravelWithProfil
     auto document = Json::parse(bytes(file));
     auto& hole = document["profiles"][0]["holes"][0];
     hole["advanced_tuning"] = false;
-    hole["routing_engine"] = "future-test-engine";
+    hole["routing"] = "future-test-engine";
     write(file, document.dump(2));
     export_profiles();
     auto plan = preview();
@@ -187,7 +187,7 @@ TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyE
     legacy["profiles"][0]["display_name"] = "Legacy profile";
     legacy["profiles"][0]["holes"][0]["id"] = "legacy-hole";
     legacy["profiles"][0]["holes"][0].erase("advanced_tuning");
-    legacy["profiles"][0]["holes"][0].erase("routing_engine");
+    legacy["profiles"][0]["holes"][0].erase("routing");
     const auto original = legacy.dump(2);
     write(target / "configuration.json", original);
     export_profiles();

@@ -46,7 +46,7 @@ class ThemedList final : public wxListBox {
 // Only application-palette painting is replaced; high contrast uses wx/Windows.
 class ActionButton final : public wxButton {
   public:
-    ActionButton(wxWindow* parent, const wxString& title, long style = 0);
+    ActionButton(wxWindow* parent, const wxString& title, long style = 0, wxWindowID id = wxID_ANY);
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
     bool use_native_colours = false;
 };

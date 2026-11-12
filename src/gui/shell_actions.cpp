@@ -195,4 +195,22 @@ Result configure_windows_startup(bool enabled) {
     return {result == ERROR_SUCCESS || (!enabled && result == ERROR_FILE_NOT_FOUND),
             "Windows startup preference updated."};
 }
+std::filesystem::path first_run_marker_path() {
+    return std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
+               .parent_path() /
+           "AudioHole.has-run";
+}
+Result show_in_explorer(const std::filesystem::path& file) {
+    std::error_code error;
+    if (!std::filesystem::is_regular_file(file, error) || error)
+        return {false, "The saved JSON file is unavailable. Save or reload the record first."};
+    const auto item = ILCreateFromPathW(file.c_str());
+    if (!item)
+        return {false, "Windows could not resolve the saved JSON file."};
+    const auto result = SHOpenFolderAndSelectItems(item, 0, nullptr, 0);
+    CoTaskMemFree(item);
+    return {SUCCEEDED(result), SUCCEEDED(result)
+                                   ? "Saved JSON selected in Explorer."
+                                   : "Windows could not open Explorer for this file."};
+}
 } // namespace audiohole::gui

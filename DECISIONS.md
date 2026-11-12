@@ -1666,3 +1666,17 @@ back silently. Native descriptors and runtime results are not saved intent.
 The owner will regenerate development profiles; older-build compatibility is not
 an acceptance requirement. The existing legacy reader remains a convenience.
 Production O-004/O-006 and backend/conversion/synchronization decisions remain open.
+
+
+## Owner-authorized workflow refinements
+
+The current implementation contract is [PROFILE_BUILDER.md](PROFILE_BUILDER.md):
+individual profile record **version 2**, aggregate transfer wrapper **version 6**,
+ZIP manifest still version 1. Current profiles write hole-level `routing` and
+`exclusive_mode_preferred`, plus per-direction preferences including reserved
+`preferred_clock_device`. Supported routing values are automatic/wasapi/miniaudio/
+experimental. Forced access mode takes precedence over the exclusive preference;
+clock preference currently has no engine effect. Separate Forward/Return tuning
+panels are disclosures only and sit beneath their respective direction groups.
+This supersedes earlier record-v1/transfer-v5 and single-panel UI descriptions.
+These changes do not add a streaming backend or settle production architecture.

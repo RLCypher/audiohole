@@ -1613,6 +1613,60 @@
         "expression": "happy",
         "fallback_expression": "idle"
       }
+    ],
+    "device_connected": [
+      {
+        "id": "uwu_device_connected_001",
+        "category": "status",
+        "text": "Ooh~ a new toy just swid in. Come cwoser, cutie~ OwO",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_device_connected_002",
+        "category": "status",
+        "text": "Hewwo, hawdware~ we've got a cozy wittle hole fow you~",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_disconnected": [
+      {
+        "id": "uwu_device_disconnected_001",
+        "category": "status",
+        "text": "Aww~ one of ouw toys puwwed out. I'll keep its spot cozy~",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_device_disconnected_002",
+        "category": "status",
+        "text": "You can come back whenevew you wike, cutie~ I'll be hewe~",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_unavailable": [
+      {
+        "id": "uwu_device_unavailable_001",
+        "category": "status",
+        "text": "Pwaying hawd to get, awe we? Let's see what Windows did this time~",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_device_unavailable_002",
+        "category": "status",
+        "text": "Ouw wittle toy isn't weady wight now. No need to fowce it, cutie~",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

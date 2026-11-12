@@ -219,7 +219,7 @@ TEST_F(ProfileStorage, V4MigrationTranslatesIntentOnceWithoutPromotingAutomaticC
     ASSERT_TRUE(store.save(records).ok);
     const auto migrated = Json::parse(read(file));
     const auto& saved = migrated["profiles"][0]["holes"][0]["forward"]["settings"];
-    EXPECT_EQ(migrated["schema_version"], 5);
+    EXPECT_EQ(migrated["schema_version"], 6);
     EXPECT_EQ(saved["preferences"]["common"]["buffer_ms"], 23);
     EXPECT_TRUE(saved["preferences"]["common"]["sample_rate_hz"].is_null());
     EXPECT_FALSE(saved.contains("format"));
@@ -237,13 +237,13 @@ TEST_F(ProfileStorage, IndividualRecordVersionsAndEnvelopeExtensionsSurviveTrans
     const auto first = root / "profiles" / "VR Streaming.json";
     auto record = Json::parse(read(first));
     EXPECT_EQ(record["format"], "audiohole-profile");
-    EXPECT_EQ(record["schema_version"], 1);
+    EXPECT_EQ(record["schema_version"], 2);
     EXPECT_FALSE(record.contains("profiles"));
     Profile output;
     ASSERT_TRUE(validate_profile_record(record.dump(), output).ok);
     EXPECT_EQ(output.notes, "Keep µ notes");
     auto future = record;
-    future["schema_version"] = 2;
+    future["schema_version"] = 3;
     EXPECT_FALSE(validate_profile_record(future.dump(), output).ok);
     EXPECT_EQ(output.id, "profile");
     EXPECT_FALSE(validate_test_document(record.dump(), records).ok);
@@ -253,7 +253,7 @@ TEST_F(ProfileStorage, IndividualRecordVersionsAndEnvelopeExtensionsSurviveTrans
     ASSERT_TRUE(store.load(records).ok);
     std::string transfer;
     ASSERT_TRUE(read_profile_document(file, transfer).ok);
-    EXPECT_EQ(Json::parse(transfer)["schema_version"], 5);
+    EXPECT_EQ(Json::parse(transfer)["schema_version"], 6);
     ProfileDirectoryPersistence target(root / "imported" / "configuration.json");
     ConfigurationRecords empty;
     ASSERT_TRUE(target.load(empty).ok);

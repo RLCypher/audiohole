@@ -89,6 +89,9 @@ enum class Message {
     AdvancedTuningEnabled,
     ManualOverrideApplied,
     AutomaticRestored,
+    DeviceConnected,
+    DeviceDisconnected,
+    DeviceUnavailable,
     Count
 };
 struct Variant {

@@ -41,7 +41,7 @@ Result replace_document(const std::filesystem::path&, const std::string& bytes,
 // Reuse the Test serializer's validation for portable bundle payloads. Merging
 // adds profiles only; conflicting profile/hole identities are never regenerated.
 Result validate_test_document(const std::string&, ConfigurationRecords&);
-// Canonical individual profile envelope: audiohole-profile, record version 1.
+// Canonical individual profile envelope: audiohole-profile, record version 2.
 Result validate_profile_record(const std::string&, Profile&);
 Result merge_test_profiles(const std::optional<std::string>& existing, const std::string& incoming,
                            std::string& merged);
@@ -62,6 +62,8 @@ class ProfileDirectoryPersistence final : public ConfigurationPersistence {
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };
+Result profile_record_path(const std::filesystem::path& legacy_file, const std::string& id,
+                           std::filesystem::path& output);
 Result read_profile_document(const std::filesystem::path& legacy_file, std::string& document);
 Result write_profile_document(const std::filesystem::path& legacy_file, const std::string& document,
                               const std::string& expected,

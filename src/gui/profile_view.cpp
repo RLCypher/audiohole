@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "model/persistence.h"
 #include <sstream>
 #include <wx/access.h>
 
@@ -151,9 +152,33 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.information->SetMaxSize(wxSize(-1, information_height));
     w.information->SetSize(wxSize(w.information->GetSize().x, information_height));
     w.group->Add(w.information, 0, wxEXPAND | wxALL, FromDIP(4));
-    auto* tuning = new wxStaticBoxSizer(wxVERTICAL, advanced_panel_, title + " tuning");
+    if (&w == &forward_) {
+        exclusive_preferred_ = new wxCheckBox(box, wxID_ANY, "Exclusive mode preferred");
+        exclusive_preferred_->SetToolTip(
+            "Prefer exclusive access in both directions when operating mode "
+            "is Automatic. A forced mode takes precedence in each direction.");
+        w.group->Add(exclusive_preferred_, 0, wxALL, FromDIP(4));
+        exclusive_preferred_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
+            if (!loading_) {
+                capture_draft();
+                dirty_ = true;
+                refresh();
+            }
+        });
+    }
+    w.tuning = new wxCollapsiblePane(box, wxID_ANY, "Advanced tuning", wxDefaultPosition,
+                                     wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
+    w.tuning->SetName(title + " advanced tuning");
+    w.group->Add(w.tuning, 0, wxEXPAND | wxALL, FromDIP(4));
+    auto* pane = w.tuning->GetPane();
+    auto* pane_layout = new wxBoxSizer(wxVERTICAL);
+    auto* tuning = new wxStaticBoxSizer(wxVERTICAL, pane, title + " tuning");
     w.tuning_group = tuning;
-    advanced_panel_->GetSizer()->Add(tuning, 0, wxEXPAND | wxALL, FromDIP(4));
+    pane_layout->Add(tuning, 0, wxEXPAND);
+    pane->SetSizer(pane_layout);
+    w.tuning->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [this, &w](wxCollapsiblePaneEvent&) {
+        layout_direction(w); // Visibility only; no draft capture, policy toggle or Fit().
+    });
     box = tuning->GetStaticBox();
     label(box, tuning, "Complete format preset (optional)");
     w.format = new ThemedChoice(box, wxID_ANY);
@@ -228,7 +253,22 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                          "listed device to bind it.");
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
-    w.mode = choices(box, tuning, "Operating mode", {"Automatic", "Shared", "Exclusive"});
+    w.mode = choices(box, tuning, "Operating mode",
+                     {"Automatic", "Force exclusive mode", "Force shared mode"});
+    w.clock = choices(box, tuning, "Preferred clock device", {"Automatic", "Capture", "Playback"});
+    w.clock->SetToolTip(
+        "Saved for future engine support. This selection currently has no routing effect.");
+    auto* clock_note = label(
+        box, tuning, "Clock preference is reserved for future engine support; currently inactive.");
+    clock_note->SetMinSize(wxSize(0, -1));
+    clock_note->Wrap(FromDIP(320));
+    w.clock->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        if (!loading_) {
+            capture_draft();
+            dirty_ = true;
+            refresh();
+        }
+    });
     w.mode->SetToolTip("Automatic initially uses Shared access. Shared cooperates with other apps; "
                        "Exclusive can reserve a device. Changes wait for explicit Apply.");
     for (auto* field :
@@ -295,7 +335,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
          std::vector<wxWindow*>{w.rate, w.channels, w.source_channels, w.destination_channels,
                                 w.channel_map, w.source, w.destination})
         input->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent&) { queue_field_save(false); });
-    for (auto* choice : {w.format, w.mode, w.representation})
+    for (auto* choice : {w.format, w.mode, w.representation, w.clock})
         choice->Bind(wxEVT_KEY_UP, [this](wxKeyEvent& event) {
             if ((event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) &&
                 !event.HasAnyModifiers())
@@ -325,12 +365,13 @@ void Frame::tuning_changed() {
     advanced_tuning_->SetValue(enabled);
     hole.advanced_tuning = enabled;
     auto* focused = wxWindow::FindFocus();
-    if (!enabled && focused && advanced_panel_->IsDescendant(focused))
+    if (!enabled && focused &&
+        (forward_.tuning->IsDescendant(focused) || reverse_.tuning->IsDescendant(focused)))
         advanced_tuning_->SetFocus();
     // Showing controls is independent of whether retained overrides participate.
     populate_direction(forward_, hole.forward);
     populate_direction(reverse_, hole.reverse);
-    auto* editor = static_cast<wxScrolledWindow*>(advanced_panel_->GetParent());
+    auto* editor = static_cast<wxScrolledWindow*>(hole_heading_->GetParent());
     editor->Layout();
     editor->FitInside();
     dirty_ = true;
@@ -384,6 +425,18 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
     menu->Append(wxID_EDIT, wxS("Rename…"),
                  "Rename and save the profile without changing active routing.");
     menu->Append(wxID_DUPLICATE, "Duplicate", "Create a separate copy of the saved profile.");
+    const auto reveal = wxWindow::NewControlId();
+    menu->Append(reveal, "Show in Explorer",
+                 "Open the folder and select this profile's saved JSON.");
+    menu->Enable(reveal, controller_->snapshot().operating_mode == OperatingMode::Test);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, id](wxCommandEvent&) {
+            std::filesystem::path file;
+            const auto found = profile_record_path(preferences_->test_configuration(), id, file);
+            show_result(found.ok ? show_in_explorer(file) : found);
+        },
+        reveal);
     menu->AppendSeparator();
     menu->Append(wxID_DELETE, "Delete", "Delete this saved profile after confirmation.");
     const auto& snapshot = controller_->snapshot();
@@ -750,41 +803,29 @@ void Frame::build_profiles() {
     right->Add(toggles);
     hole_notes_ = field(editor, right, "Hole notes", wxTE_MULTILINE | wxTE_WORDWRAP);
     hole_notes_->SetMinSize(wxSize(0, hole_notes_->GetCharHeight() * 3 + FromDIP(8)));
-    advanced_panel_ = new wxPanel(editor);
-    advanced_panel_->SetSizer(new wxBoxSizer(wxVERTICAL));
-    routing_engine_ =
-        choices(advanced_panel_, advanced_panel_->GetSizer(), "Routing Engine", {"Automatic"});
-    routing_engine_->SetToolTip("Requested engine selection for this hole. Only Automatic is "
-                                "available; no engine is selected or started by this control.");
-    routing_engine_notice_ = label(advanced_panel_, advanced_panel_->GetSizer(), "");
+    advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Use advanced tuning");
+    advanced_tuning_->SetName("Use advanced tuning");
+    advanced_tuning_->SetToolTip(
+        "Use saved tuning in both directions. Opening a tuning panel only changes visibility.");
+    right->Add(advanced_tuning_, 0, wxALL, FromDIP(4));
+    advanced_tuning_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { tuning_changed(); });
+    routing_engine_ = choices(editor, right, "Routing Engine",
+                              {"Automatic", "WASAPI", "Miniaudio", "Experimental"});
+    routing_engine_->SetToolTip("Save the routing backend request for this hole. Selecting an "
+                                "engine does not start routing.");
+    routing_engine_notice_ = label(editor, right, "");
     routing_engine_notice_->SetMinSize(wxSize(0, -1));
     routing_engine_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         if (!loading_) {
             capture_draft();
-            routing_engine_notice_->SetLabel("");
             dirty_ = true;
             refresh();
         }
     });
     build_direction(editor, right, forward_, "Forward");
     build_direction(editor, right, reverse_, "Return");
-    show_tuning_ = new wxCheckBox(editor, wxID_ANY, "Show advanced tuning");
-    right->Add(show_tuning_, 0, wxALL, FromDIP(4));
-    show_tuning_->Bind(wxEVT_CHECKBOX, [this, editor](wxCommandEvent&) {
-        advanced_panel_->Show(show_tuning_->GetValue());
-        editor->Layout();
-        editor->FitInside();
-    });
-    advanced_tuning_ = new wxCheckBox(editor, wxID_ANY, "Use advanced overrides");
-    advanced_tuning_->SetName("Enable Advanced Tuning");
-    advanced_tuning_->SetToolTip("Allow retained manual overrides for this hole. Save / Apply is "
-                                 "explicit; toggling never starts routing.");
-    right->Add(advanced_tuning_, 0, wxALL, FromDIP(4));
-    right->Add(advanced_panel_, 0, wxEXPAND);
-    advanced_panel_->MoveAfterInTabOrder(advanced_tuning_);
-    advanced_panel_->Hide();
-    advanced_tuning_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { tuning_changed(); });
-    for (auto* input : std::vector<wxWindow*>{enabled_, duplex_, advanced_tuning_, routing_engine_})
+    for (auto* input : std::vector<wxWindow*>{enabled_, duplex_, advanced_tuning_, routing_engine_,
+                                              exclusive_preferred_})
         input->Bind(wxEVT_KEY_UP, [this](wxKeyEvent& event) {
             if ((event.GetKeyCode() == WXK_RETURN || event.GetKeyCode() == WXK_NUMPAD_ENTER) &&
                 !event.HasAnyModifiers())
@@ -969,10 +1010,10 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.channel_map->ChangeValue(text(mapping));
     w.buffer->SetValue(d.settings.preferences.common.buffer_ms.value_or(0));
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
-    w.mode->Clear();
-    for (const auto* mode : {"Automatic", "Shared", "Exclusive"})
-        w.mode->Append(mode);
-    w.mode->SetStringSelection(text(d.settings.preferences.common.mode.value_or("Automatic")));
+    const auto mode = d.settings.preferences.common.mode.value_or("Automatic");
+    w.mode->SetSelection(mode == "Exclusive" ? 1 : mode == "Shared" ? 2 : 0);
+    const auto clock = d.settings.preferences.preferred_clock_device;
+    w.clock->SetSelection(clock == "capture" ? 1 : clock == "playback" ? 2 : 0);
     loading_ = old_loading;
     if (!loading_)
         layout_direction(w);
@@ -1118,9 +1159,12 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
         d.settings.preferences = std::move(preference);
     if (const auto parsed = buffer_value(w.buffer))
         d.settings.set_buffer_preference(*parsed);
-    const auto mode = utf8(w.mode->GetStringSelection());
+    const auto mode = w.mode->GetSelection();
     d.settings.preferences.common.mode =
-        mode == "Automatic" ? std::nullopt : std::optional<std::string>(mode);
+        mode == 0 ? std::nullopt : std::optional<std::string>(mode == 1 ? "Exclusive" : "Shared");
+    d.settings.preferences.preferred_clock_device = w.clock->GetSelection() == 1   ? "capture"
+                                                    : w.clock->GetSelection() == 2 ? "playback"
+                                                                                   : "automatic";
     d.settings.refresh_projection();
 }
 void Frame::capture_draft() {
@@ -1134,8 +1178,11 @@ void Frame::capture_draft() {
     h.enabled = enabled_->GetValue();
     h.duplex = duplex_->GetValue();
     h.advanced_tuning = advanced_tuning_->GetValue();
-    if (routing_engine_->GetSelection() == 0)
-        h.routing_engine = "automatic";
+    h.exclusive_mode_preferred = exclusive_preferred_->GetValue();
+    constexpr const char* engines[]{"automatic", "wasapi", "miniaudio", "experimental"};
+    const int engine = routing_engine_->GetSelection();
+    if (engine >= 0 && engine < 4)
+        h.routing_engine = engines[engine];
     read_direction(forward_, h.forward);
     read_direction(reverse_, h.reverse);
 }
@@ -1199,17 +1246,21 @@ void Frame::load_hole(int index) {
     enabled_->SetValue(h.enabled);
     duplex_->SetValue(h.duplex);
     advanced_tuning_->SetValue(index >= 0 && h.advanced_tuning);
-    show_tuning_->Enable(index >= 0);
     advanced_tuning_->Enable(index >= 0);
+    exclusive_preferred_->SetValue(h.exclusive_mode_preferred);
+    exclusive_preferred_->Enable(index >= 0);
     hole_remove_->Enable(index >= 0);
-    advanced_panel_->Show(index >= 0 && show_tuning_->GetValue());
-    routing_engine_->SetSelection(h.routing_engine == "automatic" ? 0 : wxNOT_FOUND);
+    constexpr const char* engines[]{"automatic", "wasapi", "miniaudio", "experimental"};
+    int engine = wxNOT_FOUND;
+    for (int i = 0; i < 4; ++i)
+        if (h.routing_engine == engines[i])
+            engine = i;
+    routing_engine_->SetSelection(engine);
     routing_engine_->Enable(index >= 0);
     routing_engine_notice_->SetLabel(
-        h.routing_engine == "automatic"
-            ? wxString{}
-            : text("Saved Routing Engine unavailable in this build: " + h.routing_engine +
-                   ". Retained until you explicitly select Automatic."));
+        engine == wxNOT_FOUND ? text("Saved Routing Engine unavailable: " + h.routing_engine +
+                                     ". Choose a supported engine explicitly.")
+                              : wxString{});
     routing_engine_notice_->Wrap(560);
     activity_direction_->SetSelection(0);
     activity_direction_->Enable(index >= 0 && h.duplex);
@@ -1223,7 +1274,7 @@ void Frame::load_hole(int index) {
     for (auto* direction : {&forward_, &reverse_}) {
         for (wxWindow* input :
              std::vector<wxWindow*>{direction->source, direction->destination, direction->format,
-                                    direction->mode, direction->buffer})
+                                    direction->mode, direction->buffer, direction->clock})
             input->Enable(index >= 0);
         for (wxWindow* input :
              std::vector<wxWindow*>{direction->rate, direction->channels, direction->representation,

@@ -1,6 +1,6 @@
 {
   "format": "audiohole-profile",
-  "schema_version": 1,
+  "schema_version": 2,
   "profile": {
     "display_name": "Microphone monitoring",
     "notes": "Illustrative provisional Test configuration; device IDs must exist in the separate scanned inventory.",
@@ -28,7 +28,8 @@
               },
               "source": {},
               "destination": {},
-              "channel_map": []
+              "channel_map": [],
+              "preferred_clock_device": "automatic"
             }
           }
         },
@@ -48,12 +49,14 @@
               },
               "source": {},
               "destination": {},
-              "channel_map": []
+              "channel_map": [],
+              "preferred_clock_device": "automatic"
             }
           }
         },
         "advanced_tuning": false,
-        "routing_engine": "automatic"
+        "routing": "automatic",
+        "exclusive_mode_preferred": false
       }
     ]
   }

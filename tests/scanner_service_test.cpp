@@ -1038,7 +1038,7 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
     const auto json = Json::parse(bytes(file));
     EXPECT_TRUE(json.at("devices").empty());
-    EXPECT_EQ(json.at("schema_version"), 5);
+    EXPECT_EQ(json.at("schema_version"), 6);
     EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
     EXPECT_FALSE(json["profiles"][0]["holes"][0]["forward"]["settings"].contains("format"));
     EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);

@@ -14,7 +14,11 @@ constexpr int scan_ms_per_percent = 30;
 constexpr int simulated_automatic_buffer_ms = 6; // Fixture choice, never a hardware recommendation.
 constexpr std::size_t maximum_diagnostic_events = 500;
 bool manual_settings(const Direction& direction) {
-    return direction.settings.preferences != Preferences{};
+    const auto& preference = direction.settings.preferences;
+    // Reserved clock metadata is saved intent, not an applied audio override.
+    return preference.common != EndpointPreferences{} ||
+           preference.source != EndpointPreferences{} ||
+           preference.destination != EndpointPreferences{} || !preference.channel_map.empty();
 }
 bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
     bool supported = false;
@@ -105,6 +109,9 @@ std::optional<Format> derive_pcm_format(const EndpointPreferences& p) {
                              rate * alignment}};
 }
 Result validate_preferences(const Preferences& p) {
+    if (p.preferred_clock_device != "automatic" && p.preferred_clock_device != "capture" &&
+        p.preferred_clock_device != "playback")
+        return {false, "Choose Automatic, Capture or Playback as the preferred clock device."};
     for (const auto* e : {&p.common, &p.source, &p.destination}) {
         if ((e->sample_rate_hz && (*e->sample_rate_hz < 1 || *e->sample_rate_hz > 768000)) ||
             (e->channel_count && (*e->channel_count < 1 || *e->channel_count > 256)) ||
@@ -298,7 +305,8 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
                 choices.compatible.empty()
                     ? derive_pcm_format(d.settings.preferences.common).value_or(Format{})
                     : choices.compatible.front();
-            const auto mode = d.settings.preferences.common.mode.value_or("Shared");
+            const auto mode = d.settings.preferences.common.mode.value_or(
+                hole.exclusive_mode_preferred ? "Exclusive" : "Shared");
             RoutingPathRequest path;
             path.hole_id = hole.id;
             path.source = d.source;
@@ -321,6 +329,7 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
             request.mode = mode;
             request.buffer_ms = request.preferences.common.buffer_ms.value_or(0);
             request.routing_engine = hole.routing_engine;
+            request.exclusive_mode_preferred = hole.exclusive_mode_preferred;
         }
     }
     output = std::move(prepared);
@@ -338,7 +347,8 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
         if (!hole.enabled)
             continue;
         ++enabled;
-        if (hole.routing_engine != "automatic")
+        if (hole.routing_engine != "automatic" && hole.routing_engine != "wasapi" &&
+            hole.routing_engine != "miniaudio" && hole.routing_engine != "experimental")
             return {false, "The requested Routing Engine is unavailable in this build. Select "
                            "Automatic. Engine selection is independent of audio overrides."};
         for (const bool reverse : {false, true}) {
@@ -383,17 +393,30 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
                                                : direction->settings.preferences.destination;
                     const auto preference =
                         inherit_preferences(direction->settings.preferences.common, specific);
-                    bool rejected = false, supported = false;
+                    bool shared_rejected = false, exclusive_rejected = false, supported = false;
                     if (preference.sample_rate_hz && preference.channel_count &&
                         preference.sample_format)
                         for (const auto& capability : device->capabilities)
-                            if (capability.mode == preference.mode.value_or("Shared") &&
+                            if ((capability.mode == preference.mode.value_or("Shared") ||
+                                 (!preference.mode && hole.exclusive_mode_preferred &&
+                                  capability.mode == "Exclusive")) &&
                                 capability.format.rate == *preference.sample_rate_hz &&
                                 capability.format.channels == *preference.channel_count &&
                                 capability.format.representation == *preference.sample_format) {
                                 supported |= capability.support == FormatSupport::Supported;
-                                rejected |= capability.support == FormatSupport::Unsupported;
+                                if (capability.support == FormatSupport::Unsupported) {
+                                    shared_rejected |= capability.mode == "Shared";
+                                    exclusive_rejected |= capability.mode == "Exclusive";
+                                }
                             }
+                    // A preference cannot turn one access-mode rejection into
+                    // a forced requirement. The other mode may still work or
+                    // remain untested; initialization owns the final result.
+                    const bool rejected =
+                        preference.mode ? (*preference.mode == "Exclusive" ? exclusive_rejected
+                                                                           : shared_rejected)
+                        : hole.exclusive_mode_preferred ? shared_rejected && exclusive_rejected
+                                                        : shared_rejected;
                     if (rejected && !supported)
                         return {false, "An explicit format override was reported unsupported. "
                                        "Change it or reset to Automatic."};

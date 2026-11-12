@@ -1,5 +1,6 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include "gui/welcome.h"
 #include "model/application_controller.h"
 #include "model/configuration_bundle.h"
 #include "model/configuration_controller.h"
@@ -403,6 +404,11 @@ void Frame::bother() {
     present(presentation::Message::Bother);
 }
 void Frame::present(presentation::Message event) {
+    const bool device_notice = event == presentation::Message::DeviceConnected ||
+                               event == presentation::Message::DeviceDisconnected ||
+                               event == presentation::Message::DeviceUnavailable;
+    if (!device_notice)
+        device_event_copy_.clear();
     operational_warning_visible_ = event == presentation::Message::ScanFailed ||
                                    event == presentation::Message::Disconnected ||
                                    event == presentation::Message::Recovering ||
@@ -416,6 +422,8 @@ void Frame::present(presentation::Message event) {
     fallback_copy_ =
         personality_fallback_note_.empty() ? c.fallback_detail : personality_fallback_note_;
     technical_copy_ = event == presentation::Message::Bother ? std::string{} : c.technical;
+    if (device_notice && !device_event_copy_.empty())
+        technical_copy_ = device_event_copy_;
     commentary_copy_ = c.commentary;
     layout_header();
 }
@@ -807,6 +815,16 @@ void Frame::refresh() {
                                    e.type == "error" ? wxICON_WARNING : wxICON_INFORMATION, 3000);
             }
         }
+    const auto device_notices = device_events_.observe(s.endpoints);
+    if (!device_notices.empty() && !operational_warning_visible_) {
+        device_event_copy_.clear();
+        for (const auto& notice : device_notices) {
+            if (!device_event_copy_.empty())
+                device_event_copy_ += " ";
+            device_event_copy_ += notice.text;
+        }
+        present(device_notices.back().message);
+    }
     tray_->update(s);
 }
 bool Frame::smoke(const wxString& directory) {
@@ -815,6 +833,15 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        {
+            WelcomeDialog welcome(true);
+            require(welcome.has_norm_image(), "Welcome Norm image missing");
+            require(welcome.FindWindow(wxID_YES)->GetLabel() == "It's my first time" &&
+                        welcome.FindWindow(wxID_NO)->GetLabel() == "Show me them holes!" &&
+                        welcome.FindWindow(wxID_CANCEL)->GetLabel() == "I'm not ready yet",
+                    "Welcome button labels/launch targets changed");
+        }
+        apply_appearance(); // The separate welcome follows Windows' dialog theme.
         auto exercise_information = [&] {
             const auto window_size = GetSize();
             const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
@@ -858,59 +885,75 @@ bool Frame::smoke(const wxString& directory) {
         auto exercise_tuning = [&] {
             exercise_information();
             require(hole_index_ >= 0 && !advanced_tuning_->GetValue() &&
-                        !advanced_panel_->IsShown() && signal_tools_->IsCollapsed(),
-                    "Ordinary configuration must start Automatic with tuning/tools hidden");
-            require(routing_engine_->GetCount() == 1 &&
-                        routing_engine_->GetString(0) == "Automatic" &&
-                        routing_engine_->GetSelection() == 0,
-                    "Routing Engine must offer only Automatic in this build");
+                        forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed() &&
+                        signal_tools_->IsCollapsed(),
+                    "New holes must start with Automatic tuning and collapsed direction panels");
+            require(advanced_tuning_->GetLabel() == "Use advanced tuning" &&
+                        routing_engine_->GetCount() == 4 &&
+                        routing_engine_->GetString(1) == "WASAPI" &&
+                        routing_engine_->GetString(2) == "Miniaudio" &&
+                        routing_engine_->GetString(3) == "Experimental",
+                    "Routing/tuning choices are incomplete");
+            require(forward_.tuning->GetParent() == forward_.group->GetStaticBox() &&
+                        reverse_.tuning->GetParent() == reverse_.group->GetStaticBox() &&
+                        forward_.tuning != reverse_.tuning,
+                    "Direction tuning must belong to its own endpoint group");
+            require(forward_.mode->GetString(1) == "Force exclusive mode" &&
+                        forward_.mode->GetString(2) == "Force shared mode" &&
+                        forward_.clock->GetCount() == 3,
+                    "Forced mode or clock choices missing");
             const auto revision = controller_->snapshot().revision;
             const auto occurrence = occurrence_;
             const auto before = draft_.holes.at(static_cast<std::size_t>(hole_index_));
             const auto window_size = GetSize();
+            auto disclose = [&](DirectionWidgets& widgets, bool expanded) {
+                widgets.tuning->Collapse(!expanded);
+                wxCollapsiblePaneEvent event(widgets.tuning, widgets.tuning->GetId(), !expanded);
+                widgets.tuning->GetEventHandler()->ProcessEvent(event);
+                require(GetSize() == window_size, "Direction disclosure resized the window");
+            };
+            disclose(forward_, true);
+            require(reverse_.tuning->IsCollapsed() && !advanced_tuning_->GetValue(),
+                    "Opening Forward tuning opened Return or changed eligibility");
             wxCommandEvent toggle(wxEVT_CHECKBOX, advanced_tuning_->GetId());
             auto choose = [&](bool enabled) {
                 advanced_tuning_->SetValue(enabled);
                 advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
-                require(advanced_panel_->IsShown() == show_tuning_->GetValue(),
-                        "Override policy changed control visibility");
-                require(GetSize() == window_size,
-                        "Changing override eligibility resized the top-level window");
+                require(!forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed() &&
+                            GetSize() == window_size,
+                        "Tuning eligibility changed disclosure or frame geometry");
             };
-            show_tuning_->SetValue(true);
-            wxCommandEvent show_controls(wxEVT_CHECKBOX, show_tuning_->GetId());
-            show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
-            require(advanced_panel_->IsShown() && GetSize() == window_size,
-                    "Showing advanced tuning resized the top-level window");
             choose(true);
             forward_.buffer->SetValue(19);
             reverse_.buffer->SetValue(23);
+            forward_.clock->SetSelection(1);
+            reverse_.clock->SetSelection(2);
             capture_draft();
             choose(false);
-            require(
-                draft_.holes.at(static_cast<std::size_t>(hole_index_)).forward.settings.buffer_ms ==
-                        19 &&
-                    draft_.holes.at(static_cast<std::size_t>(hole_index_))
-                            .reverse.settings.buffer_ms == 23,
-                "Disabling tuning discarded independent overrides");
+            require(draft_.holes.at(hole_index_).forward.settings.buffer_ms == 19 &&
+                        draft_.holes.at(hole_index_).reverse.settings.buffer_ms == 23 &&
+                        draft_.holes.at(hole_index_)
+                                .forward.settings.preferences.preferred_clock_device == "capture" &&
+                        draft_.holes.at(hole_index_)
+                                .reverse.settings.preferences.preferred_clock_device == "playback",
+                    "Disabling tuning discarded independent directional choices");
             choose(true);
-            require(forward_.buffer->GetValue() == 19 && reverse_.buffer->GetValue() == 23 &&
-                        controller_->snapshot().revision == revision && occurrence_ == occurrence,
-                    "Policy toggles altered operational state or spammed immediate commentary");
+            require(controller_->snapshot().revision == revision && occurrence_ == occurrence,
+                    "Tuning changed operational state or emitted immediate commentary");
             tuning_timer_.Stop();
             capture_draft();
-            const auto before_hiding = draft_.holes.at(static_cast<std::size_t>(hole_index_));
-            show_tuning_->SetValue(false);
-            show_tuning_->GetEventHandler()->ProcessEvent(show_controls);
+            const auto retained = draft_.holes.at(hole_index_);
+            disclose(forward_, false);
+            disclose(reverse_, true);
             capture_draft();
-            require(draft_.holes.at(static_cast<std::size_t>(hole_index_)) == before_hiding &&
-                        !advanced_panel_->IsShown() && GetSize() == window_size,
-                    "Hiding tuning changed retained intent or resized the window");
-            draft_.holes.at(static_cast<std::size_t>(hole_index_)) = before;
+            require(draft_.holes.at(hole_index_) == retained && forward_.tuning->IsCollapsed(),
+                    "Directional disclosure changed saved intent or its sibling panel");
+            disclose(reverse_, false);
+            draft_.holes.at(hole_index_) = before;
             load_hole(hole_index_);
-            choose(true); // The following buffer-Apply smoke explicitly opts into tuning.
+            advanced_tuning_->SetValue(true);
+            advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
             tuning_timer_.Stop();
-            require(GetSize() == window_size, "Tuning disclosure resized the top-level window");
         };
         auto decline_delete = [&](wxListBox* list, wxButton* remove = nullptr) {
             capture_draft();

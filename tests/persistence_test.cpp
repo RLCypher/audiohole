@@ -141,7 +141,7 @@ TEST_F(PersistenceTest, LegacyPolicyMigratesExplicitlyAndInactiveManualValuesSur
     EXPECT_FALSE(loaded.profiles[0].holes[0].advanced_tuning);
     EXPECT_EQ(loaded.profiles[0].holes[0].forward, retained);
     const auto json = nlohmann::ordered_json::parse(read());
-    EXPECT_EQ(json.at("schema_version"), 5);
+    EXPECT_EQ(json.at("schema_version"), 6);
     EXPECT_EQ(json["profiles"][0]["holes"][0]["extension"], hole["extension"]);
     EXPECT_TRUE(json["profiles"][0]["holes"][0]["forward"]["settings"]["custom"]["keep"]);
 }
@@ -170,8 +170,8 @@ TEST_F(PersistenceTest, RoutingEngineDefaultsRoundTripsAndRejectsMalformedTypes)
     seed();
     auto json = nlohmann::ordered_json::parse(read());
     auto& hole = json["profiles"][0]["holes"][0];
-    EXPECT_EQ(hole.at("routing_engine"), "automatic");
-    hole.erase("routing_engine");
+    EXPECT_EQ(hole.at("routing"), "automatic");
+    hole.erase("routing");
     write(json.dump());
     TestJsonPersistence provider(file);
     ConfigurationRecords records;
@@ -188,7 +188,7 @@ TEST_F(PersistenceTest, RoutingEngineDefaultsRoundTripsAndRejectsMalformedTypes)
     for (const auto& invalid :
          {nlohmann::ordered_json(2), nlohmann::ordered_json(""), nlohmann::ordered_json(nullptr)}) {
         auto broken = nlohmann::ordered_json::parse(saved);
-        broken["profiles"][0]["holes"][0]["routing_engine"] = invalid;
+        broken["profiles"][0]["holes"][0]["routing"] = invalid;
         const auto bytes = broken.dump();
         write(bytes);
         TestJsonPersistence rejected(file);
@@ -240,9 +240,9 @@ TEST_F(PersistenceTest, MalformedNewerDuplicateAndFractionalInputNeverGetsOverwr
         EXPECT_EQ(read(), text);
     }
     auto newer = valid;
-    const auto version = newer.find("\"schema_version\": 5");
+    const auto version = newer.find("\"schema_version\": 6");
     ASSERT_NE(version, std::string::npos);
-    newer.replace(version, 19, "\"schema_version\": 6");
+    newer.replace(version, 19, "\"schema_version\": 7");
     write(newer);
     TestJsonPersistence store(file);
     ConfigurationRecords data;
@@ -410,9 +410,9 @@ TEST_F(PersistenceTest, FractionalAndOverflowNumericFieldsPreserveOriginalOnFail
     const auto valid = read();
     for (const auto& invalid : {"1.5", "18446744073709551615"}) {
         auto broken = valid;
-        const auto position = broken.find("\"schema_version\": 5");
+        const auto position = broken.find("\"schema_version\": 6");
         ASSERT_NE(position, std::string::npos);
-        broken.replace(position, std::string("\"schema_version\": 5").size(),
+        broken.replace(position, std::string("\"schema_version\": 6").size(),
                        std::string("\"schema_version\": ") + invalid);
         write(broken);
         TestJsonPersistence provider(file);
@@ -458,7 +458,7 @@ TEST_F(PersistenceTest, V1LoadsWithoutWritesAndExplicitSavePreservesOriginalBefo
     ASSERT_TRUE(provider.save(records).ok);
     std::ifstream backup(file.string() + ".v1.bak", std::ios::binary);
     EXPECT_EQ(std::string(std::istreambuf_iterator<char>(backup), {}), legacy);
-    EXPECT_NE(read().find("\"schema_version\": 5"), std::string::npos);
+    EXPECT_NE(read().find("\"schema_version\": 6"), std::string::npos);
     const auto bytes = read();
     EXPECT_LT(bytes.find("\"profiles\""), bytes.find("\"devices\""));
     EXPECT_LT(bytes.find("\"display_name\""), bytes.find("\"notes\""));

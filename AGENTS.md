@@ -1329,3 +1329,15 @@ This supersedes conflicting earlier Test v4 rules. The owner will regenerate
 profiles; do not expand compatibility work for old development versions.
 Production architecture decisions remain Open. Review affected native smoke
 checks before pushing and report native execution as pending when unavailable.
+
+
+## Owner-authorized workflow to-do implementation
+
+Implement the twelve-item welcome, Explorer, directional tuning and device-event
+refinements documented in GUI.md and PROFILE_BUILDER.md. Routing selection is a
+hole-level `routing` request with four lowercase values; exclusive preference is
+a hole-level boolean and forced modes supersede it. Clock selection is reserved
+per-direction intent, not an implemented clock strategy. Record v2 / transfer v6
+supersede prior development storage. Use the owner's welcome text verbatim and
+existing Norm artwork. First-run/replay state lives beside the executable, with
+no installed marker writes from smoke mode. Native smoke review remains mandatory.

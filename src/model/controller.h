@@ -57,6 +57,7 @@ struct ChannelRoute {
 struct Preferences {
     EndpointPreferences common, source, destination;
     std::vector<ChannelRoute> channel_map;
+    std::string preferred_clock_device = "automatic"; // Reserved intent; no current engine effect.
     bool operator==(const Preferences&) const = default;
 };
 struct Settings {
@@ -87,7 +88,8 @@ struct Hole {
     bool enabled = true, duplex = false;
     Direction forward, reverse;
     bool advanced_tuning = false; // Policy gate; retained manual values are never erased.
-    std::string routing_engine = "automatic"; // Requested selector, not an initialized backend.
+    std::string routing_engine = "automatic"; // Serialized as routing; not an initialized backend.
+    bool exclusive_mode_preferred = false;
     bool operator==(const Hole&) const = default;
 };
 struct Profile {
@@ -153,6 +155,7 @@ struct RoutingPathRequest {
     int buffer_ms = 0; // Zero leaves buffer selection to the future engine.
     std::string routing_engine = "automatic";
     Preferences preferences;
+    bool exclusive_mode_preferred = false;
     EndpointPreferences source_requirements, destination_requirements;
     // The legacy format above is a candidate only when runtime_negotiation is
     // true. An engine must resolve each endpoint independently before opening.

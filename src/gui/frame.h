@@ -8,6 +8,7 @@
 #include "model/controller.h"
 #include "platform/windows/com_apartment.h"
 #include "presentation/avatar_host.h"
+#include "presentation/device_events.h"
 #include "presentation/messages.h"
 #include "presentation/sleep_commentary.h"
 #include <algorithm>
@@ -57,6 +58,8 @@ class Tray final : public wxTaskBarIcon {
 struct DirectionWidgets {
     wxStaticBoxSizer* group{};
     wxStaticBoxSizer* tuning_group{};
+    wxCollapsiblePane* tuning{};
+    wxChoice* clock{};
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{}, *representation{};
     wxTextCtrl *rate{}, *channels{}, *source_channels{}, *destination_channels{}, *channel_map{};
@@ -165,6 +168,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::vector<std::string> personality_ids_;
     presentation::Message last_message_ = presentation::Message::Ready;
     presentation::Messages messages_;
+    presentation::DeviceEvents device_events_;
+    std::string device_event_copy_;
     wxSimplebook* notebook_{};
     std::vector<wxToggleButton*> navigation_;
     bool dark_appearance_ = true;
@@ -205,10 +210,9 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
-    wxCheckBox *advanced_tuning_{}, *show_tuning_{};
+    wxCheckBox *advanced_tuning_{}, *exclusive_preferred_{};
     wxChoice* routing_engine_{};
     wxStaticText* routing_engine_notice_{};
-    wxPanel* advanced_panel_{};
     wxCollapsiblePane* signal_tools_{};
     wxChoice *activity_direction_{}, *personality_choice_{}, *destination_test_{}, *scan_mode_{},
         *scan_scope_{}, *severity_{}, *startup_{}, *startup_target_{}, *notifications_{};

@@ -1955,3 +1955,45 @@ a newline. Endpoint search text must be resolved to a listed device before savin
 no identity is guessed. Repeated queued Enter events coalesce and cannot save a
 different record after navigation. Settings entries commit their existing setting;
 scan/search controls do not acquire an implicit Start or unrelated Save action.
+
+
+## Owner-authorized workflow refinements
+
+The current implementation contract is [PROFILE_BUILDER.md](PROFILE_BUILDER.md):
+individual profile record **version 2**, aggregate transfer wrapper **version 6**,
+ZIP manifest still version 1. Current profiles write hole-level `routing` and
+`exclusive_mode_preferred`, plus per-direction preferences including reserved
+`preferred_clock_device`. Supported routing values are automatic/wasapi/miniaudio/
+experimental. Forced access mode takes precedence over the exclusive preference;
+clock preference currently has no engine effect. Separate Forward/Return tuning
+panels are disclosures only and sit beneath their respective direction groups.
+This supersedes earlier record-v1/transfer-v5 and single-panel UI descriptions.
+These changes do not add a streaming backend or settle production architecture.
+
+
+The welcome uses the owner's supplied introduction verbatim and existing Norm
+preview artwork. It's my first time opens Preview for now; Show me them holes!
+opens the working Test environment; I'm not ready yet exits. All buttons and the
+copy remain reachable at smaller display sizes through wrapping/scrolling. The
+introductory copy does not change engine capabilities. Tooltips identify the
+current development environments and unavailable streaming behavior.
+
+`AudioHole.has-run` lives beside the executable and is created only after an
+interactive launch is accepted. A missing marker forces the welcome even when
+startup display is disabled or minimized. Cancel does not mark a first run.
+Replay Tutorial confirms, confirms any unsaved editor discard, removes the marker
+and restarts with the existing single-instance restart handshake. The guided
+script is still unwritten, so replay returns to the welcome and Preview option.
+A non-writable install directory reports marker errors; it does not request admin
+rights or silently store a second marker elsewhere. Smoke launches never read or
+write the installed marker. Resetting the marker leaves device/profile data alone.
+
+Device availability transitions select external Norm/UwU commentary; Vanilla
+states the device name and observed change only. The initial saved inventory,
+unchanged polling, renames, hidden-status edits and clearing records are silent.
+Reported not_present/unplugged transitions are disconnections; other reported
+unavailability is named accordingly. This observer uses discovery/registry state,
+not audio callbacks, and never claims that a device streamed successfully. Unknown
+hardware enters this view through normal discovery; no intrusive auto-scan is
+started to obtain a personality response. Existing operational warnings take
+priority over these cosmetic callouts.

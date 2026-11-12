@@ -1586,6 +1586,60 @@
         "expression": "thinking",
         "fallback_expression": "idle"
       }
+    ],
+    "device_connected": [
+      {
+        "id": "default_device_connected_001",
+        "category": "status",
+        "text": "Another device has entered the hole situation. Let's make room.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_device_connected_002",
+        "category": "status",
+        "text": "Well, hello there. More hardware, more possibilities.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_disconnected": [
+      {
+        "id": "default_device_disconnected_001",
+        "category": "status",
+        "text": "One of our toys stepped out. I'll keep its place warm.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_device_disconnected_002",
+        "category": "status",
+        "text": "A cable has left the chat. Your saved setup is still here.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
+    ],
+    "device_unavailable": [
+      {
+        "id": "default_device_unavailable_001",
+        "category": "status",
+        "text": "That one's playing hard to get. Let's check what Windows is up to.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_device_unavailable_002",
+        "category": "status",
+        "text": "Still on the guest list, just not taking audio calls right now.",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }
