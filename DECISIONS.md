@@ -1713,3 +1713,17 @@ meter in interactive Test; Preview remains simulated. Native smoke disables the
 service. Cooperative cancellation and unsupported native formats must be reported
 honestly; no scan verification or runtime routing-health claim follows from a
 successful test beep. See GUI.md and MANUAL_GUI_CHECKLIST.md for acceptance checks.
+
+### 2026-11-12 — Advanced controls and Settings follow-up
+
+Owner-authorized: fix forced access-mode selection, block DFA wheel adjustments,
+match DFA arrows to the numeric editor, remove unused fallback dropdowns, align
+the buffer field/Apply row, and remove Settings' Preview Build environment panel
+while retaining Restart. The eventual Preview-to-Tutorial transition is deferred.
+
+Tuning controls retain editable saved intent even when tuning eligibility is off;
+resolution remains gated by each direction's existing advanced_tuning field. No
+profile schema or engine semantics change. The previous reported smoke failure
+was identified by the owner's build log as MSVC C2445 in diagnostic_view.cpp,
+caused by mixed literal/wxString conditional operands. Explicit typed assignment
+fixes that compile failure; native execution must still be reported separately.

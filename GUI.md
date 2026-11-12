@@ -2064,3 +2064,27 @@ reject duplicates. Distinct capture and playback logical IDs on one physical
 interface are independent. Other holes may reuse endpoints. **Clear endpoint**
 is always last and clears only that slot's assignment and label hint; it does
 not delete the scanned device. Inactive Return assignments do not reserve slots.
+
+### Advanced tuning and Settings polish (2026-11-12)
+
+Advanced controls retain edits regardless of the **Use advanced tuning** switch.
+For example, selecting Force exclusive mode while the switch is off saves that
+choice for later use; it remains inactive until the switch is enabled. Automatic,
+Force exclusive mode and Force shared mode remain independent in Forward/Return.
+Changing a choice neither enables tuning nor saves/applies a live route. Invalid
+editable tuning input must be corrected before Save, even while tuning is off.
+This fixes the previously silent reset of mode choices made with tuning disabled.
+The buffer field and its Apply button share a height and row alignment. The
+unused fallback-device dropdowns are removed from both direction panels.
+
+The Settings environment-selection panel is removed. **Restart AudioHole** is a
+standalone button below Advanced, retaining confirmation for unsaved profile and
+device edits. Existing saved environment preferences and welcome/replay behavior
+are unchanged. Preview-to-Tutorial conversion remains a future task.
+
+The DFA slider, exact-value editor and arrow control consume wheel gestures at
+both the wx event boundary and native Windows control boundary. Gestures scroll
+the Settings page without changing DFA or selecting commentary. Deliberate
+slider drags, typed values, keyboard arrows and button clicks still work. The
+arrow control matches the numeric editor height instead of its native oversized
+default. DFA remains transient cosmetic state and is not serialized.

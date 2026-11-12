@@ -97,10 +97,15 @@ void Frame::refresh_device_checks() {
                              : 0;
         if (widgets->meter->GetValue() != peak)
             widgets->meter->SetValue(peak);
-        wxString detail = !supported ? "Device checking unavailable."
-                          : active   ? state.capabilities.simulated ? "Preview check (simulated)."
-                                                                    : text(state.diagnostic_detail)
-                                     : "Not checking.";
+        wxString detail = wxS("Not checking.");
+        if (!supported)
+            detail = wxS("Device checking unavailable.");
+        else if (active) {
+            if (state.capabilities.simulated)
+                detail = wxS("Preview check (simulated).");
+            else
+                detail = text(state.diagnostic_detail);
+        }
         if (active && widgets->capture && !state.capabilities.simulated && !state.input_peak)
             detail += " Waiting for capture samples.";
         if (!active && active_check_ == widgets && !state.diagnostic_detail.empty())

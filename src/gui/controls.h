@@ -68,6 +68,9 @@ class NavigationButton final : public wxToggleButton {
 void theme_dialog(wxWindow*);
 bool confirm_exit(wxWindow* parent);
 void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event);
+// Protect native controls that change values before wx dispatches a wheel event.
+// Parent windows still receive the gesture for page scrolling.
+void prevent_wheel_adjustment(wxWindow& control);
 int themed_message_box(const wxString& message, const wxString& caption = "AudioHole",
                        long style = wxOK, wxWindow* parent = nullptr);
 wxString button_help(const wxString& title);

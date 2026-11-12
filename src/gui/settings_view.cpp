@@ -314,7 +314,12 @@ void Frame::build_settings() {
     dfa_value_ = new wxTextCtrl(box, wxID_ANY, "0.00", wxDefaultPosition, FromDIP(wxSize(100, -1)),
                                 wxTE_PROCESS_ENTER);
     dfa_value_->SetName("DFA exact value, normalized to two decimal places");
-    dfa_stepper_ = new wxSpinButton(box, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_VERTICAL);
+    const auto stepper_size = wxSize(FromDIP(18), dfa_value_->GetBestSize().y);
+    dfa_stepper_ = new wxSpinButton(box, wxID_ANY, wxDefaultPosition, stepper_size, wxSP_VERTICAL);
+    dfa_stepper_->SetMinSize(stepper_size);
+    dfa_stepper_->SetMaxSize(stepper_size);
+    for (auto* control : std::vector<wxWindow*>{dfa_slider_, dfa_value_, dfa_stepper_})
+        prevent_wheel_adjustment(*control);
     dfa_stepper_->SetRange(-1, 1);
     dfa_stepper_->SetValue(0);
     dfa_stepper_->SetName("Adjust DFA by one hundredth");
@@ -369,52 +374,24 @@ void Frame::build_settings() {
     dfa_value_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     dfa_stepper_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     root->Add(advanced, 0, wxEXPAND | wxALL, 4);
-    auto* preview_settings = new wxStaticBoxSizer(wxVERTICAL, page, "Preview Build environment");
-    auto* environment_box = preview_settings->GetStaticBox();
-    preview_mode_ = new wxCheckBox(environment_box, wxID_ANY,
-                                   "Preview Mode (load preview profiles and devices)");
-    preview_mode_->SetValue(preferences_->values().preview_mode);
-    preview_mode_->SetToolTip(
-        "Select the environment for the next launch. Preview uses demonstration records; Test uses "
-        "isolated persisted configuration. Restart is required.");
-    preview_settings->Add(preview_mode_, 0, wxALL, 4);
-    auto save_environment = [this](wxCommandEvent&) {
-        auto next = preferences_->values();
-        next.preview_mode = preview_mode_->GetValue();
-        const auto result = preferences_->update(next);
-        if (!result.ok) {
-            preview_mode_->SetValue(preferences_->values().preview_mode);
-            show_result(result);
-        }
-    };
-    preview_mode_->Bind(wxEVT_CHECKBOX, save_environment);
-    auto* environment_note =
-        label(environment_box, preview_settings,
-              controller_->snapshot().operating_mode == OperatingMode::Preview
-                  ? "Active: Preview Mode. Environment changes take effect after restart."
-                  : "Active: Test Mode (persistent configuration and real device scanning). "
-                    "Environment changes take "
-                    "effect after restart.");
-    auto* data_note =
-        label(environment_box, preview_settings,
-              wxS("Test data: ") + wxString(preferences_->test_configuration().wstring()));
-    for (auto* note : {environment_note, data_note}) {
-        wrapping_notes.emplace_back(note, note->GetLabel());
-        note->SetMinSize(wxSize(0, -1));
-        note->SetToolTip(note->GetLabel());
-    }
-    auto* restart_button = button(environment_box, preview_settings, "Restart AudioHole", [this] {
+    auto* restart_button = button(page, root, "Restart AudioHole", [this] {
         if (!discard())
+            return;
+        if (device_dirty_ &&
+            themed_message_box("Discard unsaved device edits before restarting? Saved device "
+                               "records will be retained.",
+                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
+                               this) != wxYES)
             return;
         if (restart_)
             restart_();
         else
             show_result({false, "Restart is unavailable for this host."});
     });
+    restart_button->SetName("Restart AudioHole");
     restart_button->SetToolTip(
-        "Close this session cleanly and launch the saved environment after the current process "
-        "exits. Saved settings/data are preserved; unsaved edits require confirmation.");
-    root->Add(preview_settings, 0, wxEXPAND | wxALL, FromDIP(4));
+        "Restart AudioHole after cleanly closing this session. Saved settings and data are "
+        "preserved; unsaved edits require confirmation.");
     page->Bind(wxEVT_SIZE, [page, wrapping_notes, last_width = 0](wxSizeEvent& event) mutable {
         const int width = page->GetClientSize().x;
         if (width > 0 && width != last_width) {
@@ -438,7 +415,8 @@ void Frame::testing_notice() {
             "Test Mode saves isolated configuration and reads real Windows device evidence. "
             "Basic scans do not open experimental streams. Deep scans require consent and can "
             "interrupt audio. "
-            "Routing, monitoring and Test Beep remain unavailable. External device JSON edits and "
+            "Temporary device checks open only the selected endpoint in shared mode. Routing "
+            "remains unavailable. External device JSON edits and "
             "filename renames can be read with Reload saved devices.",
             "AudioHole Test Mode", wxOK | wxICON_INFORMATION, this);
         return;

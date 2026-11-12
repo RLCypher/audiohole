@@ -232,3 +232,14 @@ show_preview_dialog preference no longer overrides that flag. Replay confirms,
 removes it and restarts. User Exit actions confirm with Exit/Cancel; controlled
 restart and unattended smoke shutdown do not ask twice. The bottom status bar
 omits the Test Mode suffix while retaining engine availability.
+
+### Editing inactive tuning (2026-11-12)
+
+The tuning-enable switch controls whether saved overrides are effective, not
+whether edits are retained. All displayed tuning values can be edited and saved
+while the switch is off; enabling it later activates those retained values.
+In particular, operating-mode selections no longer reset to Automatic just
+because tuning is disabled. Forward and Return remain independent. Invalid
+editable input blocks Save rather than being silently discarded. No profile
+schema, inheritance, access-mode enum, or routing-engine field changes follow
+from this GUI correction. Unused fallback dropdown placeholders are removed.

@@ -238,8 +238,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.buffer = new wxSpinCtrl(box, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
     auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
-    buffer_row->Add(w.buffer, 0, wxALL, 3);
+    buffer_row->Add(w.buffer, 0, wxALL | wxALIGN_CENTER_VERTICAL, FromDIP(4));
     w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
+    const int buffer_height = std::max(w.buffer->GetBestSize().y, FromDIP(32));
+    w.buffer->SetMinSize(wxSize(FromDIP(96), buffer_height));
+    w.buffer->SetMaxSize(wxSize(-1, buffer_height));
+    w.buffer_apply->SetMinSize(wxSize(-1, buffer_height));
+    w.buffer_apply->SetMaxSize(wxSize(-1, buffer_height));
     w.buffer_apply->Disable();
     w.buffer_apply->SetToolTip(
         "Save just this direction's buffer preference. A matching active Preview direction also "
@@ -270,8 +275,9 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             refresh();
         }
     });
-    w.mode->SetToolTip("Automatic initially uses Shared access. Shared cooperates with other apps; "
-                       "Exclusive can reserve a device. Changes wait for explicit Apply.");
+    w.mode->SetToolTip("Save an access-mode choice for this direction. Use advanced tuning must be "
+                       "enabled for it to apply. Forced modes take precedence over Exclusive mode "
+                       "preferred; Automatic initially uses shared access.");
     for (auto* field :
          {w.rate, w.channels, w.source_channels, w.destination_channels, w.channel_map})
         field->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
@@ -282,11 +288,6 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (!loading_)
             dirty_ = true;
     });
-    auto* fallback = new ThemedChoice(box, wxID_ANY);
-    fallback->Append(wxS("Fallback device — unavailable"));
-    fallback->SetSelection(0);
-    fallback->Disable();
-    tuning->Add(fallback, 0, wxEXPAND | wxALL, FromDIP(4));
     auto changed = [this, &w](bool source) {
         if (loading_ || hole_index_ < 0)
             return;
@@ -339,6 +340,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         const auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
         populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
         dirty_ = true;
+        refresh();
     });
     w.buffer->Bind(wxEVT_SPINCTRL, [this, &w](wxSpinEvent&) { acknowledge_buffer(w); });
     w.buffer->Bind(wxEVT_TEXT_ENTER, [this, &w](wxCommandEvent&) {
@@ -1187,8 +1189,8 @@ void Frame::read_direction(DirectionWidgets& w, audiohole::Direction& d) {
                             w.retained_destination_caption);
     d.advanced_tuning = w.advanced_tuning->GetValue();
     d.exclusive_mode_preferred = w.exclusive_preferred->GetValue();
-    if (!d.advanced_tuning)
-        return;
+    // The checkbox gates resolution, not editing. Retain explicit choices made
+    // while tuning is off; opening a panel or picking a mode must not discard them.
     auto preference = d.settings.preferences;
     if (read_preferences(w, preference))
         d.settings.preferences = std::move(preference);
@@ -1339,8 +1341,6 @@ bool Frame::profile_edits_pending() {
         for (auto* widgets : {&forward_, &reverse_}) {
             if (widgets == &reverse_ && !duplex_->GetValue())
                 continue;
-            if (!widgets->advanced_tuning->GetValue())
-                continue;
             auto preference = (widgets == &forward_ ? draft_.holes[hole_index_].forward
                                                     : draft_.holes[hole_index_].reverse)
                                   .settings.preferences;
@@ -1370,8 +1370,6 @@ void Frame::save(bool apply) {
     if (hole_index_ >= 0) {
         for (auto* widgets : {&forward_, &reverse_}) {
             if (widgets == &reverse_ && !duplex_->GetValue())
-                continue;
-            if (!widgets->advanced_tuning->GetValue())
                 continue;
             auto preference = (widgets == &forward_ ? draft_.holes[hole_index_].forward
                                                     : draft_.holes[hole_index_].reverse)

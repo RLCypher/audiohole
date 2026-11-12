@@ -327,7 +327,8 @@ int Frame::FilterEvent(wxEvent& event) {
     if (type == wxEVT_MOUSEWHEEL) {
         auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
         for (auto* control = window; control && control != this; control = control->GetParent()) {
-            if (dynamic_cast<wxChoice*>(control) || dynamic_cast<wxComboBox*>(control)) {
+            if (dynamic_cast<wxChoice*>(control) || dynamic_cast<wxComboBox*>(control) ||
+                control == dfa_slider_ || control == dfa_value_ || control == dfa_stepper_) {
                 forward_dropdown_wheel(*control, static_cast<wxMouseEvent&>(event));
                 return wxEventFilter::Event_Processed;
             }
@@ -872,6 +873,33 @@ bool Frame::smoke(const wxString& directory) {
             require(theme_choice_->GetSelection() == initial,
                     "Native wheel changed a dropdown selection");
         }
+        {
+            const auto value = dfa_hundredths_;
+            const auto slider = dfa_slider_->GetValue();
+            const auto entered = dfa_value_->GetValue();
+            const auto revision = controller_->snapshot().revision;
+            const auto occurrence = occurrence_;
+            for (auto* control : std::vector<wxWindow*>{dfa_slider_, dfa_value_, dfa_stepper_}) {
+                for (int rotation : {-WHEEL_DELTA, WHEEL_DELTA}) {
+                    wxMouseEvent wheel(wxEVT_MOUSEWHEEL);
+                    wheel.SetEventObject(control);
+                    wheel.m_wheelRotation = rotation;
+                    wheel.m_wheelDelta = WHEEL_DELTA;
+                    wheel.m_linesPerAction = 3;
+                    require(FilterEvent(wheel) == wxEventFilter::Event_Processed,
+                            "DFA wheel gesture was not intercepted");
+                    const auto point = control->ClientToScreen(wxPoint(2, 2));
+                    SendMessageW(static_cast<HWND>(control->GetHandle()), WM_MOUSEWHEEL,
+                                 MAKEWPARAM(0, rotation), MAKELPARAM(point.x, point.y));
+                }
+            }
+            require(dfa_hundredths_ == value && dfa_slider_->GetValue() == slider &&
+                        dfa_value_->GetValue() == entered && occurrence_ == occurrence &&
+                        controller_->snapshot().revision == revision,
+                    "Wheel changed DFA values, commentary or controller state");
+            require(dfa_stepper_->GetSize().y == dfa_value_->GetSize().y,
+                    "DFA arrows must match the numeric editor height");
+        }
         auto exercise_information = [&] {
             const auto window_size = GetSize();
             const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
@@ -927,6 +955,9 @@ bool Frame::smoke(const wxString& directory) {
                         reverse_.tuning->GetParent() == reverse_.group->GetStaticBox() &&
                         forward_.tuning != reverse_.tuning,
                     "Direction tuning must belong to its own endpoint group");
+            require(wxWindow::FindWindowByLabel(wxS("Fallback device — unavailable"), this) ==
+                        nullptr,
+                    "Fallback device placeholder remains in advanced tuning");
             require(forward_.mode->GetString(1) == "Force exclusive mode" &&
                         forward_.mode->GetString(2) == "Force shared mode" &&
                         forward_.clock->GetCount() == 3,
@@ -947,6 +978,42 @@ bool Frame::smoke(const wxString& directory) {
                                 ->GetWindow() == widgets->advanced_tuning,
                         "Use advanced tuning must be the first control inside its disclosure");
             }
+            const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
+            const auto saved_profiles = controller_->snapshot().profiles;
+            for (auto* widgets : {&forward_, &reverse_}) {
+                for (bool enabled : {false, true}) {
+                    widgets->advanced_tuning->SetValue(enabled);
+                    tuning_changed(*widgets);
+                    for (int selection : {1, 2, 0}) {
+                        const auto sibling = widgets == &forward_
+                                                 ? draft_.holes[hole_index_].reverse
+                                                 : draft_.holes[hole_index_].forward;
+                        widgets->mode->SetSelection(selection);
+                        wxCommandEvent mode(wxEVT_CHOICE, widgets->mode->GetId());
+                        widgets->mode->GetEventHandler()->ProcessEvent(mode);
+                        const auto& edited = widgets == &forward_
+                                                 ? draft_.holes[hole_index_].forward
+                                                 : draft_.holes[hole_index_].reverse;
+                        const auto expected =
+                            selection == 0 ? std::optional<std::string>{}
+                                           : std::optional<std::string>(selection == 1 ? "Exclusive"
+                                                                                       : "Shared");
+                        require(widgets->mode->GetSelection() == selection &&
+                                    edited.settings.preferences.common.mode == expected &&
+                                    edited.advanced_tuning == enabled,
+                                "Operating mode edit was discarded or changed tuning eligibility");
+                        require((widgets == &forward_
+                                     ? draft_.holes[hole_index_].reverse
+                                     : draft_.holes[hole_index_].forward) == sibling,
+                                "Operating mode edit changed the sibling direction");
+                    }
+                }
+            }
+            require(controller_->snapshot().profiles == saved_profiles,
+                    "Editing operating mode silently saved a profile");
+            tuning_timer_.Stop();
+            draft_.holes[hole_index_] = original;
+            load_hole(hole_index_);
             const auto revision = controller_->snapshot().revision;
             const auto occurrence = occurrence_;
             const auto before = draft_.holes.at(static_cast<std::size_t>(hole_index_));
@@ -958,6 +1025,9 @@ bool Frame::smoke(const wxString& directory) {
                 require(GetSize() == window_size, "Direction disclosure resized the window");
             };
             disclose(forward_, true);
+            require(forward_.buffer->GetSize().y == forward_.buffer_apply->GetSize().y &&
+                        forward_.buffer->GetPosition().y == forward_.buffer_apply->GetPosition().y,
+                    "Buffer input and Apply button must have matching heights and alignment");
             require(reverse_.tuning->IsCollapsed() && !forward_.advanced_tuning->GetValue(),
                     "Opening Forward tuning opened Return or changed eligibility");
             wxCommandEvent toggle(wxEVT_CHECKBOX, forward_.advanced_tuning->GetId());
@@ -1330,9 +1400,13 @@ bool Frame::smoke(const wxString& directory) {
                 columns && columns->GetCols() == 2 && columns->GetItemCount() == 2 &&
                     personality->GetContainingSizer() == layout->GetItem(1U)->GetSizer() &&
                     advanced->GetContainingSizer() == layout->GetItem(2U)->GetSizer() &&
-                    preview_mode_->GetParent()->GetContainingSizer() ==
-                        layout->GetItem(3U)->GetSizer(),
-                "Settings group order changed: Personality, Advanced, then Preview environment");
+                    layout->GetItem(3U)->GetWindow() ==
+                        wxWindow::FindWindowByName("Restart AudioHole", settings) &&
+                    wxWindow::FindWindowByLabel("Preview Build environment", settings) == nullptr &&
+                    wxWindow::FindWindowByLabel("Preview Mode (load preview profiles and devices)",
+                                                settings) == nullptr,
+                "Settings must contain Personality, Advanced, then standalone Restart without the "
+                "environment panel");
         }
         {
             const auto original_console = console_->GetValue();

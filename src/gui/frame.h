@@ -186,7 +186,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::vector<wxToggleButton*> navigation_;
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
-    wxCheckBox *preview_mode_{}, *hold_expressions_{};
+    wxCheckBox* hold_expressions_{};
     wxCheckBox *loop_until_event_{}, *low_motion_{};
     wxSpinCtrl* animation_loops_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};

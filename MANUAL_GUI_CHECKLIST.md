@@ -680,3 +680,26 @@ Portable tests exercise state/persistence/cleanup contracts and Windows cross
 build checks compilation/linking. Native GUI smoke, DPI/layout, microphone and
 speaker behavior require Windows execution; do not infer hardware results from
 portable or cross-build success.
+
+### Advanced controls and Settings follow-up (2026-11-12)
+
+- In both Forward and Return, select Automatic, Force exclusive mode and Force
+  shared mode with Use advanced tuning both off and on. Each choice remains
+  selected, survives Save/reload, and does not change the sibling direction or
+  toggle tuning eligibility. With tuning off, preparation still uses Automatic.
+- Verify invalid rate, buffer and channel-map edits receive validation while
+  tuning is off as well as on. Existing saved overrides remain intact on failure.
+- Inspect both tuning panels: no fallback dropdown; buffer field and Apply align
+  with equal heights. Apply still saves only that direction's buffer.
+- Settings has Application & Tray / Routing Activation, Personality & animation,
+  Advanced, and a standalone Restart AudioHole button. The environment panel and
+  environment checkbox are absent. Cancel restart with unsaved profile/device
+  edits; verify nothing closes or saves. Welcome/replay behavior is unchanged.
+- Wheel over the DFA slider, exact-value field and arrows, with and without focus:
+  scroll the Settings page without changing the value or commentary. Typed values,
+  keyboard arrows, clicked arrows and slider drags still adjust DFA. Arrow height
+  matches the numeric field at 100%, 125%, 150% and 200% Windows scaling.
+- Run native Preview and Test GUI smoke in MSVC Debug and Release. The previous
+  9ff069b failure was C2445 in diagnostic_view.cpp (mixed string-literal/wxString
+  conditional), before smoke execution. The diagnostic detail assignment now uses
+  explicit wxString branches; do not count a cross-build as native MSVC execution.

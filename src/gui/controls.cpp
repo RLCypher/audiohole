@@ -105,6 +105,10 @@ bool measure_selection(wxWindow& control, WXMEASUREITEMSTRUCT* item) {
     return true;
 }
 } // namespace
+void prevent_wheel_adjustment(wxWindow& control) {
+    SetWindowSubclass(static_cast<HWND>(control.GetHandle()), dropdown_wheel_proc,
+                      dropdown_wheel_subclass, reinterpret_cast<DWORD_PTR>(&control));
+}
 ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
     Create(parent, id);
     protect_dropdown_children(*this);
