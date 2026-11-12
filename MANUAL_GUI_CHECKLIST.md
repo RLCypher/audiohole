@@ -646,3 +646,37 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
 - [ ] Exit button/tray/taskbar use Exit/Cancel. Cancel leaves routing/scanning and
   edits untouched; Exit stops and closes. Restart/smoke teardown has no extra
   confirmation. Bottom status keeps engine availability without (Test Mode).
+
+### 2026-11-12 endpoint tools and profile workflow
+
+- In Preview and Test, load an unchanged profile: Save is gray. Edit and undo
+  profile/hole notes, endpoint, engine and tuning values: Save follows actual
+  edits. Enter and Ctrl+S still save immediately without waiting for a UI timer.
+- Scroll a long duplex editor and resize its column. Performance Diagnostics
+  stays below the editor and above the application status row.
+- Confirm Arm Ready and the shared Signal Testing & Monitoring pane are gone.
+  Each Forward/Return card owns its own button; capture cards have a meter.
+  Devices places its selected-device tools between Overview and Device Notes.
+- On a real available Test playback endpoint, explicitly click Test beep. Hear
+  one quiet tone from that selected device, then natural completion. Cancel
+  before completion; check a second operation waits for cleanup. Try unsupported
+  or busy devices and confirm a visible error, no fallback or format/volume edits.
+- On a real capture endpoint, explicitly Check level and speak: the meter follows
+  input. Cancel, switch tabs, change device/hole/profile, hide, minimize, close,
+  Stop or unplug the target: the session ends and the microphone indicator
+  releases after cleanup. No background checking starts on returning to a tab.
+- No preview/smoke run should emit sound. Preview's meter is marked simulated.
+- In a duplex hole, an assigned Forward source is gray in Return source and
+  cannot be chosen with mouse/keyboard; current Forward selection remains usable.
+  Clear endpoint is last and reusable; clearing frees the device for Return.
+  Separate capture/render IDs and assignments in other holes remain allowed.
+- Preview: test both Routing Activation preferences and restart persistence.
+  Automatic waiting defaults on; Stop prevents device-return rearming. Automatic
+  profile switching defaults off. When on, a ready saved profile switches while
+  armed; a missing-device replacement asks first and declining keeps the old route.
+  Editing preferences alone never starts a route. Test still has no routing backend.
+
+Portable tests exercise state/persistence/cleanup contracts and Windows cross
+build checks compilation/linking. Native GUI smoke, DPI/layout, microphone and
+speaker behavior require Windows execution; do not infer hardware results from
+portable or cross-build success.

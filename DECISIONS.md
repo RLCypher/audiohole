@@ -1698,3 +1698,18 @@ third-party notices are in licenses/; documents and build-info.json are in docs/
 A present marker suppresses the welcome regardless of deprecated dialog settings.
 Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
 appearance follows Windows; dropdown wheel gestures scroll pages without selecting.
+
+### 2026-11-12 — Endpoint tools and activation-policy refinement
+
+User-authorized: replace Arm Ready with automatic-wait preference (on by default),
+add opt-in automatic saved-profile switching (off by default), preserve explicit
+confirmation for replacing working routing with a waiting profile, pin performance
+status, reflect actual dirty state in Save, move setup tools into their endpoint
+cards/device detail, and prevent duplicate endpoint slots within a hole.
+
+The temporary Windows diagnostic service is separate from the deferred routing
+backend. Shared-only exact-target streams provide the requested beep/capture
+meter in interactive Test; Preview remains simulated. Native smoke disables the
+service. Cooperative cancellation and unsupported native formats must be reported
+honestly; no scan verification or runtime routing-health claim follows from a
+successful test beep. See GUI.md and MANUAL_GUI_CHECKLIST.md for acceptance checks.

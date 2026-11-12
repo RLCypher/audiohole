@@ -35,8 +35,10 @@ struct WorkflowRefinements : testing::Test {
         h.duplex = true;
         h.forward.advanced_tuning = true;
         h.reverse.advanced_tuning = true;
-        h.forward.source = h.reverse.source = "capture";
-        h.forward.destination = h.reverse.destination = "render";
+        h.forward.source = "capture";
+        h.reverse.source = "capture-return";
+        h.forward.destination = "render";
+        h.reverse.destination = "render-return";
         p.holes.push_back(h);
         return p;
     }
@@ -49,6 +51,8 @@ struct WorkflowRefinements : testing::Test {
             e.capture = capture;
             e.display_name = capture ? "Microphone" : "Headphones";
             e.inspection = std::make_shared<DeviceInspection>();
+            s.endpoints.push_back(e);
+            e.id += "-return";
             s.endpoints.push_back(e);
         }
         return s;
@@ -303,5 +307,17 @@ TEST_F(WorkflowRefinements, FreshAndMissingAppearanceFollowSystemWhileSavedDarkI
     EXPECT_EQ(legacy.values().appearance, "system");
     EXPECT_EQ(legacy.values().startup_mode, 2);
     EXPECT_EQ(legacy.values().startup_delay_seconds, 23);
+}
+TEST_F(WorkflowRefinements, DuplicateEndpointImportNeverReplacesNamedProfile) {
+    ProfileDirectoryPersistence store(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(store.load(records).ok);
+    records.profiles.push_back(sample());
+    ASSERT_TRUE(store.save(records).ok);
+    const auto path = root / "profiles" / "VR Workflow.json";
+    const auto before = read(path);
+    records.profiles[0].holes[0].reverse.source = records.profiles[0].holes[0].forward.source;
+    EXPECT_FALSE(store.save(records).ok);
+    EXPECT_EQ(read(path), before);
 }
 } // namespace

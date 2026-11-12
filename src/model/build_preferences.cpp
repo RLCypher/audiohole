@@ -95,6 +95,9 @@ Result BuildPreferences::load() {
             PreviewPreferences values;
             values.preview_mode = document.at("preview_mode").get<bool>();
             values.show_preview_dialog = document.at("show_preview_dialog").get<bool>();
+            values.automatically_wait_for_devices =
+                document.value("automatically_wait_for_devices", true);
+            values.activate_selected_profile = document.value("activate_selected_profile", false);
             values.hold_expressions = document.value("hold_expressions", false);
             values.low_motion = document.value("low_motion", false);
             values.start_with_windows = document.value("start_with_windows", false);
@@ -145,6 +148,8 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["loop_until_event"] = values.loop_until_event;
         document["animation_loops"] = values.animation_loops;
         document["personality_id"] = values.personality_id;
+        document["automatically_wait_for_devices"] = values.automatically_wait_for_devices;
+        document["activate_selected_profile"] = values.activate_selected_profile;
         document["appearance"] = values.appearance;
         document["notifications"] = values.notifications;
         document["startup_mode"] = values.startup_mode;

@@ -1073,3 +1073,17 @@ third-party notices are in licenses/; documents and build-info.json are in docs/
 A present marker suppresses the welcome regardless of deprecated dialog settings.
 Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
 appearance follows Windows; dropdown wheel gestures scroll pages without selecting.
+
+### Explicit endpoint checks (2026-11-12)
+
+`Controller::check_level(logical_id)` and `beep(logical_id)` request temporary
+exact-target diagnostics. `monitor(false)` cancels capture and `cancel_beep()`
+cancels playback. `Snapshot::monitor_source`, `input_peak` (optional normalized
+0..1 amplitude), `beep_destination`, and `diagnostic_detail` describe status;
+absence of a peak is not evidence of silence. Cancellation is a request; active
+state clears only when the service has released its resources. A new operation
+must wait for that cleanup. The in-process `DiagnosticService` seam carries local
+binding identity on the control side and publishes scalar readings, never PCM.
+No new external transport or routing backend is implied. GUI actions use the
+same application-controller ownership boundary. `wait_for_devices(bool)` sets
+future activation policy without starting an operation.

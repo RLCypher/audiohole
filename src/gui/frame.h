@@ -55,7 +55,16 @@ class Tray final : public wxTaskBarIcon {
 };
 // Non-owning widget handles. wx parent/child ownership destroys controls with Frame.
 // ID and format vectors map visible selections to typed controller values.
+struct DiagnosticWidgets {
+    wxPanel* panel{};
+    wxButton* action{};
+    wxGauge* meter{};
+    wxStaticText* detail{};
+    std::string target;
+    bool capture = false;
+};
 struct DirectionWidgets {
+    DiagnosticWidgets capture_check, playback_check;
     wxStaticBoxSizer* group{};
     wxStaticBoxSizer* tuning_group{};
     wxCollapsiblePane* tuning{};
@@ -123,8 +132,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         testing_notice();
     }
     void tray_activate(const std::string& id) {
-        show_result(controller_->activate(id));
-        refresh();
+        activate_saved_profile(id, false);
     }
     void tray_start() {
         if (!controller_->snapshot().active_profile.empty())
@@ -161,6 +169,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool smoke_ = false, loading_ = false, dirty_ = false;
     bool enter_save_pending_ = false;
     void queue_field_save(bool device);
+    bool profile_edits_pending();
     audiohole::Profile draft_;
     int hole_index_ = -1;
     std::string viewed_, device_id_;
@@ -198,11 +207,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool header_layout_pending_ = false;
     wxStaticText* personality_heading_{};
     wxPanel* status_dot_{};
-    wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *beep_status_{},
-        *activity_{}, *device_detail_{};
+    wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *device_detail_{};
     wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
-    wxButton* beep_button_{};
-    wxButton* arm_ready_{};
     wxButton* profile_apply_{};
     wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
     wxButton *profile_remove_{}, *hole_remove_{}, *profiles_folder_{}, *devices_folder_{};
@@ -212,16 +218,23 @@ class Frame final : public wxFrame, private wxEventFilter {
     DeviceList *capture_devices_{}, *playback_devices_{};
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
-    wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
+    wxCheckBox *enabled_{}, *duplex_{};
     wxChoice* routing_engine_{};
     wxStaticText* routing_engine_notice_{};
-    wxCollapsiblePane* signal_tools_{};
-    wxChoice *activity_direction_{}, *personality_choice_{}, *destination_test_{}, *scan_mode_{},
-        *scan_scope_{}, *severity_{}, *startup_{}, *startup_target_{}, *notifications_{};
+    wxChoice *personality_choice_{}, *scan_mode_{}, *scan_scope_{}, *severity_{}, *startup_{},
+        *startup_target_{}, *notifications_{};
     wxSpinCtrl* delay_{};
     wxGauge* scan_progress_{};
     DirectionWidgets forward_, reverse_;
-    std::vector<std::string> profile_ids_, capture_device_ids_, playback_device_ids_, beep_ids_;
+    DiagnosticWidgets device_check_;
+    DiagnosticWidgets* active_check_ = nullptr;
+    wxPanel* performance_panel_{};
+    wxScrolledWindow* profile_editor_{};
+    void build_device_check(wxWindow*, wxSizer*, DiagnosticWidgets&, bool capture,
+                            const wxString& name);
+    void refresh_device_checks();
+    void start_device_check(DiagnosticWidgets&);
+    std::vector<std::string> profile_ids_, capture_device_ids_, playback_device_ids_;
     wxChoice* device_view_{};
     wxTextCtrl* device_evidence_{};
     wxButton* device_save_{};
@@ -297,12 +310,12 @@ class Frame final : public wxFrame, private wxEventFilter {
     void select_profile(const std::string&);
     void load_holes();
     void load_hole(int);
-    void update_beep_destinations();
     // Copies editor fields into draft_ only, never into the active plan.
     void capture_draft();
     // Confirms a potentially destructive editor navigation; does not mutate state.
     bool discard();
     void save(bool);
+    void activate_saved_profile(const std::string& id, bool ready);
     void activate(bool);
     void populate_devices();
     void load_device();

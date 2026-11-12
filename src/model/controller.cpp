@@ -335,6 +335,34 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
     output = std::move(prepared);
     return {true, "Routing requests prepared; runtime endpoint initialization is still required."};
 }
+bool endpoint_used_elsewhere(const Hole& hole, bool reverse, bool source, const std::string& id) {
+    if (id.empty())
+        return false;
+    for (bool other_reverse : {false, true}) {
+        if (other_reverse && !hole.duplex)
+            continue;
+        const auto& direction = other_reverse ? hole.reverse : hole.forward;
+        for (bool other_source : {true, false}) {
+            if (other_reverse == reverse && other_source == source)
+                continue;
+            if ((other_source ? direction.source : direction.destination) == id)
+                return true;
+        }
+    }
+    return false;
+}
+Result validate_endpoint_assignments(const Hole& hole) {
+    for (bool reverse : {false, true}) {
+        if (reverse && !hole.duplex)
+            continue;
+        const auto& d = reverse ? hole.reverse : hole.forward;
+        if (endpoint_used_elsewhere(hole, reverse, true, d.source) ||
+            endpoint_used_elsewhere(hole, reverse, false, d.destination))
+            return {false, "An endpoint is assigned more than once in this hole. Clear one "
+                           "assignment or select another endpoint."};
+    }
+    return {true, "Endpoint assignments are distinct."};
+}
 Result validate(const Snapshot& snapshot, const Profile& candidate) {
     if (candidate.display_name.empty())
         return {false, "Enter a profile display name."};
@@ -344,6 +372,9 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
         if (hole.id.empty() || std::find(ids.begin(), ids.end(), hole.id) != ids.end())
             return {false, "Hole IDs must be nonempty and unique."};
         ids.push_back(hole.id);
+        const auto assignments = validate_endpoint_assignments(hole);
+        if (!assignments.ok)
+            return assignments;
         if (!hole.enabled)
             continue;
         ++enabled;
@@ -580,6 +611,11 @@ Result SimulatedController::save(Profile draft, bool apply) {
         if (!result.ok)
             return result;
     }
+    for (const auto& hole : draft.holes) {
+        const auto checked = validate_endpoint_assignments(hole);
+        if (!checked.ok)
+            return checked;
+    }
     *found = draft;
     event("saved", "Edits saved in memory only; persistent formats are not implemented.");
     if (apply)
@@ -608,9 +644,12 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
                                     Availability::Available &&
                                 endpoint(state_, direction->destination)->availability ==
                                     Availability::Available;
+    if (!available && !wait_for_devices_ && !arm_waiting)
+        return {false, "Required devices are unavailable. Automatic waiting is disabled; the "
+                       "current route is unchanged."};
     if (!available && state_.armed && !arm_waiting)
-        return {false, "Required resources unavailable. Existing route retained. Use Arm "
-                       "Ready explicitly to replace it."};
+        return {false, "Required resources unavailable. Existing route retained. Confirm "
+                       "replacement with a waiting profile to proceed."};
     live_ = *candidate;
     pending_manual_ack_ = std::any_of(live_.holes.begin(), live_.holes.end(), [](const auto& hole) {
         return hole.enabled &&
@@ -627,6 +666,8 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     failures_.clear();
     cancel_beep();
     state_.monitoring = false;
+    state_.monitor_source.clear();
+    state_.input_peak.reset();
     state_.armed = true;
     state_.state = State::Starting;
     state_.paths.clear(); // A newly activated plan owns fresh simulated path lifetimes.
@@ -683,6 +724,8 @@ void SimulatedController::stop() {
     scan(false);
     cancel_beep();
     state_.monitoring = false;
+    state_.monitor_source.clear();
+    state_.input_peak.reset();
     failures_.clear();
     state_.state = State::Stopping;
     transition_ms_ = stop_duration_ms;
@@ -827,6 +870,8 @@ Result SimulatedController::update_endpoint(const Endpoint& device) {
     found->availability = device.availability;
     if (changed) {
         cancel_beep();
+        if (state_.monitor_source == device.id && device.availability != Availability::Available)
+            monitor(false);
         if (state_.armed) {
             transition_ms_ = transition_duration_ms;
             refresh_paths(device.availability == Availability::Available);
@@ -855,8 +900,26 @@ void SimulatedController::recover() {
     }
 }
 void SimulatedController::monitor(bool enabled) {
+    if (!enabled && !state_.monitoring && state_.monitor_source.empty() && !state_.input_peak)
+        return;
+    if (!enabled) {
+        state_.monitor_source.clear();
+        state_.input_peak.reset();
+    }
     state_.monitoring = enabled;
     ++state_.revision;
+}
+Result SimulatedController::check_level(const std::string& id) {
+    const auto* source = endpoint(state_, id);
+    if (!source || !source->capture || source->availability != Availability::Available)
+        return {false, "Choose an available capture endpoint."};
+    cancel_beep();
+    state_.monitor_source = id;
+    state_.monitoring = true;
+    state_.input_peak = .35f;
+    state_.diagnostic_detail = "Capture level is simulated in Preview.";
+    ++state_.revision;
+    return {true, state_.diagnostic_detail};
 }
 Result SimulatedController::beep(const std::string& id) {
     const auto* destination = endpoint(state_, id);
@@ -872,6 +935,7 @@ Result SimulatedController::beep(const std::string& id) {
                     direction->settings.mode == "Exclusive")
                     return {false, "Selected destination is occupied in exclusive mode. "
                                    "Live routing will not be disturbed."};
+    monitor(false);
     state_.beep_destination = id;
     beep_ms_ = beep_duration_ms;
     event("beep-start", "Test Beep target: " + destination->display_name +
@@ -886,6 +950,8 @@ void SimulatedController::clear_diagnostics() {
     // empty log, and future events must remain newer than consumers' cursors.
 }
 void SimulatedController::cancel_beep() {
+    if (!state_.beep_destination.empty())
+        ++state_.revision;
     beep_ms_ = 0;
     state_.beep_destination.clear();
 }

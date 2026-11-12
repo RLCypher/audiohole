@@ -478,6 +478,16 @@ void ApplicationController::recover() {
     backend_->recover();
     publish();
 }
+Result ApplicationController::check_level(const std::string& id) {
+    require_owner();
+    const auto result = backend_->check_level(id);
+    publish();
+    return result;
+}
+void ApplicationController::wait_for_devices(bool enabled) {
+    require_owner();
+    backend_->wait_for_devices(enabled);
+}
 void ApplicationController::monitor(bool enabled) {
     require_owner();
     backend_->monitor(enabled);

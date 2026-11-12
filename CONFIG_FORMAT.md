@@ -2026,3 +2026,22 @@ third-party notices are in licenses/; documents and build-info.json are in docs/
 A present marker suppresses the welcome regardless of deprecated dialog settings.
 Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
 appearance follows Windows; dropdown wheel gestures scroll pages without selecting.
+
+### Endpoint assignment invariant and application policies (2026-11-12)
+
+A nonempty logical device ID may occur at most once across the active endpoint
+slots of a hole (Forward and, when enabled, Return). Empty assignments are valid
+in saved drafts; inactive Return assignments do not reserve endpoints. Duplicate
+IDs within a hole are rejected by the editor, save, and import validation.
+Different holes can reuse an endpoint. Capture/render IDs remain separate even
+when they describe the same hardware. No profile schema version or field change
+is needed for this validation rule.
+
+Preview Build preferences add optional booleans
+`automatically_wait_for_devices` (default `true`) and
+`activate_selected_profile` (default `false`). Non-booleans are rejected. These
+are application activation policies, not per-profile audio requirements. Older
+preference files receive the defaults without being rewritten merely by loading.
+Temporary diagnostic state and transient Windows endpoint bindings are never
+written into profile records; the existing local scanner binding supplies an
+explicit device check's physical target.

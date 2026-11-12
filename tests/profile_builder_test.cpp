@@ -283,14 +283,18 @@ TEST(ProfileBuilder, EndpointInheritanceAndOverrideSwitchAreIndependentFromEngin
         endpoint.capture = capture;
         endpoint.inspection = std::make_shared<DeviceInspection>();
         snapshot.endpoints.push_back(endpoint);
+        endpoint.id += "-return";
+        snapshot.endpoints.push_back(endpoint);
     }
     Profile profile;
     profile.id = "profile";
     profile.display_name = "Contract";
     Hole hole;
     hole.id = "hole";
-    hole.forward.source = hole.reverse.source = "source";
-    hole.forward.destination = hole.reverse.destination = "destination";
+    hole.forward.source = "source";
+    hole.reverse.source = "source-return";
+    hole.forward.destination = "destination";
+    hole.reverse.destination = "destination-return";
     hole.duplex = true;
     hole.forward.advanced_tuning = true;
     hole.reverse.advanced_tuning = true;
@@ -337,6 +341,8 @@ TEST(ProfileBuilder, ExplicitUnsupportedRequirementsDoNotSilentlyFallBack) {
         endpoint.id = capture ? "source" : "destination";
         endpoint.capture = capture;
         endpoint.inspection = std::make_shared<DeviceInspection>();
+        snapshot.endpoints.push_back(endpoint);
+        endpoint.id += "-return";
         snapshot.endpoints.push_back(endpoint);
     }
     Profile profile;
@@ -398,14 +404,18 @@ TEST(ProfileBuilder, AutomaticRequiresNoDeepEvidenceAndRetainsIndependentPartial
         e.capture = capture;
         e.inspection = std::make_shared<DeviceInspection>();
         snapshot.endpoints.push_back(e);
+        e.id += "-return";
+        snapshot.endpoints.push_back(e);
     }
     Hole h;
     h.id = "hole";
     h.duplex = true;
     h.forward.advanced_tuning = true;
     h.reverse.advanced_tuning = true;
-    h.forward.source = h.reverse.source = "capture";
-    h.forward.destination = h.reverse.destination = "render";
+    h.forward.source = "capture";
+    h.reverse.source = "capture-return";
+    h.forward.destination = "render";
+    h.reverse.destination = "render-return";
     h.forward.settings.preferences.common.channel_count = 2;
     h.forward.settings.preferences.channel_map = {{0, 0}, {1, 1}};
     h.reverse.settings.preferences.source.sample_rate_hz = 44100;

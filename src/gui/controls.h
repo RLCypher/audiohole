@@ -1,6 +1,7 @@
 #pragma once
 #include "gui/palette.h"
 #include "model/controller.h"
+#include <algorithm>
 #include <functional>
 #include <string>
 #include <utility>
@@ -26,6 +27,11 @@ class ThemedChoice final : public wxChoice {
 class ThemedCombo final : public wxComboBox {
   public:
     ThemedCombo(wxWindow*, wxWindowID = wxID_ANY);
+    std::vector<unsigned> disabled_items;
+    bool item_enabled(unsigned item) const {
+        return std::find(disabled_items.begin(), disabled_items.end(), item) ==
+               disabled_items.end();
+    }
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
     bool MSWOnMeasure(WXMEASUREITEMSTRUCT*) override;
     WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;

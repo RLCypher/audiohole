@@ -129,6 +129,8 @@ struct Snapshot {
     std::string active_profile, pending_profile;
     State state = State::Stopped;
     bool armed = false, monitoring = false, scanning = false;
+    std::string monitor_source, diagnostic_detail;
+    std::optional<float> input_peak;
     int pending_ms = 0, scan_percent = 0;
     std::string beep_destination;
     std::vector<PathStatus> paths;
@@ -190,6 +192,8 @@ EndpointPreferences inherit_preferences(const EndpointPreferences& common,
 std::optional<Format> derive_pcm_format(const EndpointPreferences&);
 std::string unique_name(const std::string& base, const std::vector<std::string>& used);
 Result validate(const Snapshot&, const Profile&);
+bool endpoint_used_elsewhere(const Hole&, bool reverse, bool source, const std::string& id);
+Result validate_endpoint_assignments(const Hole&);
 // Internal, in-process GUI seam; not API.md's final public schema/transport.
 // Calls and snapshots belong to the control/GUI thread. The scanner owns its
 // worker and marshals immutable updates back through this boundary;
@@ -239,6 +243,10 @@ class Controller {
     virtual void recover() = 0;
     // Temporary observation flag only; caller clears it on panel/window closure.
     virtual void monitor(bool enabled) = 0;
+    virtual Result check_level(const std::string&) {
+        return {false, "Capture checks are unavailable."};
+    }
+    virtual void wait_for_devices(bool) {}
     // Simulates a bounded interval for one explicit playback endpoint. Rejects
     // missing/ambiguous/capture endpoints and exclusive conflicts. Emits NO SOUND.
     virtual Result beep(const std::string& destination) = 0;
@@ -277,6 +285,10 @@ class SimulatedController final : public Controller {
     void fail_path(const std::string&, bool) override;
     void recover() override;
     void monitor(bool) override;
+    Result check_level(const std::string&) override;
+    void wait_for_devices(bool enabled) override {
+        wait_for_devices_ = enabled;
+    }
     Result beep(const std::string&) override;
     void cancel_beep() override;
     void clear_diagnostics() override;
@@ -290,7 +302,7 @@ class SimulatedController final : public Controller {
     std::vector<std::string> failures_;
     std::uint64_t next_id_ = 10, sequence_ = 0;
     int transition_ms_ = 0, beep_ms_ = 0, scan_ms_ = 0;
-    bool pending_manual_ack_ = false;
+    bool pending_manual_ack_ = false, wait_for_devices_ = true;
     void event(std::string type, std::string detail);
     void refresh_paths(bool reconnecting = false);
 };

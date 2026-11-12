@@ -3,6 +3,7 @@
 #include "gui/welcome.h"
 #include "model/configuration_controller.h"
 #include "model/first_run.h"
+#include "platform/windows/diagnostics.h"
 #include <cstdio>
 #include <cstdlib>
 #include <shobjidl.h>
@@ -230,7 +231,8 @@ class App final : public wxApp {
                 "bin" / "audiohole-probe.exe";
             controller = std::make_unique<ConfigurationController>(
                 std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()),
-                std::make_unique<ScannerService>(std::move(scanner)));
+                std::make_unique<ScannerService>(std::move(scanner)),
+                smoke ? nullptr : audiohole::windows::make_diagnostic_service());
         }
         auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
             restart_requested_ = true;

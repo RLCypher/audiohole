@@ -2015,3 +2015,52 @@ third-party notices are in licenses/; documents and build-info.json are in docs/
 A present marker suppresses the welcome regardless of deprecated dialog settings.
 Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
 appearance follows Windows; dropdown wheel gestures scroll pages without selecting.
+
+### Endpoint diagnostics and routing preferences (2026-11-12)
+
+This amendment supersedes the earlier shared Signal Testing & Monitoring pane and
+Arm Ready button descriptions. Performance Diagnostics is a fixed sibling below
+Profile's scrolling hole editor; scrolling Forward/Return settings does not move
+it. Full path details remain in its tooltip. Save is disabled when the editor
+matches the saved profile, including after undo; invalid pending input still
+requires correction. Application preferences never make a profile dirty.
+
+Each Forward/Return capture card owns **Check level / Cancel check** and a peak
+meter. Each playback card owns **Test beep / Cancel beep**. Devices exposes the
+same tools between Overview and Device Notes. The exact logical endpoint shown
+is the target; hidden/unavailable/ambiguous bindings are never substituted.
+Checking an already-assigned endpoint does not save a profile or start routing.
+Only one temporary diagnostic session can run at a time. Stop, any tab change,
+profile/hole/endpoint navigation, window hiding/minimizing/closing, endpoint loss
+or binding replacement requests cleanup. A subsequent session waits for cleanup.
+
+Interactive Test mode supplies a small Windows shared-mode diagnostic service:
+a quiet approximately 1 kHz, -30 dBFS, one-second beep with fades, or temporary
+capture peak sampling. Capture packets are discarded, never recorded. Output
+uses the first two stream channels (remaining channels silent); this is not
+physical mixer-bus discovery, end-to-end verification, or a latency measurement.
+Preview remains explicitly simulated and silent. Native smoke modes never open
+hardware streams. No routing backend is introduced by these tools. Stream event
+waits poll cancellation at most every 30 ms; Windows driver activation/cleanup
+calls are cooperative and do not have a hard interruption deadline. Queued audio
+can remain briefly audible after cancellation.
+
+Routing Activation adds two saved application policies:
+
+- **Automatically start routing once devices become available** defaults on.
+  Start or scheduled activation arms waiting; merely launching or selecting a
+  device does not. Turning it off rejects a new unavailable activation. Stop
+  disarms waiting and recovery. Existing active-route device recovery is retained.
+- **Automatically activate selected profiles while routing** defaults off.
+  When enabled, selecting another saved profile while armed requests activation.
+  An unavailable replacement requires confirmation before replacing the old
+  profile with a waiting plan. A failed switch preserves the previous plan.
+  Unsaved edits still require explicit Save/Apply. This does not enable a routing
+  backend in Test mode.
+
+Endpoint lists gray out logical endpoints assigned to another active slot in the
+same hole. Keyboard navigation skips them, and selection/save/import validation
+reject duplicates. Distinct capture and playback logical IDs on one physical
+interface are independent. Other holes may reuse endpoints. **Clear endpoint**
+is always last and clears only that slot's assignment and label hint; it does
+not delete the scanned device. Inactive Return assignments do not reserve slots.

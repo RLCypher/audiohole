@@ -141,6 +141,24 @@ WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM 
 ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
     Create(parent, id, {}, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxTE_PROCESS_ENTER);
     protect_dropdown_children(*this);
+    Bind(wxEVT_KEY_DOWN, [this](wxKeyEvent& event) {
+        const int key = event.GetKeyCode();
+        if (!event.AltDown() && (key == WXK_UP || key == WXK_DOWN) && !disabled_items.empty()) {
+            const int step = key == WXK_UP ? -1 : 1;
+            int index = GetSelection() + step;
+            while (index >= 0 && index < static_cast<int>(GetCount()) && !item_enabled(index))
+                index += step;
+            if (index >= 0 && index < static_cast<int>(GetCount())) {
+                SetSelection(index);
+                wxCommandEvent selected(wxEVT_COMBOBOX, GetId());
+                selected.SetEventObject(this);
+                selected.SetInt(index);
+                GetEventHandler()->ProcessEvent(selected);
+            }
+            return;
+        }
+        event.Skip();
+    });
 }
 WXDWORD ThemedCombo::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxComboBox::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
@@ -149,8 +167,11 @@ bool ThemedCombo::MSWOnMeasure(WXMEASUREITEMSTRUCT* item) {
     return measure_selection(*this, item);
 }
 bool ThemedCombo::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
-    const auto id = reinterpret_cast<DRAWITEMSTRUCT*>(item)->itemID;
-    return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
+    auto draw = *reinterpret_cast<DRAWITEMSTRUCT*>(item);
+    if (!item_enabled(draw.itemID))
+        draw.itemState |= ODS_DISABLED;
+    return paint_selection(*this, draw.itemID < GetCount() ? GetString(draw.itemID) : wxString{},
+                           reinterpret_cast<WXDRAWITEMSTRUCT*>(&draw));
 }
 WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
     if (native_dropdown_wheel(*this, message, wparam, lparam))
@@ -393,7 +414,6 @@ wxColour routing_colour(audiohole::State state) {
 wxString button_help(const wxString& title) {
     static const std::pair<const char*, const char*> help[] = {
         {"Start Routing", "Validate and activate the profile currently open in the editor."},
-        {"Arm Ready", "Replace the active plan and wait for unavailable devices to return."},
         {"Stop Routing", "Stop every direction and cancel pending startup and recovery."},
         {"Exit AudioHole",
          "Stop routing and exit completely. Closing the window instead hides it to the tray."},
@@ -447,9 +467,9 @@ wxString button_help(const wxString& title) {
         {"Replay Tutorial", "Restart the welcome/tutorial after confirmation; your "
                             "saved configuration is preserved."},
         {"DFA", "Working as intended."},
-        {"Test Beep", "Test only the explicitly selected playback destination. Cancel stops the "
+        {"Test beep", "Test only the explicitly selected playback destination. Cancel stops the "
                       "test immediately."},
-        {"Cancel Test Beep", "End the current destination test."},
+        {"Cancel beep", "End the current destination test."},
         {"Forward failure", "Exercise a forward-direction failure in this evaluation scenario."},
         {"Return failure",
          "Exercise a return-direction failure while preserving the forward direction."},

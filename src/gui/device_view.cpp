@@ -165,6 +165,7 @@ void Frame::build_devices() {
     device_evidence_->SetName("Device evidence");
     device_evidence_->SetMinSize(wxSize(0, 24));
     evidence_layout->Add(device_evidence_, 1, wxEXPAND | wxALL, 3);
+    build_device_check(evidence_panel, evidence_layout, device_check_, true, "Selected device");
     evidence_panel->SetSizer(evidence_layout);
     device_rows_->SplitHorizontally(evidence_panel, notes_panel);
     right->Add(device_rows_, 1, wxEXPAND);
@@ -241,6 +242,8 @@ void Frame::build_devices() {
         });
 }
 bool Frame::select_device(const std::string& id) {
+    if (id != device_id_)
+        end_observation();
     if (id != device_id_ && device_dirty_ &&
         themed_message_box("Discard unsaved device edits?", "Device edits",
                            wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES) {
@@ -427,7 +430,7 @@ void Frame::scanner_action(const ScannerActionRequest& request) {
             populate_direction(forward_, h.forward);
             populate_direction(reverse_, h.reverse);
         }
-        update_beep_destinations();
+        end_observation();
     }
     refresh();
 }

@@ -61,7 +61,7 @@ CI: $runUrl
 
 Purpose: Preview Build GUI and isolated configuration evaluation, not a formal release.
 Launch AudioHole.exe. Preview uses authored simulated devices; Test offers real Windows device scanning and isolated persistent configuration.
-No routing/playback backend is included. Device/profile bundle transfer and the engine handoff are described in docs/CONFIGURATION_BUNDLES.md.
+No routing backend is included. Explicit device checks use temporary shared-mode streams in Test. Device/profile bundle transfer and the engine handoff are described in docs/CONFIGURATION_BUNDLES.md.
 Use docs/MANUAL_GUI_CHECKLIST.md for evaluation workflows.
 The Release package is preferred for ordinary manual testing.
 
@@ -70,8 +70,8 @@ No Visual Studio, SDK, CMake, Git, test framework, administrator rights,
 driver, service, or separately installed VC runtime is needed to launch this build.
 The reference MSVC build uses the static CRT. Normal Windows system DLLs remain required.
 
-Known limitations: Preview devices, scans, activity, failures and Test Beep are simulated. Test has real configuration I/O and Windows device scanning. Deep testing requires consent. No routing/playback backend.
-Test Beep emits NO SOUND. Test configuration and Preview Build preferences persist; Preview fixtures remain session-only.
+Known limitations: Preview devices, scans, activity, failures and Test Beep are simulated. Test has real configuration I/O, Windows device scanning, and explicit temporary capture-level and playback-beep checks. Deep testing requires consent. No routing backend.
+Preview Test Beep emits NO SOUND. Test device checks open only the selected available endpoint, never record audio, and cancel on navigation or hiding the window. Test configuration and Preview Build preferences persist; Preview fixtures remain session-only.
 Synchronization algorithms, production schemas, and storage roots remain unresolved.
 wxWidgets 3.2.6 is statically linked; third-party notices are in licenses/.
 The header-only nlohmann/json 3.11.3 MIT notice is included.

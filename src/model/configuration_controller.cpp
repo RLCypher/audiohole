@@ -5,12 +5,15 @@
 
 namespace audiohole {
 ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPersistence> provider,
-                                                 std::unique_ptr<ScannerService> scanner)
-    : persistence_(std::move(provider)), scanner_(std::move(scanner)) {
+                                                 std::unique_ptr<ScannerService> scanner,
+                                                 std::unique_ptr<DiagnosticService> checks)
+    : persistence_(std::move(provider)), scanner_(std::move(scanner)),
+      device_checks_(std::move(checks)) {
     if (!persistence_)
         throw std::invalid_argument("Test configuration provider is required");
     state_.operating_mode = OperatingMode::Test;
     state_.capabilities = {false, false, false, false, false, true, false};
+    state_.capabilities.beep = state_.capabilities.monitoring = bool(device_checks_);
     ConfigurationRecords records;
     const auto result = persistence_->load(records);
     loaded_ = result.ok;
@@ -47,8 +50,7 @@ void ConfigurationController::event(std::string type, std::string detail) {
     ++state_.revision;
 }
 Result ConfigurationController::unavailable(const std::string& operation) {
-    const auto detail =
-        operation + " is unavailable: Test Mode has no routing, monitoring or playback engine.";
+    const auto detail = operation + " is unavailable in this environment.";
     event("action-rejected", detail);
     return {false, detail};
 }
@@ -131,6 +133,11 @@ Result ConfigurationController::remove_profile(const std::string& id) {
 Result ConfigurationController::save(Profile edited, bool apply) {
     if (apply)
         return unavailable("Applying a live routing plan; use Save for configuration-only changes");
+    for (const auto& hole : edited.holes) {
+        const auto checked = validate_endpoint_assignments(hole);
+        if (!checked.ok)
+            return checked;
+    }
     describe_profile(state_, edited);
     ConfigurationRecords records{state_.endpoints, state_.profiles};
     const auto found = std::find_if(records.profiles.begin(), records.profiles.end(),
@@ -194,12 +201,41 @@ Result ConfigurationController::activate(const std::string&, bool) {
 Result ConfigurationController::schedule(const std::string&, int) {
     return unavailable("Scheduled routing");
 }
-Result ConfigurationController::beep(const std::string&) {
-    return unavailable("Test Beep playback");
+Result ConfigurationController::start_check(const std::string& id, bool capture) {
+    const auto* target = endpoint(state_, id);
+    if (!device_checks_)
+        return unavailable("Device checking");
+    if (state_.scanner.busy || !target || target->capture != capture ||
+        target->availability != Availability::Available || !target->inspection ||
+        target->inspection->diagnostic_endpoint_id.empty())
+        return {false, "Choose an available, unambiguous scanned endpoint and finish any scan "
+                       "before checking it."};
+    if (!device_checks_->start(id, target->inspection->diagnostic_endpoint_id, capture))
+        return {false, "The previous device check is still stopping. Try again after cleanup."};
+    diagnostic_binding_ = target->inspection->diagnostic_endpoint_id;
+    state_.monitoring = capture;
+    state_.monitor_source = capture ? id : "";
+    state_.beep_destination = capture ? "" : id;
+    state_.input_peak.reset();
+    ++state_.revision;
+    return {true, capture ? "Opening the selected capture endpoint."
+                          : "Opening the selected playback endpoint."};
+}
+Result ConfigurationController::beep(const std::string& id) {
+    return start_check(id, false);
+}
+Result ConfigurationController::check_level(const std::string& id) {
+    return start_check(id, true);
+}
+void ConfigurationController::cancel_beep() {
+    if (device_checks_ && !device_checks_->reading().capture)
+        device_checks_->cancel();
 }
 void ConfigurationController::monitor(bool enabled) {
     if (enabled)
-        unavailable("Source monitoring");
+        unavailable("Select an explicit capture endpoint");
+    else if (device_checks_ && device_checks_->reading().capture)
+        device_checks_->cancel();
 }
 void ConfigurationController::fail_path(const std::string&, bool) {
     unavailable("Preview failure injection");
@@ -209,6 +245,11 @@ void ConfigurationController::recover() {
 }
 void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, const std::string& id,
                                    const ScanOptions& options) {
+    if (enabled && device_checks_ && device_checks_->reading().active) {
+        event("scan-failed", "Cancel the active device check before scanning.");
+        return;
+    }
+
     if (!scanner_) {
         if (enabled)
             unavailable("Device scanning");
@@ -244,6 +285,8 @@ void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, con
     }
 }
 void ConfigurationController::stop() {
+    if (device_checks_)
+        device_checks_->cancel();
     if (scanner_)
         scan(false);
 }
@@ -303,6 +346,29 @@ void ConfigurationController::merge_scanner_devices() {
         used_ids_.insert(device.id);
 }
 void ConfigurationController::advance(int) {
+    if (device_checks_) {
+        const auto value = device_checks_->reading();
+        const bool changed =
+            state_.monitoring != (value.active && value.capture) ||
+            state_.monitor_source != (value.active && value.capture ? value.target : "") ||
+            state_.input_peak != (value.active && value.capture ? value.peak : std::nullopt) ||
+            state_.beep_destination != (value.active && !value.capture ? value.target : "") ||
+            state_.diagnostic_detail != value.detail;
+        if (changed)
+            ++state_.revision;
+        state_.monitoring = value.active && value.capture;
+        state_.monitor_source = state_.monitoring ? value.target : "";
+        state_.input_peak = state_.monitoring ? value.peak : std::nullopt;
+        state_.beep_destination = value.active && !value.capture ? value.target : "";
+        state_.diagnostic_detail = value.detail;
+        if (value.active) {
+            const auto* target = endpoint(state_, value.target);
+            if (!target || target->availability != Availability::Available || !target->inspection ||
+                target->inspection->diagnostic_endpoint_id != diagnostic_binding_)
+                device_checks_->cancel();
+        }
+    }
+
     if (!scanner_)
         return;
     for (auto& update : scanner_->drain()) {

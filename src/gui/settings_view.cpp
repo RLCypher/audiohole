@@ -80,6 +80,30 @@ void Frame::build_settings() {
         }
         save_startup();
     });
+    auto* wait = new wxCheckBox(startup_box, wxID_ANY,
+                                "Automatically start routing once devices become available");
+    auto* switch_profile = new wxCheckBox(startup_box, wxID_ANY,
+                                          "Automatically activate selected profiles while routing");
+    wait->SetValue(preferences_->values().automatically_wait_for_devices);
+    switch_profile->SetValue(preferences_->values().activate_selected_profile);
+    wait->SetToolTip("After Start or configured startup activation, wait for missing devices. Stop "
+                     "cancels waiting.");
+    switch_profile->SetToolTip(
+        "Selecting a saved profile switches routing while a session is armed. Edits still require "
+        "Save/Apply; a waiting replacement asks for confirmation.");
+    startup_group->Add(wait, 0, wxALL, FromDIP(4));
+    startup_group->Add(switch_profile, 0, wxALL, FromDIP(4));
+    auto save_routing_policy = [this, wait, switch_profile](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.automatically_wait_for_devices = wait->GetValue();
+        next.activate_selected_profile = switch_profile->GetValue();
+        const auto result = preferences_->update(next);
+        if (result.ok)
+            controller_->wait_for_devices(next.automatically_wait_for_devices);
+        show_result(result);
+    };
+    wait->Bind(wxEVT_CHECKBOX, save_routing_policy);
+    switch_profile->Bind(wxEVT_CHECKBOX, save_routing_policy);
     auto* row = new wxWrapSizer(wxHORIZONTAL);
     auto* startup_preview = button(startup_box, row, "Preview startup", [this] {
         if (startup_->GetSelection() == 2) {
@@ -92,6 +116,7 @@ void Frame::build_settings() {
             show_result({false, "Select a startup profile."});
             return;
         }
+        controller_->wait_for_devices(preferences_->values().automatically_wait_for_devices);
         show_result(
             controller_->schedule(profile_ids_.at(static_cast<std::size_t>(i)),
                                   startup_->GetSelection() == 0 ? 0 : delay_->GetValue() * 1000));

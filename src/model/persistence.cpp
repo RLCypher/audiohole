@@ -374,6 +374,7 @@ ConfigurationRecords decode(const Json& root) {
             const auto* routing_key = root.at("schema_version") >= 6 ? "routing" : "routing_engine";
             h.routing_engine = x.contains(routing_key) ? string(x, routing_key, 64) : "automatic";
             require(!h.routing_engine.empty());
+            require(validate_endpoint_assignments(h).ok);
             p.holes.push_back(std::move(h));
         }
         records.profiles.push_back(std::move(p));

@@ -1,17 +1,20 @@
 #pragma once
+#include "model/diagnostic_service.h"
 #include "model/persistence.h"
 #include "model/scanner_service.h"
 #include <set>
 
 namespace audiohole {
 // Test environment: real configuration I/O and optional owned scanner service;
-// routing/monitoring/playback remain unavailable. One authoritative snapshot. Mutations publish
+// routing remains unavailable; an optional service owns temporary device checks.
+// One authoritative snapshot. Mutations publish
 // only after a provider commits, so rejected writes cannot silently replace the visible saved
 // records.
 class ConfigurationController final : public Controller {
   public:
     explicit ConfigurationController(std::unique_ptr<ConfigurationPersistence>,
-                                     std::unique_ptr<ScannerService> = {});
+                                     std::unique_ptr<ScannerService> = {},
+                                     std::unique_ptr<DiagnosticService> = {});
     ~ConfigurationController() override;
     const Snapshot& snapshot() const override {
         return state_;
@@ -30,7 +33,8 @@ class ConfigurationController final : public Controller {
     Result beep(const std::string&) override;
     void stop() override;
     void advance(int) override;
-    void cancel_beep() override {}
+    void cancel_beep() override;
+    Result check_level(const std::string&) override;
     void monitor(bool enabled) override;
     void fail_path(const std::string&, bool) override;
     void recover() override;
@@ -43,6 +47,9 @@ class ConfigurationController final : public Controller {
     bool bundle_job_ = false;
     std::unique_ptr<ConfigurationPersistence> persistence_;
     std::unique_ptr<ScannerService> scanner_;
+    std::unique_ptr<DiagnosticService> device_checks_;
+    std::string diagnostic_binding_;
+    Result start_check(const std::string&, bool capture);
     std::vector<Endpoint> scanner_devices_;
     bool scanner_job_is_scan_ = false;
     Snapshot state_;

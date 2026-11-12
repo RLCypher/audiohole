@@ -46,7 +46,8 @@ inline constexpr std::array<const char*, 9> inspection_view_names{
 // scanner JSON. Raw views retain explicit unknown values and exact evidence.
 struct DeviceInspection {
     std::string source, path, observed_state, last_observed;
-    std::string edit_bytes; // Opaque snapshot used only for checked metadata saves.
+    std::string diagnostic_endpoint_id; // Local binding only; never serialized in a profile.
+    std::string edit_bytes;             // Opaque snapshot used only for checked metadata saves.
     bool warning = false;
     bool unusable =
         false; // Reserved for explicit backend evidence; never inferred from one rejected tuple.

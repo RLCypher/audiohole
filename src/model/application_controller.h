@@ -131,6 +131,8 @@ class ApplicationController final : public Controller {
     void fail_path(const std::string&, bool) override;
     void recover() override;
     void monitor(bool) override;
+    Result check_level(const std::string&) override;
+    void wait_for_devices(bool) override;
     Result beep(const std::string&) override;
     void cancel_beep() override;
     void clear_diagnostics() override;

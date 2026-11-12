@@ -109,7 +109,8 @@ void Frame::queue_field_save(bool device) {
                 return;
             wxCommandEvent click(wxEVT_BUTTON, device_save_->GetId());
             device_save_->GetEventHandler()->ProcessEvent(click);
-        } else if (viewed_ == record && hole_index_ == hole && profile_save_->IsEnabled())
+        } else if (viewed_ == record && hole_index_ == hole && !bundle_generation_ &&
+                   profile_edits_pending())
             save(false);
     });
 }
@@ -128,12 +129,14 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.source->SetMinSize(FromDIP(wxSize(120, -1)));
     source_layout->Add(w.source, 0, wxEXPAND | wxALL, FromDIP(8));
     w.source_detail = label(capture, source_layout, "Select a source");
+    build_device_check(capture, source_layout, w.capture_check, true, title + " capture");
     capture->set_content_sizer(source_layout);
     material_heading(playback, destination_layout, "Destination (Playback)", false);
     w.destination = new ThemedCombo(playback, wxID_ANY);
     w.destination->SetMinSize(FromDIP(wxSize(120, -1)));
     destination_layout->Add(w.destination, 0, wxEXPAND | wxALL, FromDIP(8));
     w.destination_detail = label(playback, destination_layout, "Select a destination");
+    build_device_check(playback, destination_layout, w.playback_check, false, title + " playback");
     playback->set_content_sizer(destination_layout);
     endpoints->Add(capture, 1, wxEXPAND | wxALL, FromDIP(5));
     auto* chevron = label(box, endpoints, wxString::FromUTF8("\xEE\x97\x8C"));
@@ -287,14 +290,27 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     auto changed = [this, &w](bool source) {
         if (loading_ || hole_index_ < 0)
             return;
+        auto* control = static_cast<ThemedCombo*>(source ? w.source : w.destination);
+        const auto& ids = source ? w.sources : w.destinations;
+        const int index = control->GetSelection();
+        if (index >= 0 && !control->item_enabled(static_cast<unsigned>(index))) {
+            const auto& hole = draft_.holes[hole_index_];
+            populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+            return;
+        }
         capture_draft();
-        update_beep_destinations();
-        auto& d = (&w == &forward_)
-                      ? draft_.holes.at(static_cast<std::size_t>(hole_index_)).forward
-                      : draft_.holes.at(static_cast<std::size_t>(hole_index_)).reverse;
-        populate_direction(w, d);
+        auto& hole = draft_.holes[hole_index_];
+        auto& direction = &w == &forward_ ? hole.forward : hole.reverse;
+        if (index >= 0 && static_cast<std::size_t>(index) < ids.size() && ids[index].empty()) {
+            (source ? direction.source : direction.destination).clear();
+            (source ? direction.source_name : direction.destination_name).clear();
+        }
+        end_observation();
+        populate_direction(forward_, hole.forward);
+        populate_direction(reverse_, hole.reverse);
         dirty_ = true;
         present(source ? presentation::Message::Source : presentation::Message::Destination);
+        refresh();
     };
     w.source->Bind(wxEVT_COMBOBOX, [changed](wxCommandEvent&) { changed(true); });
     w.destination->Bind(wxEVT_COMBOBOX, [changed](wxCommandEvent&) { changed(false); });
@@ -787,11 +803,16 @@ void Frame::build_profiles() {
     profile_rows_->SplitHorizontally(profile_panel, profile_lower_rows_);
     sidebar_layout->Add(profile_rows_, 1, wxEXPAND);
     sidebar->SetSizer(sidebar_layout);
-    auto* editor = new wxScrolledWindow(profile_columns_);
+    auto* right_container = new wxPanel(profile_columns_);
+    auto* right_column = new wxBoxSizer(wxVERTICAL);
+    right_container->SetSizer(right_column);
+    auto* editor = new wxScrolledWindow(right_container);
+    profile_editor_ = editor;
+    right_column->Add(editor, 1, wxEXPAND);
     editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
     editor->SetSizer(right);
-    profile_columns_->SplitVertically(sidebar, editor, FromDIP(300));
+    profile_columns_->SplitVertically(sidebar, right_container, FromDIP(300));
     hole_heading_ = label(editor, right, "Select a hole");
     hole_heading_->SetWindowStyleFlag(wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
     hole_heading_->SetMinSize(wxSize(0, -1));
@@ -826,16 +847,32 @@ void Frame::build_profiles() {
                 queue_field_save(false);
             event.Skip();
         });
-    path_status_ = label(editor, right, "No active paths.");
     build_hole_diagnostics(editor, right);
+    performance_panel_ = new wxPanel(right_container);
+    auto* performance =
+        new wxStaticBoxSizer(wxVERTICAL, performance_panel_, "Performance Diagnostics");
+    performance_panel_->SetSizer(performance);
+    label(performance->GetStaticBox(), performance,
+          "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    path_status_ = label(performance->GetStaticBox(), performance, "No active directions.");
+    path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 3));
+    path_status_->SetMaxSize(wxSize(-1, path_status_->GetCharHeight() * 3));
+    right_column->Add(performance_panel_, 0, wxEXPAND | wxALL, FromDIP(4));
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
     page->SetSizer(page_layout);
     notebook_->AddPage(page, "Profiles");
     profiles_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
         const int i = profiles_->GetSelection();
-        if (i >= 0 && discard())
-            select_profile(profile_ids_.at(static_cast<std::size_t>(i)));
-        else {
+        if (i >= 0 && discard()) {
+            const auto id = profile_ids_.at(static_cast<std::size_t>(i));
+            const auto& state = controller_->snapshot();
+            const bool switch_now = preferences_->values().activate_selected_profile &&
+                                    state.capabilities.routing && state.armed &&
+                                    state.active_profile != id;
+            select_profile(id);
+            if (switch_now)
+                activate(false);
+        } else {
             const auto it = std::find(profile_ids_.begin(), profile_ids_.end(), viewed_);
             profiles_->SetSelection(it == profile_ids_.end()
                                         ? wxNOT_FOUND
@@ -891,10 +928,15 @@ void Frame::build_profiles() {
                                      : presentation::Message::Disabled);
     });
     duplex_->Bind(wxEVT_CHECKBOX, [this, editor](wxCommandEvent&) {
+        if (loading_ || hole_index_ < 0)
+            return;
+        capture_draft();
+        const auto& hole = draft_.holes[hole_index_];
+        populate_direction(forward_, hole.forward);
+        populate_direction(reverse_, hole.reverse);
+        load_holes();
+        holes_->SetSelection(hole_index_);
         dirty_ = true;
-        activity_direction_->Enable(duplex_->GetValue());
-        if (!duplex_->GetValue())
-            activity_direction_->SetSelection(0);
         end_observation();
         reverse_.group->ShowItems(duplex_->GetValue());
         reverse_.tuning_group->ShowItems(duplex_->GetValue());
@@ -902,22 +944,6 @@ void Frame::build_profiles() {
         editor->Layout();
         present(duplex_->GetValue() ? presentation::Message::Duplex
                                     : presentation::Message::Simplex);
-    });
-    monitor_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
-        controller_->monitor(monitor_->GetValue());
-        const auto& paths = controller_->snapshot().paths;
-        const auto observed_hole = hole_index_ >= 0
-                                       ? draft_.holes.at(static_cast<std::size_t>(hole_index_)).id
-                                       : std::string{};
-        const bool reverse = activity_direction_->GetSelection() == 1;
-        const bool running = std::any_of(paths.begin(), paths.end(), [&](const auto& path) {
-            return path.hole_id == observed_hole && path.reverse == reverse &&
-                   path.state == audiohole::State::Running;
-        });
-        present(!monitor_->GetValue() ? presentation::Message::Cancelled
-                : running             ? presentation::Message::Signal
-                                      : presentation::Message::NoSignal);
-        refresh();
     });
 }
 // Test uses exact worker-projected scanner tuples; Preview uses authored fixtures.
@@ -934,6 +960,8 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.retained_source = d.source;
     w.retained_destination = d.destination;
     wxArrayString source_search, dest_search;
+    static_cast<ThemedCombo*>(w.source)->disabled_items.clear();
+    static_cast<ThemedCombo*>(w.destination)->disabled_items.clear();
     const auto offered_devices = configuration_devices(controller_->snapshot());
     for (const auto* offered : offered_devices) {
         const auto& e = *offered;
@@ -947,12 +975,21 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
         auto& ids = e.capture ? w.sources : w.destinations;
         list->Append(caption);
         ids.push_back(e.id);
-        (e.capture ? source_search : dest_search).Add(caption);
+        if (hole_index_ >= 0 && static_cast<std::size_t>(hole_index_) < draft_.holes.size() &&
+            endpoint_used_elsewhere(draft_.holes[hole_index_], &w == &reverse_, e.capture, e.id))
+            static_cast<ThemedCombo*>(list)->disabled_items.push_back(
+                static_cast<unsigned>(ids.size() - 1));
+        if (static_cast<ThemedCombo*>(list)->item_enabled(static_cast<unsigned>(ids.size() - 1)))
+            (e.capture ? source_search : dest_search).Add(caption);
         if (e.id == (e.capture ? d.source : d.destination)) {
             list->SetSelection(static_cast<int>(ids.size()) - 1);
             list->SetToolTip(text(e.windows_name + " | logical ID: " + e.id));
         }
     }
+    w.source->Append("Clear endpoint");
+    w.sources.push_back("");
+    w.destination->Append("Clear endpoint");
+    w.destinations.push_back("");
     // A configured hidden/missing binding remains visible as field text, never
     // as an offered list item. Saving unrelated edits retains its exact ID.
     auto retained_caption = [&](const std::string& id, const std::string& saved_name) {
@@ -1261,8 +1298,6 @@ void Frame::load_hole(int index) {
                                      ". Choose a supported engine explicitly.")
                               : wxString{});
     routing_engine_notice_->Wrap(560);
-    activity_direction_->SetSelection(0);
-    activity_direction_->Enable(index >= 0 && h.duplex);
     hole_notes_->SetEditable(index >= 0);
     for (wxWindow* widget : std::vector<wxWindow*>{enabled_, duplex_})
         widget->Enable(index >= 0);
@@ -1285,11 +1320,34 @@ void Frame::load_hole(int index) {
     }
     reverse_.group->ShowItems(h.duplex && index >= 0);
     reverse_.tuning_group->ShowItems(h.duplex && index >= 0);
-    update_beep_destinations();
+    end_observation();
     loading_ = false;
     auto* editor = dynamic_cast<wxScrolledWindow*>(hole_heading_->GetParent());
     editor->FitInside();
     editor->Layout();
+}
+bool Frame::profile_edits_pending() {
+    if (viewed_.empty())
+        return false;
+    capture_draft();
+    const auto* stored = profile(controller_->snapshot(), viewed_);
+    if (!stored)
+        return false;
+    if (draft_ != *stored)
+        return true;
+    if (hole_index_ >= 0)
+        for (auto* widgets : {&forward_, &reverse_}) {
+            if (widgets == &reverse_ && !duplex_->GetValue())
+                continue;
+            if (!widgets->advanced_tuning->GetValue())
+                continue;
+            auto preference = (widgets == &forward_ ? draft_.holes[hole_index_].forward
+                                                    : draft_.holes[hole_index_].reverse)
+                                  .settings.preferences;
+            if (!buffer_value(widgets->buffer) || !read_preferences(*widgets, preference))
+                return true;
+        }
+    return false;
 }
 void Frame::save(bool apply) {
     tuning_timer_.Stop();
@@ -1351,6 +1409,37 @@ void Frame::activate(bool ready) {
         return;
     }
     const auto id = snapshot.pending_profile.empty() ? viewed_ : snapshot.pending_profile;
+    activate_saved_profile(id, ready);
+}
+void Frame::activate_saved_profile(const std::string& id, bool ready) {
+    const auto& snapshot = controller_->snapshot();
+    const auto* selected = profile(snapshot, id);
+    controller_->wait_for_devices(preferences_->values().automatically_wait_for_devices);
+    if (selected && snapshot.armed && snapshot.active_profile != id) {
+        const auto valid = validate(snapshot, *selected);
+        if (!valid.ok) {
+            show_result(valid);
+            return;
+        }
+        bool missing = false;
+        for (const auto& hole : selected->holes)
+            if (hole.enabled)
+                for (const auto* direction : {&hole.forward, hole.duplex ? &hole.reverse : nullptr})
+                    if (direction)
+                        for (const auto& endpoint_id :
+                             {direction->source, direction->destination}) {
+                            const auto* device = endpoint(snapshot, endpoint_id);
+                            missing |= !device || device->availability != Availability::Available;
+                        }
+        if (missing && preferences_->values().automatically_wait_for_devices) {
+            if (themed_message_box("Replace the current routing profile and wait for the selected "
+                                   "profile's missing devices?",
+                                   "Switch routing profile?",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+                return;
+            ready = true;
+        }
+    }
     show_result(controller_->activate(id, ready));
     refresh();
 }
@@ -1358,89 +1447,8 @@ void Frame::activate(bool ready) {
 } // namespace audiohole::gui
 
 namespace audiohole::gui {
-// Temporary tools are independent from passive monitoring: the beep always
-// needs an explicit destination and remains a no-sound simulation in this build.
+// Preview-only failure injection stays separate from endpoint diagnostics.
 void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
-    signal_tools_ =
-        new wxCollapsiblePane(parent, wxID_ANY, "Signal Testing & Monitoring", wxDefaultPosition,
-                              wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
-    signal_tools_->SetName("Signal Testing & Monitoring");
-    layout->Add(signal_tools_, 0, wxEXPAND | wxALL, FromDIP(4));
-    auto* pane = signal_tools_->GetPane();
-    auto* groups = new wxBoxSizer(wxVERTICAL);
-    auto* observation = new wxStaticBoxSizer(wxVERTICAL, pane, "Source Activity");
-    auto* box = observation->GetStaticBox();
-    groups->Add(observation, 0, wxEXPAND | wxALL, FromDIP(4));
-    activity_direction_ = choices(box, observation, "Monitor direction",
-                                  {"Forward source", "Return source (duplex only)"});
-    activity_direction_->SetMinSize(wxSize(0, activity_direction_->GetBestSize().y));
-    activity_direction_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        end_observation();
-        refresh();
-    });
-    monitor_ = new wxCheckBox(box, wxID_ANY, "Monitor source activity");
-    monitor_->SetToolTip(
-        "Observe source activity temporarily. Leaving this page or hiding the window turns "
-        "monitoring off; source activity does not prove destination audibility.");
-    observation->Add(monitor_, 0, wxALL, 4);
-    activity_ = label(box, observation, "Observation off.");
-    button(box, observation, "Clear observation status", [this] {
-        controller_->monitor(false);
-        refresh();
-    })->SetToolTip("Stop temporary source observation and clear its displayed status.");
-    auto* beep_group = new wxStaticBoxSizer(wxVERTICAL, pane, "Test Beep");
-    groups->Add(beep_group, 0, wxEXPAND | wxALL, FromDIP(4));
-    box = beep_group->GetStaticBox();
-    label(box, beep_group, "Test Beep destination");
-    destination_test_ = new ThemedChoice(box, wxID_ANY);
-    beep_group->Add(destination_test_, 0, wxEXPAND | wxALL, 3);
-    destination_test_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        present(presentation::Message::BeepReady);
-        refresh();
-    });
-    auto* beep = new wxBoxSizer(wxHORIZONTAL);
-    beep_button_ = button(box, beep, "Test Beep", [this] {
-        // Read authoritative state on each click, including rapid repeat clicks.
-        if (!controller_->snapshot().beep_destination.empty()) {
-            controller_->cancel_beep();
-            refresh();
-            return;
-        }
-        const int index = destination_test_->GetSelection();
-        show_result(
-            controller_->beep(index >= 0 && static_cast<std::size_t>(index) < beep_ids_.size()
-                                  ? beep_ids_[static_cast<std::size_t>(index)]
-                                  : ""));
-        refresh();
-    });
-    // This starts inside a collapsed pane: a minimum alone does not resize the
-    // native window until its first layout. Reserve both captions and initialize
-    // the actual size too, so disclosure/label changes cannot change its width.
-    auto beep_size = beep_button_->GetEffectiveMinSize();
-    beep_button_->SetLabel("Cancel Beep");
-    beep_size.IncTo(beep_button_->GetEffectiveMinSize());
-    beep_button_->SetLabel("Test Beep");
-    beep_button_->SetMinSize(beep_size);
-    beep_button_->SetMaxSize(wxSize(beep_size.x, -1));
-    beep_button_->SetSize(beep_size);
-    beep_group->Add(beep);
-    beep_status_ = label(box, beep_group, "Test Beep inactive.");
-    auto* performance = new wxStaticBoxSizer(wxVERTICAL, pane, "Performance Diagnostics");
-    groups->Add(performance, 0, wxEXPAND | wxALL, FromDIP(4));
-    label(performance->GetStaticBox(), performance,
-          "Latency / buffer occupancy / clock drift / CPU: unavailable.");
-    pane->SetSizer(groups);
-    signal_tools_->Collapse(true);
-    signal_tools_->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [this, parent](wxCollapsiblePaneEvent&) {
-        // Disclosure is presentation only; do not stop monitoring or a beep.
-        auto* focused = wxWindow::FindFocus();
-        if (signal_tools_->IsCollapsed() && focused &&
-            signal_tools_->GetPane()->IsDescendant(focused))
-            signal_tools_->SetFocus();
-        parent->Layout();
-        static_cast<wxScrolledWindow*>(parent)->FitInside();
-        refresh();
-    });
     if (controller_->snapshot().operating_mode != OperatingMode::Preview)
         return;
     auto* simulation = new wxStaticBoxSizer(wxVERTICAL, parent, "Simulate Errors");
@@ -1465,32 +1473,5 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
         refresh();
     });
     simulation->Add(failures);
-}
-} // namespace audiohole::gui
-
-namespace audiohole::gui {
-// Recompute only after an editor selection changes; never choose a beep target
-// implicitly or carry an armed test to a newly edited destination.
-void Frame::update_beep_destinations() {
-    const audiohole::Hole hole = hole_index_ >= 0
-                                     ? draft_.holes.at(static_cast<std::size_t>(hole_index_))
-                                     : audiohole::Hole{};
-    controller_->cancel_beep();
-    destination_test_->Clear();
-    beep_ids_.clear();
-    destination_test_->Append("Select a destination direction explicitly");
-    beep_ids_.push_back("");
-    destination_test_->SetSelection(0);
-    for (const auto* d : {&hole.forward, hole.duplex ? &hole.reverse : nullptr})
-        if (d) {
-            if (const auto* e = audiohole::endpoint(controller_->snapshot(), d->destination)) {
-                if (e->hidden)
-                    continue;
-                destination_test_->Append(
-                    text(std::string(d == &hole.forward ? "Forward → " : "Return → ") +
-                         e->display_name + " [" + e->id + "]"));
-                beep_ids_.push_back(e->id);
-            }
-        }
 }
 } // namespace audiohole::gui

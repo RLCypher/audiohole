@@ -217,6 +217,8 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
         detail->last_observed = value(field(saved.local_binding, "last_seen"));
         const auto& local_id = field(saved.local_binding, "endpoint_id");
         const bool ambiguous = local_id.is_string() && claims[local_id.get<std::string>()] > 1;
+        if (local_id.is_string() && !ambiguous)
+            detail->diagnostic_endpoint_id = local_id.get<std::string>();
         endpoint.availability = ambiguous                            ? Availability::Ambiguous
                                 : detail->observed_state == "active" ? Availability::Available
                                 : detail->observed_state == "disabled" ||

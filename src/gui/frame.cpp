@@ -88,7 +88,6 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
     routing_actions_ = actions;
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
-    arm_ready_ = button(this, actions, "Arm Ready", [this] { activate(true); });
     stop_ = button(this, actions, "Stop Routing", [this] {
         controller_->stop();
         refresh();
@@ -259,8 +258,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         e.Skip();
     });
     notebook_->Bind(wxEVT_BOOKCTRL_PAGE_CHANGED, [this](wxBookCtrlEvent& e) {
-        if (e.GetSelection() != 0)
-            end_observation();
+        end_observation();
         update_navigation();
         e.Skip();
     });
@@ -274,7 +272,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         present(presentation::Message::Ready);
     Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
         if (event.ControlDown() && !event.AltDown() && event.GetKeyCode() == 'S' &&
-            notebook_->GetSelection() == 0 && profile_save_->IsEnabled())
+            notebook_->GetSelection() == 0 && !bundle_generation_ && profile_edits_pending())
             save(false);
         else if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
             select_page((static_cast<std::size_t>(notebook_->GetSelection()) +
@@ -530,7 +528,7 @@ bool Frame::discard() {
 void Frame::end_observation() {
     controller_->monitor(false);
     controller_->cancel_beep();
-    monitor_->SetValue(false);
+    active_check_ = nullptr;
 }
 // GUI timer polling does not create presentation events. A controller sequence
 // number gates commentary, so repainting/telemetry cannot consume more variants.
@@ -568,10 +566,11 @@ void Frame::refresh() {
     avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
     const bool preview = s.operating_mode == OperatingMode::Preview;
     start_->Enable(s.capabilities.routing);
-    arm_ready_->Enable(s.capabilities.routing);
     stop_->Enable(s.capabilities.routing);
     profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
-    profile_save_->Enable(!viewed_.empty() && !bundle_generation_);
+    if (!loading_)
+        dirty_ = profile_edits_pending();
+    profile_save_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
     profile_revert_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
     profile_notes_->SetEditable(!viewed_.empty());
     hole_new_->Enable(!viewed_.empty());
@@ -605,11 +604,16 @@ void Frame::refresh() {
             populate_direction(forward_, h.forward);
             populate_direction(reverse_, h.reverse);
         }
-        update_beep_destinations();
+        end_observation();
     }
     const bool scanner_idle = !s.scanner.busy && !s.scanning;
     scan_start_->Enable(s.capabilities.scanning && scanner_idle);
     const bool selected_device = endpoint(s, device_id_) != nullptr;
+    if (!loading_ && selected_device && loaded_device_id_ == device_id_) {
+        const auto* selected = endpoint(s, device_id_);
+        device_dirty_ = utf8(device_name_->GetValue()) != selected->display_name ||
+                        utf8(device_notes_->GetValue()) != selected->notes;
+    }
     device_save_->Enable(selected_device && scanner_idle && device_dirty_);
     device_name_->SetEditable(selected_device && scanner_idle);
     device_notes_->SetEditable(selected_device && scanner_idle);
@@ -618,9 +622,6 @@ void Frame::refresh() {
     scan_cancel_->Enable(s.capabilities.scanning && (s.scanning || s.scanner.busy));
     scan_mode_->Enable(s.capabilities.scanning && scanner_idle);
     scan_scope_->Enable(s.capabilities.scanning && scanner_idle);
-    monitor_->Enable(s.capabilities.monitoring);
-    activity_direction_->Enable(s.capabilities.monitoring && hole_index_ >= 0 &&
-                                draft_.holes.at(static_cast<std::size_t>(hole_index_)).duplex);
     if (hole_index_ >= 0) {
         auto forward = draft_.holes.at(static_cast<std::size_t>(hole_index_)).forward;
         auto reverse = draft_.holes.at(static_cast<std::size_t>(hole_index_)).reverse;
@@ -682,51 +683,9 @@ void Frame::refresh() {
         paths += p.hole_id + (p.reverse ? " return: " : " forward: ") + audiohole::name(p.state) +
                  " — " + p.detail + "\n";
     path_status_->SetLabel(text(paths.empty() ? "No active directions." : paths));
-    path_status_->Wrap(620);
-    const std::string observed_hole =
-        hole_index_ >= 0 ? draft_.holes.at(static_cast<std::size_t>(hole_index_)).id : "";
-    const bool observe_reverse = activity_direction_->GetSelection() == 1;
-    const bool running = std::any_of(s.paths.begin(), s.paths.end(), [&](const auto& path) {
-        return path.hole_id == observed_hole && path.reverse == observe_reverse &&
-               path.state == audiohole::State::Running;
-    });
-    monitor_->SetValue(s.monitoring);
-    const auto tools_title = wxString("Signal Testing & Monitoring") +
-                             (s.monitoring ? " — source monitoring active" : "") +
-                             (!s.beep_destination.empty() ? " — Test Beep active" : "");
-    if (signal_tools_->GetLabel() != tools_title)
-        signal_tools_->SetLabel(tools_title);
-    activity_->SetLabel(
-        !s.capabilities.monitoring ? "Source monitoring unavailable in Test Mode."
-        : s.monitoring
-            ? (running
-                   ? "Source activity detected (simulated). Destination audibility is untested."
-                   : "No source activity (simulated). Silence does not establish disconnection.")
-            : "Observation off.");
-    // MSVC requires both branches to be wxString: its pointer conversions make
-    // a mixed literal/wxString conditional ambiguous.
-    beep_status_->SetLabel(
-        s.beep_destination.empty()
-            ? wxString(s.capabilities.beep ? wxS("Test Beep inactive.")
-                                           : wxS("Test Beep unavailable in Test Mode."))
-            : text("Test Beep active (simulated; no sound): " + s.beep_destination +
-                   ". Cancel immediately if needed."));
-    beep_button_->SetLabel(s.beep_destination.empty() ? "Test Beep" : "Cancel Beep");
-    const int beep_selection = destination_test_->GetSelection();
-    const auto* beep_target =
-        beep_selection >= 0 && static_cast<std::size_t>(beep_selection) < beep_ids_.size()
-            ? endpoint(s, beep_ids_[static_cast<std::size_t>(beep_selection)])
-            : nullptr;
-    const bool beep_available = beep_target && !beep_target->capture &&
-                                beep_target->availability == Availability::Available;
-    beep_button_->Enable(s.capabilities.beep && (!s.beep_destination.empty() || beep_available));
-    beep_button_->SetToolTip(
-        !preview ? "Test Beep playback is unavailable in Test Mode because no audio backend is "
-                   "installed."
-        : s.beep_destination.empty()
-            ? "Start a bounded test for the explicitly selected playback destination. This "
-              "preview simulates the test interval and emits no sound."
-            : "Cancel the active simulated destination test immediately. No second test starts.");
+    path_status_->SetToolTip(text(paths));
+    path_status_->Wrap(std::max(80, performance_panel_->GetClientSize().x - FromDIP(20)));
+    refresh_device_checks();
     if (s.scanner.busy && s.scan_percent < 0)
         scan_progress_->Pulse();
     else
@@ -950,15 +909,13 @@ bool Frame::smoke(const wxString& directory) {
             }
             load_hole(hole_index_); // Restore the original draft's endpoints and duplex visibility.
             require(reverse_.group->GetStaticBox()->GetLabel() == "Return" &&
-                        reverse_.tuning_group->GetStaticBox()->GetLabel() == "Return tuning" &&
-                        activity_direction_->GetString(1).Contains("Return"),
+                        reverse_.tuning_group->GetStaticBox()->GetLabel() == "Return tuning",
                     "Duplex captions must say Return");
         };
         auto exercise_tuning = [&] {
             exercise_information();
             require(hole_index_ >= 0 && !forward_.advanced_tuning->GetValue() &&
-                        forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed() &&
-                        signal_tools_->IsCollapsed(),
+                        forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed(),
                     "New holes must start with Automatic tuning and collapsed direction panels");
             require(forward_.advanced_tuning->GetLabel() == "Use advanced tuning" &&
                         routing_engine_->GetCount() == 4 &&
@@ -1152,12 +1109,15 @@ bool Frame::smoke(const wxString& directory) {
                     "Scan status changes resized the console");
             scan_state_->ChangeValue(text);
             const auto window_size = GetSize();
-            const bool collapsed = signal_tools_->IsCollapsed();
-            for (bool next : {!collapsed, collapsed}) {
-                signal_tools_->Collapse(next);
-                require(signal_tools_->IsCollapsed() == next && GetSize() == window_size,
-                        "Signal tools disclosure resized the top-level window");
-            }
+            require(performance_panel_->GetParent() == profile_editor_->GetParent() &&
+                        performance_panel_->GetParent() != profile_editor_,
+                    "Performance diagnostics must be outside the scrolling hole editor");
+            const auto position = performance_panel_->GetPosition();
+            profile_editor_->Scroll(0, 100);
+            profile_editor_->GetParent()->Layout();
+            require(performance_panel_->GetPosition() == position && GetSize() == window_size,
+                    "Scrolling the hole editor moved the pinned diagnostics panel");
+            profile_editor_->Scroll(0, 0);
         }
         {
             auto* deep = wxWindow::FindWindowByName("Deep scan settings", this);
@@ -1429,8 +1389,10 @@ bool Frame::smoke(const wxString& directory) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),
                     "Test Mode leaked preview fixtures");
-            require(!start_->IsEnabled() && !arm_ready_->IsEnabled() &&
-                        controller_->snapshot().capabilities.scanning && !beep_button_->IsEnabled(),
+            require(!start_->IsEnabled() && controller_->snapshot().capabilities.scanning &&
+                        !forward_.playback_check.action->IsEnabled() &&
+                        !forward_.capture_check.action->IsEnabled() &&
+                        wxWindow::FindWindowByLabel("Arm Ready", this) == nullptr,
                     "Test Mode enabled unsupported hardware controls");
             require(wxWindow::FindWindowByLabel("Forward failure", this) == nullptr &&
                         wxWindow::FindWindowByLabel("Return failure", this) == nullptr &&
@@ -1657,65 +1619,71 @@ bool Frame::smoke(const wxString& directory) {
                 "Unchanged buffer preferences must keep Apply disabled");
         exercise_tuning();
         save(false);
+        require(!profile_save_->IsEnabled(), "Unchanged saved profile must keep Save disabled");
+        const auto saved_notes = profile_notes_->GetValue();
+        profile_notes_->SetValue(saved_notes + " edited");
+        refresh();
+        require(profile_save_->IsEnabled(), "Editing profile notes did not enable Save");
+        profile_notes_->SetValue(saved_notes);
+        refresh();
+        require(!profile_save_->IsEnabled(), "Undoing a profile edit left Save enabled");
         require(console_->GetToolTip() == nullptr, "Diagnostic log must not have hover text");
-        const auto target = std::find(beep_ids_.begin(), beep_ids_.end(), "vr-out");
-        require(target != beep_ids_.end(), "Preview beep destination missing");
-        destination_test_->SetSelection(static_cast<int>(target - beep_ids_.begin()));
+        auto* beep_button = forward_.playback_check.action;
         refresh();
-        require(beep_button_->IsEnabled(), "Available beep target must enable the test button");
-        const auto beep_width = beep_button_->GetSize().x;
-        require(beep_width == beep_button_->GetMinSize().x &&
-                    beep_width == beep_button_->GetMaxSize().x,
-                "Collapsed beep button must start at its reserved fixed width");
-        const auto require_beep_width = [&](const char* phase) {
-            const auto width = beep_button_->GetSize().x;
-            if (width != beep_width)
-                throw std::runtime_error(
-                    std::string(phase) + ": beep width changed from " + std::to_string(beep_width) +
-                    " to " + std::to_string(width) +
-                    "; min=" + std::to_string(beep_button_->GetMinSize().x) +
-                    "; max=" + std::to_string(beep_button_->GetMaxSize().x) +
-                    "; collapsed=" + (signal_tools_->IsCollapsed() ? "true" : "false"));
-        };
-        wxCommandEvent beep_click(wxEVT_BUTTON, beep_button_->GetId());
-        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+        require(forward_.playback_check.target == "vr-out" && beep_button->IsEnabled(),
+                "Forward playback check must target its assigned endpoint");
+        const auto beep_width = beep_button->GetSize().x;
+        wxCommandEvent beep_click(wxEVT_BUTTON, beep_button->GetId());
+        beep_button->GetEventHandler()->ProcessEvent(beep_click);
         require(controller_->snapshot().beep_destination == "vr-out" &&
-                    beep_button_->GetLabel() == "Cancel Beep",
-                "Beep label must follow the controller's active test state");
-        require_beep_width("Starting Test Beep");
-        controller_->monitor(true);
-        refresh();
-        const auto disclosure_revision = controller_->snapshot().revision;
-        const auto disclosure_occurrence = occurrence_;
-        for (bool collapsed : {false, true}) {
-            signal_tools_->Collapse(collapsed);
-            wxCollapsiblePaneEvent disclosure(signal_tools_, signal_tools_->GetId(), collapsed);
-            signal_tools_->GetEventHandler()->ProcessEvent(disclosure);
-            require_beep_width(collapsed ? "Collapsing monitoring tools"
-                                         : "Expanding monitoring tools");
-        }
-        require(controller_->snapshot().monitoring &&
-                    controller_->snapshot().beep_destination == "vr-out" &&
-                    controller_->snapshot().revision == disclosure_revision &&
-                    occurrence_ == disclosure_occurrence &&
-                    signal_tools_->GetLabel().Contains("source monitoring active") &&
-                    signal_tools_->GetLabel().Contains("Test Beep active"),
-                "Monitoring disclosure changed a test/observation or generated commentary");
-        controller_->monitor(false);
-        refresh();
-        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+                    beep_button->GetLabel() == "Cancel beep",
+                "Playback card did not start the exact assigned endpoint");
+        require(!forward_.capture_check.action->IsEnabled(),
+                "Another diagnostic must wait for the current check to finish");
+        beep_button->GetEventHandler()->ProcessEvent(beep_click);
         require(controller_->snapshot().beep_destination.empty() &&
-                    beep_button_->GetLabel() == "Test Beep",
-                "Second click must cancel the current beep");
-        require_beep_width("Cancelling Test Beep");
-        beep_button_->GetEventHandler()->ProcessEvent(beep_click);
+                    beep_button->GetLabel() == "Test beep" &&
+                    beep_button->GetSize().x == beep_width,
+                "Cancel beep failed or changed the button width");
+        beep_button->GetEventHandler()->ProcessEvent(beep_click);
         controller_->advance(1000);
         refresh();
+        require(controller_->snapshot().beep_destination.empty() &&
+                    beep_button->GetLabel() == "Test beep",
+                "Natural beep completion left the check active");
+        auto* capture_button = forward_.capture_check.action;
+        wxCommandEvent capture_click(wxEVT_BUTTON, capture_button->GetId());
+        capture_button->GetEventHandler()->ProcessEvent(capture_click);
+        require(controller_->snapshot().monitoring &&
+                    controller_->snapshot().monitor_source ==
+                        draft_.holes[hole_index_].forward.source &&
+                    forward_.capture_check.meter->GetValue() > 0,
+                "Capture check failed to publish the explicit source and simulated level");
+        select_page(1, true);
+        require(!controller_->snapshot().monitoring &&
+                    controller_->snapshot().beep_destination.empty(),
+                "Changing tabs left a device diagnostic running");
+        const auto previous_device = device_id_;
+        require(select_device("mixer-in"), "Could not select the device capture test target");
+        wxCommandEvent device_capture(wxEVT_BUTTON, device_check_.action->GetId());
+        device_check_.action->GetEventHandler()->ProcessEvent(device_capture);
+        require(controller_->snapshot().monitor_source == "mixer-in" &&
+                    device_check_.meter->IsShown(),
+                "Devices capture check did not use its selected endpoint");
+        select_page(2, true);
+        require(!controller_->snapshot().monitoring,
+                "Leaving Devices for Scanning kept capture open");
+        select_page(1, true);
+        require(select_device("vr-out"), "Could not select the device playback test target");
+        device_check_.action->GetEventHandler()->ProcessEvent(device_capture);
+        require(
+            controller_->snapshot().beep_destination == "vr-out" && !device_check_.meter->IsShown(),
+            "Devices playback check did not use its selected endpoint or retained capture meter");
+        select_page(3, true);
         require(controller_->snapshot().beep_destination.empty(),
-                "Natural beep completion left the simulated test active");
-        require(beep_button_->GetLabel() == "Test Beep",
-                "Natural beep completion did not restore the idle button caption");
-        require_beep_width("Natural beep completion");
+                "Leaving Devices for Settings kept playback open");
+        select_device(previous_device);
+        select_page(0, true);
         show_result({false, "Operational warning retained."}, true);
         const auto warning_occurrence = occurrence_;
         bother();
@@ -1833,6 +1801,57 @@ bool Frame::smoke(const wxString& directory) {
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");
         select_profile("profile-duplex");
+        {
+            const auto original = draft_;
+            const auto saved_source = draft_.holes[0].forward.source;
+            const auto return_source = draft_.holes[0].reverse.source;
+            wxCommandEvent return_toggle(wxEVT_CHECKBOX, duplex_->GetId());
+            for (bool enabled : {false, true}) {
+                duplex_->SetValue(enabled);
+                duplex_->GetEventHandler()->ProcessEvent(return_toggle);
+                const auto reserved =
+                    std::find(forward_.sources.begin(), forward_.sources.end(), return_source);
+                require(reserved != forward_.sources.end() &&
+                            static_cast<ThemedCombo*>(forward_.source)
+                                    ->item_enabled(reserved - forward_.sources.begin()) != enabled,
+                        "Return channel toggle did not update endpoint reservations");
+            }
+            const auto entry =
+                std::find(reverse_.sources.begin(), reverse_.sources.end(), saved_source);
+            require(entry != reverse_.sources.end(),
+                    "Assigned endpoint disappeared instead of being grayed");
+            const auto index = static_cast<int>(entry - reverse_.sources.begin());
+            require(!static_cast<ThemedCombo*>(reverse_.source)->item_enabled(index),
+                    "Forward endpoint remains available for reuse in Return");
+            reverse_.source->SetSelection(index);
+            wxCommandEvent duplicate(wxEVT_COMBOBOX, reverse_.source->GetId());
+            reverse_.source->GetEventHandler()->ProcessEvent(duplicate);
+            require(draft_ == original, "Selecting a grayed endpoint changed the hole");
+            forward_.source->SetSelection(static_cast<int>(forward_.sources.size()) - 1);
+            wxCommandEvent clear(wxEVT_COMBOBOX, forward_.source->GetId());
+            forward_.source->GetEventHandler()->ProcessEvent(clear);
+            require(draft_.holes[0].forward.source.empty() && forward_.source->GetValue().empty(),
+                    "Clear endpoint did not leave a blank assignment");
+            const auto freed =
+                std::find(reverse_.sources.begin(), reverse_.sources.end(), saved_source);
+            require(freed != reverse_.sources.end() &&
+                        static_cast<ThemedCombo*>(reverse_.source)
+                            ->item_enabled(freed - reverse_.sources.begin()),
+                    "Cleared endpoint remained reserved in Return");
+            require(*profile(controller_->snapshot(), viewed_) == original,
+                    "Picker changes silently saved the profile");
+            draft_ = original;
+            load_hole(0);
+            refresh();
+            auto* action = reverse_.playback_check.action;
+            wxCommandEvent beep(wxEVT_BUTTON, action->GetId());
+            action->GetEventHandler()->ProcessEvent(beep);
+            require(controller_->snapshot().beep_destination ==
+                        original.holes[0].reverse.destination,
+                    "Return beep targeted another direction");
+            action->GetEventHandler()->ProcessEvent(beep);
+            require(controller_->snapshot().beep_destination.empty(), "Return beep did not cancel");
+        }
         forward_.advanced_tuning->SetValue(true);
         tuning_changed(forward_);
         save(false); // Buffer-Apply checks below deliberately opt into manual tuning.
