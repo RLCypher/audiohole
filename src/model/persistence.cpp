@@ -192,6 +192,10 @@ Json encode(const Preferences& p) {
 }
 Direction direction(const Json& value, int version) {
     Direction d;
+    if (version >= 7) {
+        d.advanced_tuning = value.at("advanced_tuning").get<bool>();
+        d.exclusive_mode_preferred = value.value("exclusive_mode_preferred", false);
+    }
     d.source = string(value, "source", 128);
     d.destination = string(value, "destination", 128);
     if (value.contains("source_name"))
@@ -261,7 +265,9 @@ Direction direction(const Json& value, int version) {
 }
 
 Json encode(const Direction& d) {
-    return {{"source_name", d.source_name},
+    return {{"advanced_tuning", d.advanced_tuning},
+            {"exclusive_mode_preferred", d.exclusive_mode_preferred},
+            {"source_name", d.source_name},
             {"source", d.source},
             {"destination_name", d.destination_name},
             {"destination", d.destination},
@@ -269,7 +275,7 @@ Json encode(const Direction& d) {
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 6},
+                   {"schema_version", 7},
                    {"profiles", Json::array()},
                    {"devices", Json::array()}};
     for (const auto& d : records.devices) {
@@ -292,9 +298,7 @@ Json encode(const ConfigurationRecords& records) {
             holes.push_back({{"display_name", h.display_name},
                              {"notes", h.notes},
                              {"id", h.id},
-                             {"advanced_tuning", h.advanced_tuning},
                              {"routing", h.routing_engine},
-                             {"exclusive_mode_preferred", h.exclusive_mode_preferred},
                              {"enabled", h.enabled},
                              {"duplex", h.duplex},
                              {"forward", encode(h.forward)},
@@ -306,7 +310,7 @@ Json encode(const ConfigurationRecords& records) {
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 6) >= 1);
+            integer(root, "schema_version", 1, 7) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -357,14 +361,18 @@ ConfigurationRecords decode(const Json& root) {
                 h.reverse = Direction{};
             else
                 h.reverse = direction(x.at("reverse"), root.at("schema_version").get<int>());
-            // Legacy files always used their saved tuning. Loading is read-only;
-            // an explicit save materializes this compatibility policy in v3.
-            require(x.contains("advanced_tuning") || root.at("schema_version") < 3);
-            h.advanced_tuning =
-                x.contains("advanced_tuning") ? x.at("advanced_tuning").get<bool>() : true;
+            if (root.at("schema_version") < 7) {
+                require(x.contains("advanced_tuning") || root.at("schema_version") < 3);
+                const bool tuning =
+                    x.contains("advanced_tuning") ? x.at("advanced_tuning").get<bool>() : true;
+                for (auto* direction : {&h.forward, &h.reverse}) {
+                    direction->advanced_tuning = tuning;
+                    direction->exclusive_mode_preferred =
+                        x.value("exclusive_mode_preferred", false);
+                }
+            }
             const auto* routing_key = root.at("schema_version") >= 6 ? "routing" : "routing_engine";
             h.routing_engine = x.contains(routing_key) ? string(x, routing_key, 64) : "automatic";
-            h.exclusive_mode_preferred = x.value("exclusive_mode_preferred", false);
             require(!h.routing_engine.empty());
             p.holes.push_back(std::move(h));
         }
@@ -400,7 +408,9 @@ Json merge(const Json& old, const Json& current) {
             result[key] = old.contains(key) ? merge(old.at(key), value) : value;
         for (const auto& [key, value] : old.items())
             if (!current.contains(key)) {
-                if (current.contains("routing") && key == "routing_engine")
+                if (current.contains("routing") &&
+                    (key == "routing_engine" || key == "advanced_tuning" ||
+                     key == "exclusive_mode_preferred"))
                     continue;
                 if (current.contains("preferences") &&
                     (key == "automatic" || key == "format" || key == "mode" || key == "buffer_ms"))
@@ -554,7 +564,7 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
                 current["profile_record_extensions"][id] = extension;
             }
         }
-        current["schema_version"] = 6;
+        current["schema_version"] = 7;
         std::set<std::string> filenames;
         for (const auto& profile : current.at("profiles")) {
             auto filename = profile_filename(string(profile, "display_name"));
@@ -596,7 +606,7 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
-        if (impl_->expected && impl_->original.at("schema_version") != 6) {
+        if (impl_->expected && impl_->original.at("schema_version") != 7) {
             // No load-time migration. The first explicit save keeps the exact
             // legacy original; never overwrite a different earlier backup.
             if (read_document(impl_->file) != impl_->expected)
@@ -663,9 +673,11 @@ Json current_document(const Json& document) {
 }
 Json record_document(const Json& record) {
     require(record.at("format") == "audiohole-profile" &&
-            integer(record, "schema_version", 1, 2) >= 1);
+            integer(record, "schema_version", 1, 3) >= 1);
     auto wrapper = encode(ConfigurationRecords{});
-    wrapper["schema_version"] = record.at("schema_version") == 1 ? 5 : 6;
+    wrapper["schema_version"] = record.at("schema_version") == 1   ? 5
+                                : record.at("schema_version") == 2 ? 6
+                                                                   : 7;
     wrapper["profiles"].push_back(record.at("profile"));
     return current_document(wrapper);
 }
@@ -842,7 +854,7 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
             if (!extension.empty())
                 active_envelopes[id] = extension;
             Json single{
-                {"format", "audiohole-profile"}, {"schema_version", 2}, {"profile", profile}};
+                {"format", "audiohole-profile"}, {"schema_version", 3}, {"profile", profile}};
             for (const auto& [key, value] : extension.items())
                 if (!single.contains(key))
                     single[key] = value;
@@ -882,7 +894,7 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
                 read_document(impl_->file) == impl_->legacy)
                 std::filesystem::remove(impl_->file);
         }
-        for (int version : {1, 2, 3, 4, 5}) {
+        for (int version : {1, 2, 3, 4, 5, 6}) {
             auto old = impl_->file;
             old += ".v" + std::to_string(version) + ".bak";
             if (const auto bytes = read_document(old)) {

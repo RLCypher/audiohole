@@ -1,6 +1,6 @@
 # Device and profile bundles — provisional Test transport v1
 
-Current Test profile storage uses individual record v2 and transfer wrapper v6. See
+Current Test profile storage uses individual record v3 and transfer wrapper v7. See
 [PROFILE_BUILDER.md](PROFILE_BUILDER.md) for the current contract; earlier version
 sections below remain compatibility history. Bundle envelope version remains 1.
 
@@ -183,3 +183,21 @@ clock preference currently has no engine effect. Separate Forward/Return tuning
 panels are disclosures only and sit beneath their respective direction groups.
 This supersedes earlier record-v1/transfer-v5 and single-panel UI descriptions.
 These changes do not add a streaming backend or settle production architecture.
+
+
+## Current directional controls and package layout
+
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) now defines individual record v3 and
+transfer wrapper v7. Each direction owns its tuning-enable and exclusive-preference
+booleans. Their controls live inside/above the corresponding tuning and information
+areas; there is no shared tuning master. Routing remains hole-wide. Clock intent
+continues to persist without a visible implementation-status notice. Runtime
+clock support is unchanged. Saved startup preferences can be edited in Test mode
+without enabling unavailable backend operations.
+
+Packages place only AudioHole.exe and README.txt at the root beside folders.
+Helpers and AudioHole.has-run are in bin/; avatar-assets.json is in assets/;
+third-party notices are in licenses/; documents and build-info.json are in docs/.
+A present marker suppresses the welcome regardless of deprecated dialog settings.
+Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
+appearance follows Windows; dropdown wheel gestures scroll pages without selecting.

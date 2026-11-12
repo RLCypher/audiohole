@@ -9,7 +9,7 @@ Result first_run_needed(const std::filesystem::path& marker, bool& needed) {
         needed = !std::filesystem::exists(marker);
         return {true, "First-run marker checked."};
     } catch (const std::exception&) {
-        return {false, "Cannot read the first-run marker beside AudioHole."};
+        return {false, "Cannot read the first-run marker in AudioHole/bin."};
     }
 }
 Result mark_first_run(const std::filesystem::path& marker) {
@@ -20,7 +20,7 @@ Result mark_first_run(const std::filesystem::path& marker) {
     const auto written = replace_document(
         marker, "AudioHole has been run. Delete this file to replay the welcome/tutorial.\n", {});
     return written.ok ? written
-                      : Result{false, "Cannot save AudioHole.has-run beside AudioHole. Check "
+                      : Result{false, "Cannot save AudioHole.has-run in AudioHole/bin. Check "
                                       "folder permissions or external changes."};
 }
 Result reset_first_run(const std::filesystem::path& marker) {
@@ -34,7 +34,7 @@ Result reset_first_run(const std::filesystem::path& marker) {
         return {true, "First-run marker removed; restart to replay the welcome/tutorial."};
     } catch (const std::exception&) {
         return {false,
-                "Cannot remove the first-run marker beside AudioHole. Check folder permissions."};
+                "Cannot remove the first-run marker in AudioHole/bin. Check folder permissions."};
     }
 }
 } // namespace audiohole

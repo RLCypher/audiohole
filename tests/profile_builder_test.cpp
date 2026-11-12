@@ -73,12 +73,14 @@ TEST_F(ProfileStorage,
     ASSERT_TRUE(legacy.load(records).ok);
     auto original = sample();
     auto& h = original.profiles[0].holes[0];
-    h.advanced_tuning = false;
+    h.forward.advanced_tuning = false;
+    h.reverse.advanced_tuning = false;
     h.forward.settings.preferences.common = {44100, 6, {}, "pcm_s16", {}};
     h.forward.settings.refresh_projection();
     ASSERT_TRUE(legacy.save(original).ok);
     auto json = Json::parse(read(file));
     json["schema_version"] = 3;
+    json["profiles"][0]["holes"][0]["advanced_tuning"] = false;
     for (const auto* which : {"forward", "reverse"}) {
         auto& settings = json["profiles"][0]["holes"][0][which]["settings"];
         settings["automatic"] = which == std::string("reverse");
@@ -97,7 +99,7 @@ TEST_F(ProfileStorage,
     ASSERT_TRUE(migration.save(records).ok);
     EXPECT_EQ(read(root / "local" / "legacy-profiles" / "configuration.json"), bytes);
     EXPECT_FALSE(std::filesystem::exists(file));
-    EXPECT_FALSE(records.profiles[0].holes[0].advanced_tuning);
+    EXPECT_FALSE(records.profiles[0].holes[0].forward.advanced_tuning);
     EXPECT_EQ(records.profiles[0].holes[0].forward.settings.preferences.common.channel_count, 6);
 }
 TEST_F(ProfileStorage, CollisionOrFailedStageRetainsCompleteOriginalGeneration) {
@@ -184,7 +186,7 @@ TEST_F(ProfileStorage, DocumentedIndividualRecordExpressesAutomaticIntent) {
     Profile profile;
     ASSERT_TRUE(validate_profile_record(read(example), profile).ok);
     ASSERT_EQ(profile.holes.size(), 1u);
-    EXPECT_FALSE(profile.holes[0].advanced_tuning);
+    EXPECT_FALSE(profile.holes[0].forward.advanced_tuning);
     EXPECT_EQ(profile.holes[0].forward.settings.preferences, Preferences{});
     EXPECT_EQ(profile.holes[0].routing_engine, "automatic");
     EXPECT_FALSE(profile.holes[0].forward.source.empty());
@@ -197,6 +199,7 @@ TEST_F(ProfileStorage, V4MigrationTranslatesIntentOnceWithoutPromotingAutomaticC
     ASSERT_TRUE(store.save(sample()).ok);
     auto document = Json::parse(read(file));
     document["schema_version"] = 4;
+    document["profiles"][0]["holes"][0]["advanced_tuning"] = false;
     auto& settings = document["profiles"][0]["holes"][0]["forward"]["settings"];
     settings["automatic"] = true;
     settings["format"] = {{"rate", 48000},
@@ -219,7 +222,7 @@ TEST_F(ProfileStorage, V4MigrationTranslatesIntentOnceWithoutPromotingAutomaticC
     ASSERT_TRUE(store.save(records).ok);
     const auto migrated = Json::parse(read(file));
     const auto& saved = migrated["profiles"][0]["holes"][0]["forward"]["settings"];
-    EXPECT_EQ(migrated["schema_version"], 6);
+    EXPECT_EQ(migrated["schema_version"], 7);
     EXPECT_EQ(saved["preferences"]["common"]["buffer_ms"], 23);
     EXPECT_TRUE(saved["preferences"]["common"]["sample_rate_hz"].is_null());
     EXPECT_FALSE(saved.contains("format"));
@@ -237,13 +240,13 @@ TEST_F(ProfileStorage, IndividualRecordVersionsAndEnvelopeExtensionsSurviveTrans
     const auto first = root / "profiles" / "VR Streaming.json";
     auto record = Json::parse(read(first));
     EXPECT_EQ(record["format"], "audiohole-profile");
-    EXPECT_EQ(record["schema_version"], 2);
+    EXPECT_EQ(record["schema_version"], 3);
     EXPECT_FALSE(record.contains("profiles"));
     Profile output;
     ASSERT_TRUE(validate_profile_record(record.dump(), output).ok);
     EXPECT_EQ(output.notes, "Keep µ notes");
     auto future = record;
-    future["schema_version"] = 3;
+    future["schema_version"] = 4;
     EXPECT_FALSE(validate_profile_record(future.dump(), output).ok);
     EXPECT_EQ(output.id, "profile");
     EXPECT_FALSE(validate_test_document(record.dump(), records).ok);
@@ -253,7 +256,7 @@ TEST_F(ProfileStorage, IndividualRecordVersionsAndEnvelopeExtensionsSurviveTrans
     ASSERT_TRUE(store.load(records).ok);
     std::string transfer;
     ASSERT_TRUE(read_profile_document(file, transfer).ok);
-    EXPECT_EQ(Json::parse(transfer)["schema_version"], 6);
+    EXPECT_EQ(Json::parse(transfer)["schema_version"], 7);
     ProfileDirectoryPersistence target(root / "imported" / "configuration.json");
     ConfigurationRecords empty;
     ASSERT_TRUE(target.load(empty).ok);
@@ -289,7 +292,8 @@ TEST(ProfileBuilder, EndpointInheritanceAndOverrideSwitchAreIndependentFromEngin
     hole.forward.source = hole.reverse.source = "source";
     hole.forward.destination = hole.reverse.destination = "destination";
     hole.duplex = true;
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     auto& p = hole.forward.settings.preferences;
     p.common = {48000, 2, 20, "float32", "Shared"};
     p.source = {44100, {}, 10, {}, "Exclusive"};
@@ -310,7 +314,8 @@ TEST(ProfileBuilder, EndpointInheritanceAndOverrideSwitchAreIndependentFromEngin
     EXPECT_EQ(request.paths[0].channel_policy, "explicit_index_mapping");
     EXPECT_EQ(request.paths[1].source_requirements, EndpointPreferences{});
     EXPECT_EQ(request.paths[1].channel_policy, "default_index_mapping");
-    profile.holes[0].advanced_tuning = false;
+    profile.holes[0].forward.advanced_tuning = false;
+    profile.holes[0].reverse.advanced_tuning = false;
     ASSERT_TRUE(prepare_profile(snapshot, profile, request).ok);
     EXPECT_EQ(request.paths[0].preferences, Preferences{});
     EXPECT_EQ(request.paths[0].source_requirements, EndpointPreferences{});
@@ -341,7 +346,8 @@ TEST(ProfileBuilder, ExplicitUnsupportedRequirementsDoNotSilentlyFallBack) {
     hole.id = "hole";
     hole.forward.source = "source";
     hole.forward.destination = "destination";
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     hole.forward.settings.preferences.source = {96000, 2, {}, "float32", "Shared"};
     profile.holes.push_back(hole);
     PreparedProfile request;
@@ -352,7 +358,8 @@ TEST(ProfileBuilder, ExplicitUnsupportedRequirementsDoNotSilentlyFallBack) {
     EXPECT_FALSE(result.ok);
     EXPECT_NE(result.detail.find("unsupported"), std::string::npos);
     EXPECT_EQ(request.paths[0].source_requirements.sample_rate_hz, 96000);
-    profile.holes[0].advanced_tuning = false;
+    profile.holes[0].forward.advanced_tuning = false;
+    profile.holes[0].reverse.advanced_tuning = false;
     EXPECT_TRUE(prepare_profile(snapshot, profile, request).ok);
 }
 TEST_F(ProfileStorage, PartialPreferencesNormalizeAutomaticAndRejectMalformedValues) {
@@ -361,7 +368,8 @@ TEST_F(ProfileStorage, PartialPreferencesNormalizeAutomaticAndRejectMalformedVal
     ASSERT_TRUE(store.load(records).ok);
     auto data = sample();
     auto& h = data.profiles[0].holes[0];
-    h.advanced_tuning = true;
+    h.forward.advanced_tuning = true;
+    h.reverse.advanced_tuning = true;
     h.forward.settings.preferences.common.channel_count = 2;
     h.forward.settings.preferences.source.sample_rate_hz = 44100;
     h.forward.settings.preferences.destination.sample_rate_hz = 48000;
@@ -394,7 +402,8 @@ TEST(ProfileBuilder, AutomaticRequiresNoDeepEvidenceAndRetainsIndependentPartial
     Hole h;
     h.id = "hole";
     h.duplex = true;
-    h.advanced_tuning = true;
+    h.forward.advanced_tuning = true;
+    h.reverse.advanced_tuning = true;
     h.forward.source = h.reverse.source = "capture";
     h.forward.destination = h.reverse.destination = "render";
     h.forward.settings.preferences.common.channel_count = 2;
@@ -424,7 +433,8 @@ TEST(ProfileBuilder, BufferOnlyApplyUpdatesExistingCanonicalPreference) {
     SimulatedController controller;
     auto candidate = controller.snapshot().profiles.front();
     auto& hole = candidate.holes.front();
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     hole.forward.settings.buffer_ms = 17;
     hole.forward.settings.preferences.common.buffer_ms = 17;
     ASSERT_TRUE(controller.save(candidate, false).ok);
@@ -438,7 +448,8 @@ TEST(ProfileBuilder, BufferApplyFromAutomaticMatchesEditorAndPreservesTheOtherDi
         SCOPED_TRACE(reverse ? "Return" : "Forward");
         SimulatedController controller;
         auto candidate = *profile(controller.snapshot(), "profile-duplex");
-        candidate.holes.front().advanced_tuning = true;
+        candidate.holes.front().forward.advanced_tuning = true;
+        candidate.holes.front().reverse.advanced_tuning = true;
         ASSERT_TRUE(controller.save(candidate, false).ok);
         ASSERT_TRUE(controller.activate(candidate.id).ok);
         controller.advance(300);

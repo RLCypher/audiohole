@@ -60,6 +60,7 @@ struct DirectionWidgets {
     wxStaticBoxSizer* tuning_group{};
     wxCollapsiblePane* tuning{};
     wxChoice* clock{};
+    wxCheckBox *advanced_tuning{}, *exclusive_preferred{};
     wxComboBox *source{}, *destination{};
     wxChoice *format{}, *mode{}, *representation{};
     wxTextCtrl *rate{}, *channels{}, *source_channels{}, *destination_channels{}, *channel_map{};
@@ -105,6 +106,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         Raise();
         SetFocus();
     }
+    void request_exit();
     void exit() {
         timer_.Stop();
         tuning_timer_.Stop();
@@ -146,6 +148,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::unique_ptr<Tray> tray_;
     wxTimer timer_;
     wxTimer avatar_timer_;
+    bool tuning_reaction_reverse_ = false;
     wxTimer tuning_timer_; // One settled policy reaction; never a controller command.
     std::unique_ptr<presentation::AvatarHost> avatar_host_;
     std::vector<std::string> avatar_diagnostics_, last_avatar_diagnostics_;
@@ -174,7 +177,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::vector<wxToggleButton*> navigation_;
     bool dark_appearance_ = true;
     wxChoice* theme_choice_{};
-    wxCheckBox *preview_mode_{}, *show_preview_dialog_{}, *hold_expressions_{};
+    wxCheckBox *preview_mode_{}, *hold_expressions_{};
     wxCheckBox *loop_until_event_{}, *low_motion_{};
     wxSpinCtrl* animation_loops_{};
     wxStaticText *personality_notice_{}, *fallback_notice_{};
@@ -210,7 +213,6 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTextCtrl *profile_notes_{}, *hole_notes_{}, *device_name_{}, *device_notes_{},
         *device_search_{}, *console_{}, *log_search_{};
     wxCheckBox *enabled_{}, *duplex_{}, *monitor_{};
-    wxCheckBox *advanced_tuning_{}, *exclusive_preferred_{};
     wxChoice* routing_engine_{};
     wxStaticText* routing_engine_notice_{};
     wxCollapsiblePane* signal_tools_{};
@@ -281,7 +283,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void update_navigation();
     WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM) override;
     void build_direction(wxWindow*, wxSizer*, DirectionWidgets&, const wxString&);
-    void tuning_changed();
+    void tuning_changed(DirectionWidgets&);
     // Rebuilds evidence while retaining explicit unsupported overrides for correction.
     void populate_direction(DirectionWidgets&, const audiohole::Direction&);
     void read_direction(DirectionWidgets&, audiohole::Direction&);

@@ -164,7 +164,7 @@ TEST_F(ConfigurationBundle, InactiveTuningAndFutureEngineRequestTravelWithProfil
     ConfigurationController restarted(
         std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     const auto& saved = restarted.snapshot().profiles.front().holes.front();
-    EXPECT_FALSE(saved.advanced_tuning);
+    EXPECT_FALSE(saved.forward.advanced_tuning);
     EXPECT_EQ(saved.routing_engine, "future-test-engine");
     EXPECT_FALSE(saved.forward.settings.automatic);
     EXPECT_FALSE(restarted.snapshot().armed);
@@ -199,7 +199,7 @@ TEST_F(ConfigurationBundle, LegacyV2ImportPreservesOriginalAndMakesTheOldPolicyE
         std::make_unique<ProfileDirectoryPersistence>(target / "configuration.json"));
     const auto* old = profile(restarted.snapshot(), "legacy-profile");
     ASSERT_TRUE(old);
-    EXPECT_TRUE(old->holes.front().advanced_tuning);
+    EXPECT_TRUE(old->holes.front().forward.advanced_tuning);
     EXPECT_EQ(old->holes.front().routing_engine, "automatic");
     EXPECT_FALSE(restarted.snapshot().armed);
 }

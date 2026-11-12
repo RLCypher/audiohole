@@ -60,6 +60,8 @@ class NavigationButton final : public wxToggleButton {
 // Generic wx dialogs avoid Windows' light-only message-box body. The palette
 // follows Windows app appearance, retaining native high-contrast presentation.
 void theme_dialog(wxWindow*);
+bool confirm_exit(wxWindow* parent);
+void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event);
 int themed_message_box(const wxString& message, const wxString& caption = "AudioHole",
                        long style = wxOK, wxWindow* parent = nullptr);
 wxString button_help(const wxString& title);

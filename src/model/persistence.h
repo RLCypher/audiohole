@@ -41,7 +41,7 @@ Result replace_document(const std::filesystem::path&, const std::string& bytes,
 // Reuse the Test serializer's validation for portable bundle payloads. Merging
 // adds profiles only; conflicting profile/hole identities are never regenerated.
 Result validate_test_document(const std::string&, ConfigurationRecords&);
-// Canonical individual profile envelope: audiohole-profile, record version 2.
+// Canonical individual profile envelope: audiohole-profile, record version 3.
 Result validate_profile_record(const std::string&, Profile&);
 Result merge_test_profiles(const std::optional<std::string>& existing, const std::string& incoming,
                            std::string& merged);

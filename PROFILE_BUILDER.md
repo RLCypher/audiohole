@@ -13,7 +13,7 @@ streaming backend remain open. Test Mode does not route audio.
 ```json
 {
   "format": "audiohole-profile",
-  "schema_version": 2,
+  "schema_version": 3,
   "profile": {
     "display_name": "Desktop audio",
     "notes": "User notes",
@@ -23,9 +23,9 @@ streaming backend remain open. Test Mode does not route audio.
 }
 ```
 
-See [the complete example](docs/test-profile-example.json). Record version 2 is
+See [the complete example](docs/test-profile-example.json). Record version 3 is
 independent of the **aggregate transfer wrapper** used inside profile bundles:
-`audiohole-test-configuration`, `schema_version: 6`, `profiles: [...]`,
+`audiohole-test-configuration`, `schema_version: 7`, `profiles: [...]`,
 `devices: []`. The wrapper can also carry `profile_record_extensions`, an opaque
 map of individual-envelope extensions keyed by profile ID. It is transfer
 metadata, not routing intent. `validate_profile_record` validates individual
@@ -33,7 +33,7 @@ records; `validate_test_document` validates the aggregate. They are not
 interchangeable. Unknown/newer record versions reject without rewriting files.
 
 Profiles retain names, notes, stable IDs and ordered holes. Each hole retains
-its name/notes/ID, `enabled`, `duplex`, `advanced_tuning`, `routing`, `exclusive_mode_preferred`, and
+its name/notes/ID, `enabled`, `duplex`, `routing`, and
 independent `forward` and `reverse` directions. The GUI calls `reverse` Return.
 Logical device IDs reference the separate scanned registry; names are readable
 hints. Hidden devices are excluded from new choices, but existing references
@@ -93,9 +93,10 @@ layout remains unknown until independently established.
 
 ## Independent policy controls
 
-- **Use advanced tuning** (`advanced_tuning`): off retains saved preferences
-  and maps but resolves all of them automatically. On applies saved values, with
-  unspecified values inheriting. This includes channel mapping.
+- **Use advanced tuning** (`forward.advanced_tuning` / `reverse.advanced_tuning`):
+  the first control inside each disclosure. Off retains that direction's saved
+  preferences/maps but resolves them automatically. On applies its saved values,
+  with unspecified values inheriting. The sibling direction is unchanged.
 - **Advanced tuning**: separate collapsible panels directly beneath Forward and
   Return. Each contains only its own direction's settings. Return and its panel
   are hidden for simplex holes. Disclosures never change intent, eligibility, the
@@ -108,9 +109,9 @@ layout remains unknown until independently established.
   WASAPI, Miniaudio and Experimental. Unknown identifiers remain unavailable and
   block preparation of an enabled hole, independently of tuning eligibility.
   Test Mode still has no streaming backend; selection saves intent only.
-- **Exclusive mode preferred**: per-hole `exclusive_mode_preferred` boolean,
-  default false, placed above the first tuning disclosure. It applies to both
-  directions in Automatic access mode. An active explicit source/destination or
+- **Exclusive mode preferred**: a separate `exclusive_mode_preferred` boolean in
+  each direction, default false. Its checkbox sits below that direction's device
+  selectors and above its information pane. It applies in Automatic access mode. An active explicit source/destination or
   common access-mode requirement takes precedence, including Force shared mode.
   With tuning disabled, retained forced settings are inactive and the preference
   applies to Automatic. This flag is a preference, not a forced-mode requirement; a rejected exclusive
@@ -195,9 +196,8 @@ read path is a convenience, not a commitment to support older development builds
 
 Access choices are Automatic, Force exclusive mode and Force shared mode. They
 serialize as null, Exclusive and Shared respectively; display wording is not an
-engine enum. Each direction retains independent preferences and mapping. The
-hole-wide Routing Engine and Use advanced tuning controls remain outside those
-panels so they cannot disagree between directions.
+engine enum. Each direction retains independent preferences and mapping. Routing Engine remains a hole-wide selector; tuning eligibility and exclusive
+preference are independent per direction.
 
 Profile/device context menus offer Show in Explorer for saved JSON. Profiles are
 located by stable ID in the current named folder, including after rename; device
@@ -205,3 +205,30 @@ paths come from the scanner's opaque edit snapshot. The Windows shell API select
 the actual file without constructing an Explorer command line. Preview fixture
 records have no saved file and the action is disabled. Missing files show feedback
 without creating records or guessing a filename.
+
+
+## Current workflow and distribution amendment
+
+Individual record v3 and transfer wrapper v7 move `advanced_tuning` and
+`exclusive_mode_preferred` into each Forward/Return object. They are independent
+of each other and of the hole's routing selector. Older development flags are
+copied to both directions on read; canonical output writes only direction flags.
+Newer versions and malformed booleans are rejected. The owner may regenerate old
+profiles; this is not a long-term development compatibility promise.
+
+Routing Activation preferences are editable in both environments. Test mode saves
+intent for a future backend, while actions requiring a routing backend stay
+unavailable. Immediately and Manual show a disabled zero delay; After Delay edits
+the retained configured duration. Fresh appearance remains Follow System; existing
+saved themes are preserved. Wheel gestures over dropdowns (including edit/popup
+children) scroll the nearest page instead of selecting another value. Keyboard
+and explicit pointer selection remain available.
+
+Distribution root contains AudioHole.exe, README.txt and folders: bin/ (probe and
+first-run marker), assets/ (including avatar-assets.json), docs/ (handoff documents
+and build-info.json), licenses/ (third-party notices), personalities/ (packages).
+The welcome is controlled solely by bin/AudioHole.has-run; the legacy
+show_preview_dialog preference no longer overrides that flag. Replay confirms,
+removes it and restarts. User Exit actions confirm with Exit/Cancel; controlled
+restart and unattended smoke shutdown do not ask twice. The bottom status bar
+omits the Test Mode suffix while retaining engine availability.

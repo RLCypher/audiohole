@@ -954,7 +954,8 @@ TEST_F(ScannerIntegration, RoutingChoicesUseExactModeSpecificDescriptorsAndPrese
     d.settings.refresh_projection();
     EXPECT_TRUE(recommend(snapshot, d).compatible.empty());
     p.holes.front().forward = d;
-    p.holes.front().advanced_tuning = true;
+    p.holes.front().forward.advanced_tuning = true;
+    p.holes.front().reverse.advanced_tuning = true;
     // Missing Exclusive observations do not prove rejection. Pass explicit
     // intent to runtime initialization without upgrading evidence to support.
     EXPECT_TRUE(prepare_profile(snapshot, p, plan).ok);
@@ -1038,7 +1039,7 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
     const auto json = Json::parse(bytes(file));
     EXPECT_TRUE(json.at("devices").empty());
-    EXPECT_EQ(json.at("schema_version"), 6);
+    EXPECT_EQ(json.at("schema_version"), 7);
     EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
     EXPECT_FALSE(json["profiles"][0]["holes"][0]["forward"]["settings"].contains("format"));
     EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);

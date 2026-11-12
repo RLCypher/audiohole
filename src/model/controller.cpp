@@ -262,7 +262,7 @@ Recommendation recommend(const Snapshot& snapshot, const Direction& direction) {
 }
 Direction effective_direction(const Hole& hole, bool reverse) {
     auto direction = reverse ? hole.reverse : hole.forward;
-    if (!hole.advanced_tuning)
+    if (!direction.advanced_tuning)
         direction.settings = Settings{};
     direction.settings.refresh_projection();
     return direction;
@@ -306,7 +306,7 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
                     ? derive_pcm_format(d.settings.preferences.common).value_or(Format{})
                     : choices.compatible.front();
             const auto mode = d.settings.preferences.common.mode.value_or(
-                hole.exclusive_mode_preferred ? "Exclusive" : "Shared");
+                d.exclusive_mode_preferred ? "Exclusive" : "Shared");
             RoutingPathRequest path;
             path.hole_id = hole.id;
             path.source = d.source;
@@ -329,7 +329,7 @@ Result prepare_profile(const Snapshot& snapshot, const Profile& candidate,
             request.mode = mode;
             request.buffer_ms = request.preferences.common.buffer_ms.value_or(0);
             request.routing_engine = hole.routing_engine;
-            request.exclusive_mode_preferred = hole.exclusive_mode_preferred;
+            request.exclusive_mode_preferred = d.exclusive_mode_preferred;
         }
     }
     output = std::move(prepared);
@@ -398,7 +398,7 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
                         preference.sample_format)
                         for (const auto& capability : device->capabilities)
                             if ((capability.mode == preference.mode.value_or("Shared") ||
-                                 (!preference.mode && hole.exclusive_mode_preferred &&
+                                 (!preference.mode && direction->exclusive_mode_preferred &&
                                   capability.mode == "Exclusive")) &&
                                 capability.format.rate == *preference.sample_rate_hz &&
                                 capability.format.channels == *preference.channel_count &&
@@ -415,8 +415,9 @@ Result validate(const Snapshot& snapshot, const Profile& candidate) {
                     const bool rejected =
                         preference.mode ? (*preference.mode == "Exclusive" ? exclusive_rejected
                                                                            : shared_rejected)
-                        : hole.exclusive_mode_preferred ? shared_rejected && exclusive_rejected
-                                                        : shared_rejected;
+                        : direction->exclusive_mode_preferred
+                            ? shared_rejected && exclusive_rejected
+                            : shared_rejected;
                     if (rejected && !supported)
                         return {false, "An explicit format override was reported unsupported. "
                                        "Change it or reset to Automatic."};
@@ -612,8 +613,9 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
                        "Ready explicitly to replace it."};
     live_ = *candidate;
     pending_manual_ack_ = std::any_of(live_.holes.begin(), live_.holes.end(), [](const auto& hole) {
-        return hole.enabled && hole.advanced_tuning &&
-               (manual_settings(hole.forward) || (hole.duplex && manual_settings(hole.reverse)));
+        return hole.enabled &&
+               ((hole.forward.advanced_tuning && manual_settings(hole.forward)) ||
+                (hole.duplex && hole.reverse.advanced_tuning && manual_settings(hole.reverse)));
     });
     for (auto& hole : live_.holes) {
         hole.forward = effective_direction(hole);
@@ -647,8 +649,9 @@ Result SimulatedController::update_buffer(const std::string& profile_id, const s
     const auto* saved_profile = profile(state_, profile_id);
     const auto saved_hole = std::find_if(saved_profile->holes.begin(), saved_profile->holes.end(),
                                          [&](const auto& item) { return item.id == hole_id; });
-    if (!hole->advanced_tuning || saved_hole == saved_profile->holes.end() ||
-        !saved_hole->advanced_tuning)
+    if (saved_hole == saved_profile->holes.end() ||
+        !(reverse ? hole->reverse : hole->forward).advanced_tuning ||
+        !(reverse ? saved_hole->reverse : saved_hole->forward).advanced_tuning)
         return {true, "Buffer preference retained. Automatic policy or unapplied policy changes "
                       "keep it inactive."};
     (reverse ? hole->reverse : hole->forward).settings.set_buffer_preference(milliseconds);
@@ -787,7 +790,7 @@ void SimulatedController::advance(int ms) {
                             std::find_if(live_.holes.begin(), live_.holes.end(),
                                          [&](const auto& item) { return item.id == path.hole_id; });
                         return path.state == State::Running && hole != live_.holes.end() &&
-                               hole->advanced_tuning &&
+                               (path.reverse ? hole->reverse : hole->forward).advanced_tuning &&
                                manual_settings(path.reverse ? hole->reverse : hole->forward);
                     }))
                     event("manual-override-applied",

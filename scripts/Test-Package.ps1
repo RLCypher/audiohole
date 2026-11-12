@@ -14,7 +14,7 @@ try {
     if ($roots.Count -ne 1) { throw 'Expected one package root.' }
     $root = $roots[0].FullName
     $files = @(Get-ChildItem -LiteralPath $root -File -Recurse)
-    $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('build-info.json', 'README.txt')
+    $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($root.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {
         throw 'Package contains missing or unexpected files.'
@@ -24,12 +24,15 @@ try {
         $actualHash = (Get-FileHash -LiteralPath (Join-Path $root $property.Name) -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($actualHash -ne $property.Value) { throw "Avatar asset differs from approved input: $($property.Name)" }
     }
-    $metadata = Get-Content (Join-Path $root 'build-info.json') -Raw | ConvertFrom-Json
+    $metadata = Get-Content (Join-Path $root 'docs/build-info.json') -Raw | ConvertFrom-Json
     if ($metadata.commit -notmatch '^[0-9a-f]{40}$' -or $metadata.source_dirty) { throw 'Invalid or dirty package metadata.' }
     # The embedded logo/icon must work even without the reference artwork copies.
     # This disposable extraction is distinct from the ZIP uploaded as the artifact.
-    Move-Item -LiteralPath (Join-Path $root 'assets') -Destination (Join-Path $temporary 'reference-assets')
-    $exe = Join-Path $root 'audiohole.exe'
+    New-Item -ItemType Directory -Path (Join-Path $temporary 'reference-assets') | Out-Null
+    foreach ($folder in @('branding', 'presentation')) {
+        Move-Item -LiteralPath (Join-Path $root "assets/$folder") -Destination (Join-Path $temporary "reference-assets/$folder")
+    }
+    $exe = Join-Path $root 'AudioHole.exe'
     # The runner has VS installed: inspect imports so that cannot mask a missing
     # redistributable/debug CRT dependency during the isolated launch test.
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
@@ -37,7 +40,7 @@ try {
     if ($LASTEXITCODE -ne 0 -or -not $installation) { throw 'Cannot locate dumpbin for the runtime dependency audit.' }
     $version = (Get-Content (Join-Path $installation 'VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt') -Raw).Trim()
     $dumpbin = Join-Path $installation "VC/Tools/MSVC/$version/bin/Hostx64/x64/dumpbin.exe"
-    foreach ($binary in @('audiohole.exe', 'audiohole-probe.exe')) {
+    foreach ($binary in @('AudioHole.exe', 'bin/audiohole-probe.exe')) {
         $imports = & $dumpbin /nologo /dependents (Join-Path $root $binary)
         if ($LASTEXITCODE -ne 0) { throw "Runtime import audit failed: $binary" }
         if (($imports -join "`n") -match '(?i)\b(?:msvcp\d+\w*|vcruntime\w*|ucrtbased|libstdc\+\+[^\s]*|libgcc[^\s]*)\.dll') {
@@ -45,7 +48,7 @@ try {
         }
     }
     # The helper accepts only the private protocol; never discover hardware here.
-    $helper = Start-Process -FilePath (Join-Path $root 'audiohole-probe.exe') -WorkingDirectory $root -PassThru
+    $helper = Start-Process -FilePath (Join-Path $root 'bin/audiohole-probe.exe') -WorkingDirectory $root -PassThru
     if (-not $helper.WaitForExit(10000)) { $helper.Kill(); throw 'Private probe helper did not reject missing arguments.' }
     $helper.WaitForExit()
     if ($helper.ExitCode -ne 2) { throw 'Private probe helper accepted a public invocation.' }
@@ -59,6 +62,9 @@ try {
     $result = Join-Path $evidence 'smoke-result.txt'
     if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
         throw 'Extracted GUI did not produce successful smoke evidence.'
+    }
+    if ((Test-Path (Join-Path $root 'bin/AudioHole.has-run')) -or (Test-Path (Join-Path $root 'AudioHole.has-run'))) {
+        throw 'Smoke execution modified the installed first-run marker.'
     }
     Write-Host "PASS: isolated package launch and runtime import audit ($($metadata.configuration), $($metadata.commit))."
 } finally {

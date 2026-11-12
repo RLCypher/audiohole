@@ -623,3 +623,26 @@ Native Windows rendering and shell-cache behavior remain manual validation tasks
   Check named factual messages in Vanilla and authored responses in Norm/UwU.
   Repeated polling, initial loading, renames, hiding and clearing do not repeat
   responses. Unavailable does not imply a successful stream or a physical unplug.
+
+
+## Current polish acceptance
+
+- [ ] Test and Preview: Routing on startup/Profile on startup are usable. Switching
+  Immediately/Manual shows disabled delay 0; After Delay restores/enables the saved
+  delay. Editing preferences never starts a Test routing backend.
+- [ ] Toggle only Forward tuning/exclusive preference, then only Return. The
+  sibling's policy and settings do not change. Each tuning checkbox is first
+  inside its disclosure; each exclusive checkbox is below its devices and above
+  information. Clock implementation-status text is absent, selection still saves.
+- [ ] Wheel over focused/unfocused, closed/open and editable dropdowns across all
+  pages. Page scrolls and selections stay unchanged. Explicit mouse selection and
+  keyboard navigation still work.
+- [ ] Fresh preferences follow Windows; saved Light/Dark choices survive restart.
+- [ ] Fresh extracted package: root has only AudioHole.exe/README.txt and folders.
+  Probe runs from bin/; licenses/docs/assets manifest are in their new locations.
+  First accepted launch creates bin/AudioHole.has-run. Subsequent launch skips the
+  welcome even with an old show-preview setting. Replay confirms/removes/restarts.
+  Cancellation never resets the marker. Saved profiles/devices are retained.
+- [ ] Exit button/tray/taskbar use Exit/Cancel. Cancel leaves routing/scanning and
+  edits untouched; Exit stops and closes. Restart/smoke teardown has no extra
+  confirmation. Bottom status keeps engine availability without (Test Mode).

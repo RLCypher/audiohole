@@ -1341,3 +1341,16 @@ per-direction intent, not an implemented clock strategy. Record v2 / transfer v6
 supersede prior development storage. Use the owner's welcome text verbatim and
 existing Norm artwork. First-run/replay state lives beside the executable, with
 no installed marker writes from smoke mode. Native smoke review remains mandatory.
+
+
+## Current owner-authorized polish amendment
+
+The latest assignment supersedes prior shared tuning and startup-splash rules:
+per-direction tuning/exclusive controls and profile record v3 / transfer v7;
+editable startup preferences in Test without enabling backend operations; no
+wheel selection in dropdowns; marker-only welcome/replay; Exit/Cancel confirmation;
+Follow System default verification; and distribution layout in PROFILE_BUILDER.md.
+The marker is bin/AudioHole.has-run, not a root file. Keep the user's saved data
+and themes, private probe protocol, package allowlist and substantive native smoke
+checks intact. Remove implementation-status clock wording from controls, without
+claiming newly implemented runtime clock behavior in engineering evidence.

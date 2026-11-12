@@ -1,15 +1,66 @@
 #include "gui/controls.h"
 #include "gui/native_theme.h"
+#include <commctrl.h>
 #include <dwmapi.h>
 #include <windows.h>
+#include <windowsx.h>
 #include <wx/dcbuffer.h>
 #include <wx/filename.h>
 #include <wx/generic/msgdlgg.h>
+#include <wx/scrolwin.h>
 #include <wx/settings.h>
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
+// Route wheel gestures to the nearest scrolling container. Never fall through
+// to the native combo procedure, which can change a focused selection silently.
+void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event) {
+    for (auto* parent = control.GetParent(); parent; parent = parent->GetParent()) {
+        if (!dynamic_cast<wxScrolledWindow*>(parent))
+            continue;
+        wxMouseEvent routed(event);
+        routed.SetEventObject(parent);
+        routed.SetPosition(parent->ScreenToClient(control.ClientToScreen(event.GetPosition())));
+        parent->GetEventHandler()->ProcessEvent(routed);
+        return;
+    }
+}
 namespace {
+bool native_dropdown_wheel(wxWindow& control, UINT message, WPARAM wparam, LPARAM lparam) {
+    if (message != WM_MOUSEWHEEL && message != WM_MOUSEHWHEEL)
+        return false;
+    wxMouseEvent event(wxEVT_MOUSEWHEEL);
+    event.m_wheelRotation = GET_WHEEL_DELTA_WPARAM(wparam);
+    event.m_wheelDelta = WHEEL_DELTA;
+    UINT lines = 3;
+    SystemParametersInfoW(SPI_GETWHEELSCROLLLINES, 0, &lines, 0);
+    event.m_linesPerAction = lines == WHEEL_PAGESCROLL ? 3 : static_cast<int>(lines);
+    event.m_wheelAxis =
+        message == WM_MOUSEHWHEEL ? wxMOUSE_WHEEL_HORIZONTAL : wxMOUSE_WHEEL_VERTICAL;
+    event.SetPosition(control.ScreenToClient(wxPoint(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam))));
+    forward_dropdown_wheel(control, event);
+    return true;
+}
+constexpr UINT_PTR dropdown_wheel_subclass = 0x4148574c;
+LRESULT CALLBACK dropdown_wheel_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lparam,
+                                     UINT_PTR id, DWORD_PTR owner) {
+    if (message == WM_NCDESTROY)
+        RemoveWindowSubclass(handle, dropdown_wheel_proc, id);
+    else if (native_dropdown_wheel(*reinterpret_cast<wxWindow*>(owner), message, wparam, lparam))
+        return 0;
+    return DefSubclassProc(handle, message, wparam, lparam);
+}
+void protect_dropdown_children(wxWindow& owner) {
+    COMBOBOXINFO info{};
+    info.cbSize = sizeof(info);
+    const auto handle = static_cast<HWND>(owner.GetHandle());
+    if (!GetComboBoxInfo(handle, &info))
+        return;
+    for (const auto child : {info.hwndList, info.hwndItem})
+        if (child && child != handle)
+            SetWindowSubclass(child, dropdown_wheel_proc, dropdown_wheel_subclass,
+                              reinterpret_cast<DWORD_PTR>(&owner));
+}
 bool contrast_active() {
     HIGHCONTRASTW settings{};
     settings.cbSize = sizeof(settings);
@@ -56,6 +107,7 @@ bool measure_selection(wxWindow& control, WXMEASUREITEMSTRUCT* item) {
 } // namespace
 ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
     Create(parent, id);
+    protect_dropdown_children(*this);
 }
 WXDWORD ThemedChoice::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxChoice::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
@@ -68,6 +120,8 @@ bool ThemedChoice::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
 }
 WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    if (native_dropdown_wheel(*this, message, wparam, lparam))
+        return 0;
     if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||
          message == WM_CTLCOLORLISTBOX) &&
         GetBackgroundColour().IsOk()) {
@@ -86,6 +140,7 @@ WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM 
 }
 ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
     Create(parent, id, {}, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxTE_PROCESS_ENTER);
+    protect_dropdown_children(*this);
 }
 WXDWORD ThemedCombo::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxComboBox::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
@@ -98,6 +153,8 @@ bool ThemedCombo::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
 }
 WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    if (native_dropdown_wheel(*this, message, wparam, lparam))
+        return 0;
     if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||
          message == WM_CTLCOLORLISTBOX) &&
         GetBackgroundColour().IsOk()) {
@@ -161,6 +218,14 @@ void theme_dialog(wxWindow* window) {
     const BOOL title_dark = dark ? TRUE : FALSE;
     (void)DwmSetWindowAttribute(static_cast<HWND>(window->GetHandle()), 20, &title_dark,
                                 sizeof(title_dark));
+}
+bool confirm_exit(wxWindow* parent) {
+    wxGenericMessageDialog dialog(parent, "Exit AudioHole?", "Exit AudioHole?",
+                                  wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+    dialog.SetYesNoLabels("Exit", "Cancel");
+    dialog.SetEscapeId(wxID_NO);
+    theme_dialog(&dialog);
+    return dialog.ShowModal() == wxID_YES;
 }
 int themed_message_box(const wxString& message, const wxString& caption, long style,
                        wxWindow* parent) {

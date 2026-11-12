@@ -23,7 +23,7 @@ try {
         & "$PSScriptRoot/Package.ps1" -Configuration $Configuration
     }
     if ($Launch) {
-        & (Join-Path $repoRoot "build/windows-msvc/bin/$Configuration/audiohole.exe")
+        & (Join-Path $repoRoot "build/windows-msvc/bin/$Configuration/AudioHole.exe")
         if ($LASTEXITCODE -ne 0) { throw 'AudioHole GUI failed.' }
     }
 } finally {

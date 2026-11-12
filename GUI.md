@@ -1997,3 +1997,21 @@ not audio callbacks, and never claims that a device streamed successfully. Unkno
 hardware enters this view through normal discovery; no intrusive auto-scan is
 started to obtain a personality response. Existing operational warnings take
 priority over these cosmetic callouts.
+
+
+## Current directional controls and package layout
+
+[PROFILE_BUILDER.md](PROFILE_BUILDER.md) now defines individual record v3 and
+transfer wrapper v7. Each direction owns its tuning-enable and exclusive-preference
+booleans. Their controls live inside/above the corresponding tuning and information
+areas; there is no shared tuning master. Routing remains hole-wide. Clock intent
+continues to persist without a visible implementation-status notice. Runtime
+clock support is unchanged. Saved startup preferences can be edited in Test mode
+without enabling unavailable backend operations.
+
+Packages place only AudioHole.exe and README.txt at the root beside folders.
+Helpers and AudioHole.has-run are in bin/; avatar-assets.json is in assets/;
+third-party notices are in licenses/; documents and build-info.json are in docs/.
+A present marker suppresses the welcome regardless of deprecated dialog settings.
+Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
+appearance follows Windows; dropdown wheel gestures scroll pages without selecting.

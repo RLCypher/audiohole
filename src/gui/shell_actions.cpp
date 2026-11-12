@@ -198,7 +198,7 @@ Result configure_windows_startup(bool enabled) {
 std::filesystem::path first_run_marker_path() {
     return std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
                .parent_path() /
-           "AudioHole.has-run";
+           "bin" / "AudioHole.has-run";
 }
 Result show_in_explorer(const std::filesystem::path& file) {
     std::error_code error;

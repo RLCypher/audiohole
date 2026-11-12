@@ -25,12 +25,13 @@ if(MSVC)
     "/MANIFESTINPUT:${wxwidgets_SOURCE_DIR}/include/wx/msw/wx_dpi_aware_pmv2.manifest"
     "/MANIFESTUAC:level='asInvoker' uiAccess='false'")
 endif()
+set_target_properties(audiohole PROPERTIES OUTPUT_NAME "AudioHole")
 install(TARGETS audiohole RUNTIME DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
-  "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt"
-  "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
+  "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt" DESTINATION licenses COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
   "${PROJECT_SOURCE_DIR}/PROFILE_BUILDER.md"
-  "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION . COMPONENT Runtime)
+  "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
 
 add_custom_target(audiohole_personality_files ALL
   # Remove only obsolete source-owned flat catalogs from an incremental build's
@@ -41,7 +42,7 @@ add_custom_target(audiohole_personality_files ALL
 add_dependencies(audiohole audiohole_personality_files audiohole-probe)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/personalities/" DESTINATION personalities COMPONENT Runtime
   FILES_MATCHING PATTERN "*.json" PATTERN "*.png" PATTERN "README.md")
-install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION . COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
 
 # Original and ICO are embedded for offline/isolated launch; copies in the ZIP
 # make the canonical artwork and its provenance available to maintainers/users.
@@ -58,9 +59,11 @@ set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS
   "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png")
 
 install(FILES "${PROJECT_SOURCE_DIR}/assets/personalities/provenance/deployed-assets.json"
-  DESTINATION . RENAME avatar-assets.json COMPONENT Runtime)
+  DESTINATION assets RENAME avatar-assets.json COMPONENT Runtime)
 
 # Apache-2.0 Material icon font, loaded privately for this process only.
 add_custom_command(TARGET audiohole POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_directory
   "${PROJECT_SOURCE_DIR}/assets/ui" "$<TARGET_FILE_DIR:audiohole>/assets/ui")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/ui/" DESTINATION assets/ui COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-Regular.ttf" DESTINATION assets/ui COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/NOTICE.txt" DESTINATION licenses RENAME MaterialIcons-NOTICE.txt COMPONENT Runtime)

@@ -198,9 +198,8 @@ class App final : public wxApp {
                 themed_message_box(text(checked.detail), "AudioHole welcome",
                                    wxOK | wxICON_WARNING);
         }
-        if (!smoke && (first_time || (preferences_->values().show_preview_dialog &&
-                                      !preferences_->values().start_minimized))) {
-            WelcomeDialog dialog(first_time || preview);
+        if (!smoke && first_time) {
+            WelcomeDialog dialog(true);
             const auto choice = dialog.ShowModal();
             if (choice == wxID_CANCEL)
                 return false;
@@ -228,7 +227,7 @@ class App final : public wxApp {
             scanner.probe_executable =
                 std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
                     .parent_path() /
-                "audiohole-probe.exe";
+                "bin" / "audiohole-probe.exe";
             controller = std::make_unique<ConfigurationController>(
                 std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()),
                 std::make_unique<ScannerService>(std::move(scanner)));

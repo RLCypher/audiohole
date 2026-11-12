@@ -54,14 +54,14 @@ void Frame::build_settings() {
     auto sync_delay = [this] {
         const bool delayed = startup_->GetSelection() == 1;
         delay_->SetValue(delayed ? preferences_->values().startup_delay_seconds : 0);
-        delay_->Enable(delayed && controller_->snapshot().operating_mode == OperatingMode::Preview);
+        delay_->Enable(delayed);
     };
     sync_delay();
     auto save_startup = [this, sync_delay] {
         auto next = preferences_->values();
         next.notifications = notifications_->GetSelection();
         next.startup_mode = (startup_->GetSelection() + 1) % 3;
-        if (startup_->GetSelection() == 1)
+        if (startup_->GetSelection() == 1 && delay_->IsEnabled())
             next.startup_delay_seconds = delay_->GetValue();
         const int target = startup_target_->GetSelection();
         if (target >= 0 && static_cast<std::size_t>(target) < profile_ids_.size())
@@ -105,9 +105,10 @@ void Frame::build_settings() {
     startup_group->Add(row, 0, wxEXPAND);
     const bool preview_environment =
         controller_->snapshot().operating_mode == OperatingMode::Preview;
-    for (auto* control :
-         std::vector<wxWindow*>{startup_preview, cancel_startup, startup_, startup_target_, delay_})
-        control->Enable(preview_environment);
+    startup_preview->Enable(preview_environment);
+    cancel_startup->Enable(preview_environment);
+    startup_->Enable(true);
+    startup_target_->Enable(true);
     sync_delay();
     auto* windows_startup = new wxWrapSizer(wxHORIZONTAL);
     auto* launch = new wxCheckBox(appearance_box, wxID_ANY, "Start with Windows");
@@ -351,27 +352,17 @@ void Frame::build_settings() {
     preview_mode_->SetToolTip(
         "Select the environment for the next launch. Preview uses demonstration records; Test uses "
         "isolated persisted configuration. Restart is required.");
-    show_preview_dialog_ = new wxCheckBox(environment_box, wxID_ANY, "Show welcome on startup");
-    show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
-    show_preview_dialog_->SetToolTip(
-        "Show the welcome and environment choices on startup. A missing first-run marker always "
-        "shows it. Otherwise the saved environment starts "
-        "directly; Settings can still change the next launch.");
     preview_settings->Add(preview_mode_, 0, wxALL, 4);
-    preview_settings->Add(show_preview_dialog_, 0, wxALL, 4);
     auto save_environment = [this](wxCommandEvent&) {
         auto next = preferences_->values();
         next.preview_mode = preview_mode_->GetValue();
-        next.show_preview_dialog = show_preview_dialog_->GetValue();
         const auto result = preferences_->update(next);
         if (!result.ok) {
             preview_mode_->SetValue(preferences_->values().preview_mode);
-            show_preview_dialog_->SetValue(preferences_->values().show_preview_dialog);
             show_result(result);
         }
     };
     preview_mode_->Bind(wxEVT_CHECKBOX, save_environment);
-    show_preview_dialog_->Bind(wxEVT_CHECKBOX, save_environment);
     auto* environment_note =
         label(environment_box, preview_settings,
               controller_->snapshot().operating_mode == OperatingMode::Preview

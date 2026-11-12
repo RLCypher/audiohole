@@ -26,8 +26,9 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         wxEVT_TIMER,
         [this](wxTimerEvent&) {
             if (hole_index_ >= 0 && !operational_warning_visible_)
-                present(advanced_tuning_->GetValue() ? presentation::Message::AdvancedTuningEnabled
-                                                     : presentation::Message::AutomaticRestored);
+                present((tuning_reaction_reverse_ ? reverse_ : forward_).advanced_tuning->GetValue()
+                            ? presentation::Message::AdvancedTuningEnabled
+                            : presentation::Message::AutomaticRestored);
         },
         tuning_timer_.GetId());
     SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
@@ -92,7 +93,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         controller_->stop();
         refresh();
     });
-    button(this, actions, "Exit AudioHole", [this] { exit(); });
+    button(this, actions, "Exit AudioHole", [this] { request_exit(); });
     // Align the card with the actual first/last button edges. Keep spacing only
     // between buttons, with DPI-scaled borders rather than outer side margins.
     for (auto* item : actions->GetChildren())
@@ -325,6 +326,15 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
 }
 int Frame::FilterEvent(wxEvent& event) {
     const auto type = event.GetEventType();
+    if (type == wxEVT_MOUSEWHEEL) {
+        auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
+        for (auto* control = window; control && control != this; control = control->GetParent()) {
+            if (dynamic_cast<wxChoice*>(control) || dynamic_cast<wxComboBox*>(control)) {
+                forward_dropdown_wheel(*control, static_cast<wxMouseEvent&>(event));
+                return wxEventFilter::Event_Processed;
+            }
+        }
+    }
     if (bundle_generation_ &&
         (type == wxEVT_KEY_DOWN || type == wxEVT_CHAR_HOOK || type == wxEVT_CHAR ||
          type == wxEVT_LEFT_DOWN || type == wxEVT_LEFT_DCLICK || type == wxEVT_RIGHT_DOWN)) {
@@ -348,6 +358,10 @@ int Frame::FilterEvent(wxEvent& event) {
             avatar_host_->activity(avatar::monotonic_ms());
     }
     return wxEventFilter::Event_Skip;
+}
+void Frame::request_exit() {
+    if (confirm_exit(this))
+        exit();
 }
 void Frame::stop_avatar() {
     avatar_timer_.Stop();
@@ -656,13 +670,12 @@ void Frame::refresh() {
         return event.type == "error" || event.type == "scan-failed";
     });
     const auto holes = draft_.holes.size();
-    SetStatusText(text(std::string(preview ? "AudioHole (Preview Mode) | Engine: "
-                                           : "AudioHole (Test Mode) | Engine: ") +
-                       (preview ? name(s.state) : "unavailable") +
-                       " | Devices: " + std::to_string(s.endpoints.size()) +
-                       " | Profiles: " + std::to_string(s.profiles.size()) +
-                       " | Viewed holes: " + std::to_string(holes) +
-                       " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
+    SetStatusText(
+        text(std::string(preview ? "AudioHole (Preview Mode) | Engine: " : "AudioHole | Engine: ") +
+             (preview ? name(s.state) : "unavailable") +
+             " | Devices: " + std::to_string(s.endpoints.size()) + " | Profiles: " +
+             std::to_string(s.profiles.size()) + " | Viewed holes: " + std::to_string(holes) +
+             " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
     update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)
@@ -842,10 +855,69 @@ bool Frame::smoke(const wxString& directory) {
                     "Welcome button labels/launch targets changed");
         }
         apply_appearance(); // The separate welcome follows Windows' dialog theme.
+        require(theme_choice_->GetSelection() == 2 && preferences_->values().appearance == "system",
+                "Fresh appearance must follow the Windows system theme");
+        require(startup_->IsEnabled() && startup_target_->IsEnabled(),
+                "Routing Activation preferences must be editable in both environments");
+        {
+            const auto original = preferences_->values();
+            const auto revision = controller_->snapshot().revision;
+            wxCommandEvent mode(wxEVT_CHOICE, startup_->GetId());
+            for (int selection : {0, 1, 2, 1}) {
+                startup_->SetSelection(selection);
+                startup_->GetEventHandler()->ProcessEvent(mode);
+                require(delay_->IsEnabled() == (selection == 1) &&
+                            (selection == 1 || delay_->GetValue() == 0),
+                        "Routing delay enable/value does not match activation mode");
+            }
+            require(controller_->snapshot().revision == revision,
+                    "Saving startup preferences attempted a routing operation");
+            require(preferences_->update(original).ok, "Could not restore startup preferences");
+            startup_->SetSelection((original.startup_mode + 2) % 3);
+            startup_->GetEventHandler()->ProcessEvent(mode);
+        }
+        {
+            class CancelExit final : public wxModalDialogHook {
+              public:
+                bool asked = false;
+                int Enter(wxDialog* dialog) override {
+                    if (dialog->GetTitle() != "Exit AudioHole?")
+                        return wxID_NONE;
+                    asked = true;
+                    return wxID_NO;
+                }
+            } hook;
+            const auto before = controller_->snapshot().revision;
+            hook.Register();
+            request_exit();
+            hook.Unregister();
+            require(hook.asked && !IsBeingDeleted() && controller_->snapshot().revision == before,
+                    "Cancel on Exit must leave the session running and unchanged");
+        }
+        {
+            const auto initial = theme_choice_->GetSelection();
+            const auto revision = controller_->snapshot().revision;
+            wxMouseEvent wheel(wxEVT_MOUSEWHEEL);
+            wheel.SetEventObject(theme_choice_);
+            wheel.m_wheelRotation = -WHEEL_DELTA;
+            wheel.m_wheelDelta = WHEEL_DELTA;
+            wheel.m_linesPerAction = 3;
+            require(FilterEvent(wheel) == wxEventFilter::Event_Processed &&
+                        theme_choice_->GetSelection() == initial &&
+                        controller_->snapshot().revision == revision,
+                    "Wheel gesture changed a dropdown or controller state");
+            theme_choice_->GetEventHandler()->ProcessEvent(wheel);
+            const auto point = theme_choice_->ClientToScreen(wxPoint(2, 2));
+            SendMessageW(static_cast<HWND>(theme_choice_->GetHandle()), WM_MOUSEWHEEL,
+                         MAKEWPARAM(0, -WHEEL_DELTA), MAKELPARAM(point.x, point.y));
+            require(theme_choice_->GetSelection() == initial,
+                    "Native wheel changed a dropdown selection");
+        }
         auto exercise_information = [&] {
             const auto window_size = GetSize();
             const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
-            require(!advanced_tuning_->GetValue(), "Information regression needs Automatic policy");
+            require(!forward_.advanced_tuning->GetValue(),
+                    "Information regression needs Automatic policy");
             for (bool duplex : {false, true}) {
                 reverse_.group->ShowItems(duplex);
                 for (auto* widgets : {&forward_, &reverse_}) {
@@ -871,7 +943,7 @@ bool Frame::smoke(const wxString& directory) {
                                     widgets->information->GetScreenRect()),
                                 "Direction information extends outside its group before a tuning "
                                 "toggle");
-                        require(GetSize() == window_size && !advanced_tuning_->GetValue(),
+                        require(GetSize() == window_size && !forward_.advanced_tuning->GetValue(),
                                 "Endpoint information changed window size or enabled tuning");
                     }
                 }
@@ -884,11 +956,11 @@ bool Frame::smoke(const wxString& directory) {
         };
         auto exercise_tuning = [&] {
             exercise_information();
-            require(hole_index_ >= 0 && !advanced_tuning_->GetValue() &&
+            require(hole_index_ >= 0 && !forward_.advanced_tuning->GetValue() &&
                         forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed() &&
                         signal_tools_->IsCollapsed(),
                     "New holes must start with Automatic tuning and collapsed direction panels");
-            require(advanced_tuning_->GetLabel() == "Use advanced tuning" &&
+            require(forward_.advanced_tuning->GetLabel() == "Use advanced tuning" &&
                         routing_engine_->GetCount() == 4 &&
                         routing_engine_->GetString(1) == "WASAPI" &&
                         routing_engine_->GetString(2) == "Miniaudio" &&
@@ -902,6 +974,22 @@ bool Frame::smoke(const wxString& directory) {
                         forward_.mode->GetString(2) == "Force shared mode" &&
                         forward_.clock->GetCount() == 3,
                     "Forced mode or clock choices missing");
+            for (auto* widgets : {&forward_, &reverse_}) {
+                const auto& items = widgets->group->GetChildren();
+                auto find = [&](wxWindow* window) {
+                    return std::find_if(items.begin(), items.end(), [&](wxSizerItem* item) {
+                        return item->IsWindow() && item->GetWindow() == window;
+                    });
+                };
+                require(std::distance(items.begin(), find(widgets->exclusive_preferred)) <
+                            std::distance(items.begin(), find(widgets->information)),
+                        "Exclusive preference must precede its direction information");
+                require(widgets->tuning->GetPane()
+                                ->GetSizer()
+                                ->GetItem(static_cast<std::size_t>(0))
+                                ->GetWindow() == widgets->advanced_tuning,
+                        "Use advanced tuning must be the first control inside its disclosure");
+            }
             const auto revision = controller_->snapshot().revision;
             const auto occurrence = occurrence_;
             const auto before = draft_.holes.at(static_cast<std::size_t>(hole_index_));
@@ -913,16 +1001,32 @@ bool Frame::smoke(const wxString& directory) {
                 require(GetSize() == window_size, "Direction disclosure resized the window");
             };
             disclose(forward_, true);
-            require(reverse_.tuning->IsCollapsed() && !advanced_tuning_->GetValue(),
+            require(reverse_.tuning->IsCollapsed() && !forward_.advanced_tuning->GetValue(),
                     "Opening Forward tuning opened Return or changed eligibility");
-            wxCommandEvent toggle(wxEVT_CHECKBOX, advanced_tuning_->GetId());
+            wxCommandEvent toggle(wxEVT_CHECKBOX, forward_.advanced_tuning->GetId());
             auto choose = [&](bool enabled) {
-                advanced_tuning_->SetValue(enabled);
-                advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
+                forward_.advanced_tuning->SetValue(enabled);
+                forward_.advanced_tuning->GetEventHandler()->ProcessEvent(toggle);
+                reverse_.advanced_tuning->SetValue(enabled);
+                wxCommandEvent return_toggle(wxEVT_CHECKBOX, reverse_.advanced_tuning->GetId());
+                reverse_.advanced_tuning->GetEventHandler()->ProcessEvent(return_toggle);
                 require(!forward_.tuning->IsCollapsed() && reverse_.tuning->IsCollapsed() &&
                             GetSize() == window_size,
                         "Tuning eligibility changed disclosure or frame geometry");
             };
+            forward_.advanced_tuning->SetValue(true);
+            forward_.advanced_tuning->GetEventHandler()->ProcessEvent(toggle);
+            require(draft_.holes.at(hole_index_).forward.advanced_tuning &&
+                        !draft_.holes.at(hole_index_).reverse.advanced_tuning,
+                    "Forward tuning checkbox changed the Return policy");
+            forward_.exclusive_preferred->SetValue(true);
+            wxCommandEvent exclusive(wxEVT_CHECKBOX, forward_.exclusive_preferred->GetId());
+            forward_.exclusive_preferred->GetEventHandler()->ProcessEvent(exclusive);
+            require(draft_.holes.at(hole_index_).forward.exclusive_mode_preferred &&
+                        !draft_.holes.at(hole_index_).reverse.exclusive_mode_preferred,
+                    "Forward exclusive preference changed Return");
+            forward_.exclusive_preferred->SetValue(false);
+            forward_.exclusive_preferred->GetEventHandler()->ProcessEvent(exclusive);
             choose(true);
             forward_.buffer->SetValue(19);
             reverse_.buffer->SetValue(23);
@@ -951,8 +1055,11 @@ bool Frame::smoke(const wxString& directory) {
             disclose(reverse_, false);
             draft_.holes.at(hole_index_) = before;
             load_hole(hole_index_);
-            advanced_tuning_->SetValue(true);
-            advanced_tuning_->GetEventHandler()->ProcessEvent(toggle);
+            forward_.advanced_tuning->SetValue(true);
+            forward_.advanced_tuning->GetEventHandler()->ProcessEvent(toggle);
+            reverse_.advanced_tuning->SetValue(true);
+            wxCommandEvent return_toggle(wxEVT_CHECKBOX, reverse_.advanced_tuning->GetId());
+            reverse_.advanced_tuning->GetEventHandler()->ProcessEvent(return_toggle);
             tuning_timer_.Stop();
         };
         auto decline_delete = [&](wxListBox* list, wxButton* remove = nullptr) {
@@ -1077,7 +1184,8 @@ bool Frame::smoke(const wxString& directory) {
             unknown_mode.settings.mode = "Future mode (unrecognized)";
             populate_direction(forward_, unknown_mode);
             Direction retained_mode;
-            advanced_tuning_->SetValue(true); // Explicitly read manual inputs for this check.
+            forward_.advanced_tuning->SetValue(
+                true); // Explicitly read manual inputs for this check.
             read_direction(forward_, retained_mode);
             require(!retained_mode.settings.preferences.common.mode &&
                         retained_mode.settings.mode == "Automatic",
@@ -1725,8 +1833,8 @@ bool Frame::smoke(const wxString& directory) {
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");
         select_profile("profile-duplex");
-        advanced_tuning_->SetValue(true);
-        tuning_changed();
+        forward_.advanced_tuning->SetValue(true);
+        tuning_changed(forward_);
         save(false); // Buffer-Apply checks below deliberately opt into manual tuning.
         wxCommandEvent start(wxEVT_BUTTON, start_->GetId());
         start_->GetEventHandler()->ProcessEvent(start);

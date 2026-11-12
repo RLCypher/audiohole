@@ -93,7 +93,7 @@ void Frame::perform_shell_action(ShellAction action) {
         Close();
         break; // Existing close-to-tray handling.
     case ShellAction::Exit:
-        exit();
+        request_exit();
         break;
     }
 }

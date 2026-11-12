@@ -1,3 +1,4 @@
+#include "model/build_preferences.h"
 #include "model/controller.h"
 #include "model/first_run.h"
 #include "model/persistence.h"
@@ -32,7 +33,8 @@ struct WorkflowRefinements : testing::Test {
         h.id = "hole";
         h.display_name = "Steam Frame";
         h.duplex = true;
-        h.advanced_tuning = true;
+        h.forward.advanced_tuning = true;
+        h.reverse.advanced_tuning = true;
         h.forward.source = h.reverse.source = "capture";
         h.forward.destination = h.reverse.destination = "render";
         p.holes.push_back(h);
@@ -60,8 +62,10 @@ TEST_F(WorkflowRefinements, ForcedModeSupersedesExclusivePreferenceForEveryEngin
         for (bool preferred : {false, true})
             for (bool enabled : {false, true}) {
                 h.routing_engine = engine;
-                h.exclusive_mode_preferred = preferred;
-                h.advanced_tuning = enabled;
+                h.forward.exclusive_mode_preferred = preferred;
+                h.reverse.exclusive_mode_preferred = preferred;
+                h.forward.advanced_tuning = enabled;
+                h.reverse.advanced_tuning = enabled;
                 h.forward.settings.preferences.common.mode = "Shared";
                 h.reverse.settings.preferences.common.mode = "Exclusive";
                 h.forward.settings.preferences.preferred_clock_device = "capture";
@@ -93,7 +97,8 @@ TEST_F(WorkflowRefinements,
     auto p = sample();
     auto& h = p.holes[0];
     h.routing_engine = "experimental";
-    h.exclusive_mode_preferred = true;
+    h.forward.exclusive_mode_preferred = true;
+    h.reverse.exclusive_mode_preferred = true;
     h.forward.settings.preferences.preferred_clock_device = "capture";
     h.reverse.settings.preferences.preferred_clock_device = "playback";
     h.forward.settings.preferences.common.mode = "Shared";
@@ -101,21 +106,21 @@ TEST_F(WorkflowRefinements,
     records.profiles.push_back(p);
     ASSERT_TRUE(store.save(records).ok);
     const auto doc = Json::parse(read(root / "profiles" / "VR Workflow.json"));
-    EXPECT_EQ(doc["schema_version"], 2);
+    EXPECT_EQ(doc["schema_version"], 3);
     EXPECT_EQ(doc["profile"]["holes"][0]["routing"], "experimental");
-    EXPECT_TRUE(doc["profile"]["holes"][0]["exclusive_mode_preferred"].get<bool>());
+    EXPECT_TRUE(doc["profile"]["holes"][0]["forward"]["exclusive_mode_preferred"].get<bool>());
     EXPECT_FALSE(doc["profile"]["holes"][0].contains("routing_engine"));
     Profile loaded;
     ASSERT_TRUE(validate_profile_record(doc.dump(), loaded).ok);
     EXPECT_EQ(loaded, p);
     std::string transfer;
     ASSERT_TRUE(read_profile_document(file, transfer).ok);
-    EXPECT_EQ(Json::parse(transfer)["schema_version"], 6);
+    EXPECT_EQ(Json::parse(transfer)["schema_version"], 7);
     ConfigurationRecords decoded;
     ASSERT_TRUE(validate_test_document(transfer, decoded).ok);
     EXPECT_EQ(decoded.profiles[0], p);
     auto invalid = doc;
-    invalid["profile"]["holes"][0]["exclusive_mode_preferred"] = "yes";
+    invalid["profile"]["holes"][0]["forward"]["exclusive_mode_preferred"] = "yes";
     EXPECT_FALSE(validate_profile_record(invalid.dump(), loaded).ok);
     EXPECT_EQ(loaded, p);
     invalid = doc;
@@ -144,7 +149,7 @@ TEST_F(WorkflowRefinements, ExplorerPathUsesSavedIdentityAndTracksRenames) {
     EXPECT_EQ(records.profiles[0].notes, "Keep µ notes");
 }
 TEST_F(WorkflowRefinements, FirstRunMarkerCanBeResetWithoutChangingUserData) {
-    const auto marker = root / "AudioHole.has-run";
+    const auto marker = root / "bin" / "AudioHole.has-run";
     bool needed = false;
     ASSERT_TRUE(first_run_needed(marker, needed).ok);
     EXPECT_TRUE(needed);
@@ -213,7 +218,8 @@ TEST_F(WorkflowRefinements, ExclusivePreferenceDoesNotTurnAnAutomaticModeIntoAFo
     auto s = inventory();
     auto p = sample();
     auto& hole = p.holes[0];
-    hole.exclusive_mode_preferred = true;
+    hole.forward.exclusive_mode_preferred = true;
+    hole.reverse.exclusive_mode_preferred = true;
     hole.forward.settings.preferences.common = {48000, 2, {}, "float32", {}};
     for (auto& device : s.endpoints) {
         device.capabilities.push_back(
@@ -233,7 +239,8 @@ TEST_F(WorkflowRefinements, ExclusivePreferenceDoesNotTurnAnAutomaticModeIntoAFo
 TEST_F(WorkflowRefinements, ReservedClockChoiceDoesNotClaimAnAppliedAudioOverride) {
     SimulatedController controller;
     auto candidate = *profile(controller.snapshot(), "profile-duplex");
-    candidate.holes[0].advanced_tuning = true;
+    candidate.holes[0].forward.advanced_tuning = true;
+    candidate.holes[0].reverse.advanced_tuning = true;
     candidate.holes[0].forward.settings.preferences.preferred_clock_device = "capture";
     candidate.holes[0].reverse.settings.preferences.preferred_clock_device = "playback";
     ASSERT_TRUE(controller.save(candidate, false).ok);
@@ -241,5 +248,60 @@ TEST_F(WorkflowRefinements, ReservedClockChoiceDoesNotClaimAnAppliedAudioOverrid
     controller.advance(300);
     for (const auto& event : controller.snapshot().events)
         EXPECT_NE(event.type, "manual-override-applied");
+}
+TEST_F(WorkflowRefinements, DirectionPoliciesAndExclusivePreferencesRemainIndependent) {
+    auto candidate = sample();
+    auto& hole = candidate.holes[0];
+    hole.forward.advanced_tuning = true;
+    hole.forward.settings.preferences.common.mode = "Exclusive";
+    hole.forward.settings.set_buffer_preference(11);
+    hole.reverse.advanced_tuning = false;
+    hole.reverse.exclusive_mode_preferred = true;
+    hole.reverse.settings.preferences.common.mode = "Shared";
+    hole.reverse.settings.set_buffer_preference(41);
+    const auto retained_return = hole.reverse;
+    PreparedProfile prepared;
+    ASSERT_TRUE(prepare_profile(inventory(), candidate, prepared).ok);
+    EXPECT_EQ(prepared.paths[0].mode, "Exclusive");
+    EXPECT_EQ(prepared.paths[0].buffer_ms, 11);
+    EXPECT_EQ(prepared.paths[1].mode, "Exclusive");
+    EXPECT_EQ(prepared.paths[1].buffer_ms, 0);
+    hole.forward.advanced_tuning = false;
+    ASSERT_TRUE(prepare_profile(inventory(), candidate, prepared).ok);
+    EXPECT_EQ(prepared.paths[0].mode, "Shared");
+    EXPECT_EQ(hole.reverse, retained_return);
+    hole.reverse.advanced_tuning = true;
+    ASSERT_TRUE(prepare_profile(inventory(), candidate, prepared).ok);
+    EXPECT_EQ(prepared.paths[1].mode, "Shared");
+    EXPECT_EQ(prepared.paths[1].buffer_ms, 41);
+    ProfileDirectoryPersistence store(file);
+    ConfigurationRecords records;
+    ASSERT_TRUE(store.load(records).ok);
+    records.profiles.push_back(candidate);
+    ASSERT_TRUE(store.save(records).ok);
+    ASSERT_TRUE(store.load(records).ok);
+    EXPECT_EQ(records.profiles[0], candidate);
+}
+TEST_F(WorkflowRefinements, FreshAndMissingAppearanceFollowSystemWhileSavedDarkIsPreserved) {
+    BuildPreferences preferences(root);
+    ASSERT_TRUE(preferences.load().ok);
+    EXPECT_EQ(preferences.values().appearance, "system");
+    auto selected = preferences.values();
+    selected.appearance = "dark";
+    selected.startup_mode = 2;
+    selected.startup_delay_seconds = 23;
+    selected.startup_profile_id = "profile";
+    ASSERT_TRUE(preferences.update(selected).ok);
+    BuildPreferences restarted(root);
+    ASSERT_TRUE(restarted.load().ok);
+    EXPECT_EQ(restarted.values(), selected);
+    auto document = Json::parse(read(root / "preferences.json"));
+    document.erase("appearance");
+    std::ofstream(root / "preferences.json") << document.dump();
+    BuildPreferences legacy(root);
+    ASSERT_TRUE(legacy.load().ok);
+    EXPECT_EQ(legacy.values().appearance, "system");
+    EXPECT_EQ(legacy.values().startup_mode, 2);
+    EXPECT_EQ(legacy.values().startup_delay_seconds, 23);
 }
 } // namespace

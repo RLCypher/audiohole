@@ -9,8 +9,8 @@ TEST(AdvancedTuning, NewHolesIgnoreRetainedUnsupportedOverridesUntilExplicitlyEn
     SimulatedController controller;
     auto candidate = controller.snapshot().profiles.front();
     auto& hole = candidate.holes.front();
-    EXPECT_FALSE(controller.make_hole().advanced_tuning);
-    EXPECT_FALSE(hole.advanced_tuning);
+    EXPECT_FALSE(controller.make_hole().forward.advanced_tuning);
+    EXPECT_FALSE(hole.forward.advanced_tuning);
     hole.forward.settings.preferences.common = {96000, 2, 20, "float32", "Exclusive"};
     hole.forward.settings.refresh_projection();
     const auto retained = hole.forward;
@@ -20,21 +20,27 @@ TEST(AdvancedTuning, NewHolesIgnoreRetainedUnsupportedOverridesUntilExplicitlyEn
     EXPECT_EQ(request.paths.front().mode, "Shared");
     EXPECT_EQ(request.paths.front().format.rate, 48000);
     EXPECT_EQ(hole.forward, retained);
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     const auto previous = request.paths.front().format;
     EXPECT_FALSE(prepare_profile(controller.snapshot(), candidate, request).ok);
     EXPECT_EQ(request.paths.front().format, previous); // Failed validation is transactional.
-    hole.advanced_tuning = false;
+    hole.forward.advanced_tuning = false;
+    hole.reverse.advanced_tuning = false;
     EXPECT_TRUE(validate(controller.snapshot(), candidate).ok);
-    hole.advanced_tuning = true;
-    EXPECT_EQ(hole.forward, retained);
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
+    EXPECT_EQ(hole.forward.settings, retained.settings);
+    EXPECT_EQ(hole.forward.source, retained.source);
+    EXPECT_TRUE(hole.forward.advanced_tuning);
 }
 
 TEST(AdvancedTuning, DuplexDirectionsKeepIndependentOverridesAndIndividualAutomaticValues) {
     SimulatedController controller;
     auto candidate = controller.snapshot().profiles[1];
     auto& hole = candidate.holes.front();
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     hole.forward.settings.set_buffer_preference(11);
     hole.forward.settings.preferences.common.mode = "Exclusive";
     hole.forward.settings.refresh_projection();
@@ -47,11 +53,13 @@ TEST(AdvancedTuning, DuplexDirectionsKeepIndependentOverridesAndIndividualAutoma
     EXPECT_EQ(prepared.paths[1].buffer_ms, 0);
     EXPECT_EQ(prepared.paths[1].mode, "Shared");
     const auto retained = hole;
-    hole.advanced_tuning = false;
+    hole.forward.advanced_tuning = false;
+    hole.reverse.advanced_tuning = false;
     ASSERT_TRUE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
     EXPECT_EQ(prepared.paths[0].buffer_ms, 0);
     EXPECT_EQ(prepared.paths[0].mode, "Shared");
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     EXPECT_EQ(hole, retained);
 }
 
@@ -62,7 +70,8 @@ TEST(AdvancedTuning, SavingPolicyDoesNotStartOrReconfigureTheLiveCopy) {
     ASSERT_TRUE(controller.activate(id).ok);
     controller.advance(300);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 6);
-    candidate.holes.front().advanced_tuning = true;
+    candidate.holes.front().forward.advanced_tuning = true;
+    candidate.holes.front().reverse.advanced_tuning = true;
     candidate.holes.front().forward.settings.set_buffer_preference(17);
     ASSERT_TRUE(controller.save(candidate, false).ok);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 6);
@@ -73,7 +82,8 @@ TEST(AdvancedTuning, SavingPolicyDoesNotStartOrReconfigureTheLiveCopy) {
     controller.advance(300);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 19);
     auto restored = *profile(controller.snapshot(), id);
-    restored.holes.front().advanced_tuning = false;
+    restored.holes.front().forward.advanced_tuning = false;
+    restored.holes.front().reverse.advanced_tuning = false;
     ASSERT_TRUE(controller.save(restored, false).ok);
     EXPECT_EQ(controller.snapshot().paths.front().applied_buffer_ms, 19);
     ASSERT_TRUE(controller.activate(id).ok);
@@ -88,7 +98,8 @@ TEST(AdvancedTuning, SavingPolicyDoesNotStartOrReconfigureTheLiveCopy) {
 TEST(AdvancedTuning, ManualAcknowledgmentRequiresAConfirmedSimulatedApplication) {
     SimulatedController controller;
     auto candidate = controller.snapshot().profiles.front();
-    candidate.holes.front().advanced_tuning = true;
+    candidate.holes.front().forward.advanced_tuning = true;
+    candidate.holes.front().reverse.advanced_tuning = true;
     auto count = [&] {
         return std::count_if(
             controller.snapshot().events.begin(), controller.snapshot().events.end(),
@@ -139,7 +150,8 @@ TEST(AdvancedTuning, RoutingEngineSelectionIsIndependentOfOverrideEligibility) {
     hole.routing_engine = "future-test-engine";
     EXPECT_FALSE(prepare_profile(controller.snapshot(), candidate, prepared).ok);
     EXPECT_EQ(hole.routing_engine, "future-test-engine");
-    hole.advanced_tuning = true;
+    hole.forward.advanced_tuning = true;
+    hole.reverse.advanced_tuning = true;
     const auto unavailable = prepare_profile(controller.snapshot(), candidate, prepared);
     EXPECT_FALSE(unavailable.ok);
     EXPECT_NE(unavailable.detail.find("Routing Engine is unavailable"), std::string::npos);

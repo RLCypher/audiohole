@@ -29,9 +29,9 @@ try {
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
     $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
-    $expected = @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt')) + @('build-info.json', 'README.txt')
+    $expected = @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
-    $meta = Get-Content (Join-Path $root.FullName 'build-info.json') -Raw | ConvertFrom-Json
+    $meta = Get-Content (Join-Path $root.FullName 'docs/build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD
     if ($LASTEXITCODE -ne 0) { throw 'Cannot read expected commit' }
     $sourceStatus = & git -C $repo status --porcelain
@@ -48,7 +48,7 @@ try {
     }
     # A root-level document caused the regression: prove omissions are rejected
     # with a useful filename, rather than weakening the allowlist to pass.
-    $installRules | Where-Object { $_ -notlike '*FILES "CONFIGURATION_BUNDLES.md"*' } |
+    $installRules | Where-Object { $_ -notlike '*FILES "docs/CONFIGURATION_BUNDLES.md"*' } |
         Set-Content "$fixture/source/CMakeLists.txt"
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Missing-document fixture configure failed' }
@@ -57,7 +57,7 @@ try {
         throw 'Expected missing-runtime rejection was missing'
     } catch {
         if ($_.Exception.Message -notmatch 'Unexpected Runtime component' -or
-            $_.Exception.Message -notmatch 'Missing: CONFIGURATION_BUNDLES.md') { throw }
+            $_.Exception.Message -notmatch 'Missing: docs/CONFIGURATION_BUNDLES.md') { throw }
         if (@(Get-ChildItem "$fixture/missing" -Force).Count -ne 0) { throw 'Missing-file staging was not cleaned up' }
         Write-Host 'PASS: missing handoff document reported; staging cleaned up.'
     }

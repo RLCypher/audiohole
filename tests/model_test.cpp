@@ -109,7 +109,8 @@ TEST(Simulator, ManualOverrideIsRetainedAndUnsupportedTupleRejected) {
     SimulatedController controller;
     auto draft = *profile(controller.snapshot(), "profile-simplex");
     auto& direction = draft.holes.front().forward;
-    draft.holes.front().advanced_tuning = true;
+    draft.holes.front().forward.advanced_tuning = true;
+    draft.holes.front().reverse.advanced_tuning = true;
     direction.settings.preferences.common = {96000, 2, {}, "float32", {}};
     direction.settings.refresh_projection();
     EXPECT_FALSE(validate(controller.snapshot(), draft).ok);
@@ -145,7 +146,8 @@ TEST(Simulator, BeepHasExplicitTargetAndExclusiveConflictIsNotBypassed) {
     controller.advance(1000);
     EXPECT_TRUE(controller.snapshot().beep_destination.empty());
     auto draft = *profile(controller.snapshot(), "profile-simplex");
-    draft.holes.front().advanced_tuning = true;
+    draft.holes.front().forward.advanced_tuning = true;
+    draft.holes.front().reverse.advanced_tuning = true;
     draft.holes.front().forward.settings.preferences.common.mode = "Exclusive";
     draft.holes.front().forward.settings.refresh_projection();
     ASSERT_TRUE(controller.save(draft, true).ok);

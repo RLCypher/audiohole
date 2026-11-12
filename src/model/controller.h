@@ -79,6 +79,7 @@ struct Settings {
 struct Direction {
     std::string source, destination;
     Settings settings;
+    bool advanced_tuning = false, exclusive_mode_preferred = false;
     // Readable hints only. Logical IDs remain authoritative after a rename.
     std::string source_name{}, destination_name{};
     bool operator==(const Direction&) const = default;
@@ -87,9 +88,7 @@ struct Hole {
     std::string id, display_name, notes;
     bool enabled = true, duplex = false;
     Direction forward, reverse;
-    bool advanced_tuning = false; // Policy gate; retained manual values are never erased.
     std::string routing_engine = "automatic"; // Serialized as routing; not an initialized backend.
-    bool exclusive_mode_preferred = false;
     bool operator==(const Hole&) const = default;
 };
 struct Profile {
