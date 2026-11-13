@@ -3,6 +3,7 @@
 #include "gui/shell_actions.h"
 #include "model/first_run.h"
 #include <cmath>
+#include <sstream>
 #include <wx/dcbuffer.h>
 #include <wx/dcscreen.h>
 #include <wx/modalhook.h>
@@ -33,12 +34,15 @@ class TutorialOutline final : public wxPopupWindow {
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawRoundedRectangle(GetClientRect().Deflate((thickness + 1) / 2), FromDIP(10));
         });
-        Bind(wxEVT_TIMER, [this](wxTimerEvent&) { update_bounds(); }, pulse_.GetId());
-        Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
-            if (!event.IsShown())
-                pulse_.Stop();
-            event.Skip();
-        });
+        Bind(wxEVT_TIMER, &TutorialOutline::on_pulse, this, pulse_.GetId());
+        Bind(wxEVT_SHOW, &TutorialOutline::on_show, this);
+    }
+    ~TutorialOutline() override {
+        // DestroyWindow can send WM_SHOWWINDOW from the base destructor, after
+        // member destruction. Detach callbacks before the timer ceases to exist.
+        pulse_.Stop();
+        Unbind(wxEVT_TIMER, &TutorialOutline::on_pulse, this, pulse_.GetId());
+        Unbind(wxEVT_SHOW, &TutorialOutline::on_show, this);
     }
     void place(const wxRect& bounds, bool animate) {
         bounds_ = bounds;
@@ -55,6 +59,14 @@ class TutorialOutline final : public wxPopupWindow {
     wxTimer pulse_;
     wxRect bounds_;
     std::int64_t epoch_ = 0;
+    void on_pulse(wxTimerEvent&) {
+        update_bounds();
+    }
+    void on_show(wxShowEvent& event) {
+        if (!event.IsShown())
+            pulse_.Stop();
+        event.Skip();
+    }
     void update_bounds() {
         auto bounds = bounds_;
         if (pulse_.IsRunning()) {
@@ -580,6 +592,12 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require(preferences_->update(original_preferences).ok,
                 "Could not restore smoke preferences");
         render_tutorial();
+        {
+            // Exercise teardown while still shown/animating. Native destruction
+            // must not call the show handler after its timer member is gone.
+            auto temporary = std::make_unique<TutorialOutline>(this);
+            temporary->place(wxRect(scan_start_->GetScreenRect()).Inflate(FromDIP(4)), true);
+        }
         click(scan_start_);
         check("N009");
         capture("scanning");
@@ -602,6 +620,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N014");
         require(capture_devices_->GetCount() == 2 && playback_devices_->GetCount() == 2,
                 "Tutorial lists do not show two capture and two playback endpoints");
+        capture("device-selection");
         auto row_highlight = [&](DeviceList* list, const std::vector<std::string>& ids,
                                  const char* id) {
             const auto targets = tutorial_->view().targets;
@@ -610,17 +629,71 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             require(target != targets.end(), "Tutorial is missing the intended device-row target");
             const auto row = std::find(ids.begin(), ids.end(), id);
             require(row != ids.end(), "Guided device row no longer exists");
-            auto bounds = list->GetItemRect(list->RowToItem(static_cast<int>(row - ids.begin())));
-            bounds.SetPosition(list->ClientToScreen(bounds.GetPosition()));
             auto* highlight =
                 tutorial_highlights_.at(static_cast<std::size_t>(target - targets.begin()));
-            require(highlight->IsShownOnScreen() && highlight->GetScreenRect().Contains(bounds) &&
-                        highlight->GetSize().y <= bounds.height + FromDIP(14),
-                    "Tutorial outlines the device list instead of the specific row");
+            const int expected_row = static_cast<int>(row - ids.begin());
+            wxRect logical, visible, actual;
+            int hit = wxNOT_FOUND;
+            // Native column layout/scroll messages can be pending after a reply.
+            // Pump only presentation, then sample a freshly positioned outline.
+            const auto deadline = avatar::monotonic_ms() + 1000;
+            do {
+                wxYield();
+                render_tutorial();
+                logical = list->GetItemRect(list->RowToItem(expected_row));
+                logical.SetPosition(list->ClientToScreen(logical.GetPosition()));
+                visible = logical;
+                visible.Intersect(wxRect(list->GetMainWindow()->ClientToScreen(wxPoint(0, 0)),
+                                         list->GetMainWindow()->GetClientSize()));
+                for (auto* parent = list->GetParent(); parent && parent != this;
+                     parent = parent->GetParent())
+                    visible.Intersect(
+                        wxRect(parent->ClientToScreen(wxPoint(0, 0)), parent->GetClientSize()));
+                actual = highlight->GetScreenRect();
+                hit = list->HitTest(list->ScreenToClient(
+                    wxPoint(actual.x + actual.width / 2, actual.y + actual.height / 2)));
+                // Compare visible pixels, not the logical column width (which
+                // can extend under clipping). Independently hit-test the row ID
+                // and bound thickness, including separate rounded DIP margins.
+                if (!visible.IsEmpty() && highlight->IsShownOnScreen() &&
+                    actual.Contains(visible) && hit == expected_row &&
+                    actual.height <= visible.height + 2 * (FromDIP(4) + FromDIP(3)))
+                    return;
+                wxMilliSleep(5);
+            } while (avatar::monotonic_ms() < deadline);
+            auto rectangle = [](const wxRect& r) {
+                return std::to_string(r.x) + "," + std::to_string(r.y) + "," +
+                       std::to_string(r.width) + "," + std::to_string(r.height);
+            };
+            std::ostringstream error;
+            error << "Tutorial row outline mismatch: " << id << " beat=" << tutorial_->beat()
+                  << " logical=" << rectangle(logical) << " visible=" << rectangle(visible)
+                  << " outline=" << rectangle(actual) << " shown=" << highlight->IsShownOnScreen()
+                  << " hit=" << hit << " expected_row=" << expected_row << " dpi=" << GetDPI().x;
+            throw std::runtime_error(error.str());
         };
         row_highlight(capture_devices_, capture_device_ids_, "tutorial-mic");
         row_highlight(playback_devices_, playback_device_ids_, "tutorial-speakers");
-        capture("device-selection");
+        {
+            // Deliberately extend logical columns beyond the viewport. The old
+            // whole-row containment assertion rejects this valid clipped outline.
+            auto* status = capture_devices_->GetColumn(0);
+            auto* name = capture_devices_->GetColumn(1);
+            const int status_width = status->GetWidth(), name_width = name->GetWidth();
+            status->SetWidth(capture_devices_->GetMainWindow()->GetClientSize().x + FromDIP(80));
+            row_highlight(capture_devices_, capture_device_ids_, "tutorial-mic");
+            const auto row =
+                std::find(capture_device_ids_.begin(), capture_device_ids_.end(), "tutorial-mic");
+            require(capture_devices_
+                            ->GetItemRect(capture_devices_->RowToItem(
+                                static_cast<int>(row - capture_device_ids_.begin())))
+                            .width >
+                        capture_devices_->GetMainWindow()->GetClientSize().x + FromDIP(40),
+                    "Clipped-row regression fixture did not exceed the visible viewport");
+            status->SetWidth(status_width);
+            name->SetWidth(name_width);
+            row_highlight(capture_devices_, capture_device_ids_, "tutorial-mic");
+        }
         select_list(capture_devices_, capture_device_ids_, "tutorial-mic");
         device_name_->SetValue("My headset microphone");
         check("N015");
@@ -747,8 +820,10 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             out << "PASS: actual tutorial controls, authored branches, identity-based renames and "
                    "assignments, 20-second scan / 10-second activation completion events, "
                    "microphone acknowledgement, pink replies without tooltips, first-reply arrow, "
-                   "pulsing row guidance with Low motion, farewell/exit confirmation, restricted "
-                   "Settings, no installed flag writes.\n";
+                   "pulsing/clipped row guidance with Low motion, safe animated-popup teardown, "
+                   "farewell/exit confirmation, restricted Settings, no installed flag writes. "
+                   "DPI: "
+                << GetDPI().x << ".\n";
             require(bool(out), "Could not write tutorial smoke evidence");
         }
         return true;

@@ -757,6 +757,10 @@ portable or cross-build success.
   outlines follow visible targets without selecting rows or intercepting clicks.
   Guidance gently expands 3 DIP over one second, returns over the next, rests
   one second, and repeats. Low motion/Windows animation-off keeps it static.
+  Verify clipped columns and fractional DPI: the outline surrounds the visible
+  portion of the intended row. Close while outlines are pulsing; popup teardown
+  must not invoke callbacks after their timer is destroyed. Tutorial smoke covers
+  a deliberately clipped row and destruction of a shown, animated outline.
 - Replay/restart during a real session: native streams must reach Stopped before
   the old window closes and the next instance opens. No path-alias or PID-reuse
   assumptions belong to the handshake. Repeat from paths with spaces/Unicode.
