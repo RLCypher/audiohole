@@ -744,10 +744,19 @@ portable or cross-build success.
   not advance. Valid non-default names, including trimmed surrounding spaces,
   must advance after confirmation; no response buttons appear for these steps.
 - Check all tutorial choices in Dark, Light and Follow System, including new
-  choices after a phase transition and hover/pressed/focus states. Verify actual
+  choices after a phase transition and hover/pressed/focus states. All replies
+  have pink outlines and no hover text. The initial dialogue has a subtle arrow
+  inside the frame pointing at replies; it disappears after the first choice
+  without resizing anything. Verify actual
   emote animation during dialogue and static deadpan without false approval logs.
 - Complete the tutorial: End tutorial replaces Skip, final dialogue has no
-  implementation-flag wording, and exiting preserves the completion marker.
+  implementation-flag wording, explicitly announces the lesson is finished,
+  and offers Exit tutorial at Norm's feet. Exiting preserves the completion marker.
+- During device renaming, outline the actual FakeTech microphone/speaker rows,
+  removing a row's guidance after its saved rename. Resize/scroll and change tabs:
+  outlines follow visible targets without selecting rows or intercepting clicks.
+  Guidance gently expands 3 DIP over one second, returns over the next, rests
+  one second, and repeats. Low motion/Windows animation-off keeps it static.
 - Replay/restart during a real session: native streams must reach Stopped before
   the old window closes and the next instance opens. No path-alias or PID-reuse
   assumptions belong to the handshake. Repeat from paths with spaces/Unicode.

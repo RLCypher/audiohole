@@ -21,7 +21,7 @@ const std::map<std::string, std::vector<std::string>> targets{
     {"N007", {"scan_level", "scan_scope"}},
     {"N008", {"scan_start"}},
     {"N011", {"devices_tab"}},
-    {"N014", {"capture_list", "playback_list", "device_name"}},
+    {"N014", {"device_name"}},
     {"N015", {"device_name", "device_save"}},
     {"N016", {"profiles_tab"}},
     {"N017", {"profile_new"}},
@@ -102,6 +102,10 @@ TutorialView Tutorial::view() const {
             {beat_ + "/" + std::to_string(i), beat["choices"][i].get<std::string>()});
     if (const auto found = targets.find(beat_); found != targets.end())
         out.targets = found->second;
+    if (beat_ == "N014" || beat_ == "N015")
+        for (const auto* id : {"tutorial-mic", "tutorial-speakers"})
+            if (!renamed_.contains(id))
+                out.targets.push_back(std::string("device:") + id);
     return out;
 }
 bool Tutorial::choose(const std::string& id) {

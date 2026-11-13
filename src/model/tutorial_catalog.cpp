@@ -516,13 +516,13 @@ std::string_view tutorial_catalog() {
         "from": "N035",
         "label": "Keep exploring",
         "expression": "smug",
-        "text": "Knock yourself out. Figuratively. Legal gets upset when I don't specify. Feel free to poke around some more; you can't hurt the real setup from here, and your imaginary devices aren't coming with you. When you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions."
+        "text": "That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side."
       },
       {
         "from": "N035",
         "label": "Can I break anything?",
         "expression": "deadpan",
-        "text": "Not your real setup. The whole sandbox gets swept away when you leave; all you keep is the know-how. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions."
+        "text": "Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side."
       }
     ],
     "choices": []
@@ -659,7 +659,7 @@ std::string_view tutorial_catalog() {
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(27979);
+        result.reserve(27789);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

@@ -2,6 +2,7 @@
 #include "gui/frame.h"
 #include "gui/shell_actions.h"
 #include "model/first_run.h"
+#include <cmath>
 #include <wx/dcbuffer.h>
 #include <wx/dcscreen.h>
 #include <wx/modalhook.h>
@@ -9,17 +10,20 @@
 #include <wx/textdlg.h>
 namespace audiohole::gui {
 namespace {
+void prepare_tutorial_overlay(wxWindow& window) {
+    window.SetBackgroundStyle(wxBG_STYLE_PAINT);
+    const auto handle = static_cast<HWND>(window.GetHandle());
+    SetWindowLongPtrW(handle, GWL_EXSTYLE,
+                      GetWindowLongPtrW(handle, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT |
+                          WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
+    SetLayeredWindowAttributes(handle, RGB(0, 0, 0), 255, LWA_COLORKEY);
+}
 // A non-activating, click-through outline. Only its pink stroke is opaque;
 // native input goes to the real control below, including keyboard/accessibility.
 class TutorialOutline final : public wxPopupWindow {
   public:
-    explicit TutorialOutline(wxWindow* owner) : wxPopupWindow(owner, wxBORDER_NONE) {
-        SetBackgroundStyle(wxBG_STYLE_PAINT);
-        const auto handle = static_cast<HWND>(GetHandle());
-        SetWindowLongPtrW(handle, GWL_EXSTYLE,
-                          GetWindowLongPtrW(handle, GWL_EXSTYLE) | WS_EX_LAYERED |
-                              WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
-        SetLayeredWindowAttributes(handle, RGB(0, 0, 0), 255, LWA_COLORKEY);
+    explicit TutorialOutline(wxWindow* owner) : wxPopupWindow(owner, wxBORDER_NONE), pulse_(this) {
+        prepare_tutorial_overlay(*this);
         Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
             wxAutoBufferedPaintDC dc(this);
             dc.SetBackground(*wxBLACK_BRUSH);
@@ -28,6 +32,61 @@ class TutorialOutline final : public wxPopupWindow {
             dc.SetPen(wxPen(palette::magenta(), thickness));
             dc.SetBrush(*wxTRANSPARENT_BRUSH);
             dc.DrawRoundedRectangle(GetClientRect().Deflate((thickness + 1) / 2), FromDIP(10));
+        });
+        Bind(wxEVT_TIMER, [this](wxTimerEvent&) { update_bounds(); }, pulse_.GetId());
+        Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
+            if (!event.IsShown())
+                pulse_.Stop();
+            event.Skip();
+        });
+    }
+    void place(const wxRect& bounds, bool animate) {
+        bounds_ = bounds;
+        if (animate && !pulse_.IsRunning()) {
+            epoch_ = avatar::monotonic_ms();
+            pulse_.Start(33);
+        } else if (!animate)
+            pulse_.Stop();
+        update_bounds();
+        Show();
+    }
+
+  private:
+    wxTimer pulse_;
+    wxRect bounds_;
+    std::int64_t epoch_ = 0;
+    void update_bounds() {
+        auto bounds = bounds_;
+        if (pulse_.IsRunning()) {
+            // One second out, one second back, one second resting. Only the
+            // click-through popup moves; real controls and layout stay fixed.
+            const auto phase = (avatar::monotonic_ms() - epoch_) % 3000;
+            const double amount =
+                phase < 2000 ? (1 - std::cos(phase * 3.141592653589793 / 1000)) / 2 : 0;
+            bounds.Inflate(static_cast<int>(std::lround(FromDIP(3) * amount)));
+        }
+        if (GetScreenRect() != bounds) {
+            SetSize(bounds);
+            Refresh();
+        }
+    }
+};
+// An overlay inside the first dialogue frame, never a sizer item or input target.
+class TutorialReplyArrow final : public wxPopupWindow {
+  public:
+    explicit TutorialReplyArrow(wxWindow* owner) : wxPopupWindow(owner, wxBORDER_NONE) {
+        SetName("Tutorial reply guidance arrow");
+        prepare_tutorial_overlay(*this);
+        Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
+            wxAutoBufferedPaintDC dc(this);
+            dc.SetBackground(*wxBLACK_BRUSH);
+            dc.Clear();
+            dc.SetPen(wxPen(palette::magenta(), std::max(2, FromDIP(2))));
+            const int left = FromDIP(6), right = GetClientSize().x - FromDIP(6);
+            const int middle = GetClientSize().y / 2, tip = FromDIP(7);
+            dc.DrawLine(left, middle, right, middle);
+            dc.DrawLine(right - tip, middle - tip, right, middle);
+            dc.DrawLine(right - tip, middle + tip, right, middle);
         });
     }
 };
@@ -95,6 +154,9 @@ void Frame::render_tutorial() {
     std::string choice_key;
     for (const auto& c : view.choices)
         choice_key += c.id + "\n";
+    const bool farewell = view.beat == "N036";
+    if (farewell)
+        choice_key += "exit-tutorial";
     if (choice_key != tutorial_choice_key_) {
         for (auto* choice : tutorial_choices_) {
             tutorial_choices_layout_->Detach(choice);
@@ -105,12 +167,21 @@ void Frame::render_tutorial() {
         for (const auto& choice : view.choices) {
             auto* control = new ActionButton(tutorial_choices_panel_, text(choice.label));
             control->SetName(text("Tutorial choice " + choice.id));
-            control->SetToolTip("Choose this reply to Norm. Your reply selects the next complete "
-                                "dialogue variant.");
+            control->outline_colour = palette::magenta();
+            control->UnsetToolTip();
             control->Bind(wxEVT_BUTTON, [this, id = choice.id](wxCommandEvent&) {
                 if (tutorial_->choose(id))
                     render_tutorial();
             });
+            tutorial_choices_layout_->Add(control, 0, wxEXPAND | wxALL, FromDIP(2));
+            tutorial_choices_.push_back(control);
+        }
+        if (farewell) {
+            auto* control = new ActionButton(tutorial_choices_panel_, "Exit tutorial");
+            control->SetName("Exit tutorial");
+            control->outline_colour = palette::magenta();
+            control->UnsetToolTip();
+            control->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { skip_tutorial(); });
             tutorial_choices_layout_->Add(control, 0, wxEXPAND | wxALL, FromDIP(2));
             tutorial_choices_.push_back(control);
         }
@@ -120,6 +191,21 @@ void Frame::render_tutorial() {
         tutorial_choices_panel_->Layout();
         avatar_region_->Layout();
     }
+    if (view.beat == "N001" && !tutorial_choices_.empty() && IsShown() && !IsIconized() &&
+        comment_surface_->IsShownOnScreen()) {
+        if (!tutorial_reply_arrow_)
+            tutorial_reply_arrow_ = new TutorialReplyArrow(this);
+        const auto card = comment_surface_->GetScreenRect();
+        const auto button = tutorial_choices_.front()->GetScreenRect();
+        const auto size = FromDIP(wxSize(48, 24));
+        const int inset = FromDIP(16);
+        const int y = std::clamp(button.y + button.height / 2 - size.y / 2, card.y + inset,
+                                 card.GetBottom() - inset - size.y);
+        tutorial_reply_arrow_->SetSize(wxRect(card.GetRight() - inset - size.x, y, size.x, size.y));
+        tutorial_reply_arrow_->Show();
+        tutorial_reply_arrow_->Refresh();
+    } else if (tutorial_reply_arrow_)
+        tutorial_reply_arrow_->Hide();
     const auto signature = view.beat + "\n" + view.text + "\n" + view.expression;
     const bool changed = signature != tutorial_rendered_;
     const bool step_changed = !tutorial_rendered_.starts_with(view.beat + "\n");
@@ -150,7 +236,20 @@ void Frame::render_tutorial() {
         layout_header();
     while (tutorial_highlights_.size() < view.targets.size())
         tutorial_highlights_.push_back(new TutorialOutline(this));
+    int directed_row = -1;
     auto target = [&](const std::string& key) -> wxWindow* {
+        if (key.starts_with("device:")) {
+            const auto id = key.substr(7);
+            for (const auto& [list, ids] : {std::pair{capture_devices_, &capture_device_ids_},
+                                            std::pair{playback_devices_, &playback_device_ids_}}) {
+                const auto found = std::find(ids->begin(), ids->end(), id);
+                if (found != ids->end()) {
+                    directed_row = static_cast<int>(found - ids->begin());
+                    return list;
+                }
+            }
+            return nullptr;
+        }
         if (key == "devices_tab")
             return navigation_[1];
         if (key == "scan_tab")
@@ -201,8 +300,12 @@ void Frame::render_tutorial() {
             return stop_;
         return nullptr;
     };
+    BOOL client_animation = TRUE;
+    SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &client_animation, 0);
+    const bool animate = !preferences_->values().low_motion && client_animation != FALSE;
     for (std::size_t i = 0; i < tutorial_highlights_.size(); ++i) {
-        auto* highlight = tutorial_highlights_[i];
+        auto* highlight = static_cast<TutorialOutline*>(tutorial_highlights_[i]);
+        directed_row = -1;
         auto* directed = i < view.targets.size() ? target(view.targets[i]) : nullptr;
         if (directed && step_changed && profile_editor_->IsDescendant(directed)) {
             const auto point = profile_editor_->ScreenToClient(directed->GetScreenPosition());
@@ -223,6 +326,7 @@ void Frame::render_tutorial() {
             for (std::size_t page = 0; page < notebook_->GetPageCount(); ++page)
                 if (notebook_->GetPage(page)->IsDescendant(directed)) {
                     directed = navigation_[page];
+                    directed_row = -1;
                     break;
                 }
         }
@@ -231,6 +335,16 @@ void Frame::render_tutorial() {
             continue;
         }
         auto bounds = directed->GetScreenRect();
+        if (directed_row >= 0) {
+            auto* list = static_cast<DeviceList*>(directed);
+            const auto item = list->RowToItem(static_cast<unsigned>(directed_row));
+            if (step_changed)
+                list->EnsureVisible(item);
+            bounds = list->GetItemRect(item);
+            bounds.SetPosition(list->ClientToScreen(bounds.GetPosition()));
+            bounds.Intersect(wxRect(list->GetMainWindow()->ClientToScreen(wxPoint(0, 0)),
+                                    list->GetMainWindow()->GetClientSize()));
+        }
         for (auto* parent = directed->GetParent(); parent && parent != this;
              parent = parent->GetParent())
             bounds.Intersect(
@@ -240,10 +354,7 @@ void Frame::render_tutorial() {
             continue;
         }
         bounds.Inflate(FromDIP(4));
-        if (highlight->GetScreenRect() != bounds)
-            highlight->SetSize(bounds);
-        highlight->Show();
-        highlight->Refresh();
+        highlight->place(bounds, animate);
     }
 }
 } // namespace audiohole::gui
@@ -254,6 +365,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         // Drive the controller clock explicitly. Rendering/artwork yields must
         // not add nondeterministic wall-clock ticks to the boundary assertions.
         timer_.Stop();
+        render_tutorial();
         auto require = [](bool ok, const char* message) {
             if (!ok)
                 throw std::runtime_error(message);
@@ -265,6 +377,13 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             require(commentary_copy_ == tutorial_->view().text && technical_copy_.empty(),
                     "Ordinary status displaced tutorial dialogue");
             require(!personality_heading_->IsShown(), "Tutorial rendered a speaker prefix/heading");
+            for (const auto* control : tutorial_choices_) {
+                const auto* button = dynamic_cast<const ActionButton*>(control);
+                require(button && button->outline_colour == palette::magenta(),
+                        "Tutorial reply is missing its pink outline");
+                require(control->GetToolTip() == nullptr,
+                        "Tutorial reply must not have hover text");
+            }
         };
         auto click = [&](wxButton* control) {
             require(control != nullptr && control->IsEnabled(),
@@ -354,10 +473,17 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             bitmap.SaveFile(directory + "/" + wxString::FromUTF8(name) + ".bmp", wxBITMAP_TYPE_BMP);
         };
         check("N001");
+        require(
+            tutorial_reply_arrow_ && tutorial_reply_arrow_->IsShownOnScreen() &&
+                comment_surface_->GetScreenRect().Contains(tutorial_reply_arrow_->GetScreenRect()),
+            "First interaction is missing its in-frame reply arrow");
+        const auto initial_card = comment_surface_->GetScreenRect();
+        const auto initial_avatar = agent_display_->GetScreenRect();
         for (int appearance : {0, 1, 2}) {
             theme_choice_->SetSelection(appearance);
             wxCommandEvent event(wxEVT_CHOICE, theme_choice_->GetId());
             theme_choice_->GetEventHandler()->ProcessEvent(event);
+            check("N001");
             for (const auto* control : tutorial_choices_)
                 require(control->GetBackgroundColour() ==
                                 tutorial_choices_panel_->GetBackgroundColour() &&
@@ -377,8 +503,13 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         tutorial_->dismiss_reminder();
         render_tutorial();
         require(commentary_copy_ == initial, "Early-start reminder lost the current dialogue");
+        capture("first-reply");
         choice(1);
         check("N002");
+        require(!tutorial_reply_arrow_->IsShown() &&
+                    comment_surface_->GetScreenRect() == initial_card &&
+                    agent_display_->GetScreenRect() == initial_avatar,
+                "First reply arrow persists or changes the card/avatar layout");
         require(commentary_copy_.find("wobbly desk") != std::string::npos,
                 "Tutorial choice selected the wrong complete variant");
         const auto image_deadline = avatar::monotonic_ms() + 8000;
@@ -419,6 +550,36 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require((outline_style & (WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE)) ==
                     (WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE),
                 "Tutorial highlight can intercept input or activate itself");
+        BOOL client_animation = TRUE;
+        SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &client_animation, 0);
+        if (!preferences_->values().low_motion && client_animation != FALSE) {
+            const auto control_bounds = scan_start_->GetScreenRect();
+            const auto base = wxRect(control_bounds).Inflate(FromDIP(4));
+            int minimum = INT_MAX, maximum = 0;
+            const auto deadline = avatar::monotonic_ms() + 3300;
+            while (avatar::monotonic_ms() < deadline) {
+                wxYield();
+                const auto bounds = tutorial_highlights_[0]->GetScreenRect();
+                minimum = std::min(minimum, bounds.width);
+                maximum = std::max(maximum, bounds.width);
+                require(scan_start_->GetScreenRect() == control_bounds,
+                        "Tutorial pulse moved the actual control");
+                wxMilliSleep(10);
+            }
+            require(minimum == base.width && maximum == base.width + 2 * FromDIP(3),
+                    "Tutorial guidance did not expand and return by the expected few pixels");
+        }
+        const auto original_preferences = preferences_->values();
+        auto reduced = original_preferences;
+        reduced.low_motion = true;
+        require(preferences_->update(reduced).ok, "Could not enable Low motion in smoke memory");
+        render_tutorial();
+        require(tutorial_highlights_[0]->GetScreenRect() ==
+                    wxRect(scan_start_->GetScreenRect()).Inflate(FromDIP(4)),
+                "Low motion did not restore the static guidance outline");
+        require(preferences_->update(original_preferences).ok,
+                "Could not restore smoke preferences");
+        render_tutorial();
         click(scan_start_);
         check("N009");
         capture("scanning");
@@ -441,11 +602,31 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N014");
         require(capture_devices_->GetCount() == 2 && playback_devices_->GetCount() == 2,
                 "Tutorial lists do not show two capture and two playback endpoints");
+        auto row_highlight = [&](DeviceList* list, const std::vector<std::string>& ids,
+                                 const char* id) {
+            const auto targets = tutorial_->view().targets;
+            const auto key = std::string("device:") + id;
+            const auto target = std::find(targets.begin(), targets.end(), key);
+            require(target != targets.end(), "Tutorial is missing the intended device-row target");
+            const auto row = std::find(ids.begin(), ids.end(), id);
+            require(row != ids.end(), "Guided device row no longer exists");
+            auto bounds = list->GetItemRect(list->RowToItem(static_cast<int>(row - ids.begin())));
+            bounds.SetPosition(list->ClientToScreen(bounds.GetPosition()));
+            auto* highlight =
+                tutorial_highlights_.at(static_cast<std::size_t>(target - targets.begin()));
+            require(highlight->IsShownOnScreen() && highlight->GetScreenRect().Contains(bounds) &&
+                        highlight->GetSize().y <= bounds.height + FromDIP(14),
+                    "Tutorial outlines the device list instead of the specific row");
+        };
+        row_highlight(capture_devices_, capture_device_ids_, "tutorial-mic");
+        row_highlight(playback_devices_, playback_device_ids_, "tutorial-speakers");
+        capture("device-selection");
         select_list(capture_devices_, capture_device_ids_, "tutorial-mic");
         device_name_->SetValue("My headset microphone");
         check("N015");
         click(device_save_);
         check("N015");
+        row_highlight(playback_devices_, playback_device_ids_, "tutorial-speakers");
         select_list(playback_devices_, playback_device_ids_, "tutorial-speakers");
         device_name_->SetValue("My headset speakers");
         click(device_save_);
@@ -537,8 +718,27 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         check("N036");
         require(controller_->snapshot().operating_mode == OperatingMode::Tutorial &&
-                    tutorial_choices_.empty(),
-                "Completion switched environment or retained choices");
+                    tutorial_choices_.size() == 1 &&
+                    tutorial_choices_[0]->GetLabel() == "Exit tutorial" &&
+                    commentary_copy_.find("young grasshopper") != std::string::npos,
+                "Completion switched environment or omitted the definitive farewell/exit action");
+        capture("farewell");
+        class KeepExploring final : public wxModalDialogHook {
+          public:
+            bool asked = false;
+            int Enter(wxDialog* dialog) override {
+                if (dialog->GetTitle() != "Exit AudioHole?")
+                    return wxID_NONE;
+                asked = true;
+                return wxID_NO;
+            }
+        } confirmation;
+        confirmation.Register();
+        click(tutorial_choices_[0]);
+        confirmation.Unregister();
+        require(confirmation.asked && !closing_ && IsShown() && tutorial_->complete(),
+                "Exit tutorial did not offer a cancellable normal exit confirmation");
+        check("N036");
         require(std::filesystem::exists(marker) == marker_existed,
                 "Tutorial smoke changed the installed completion flag");
         if (!directory.empty()) {
@@ -546,8 +746,9 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             std::ofstream out(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt");
             out << "PASS: actual tutorial controls, authored branches, identity-based renames and "
                    "assignments, 20-second scan / 10-second activation completion events, "
-                   "microphone "
-                   "acknowledgement, restricted Settings, no installed flag writes.\n";
+                   "microphone acknowledgement, pink replies without tooltips, first-reply arrow, "
+                   "pulsing row guidance with Low motion, farewell/exit confirmation, restricted "
+                   "Settings, no installed flag writes.\n";
             require(bool(out), "Could not write tutorial smoke evidence");
         }
         return true;

@@ -1,5 +1,5 @@
 AUDIOHOLE — NORM TUTORIAL DIALOGUE
-Version 2.5 — Event-driven sandbox, dialogue UI contract, and microphone test
+Version 2.6 — Event-driven sandbox, selection guidance, and definitive farewell
 
 PURPOSE
 A guided, completely fictional sandbox exercise. This is the dialogue for the owner's original tutorial workflow, NOT a replacement curriculum. No real devices are scanned, no audio is routed, and no profile/device files are written. The only permitted persistent change is the tutorial-complete flag. All lines appear in the status/personality panel. Settings keeps Personality, Animation, and DFA fields visible but disabled (grayed out), with “(Disabled for tutorial)” appended to their section headers; Replay Tutorial becomes Skip Tutorial.
@@ -297,12 +297,12 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
 UI: Show two response buttons: "Keep exploring" and "Can I break anything?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N036 [smug]
-Cue: Final tutorial message; remain in sandbox until the user exits. Do not automatically swap to real devices. No Continue button; tutorial is complete and the user can freely explore or exit.
+Cue: Final tutorial message; remain in sandbox until the user exits. Do not automatically swap to real devices. Show an "Exit tutorial" action at Norm's feet; tutorial is complete and the user can freely explore or exit.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N035 / Keep exploring [smug]
-  NORM: Knock yourself out. Figuratively. Legal gets upset when I don't specify. Feel free to poke around some more; you can't hurt the real setup from here, and your imaginary devices aren't coming with you. When you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions.
+  NORM: That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
   Variant B — from N035 / Can I break anything? [deadpan]
-  NORM: Not your real setup. The whole sandbox gets swept away when you leave; all you keep is the know-how. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions.
+  NORM: Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
 
 ======================================================================
 CONDITIONAL / RECOVERY LINES

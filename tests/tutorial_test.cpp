@@ -143,11 +143,19 @@ TEST(Tutorial, TwoDistinctExplicitDeviceSavesAreRequired) {
     h.navigate(1);
     h.choice();
     h.choice();
+    const auto guided = h.lesson.view().targets;
+    EXPECT_NE(std::find(guided.begin(), guided.end(), "device:tutorial-mic"), guided.end());
+    EXPECT_NE(std::find(guided.begin(), guided.end(), "device:tutorial-speakers"), guided.end());
     h.event("device_edit");
     auto device = *endpoint(h.sandbox.snapshot(), "tutorial-mic");
     device.display_name = "One";
     h.sandbox.update_endpoint(device);
     h.event("device_saved");
+    const auto remaining = h.lesson.view().targets;
+    EXPECT_EQ(std::find(remaining.begin(), remaining.end(), "device:tutorial-mic"),
+              remaining.end());
+    EXPECT_NE(std::find(remaining.begin(), remaining.end(), "device:tutorial-speakers"),
+              remaining.end());
     device.display_name = "One again";
     h.sandbox.update_endpoint(device);
     h.event("device_saved");
@@ -187,8 +195,10 @@ TEST(Tutorial, BothMicrophoneBranchesCompleteWithoutMeasuringAnyAudio) {
         h.choice();
         EXPECT_TRUE(h.lesson.complete());
         EXPECT_EQ(h.lesson.beat(), "N035");
-        h.choice();
+        h.choice(branch);
         EXPECT_EQ(h.lesson.beat(), "N036");
+        EXPECT_NE(h.lesson.view().text.find("young grasshopper"), std::string::npos);
+        EXPECT_NE(h.lesson.view().text.find("exit and restart"), std::string::npos);
         EXPECT_TRUE(h.lesson.view().choices.empty());
         EXPECT_EQ(h.sandbox.snapshot().operating_mode, OperatingMode::Tutorial);
     }

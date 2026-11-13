@@ -2131,9 +2131,17 @@ automatic reconnect/live-switch controls are disabled for engine 0.6.
 
 Tutorial script v2.5 adds confirmed right-click Rename steps for the profile and
 hole, accepting valid names different from their initial defaults without reply
-buttons. New choices receive Dark/Light/System colors immediately. Click overlays
+buttons. New choices receive Dark/Light/System colors immediately, pink outlines
+matching the callouts, and no hover text. High contrast retains native styling. Click overlays
 last six seconds. Simulated activation lasts ten seconds with no progress bar;
 only its completion event advances. Skip becomes End tutorial on completion.
 The final spoken copy has no implementation-flag wording. Emotes use a valid
 player priority; intentionally static deadpan does not warn about missing animation.
 Replay and Restart wait on an inherited parent-process handle after cleanup.
+
+Tutorial selection guidance outlines the specific FakeTech device rows rather
+than entire lists, following stable IDs and remaining only until their saved
+renames. Click-through outlines pulse outward by 3 DIP for one second, return
+over one second and rest for one second; Low motion/Windows animation preferences
+retain static outlines. The final authored message explicitly announces completion
+and provides an Exit tutorial action at Norm's feet without changing environments.

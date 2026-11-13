@@ -284,7 +284,8 @@ void bind_feedback(wxWindow* button) {
 // despite SetThemeEnabled(false). Paint the complete matched foreground/background
 // pair ourselves. Windows still supplies focus, disabled, pressed and command state.
 // Borrow the supplied HDC/font; restore selected objects and release owned brushes.
-bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
+bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected,
+                  const wxColour& outline = wxNullColour) {
     const auto* draw = reinterpret_cast<DRAWITEMSTRUCT*>(item);
     const bool enabled = !(draw->itemState & ODS_DISABLED);
     const bool pressed = (draw->itemState & ODS_SELECTED) != 0;
@@ -306,9 +307,10 @@ bool paint_button(wxWindow& button, WXDRAWITEMSTRUCT* item, bool selected) {
     HBRUSH brush = CreateSolidBrush(rgb(background));
     FillRect(draw->hDC, &draw->rcItem, brush);
     DeleteObject(brush);
-    brush = CreateSolidBrush(rgb(selected ? wxColour(75, 146, 210)
-                                 : dark   ? wxColour(76, 88, 104)
-                                          : wxColour(170, 183, 198)));
+    brush = CreateSolidBrush(rgb(outline.IsOk() ? outline
+                                 : selected     ? wxColour(75, 146, 210)
+                                 : dark         ? wxColour(76, 88, 104)
+                                                : wxColour(170, 183, 198)));
     auto border_rect = draw->rcItem;
     for (int pixel = 0; pixel < std::max(2, button.FromDIP(2)); ++pixel) {
         FrameRect(draw->hDC, &border_rect, brush);
@@ -369,7 +371,8 @@ ActionButton::ActionButton(wxWindow* parent, const wxString& title, long style, 
     bind_feedback(this);
 }
 bool ActionButton::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
-    return use_native_colours ? wxButton::MSWOnDraw(item) : paint_button(*this, item, false);
+    return use_native_colours ? wxButton::MSWOnDraw(item)
+                              : paint_button(*this, item, false, outline_colour);
 }
 NavigationButton::NavigationButton(wxWindow* parent) : wxToggleButton(parent, wxID_ANY, "") {
     MakeOwnerDrawn();

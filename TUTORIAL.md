@@ -2,7 +2,7 @@
 
 Tutorial replaces the former user-facing Preview environment. The approved
 owner script is [docs/tutorial/Norm-script.txt](docs/tutorial/Norm-script.txt),
-version 2.5. It is compiled into inert UTF-8 catalogue data by
+version 2.6. It is compiled into inert UTF-8 catalogue data by
 `scripts/GenerateTutorial.py`; `--check` verifies an exact reproducible build.
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
 rendered prefix. Existing welcome wording and the three choices stay intact.
@@ -82,10 +82,22 @@ reply or required GUI action. No dialogue-length progression timers exist.
 Norm's dialogue exclusively owns the personality window during Tutorial. Normal
 operation messages/toasts cannot replace it. The two authored replies are stacked
 at Norm's feet in a reserved region, keeping his size stable between beats.
+Replies have the same pink outline as tutorial callouts and no hover text;
+their surfaces/text follow Dark/Light/System, with native high-contrast styling.
+A subtle right-pointing arrow is overlaid inside the first dialogue frame to
+introduce the reply buttons. It disappears after the first choice and consumes
+no layout space.
 Pink rounded click-through highlights follow actual control geometry and do not
-steal focus or intercept input. Controls are revealed by scrolling when a new
+steal focus or intercept input. Device renaming highlights the specific FakeTech
+microphone/speaker rows by stable ID, removing each row's guidance after its saved
+rename. Guidance expands by 3 DIP over one second, returns over the next second,
+then rests for one second; Low motion and Windows animation settings disable
+the pulse. Controls are revealed by scrolling when a new
 objective needs them. F1 repeats guidance. Personality/animation/DFA stay visible
 but disabled with explicit section labels; Replay is replaced by Skip Tutorial, relabelled End tutorial after completion.
+The final message explicitly tells the user the lesson is finished and to exit
+and restart for real operation. An Exit tutorial button at Norm's feet uses the
+normal exit confirmation; completion never switches environments automatically.
 
 Clicking Norm selects a contextual authored reaction with a 350-ms click guard.
 Only this temporary overlay has a dialogue timeout: 6 seconds. The exact saved

@@ -174,6 +174,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxBoxSizer* tutorial_choices_layout_{};
     std::vector<wxButton*> tutorial_choices_;
     std::vector<wxWindow*> tutorial_highlights_;
+    wxWindow* tutorial_reply_arrow_{};
     std::string tutorial_rendered_, tutorial_choice_key_;
     std::uint64_t tutorial_seen_event_ = 0;
     bool tutorial_marker_saved_ = false, tutorial_completion_attempted_ = false;

@@ -55,6 +55,8 @@ class ActionButton final : public wxButton {
     ActionButton(wxWindow* parent, const wxString& title, long style = 0, wxWindowID id = wxID_ANY);
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
     bool use_native_colours = false;
+    // Optional accent for the existing DPI-aware outline; high contrast stays native.
+    wxColour outline_colour;
 };
 class NavigationButton final : public wxToggleButton {
   public:
