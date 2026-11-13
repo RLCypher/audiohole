@@ -1501,3 +1501,19 @@ Engine selector currently requests Automatic only and cannot load or initialize
 an engine. Future actual negotiation, buffering and routing remain engine-owned;
 no permanent engine or synchronization implementation is selected by this GUI
 refinement. Test-only compatibility is specified in PROVISIONAL_TEST_PERSISTENCE.md.
+
+
+## Current owner-authorized engine integration
+
+The provided engine 0.6 is now integrated as an independent static module.
+ConfigurationController retains persistence/scanner ownership and delegates typed
+routing commands to RoutingService. That service owns Runtime on a dedicated
+non-audio control thread, carries immutable profile/binding copies and rejects
+stale publications by generation. Native lifecycle/audio workers remain inside
+the module. Widgets own no audio resources. Exit/restart requests Stop, continues
+the GUI event loop until confirmed cleanup, then destroys service ownership.
+
+See ENGINE_INTEGRATION.md for admission/progress, access/fallback, runtime-intent
+and diagnostic contracts. There is no production supervisor/recovery/transactional
+live-switch implementation added by this increment. Tutorial never creates the
+real service or touches stored device/profile data.

@@ -1,12 +1,14 @@
 #pragma once
 #include "model/diagnostic_service.h"
 #include "model/persistence.h"
+#include "model/routing_service.h"
 #include "model/scanner_service.h"
+#include <chrono>
 #include <set>
 
 namespace audiohole {
 // Test environment: real configuration I/O and optional owned scanner service;
-// routing remains unavailable; an optional service owns temporary device checks.
+// an optional service owns real routing, another owns temporary device checks.
 // One authoritative snapshot. Mutations publish
 // only after a provider commits, so rejected writes cannot silently replace the visible saved
 // records.
@@ -14,7 +16,8 @@ class ConfigurationController final : public Controller {
   public:
     explicit ConfigurationController(std::unique_ptr<ConfigurationPersistence>,
                                      std::unique_ptr<ScannerService> = {},
-                                     std::unique_ptr<DiagnosticService> = {});
+                                     std::unique_ptr<DiagnosticService> = {},
+                                     std::unique_ptr<RoutingService> = {});
     ~ConfigurationController() override;
     const Snapshot& snapshot() const override {
         return state_;
@@ -48,6 +51,11 @@ class ConfigurationController final : public Controller {
     std::unique_ptr<ConfigurationPersistence> persistence_;
     std::unique_ptr<ScannerService> scanner_;
     std::unique_ptr<DiagnosticService> device_checks_;
+    std::unique_ptr<RoutingService> routing_;
+    std::uint64_t routing_generation_ = 0, routing_revision_ = 0;
+    std::chrono::steady_clock::time_point last_engine_log_{};
+    bool routing_active() const;
+    void poll_routing();
     std::string diagnostic_binding_;
     Result start_check(const std::string&, bool capture);
     std::vector<Endpoint> scanner_devices_;

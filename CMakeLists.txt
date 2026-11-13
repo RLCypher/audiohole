@@ -36,6 +36,8 @@ set(AUDIOHOLE_AVATAR_BUILD_TESTS OFF CACHE BOOL "Standalone avatar validation" F
 include(cmake/AvatarValidation.cmake)
 add_subdirectory(assets/personalities/runtime)
 add_subdirectory(src/scanner)
+set(AUDIOHOLE_ENGINE_BUILD_VALIDATION OFF CACHE BOOL "Build standalone engine host" FORCE)
+add_subdirectory(engine)
 add_subdirectory(src/model)
 if(NOT AUDIOHOLE_MODEL_ONLY)
   add_subdirectory(src/platform/windows)

@@ -2,7 +2,7 @@
 
 Tutorial replaces the former user-facing Preview environment. The approved
 owner script is [docs/tutorial/Norm-script.txt](docs/tutorial/Norm-script.txt),
-version 2.4. It is compiled into inert UTF-8 catalogue data by
+version 2.5. It is compiled into inert UTF-8 catalogue data by
 `scripts/GenerateTutorial.py`; `--check` verifies an exact reproducible build.
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
 rendered prefix. Existing welcome wording and the three choices stay intact.
@@ -50,7 +50,10 @@ cannot advance the next one. Each reply selects one complete incoming dialogue
 variant; there are no comeback-only screens or generic Continue controls.
 Navigation, Deep/Full settings, device edits/saves, profile/hole creation, Return,
 endpoint assignment, exclusive preference, Save and Start all use the real GUI
-handlers. Two distinct renamed and saved logical IDs are required. The four
+handlers. N018A requires a confirmed profile rename after creation; N018B requires
+a confirmed hole rename after creation. Both highlight the actual list, accept
+any valid name different from the initial name, and have no reply buttons. Two distinct renamed and saved device logical IDs
+are required. The four
 fictional identities are fixed independently of their editable display names:
 
 | ID | Original display name | Direction |
@@ -66,8 +69,8 @@ the user; Return and unrelated overrides are not silently changed. Save is still
 explicit. Wrong assignments, premature Start, missing saves and unrelated
 navigation cannot complete an objective.
 
-The simulated scan and activation each run for 20,000 ms through the simulation
-controller. Progress and CLI messages are explicitly fictional. Only a successful
+The simulated scan runs for 20,000 ms and activation for 10,000 ms through the
+simulation controller. Activation has no progress bar. Progress and CLI messages are explicitly fictional. Only a successful
 `scan_completed` or `simulated_routing_running` event advances the corresponding
 operation beat. Cancellation does not manufacture completion. The microphone
 joke waits for exactly **I said something** or **Testing 1, 2**; neither is evidence
@@ -82,10 +85,10 @@ at Norm's feet in a reserved region, keeping his size stable between beats.
 Pink rounded click-through highlights follow actual control geometry and do not
 steal focus or intercept input. Controls are revealed by scrolling when a new
 objective needs them. F1 repeats guidance. Personality/animation/DFA stay visible
-but disabled with explicit section labels; Replay is replaced by Skip Tutorial.
+but disabled with explicit section labels; Replay is replaced by Skip Tutorial, relabelled End tutorial after completion.
 
 Clicking Norm selects a contextual authored reaction with a 350-ms click guard.
-Only this temporary overlay has a dialogue timeout: 10 seconds. The exact saved
+Only this temporary overlay has a dialogue timeout: 6 seconds. The exact saved
 variant, choices, highlight and expression return without advancing. A valid
 reply/action during the overlay is handled against the underlying current beat.
 Approved expressions use Norm's owned avatar engine, falling back to idle. There
@@ -99,6 +102,7 @@ operation completion/cancellation, overlay restoration, inactivity and explicit
 skip. `Gui.TutorialSmoke` walks the actual controls and never writes the installed
 marker. Existing `Gui.Smoke` and `Gui.TestModeSmoke` retain their operation,
 identity, persistence and confirmation checks. The extracted-package check also
-runs all three modes outside the checkout. Native Windows GUI, click-through,
+runs all four direct modes outside the checkout, including Gui.EngineSmoke. Native Windows GUI,
+click-through,
 DPI, assets, first-run/replay and filesystem-boundary checks remain required; a
 cross-build or Wine run does not replace MSVC/native Windows validation.

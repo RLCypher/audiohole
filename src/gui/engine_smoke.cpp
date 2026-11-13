@@ -1,0 +1,91 @@
+#include "gui/engine_smoke.h"
+#include "gui/frame.h"
+#include "tests/support/engine_fixture.h"
+
+namespace audiohole::gui {
+std::unique_ptr<Controller> make_engine_smoke_controller() {
+    auto fixture = std::make_shared<testing_engine::Control>();
+    return std::make_unique<ConfigurationController>(std::make_unique<testing_engine::Store>(),
+                                                     nullptr, nullptr,
+                                                     testing_engine::service(std::move(fixture)));
+}
+bool Frame::engine_smoke(const wxString& directory) {
+    try {
+        auto require = [](bool ok, const char* message) {
+            if (!ok)
+                throw std::runtime_error(message);
+        };
+        auto until = [&](const auto& predicate) {
+            const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(8);
+            while (!predicate()) {
+                require(std::chrono::steady_clock::now() < deadline,
+                        "Engine GUI smoke timed out waiting for confirmed state");
+                controller_->advance(10);
+                refresh();
+                wxYield();
+                wxMilliSleep(5);
+            }
+        };
+        auto click = [&](wxButton* button) {
+            require(button && button->IsEnabled(), "Engine GUI action is disabled");
+            wxCommandEvent event(wxEVT_BUTTON, button->GetId());
+            button->GetEventHandler()->ProcessEvent(event);
+        };
+        for (const auto* name : {"Preview startup", "Cancel pending activation"}) {
+            const auto* control = wxWindow::FindWindowByName(name, this);
+            require(control && control->IsEnabled(),
+                    "Engine startup scheduling/cancellation controls are disabled");
+        }
+        until([&] { return controller_->snapshot().capabilities.routing; });
+        require(!controller_->snapshot().capabilities.simulated && !tutorial_,
+                "Engine smoke selected the tutorial/legacy simulator");
+        const auto original = controller_->snapshot().profiles;
+        click(start_);
+        require(controller_->snapshot().state == State::Starting,
+                "Start bypassed engine admission/progress");
+        until([&] { return controller_->snapshot().state == State::Running; });
+        require(controller_->snapshot().paths.size() == 2, "Engine GUI lost a duplex direction");
+        require(forward_.source_detail->GetLabel().Contains("Opened: 48000 Hz") &&
+                    reverse_.destination_detail->GetLabel().Contains("Opened: 48000 Hz"),
+                "Endpoint cards did not show actual independent engine formats");
+        require(!start_->IsEnabled() && !profile_apply_->IsEnabled(),
+                "GUI offers unsupported live activation/application");
+        require(path_status_->GetValue().Contains("48000 Hz") &&
+                    path_status_->GetValue().Contains("Allocated buffer") &&
+                    path_status_->GetValue().Contains("Transferred frames"),
+                "GUI did not show actual engine format/buffer/frame observations");
+        require(!forward_.capture_check.action->IsEnabled() &&
+                    !forward_.playback_check.action->IsEnabled(),
+                "Temporary device checks remain enabled during routing");
+        click(stop_);
+        require(controller_->snapshot().state == State::Stopping && !controller_->snapshot().armed,
+                "Stop did not enter asynchronous cleanup/disarm");
+        until([&] {
+            return controller_->snapshot().state == State::Stopped &&
+                   !controller_->snapshot().routing_pending;
+        });
+        require(controller_->snapshot().profiles == original,
+                "Engine GUI rewrote saved routing intent");
+        require(start_->IsEnabled(), "Confirmed cleanup did not enable the next Start");
+        if (!directory.empty()) {
+            wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+            std::ofstream output(std::filesystem::path(directory.ToStdWstring()) /
+                                 "smoke-result.txt");
+            output << "PASS: GUI Start/Stop through real engine Runtime with software-only "
+                      "adapters; confirmed duplex progress, telemetry, cleanup and unchanged saved "
+                      "intent. No hardware opened.\n";
+            require(bool(output), "Could not write engine GUI smoke evidence");
+        }
+        return true;
+    } catch (const std::exception& error) {
+        std::fprintf(stderr, "GUI engine smoke FAIL: %s\n", error.what());
+        std::fflush(stderr);
+        if (!directory.empty()) {
+            wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+            std::ofstream(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt")
+                << "FAIL: " << error.what() << '\n';
+        }
+        return false;
+    }
+}
+} // namespace audiohole::gui

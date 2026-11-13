@@ -730,3 +730,5 @@ personalities/vanilla/avatar/pack/manifest.json
 personalities/vanilla/avatar/registry.json
 personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
+docs/ENGINE_INTEGRATION.md
+licenses/miniaudio-LICENSE.txt

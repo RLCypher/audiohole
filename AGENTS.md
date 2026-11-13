@@ -1354,3 +1354,17 @@ The marker is bin/AudioHole.has-run, not a root file. Keep the user's saved data
 and themes, private probe protocol, package allowlist and substantive native smoke
 checks intact. Remove implementation-status clock wording from controls, without
 claiming newly implemented runtime clock behavior in engineering evidence.
+
+
+## Owner-authorized engine 0.6 and tutorial integration
+
+The current assignment authorizes importing the supplied engine 0.6 module and
+connecting real operation-mode routing through the controller, as documented in
+ENGINE_INTEGRATION.md. This supersedes older configuration-only/no-engine
+statements for this prototype. Tutorial remains isolated and fictional. Preserve
+profile v3/transfer v7, exact scanner bindings, unknown fields and independent
+directions. Runtime belongs to a dedicated application control thread; GUI exit
+waits asynchronously for confirmed native cleanup. Unsupported live switching,
+automatic reconnection and destination mixing must not be claimed. All permanent
+engine/algorithm/production-schema decisions remain open. Keep substantive GUI,
+restart and software-adapter smoke checks; cross/Wine results are supplemental.

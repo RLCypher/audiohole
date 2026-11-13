@@ -259,3 +259,15 @@ DEPENDENCIES.md). Offline builds may use
 archive hash. Model-only checks also build scanner contracts and background-service
 integration tests, but do not execute Windows hardware APIs. Read
 [SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) before interpreting Deep evidence.
+
+
+## Integrated engine and GUI smoke checks
+
+The main build now includes engine 0.6 as a static module, with its separate
+console host disabled. Windows also fetches the pinned, hash-verified Miniaudio
+revision described in DEPENDENCIES.md. Parent CRT/compiler policy remains in force.
+Portable model builds run the four imported engine suites and host integration
+contracts with explicit software-only adapters. Native CI runs every Gui.* test,
+including real Runtime/software-adapter Start/Stop and an actual restart child.
+The Runtime package includes the Miniaudio license and ENGINE_INTEGRATION.md.
+Native Windows/hardware validation is still required; Wine is supplemental.

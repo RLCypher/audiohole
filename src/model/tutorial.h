@@ -45,7 +45,7 @@ class Tutorial {
     std::size_t clicks_ = 0;
     std::map<std::string, std::pair<std::string, std::string>> incoming_;
     std::set<std::string> renamed_;
-    std::string profile_id_, hole_id_;
+    std::string profile_id_, hole_id_, initial_profile_name_, initial_hole_name_;
     bool saved_ = false, routed_ = false, acknowledged_ = false, settings_ = false,
          complete_ = false;
     void enter(const std::string&);

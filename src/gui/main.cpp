@@ -1,4 +1,5 @@
 #include "gui/controls.h"
+#include "gui/engine_smoke.h"
 #include "gui/frame.h"
 #include "gui/welcome.h"
 #include "model/configuration_controller.h"
@@ -13,29 +14,13 @@
 namespace {
 // Internal restart handshake: the child waits for the old process to terminate
 // BEFORE acquiring the single-instance guard or loading any user data.
-bool wait_for_restart_parent(DWORD parent) {
-    if (!parent || parent == GetCurrentProcessId())
-        return false;
-    const auto process =
-        OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parent);
-    if (!process)
-        return GetLastError() == ERROR_INVALID_PARAMETER; // Already exited.
-    std::wstring image(32768, L'\0');
-    DWORD length = static_cast<DWORD>(image.size());
-    bool same_image = false;
-    if (QueryFullProcessImageNameW(process, 0, image.data(), &length)) {
-        image.resize(length);
-        std::error_code error;
-        same_image =
-            std::filesystem::equivalent(
-                std::filesystem::path(image),
-                std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring()),
-                error) &&
-            !error;
-    } else
-        same_image = WaitForSingleObject(process, 0) == WAIT_OBJECT_0;
-    const bool exited = same_image && WaitForSingleObject(process, 15000) == WAIT_OBJECT_0;
-    CloseHandle(process);
+bool wait_for_restart_parent(HANDLE parent) {
+    // The launcher supplies an inherited process handle, not a PID/path lookup.
+    // This survives path aliases, access restrictions and process-ID reuse.
+    const auto id = GetProcessId(parent);
+    const bool exited =
+        id && id != GetCurrentProcessId() && WaitForSingleObject(parent, 30000) == WAIT_OBJECT_0;
+    CloseHandle(parent);
     return exited;
 }
 std::wstring quote_argument(const std::wstring& value) {
@@ -56,20 +41,44 @@ std::wstring quote_argument(const std::wstring& value) {
 }
 bool launch_restart(bool smoke, const wxString& screenshot_dir, bool replay) {
     const auto executable = wxStandardPaths::Get().GetExecutablePath().ToStdWstring();
-    auto command =
-        quote_argument(executable) + L" --restart-after " + std::to_wstring(GetCurrentProcessId());
+    HANDLE parent = nullptr;
+    if (!DuplicateHandle(GetCurrentProcess(), GetCurrentProcess(), GetCurrentProcess(), &parent,
+                         SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, TRUE, 0))
+        return false;
+    auto command = quote_argument(executable) + L" --restart-handle " +
+                   std::to_wstring(reinterpret_cast<std::uintptr_t>(parent));
     if (smoke)
         command += L" --smoke-test";
     if (replay)
         command += L" --replay-tutorial";
     if (!screenshot_dir.empty())
         command += L" --screenshot-dir " + quote_argument(screenshot_dir.ToStdWstring());
-    STARTUPINFOW startup{};
-    startup.cb = sizeof(startup);
-    PROCESS_INFORMATION process{};
-    if (!CreateProcessW(executable.c_str(), command.data(), nullptr, nullptr, FALSE, 0, nullptr,
-                        nullptr, &startup, &process))
+    STARTUPINFOEXW startup{};
+    startup.StartupInfo.cb = sizeof(startup);
+    SIZE_T size = 0;
+    InitializeProcThreadAttributeList(nullptr, 1, 0, &size);
+    std::vector<std::byte> storage(size);
+    startup.lpAttributeList = reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(storage.data());
+    if (!InitializeProcThreadAttributeList(startup.lpAttributeList, 1, 0, &size)) {
+        CloseHandle(parent);
         return false;
+    }
+    const bool configured =
+        UpdateProcThreadAttribute(startup.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                                  &parent, sizeof(parent), nullptr, nullptr) != FALSE;
+    PROCESS_INFORMATION process{};
+    const bool launched =
+        configured && CreateProcessW(executable.c_str(), command.data(), nullptr, nullptr, TRUE,
+                                     EXTENDED_STARTUPINFO_PRESENT, nullptr, nullptr,
+                                     &startup.StartupInfo, &process);
+    DeleteProcThreadAttributeList(startup.lpAttributeList);
+    CloseHandle(parent);
+    if (!launched)
+        return false;
+    if (smoke && !screenshot_dir.empty()) {
+        std::ofstream(std::filesystem::path(screenshot_dir.ToStdWstring()) / "restart-child.pid")
+            << process.dwProcessId;
+    }
     CloseHandle(process.hThread);
     CloseHandle(process.hProcess);
     return true;
@@ -84,13 +93,17 @@ class App final : public wxApp {
     bool OnInit() override {
         SetAppName("AudioHole");
         bool smoke = false, test_mode_smoke = false, tutorial_smoke = false,
-             replay_tutorial = false;
+             replay_tutorial = false, engine_smoke = false, restart_smoke = false;
         wxString screenshot_dir;
-        DWORD restart_parent = 0;
+        HANDLE restart_parent = nullptr;
         std::optional<ShellAction> shell_action;
         for (int i = 1; i < argc; ++i) {
             if (wxString(argv[i]) == "--smoke-test")
                 smoke = true;
+            else if (wxString(argv[i]) == "--engine-smoke")
+                smoke = engine_smoke = true;
+            else if (wxString(argv[i]) == "--restart-smoke")
+                smoke = restart_smoke = true;
             else if (wxString(argv[i]) == "--tutorial-smoke")
                 smoke = tutorial_smoke = true;
             else if (wxString(argv[i]) == "--replay-tutorial")
@@ -103,11 +116,11 @@ class App final : public wxApp {
                 shell_action = parse_shell_action(wxString(argv[++i]).ToStdWstring());
                 if (!shell_action)
                     return false;
-            } else if (wxString(argv[i]) == "--restart-after" && i + 1 < argc) {
-                unsigned long value = 0;
-                if (!wxString(argv[++i]).ToULong(&value) || value == 0)
+            } else if (wxString(argv[i]) == "--restart-handle" && i + 1 < argc) {
+                unsigned long long value = 0;
+                if (!wxString(argv[++i]).ToULongLong(&value) || value == 0)
                     return false;
-                restart_parent = static_cast<DWORD>(value);
+                restart_parent = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(value));
             } else
                 return false;
         }
@@ -198,7 +211,8 @@ class App final : public wxApp {
         if (!preferences_result.ok && !smoke)
             themed_message_box(text(preferences_result.detail), "AudioHole preferences",
                                wxOK | wxICON_WARNING);
-        bool preview = smoke && !test_mode_smoke && !tutorial_smoke; // Internal fixture smoke only.
+        bool preview = smoke && !test_mode_smoke && !tutorial_smoke &&
+                       !engine_smoke; // Internal fixture smoke only.
         bool tutorial = tutorial_smoke;
         bool first_time = false;
         if (!smoke) {
@@ -233,7 +247,9 @@ class App final : public wxApp {
             preferences_ = std::move(memory);
         }
         std::unique_ptr<Controller> controller;
-        if (tutorial)
+        if (engine_smoke)
+            controller = make_engine_smoke_controller();
+        else if (tutorial)
             controller = std::make_unique<SimulatedController>(true);
         else if (preview)
             controller = std::make_unique<SimulatedController>();
@@ -249,7 +265,8 @@ class App final : public wxApp {
             controller = std::make_unique<ConfigurationController>(
                 std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()),
                 std::make_unique<ScannerService>(std::move(scanner)),
-                smoke ? nullptr : audiohole::windows::make_diagnostic_service());
+                smoke ? nullptr : audiohole::windows::make_diagnostic_service(),
+                smoke ? nullptr : make_routing_service());
         }
         auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
             restart_requested_ = true;
@@ -262,14 +279,29 @@ class App final : public wxApp {
         frame->Show();
         if (tutorial && replay_tutorial)
             frame->tutorial_replay_intro();
+        if (!smoke && !tutorial && preferences_->values().startup_mode != 0) {
+            const auto& startup = preferences_->values();
+            const auto result = frame->controller().schedule(
+                startup.startup_profile_id,
+                startup.startup_mode == 1 ? 0 : startup.startup_delay_seconds * 1000);
+            if (!result.ok)
+                themed_message_box(text(result.detail), "Routing on startup",
+                                   wxOK | wxICON_INFORMATION, frame);
+        }
         if (!smoke && preferences_->values().start_minimized)
             frame->Iconize(true);
         if (shell_action == ShellAction::Controls)
             frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::Controls); });
         if (smoke)
-            CallAfter([this, frame, screenshot_dir, tutorial_smoke] {
-                result_ = (tutorial_smoke ? frame->tutorial_smoke(screenshot_dir)
-                                          : frame->smoke(screenshot_dir))
+            CallAfter([this, frame, screenshot_dir, tutorial_smoke, engine_smoke, restart_smoke] {
+                if (restart_smoke) {
+                    restart_requested_ = true;
+                    frame->exit();
+                    return;
+                }
+                result_ = (engine_smoke     ? frame->engine_smoke(screenshot_dir)
+                           : tutorial_smoke ? frame->tutorial_smoke(screenshot_dir)
+                                            : frame->smoke(screenshot_dir))
                               ? 0
                               : 1;
                 frame->exit();

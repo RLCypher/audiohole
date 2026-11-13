@@ -106,7 +106,7 @@ void AvatarHost::tutorial_expression(const std::string& expression, std::uint64_
         std::find(supported_.begin(), supported_.end(), expression) != supported_.end();
     session_->player().reaction_playback(1, true);
     session_->react({owned ? expression : "idle", "tutorial:" + std::to_string(occurrence),
-                     revision_, now, 2000, 120, 0},
+                     revision_, now, 2000, 100, 0},
                     now);
 }
 avatar::Presentation AvatarHost::tick(std::int64_t now) {

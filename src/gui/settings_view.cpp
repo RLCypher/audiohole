@@ -13,9 +13,9 @@ void Frame::build_settings() {
     auto* columns = new wxFlexGridSizer(1, 2, FromDIP(12), FromDIP(12));
     columns->AddGrowableCol(0, 1);
     columns->AddGrowableCol(1, 1);
-    auto* appearance_group = new wxStaticBoxSizer(wxVERTICAL, page, "Application & Tray");
+    auto* appearance_group = new wxStaticBoxSizer(wxVERTICAL, page, "Application and Tray");
     auto* appearance_box = appearance_group->GetStaticBox();
-    appearance_box->SetName("Application & Tray settings");
+    appearance_box->SetName("Application and Tray settings");
     auto* startup_group = new wxStaticBoxSizer(wxVERTICAL, page, "Routing Activation");
     auto* startup_box = startup_group->GetStaticBox();
     startup_box->SetName("Routing Activation settings");
@@ -93,6 +93,13 @@ void Frame::build_settings() {
         "Save/Apply; a waiting replacement asks for confirmation.");
     startup_group->Add(wait, 0, wxALL, FromDIP(4));
     startup_group->Add(switch_profile, 0, wxALL, FromDIP(4));
+    if (controller_->snapshot().capabilities.real_engine) {
+        wait->Disable();
+        switch_profile->Disable();
+        wait->SetToolTip(
+            "This engine currently requires an explicit Stop and Start after device changes.");
+        switch_profile->SetToolTip("Stop routing before selecting and starting another profile.");
+    }
     auto save_routing_policy = [this, wait, switch_profile](wxCommandEvent&) {
         auto next = preferences_->values();
         next.automatically_wait_for_devices = wait->GetValue();
@@ -128,10 +135,11 @@ void Frame::build_settings() {
         refresh();
     });
     startup_group->Add(row, 0, wxEXPAND);
-    const bool preview_environment =
-        controller_->snapshot().operating_mode == OperatingMode::Preview;
-    startup_preview->Enable(preview_environment);
-    cancel_startup->Enable(preview_environment);
+    // Scheduling can wait for asynchronous engine initialization; cancellation
+    // must remain available even when no backend has become ready yet.
+    const auto& capabilities = controller_->snapshot().capabilities;
+    startup_preview->Enable(capabilities.routing || capabilities.real_engine);
+    cancel_startup->Enable(capabilities.routing || capabilities.real_engine);
     startup_->Enable(true);
     startup_target_->Enable(true);
     sync_delay();
@@ -169,7 +177,7 @@ void Frame::build_settings() {
     };
     launch->Bind(wxEVT_CHECKBOX, save_launch);
     minimized->Bind(wxEVT_CHECKBOX, save_launch);
-    button(
+    auto* tutorial_action = button(
         appearance_box, appearance_group, tutorial_ ? "Skip Tutorial" : "Replay Tutorial", [this] {
             if (tutorial_) {
                 skip_tutorial();
@@ -198,9 +206,28 @@ void Frame::build_settings() {
             if (restart_)
                 restart_();
         });
-    auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality & animation");
+    tutorial_end_ = tutorial_ ? tutorial_action : nullptr;
+    auto* restart_button = button(appearance_box, appearance_group, "Restart AudioHole", [this] {
+        if (!discard())
+            return;
+        if (device_dirty_ &&
+            themed_message_box("Discard unsaved device edits before restarting? Saved device "
+                               "records will be retained.",
+                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
+                               this) != wxYES)
+            return;
+        if (restart_)
+            restart_();
+        else
+            show_result({false, "Restart is unavailable for this host."});
+    });
+    restart_button->SetName("Restart AudioHole");
+    restart_button->SetToolTip(
+        "Restart AudioHole after cleanly closing this session. Saved settings and data are "
+        "preserved; unsaved edits require confirmation.");
+    auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and Animation");
     auto* personality_box = personality_group->GetStaticBox();
-    personality_box->SetName("Personality & animation settings");
+    personality_box->SetName("Personality and Animation settings");
     personality_choice_ = choices(personality_box, personality_group, "Personality", {});
     personality_notice_ = label(personality_box, personality_group, "");
     auto* playback = new wxWrapSizer(wxHORIZONTAL);
@@ -380,29 +407,11 @@ void Frame::build_settings() {
     dfa_stepper_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     root->Add(advanced, 0, wxEXPAND | wxALL, 4);
     if (tutorial_) {
-        personality_box->SetLabel("Personality & animation (Disabled for tutorial)");
+        personality_box->SetLabel("Personality and Animation (Disabled for tutorial)");
         box->SetLabel("Advanced / DFA (Disabled for tutorial)");
         personality_box->Disable();
         box->Disable();
     }
-    auto* restart_button = button(page, root, "Restart AudioHole", [this] {
-        if (!discard())
-            return;
-        if (device_dirty_ &&
-            themed_message_box("Discard unsaved device edits before restarting? Saved device "
-                               "records will be retained.",
-                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
-                               this) != wxYES)
-            return;
-        if (restart_)
-            restart_();
-        else
-            show_result({false, "Restart is unavailable for this host."});
-    });
-    restart_button->SetName("Restart AudioHole");
-    restart_button->SetToolTip(
-        "Restart AudioHole after cleanly closing this session. Saved settings and data are "
-        "preserved; unsaved edits require confirmation.");
     page->Bind(wxEVT_SIZE, [page, wrapping_notes, last_width = 0](wxSizeEvent& event) mutable {
         const int width = page->GetClientSize().x;
         if (width > 0 && width != last_width) {

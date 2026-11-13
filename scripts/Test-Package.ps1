@@ -54,7 +54,7 @@ try {
     if ($helper.ExitCode -ne 2) { throw 'Private probe helper accepted a public invocation.' }
     # Run the GUI's internal smoke mode from the extracted tree. It dispatches
     # native widget events and writes evidence; stdout is not a GUI contract.
-    foreach ($mode in @('smoke-test', 'test-mode-smoke', 'tutorial-smoke')) {
+    foreach ($mode in @('smoke-test', 'test-mode-smoke', 'tutorial-smoke', 'engine-smoke')) {
         $evidence = Join-Path $temporary "gui-evidence/$mode"
         $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -ArgumentList @("--$mode", '--screenshot-dir', "`"$evidence`"")
         if (-not $process.WaitForExit(45000)) { throw "Extracted GUI $mode did not finish within 45 seconds." }

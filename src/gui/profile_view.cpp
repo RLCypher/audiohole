@@ -482,9 +482,12 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
                                      text(draft_.display_name));
             theme_dialog(&dialog);
             if (dialog.ShowModal() == wxID_OK) {
-                rename_profile(utf8(dialog.GetValue()));
-                if (draft_.display_name == utf8(dialog.GetValue()))
+                auto chosen = dialog.GetValue();
+                chosen.Trim(true).Trim(false);
+                rename_profile(utf8(chosen));
+                if (!chosen.empty() && draft_.display_name == utf8(chosen))
                     save(false);
+                tutorial_event("profile_renamed");
             }
         },
         wxID_EDIT);
@@ -550,11 +553,15 @@ std::unique_ptr<wxMenu> Frame::hole_menu(const std::string& id) {
                 text(draft_.holes[static_cast<std::size_t>(hole_index_)].display_name));
             theme_dialog(&dialog);
             if (dialog.ShowModal() == wxID_OK) {
-                rename_hole(utf8(dialog.GetValue()));
+                auto chosen = dialog.GetValue();
+                chosen.Trim(true).Trim(false);
+                rename_hole(utf8(chosen));
                 if (hole_index_ >= 0 &&
                     draft_.holes.at(static_cast<std::size_t>(hole_index_)).display_name ==
-                        utf8(dialog.GetValue()))
+                        utf8(chosen) &&
+                    !chosen.empty())
                     save(false);
+                tutorial_event("hole_renamed");
             }
         },
         wxID_EDIT);
@@ -699,7 +706,8 @@ void Frame::build_profiles() {
     profile_save_->SetToolTip(
         "Save the current profile's staged changes without activating routing. Ctrl+S.");
     profile_apply_ = button(profile_actions_, saves, "Apply", [this] { save(true); });
-    if (controller_->snapshot().operating_mode == OperatingMode::Test)
+    if (controller_->snapshot().operating_mode == OperatingMode::Test &&
+        !controller_->snapshot().capabilities.real_engine)
         profile_apply_->SetToolTip("Live routing is unavailable in Test Mode. Use Save to persist "
                                    "profile preferences without claiming engine application.");
     profile_revert_ = button(profile_actions_, saves, "Revert", [this] {
@@ -872,14 +880,14 @@ void Frame::build_profiles() {
         new wxStaticBoxSizer(wxVERTICAL, performance_panel_, "Performance Diagnostics");
     performance_panel_->SetSizer(performance);
     label(performance->GetStaticBox(), performance,
-          "Latency / buffer occupancy / clock drift / CPU: unavailable.");
-    tutorial_routing_progress_ = new wxGauge(performance->GetStaticBox(), wxID_ANY, 100);
-    tutorial_routing_progress_->SetName("Pretend routing activation progress");
-    performance->Add(tutorial_routing_progress_, 0, wxEXPAND | wxALL, FromDIP(4));
-    tutorial_routing_progress_->Hide();
-    path_status_ = label(performance->GetStaticBox(), performance, "No active directions.");
-    path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 3));
-    path_status_->SetMaxSize(wxSize(-1, path_status_->GetCharHeight() * 3));
+          "Counters and allocated buffers are observations; acoustic latency and CPU are "
+          "unmeasured.");
+    path_status_ = new wxTextCtrl(performance->GetStaticBox(), wxID_ANY, "No active directions.",
+                                  wxDefaultPosition, wxDefaultSize,
+                                  wxTE_MULTILINE | wxTE_READONLY | wxTE_WORDWRAP);
+    path_status_->SetName("Routing performance observations");
+    path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 4 + FromDIP(12)));
+    performance->Add(path_status_, 0, wxEXPAND | wxALL, FromDIP(4));
     right_column->Add(performance_panel_, 0, wxEXPAND | wxALL, FromDIP(4));
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
     page->SetSizer(page_layout);
@@ -890,8 +898,8 @@ void Frame::build_profiles() {
             const auto id = profile_ids_.at(static_cast<std::size_t>(i));
             const auto& state = controller_->snapshot();
             const bool switch_now = preferences_->values().activate_selected_profile &&
-                                    state.capabilities.routing && state.armed &&
-                                    state.active_profile != id;
+                                    !state.capabilities.real_engine && state.capabilities.routing &&
+                                    state.armed && state.active_profile != id;
             select_profile(id);
             if (switch_now)
                 activate(false);
@@ -1118,9 +1126,9 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         : !saved_direction
             ? "Save this profile and direction before applying an individual buffer preference."
         : !saved_changed && !active_changed
-            ? "This buffer already matches the saved preference and any active Preview request."
+            ? "This buffer already matches the saved preference."
             : "Save only this direction's buffer preference. A matching active Preview direction "
-              "updates its simulated buffer; Test Mode saves configuration only.";
+              "updates its simulated buffer; working mode uses saved changes on the next Start.";
     if (!w.buffer_apply->GetToolTip() || w.buffer_apply->GetToolTip()->GetTip() != buffer_help)
         w.buffer_apply->SetToolTip(buffer_help);
     auto value = [](std::optional<int> buffer) {
@@ -1134,7 +1142,10 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                         (path != snapshot.paths.end() && !requested ? std::string("Automatic")
                                                                     : value(requested)) +
                         " | confirmed: " + value(confirmed) + " (simulated)"
-                  : "Engine requested/applied: unavailable")));
+                  : (snapshot.capabilities.real_engine
+                         ? "Playback applied buffer request: " + value(confirmed) +
+                               "; edits take effect on the next Start"
+                         : "Engine requested/applied: unavailable"))));
     auto effective = d;
     const bool advanced = w.advanced_tuning->GetValue();
     if (!advanced)
@@ -1150,6 +1161,29 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                             (compatible ? "Candidate: " + selected.label() : "Format unverified")
                       : std::string("No endpoint selected");
     };
+    const engine::PathSnapshot* observed = nullptr;
+    if (snapshot.routing_status && snapshot.routing_intent && snapshot.active_profile == viewed_) {
+        for (const auto& hole : snapshot.routing_intent->holes) {
+            const auto& original = reverse ? hole.reverse : hole.forward;
+            if (hole.id != selected_hole || original.source != d.source ||
+                original.destination != d.destination)
+                continue;
+            for (const auto& actual : snapshot.routing_status->paths)
+                if (actual.hole_id == selected_hole &&
+                    (actual.direction == engine::DirectionId::Reverse) == reverse &&
+                    actual.negotiated)
+                    observed = &actual;
+        }
+    }
+    auto observed_detail = [&](const engine::StreamConfiguration& stream) {
+        const auto& format = stream.client_format;
+        return std::string(observed->state == engine::State::Stopped ? "Last opened: "
+                                                                     : "Opened: ") +
+               std::to_string(format.sample_rate_hz) + " Hz / " +
+               std::to_string(format.channel_count) + " ch / " +
+               engine::name(format.sample_format) + " | " + engine::name(stream.mode) + " | " +
+               engine::name(observed->state);
+    };
     const auto update_detail = [](wxStaticText* control, wxString& previous,
                                   const wxString& value) {
         if (previous == value)
@@ -1159,10 +1193,13 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         control->Wrap(260);
         return true;
     };
-    const bool source_changed =
-        update_detail(w.source_detail, w.source_detail_copy, text(detail(d.source)));
+    const bool source_changed = update_detail(
+        w.source_detail, w.source_detail_copy,
+        text(observed ? observed_detail(observed->negotiated->source) : detail(d.source)));
     const bool destination_changed =
-        update_detail(w.destination_detail, w.destination_detail_copy, text(detail(d.destination)));
+        update_detail(w.destination_detail, w.destination_detail_copy,
+                      text(observed ? observed_detail(observed->negotiated->destination)
+                                    : detail(d.destination)));
     std::string summary;
     if (d.source.empty() || d.destination.empty())
         summary = "Automatic configuration — awaiting endpoint selection.";
@@ -1179,6 +1216,10 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         summary +=
             " Automatic policy active in this draft — retained manual settings are inactive.";
     }
+    if (observed)
+        summary = "Opened endpoint formats are shown above. Saved edits take effect after Stop and "
+                  "Start. " +
+                  summary;
     const auto information = text(summary + "\n\n" + recommendation.explanation);
     const bool information_changed = w.information->GetValue() != information;
     if (information_changed) {
@@ -1442,6 +1483,11 @@ void Frame::activate_saved_profile(const std::string& id, bool ready) {
     }
     const auto& snapshot = controller_->snapshot();
     const auto* selected = profile(snapshot, id);
+    if (snapshot.capabilities.real_engine &&
+        (snapshot.armed || snapshot.routing_pending || snapshot.state == State::Stopping)) {
+        show_result({false, "Stop routing and wait for cleanup before starting another profile."});
+        return;
+    }
     controller_->wait_for_devices(preferences_->values().automatically_wait_for_devices);
     if (selected && snapshot.armed && snapshot.active_profile != id) {
         const auto valid = validate(snapshot, *selected);

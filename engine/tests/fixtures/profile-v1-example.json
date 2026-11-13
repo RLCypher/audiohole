@@ -1,0 +1,60 @@
+{
+  "format": "audiohole-profile",
+  "schema_version": 1,
+  "profile": {
+    "display_name": "Microphone monitoring",
+    "notes": "Illustrative provisional Test configuration; device IDs must exist in the separate scanned inventory.",
+    "id": "profile-example",
+    "holes": [
+      {
+        "display_name": "Desk microphone to headphones",
+        "notes": "Names are readable hints; logical device IDs identify the devices. Buffer is a requested duration.",
+        "id": "hole-example",
+        "enabled": true,
+        "duplex": false,
+        "forward": {
+          "source_name": "Desk microphone",
+          "source": "capture-example",
+          "destination_name": "Headphones",
+          "destination": "render-example",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "source": {},
+              "destination": {},
+              "channel_map": []
+            }
+          }
+        },
+        "reverse": {
+          "source_name": "",
+          "source": "",
+          "destination_name": "",
+          "destination": "",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "source": {},
+              "destination": {},
+              "channel_map": []
+            }
+          }
+        },
+        "advanced_tuning": false,
+        "routing_engine": "automatic"
+      }
+    ]
+  }
+}

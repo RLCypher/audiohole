@@ -4,7 +4,9 @@
 #include "model/first_run.h"
 #include <wx/dcbuffer.h>
 #include <wx/dcscreen.h>
+#include <wx/modalhook.h>
 #include <wx/popupwin.h>
+#include <wx/textdlg.h>
 namespace audiohole::gui {
 namespace {
 // A non-activating, click-through outline. Only its pink stroke is opaque;
@@ -54,6 +56,11 @@ bool Frame::finish_tutorial() {
 void Frame::skip_tutorial() {
     if (!tutorial_)
         return;
+    if (tutorial_->complete()) {
+        if (finish_tutorial())
+            request_exit();
+        return;
+    }
     tutorial_->remind("B010");
     render_tutorial();
     if (themed_message_box("Skip the tutorial and close AudioHole?\nNext launch opens the working "
@@ -72,14 +79,12 @@ void Frame::render_tutorial() {
     if (!tutorial_ || !notebook_)
         return;
     const auto view = tutorial_->view();
-    if (tutorial_routing_progress_) {
-        const bool was_shown = tutorial_routing_progress_->IsShown();
-        tutorial_routing_progress_->Show(view.beat == "N027");
-        if (was_shown != tutorial_routing_progress_->IsShown())
-            performance_panel_->GetParent()->Layout();
-        if (view.beat == "N027")
-            tutorial_routing_progress_->SetValue(
-                std::clamp(controller_->snapshot().tutorial_activation_percent, 0, 100));
+    if (tutorial_end_) {
+        const wxString label = view.complete ? "End tutorial" : "Skip Tutorial";
+        if (tutorial_end_->GetLabel() != label) {
+            tutorial_end_->SetLabel(label);
+            tutorial_end_->SetToolTip(button_help(label));
+        }
     }
     // Completion is the only tutorial persistence boundary. Retry only on a
     // subsequent explicit choice/exit, not on the GUI refresh timer.
@@ -109,6 +114,9 @@ void Frame::render_tutorial() {
             tutorial_choices_layout_->Add(control, 0, wxEXPAND | wxALL, FromDIP(2));
             tutorial_choices_.push_back(control);
         }
+        // Choices are created after initial theme traversal. Apply the same
+        // palette/native button policy each time the next pair is installed.
+        apply_appearance();
         tutorial_choices_panel_->Layout();
         avatar_region_->Layout();
     }
@@ -169,6 +177,10 @@ void Frame::render_tutorial() {
             return profile_new_;
         if (key == "hole_new")
             return hole_new_;
+        if (key == "profile_list")
+            return profiles_;
+        if (key == "hole_list")
+            return holes_;
         if (key == "return")
             return duplex_;
         if (key == "forward_source")
@@ -264,6 +276,29 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             require(index < static_cast<int>(tutorial_choices_.size()), "Tutorial choices missing");
             click(tutorial_choices_[index]);
         };
+        auto rename = [&](bool is_profile, const wxString& name) {
+            class ConfirmName final : public wxModalDialogHook {
+              public:
+                wxString name;
+                bool asked = false;
+                int Enter(wxDialog* dialog) override {
+                    auto* edit = dynamic_cast<wxTextEntryDialog*>(dialog);
+                    if (!edit)
+                        return wxID_NONE;
+                    asked = true;
+                    edit->SetValue(name);
+                    return wxID_OK;
+                }
+            } hook;
+            hook.name = name;
+            hook.Register();
+            auto menu =
+                is_profile ? profile_menu(viewed_) : hole_menu(draft_.holes.at(hole_index_).id);
+            wxCommandEvent event(wxEVT_MENU, wxID_EDIT);
+            menu->ProcessEvent(event);
+            hook.Unregister();
+            require(hook.asked, "Tutorial rename did not open the real context-menu name dialog");
+        };
         auto choose_endpoint = [&](wxComboBox* control, const std::vector<std::string>& ids,
                                    const char* id) {
             const auto found = std::find(ids.begin(), ids.end(), id);
@@ -319,6 +354,17 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             bitmap.SaveFile(directory + "/" + wxString::FromUTF8(name) + ".bmp", wxBITMAP_TYPE_BMP);
         };
         check("N001");
+        for (int appearance : {0, 1, 2}) {
+            theme_choice_->SetSelection(appearance);
+            wxCommandEvent event(wxEVT_CHOICE, theme_choice_->GetId());
+            theme_choice_->GetEventHandler()->ProcessEvent(event);
+            for (const auto* control : tutorial_choices_)
+                require(control->GetBackgroundColour() ==
+                                tutorial_choices_panel_->GetBackgroundColour() &&
+                            control->GetForegroundColour() ==
+                                tutorial_choices_panel_->GetForegroundColour(),
+                        "Tutorial choice does not use the selected appearance palette");
+        }
         require(controller_->snapshot().endpoints.empty() &&
                     controller_->snapshot().profiles.empty(),
                 "Tutorial leaked normal fixtures or saved records");
@@ -336,12 +382,18 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require(commentary_copy_.find("wobbly desk") != std::string::npos,
                 "Tutorial choice selected the wrong complete variant");
         const auto image_deadline = avatar::monotonic_ms() + 8000;
-        while (!agent_display_->presentation().image && avatar::monotonic_ms() < image_deadline) {
+        while ((!agent_display_->presentation().image ||
+                agent_display_->presentation().state != tutorial_->view().expression ||
+                !agent_display_->presentation().reaction) &&
+               avatar::monotonic_ms() < image_deadline) {
             poll_avatar();
             wxYield();
             wxMilliSleep(5);
         }
-        require(bool(agent_display_->presentation().image), "Tutorial Norm artwork did not load");
+        require(bool(agent_display_->presentation().image) &&
+                    agent_display_->presentation().state == tutorial_->view().expression &&
+                    agent_display_->presentation().reaction,
+                "Tutorial Norm expression did not play for the current dialogue");
         capture("introduction");
         choice();
         choice();
@@ -401,8 +453,15 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         select_page(0);
         check("N017");
         click(profile_new_);
+        check("N018A");
+        require(tutorial_choices_.empty(), "Profile rename incorrectly has dialogue buttons");
+        rename(true, text(draft_.display_name));
+        check("N018A");
+        rename(true, "  My tutorial profile  ");
         check("N018");
         click(hole_new_);
+        check("N018B");
+        rename(false, "  My tutorial connection  ");
         check("N019");
         duplex_->SetValue(true);
         wxCommandEvent return_channel(wxEVT_CHECKBOX, duplex_->GetId());
@@ -433,10 +492,11 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N026");
         click(start_);
         check("N027");
-        controller_->advance(19999);
+        controller_->advance(9999);
         refresh();
         check("N027");
-        require(tutorial_routing_progress_->IsShown(), "Tutorial activation progress is missing");
+        require(wxWindow::FindWindowByName("Pretend routing activation progress", this) == nullptr,
+                "Tutorial activation still has a progress bar");
         controller_->advance(1);
         refresh();
         check("N027B");
@@ -472,6 +532,8 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         check("N035");
         require(tutorial_->complete(), "Tutorial did not mark completion after Settings");
+        require(tutorial_end_ && tutorial_end_->GetLabel() == "End tutorial",
+                "Completed tutorial did not relabel Skip to End tutorial");
         choice();
         check("N036");
         require(controller_->snapshot().operating_mode == OperatingMode::Tutorial &&
@@ -483,7 +545,8 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             std::ofstream out(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt");
             out << "PASS: actual tutorial controls, authored branches, identity-based renames and "
-                   "assignments, 20-second operation completion events, microphone "
+                   "assignments, 20-second scan / 10-second activation completion events, "
+                   "microphone "
                    "acknowledgement, restricted Settings, no installed flag writes.\n";
             require(bool(out), "Could not write tutorial smoke evidence");
         }

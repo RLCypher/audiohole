@@ -321,7 +321,10 @@ ClipPtr Repository::load(const std::string& personality, const std::string& styl
             idle = load_asset("idle", true).front();
         }
         std::vector<std::pair<std::string, bool>> attempts;
-        if (!static_only)
+        // Intentional static-only expressions (for example deadpan) are not
+        // broken/unapproved animations. Real approved-asset load failures below
+        // still produce diagnostics and fall back through the existing policy.
+        if (!static_only && states.at(state).at("animation").value("status", "") != "not_generated")
             attempts.emplace_back(state, true);
         attempts.emplace_back(state, false);
         if (state != "idle") {

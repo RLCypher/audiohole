@@ -116,18 +116,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         SetFocus();
     }
     void request_exit();
-    void exit() {
-        timer_.Stop();
-        tuning_timer_.Stop();
-        stop_avatar();
-        if (controller_->snapshot().scanning || controller_->snapshot().scanner.busy)
-            controller_->scan(false);
-        controller_->stop();
-        end_observation();
-        if (tray_)
-            tray_->RemoveIcon();
-        Destroy();
-    }
+    void exit();
     void show_testing_notice() {
         testing_notice();
     }
@@ -153,6 +142,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         }
     }
     bool tutorial_smoke(const wxString& directory);
+    bool engine_smoke(const wxString& directory);
     bool smoke(const wxString& directory);
 
   private:
@@ -174,8 +164,11 @@ class Frame final : public wxFrame, private wxEventFilter {
     void poll_avatar();
     void stop_avatar();
     bool smoke_ = false, loading_ = false, dirty_ = false;
+    bool closing_ = false;
+    void finish_exit();
     std::unique_ptr<Tutorial> tutorial_;
     wxPanel* avatar_region_{};
+    wxSizerItem* avatar_top_gap_{};
     wxBoxSizer* avatar_layout_{};
     wxPanel* tutorial_choices_panel_{};
     wxBoxSizer* tutorial_choices_layout_{};
@@ -228,7 +221,8 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool header_layout_pending_ = false;
     wxStaticText* personality_heading_{};
     wxPanel* status_dot_{};
-    wxStaticText *status_{}, *technical_{}, *commentary_{}, *path_status_{}, *device_detail_{};
+    wxStaticText *status_{}, *technical_{}, *commentary_{}, *device_detail_{};
+    wxTextCtrl* path_status_{};
     wxButton *start_{}, *stop_{}, *dfa_{}, *scan_start_{}, *scan_cancel_{};
     wxButton* profile_apply_{};
     wxButton *profile_save_{}, *profile_revert_{}, *profile_new_{}, *hole_new_{};
@@ -246,7 +240,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         *startup_target_{}, *notifications_{};
     wxSpinCtrl* delay_{};
     wxGauge* scan_progress_{};
-    wxGauge* tutorial_routing_progress_{};
+    wxButton* tutorial_end_{};
     DirectionWidgets forward_, reverse_;
     DiagnosticWidgets device_check_;
     DiagnosticWidgets* active_check_ = nullptr;

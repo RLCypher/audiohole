@@ -2112,3 +2112,28 @@ and Devices. Start/cancel/completion commentary uses the selected personality;
 Vanilla retains neutral facts. Errors remain visible through the existing error dialog
 and status response. Temporary streams still cancel on navigation, hide,
 minimize, close, Stop or endpoint/binding change. No routing backend is added.
+
+
+### Engine integration and current tutorial/UI corrections
+
+ENGINE_INTEGRATION.md supersedes previous configuration-only limitations for
+normal operation. Start/Stop use the provided engine 0.6 through the controller;
+Tutorial stays fictional. Actual opened formats appear in endpoint cards only
+for matching Start-time assignments. Performance Diagnostics stays pinned and
+scrollable, with real configurations/access receipts/counters and preserved
+scroll position. Save does not modify the live plan; Stop/Start applies changes.
+
+Operation-mode avatar top/height match the personality frame and its narrower
+right-hand region gives width back to the personality card/action row. Tutorial
+sizing stays independent. Settings names are Application and Tray and
+Personality and Animation; Restart belongs to Application and Tray. Unsupported
+automatic reconnect/live-switch controls are disabled for engine 0.6.
+
+Tutorial script v2.5 adds confirmed right-click Rename steps for the profile and
+hole, accepting valid names different from their initial defaults without reply
+buttons. New choices receive Dark/Light/System colors immediately. Click overlays
+last six seconds. Simulated activation lasts ten seconds with no progress bar;
+only its completion event advances. Skip becomes End tutorial on completion.
+The final spoken copy has no implementation-flag wording. Emotes use a valid
+player priority; intentionally static deadpan does not warn about missing animation.
+Replay and Restart wait on an inherited parent-process handle after cleanup.

@@ -6,22 +6,27 @@
 namespace audiohole {
 ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPersistence> provider,
                                                  std::unique_ptr<ScannerService> scanner,
-                                                 std::unique_ptr<DiagnosticService> checks)
+                                                 std::unique_ptr<DiagnosticService> checks,
+                                                 std::unique_ptr<RoutingService> routing)
     : persistence_(std::move(provider)), scanner_(std::move(scanner)),
-      device_checks_(std::move(checks)) {
+      device_checks_(std::move(checks)), routing_(std::move(routing)) {
     if (!persistence_)
         throw std::invalid_argument("Test configuration provider is required");
     state_.operating_mode = OperatingMode::Test;
     state_.capabilities = {false, false, false, false, false, true, false};
     state_.capabilities.beep = state_.capabilities.monitoring = bool(device_checks_);
+    state_.capabilities.real_engine = bool(routing_);
     ConfigurationRecords records;
     const auto result = persistence_->load(records);
     loaded_ = result.ok;
     if (loaded_) {
         state_.endpoints = std::move(records.devices);
         state_.profiles = std::move(records.profiles);
-        for (const auto& device : state_.endpoints)
+        for (const auto& device : state_.endpoints) {
             used_ids_.insert(device.id);
+            if (device.inspection)
+                scanner_devices_.push_back(device);
+        }
         for (const auto& saved : state_.profiles) {
             used_ids_.insert(saved.id);
             for (const auto& hole : saved.holes)
@@ -36,6 +41,7 @@ ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPe
         state_.scanner.available = true;
         (void)scanner_action(ScannerActionRequest{});
     }
+    poll_routing();
 }
 ConfigurationController::~ConfigurationController() = default;
 void ConfigurationController::event(std::string type, std::string detail) {
@@ -124,6 +130,8 @@ std::string ConfigurationController::create_profile(const std::string& title,
                : std::string{};
 }
 Result ConfigurationController::remove_profile(const std::string& id) {
+    if ((routing_active() && state_.active_profile == id) || state_.pending_profile == id)
+        return {false, "Stop routing before deleting the active or pending profile."};
     if (!profile(state_, id))
         return {false, "Profile no longer exists."};
     ConfigurationRecords records{state_.endpoints, state_.profiles};
@@ -131,8 +139,11 @@ Result ConfigurationController::remove_profile(const std::string& id) {
     return commit(std::move(records), "Profile deleted from Test configuration.");
 }
 Result ConfigurationController::save(Profile edited, bool apply) {
-    if (apply)
+    if (apply && !routing_)
         return unavailable("Applying a live routing plan; use Save for configuration-only changes");
+    if (apply && routing_active())
+        return {false,
+                "Stop routing before applying changes. Save can retain edits for the next Start."};
     for (const auto& hole : edited.holes) {
         const auto checked = validate_endpoint_assignments(hole);
         if (!checked.ok)
@@ -144,9 +155,21 @@ Result ConfigurationController::save(Profile edited, bool apply) {
                                     [&](const auto& record) { return record.id == edited.id; });
     if (found == records.profiles.end())
         return {false, "Profile no longer exists."};
+    const auto id = edited.id;
+    if (apply) {
+        auto projected = routing_profile(edited);
+        if (!projected.ok())
+            return {false, routing_issues(projected.issues)};
+        const auto prepared = engine::prepare_profile(*projected.value);
+        if (!prepared.ok())
+            return {false, routing_issues(prepared.issues)};
+        if (prepared.value->routes.empty())
+            return {false, "Enable at least one configured hole before applying routing."};
+    }
     *found = std::move(edited);
-    return commit(std::move(records),
-                  "Profile saved to Test configuration. No engine values were applied.");
+    const auto saved = commit(
+        std::move(records), "Profile saved to Test configuration. No engine values were applied.");
+    return saved.ok && apply ? activate(id) : saved;
 }
 Result ConfigurationController::update_buffer(const std::string& profile_id,
                                               const std::string& hole_id, bool reverse,
@@ -195,13 +218,62 @@ Result ConfigurationController::update_endpoint(const Endpoint& edited) {
     return commit(std::move(records),
                   "Device configuration saved. Hardware availability remains unverified.");
 }
-Result ConfigurationController::activate(const std::string&, bool) {
-    return unavailable("Routing");
+bool ConfigurationController::routing_active() const {
+    return state_.armed || state_.routing_pending || state_.state == State::Stopping;
 }
-Result ConfigurationController::schedule(const std::string&, int) {
-    return unavailable("Scheduled routing");
+Result ConfigurationController::activate(const std::string& id, bool) {
+    if (!routing_)
+        return unavailable("Routing");
+    if (routing_active())
+        return {false, "Stop the current routing session before starting another profile."};
+    if (state_.scanner.busy || (device_checks_ && device_checks_->reading().active))
+        return {false, "Finish the scan or device check before starting routing."};
+    const auto* selected = profile(state_, id);
+    if (!selected)
+        return {false, "Select a saved profile before starting routing."};
+    auto projected = routing_profile(*selected);
+    if (!projected.ok())
+        return {false, routing_issues(projected.issues)};
+    auto prepared = engine::prepare_profile(*projected.value);
+    if (!prepared.ok())
+        return {false, routing_issues(prepared.issues)};
+    if (prepared.value->routes.empty())
+        return {false, "Enable at least one configured hole before starting routing."};
+    const auto generation = routing_->start(std::move(*projected.value), routing_bindings(state_));
+    if (!generation)
+        return {
+            false,
+            "The engine is initializing or still cleaning up. Wait for Stopped, then try again."};
+    routing_generation_ = generation;
+    state_.routing_intent = std::make_shared<const Profile>(*selected);
+    state_.routing_status.reset();
+    state_.routing_admission_issues.clear();
+    state_.paths.clear();
+    state_.active_profile = id;
+    state_.pending_profile.clear();
+    state_.pending_ms = 0;
+    state_.routing_pending = true;
+    state_.state = State::Starting;
+    state_.armed = false;
+    event("routing-requested", "Start requested for " + selected->display_name +
+                                   ". Waiting for engine admission and frame progress.");
+    return {true, "Starting routing. Waiting for confirmed frame progress."};
+}
+Result ConfigurationController::schedule(const std::string& id, int milliseconds) {
+    if (!routing_)
+        return unavailable("Scheduled routing");
+    if (routing_active())
+        return {false, "Stop routing before scheduling another profile."};
+    if (!profile(state_, id) || milliseconds < 0 || milliseconds > 300000)
+        return {false, "Choose a saved profile and a delay between 0 and 300 seconds."};
+    state_.pending_profile = id;
+    state_.pending_ms = milliseconds;
+    ++state_.revision;
+    return {true, "Routing activation scheduled."};
 }
 Result ConfigurationController::start_check(const std::string& id, bool capture) {
+    if (routing_active())
+        return {false, "Stop routing before opening a temporary device check."};
     const auto* target = endpoint(state_, id);
     if (!device_checks_)
         return unavailable("Device checking");
@@ -246,6 +318,10 @@ void ConfigurationController::recover() {
 }
 void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, const std::string& id,
                                    const ScanOptions& options) {
+    if (enabled && routing_active()) {
+        event("scan-failed", "Stop routing before scanning device capabilities.");
+        return;
+    }
     if (enabled && device_checks_ && device_checks_->reading().active) {
         event("scan-failed", "Cancel the active device check before scanning.");
         return;
@@ -286,12 +362,24 @@ void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, con
     }
 }
 void ConfigurationController::stop() {
+    state_.pending_profile.clear();
+    state_.pending_ms = 0;
+    if (routing_) {
+        routing_generation_ = routing_->stop();
+        state_.routing_pending = true;
+        state_.armed = false;
+        state_.state = State::Stopping;
+        event("stop-requested", "Stop requested; waiting for native stream cleanup.");
+    }
     if (device_checks_)
         device_checks_->cancel();
     if (scanner_)
         scan(false);
 }
 Result ConfigurationController::scanner_action(const ScannerActionRequest& request) {
+    if (routing_active() && (request.kind == ScannerActionKind::ClearInventory ||
+                             request.kind == ScannerActionKind::ImportBundle))
+        return {false, "Stop routing before replacing device or profile inventory."};
     if (state_.scanner.busy)
         return {false, "Wait for the current scanner operation or cancel it first."};
     const auto* selected = endpoint(state_, request.logical_id);
@@ -346,7 +434,90 @@ void ConfigurationController::merge_scanner_devices() {
     for (const auto& device : state_.endpoints)
         used_ids_.insert(device.id);
 }
-void ConfigurationController::advance(int) {
+void ConfigurationController::poll_routing() {
+    if (!routing_)
+        return;
+    const auto update = routing_->reading();
+    if (update.revision == routing_revision_)
+        return;
+    routing_revision_ = update.revision;
+    state_.routing_backends = update.backends;
+    state_.capabilities.routing =
+        update.ready && std::any_of(update.backends.begin(), update.backends.end(),
+                                    [](const auto& b) { return b.available; });
+    if (update.generation != routing_generation_ || update.pending)
+        return;
+    const auto previous = state_.state;
+    state_.routing_pending = false;
+    state_.routing_admission_issues = update.admission_issues;
+    if (!update.admission_issues.empty()) {
+        state_.state = State::Failed;
+        state_.armed = false;
+        state_.active_profile.clear();
+        state_.routing_intent.reset();
+        if (previous != State::Failed)
+            event("error", routing_issues(update.admission_issues));
+    } else if (update.state) {
+        const auto& actual = *update.state;
+        state_.routing_status = update.state;
+        state_.state = routing_state(actual.state);
+        state_.armed = actual.armed && state_.state != State::Stopping;
+        state_.paths.clear();
+        for (const auto& p : actual.paths) {
+            PathStatus path;
+            path.hole_id = p.hole_id;
+            path.reverse = p.direction == engine::DirectionId::Reverse;
+            path.state = routing_state(p.state);
+            path.detail = routing_issues(p.issues);
+            if (p.negotiated)
+                path.applied_buffer_ms = p.negotiated->destination.applied_buffer_request_ms;
+            state_.paths.push_back(std::move(path));
+        }
+        if (previous != state_.state) {
+            if (state_.state == State::Stopped)
+                event("stopped", "All routing streams stopped and released.");
+            else if (state_.state == State::Running)
+                event("state", "Routing is running; frame progress confirmed by the engine.");
+            else if (state_.state == State::Failed || state_.state == State::Degraded) {
+                std::string issues;
+                for (const auto& p : actual.paths)
+                    if (!p.issues.empty())
+                        issues += routing_issues(p.issues) + "\n";
+                event("error", issues.empty()
+                                   ? "Routing failed. Stop, inspect the device status, then retry."
+                                   : issues);
+            } else if (state_.state == State::Ready)
+                event("routing-waiting", "Devices are unavailable or ambiguous. Refresh "
+                                         "availability, then Stop and Start again.");
+        }
+    }
+    if (update.state && update.admission_issues.empty()) {
+        const auto now = std::chrono::steady_clock::now();
+        if (!update.state->paths.empty() &&
+            (previous != state_.state || now - last_engine_log_ >= std::chrono::seconds(2))) {
+            last_engine_log_ = now;
+            event("engine-status", routing_diagnostics(*update.state, state_.routing_intent.get()));
+        }
+    }
+    ++state_.revision;
+}
+void ConfigurationController::advance(int milliseconds) {
+    poll_routing();
+    if (!state_.pending_profile.empty() && milliseconds > 0) {
+        ++state_.revision;
+        state_.pending_ms = std::max(0, state_.pending_ms - milliseconds);
+        const auto readiness = routing_->reading();
+        if (!readiness.ready && !readiness.admission_issues.empty()) {
+            state_.pending_profile.clear();
+            state_.pending_ms = 0;
+        } else if (!state_.pending_ms && readiness.ready && !state_.scanner.busy) {
+            const auto id = state_.pending_profile;
+            state_.pending_profile.clear();
+            const auto result = activate(id);
+            if (!result.ok)
+                event("error", result.detail);
+        }
+    }
     if (device_checks_) {
         const auto value = device_checks_->reading();
         const bool changed =

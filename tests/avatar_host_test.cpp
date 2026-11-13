@@ -58,6 +58,29 @@ TEST(AvatarIntegration, AllOwnedPacksLoadAndIdleAnimationAdvances) {
     EXPECT_FALSE(host.enabled());
     EXPECT_FALSE(host.tick(now).image);
 }
+TEST(AvatarIntegration, TutorialExpressionsAnimateAndIntentionalDeadpanIsQuiet) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    p::AvatarHost host(fake_decoder());
+    std::int64_t now = 100;
+    host.select(messages.package("default"), now);
+    wait_for(host, now, "idle");
+    host.tutorial_expression("happy", 1, now);
+    auto frame = wait_for(host, now, "happy", true);
+    ASSERT_GT(frame.frame_count, 1);
+    const auto first = frame.index;
+    bool advanced = false;
+    for (int tick = 0; tick < 80; ++tick)
+        advanced |= host.tick(now += 16).index != first;
+    EXPECT_TRUE(advanced);
+    host.tutorial_expression("deadpan", 2, now);
+    frame = wait_for(host, now, "deadpan", true);
+    EXPECT_EQ(frame.frame_count, 1);
+    EXPECT_TRUE(frame.diagnostics.empty());
+    host.tutorial_expression("thinking", 3, now);
+    frame = wait_for(host, now, "thinking", true);
+    EXPECT_GT(frame.frame_count, 1);
+}
 TEST(AvatarIntegration, UsesSelectedResponseMetadataAndReturnsToCurrentBaseline) {
     p::Messages messages(9);
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());

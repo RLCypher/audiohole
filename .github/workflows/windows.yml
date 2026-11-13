@@ -36,9 +36,9 @@ jobs:
           $configuration = '${{ matrix.configuration }}'
           $configuration = $configuration.Substring(0,1).ToUpperInvariant() + $configuration.Substring(1)
           python scripts/branding/verify_assets.py --executable "build/windows-msvc/bin/$configuration/AudioHole.exe"
-      - name: Test native GUI smoke in fixture, working and Tutorial modes
+      - name: Test native GUI, tutorial, engine and restart smoke
         run: ctest --preset windows-${{ matrix.configuration }} -R '^Gui\.'
-      - name: Test remaining contracts, COM, simulator, and presentation
+      - name: Test engine, scanner, model, COM and presentation contracts
         run: ctest --preset windows-${{ matrix.configuration }} -E '^Gui\.'
       - name: Package only the runtime component
         shell: pwsh

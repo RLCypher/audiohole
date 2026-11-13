@@ -230,7 +230,7 @@ CommandResult ApplicationController::execute(Command command, std::uint64_t id) 
                     cancel_pending("beep.start", "Activation cancelled Test Beep");
                 }
             } else if constexpr (std::is_same_v<T, StopRouting>) {
-                if (!caps.routing) {
+                if (!caps.routing && !caps.real_engine) {
                     response.result.detail = "Routing backend unavailable";
                     return;
                 }
@@ -327,8 +327,9 @@ void ApplicationController::settle(int elapsed_ms) {
         auto result = iterator->result;
         bool complete = false, failed = false, cancelled = false;
         if (result.command == "routing.start" || result.command == "configuration.save") {
-            cancelled = current.active_profile != iterator->target || !current.armed;
             failed = current.state == State::Failed;
+            cancelled = !failed && (current.active_profile != iterator->target ||
+                                    (!current.armed && !current.routing_pending));
             complete = current.state == State::Running || current.state == State::Ready ||
                        current.state == State::Degraded;
         } else if (result.command == "routing.stop")

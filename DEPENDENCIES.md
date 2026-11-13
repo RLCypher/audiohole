@@ -549,3 +549,19 @@ it for this process; no system font installation, runtime network request or new
 runtime library is required. Native appearance additionally uses Windows uxtheme;
 optional dark-mode entry points are version/capability gated and process-local.
 See GUI_REVISION_NOTES.md for limitations and validation requirements.
+
+
+## Owner-authorized engine 0.6 dependency increment
+
+The imported validation engine compiles its native WASAPI/Experimental adapters
+and pinned Miniaudio 0.11.25 adapter behind one standalone module. The Miniaudio
+revision is `9634bedb5b5a2ca38c1ee7108a9358a4e233f14d`, archive SHA-256
+`1a3a79b80fc6f0b0cc155e28b954a598e0ddfa2db64e2afa8466be88c476fa55`.
+Its upstream Unlicense/MIT alternatives are preserved in licenses/miniaudio-LICENSE.txt.
+Only WASAPI is enabled in Miniaudio; decoding, encoding, resource manager, engine
+and node graph are disabled. No new runtime DLL, driver or administrator privilege
+is introduced. The module uses existing nlohmann/json and C++20 thread facilities.
+
+This authorizes the supplied prototype integration, not a permanent backend,
+resampler or synchronization algorithm selection. Parent static-CRT policy is
+preserved. See ENGINE_INTEGRATION.md and engine/handoff/GUI_AGENT_HANDOFF.md.

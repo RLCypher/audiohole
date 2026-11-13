@@ -1,0 +1,20 @@
+Software timing experiment, 950 seconds of virtual time, zero clock mismatch.
+Capture rate and render rate: 48000 Hz. Render requests: 480 frames per 10 ms.
+Not a hardware benchmark, actual audio recording, latency or quality measurement.
+
+Capture packet frames     v0.1 PI underruns     v0.2 candidate PI underruns
+480                       0                     0
+960                       35                    0
+1440                      31666                 0
+1920                      23750                 0
+
+v0.2 final sampled FIFO / actuator command:
+480: 482 source frames, 0 ppm
+960: 722 source frames, -5.713 ppm
+1440: 1442 source frames, +6.533 ppm
+1920: 1202 source frames, -22.130 ppm
+
+The actuator command is not a measured clock mismatch. Capture arrival is bursty
+but the two virtual sample clocks are equal. The new runtime regression also
+checks both prototype controllers across these packet cadences over 120 virtual
+seconds per case. A passing software model is not proof of Corsair hardware fix.

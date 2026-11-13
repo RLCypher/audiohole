@@ -58,9 +58,22 @@ struct Lesson {
         const auto id = sandbox.create_profile("Practice");
         draft = *profile(sandbox.snapshot(), id);
         event("profile_created");
+        EXPECT_EQ(lesson.beat(), "N018A");
+        event("profile_renamed");
+        EXPECT_EQ(lesson.beat(), "N018A"); // Confirming the default is insufficient.
+        draft.display_name = "My practice profile";
+        ASSERT_TRUE(sandbox.save(draft, false).ok);
+        event("profile_renamed");
+        EXPECT_EQ(lesson.beat(), "N018");
         draft.holes.push_back(sandbox.make_hole());
         event("hole_created");
         auto& h = draft.holes[0];
+        EXPECT_EQ(lesson.beat(), "N018B");
+        event("hole_renamed");
+        EXPECT_EQ(lesson.beat(), "N018B");
+        h.display_name = "My two-way connection";
+        event("hole_renamed");
+        EXPECT_EQ(lesson.beat(), "N019");
         h.duplex = true;
         event("return");
         h.forward.source = "tutorial-mic";
@@ -81,13 +94,16 @@ struct Lesson {
     void route() {
         ASSERT_TRUE(sandbox.activate(draft.id).ok);
         event("routing_started");
-        sandbox.advance(20000);
+        sandbox.advance(9999);
+        event("simulated_routing_running");
+        EXPECT_EQ(lesson.beat(), "N027");
+        sandbox.advance(1);
         event("simulated_routing_running");
     }
 };
 TEST(Tutorial, CatalogKeepsExactDialogueBranchesAndNoSpeakerPrefix) {
     auto catalog = nlohmann::json::parse(tutorial_catalog());
-    EXPECT_EQ(catalog.size(), 62u);
+    EXPECT_EQ(catalog.size(), 64u);
     for (const auto& beat : catalog) {
         if (beat.contains("text"))
             EXPECT_FALSE(beat["text"].get<std::string>().starts_with("NORM:"));
@@ -145,7 +161,7 @@ TEST(Tutorial, BothMicrophoneBranchesCompleteWithoutMeasuringAnyAudio) {
         EXPECT_EQ(h.lesson.beat(), "N026");
         ASSERT_TRUE(h.sandbox.activate(h.draft.id).ok);
         h.event("routing_started");
-        h.sandbox.advance(19999);
+        h.sandbox.advance(9999);
         h.event("simulated_routing_running");
         EXPECT_EQ(h.lesson.beat(), "N027");
         h.sandbox.advance(1);
@@ -184,9 +200,9 @@ TEST(Tutorial, ClickOverlayRestoresExactVariantChoicesAndHighlightWithoutProgres
     t.click(1000);
     EXPECT_NE(t.view().text, before.text);
     EXPECT_EQ(t.view().choices[0].id, before.choices[0].id);
-    t.tick(10999);
+    t.tick(6999);
     EXPECT_NE(t.view().text, before.text);
-    t.tick(11000);
+    t.tick(7000);
     EXPECT_EQ(t.view().text, before.text);
     EXPECT_EQ(t.view().expression, before.expression);
     t.click(12000);

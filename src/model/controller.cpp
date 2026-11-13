@@ -679,7 +679,7 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     state_.state = State::Starting;
     state_.paths.clear(); // A newly activated plan owns fresh simulated path lifetimes.
     transition_ms_ =
-        state_.operating_mode == OperatingMode::Tutorial ? 20000 : transition_duration_ms;
+        state_.operating_mode == OperatingMode::Tutorial ? 10000 : transition_duration_ms;
     refresh_paths();
     event("activated", "Activated profile: " + candidate->display_name);
     return result;
@@ -831,7 +831,7 @@ void SimulatedController::advance(int ms) {
         transition_ms_ = std::max(0, transition_ms_ - ms);
         if (state_.operating_mode == OperatingMode::Tutorial &&
             state_.tutorial_activation_percent >= 0 && state_.armed) {
-            state_.tutorial_activation_percent = 100 * (20000 - transition_ms_) / 20000;
+            state_.tutorial_activation_percent = 100 * (10000 - transition_ms_) / 10000;
             ++state_.revision;
             if (before / 1000 != transition_ms_ / 1000)
                 event("tutorial-routing-progress",

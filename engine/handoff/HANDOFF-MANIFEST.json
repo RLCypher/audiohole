@@ -1,0 +1,33 @@
+{
+  "format": "audiohole-engine-handoff",
+  "schema_version": 1,
+  "module_version": "0.6",
+  "readiness": "GUI integration and continued real-hardware validation; not production complete",
+  "source_archive_sha256": "516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e",
+  "validation_archive_sha256": "35093d9a023487651271e0363d288967b827f3ce6acba339d653eab343176ad7",
+  "implementation_files_verified_unchanged": 40,
+  "implementation_changed_since_tested_build": false,
+  "files": {
+    "AudioHole-Engine-Module-0.6-source.zip": "516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e",
+    "AudioHole-Engine-Validation-0.6-windows-x64.zip": "35093d9a023487651271e0363d288967b827f3ce6acba339d653eab343176ad7",
+    "README.md": "9f5315b873cbc7795acbcce59d15524bc9ec2ce271f99ee3aa01486ce42420ab",
+    "references/CHANGES.md": "250dffad89df0ef5a70903d7cd26fdc99fa955a0c6534223a33af6a6e4fb2e9d",
+    "references/GUI_AGENT_HANDOFF.md": "12ddaee1b8380b40f07ee2ffbaeeeaa1b54ed406fa54fe7939a21a317f7e33c1",
+    "references/LIVE_RUN_REVIEW_2026-11-11.md": "b4b5d2ee83b275dcaae75e75758eaf973813259c3d3c49ed805254e2f20a096d",
+    "references/LIVE_RUN_REVIEW_2026-11-11_LAGMETER.md": "6ee8af007395a167830e18eb7d1012d42f5b3f03544c1f80b120a863f354223d",
+    "references/LIVE_RUN_REVIEW_2026-11-11_V02.md": "dc9e8edb90cf2726b4d215b31ffcb320e5d3561e097052dc7cb357daa09411ee",
+    "references/LIVE_RUN_REVIEW_2026-11-11_V03_AB.md": "ceda1e08e8475a5f7c35a855677b5db210f739b086c77b53d870a4bdc1350711",
+    "references/LIVE_RUN_REVIEW_2026-11-11_V04_BACKENDS.md": "ec57fcd58d0329d3270e95318b133539abc069445dfe60039169a4eeb4bec07f",
+    "references/LIVE_RUN_REVIEW_2026-11-11_WIRED_AB.md": "eeb0a46d57c4478ffef3749536449aa88ee27d2af515d24a97bd2bc74ebae07f",
+    "references/LIVE_RUN_REVIEW_2026-11-12_EXCLUSIVE.md": "7322d2b90cab72671e3887f7fdb46ffc83edd05fb002886949ec5462d48b3185",
+    "references/LIVE_RUN_REVIEW_2026-11-12_V051_ACCESS.md": "3a7509c353ac97510c4a065a3c19a8be998760d8cf4060408d5d5cd833fd4e23",
+    "references/LIVE_RUN_REVIEW_2026-11-12_V051_BROWSER.md": "738020350a5b1fbc865f1425b7705209168496d6fba1006a39e84a5a65167648",
+    "references/LIVE_RUN_REVIEW_2026-11-12_V06_WIRELESS.md": "a37541d5dae253d0b859eea6ee0016caa42eeefe95063a0056f1e92812bbb491",
+    "references/LOW_LATENCY_TEST.md": "173537f2176a672d4a9d1be208729f8dcda23ceea932befff767635462e120af",
+    "references/PROFILE_V3_HANDOFF.md": "c3050ab0b66d6be0064f252310070bb93651d2bdf725cb1775b1228443d550bf",
+    "references/README.md": "3bd938168e57e5451e33a367aa266b390e0be339568d78ede2f4dffd867f6650",
+    "references/STARTUP_BUFFER_TEST.md": "3b27fb4ef1bf89f4d0064a66d46908b6d44cdd7df9e93d8fec2c713211c4a43a",
+    "references/STARTUP_PROGRESS_TEST.md": "49db2271c39b1eab4e27ec1fd696b7c677cb442cdb385fcfe19d7ae0a58b924e",
+    "references/VALIDATION.md": "a1cfe01aed8565c733df42531e9a7fd97da97173bd4ffc8f88e9d2796d08517c"
+  }
+}

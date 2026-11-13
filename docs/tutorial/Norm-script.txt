@@ -1,5 +1,5 @@
 AUDIOHOLE — NORM TUTORIAL DIALOGUE
-Version 2.4 — Event-driven sandbox, dialogue UI contract, and microphone test
+Version 2.5 — Event-driven sandbox, dialogue UI contract, and microphone test
 
 PURPOSE
 A guided, completely fictional sandbox exercise. This is the dialogue for the owner's original tutorial workflow, NOT a replacement curriculum. No real devices are scanned, no audio is routed, and no profile/device files are written. The only permitted persistent change is the tutorial-complete flag. All lines appear in the status/personality panel. Settings keeps Personality, Animation, and DFA fields visible but disabled (grayed out), with “(Disabled for tutorial)” appended to their section headers; Replay Tutorial becomes Skip Tutorial.
@@ -7,7 +7,7 @@ A guided, completely fictional sandbox exercise. This is the dialogue for the ow
 FORMAT AND EVENT CONTRACT
 Each beat has an ID, approved expression, activation cue and displayed dialogue. The prefix `NORM:` in this authoring file is a SCRIPT DESIGNATOR ONLY: never render a speaker label, `Norm:`, `NORM:`, or similar prefix in the application's dialogue panel. Display only the dialogue text. Fallback expression: idle.
 
-Every tutorial transition is triggered by a confirmed EVENT, not a dialogue-duration timer: a response-button click, specified GUI navigation/change/save, or a simulated operation's `completed` event. The two deliberate simulated operations have approximately 20-second durations: Deep / Full scan and Start Routing. Their simulation controllers emit completion events after their respective progress sequences. The tutorial state machine subscribes to those events; it does not advance by waiting an arbitrary number of seconds, firing a generic dialogue timeout, or assuming a result. No other progression timers are allowed.
+Every tutorial transition is triggered by a confirmed EVENT, not a dialogue-duration timer: a response-button click, specified GUI navigation/change/save, or a simulated operation's `completed` event. The two deliberate simulated operations have approximately 20-second Deep / Full scan and 10-second Start Routing durations. Their simulation controllers emit completion events after their respective progress sequences. The tutorial state machine subscribes to those events; it does not advance by waiting an arbitrary number of seconds, firing a generic dialogue timeout, or assuming a result. No other progression timers are allowed.
 
 Each narration-only beat has TWO bespoke player-response buttons, vertically stacked directly at the avatar's feet in the status/personality panel, styled like dating-sim dialogue choices. They are distinct full-width options, not side-by-side buttons. Clicking one advances exactly once to the same next beat, selecting the COMPLETE next-beat dialogue variant that incorporates Norm's reaction. No intermediate comeback screen, reaction-only beat, 'Continue' button, or extra click. When the next state requires a GUI action, that action (not a response button) is the progression gate. Keep the existing welcome screen intact.
 
@@ -15,7 +15,7 @@ During Tutorial Mode, the personality/status window is dedicated to Norm's tutor
 
 Highlight the actual directed GUI controls with an AUDIOHOLE PINK rectangular frame, matching the personality/avatar frame's exact border style (color, thickness, corners and visual treatment). Highlights track the target control's geometry and disappear/reposition on step changes. Prefer no overlay that prevents clicking or hides labels. Buttons use the existing application button language but adopt the two vertically stacked dating-sim-choice presentation at the avatar's feet. Disabled tutorial Settings sections: Personality, Animation and DFA stay visible but gray, with `(Disabled for tutorial)` in each section header; Replay Tutorial is replaced by Skip Tutorial.
 
-Clicking Norm is the ONLY tutorial dialogue overlay governed by a timeout: show the selected bespoke click reaction for approximately 10 seconds, then restore the exact previous dialogue, choice buttons, highlighted control and expression without changing tutorial progress. An explicit user action during the overlay should still be handled correctly; dismiss the overlay and resolve the action against the saved current step rather than losing progress. Subsequent clicks can replace the overlay or be subject to a click cooldown; the return interval restarts on a new displayed reaction. Do not use that ten-second timer for tutorial progression.
+Clicking Norm is the ONLY tutorial dialogue overlay governed by a timeout: show the selected bespoke click reaction for approximately 6 seconds, then restore the exact previous dialogue, choice buttons, highlighted control and expression without changing tutorial progress. An explicit user action during the overlay should still be handled correctly; dismiss the overlay and resolve the action against the saved current step rather than losing progress. Subsequent clicks can replace the overlay or be subject to a click cooldown; the return interval restarts on a new displayed reaction. Do not use that six-second timer for tutorial progression.
 
 VOICE
 Norm is a competent, laid-back audio tech who finds the whole business faintly ridiculous. He's conversational, affectionate in his sarcasm, mildly foul-mouthed when it lands, and comfortable with a little innuendo. He is teaching by doing, not dictating an instruction manual. Jokes should be woven into his actual speech, never tacked onto generic documentation. He never mocks the user for being new, and he never implies pretend actions actually accessed hardware.
@@ -148,12 +148,22 @@ N017 [talking]
 Cue: Profiles tab entered; highlight Create Profile.
 NORM: Profiles are just saved setups. One for your headset, one for your desk, one for whatever cursed collection of USB gadgets you're running next Tuesday. Let's make one. Click Create Profile.
 
+N018A [thinking]
+Cue: Profile created. Highlight the new profile with an AudioHole Pink border. Require user to right-click the profile, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
+NORM: Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, 'New Profile (7)' stops being helpful.
+Advancement: Confirmed profile rename. No dialogue buttons.
+
 N018 [mischievous]
-Cue: Profile created; highlight Create Hole.
+Cue: Profile renamed; highlight Create Hole.
 NORM: Excellent. Now the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. Go ahead and create one.
 
+N018B [smug]
+Cue: Hole created. Highlight the new hole with an AudioHole Pink border. Require user to right-click the hole, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
+NORM: Same deal with the hole. Right-click, Rename, give it something descriptive. I know, naming things isn't exactly the exciting part of audio engineering, but a little organization now saves a whole lot of 'what the hell does this one do?' later. Good habits.
+Advancement: Confirmed hole rename. No dialogue buttons.
+
 N019 [talking]
-Cue: Hole created; highlight Enable return channel, require ON.
+Cue: Hole renamed; highlight Enable return channel, require ON.
 NORM: Normally, a hole carries audio from a Source to a Destination. But we want to talk into the mixer AND hear audio coming back. So we're going both ways. Turn on Enable return channel. One hole, two directions. Efficient, really.
 
 N020 [talking]
@@ -292,7 +302,7 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
   Variant A — from N035 / Keep exploring [smug]
   NORM: Knock yourself out. Figuratively. Legal gets upset when I don't specify. Feel free to poke around some more; you can't hurt the real setup from here, and your imaginary devices aren't coming with you. When you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions.
   Variant B — from N035 / Can I break anything? [deadpan]
-  NORM: Not your real setup. The whole sandbox gets swept away when you leave; the tutorial-complete flag is knowledge, minus the garage and new Lamborgini. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions.
+  NORM: Not your real setup. The whole sandbox gets swept away when you leave; all you keep is the know-how. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions.
 
 ======================================================================
 CONDITIONAL / RECOVERY LINES
@@ -350,7 +360,7 @@ NORM: Back for another round? Alright, I'll dust off the imaginary headset. Some
 CLICKING NORM — TUTORIAL-ONLY REACTIONS
 ======================================================================
 
-These are optional, non-progressing reactions when the user clicks Norm's avatar in the status/personality panel. They must not dismiss the current instruction, hide its highlighted target, or count toward any step's completion. Temporarily show a reaction for approximately 10 seconds, then restore the EXACT previously displayed dialogue variant, both choice buttons (if present), highlight and original expression. Rotate responses without immediate repeats; guard against rapid-click spam. Never advance on this timeout. If a real tutorial action occurs, resolve it immediately against the stored current beat and dismiss the overlay.
+These are optional, non-progressing reactions when the user clicks Norm's avatar in the status/personality panel. They must not dismiss the current instruction, hide its highlighted target, or count toward any step's completion. Temporarily show a reaction for approximately 6 seconds, then restore the EXACT previously displayed dialogue variant, both choice buttons (if present), highlight and original expression. Rotate responses without immediate repeats; guard against rapid-click spam. Never advance on this timeout. If a real tutorial action occurs, resolve it immediately against the stored current beat and dismiss the overlay.
 
 C001 [suspicious]
 Cue: Click Norm early in the tutorial.
@@ -394,16 +404,16 @@ IMPLEMENTATION NOTES — NOT SPOKEN
 
 1. Tutorial is a self-contained in-memory sandbox. No production device enumeration, real audio streams, real routing, profile/device file reads or writes, or Windows audio settings changes. Only tutorial-complete flag may persist. Never conflate tutorial with ordinary Preview/Test Mode.
 2. Simulated Deep / Advanced Full scan runs for approximately 20 seconds, with convincing progress bar and CLI-style output. The scan controller emits `scan_completed`; only that event advances N009 → N010. Do not use a UI dialogue timeout for progression.
-3. Simulated Start Routing runs for approximately 20 seconds, with deliberately hammed-up progress animation. On finished simulated Running result, controller emits `simulated_routing_running` to advance N027 → N027B. N027B then waits indefinitely for a response choice (no additional scheduled wait); N027A immediately delivers the comeback and hamming-it-up admission.
+3. Simulated Start Routing runs for approximately 10 seconds without a progress bar, with deliberately hammed-up progress animation. On finished simulated Running result, controller emits `simulated_routing_running` to advance N027 → N027B. N027B then waits indefinitely for a response choice (no additional scheduled wait); N027A immediately delivers the comeback and hamming-it-up admission.
 4. All other progression is event-based: button choice, confirmed tab navigation, required setting change, device rename-and-Save, profile creation, hole creation, endpoint selection, profile Save, and settings navigation. Nothing auto-advances when a line ends or after a generic delay. If a simulated operation fails/cancels, remain appropriately blocked with a retry path, not a fake completion.
 5. The normal system status messages that ordinarily appear in the personality/status window are NOT SHOWN during tutorial. Tutorial dialogue exclusively owns this surface. Diagnostic/progress data can be shown in the relevant scanner/routing panels, but ordinary runtime notifications must not displace or append to tutorial script. After leaving tutorial, restore normal status behavior.
 6. Directed controls use an **AudioHole Pink box** with the exact visual style of the personality frame (border color/weight/radius/glow as applicable). Track target location; do not intercept pointer events. Remove old highlights when the step changes.
 7. Two dialogue choices appear as **two vertically stacked buttons at the avatar's feet** in dating-sim dialogue-option format. They are never horizontal, never a generic Continue, and aren't stand-alone response screens. The selected button's flavor is baked into the next state's COMPLETE dialogue; both choices lead to the same underlying objective unless an explicit exception is authored. The two speech acknowledgments are EXACTLY `I said something` and `Testing 1, 2`.
 8. `NORM:` appears in this script solely as an author's dialogue-field designator. Do NOT render `Norm:`, `NORM:`, or any speaker name prefix. Render only dialogue content, with the approved avatar expression.
-9. Clicking Norm is the ONLY tutorial-dialogue timeout: a tutorial-only quip temporarily overrides the current displayed text for roughly 10 seconds, then restores the exact text variant, buttons, highlight, and expression. Timeout never advances the tutorial. A user step-completion event during the quip must still work.
+9. Clicking Norm is the ONLY tutorial-dialogue timeout: a tutorial-only quip temporarily overrides the current displayed text for roughly 6 seconds, then restores the exact text variant, buttons, highlight, and expression. Timeout never advances the tutorial. A user step-completion event during the quip must still work.
 10. Exact generated CAPTURE endpoints: `MixBoard Input`; `Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device)`. PLAYBACK endpoints: `MixBoard Output`; `Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device)`.
 11. Renames change display names, never underlying endpoint identity. Require TWO distinct devices to be renamed and explicitly saved. Forward Source = FakeTech mic; Forward Destination = MixBoard Output. Return Source = MixBoard Input; Return Destination = FakeTech speakers. Matching must use stable identities, not editable display names.
-12. Require a new profile, new hole, Enable return channel ON, correct four assignments, Forward Prefer exclusive mode ON, successful Save, Start Routing click, user microphone acknowledgement, and Settings visit. Exclusive is a preference, not a guarantee; honor product's actual effective-configuration semantics without silently switching unrelated settings.
+12. Require a new profile with confirmed rename, new hole with confirmed rename, Enable return channel ON, correct four assignments, Forward Prefer exclusive mode ON, successful Save, Start Routing click, user microphone acknowledgement, and Settings visit. Exclusive is a preference, not a guarantee; honor product's actual effective-configuration semantics without silently switching unrelated settings.
 13. Microphone test never accesses a real input or detects speech. N028 holds until user chooses `I said something` or `Testing 1, 2`. Both are acknowledgements, NOT evidence of microphone performance. Keep Norm's joke about hearing oneself while reinforcing real-world verification.
 14. Tutorial Settings keeps Personality, Animation and DFA visible but greyed out; append `(Disabled for tutorial)` to each section header. Replace Replay Tutorial with Skip Tutorial. Normal personality/status messages and controls resume on the next real launch.
 15. Upon required Settings completion, persist only tutorial-complete flag and stay in sandbox for free exploration. Next launch is real mode. Closing early without Skip leaves tutorial incomplete; a confirmed Skip uses explicit skip/completion semantics and exits sandbox without leaking fake data.

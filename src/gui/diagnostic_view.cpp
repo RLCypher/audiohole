@@ -101,10 +101,12 @@ void Frame::refresh_device_checks() {
             widgets->capture ? state.capabilities.monitoring : state.capabilities.beep;
         widgets->action->SetLabel(active ? (widgets->capture ? "Cancel check" : "Cancel beep")
                                          : (widgets->capture ? "Check level" : "Test beep"));
-        widgets->action->Enable(active ||
-                                (supported && device && device->capture == widgets->capture &&
-                                 device->availability == Availability::Available &&
-                                 !state.scanner.busy && !busy));
+        widgets->action->Enable(
+            active ||
+            (supported && device && device->capture == widgets->capture &&
+             device->availability == Availability::Available && !state.scanner.busy && !busy &&
+             (!state.capabilities.real_engine ||
+              (!state.armed && !state.routing_pending && state.state != State::Stopping))));
         widgets->meter->Show(widgets->capture);
         const int peak = active && widgets->capture && state.input_peak
                              ? static_cast<int>(*state.input_peak * 100)

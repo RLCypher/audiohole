@@ -1,4 +1,5 @@
 #pragma once
+#include "audiohole/engine/runtime.hpp"
 #include "model/scanner_types.h"
 #include <cstdint>
 #include <memory>
@@ -112,13 +113,14 @@ struct Event {
     Severity severity = Severity::Info;
 };
 // Read-only view owned by the controller. References/pointers into its vectors
-// must not survive a mutating command. No audio buffers or measured telemetry.
+// must not survive a mutating command. No audio buffers; optional engine
+// observations remain distinct from saved intent and calibrated measurements.
 enum class ScanScope { Update, Full, Selected };
 enum class OperatingMode { Preview, Test, Tutorial };
 // Command availability, never evidence that hardware opened or audio flowed.
 struct BackendCapabilities {
     bool simulated = true, routing = true, scanning = true, beep = true, monitoring = true;
-    bool persistence = false, live_buffer = false;
+    bool persistence = false, live_buffer = false, real_engine = false;
 };
 
 struct Snapshot {
@@ -139,6 +141,13 @@ struct Snapshot {
     std::vector<Event> events;
     std::uint64_t revision = 0;
     ScannerStatus scanner;
+    // Real-engine copied observations; absent in Tutorial and legacy fixtures.
+    // Admission/cleanup are asynchronous and never mean confirmed audio flow.
+    bool routing_pending = false;
+    std::shared_ptr<const engine::RuntimeSnapshot> routing_status;
+    std::shared_ptr<const Profile> routing_intent; // Immutable Start-time labels/assignments.
+    std::vector<engine::BackendDescriptor> routing_backends;
+    std::vector<engine::Issue> routing_admission_issues;
 };
 struct Result {
     bool ok;
@@ -234,8 +243,8 @@ class Controller {
     virtual void stop() = 0;
     // Replaces the pending startup deadline. No OS startup registration occurs.
     virtual Result schedule(const std::string&, int milliseconds) = 0;
-    // Advances deterministic logical time, never wall-clock measurements.
-    // Nonpositive durations are ignored. No sleeping or blocking work occurs.
+    // Fixtures advance logical time; real backends consume queued observations
+    // and startup deadlines. No device APIs, sleeping or native joins run here.
     virtual void advance(int milliseconds) = 0;
     // Edits display name, notes and simulated availability only; identity and
     // windows_name are immutable. Availability changes reevaluate live directions.

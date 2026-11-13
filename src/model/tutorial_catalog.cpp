@@ -237,11 +237,23 @@ std::string_view tutorial_catalog() {
     "choices": [],
     "text": "Profiles are just saved setups. One for your headset, one for your desk, one for whatever cursed collection of USB gadgets you're running next Tuesday. Let's make one. Click Create Profile."
   },
+  "N018A": {
+    "expression": "thinking",
+    "variants": [],
+    "choices": [],
+    "text": "Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, 'New Profile (7)' stops being helpful."
+  },
   "N018": {
     "expression": "mischievous",
     "variants": [],
     "choices": [],
     "text": "Excellent. Now the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. Go ahead and create one."
+  },
+  "N018B": {
+    "expression": "smug",
+    "variants": [],
+    "choices": [],
+    "text": "Same deal with the hole. Right-click, Rename, give it something descriptive. I know, naming things isn't exactly the exciting part of audio engineering, but a little organization now saves a whole lot of 'what the hell does this one do?' later. Good habits."
   },
   "N019": {
     "expression": "talking",
@@ -510,7 +522,7 @@ std::string_view tutorial_catalog() {
         "from": "N035",
         "label": "Can I break anything?",
         "expression": "deadpan",
-        "text": "Not your real setup. The whole sandbox gets swept away when you leave; the tutorial-complete flag is knowledge, minus the garage and new Lamborgini. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions."
+        "text": "Not your real setup. The whole sandbox gets swept away when you leave; all you keep is the know-how. So feel free to poke around some more, and when you're done, exit AudioHole. Next time you fire it up, we do this for real. Try not to be too disappointed when the hardware starts having opinions."
       }
     ],
     "choices": []
@@ -647,7 +659,7 @@ std::string_view tutorial_catalog() {
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(27325);
+        result.reserve(27979);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

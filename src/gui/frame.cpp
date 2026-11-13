@@ -4,6 +4,7 @@
 #include "model/application_controller.h"
 #include "model/configuration_bundle.h"
 #include "model/configuration_controller.h"
+#include "model/routing_service.h"
 #include "presentation/text_layout.h"
 #include <cstdio>
 #include <wx/display.h>
@@ -131,7 +132,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     // Existing commentary remains to the left of the replaceable agent image;
     // animation uses the shared avatar engine; branding stays independent.
     avatar_region_ = new wxPanel(this);
-    avatar_region_->SetMinSize(FromDIP(wxSize(tutorial_ ? 260 : 220, -1)));
+    avatar_region_->SetMinSize(FromDIP(wxSize(tutorial_ ? 260 : 120, -1)));
     avatar_layout_ = new wxBoxSizer(wxVERTICAL);
     avatar_region_->SetSizer(avatar_layout_);
     agent_display_ = new avatar::Panel(avatar_region_);
@@ -139,7 +140,9 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     avatar::initialize_image_decoder();
     avatar_host_ = std::make_unique<presentation::AvatarHost>(avatar::native_decoder());
     agent_display_->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&) { bother(); });
-    avatar_layout_->Add(agent_display_, 1, wxALIGN_CENTER_HORIZONTAL);
+    if (!tutorial_)
+        avatar_top_gap_ = avatar_layout_->AddSpacer(0);
+    avatar_layout_->Add(agent_display_, tutorial_ ? 1 : 0, wxALIGN_CENTER_HORIZONTAL);
     if (tutorial_) {
         tutorial_choices_panel_ = new wxPanel(avatar_region_);
         tutorial_choices_panel_->SetName("Tutorial choices at Norm's feet");
@@ -261,6 +264,9 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
                 (void)controller_->scanner_action(request);
             }
             refresh();
+            if (closing_ && !controller_->snapshot().routing_pending &&
+                controller_->snapshot().state == State::Stopped)
+                finish_exit();
         },
         timer_.GetId());
     Bind(wxEVT_CLOSE_WINDOW, [this](wxCloseEvent& e) {
@@ -403,7 +409,36 @@ int Frame::FilterEvent(wxEvent& event) {
     }
     return wxEventFilter::Event_Skip;
 }
+void Frame::exit() {
+    if (closing_)
+        return;
+    closing_ = true;
+    controller_->stop();
+    end_observation();
+    const auto& state = controller_->snapshot();
+    if (state.capabilities.real_engine &&
+        (state.routing_pending || state.state != State::Stopped)) {
+        start_->Disable();
+        notebook_->Disable();
+        technical_copy_ = "Stopping routing before closing. Waiting for stream cleanup.";
+        commentary_copy_.clear();
+        layout_header();
+        timer_.Start(100);
+        return;
+    }
+    finish_exit();
+}
+void Frame::finish_exit() {
+    timer_.Stop();
+    tuning_timer_.Stop();
+    stop_avatar();
+    if (tray_)
+        tray_->RemoveIcon();
+    Destroy();
+}
 void Frame::request_exit() {
+    if (closing_)
+        return;
     if (tutorial_ && !tutorial_->complete()) {
         tutorial_->remind("B011");
         render_tutorial();
@@ -522,7 +557,13 @@ void Frame::layout_header() {
         item->CalcMin();
         header_height = std::max(header_height, item->GetMinSizeWithBorder().y);
     }
-    agent_display_->fit_height(header_height - 2 * FromDIP(6) - (tutorial_ ? FromDIP(84) : 0));
+    if (tutorial_)
+        agent_display_->fit_height(header_height - 2 * FromDIP(6) - FromDIP(84));
+    else {
+        avatar_top_gap_->SetMinSize(0,
+                                    routing_actions_->GetMinSize().y + 2 * FromDIP(8) - FromDIP(6));
+        agent_display_->fit_height(comment_surface_->GetMinSize().y);
+    }
     // Full-height artwork needs its real proportional width even at minimum
     // size. Increase the minimum instead of clipping or reducing the image.
     auto minimum = FromDIP(wxSize(980, 680));
@@ -657,9 +698,15 @@ void Frame::refresh() {
     if (!tutorial_)
         avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
     const bool preview = s.operating_mode != OperatingMode::Test;
-    start_->Enable(s.capabilities.routing);
+    start_->Enable(s.capabilities.routing &&
+                   (!s.capabilities.real_engine ||
+                    (!s.scanner.busy && !s.monitoring && s.beep_destination.empty())) &&
+                   !s.routing_pending && (!s.armed || s.capabilities.simulated) &&
+                   s.state != State::Stopping);
     stop_->Enable(s.capabilities.routing);
-    profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
+    profile_apply_->Enable(s.capabilities.routing && !viewed_.empty() &&
+                           (s.capabilities.simulated ||
+                            (!s.armed && !s.routing_pending && s.state != State::Stopping)));
     if (!loading_)
         dirty_ = profile_edits_pending();
     profile_save_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
@@ -699,7 +746,9 @@ void Frame::refresh() {
         end_observation();
     }
     const bool scanner_idle = !s.scanner.busy && !s.scanning;
-    scan_start_->Enable(s.capabilities.scanning && scanner_idle);
+    scan_start_->Enable(s.capabilities.scanning && scanner_idle &&
+                        (s.capabilities.simulated ||
+                         (!s.armed && !s.routing_pending && s.state != State::Stopping)));
     const bool selected_device = endpoint(s, device_id_) != nullptr;
     if (!loading_ && selected_device && loaded_device_id_ == device_id_) {
         const auto* selected = endpoint(s, device_id_);
@@ -742,7 +791,8 @@ void Frame::refresh() {
     std::string status =
         (tutorial_ ? std::string("Tutorial Mode | Pretend routing: ") + audiohole::name(s.state)
          : preview ? std::string("Preview Mode | Routing: ") + audiohole::name(s.state)
-                   : std::string("Test Mode | Engine: unavailable")) +
+                   : (s.capabilities.routing ? std::string("Routing: ") + audiohole::name(s.state)
+                                             : std::string("Engine: unavailable"))) +
         "\nActive: " + (active ? active->display_name : "none") +
         "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
     if (!s.pending_profile.empty())
@@ -767,7 +817,7 @@ void Frame::refresh() {
     SetStatusText(text(std::string(tutorial_ ? "AudioHole (Tutorial Mode) | Simulated: "
                                    : preview ? "AudioHole (Preview Mode) | Engine: "
                                              : "AudioHole | Engine: ") +
-                       (preview ? name(s.state) : "unavailable") +
+                       ((preview || s.capabilities.routing) ? name(s.state) : "unavailable") +
                        " | Devices: " + std::to_string(s.endpoints.size()) +
                        " | Profiles: " + std::to_string(s.profiles.size()) +
                        " | Viewed holes: " + std::to_string(holes) +
@@ -777,9 +827,24 @@ void Frame::refresh() {
     for (const auto& p : s.paths)
         paths += p.hole_id + (p.reverse ? " return: " : " forward: ") + audiohole::name(p.state) +
                  " — " + p.detail + "\n";
-    path_status_->SetLabel(text(paths.empty() ? "No active directions." : paths));
-    path_status_->SetToolTip(text(paths));
-    path_status_->Wrap(std::max(80, performance_panel_->GetClientSize().x - FromDIP(20)));
+    if (s.routing_status)
+        paths = routing_diagnostics(*s.routing_status, s.routing_intent.get());
+    if (!s.routing_admission_issues.empty())
+        paths = routing_issues(s.routing_admission_issues);
+    const auto rendered_paths = text(paths.empty() ? "No active directions." : paths);
+    if (path_status_->GetValue() != rendered_paths) {
+        const auto handle = static_cast<HWND>(path_status_->GetHandle());
+        const auto first = SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+        long begin = 0, end = 0;
+        path_status_->GetSelection(&begin, &end);
+        path_status_->Freeze();
+        path_status_->ChangeValue(rendered_paths);
+        const auto length = path_status_->GetLastPosition();
+        path_status_->SetSelection(std::min(begin, length), std::min(end, length));
+        SendMessageW(handle, EM_LINESCROLL, 0,
+                     first - SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+        path_status_->Thaw();
+    }
     refresh_device_checks();
     if (s.scanner.busy && s.scan_percent < 0)
         scan_progress_->Pulse();
@@ -1507,10 +1572,11 @@ bool Frame::smoke(const wxString& directory) {
         }
         {
             auto* settings = notebook_->GetPage(3);
-            auto* appearance = wxWindow::FindWindowByName("Application & Tray settings", settings);
+            auto* appearance =
+                wxWindow::FindWindowByName("Application and Tray settings", settings);
             auto* startup = wxWindow::FindWindowByName("Routing Activation settings", settings);
             auto* personality =
-                wxWindow::FindWindowByName("Personality & animation settings", settings);
+                wxWindow::FindWindowByName("Personality and Animation settings", settings);
             auto* advanced = wxWindow::FindWindowByName("Advanced settings", settings);
             require(appearance && startup && personality && advanced &&
                         theme_choice_->GetParent() == appearance &&
@@ -1520,7 +1586,7 @@ bool Frame::smoke(const wxString& directory) {
                         animation_loops_->GetParent() == personality,
                     "Settings controls escaped their functional groups");
             auto* layout = settings->GetSizer();
-            require(layout->GetItemCount() == 4 && layout->GetItem(std::size_t{0})->IsSizer(),
+            require(layout->GetItemCount() == 3 && layout->GetItem(std::size_t{0})->IsSizer(),
                     "Settings no longer starts with the two-column layout");
             auto* columns =
                 dynamic_cast<wxFlexGridSizer*>(layout->GetItem(std::size_t{0})->GetSizer());
@@ -1528,12 +1594,13 @@ bool Frame::smoke(const wxString& directory) {
                 columns && columns->GetCols() == 2 && columns->GetItemCount() == 2 &&
                     personality->GetContainingSizer() == layout->GetItem(1U)->GetSizer() &&
                     advanced->GetContainingSizer() == layout->GetItem(2U)->GetSizer() &&
-                    layout->GetItem(3U)->GetWindow() ==
-                        wxWindow::FindWindowByName("Restart AudioHole", settings) &&
+                    wxWindow::FindWindowByName("Restart AudioHole", settings)->GetParent() ==
+                        appearance &&
                     wxWindow::FindWindowByLabel("Preview Build environment", settings) == nullptr &&
                     wxWindow::FindWindowByLabel("Preview Mode (load preview profiles and devices)",
                                                 settings) == nullptr,
-                "Settings must contain Personality, Advanced, then standalone Restart without the "
+                "Settings must contain Personality and Advanced, with Restart in Application and "
+                "Tray, without the "
                 "environment panel");
         }
         {
@@ -1962,10 +2029,8 @@ bool Frame::smoke(const wxString& directory) {
                         avatar.GetSize() == previous_avatar_size,
                     "Window resizing reduces the full-height avatar");
             previous_avatar_size = avatar.GetSize();
-            const auto* header = avatar_region_->GetContainingSizer();
-            require(avatar.GetTop() == header->GetPosition().y + FromDIP(6) &&
-                        avatar.GetHeight() == header->GetSize().y - 2 * FromDIP(6),
-                    "Avatar does not fill the header height");
+            require(avatar.GetTop() == card.GetTop() && avatar.GetHeight() == card.GetHeight(),
+                    "Operation-mode avatar does not match the personality frame height");
             require(static_cast<long long>(avatar.GetWidth()) * 768 >=
                         static_cast<long long>(avatar.GetHeight()) * 512,
                     "Avatar width constrains its rendered height");

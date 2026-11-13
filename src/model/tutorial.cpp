@@ -26,6 +26,8 @@ const std::map<std::string, std::vector<std::string>> targets{
     {"N016", {"profiles_tab"}},
     {"N017", {"profile_new"}},
     {"N018", {"hole_new"}},
+    {"N018A", {"profile_list"}},
+    {"N018B", {"hole_list"}},
     {"N019", {"return"}},
     {"N020", {"forward_source"}},
     {"N021", {"forward_destination"}},
@@ -152,7 +154,7 @@ void Tutorial::click(std::int64_t now) {
                                                                : "C001";
     // Contextual first click, then rotate authored general reactions without repeats.
     overlay_ = clicks_++ % 3 == 0 ? context : clicks_ % 3 == 0 ? "C008" : "C009";
-    overlay_until_ = now + 10000;
+    overlay_until_ = now + 6000;
 }
 void Tutorial::tick(std::int64_t now) {
     if (!overlay_.empty() && now >= overlay_until_)
@@ -162,9 +164,10 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
                      int page) {
     // Confirmed user actions dismiss a click quip even when they do not finish
     // the objective. Background progress events must leave its timer intact.
-    for (const auto user_action : {"navigation", "scan_options", "scan_started", "device_edit",
-                                   "device_saved", "profile_created", "hole_created", "return",
-                                   "endpoints", "exclusive", "saved", "routing_started", "stopped"})
+    for (const auto user_action :
+         {"navigation", "scan_options", "scan_started", "device_edit", "device_saved",
+          "profile_created", "hole_created", "profile_renamed", "hole_renamed", "return",
+          "endpoints", "exclusive", "saved", "routing_started", "stopped"})
         if (action == user_action)
             overlay_.clear();
     if (action == "navigation") {
@@ -239,7 +242,15 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
     }
     if (action == "profile_created" && beat_ == "N017" && !draft.id.empty()) {
         profile_id_ = draft.id;
-        enter("N018");
+        initial_profile_name_ = draft.display_name;
+        enter("N018A");
+        return;
+    }
+    if (action == "profile_renamed" && beat_ == "N018A" && draft.id == profile_id_ &&
+        !draft.display_name.empty() && draft.display_name != initial_profile_name_) {
+        const auto* stored = profile(s, profile_id_);
+        if (stored && stored->display_name == draft.display_name)
+            enter("N018");
         return;
     }
     if (hole < 0 || static_cast<std::size_t>(hole) >= draft.holes.size())
@@ -247,11 +258,17 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
     const auto& h = draft.holes[hole];
     if (action == "hole_created" && beat_ == "N018" && draft.id == profile_id_) {
         hole_id_ = h.id;
-        enter("N019");
+        initial_hole_name_ = h.display_name;
+        enter("N018B");
         return;
     }
     if (draft.id != profile_id_ || h.id != hole_id_)
         return;
+    if (action == "hole_renamed" && beat_ == "N018B" && !h.display_name.empty() &&
+        h.display_name != initial_hole_name_) {
+        enter("N019");
+        return;
+    }
     if (action == "return" && beat_ == "N019") {
         if (h.duplex)
             enter("N020");

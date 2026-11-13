@@ -1743,3 +1743,23 @@ coverage. Production audio-engine architecture and profile schema are unchanged.
 Also implement the pending compact diagnostic rows/personality responses, wider
 personality card/actions, centered avatar, larger branding and wrapped status.
 No extra audio diagnostic sessions or playback algorithms are introduced.
+
+
+### Owner-authorized engine 0.6 integration and tutorial corrections
+
+Integrate the supplied, hash-verified module behind ConfigurationController, with
+Runtime on a dedicated application-owned control thread and Low native host
+scheduling. No streaming algorithm is changed or permanently selected. Engine
+projections never become serializers. Exact scanner bindings, schema 3/transfer 7,
+strict requirements, independent direction state and truthful access receipts
+remain authoritative. Stop must finish cleanup before another Start or exit.
+Automatic reconnect/live switching remain unavailable for this prototype; keep
+saved policies but disable those operation-mode controls. See ENGINE_INTEGRATION.md.
+
+Implement the owner's current tutorial/UI list: profile/hole rename gates using
+the supplied dialogue, six-second click overlays, actual emote playback, themed
+choices, ten-second activation without a progress bar, final wording cleanup,
+End tutorial, smaller operation avatar with wider frame, Settings group names
+and relocated Restart. Use inherited process-handle restart coordination.
+Intentional static deadpan is not an unapproved animation; approved-asset failures
+still retain normal integrity/diagnostic behavior.

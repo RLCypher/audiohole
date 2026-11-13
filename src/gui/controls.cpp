@@ -470,6 +470,10 @@ wxString button_help(const wxString& title) {
          "Cancel the startup countdown and disarm pending activation."},
         {"Replay Tutorial", "Restart the welcome/tutorial after confirmation; your "
                             "saved configuration is preserved."},
+        {"Skip Tutorial", "Skip the remaining lesson and close AudioHole after confirmation. "
+                          "Next launch opens your saved working environment."},
+        {"End tutorial",
+         "Close the fictional tutorial. Next launch opens your saved working environment."},
         {"DFA", "Working as intended."},
         {"Test beep", "Test only the explicitly selected playback destination. Cancel stops the "
                       "test immediately."},

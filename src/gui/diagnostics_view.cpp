@@ -6,12 +6,14 @@
 
 namespace audiohole::gui {
 namespace {
-wxString diagnostic_provenance(OperatingMode mode) {
-    if (mode == OperatingMode::Tutorial)
+wxString diagnostic_provenance(const Snapshot& state) {
+    if (state.operating_mode == OperatingMode::Tutorial)
         return wxS(
             "AudioHole Tutorial — fictional devices and simulated operations; no real audio.\n\n");
-    if (mode == OperatingMode::Preview)
+    if (state.operating_mode == OperatingMode::Preview)
         return wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n");
+    if (state.capabilities.real_engine)
+        return wxS("AudioHole — real scanner and engine observations.\n\n");
     return wxS("AudioHole Test Mode — real scanner evidence; no routing/playback backend.\n\n");
 }
 } // namespace
@@ -61,7 +63,7 @@ void Frame::build_scan() {
     scan_scope_ = choices(page, options, "Scope", {"Update (new devices)", "Full scan"});
     scan_mode_->SetToolTip(
         "Basic reads Windows-reported capabilities without experimental streams. Deep adds bounded "
-        "stream tests with explicit consent. Preview simulates both.");
+        "stream tests with explicit consent. Tutorial simulates both.");
     scan_scope_->SetToolTip(
         "Update tests only newly discovered devices and refreshes known metadata. Full retests "
         "all. Per-device scans are available by right-clicking a device on Devices.");
@@ -216,7 +218,7 @@ void Frame::build_scan() {
         // wxClipboard owns the supplied data object. Close on either SetData
         // outcome; never announce success when the clipboard rejects the data.
         const bool copied = wxTheClipboard->SetData(new wxTextDataObject(
-            diagnostic_provenance(controller_->snapshot().operating_mode) + console_->GetValue()));
+            diagnostic_provenance(controller_->snapshot()) + console_->GetValue()));
         wxTheClipboard->Close();
         if (copied)
             present(presentation::Message::DiagnosticsCopied);
@@ -407,8 +409,7 @@ void Frame::export_log() {
     // simulator provenance after it leaves the context of the startup notice.
     wxFFile output(dialog.GetPath(), "wb");
     if (!output.IsOpened() ||
-        !output.Write(diagnostic_provenance(controller_->snapshot().operating_mode) +
-                          console_->GetValue(),
+        !output.Write(diagnostic_provenance(controller_->snapshot()) + console_->GetValue(),
                       wxConvUTF8) ||
         !output.Close())
         show_result({false, "Could not write diagnostics to the selected file. Check permissions "

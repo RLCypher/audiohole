@@ -1,0 +1,353 @@
+#include "model/routing_service.h"
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <thread>
+
+namespace audiohole {
+namespace {
+using Json = nlohmann::json;
+const char* issue_code(engine::ErrorCode code) {
+    switch (code) {
+    case engine::ErrorCode::InvalidDocument:
+        return "InvalidDocument";
+    case engine::ErrorCode::UnsupportedVersion:
+        return "UnsupportedVersion";
+    case engine::ErrorCode::InvalidConfiguration:
+        return "InvalidConfiguration";
+    case engine::ErrorCode::UnsupportedBackend:
+        return "UnsupportedBackend";
+    case engine::ErrorCode::BackendUnavailable:
+        return "BackendUnavailable";
+    case engine::ErrorCode::UnsupportedRequirement:
+        return "UnsupportedRequirement";
+    case engine::ErrorCode::UnresolvedEndpoint:
+        return "UnresolvedEndpoint";
+    case engine::ErrorCode::AmbiguousEndpoint:
+        return "AmbiguousEndpoint";
+    case engine::ErrorCode::UnavailableEndpoint:
+        return "UnavailableEndpoint";
+    case engine::ErrorCode::DirectionMismatch:
+        return "DirectionMismatch";
+    case engine::ErrorCode::ResourceConflict:
+        return "ResourceConflict";
+    case engine::ErrorCode::Busy:
+        return "Busy";
+    case engine::ErrorCode::Cancelled:
+        return "Cancelled";
+    case engine::ErrorCode::BackendFailure:
+        return "BackendFailure";
+    case engine::ErrorCode::ContractViolation:
+        return "ContractViolation";
+    }
+    return "UnknownIssue";
+}
+Json preferences_json(const EndpointPreferences& p) {
+    Json out = Json::object();
+    if (p.sample_rate_hz)
+        out["sample_rate_hz"] = *p.sample_rate_hz;
+    if (p.channel_count)
+        out["channel_count"] = *p.channel_count;
+    if (p.sample_format)
+        out["sample_format"] = *p.sample_format;
+    if (p.mode)
+        out["mode"] = *p.mode;
+    if (p.buffer_ms)
+        out["buffer_ms"] = *p.buffer_ms;
+    return out;
+}
+Json direction_json(const Direction& d) {
+    const auto& p = d.settings.preferences;
+    auto map = Json::array();
+    for (const auto& channel : p.channel_map)
+        map.push_back({{"source", channel.source}, {"destination", channel.destination}});
+    return {{"source", d.source},
+            {"destination", d.destination},
+            {"source_name", d.source_name},
+            {"destination_name", d.destination_name},
+            {"advanced_tuning", d.advanced_tuning},
+            {"exclusive_mode_preferred", d.exclusive_mode_preferred},
+            {"settings",
+             {{"preferences",
+               {{"common", preferences_json(p.common)},
+                {"source", preferences_json(p.source)},
+                {"destination", preferences_json(p.destination)},
+                {"channel_map", map},
+                {"preferred_clock_device", p.preferred_clock_device}}}}}};
+}
+class Service final : public RoutingService {
+  public:
+    explicit Service(RuntimeFactory factory)
+        : worker_(
+              [this, factory = std::move(factory)](std::stop_token stop) { run(stop, factory); }) {}
+    ~Service() override {
+        worker_.request_stop();
+        wake_.notify_all();
+        // The GUI's asynchronous exit gate waits for engine Stopped before
+        // destroying this owner. Tests also release all native/fake sessions.
+        worker_.join();
+    }
+    std::uint64_t start(engine::Profile profile, engine::BindingSnapshot bindings) override {
+        std::lock_guard lock(mutex_);
+        if (!reading_.ready || reading_.pending ||
+            (reading_.state &&
+             (reading_.state->armed || reading_.state->state == engine::State::Stopping)))
+            return 0;
+        const auto generation = ++reading_.generation;
+        reading_.pending = true;
+        reading_.admission_issues.clear();
+        command_ = Command{generation, false, std::move(profile), std::move(bindings)};
+        wake_.notify_all();
+        return generation;
+    }
+    std::uint64_t stop() override {
+        std::lock_guard lock(mutex_);
+        const auto generation = ++reading_.generation;
+        if (!reading_.ready) {
+            reading_.pending = false;
+            reading_.admission_issues.clear();
+            command_.reset();
+            reading_.state = std::make_shared<const engine::RuntimeSnapshot>();
+            ++reading_.revision;
+            return generation;
+        }
+        reading_.pending = true;
+        command_ = Command{generation, true, {}, {}};
+        wake_.notify_all();
+        return generation;
+    }
+    RoutingReading reading() const override {
+        std::lock_guard lock(mutex_);
+        return reading_;
+    }
+
+  private:
+    struct Command {
+        std::uint64_t generation;
+        bool stop;
+        engine::Profile profile;
+        engine::BindingSnapshot bindings;
+    };
+    mutable std::mutex mutex_;
+    std::condition_variable wake_;
+    RoutingReading reading_;
+    std::optional<Command> command_;
+    std::jthread worker_; // Last member: every referenced field is initialized first.
+    void run(std::stop_token stop, const RuntimeFactory& factory) noexcept {
+        try {
+            auto runtime = factory();
+            if (!runtime)
+                throw std::runtime_error("Engine factory returned no runtime.");
+            {
+                std::lock_guard lock(mutex_);
+                reading_.backends = runtime->backends();
+                reading_.state =
+                    std::make_shared<const engine::RuntimeSnapshot>(runtime->snapshot());
+                reading_.ready = true;
+                ++reading_.revision;
+            }
+            std::uint64_t generation = 0;
+            while (!stop.stop_requested()) {
+                std::optional<Command> command;
+                {
+                    std::unique_lock lock(mutex_);
+                    wake_.wait_for(lock, std::chrono::milliseconds(50),
+                                   [&] { return command_.has_value() || stop.stop_requested(); });
+                    command.swap(command_);
+                }
+                if (stop.stop_requested())
+                    break;
+                std::vector<engine::Issue> issues;
+                if (command) {
+                    generation = command->generation;
+                    if (command->stop)
+                        runtime->stop();
+                    else {
+                        auto accepted = runtime->start(command->profile, command->bindings);
+                        if (!accepted.ok())
+                            issues = std::move(accepted.issues);
+                    }
+                }
+                auto state = std::make_shared<const engine::RuntimeSnapshot>(runtime->snapshot());
+                std::lock_guard lock(mutex_);
+                if (generation != reading_.generation)
+                    continue;
+                reading_.state = std::move(state);
+                if (command) {
+                    reading_.admission_issues = std::move(issues);
+                    reading_.pending = false;
+                }
+                ++reading_.revision;
+            }
+            runtime->stop();
+            // Destruction and all potentially blocking driver joins stay on
+            // this control thread; no detached ownership or forced termination.
+        } catch (const std::exception& error) {
+            std::lock_guard lock(mutex_);
+            reading_.ready = false;
+            reading_.pending = false;
+            reading_.admission_issues = {
+                {engine::ErrorCode::BackendFailure, "engine", error.what()}};
+            ++reading_.revision;
+        }
+    }
+};
+} // namespace
+std::unique_ptr<RoutingService> make_routing_service(RuntimeFactory factory) {
+    if (!factory)
+        factory = [] { return std::make_unique<engine::Runtime>(engine::LatencyPreset::Low); };
+    return std::make_unique<Service>(std::move(factory));
+}
+engine::Result<engine::Profile> routing_profile(const Profile& p) {
+    auto holes = Json::array();
+    for (const auto& h : p.holes)
+        holes.push_back({{"id", h.id},
+                         {"display_name", h.display_name},
+                         {"notes", h.notes},
+                         {"enabled", h.enabled},
+                         {"duplex", h.duplex},
+                         {"routing", h.routing_engine},
+                         {"forward", direction_json(h.forward)},
+                         {"reverse", direction_json(h.reverse)}});
+    // A transient operational projection only. Existing persistence retains
+    // original JSON/unknown fields and is never rewritten from this value.
+    return engine::parse_profile(Json{
+        {"format", "audiohole-profile"},
+        {"schema_version", 3},
+        {"profile",
+         {{"id", p.id}, {"display_name", p.display_name}, {"notes", p.notes}, {"holes", holes}}}}
+                                     .dump());
+}
+engine::BindingSnapshot routing_bindings(const Snapshot& s) {
+    engine::BindingSnapshot out;
+    out.revision = s.scanner.inventory_revision;
+    for (const auto& device : s.endpoints) {
+        engine::LocalBinding binding;
+        binding.logical_id = device.id;
+        binding.direction =
+            device.capture ? engine::EndpointDirection::Capture : engine::EndpointDirection::Render;
+        binding.state =
+            device.availability == Availability::Ambiguous     ? engine::BindingState::Ambiguous
+            : device.availability == Availability::Available   ? engine::BindingState::Available
+            : device.availability == Availability::Unavailable ? engine::BindingState::Unavailable
+                                                               : engine::BindingState::Unknown;
+        if (device.inspection)
+            binding.endpoint_id = device.inspection->diagnostic_endpoint_id;
+        if (binding.endpoint_id.empty() && binding.state == engine::BindingState::Available)
+            binding.state = engine::BindingState::Unknown;
+        out.endpoints.push_back(std::move(binding));
+    }
+    return out;
+}
+State routing_state(engine::State state) {
+    switch (state) {
+    case engine::State::Stopped:
+        return State::Stopped;
+    case engine::State::Ready:
+        return State::Ready;
+    case engine::State::Starting:
+        return State::Starting;
+    case engine::State::Running:
+        return State::Running;
+    case engine::State::Degraded:
+        return State::Degraded;
+    case engine::State::Recovering:
+        return State::Recovering;
+    case engine::State::Failed:
+        return State::Failed;
+    case engine::State::Stopping:
+        return State::Stopping;
+    }
+    return State::Failed;
+}
+std::string routing_issues(const std::vector<engine::Issue>& issues) {
+    std::string out;
+    for (const auto& issue : issues) {
+        if (!out.empty())
+            out += "\n";
+        out +=
+            "[" + std::string(issue_code(issue.code)) + "] " + issue.location + ": " + issue.detail;
+        if (!issue.native_code.empty())
+            out += " [" + issue.native_code + "]";
+    }
+    return out;
+}
+std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Profile* profile) {
+    std::ostringstream out;
+    out << "Engine 0.6 | Native scheduling preset: Low (host policy)\n";
+    auto format = [](const engine::StreamFormat& f) {
+        return std::to_string(f.sample_rate_hz) + " Hz / " + std::to_string(f.channel_count) +
+               " ch / " + engine::name(f.sample_format);
+    };
+    for (const auto& path : state.paths) {
+        std::string title = path.hole_id;
+        if (profile)
+            for (const auto& hole : profile->holes)
+                if (hole.id == path.hole_id)
+                    title = hole.display_name;
+        out << title
+            << (path.direction == engine::DirectionId::Reverse ? " / Return: " : " / Forward: ")
+            << engine::name(path.state) << '\n';
+        if (path.negotiated) {
+            const auto& n = *path.negotiated;
+            out << "Engine: " << engine::name(n.backend) << " | " << n.selection_reason << '\n';
+            auto stream = [&](const char* label, const engine::StreamConfiguration& s) {
+                out << label << ": " << format(s.client_format) << " | " << engine::name(s.mode)
+                    << " | Policy: " << engine::name(s.access_policy);
+                out << " | Requested: "
+                    << (s.requested_mode ? engine::name(*s.requested_mode) : "Automatic")
+                    << " | Exclusive preferred: " << (s.exclusive_mode_preferred ? "yes" : "no");
+                if (s.allocated_buffer_frames)
+                    out << " | Allocated buffer: " << *s.allocated_buffer_frames << " frames";
+                if (s.period_frames)
+                    out << " | Period: " << *s.period_frames << " frames";
+                if (s.applied_buffer_request_ms)
+                    out << " | Applied request: " << *s.applied_buffer_request_ms << " ms";
+                if (s.access_fell_back)
+                    out << " | Preferred Exclusive fell back to Shared";
+                out << '\n';
+                for (const auto& attempt : s.access_attempts) {
+                    out << "  " << engine::name(attempt.mode) << ": "
+                        << (attempt.succeeded ? "accepted" : "refused")
+                        << (attempt.native_open_attempted ? " (native open attempted)"
+                                                          : " (ownership check; no native open)")
+                        << '\n';
+                    if (!attempt.issues.empty())
+                        out << "  " << routing_issues(attempt.issues) << '\n';
+                }
+            };
+            stream("Capture", n.source);
+            stream("Playback", n.destination);
+            out << "Processing: " << n.processing << " | Synchronization: " << n.synchronization
+                << '\n';
+        }
+        const auto& o = path.observation;
+        auto counter = [&](const char* label, const auto& value) {
+            if (value)
+                out << label << ": " << *value << " | ";
+        };
+        counter("Captured frames", o.captured_frames);
+        counter("Rendered frames", o.rendered_frames);
+        counter("Transferred frames", o.transferred_frames);
+        counter("FIFO queued frames", o.queued_frames);
+        counter("Native capture wakes", o.native_capture_wakes);
+        counter("Native render wakes", o.native_render_wakes);
+        counter("Native wait timeouts", o.native_wait_timeouts);
+        counter("Capture waits", o.render_capture_waits);
+        counter("Capture wait timeouts", o.render_capture_wait_timeouts);
+        counter("Underruns", o.underruns);
+        counter("Overruns", o.overruns);
+        counter("Correction ppm", o.correction_ppm);
+        counter("Progress age (ms)", path.progress_age_ms);
+        out << '\n';
+        if (!path.issues.empty())
+            out << routing_issues(path.issues) << '\n';
+        if (!o.issues.empty())
+            out << routing_issues(o.issues) << '\n';
+        out << '\n';
+    }
+    return out.str();
+}
+} // namespace audiohole

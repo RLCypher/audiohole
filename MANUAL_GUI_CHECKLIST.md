@@ -713,10 +713,10 @@ portable or cross-build success.
   response variant. Check exact microphone choices, two distinct explicit rename
   saves, four exact logical assignments despite renamed labels, Return enabled,
   Forward exclusive preference only, Save, Start and Settings acknowledgement.
-- The pretend Deep/Full scan and routing activation each run about 20 seconds.
+- The pretend Deep/Full scan runs about 20 seconds; routing activation runs 10 seconds without a progress bar.
   Cancel, retry, change tabs and click Norm while pending: no false completion.
   Dialogue waits for controller completion events and never times out to a new beat.
-- Click Norm on a narration beat and an action beat. After about 10 seconds the
+- Click Norm on a narration beat and an action beat. After about 6 seconds the
   exact previous variant/choices/target/expression return. Click a reply or finish
   the required action during the overlay: it still works once. F1 repeats guidance.
 - Highlights match the pink frame, follow scrolling/resizing, remain click-through
@@ -736,3 +736,39 @@ portable or cross-build success.
   responses in both hole cards and Devices, and visible asynchronous check errors.
 - Run all three native GUI smoke modes before package publication. Tutorial smoke
   is a complete actual-control walkthrough, not a nonempty-widget traversal.
+
+
+### Engine integration and current tutorial polish
+
+- Walk N018A/N018B through right-click Rename. Cancel and unchanged names must
+  not advance. Valid non-default names, including trimmed surrounding spaces,
+  must advance after confirmation; no response buttons appear for these steps.
+- Check all tutorial choices in Dark, Light and Follow System, including new
+  choices after a phase transition and hover/pressed/focus states. Verify actual
+  emote animation during dialogue and static deadpan without false approval logs.
+- Complete the tutorial: End tutorial replaces Skip, final dialogue has no
+  implementation-flag wording, and exiting preserves the completion marker.
+- Replay/restart during a real session: native streams must reach Stopped before
+  the old window closes and the next instance opens. No path-alias or PID-reuse
+  assumptions belong to the handshake. Repeat from paths with spaces/Unicode.
+- In operation mode, avatar height/top align with the personality frame; the
+  wider frame/action row use the freed space. Tutorial retains its larger layout.
+  Review at 100–200% DPI, especially fractional scales.
+- Settings: Application and Tray contains Restart; Personality and Animation is
+  immediately above Advanced. Unsupported automatic reconnect/live-switch
+  policies are disabled for engine 0.6 with explanatory help, preserving settings.
+- Real hardware: start a saved schema-3 profile with exact scanner bindings;
+  confirm Starting, then actual per-path Running/Degraded/Failed/Ready. Check
+  source/playback formats, modes, allocated frames, access attempts and frame
+  progress. No latency/CPU value may be invented. Repeat the handoff Low profile.
+- Test strict Exclusive refusal versus unforced preferred Shared fallback. Keep
+  the refusal receipt visible after successful fallback; healthy siblings continue.
+- Stop during startup and flowing audio. Another Start/profile Apply must be
+  blocked until confirmed cleanup. Save preserves edits for next Start without
+  changing the live copied assignments. Device checks/Deep scanning are blocked
+  while routing. Hiding the GUI keeps deliberate routing alive; Exit stops it.
+- Native MSVC Debug/Release CI must run all Gui.* checks, including EngineSmoke
+  (real Runtime/software adapters) and RestartSmoke (actual child process), plus
+  the four imported engine suites and controller contracts. Extracted-package
+  validation runs the four direct modes and audits Miniaudio's license/runtime.
+  Wine and cross-builds are supplemental, not native/hardware confirmation.

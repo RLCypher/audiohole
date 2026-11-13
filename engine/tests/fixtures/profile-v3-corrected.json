@@ -1,0 +1,89 @@
+{
+  "format": "audiohole-profile",
+  "schema_version": 3,
+  "profile": {
+    "display_name": "Wasapi Exclusive Test +Bogus Duplex",
+    "notes": "This is a test profile of a new profile .json schema with expanded capabilities and mindfulness of potential future development. Some currently-unused features are enabled to generate an example data set.",
+    "id": "profile-6",
+    "holes": [
+      {
+        "display_name": "Wasapi Exclusive Tester",
+        "notes": "",
+        "id": "hole-7",
+        "routing": "automatic",
+        "enabled": true,
+        "duplex": true,
+        "forward": {
+          "advanced_tuning": true,
+          "exclusive_mode_preferred": true,
+          "source_name": "RCP2 Chat",
+          "source": "capture-e54e368e5d36f96fb9977e4e9e18ca4e",
+          "destination_name": "Front Audio Port",
+          "destination": "render-3ebb8d7988f952ba756b87367def0660",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "channel_map": [],
+              "preferred_clock_device": "capture"
+            }
+          }
+        },
+        "reverse": {
+          "advanced_tuning": false,
+          "exclusive_mode_preferred": true,
+          "source_name": "RCP2 Main",
+          "source": "capture-bbe843a3366d74575eafd8563f860a43",
+          "destination_name": "RCP2 VirtA",
+          "destination": "render-a1e7a0aed968f33642393af1ff78ea99",
+          "settings": {
+            "preferences": {
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null
+              },
+              "channel_map": [],
+              "preferred_clock_device": "automatic"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

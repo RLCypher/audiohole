@@ -60,8 +60,7 @@ It's easier than it looks. Usually.)");
             option.first == wxID_YES ? "Learn with Norm in a fictional tutorial. Your real devices "
                                        "and profiles stay untouched."
             : option.first == wxID_NO
-                ? "Open your saved Test environment with real device scanning. Routing/playback "
-                  "are not available in this build."
+                ? "Open your saved working environment with real device scanning and audio routing."
                 : "Close AudioHole without starting a session.");
         actions->Add(button, 0, wxALL, FromDIP(5));
         button->Bind(wxEVT_BUTTON, [this, id = option.first](wxCommandEvent&) { EndModal(id); });
