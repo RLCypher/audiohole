@@ -42,7 +42,7 @@ for beat_id, entry in beats.items():
         if variant['from'] not in beats or variant['label'] not in beats[variant['from']]['choices']:
             raise SystemExit(f"Invalid incoming choice for {beat_id}: {variant['from']} / {variant['label']}")
 out = json.dumps(beats, ensure_ascii=False, indent=2)
-# Keep the six lesson phases, recovery lines and click reactions independent.
+# Keep lesson phases, working greetings, recovery lines and click reactions independent.
 # MSVC C2026 limits each literal to 16,380 characters. A conservative UTF-8
 # byte budget also guards multibyte dialogue; never concatenate literals at
 # compile time. A phase that outgrows the budget fails with its name.

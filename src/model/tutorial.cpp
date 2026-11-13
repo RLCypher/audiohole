@@ -21,13 +21,9 @@ const std::map<std::string, std::vector<std::string>> targets{
     {"N007", {"scan_level", "scan_scope"}},
     {"N008", {"scan_start"}},
     {"N011", {"devices_tab"}},
-    {"N014", {"device_name"}},
-    {"N015", {"device_name", "device_save"}},
     {"N016", {"profiles_tab"}},
     {"N017", {"profile_new"}},
     {"N018", {"hole_new"}},
-    {"N018A", {"profile_list"}},
-    {"N018B", {"hole_list"}},
     {"N019", {"return"}},
     {"N020", {"forward_source"}},
     {"N021", {"forward_destination"}},
@@ -73,7 +69,7 @@ void Tutorial::enter(const std::string& beat) {
     reminder_.clear();
     overlay_.clear();
 }
-TutorialView Tutorial::view() const {
+TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty) const {
     TutorialView out;
     out.beat = beat_;
     out.complete = complete_;
@@ -102,11 +98,34 @@ TutorialView Tutorial::view() const {
             {beat_ + "/" + std::to_string(i), beat["choices"][i].get<std::string>()});
     if (const auto found = targets.find(beat_); found != targets.end())
         out.targets = found->second;
-    if (beat_ == "N014" || beat_ == "N015")
+    if (beat_ == "N014" || beat_ == "N015") {
+        if ((selected_device == "tutorial-mic" || selected_device == "tutorial-speakers") &&
+            !renamed_.contains(std::string(selected_device))) {
+            out.targets.push_back("device_name");
+            if (device_dirty)
+                out.targets.push_back("device_save");
+        }
         for (const auto* id : {"tutorial-mic", "tutorial-speakers"})
             if (!renamed_.contains(id))
                 out.targets.push_back(std::string("device:") + id);
+    }
+    if (beat_ == "N018A")
+        out.targets.push_back("profile:" + profile_id_);
+    if (beat_ == "N018B")
+        out.targets.push_back("hole:" + hole_id_);
     return out;
+}
+std::optional<OnboardingGreeting> onboarding_greeting(OnboardingOutcome outcome,
+                                                      std::string_view personality) {
+    const char* key = outcome == OnboardingOutcome::Completed && personality == "default" ? "N037"
+                      : outcome == OnboardingOutcome::Skipped && personality == "default" ? "N037A"
+                      : outcome == OnboardingOutcome::Skipped && personality == "uwu"     ? "N037B"
+                                                                                          : nullptr;
+    if (!key)
+        return {};
+    const auto& entry = catalog().at(key);
+    return OnboardingGreeting{entry.at("text").get<std::string>(),
+                              entry.at("expression").get<std::string>()};
 }
 bool Tutorial::choose(const std::string& id) {
     const auto current = view();

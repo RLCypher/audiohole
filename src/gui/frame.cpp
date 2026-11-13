@@ -47,7 +47,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* header = new wxBoxSizer(wxHORIZONTAL);
     auto* information = new wxBoxSizer(wxVERTICAL);
-    information->SetMinSize(FromDIP(wxSize(320, -1)));
+    information->SetMinSize(FromDIP(wxSize(tutorial_ ? 320 : 280, -1)));
     header->Add(information, 0, wxEXPAND | wxALL, FromDIP(10));
     auto* brand_row = new wxBoxSizer(wxHORIZONTAL);
     auto* brand_logo = new AgentDisplay(this, wxSize(80, 80));
@@ -83,7 +83,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     // Reserve wrapped lines for routing, profiles, startup, advisory and scan.
     status_ = new wxStaticText(this, wxID_ANY, "Routing: Stopped", wxDefaultPosition, wxDefaultSize,
                                wxST_NO_AUTORESIZE);
-    status_->SetMinSize(wxSize(0, status_->GetCharHeight() * 9));
+    status_->SetMinSize(wxSize(0, status_->GetCharHeight() * (tutorial_ ? 9 : 5)));
     status_row->Add(status_, 1, wxEXPAND | wxALL, FromDIP(4));
     information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* middle = new wxBoxSizer(wxVERTICAL);
@@ -111,7 +111,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* comment_surface = new SurfacePanel(this, "commentary-card");
     comment_surface_ = comment_surface;
     comment_surface->SetMinSize(wxSize(actions->GetMinSize().x, FromDIP(156)));
-    middle->Add(comment_surface, 0, wxEXPAND | wxTOP, FromDIP(8));
+    middle->Add(comment_surface, tutorial_ ? 0 : 1, wxEXPAND | wxTOP, FromDIP(8));
     auto* comment_layout = new wxBoxSizer(wxVERTICAL);
     personality_heading_ = new wxStaticText(comment_surface, wxID_ANY, "Norm", wxDefaultPosition,
                                             wxDefaultSize, wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
@@ -140,9 +140,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     avatar::initialize_image_decoder();
     avatar_host_ = std::make_unique<presentation::AvatarHost>(avatar::native_decoder());
     agent_display_->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&) { bother(); });
-    if (!tutorial_)
-        avatar_top_gap_ = avatar_layout_->AddSpacer(0);
-    avatar_layout_->Add(agent_display_, tutorial_ ? 1 : 0, wxALIGN_CENTER_HORIZONTAL);
+    avatar_layout_->Add(agent_display_, 1, wxALIGN_CENTER_HORIZONTAL);
     if (tutorial_) {
         tutorial_choices_panel_ = new wxPanel(avatar_region_);
         tutorial_choices_panel_->SetName("Tutorial choices at Norm's feet");
@@ -339,8 +337,10 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
             avatar_timer_.Start(16);
-        } else
+        } else {
             avatar_timer_.Stop();
+            tutorial_scroll_duration_ = 0;
+        }
         event.Skip();
     });
     Bind(wxEVT_ICONIZE, [this](wxIconizeEvent& event) {
@@ -348,8 +348,10 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
             avatar_timer_.Start(16);
-        } else
+        } else {
             avatar_timer_.Stop();
+            tutorial_scroll_duration_ = 0;
+        }
         event.Skip();
     });
     // Prefer a square initial window when the fixed header and monitor permit
@@ -377,6 +379,12 @@ int Frame::FilterEvent(wxEvent& event) {
     }
     if (type == wxEVT_MOUSEWHEEL) {
         auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
+        if (tutorial_ && window &&
+            (window == profile_editor_ || profile_editor_->IsDescendant(window)))
+            tutorial_scroll_duration_ = 0;
+        if (window && notebook_->GetPage(0)->IsDescendant(window) &&
+            chain_field_wheel(*window, static_cast<wxMouseEvent&>(event)))
+            return wxEventFilter::Event_Processed;
         for (auto* control = window; control && control != this; control = control->GetParent()) {
             if (dynamic_cast<wxChoice*>(control) || dynamic_cast<wxComboBox*>(control) ||
                 control == dfa_slider_ || control == dfa_value_ || control == dfa_stepper_) {
@@ -463,8 +471,11 @@ void Frame::poll_avatar() {
     if (!avatar_host_)
         return;
     const auto now = avatar::monotonic_ms();
-    if (tutorial_)
+    if (tutorial_) {
         avatar_host_->activity(now);
+        if (advance_tutorial_scroll(now))
+            render_tutorial();
+    }
     auto frame = avatar_host_->tick(now);
     if (frame.diagnostics != last_avatar_diagnostics_) {
         last_avatar_diagnostics_ = frame.diagnostics;
@@ -557,13 +568,11 @@ void Frame::layout_header() {
         item->CalcMin();
         header_height = std::max(header_height, item->GetMinSizeWithBorder().y);
     }
-    if (tutorial_)
-        agent_display_->fit_height(header_height - 2 * FromDIP(6) - FromDIP(84));
-    else {
-        avatar_top_gap_->SetMinSize(0,
-                                    routing_actions_->GetMinSize().y + 2 * FromDIP(8) - FromDIP(6));
-        agent_display_->fit_height(comment_surface_->GetMinSize().y);
-    }
+    const int avatar_height = header_height - 2 * FromDIP(6);
+    agent_display_->fit_height(avatar_height - (tutorial_ ? FromDIP(84) : 0));
+    if (!tutorial_)
+        avatar_region_->SetMinSize(
+            wxSize(std::max(FromDIP(120), agent_display_->GetMinSize().x), avatar_height));
     // Full-height artwork needs its real proportional width even at minimum
     // size. Increase the minimum instead of clipping or reducing the image.
     auto minimum = FromDIP(wxSize(980, 680));
@@ -1984,6 +1993,31 @@ bool Frame::smoke(const wxString& directory) {
                     personality_choice_->GetString(2) == wxS("UwU"),
                 "Canonical personality labels changed");
         require(theme_choice_->GetSelection() == 2, "Follow System is not the initial theme");
+        {
+            const auto revision = controller_->snapshot().revision;
+            require(show_onboarding_greeting(OnboardingOutcome::Completed) &&
+                        personality_ == "default" && technical_copy_.empty() &&
+                        commentary_copy_.find("Training wheels are off") != std::string::npos &&
+                        !tutorial_choices_panel_,
+                    "Norm completion greeting is missing or introduced tutorial controls");
+            select_personality("uwu");
+            require(!show_onboarding_greeting(OnboardingOutcome::Completed) &&
+                        personality_ == "uwu",
+                    "Completion greeting switched a saved Horu personality to Norm");
+            require(show_onboarding_greeting(OnboardingOutcome::Skipped) &&
+                        commentary_copy_.starts_with("Ehehe~") && personality_ == "uwu",
+                    "Horu skip greeting did not match the working personality");
+            select_personality("vanilla");
+            require(!show_onboarding_greeting(OnboardingOutcome::Skipped),
+                    "Vanilla displayed an unauthored onboarding greeting");
+            select_personality("default");
+            require(show_onboarding_greeting(OnboardingOutcome::Skipped) &&
+                        commentary_copy_.starts_with("Oh, skipping the tutorial?"),
+                    "Norm skip greeting did not match the working personality");
+            require(controller_->snapshot().revision == revision,
+                    "Working greeting issued a controller command");
+            present(presentation::Message::Ready);
+        }
         // Exercise the real sizers: changing status text must never resize or
         // move the commentary card or reduce the full-height avatar.
         const auto initial_client = GetClientSize();
@@ -2008,7 +2042,10 @@ bool Frame::smoke(const wxString& directory) {
             layout_header();
             require(comment_surface_->GetRect() == card,
                     "Status changes move or resize the personality card");
-            require(card.GetHeight() == FromDIP(156), "Commentary card height is not bounded");
+            require(card.GetHeight() >= FromDIP(156) && card.GetHeight() < FromDIP(240),
+                    "Operation-mode commentary card lost its compact bounded height");
+            require(navigation_[0]->GetPosition().y - card.GetBottom() <= FromDIP(16),
+                    "Empty header space remains between the personality card and tabs");
             const auto* exit_button = routing_actions_->GetChildren().back()->GetWindow();
             require(card.GetLeft() == start_->GetRect().GetLeft() &&
                         card.GetRight() == exit_button->GetRect().GetRight(),
@@ -2029,11 +2066,18 @@ bool Frame::smoke(const wxString& directory) {
                         avatar.GetSize() == previous_avatar_size,
                     "Window resizing reduces the full-height avatar");
             previous_avatar_size = avatar.GetSize();
-            require(avatar.GetTop() == card.GetTop() && avatar.GetHeight() == card.GetHeight(),
-                    "Operation-mode avatar does not match the personality frame height");
-            require(static_cast<long long>(avatar.GetWidth()) * 768 >=
-                        static_cast<long long>(avatar.GetHeight()) * 512,
-                    "Avatar width constrains its rendered height");
+            require(avatar.GetTop() == region.GetTop() &&
+                        avatar.GetHeight() == region.GetHeight() &&
+                        avatar.GetTop() < start_->GetPosition().y &&
+                        navigation_[0]->GetPosition().y - avatar.GetBottom() <= FromDIP(16),
+                    "Operation-mode avatar does not occupy the full compact header height");
+            if (static_cast<long long>(avatar.GetWidth()) * 768 <
+                static_cast<long long>(avatar.GetHeight()) * 512)
+                throw std::runtime_error("Avatar width constrains its rendered height: avatar=" +
+                                         std::to_string(avatar.width) + "x" +
+                                         std::to_string(avatar.height) +
+                                         ", region=" + std::to_string(region.width) + "x" +
+                                         std::to_string(region.height));
             require(region.GetLeft() - card.GetRight() - 1 == FromDIP(8) + FromDIP(6),
                     "Avatar region no longer follows the widened personality panel");
             require(std::abs(avatar.GetLeft() * 2 + avatar.GetWidth() - region.GetLeft() * 2 -
@@ -2045,6 +2089,72 @@ bool Frame::smoke(const wxString& directory) {
             require(personality_heading_->GetPosition().x >= FromDIP(12) &&
                         personality_heading_->GetPosition().y >= FromDIP(12),
                     "Personality heading covers the rounded corner");
+        }
+        {
+            select_page(0);
+            const auto information = forward_.information->GetValue();
+            const auto view = profile_editor_->GetViewStart();
+            const auto revision = controller_->snapshot().revision;
+            auto* field = forward_.information;
+            auto wheel = [&](int rotation) {
+                const auto point = field->ClientToScreen(wxPoint(2, 2));
+                SendMessageW(static_cast<HWND>(field->GetHandle()), WM_MOUSEWHEEL,
+                             MAKEWPARAM(0, rotation), MAKELPARAM(point.x, point.y));
+                wxYield();
+            };
+            auto field_position = [&] { return field->GetScrollPos(wxVERTICAL); };
+            field->ChangeValue("Short information that fits.");
+            profile_editor_->Scroll(0, 1);
+            const int initial = profile_editor_->GetViewStart().y;
+            wheel(-WHEEL_DELTA);
+            require(profile_editor_->GetViewStart().y > initial,
+                    "A partially filled information field trapped the downward wheel");
+            const int down = profile_editor_->GetViewStart().y;
+            wheel(WHEEL_DELTA);
+            require(profile_editor_->GetViewStart().y < down,
+                    "A partially filled information field trapped the upward wheel");
+            wxString overflow;
+            for (int line = 0; line < 80; ++line)
+                overflow += wxString::Format("Scrollable evidence line %d\n", line);
+            field->ChangeValue(overflow);
+            field->ShowPosition(0);
+            profile_editor_->Scroll(0, 1);
+            const auto outer = profile_editor_->GetViewStart();
+            wheel(-WHEEL_DELTA);
+            require(field_position() > 0 && profile_editor_->GetViewStart() == outer,
+                    "An overflowing field did not consume its available downward scroll");
+            // Revealing the final character can leave one scrollable line at
+            // fractional DPI/font heights. Use the actual native scroll limit.
+            SendMessageW(static_cast<HWND>(field->GetHandle()), WM_VSCROLL, SB_BOTTOM, 0);
+            profile_editor_->Scroll(0, 1);
+            const auto before_bottom = profile_editor_->GetViewStart();
+            const int bottom = field_position();
+            wheel(-WHEEL_DELTA);
+            if (field_position() != bottom ||
+                profile_editor_->GetViewStart().y <= before_bottom.y) {
+                SCROLLINFO native{};
+                native.cbSize = sizeof(native);
+                native.fMask = SIF_ALL;
+                GetScrollInfo(static_cast<HWND>(field->GetHandle()), SB_VERT, &native);
+                throw std::runtime_error(
+                    "A field at its bottom failed to hand the wheel to the editor: field=" +
+                    std::to_string(bottom) + "->" + std::to_string(field_position()) +
+                    ", outer=" + std::to_string(before_bottom.y) + "->" +
+                    std::to_string(profile_editor_->GetViewStart().y) + ", native_max=" +
+                    std::to_string(native.nMax) + ", page=" + std::to_string(native.nPage));
+            }
+            const auto at_bottom = profile_editor_->GetViewStart();
+            wheel(WHEEL_DELTA);
+            require(field_position() < bottom && profile_editor_->GetViewStart() == at_bottom,
+                    "An overflowing field did not consume upward scrolling away from its bottom");
+            SendMessageW(static_cast<HWND>(field->GetHandle()), WM_VSCROLL, SB_TOP, 0);
+            wheel(WHEEL_DELTA);
+            require(field_position() == 0 && profile_editor_->GetViewStart().y < at_bottom.y,
+                    "A field at its top failed to hand the wheel to the editor");
+            field->ChangeValue(information);
+            profile_editor_->Scroll(view);
+            require(controller_->snapshot().revision == revision,
+                    "Scrolling information modified controller state");
         }
         status_copy_ = initial_status;
         SetClientSize(initial_client);

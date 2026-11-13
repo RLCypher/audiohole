@@ -117,6 +117,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     }
     void request_exit();
     void exit();
+    bool show_onboarding_greeting(OnboardingOutcome);
     void show_testing_notice() {
         testing_notice();
     }
@@ -168,12 +169,17 @@ class Frame final : public wxFrame, private wxEventFilter {
     void finish_exit();
     std::unique_ptr<Tutorial> tutorial_;
     wxPanel* avatar_region_{};
-    wxSizerItem* avatar_top_gap_{};
     wxBoxSizer* avatar_layout_{};
     wxPanel* tutorial_choices_panel_{};
     wxBoxSizer* tutorial_choices_layout_{};
     std::vector<wxButton*> tutorial_choices_;
-    std::vector<wxWindow*> tutorial_highlights_;
+    std::vector<wxWindow*> tutorial_highlights_, tutorial_reply_outlines_;
+    wxPoint tutorial_scroll_from_, tutorial_scroll_to_;
+    std::int64_t tutorial_scroll_started_ = 0;
+    int tutorial_scroll_duration_ = 0;
+    std::string tutorial_scroll_region_;
+    void scroll_tutorial_to(wxWindow&, std::string_view region, int duration);
+    bool advance_tutorial_scroll(std::int64_t now);
     wxWindow* tutorial_reply_arrow_{};
     std::string tutorial_rendered_, tutorial_choice_key_;
     std::uint64_t tutorial_seen_event_ = 0;
@@ -181,7 +187,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void tutorial_event(std::string_view);
     void render_tutorial();
     void skip_tutorial();
-    bool finish_tutorial();
+    bool finish_tutorial(OnboardingOutcome = OnboardingOutcome::Completed);
     bool enter_save_pending_ = false;
     void queue_field_save(bool device);
     bool profile_edits_pending();

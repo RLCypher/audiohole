@@ -283,7 +283,7 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back."
+    "text": "Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you."
   },
   "N023": {
     "expression": "happy",
@@ -332,7 +332,7 @@ std::string_view tutorial_catalog() {
     "text": "Starting up... forwarding pretend audio, returning pretend audio, generally making a convincing show of competence..."
   },
   "N027B": {
-    "expression": "working",
+    "expression": "mischievous",
     "variants": [],
     "choices": [
       "Is it supposed to do that?",
@@ -367,7 +367,7 @@ std::string_view tutorial_catalog() {
       {
         "from": "N027A",
         "label": "Oscar-worthy performance",
-        "expression": "smug",
+        "expression": "laughing",
         "text": "Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. Yes, even though this is fake. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much."
       },
       {
@@ -430,7 +430,7 @@ std::string_view tutorial_catalog() {
       {
         "from": "N030-B",
         "label": "You set me up",
-        "expression": "smug",
+        "expression": "laughing",
         "text": "A little. Builds character. Nicely done, though. That's the basic workflow: find your devices, connect the right ends, save it, start it, and make sure it actually does what you intended. Revolutionary stuff."
       }
     ],
@@ -526,6 +526,25 @@ std::string_view tutorial_catalog() {
       }
     ],
     "choices": []
+  })AHTUTORIAL",
+    // 07 — RETURN TO THE REAL WORLD
+    R"AHTUTORIAL(  "N037": {
+    "expression": "mischievous",
+    "variants": [],
+    "choices": [],
+    "text": "Well, look who came back. Training wheels are off, and it's all on you now. I'll be over here drinking my coffee, watching you make questionable decisions, and offering absolutely no assistance whatsoever. Try not to disappoint me. I've got low expectations."
+  },
+  "N037A": {
+    "expression": "mischievous",
+    "variants": [],
+    "choices": [],
+    "text": "Oh, skipping the tutorial? Bold move. Well, I admire your confidence, misplaced or otherwise. I'll be over here with my coffee, watching you make questionable decisions, and offering absolutely no assistance whatsoever. Try not to disappoint me. I've got low expectations."
+  },
+  "N037B": {
+    "expression": "mischievous",
+    "variants": [],
+    "choices": [],
+    "text": "Ehehe~ Skipping the tutorial? And here I thought you already knew your way around a hole! (¬‿¬) Well, I'm not gonna hold your hand, unless you ask nicely~ ♡ I'll just sit here looking cute while you figure out where everything goes. Ganbatte, senpai~! (≧◡≦) ♡"
   })AHTUTORIAL",
     // CONDITIONAL / RECOVERY LINES
     R"AHTUTORIAL(  "B001": {
@@ -659,7 +678,7 @@ std::string_view tutorial_catalog() {
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(27789);
+        result.reserve(28946);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

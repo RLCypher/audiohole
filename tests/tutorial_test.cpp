@@ -59,6 +59,7 @@ struct Lesson {
         draft = *profile(sandbox.snapshot(), id);
         event("profile_created");
         EXPECT_EQ(lesson.beat(), "N018A");
+        EXPECT_EQ(lesson.view().targets, std::vector<std::string>{"profile:" + draft.id});
         event("profile_renamed");
         EXPECT_EQ(lesson.beat(), "N018A"); // Confirming the default is insufficient.
         draft.display_name = "My practice profile";
@@ -69,6 +70,7 @@ struct Lesson {
         event("hole_created");
         auto& h = draft.holes[0];
         EXPECT_EQ(lesson.beat(), "N018B");
+        EXPECT_EQ(lesson.view().targets, std::vector<std::string>{"hole:" + h.id});
         event("hole_renamed");
         EXPECT_EQ(lesson.beat(), "N018B");
         h.display_name = "My two-way connection";
@@ -103,7 +105,7 @@ struct Lesson {
 };
 TEST(Tutorial, CatalogKeepsExactDialogueBranchesAndNoSpeakerPrefix) {
     auto catalog = nlohmann::json::parse(tutorial_catalog());
-    EXPECT_EQ(catalog.size(), 64u);
+    EXPECT_EQ(catalog.size(), 67u);
     for (const auto& beat : catalog) {
         if (beat.contains("text"))
             EXPECT_FALSE(beat["text"].get<std::string>().starts_with("NORM:"));
@@ -295,3 +297,60 @@ TEST(Tutorial, FictionalInventoryIsOfferedAndDiscoveryPreservesEditsOnRescan) {
 }
 
 } // namespace
+
+TEST(Tutorial, DeviceEditorGuidanceTracksIntendedSelectionAndConfirmedSave) {
+    Lesson h;
+    h.to_scan();
+    h.scan();
+    h.choice();
+    h.navigate(1);
+    h.choice();
+    h.choice();
+    ASSERT_EQ(h.lesson.beat(), "N014");
+    auto has = [&](std::string_view device, bool dirty, const char* target) {
+        const auto targets = h.lesson.view(device, dirty).targets;
+        return std::find(targets.begin(), targets.end(), target) != targets.end();
+    };
+    EXPECT_FALSE(has("", false, "device_name"));
+    EXPECT_FALSE(has("tutorial-mixer-in", true, "device_name"));
+    EXPECT_FALSE(has("tutorial-mixer-out", true, "device_save"));
+    EXPECT_TRUE(has("tutorial-mic", false, "device_name"));
+    EXPECT_FALSE(has("tutorial-mic", false, "device_save"));
+    h.event("device_edit");
+    EXPECT_TRUE(has("tutorial-mic", true, "device_save"));
+    auto mic = *endpoint(h.sandbox.snapshot(), "tutorial-mic");
+    mic.display_name = "Any valid operator name";
+    ASSERT_TRUE(h.sandbox.update_endpoint(mic).ok);
+    h.event("device_saved");
+    EXPECT_FALSE(has("tutorial-mic", false, "device_name"));
+    EXPECT_FALSE(has("tutorial-mic", false, "device_save"));
+    EXPECT_FALSE(has("tutorial-mic", false, "device:tutorial-mic"));
+    EXPECT_FALSE(has("tutorial-mic", true, "device_name"));
+    EXPECT_FALSE(has("tutorial-mic", true, "device_save"));
+    EXPECT_TRUE(has("tutorial-mic", false, "device:tutorial-speakers"));
+}
+TEST(Tutorial, WorkingGreetingsNeverSwitchPersonalityOrAddTutorialChoices) {
+    for (const auto outcome : {OnboardingOutcome::Completed, OnboardingOutcome::Skipped}) {
+        const auto norm = onboarding_greeting(outcome, "default");
+        ASSERT_TRUE(norm);
+        EXPECT_EQ(norm->expression, "mischievous");
+        EXPECT_NE(norm->text.find(outcome == OnboardingOutcome::Completed
+                                      ? "Training wheels are off"
+                                      : "skipping the tutorial"),
+                  std::string::npos);
+        EXPECT_FALSE(onboarding_greeting(outcome, "vanilla"));
+        EXPECT_FALSE(onboarding_greeting(outcome, "unknown-personality"));
+    }
+    EXPECT_FALSE(onboarding_greeting(OnboardingOutcome::Completed, "uwu"));
+    const auto horu = onboarding_greeting(OnboardingOutcome::Skipped, "uwu");
+    ASSERT_TRUE(horu);
+    EXPECT_EQ(horu->expression, "mischievous");
+    EXPECT_TRUE(horu->text.starts_with("Ehehe~"));
+    EXPECT_FALSE(onboarding_greeting(OnboardingOutcome::None, "default"));
+    Tutorial lesson;
+    EXPECT_EQ(lesson.beat(), "N001");
+    EXPECT_EQ(lesson.view().choices.size(), 2u);
+    EXPECT_EQ(
+        lesson.view().expression,
+        nlohmann::json::parse(tutorial_catalog()).at("N001").at("expression").get<std::string>());
+}

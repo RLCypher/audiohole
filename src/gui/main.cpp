@@ -231,7 +231,8 @@ class App final : public wxApp {
             tutorial = choice == wxID_YES;
             // Choosing the working environment explicitly skips onboarding.
             if (!tutorial) {
-                const auto marked = mark_first_run(first_run_marker_path());
+                const auto marked =
+                    mark_first_run(first_run_marker_path(), OnboardingOutcome::Skipped);
                 if (!marked.ok)
                     themed_message_box(text(marked.detail), "AudioHole welcome",
                                        wxOK | wxICON_WARNING);
@@ -290,6 +291,17 @@ class App final : public wxApp {
         }
         if (!smoke && preferences_->values().start_minimized)
             frame->Iconize(true);
+        if (!smoke && !tutorial) {
+            OnboardingStatus onboarding;
+            const auto read = read_onboarding_status(first_run_marker_path(), onboarding);
+            if (read.ok && !onboarding.greeting_shown &&
+                frame->show_onboarding_greeting(onboarding.outcome)) {
+                const auto marked = mark_onboarding_greeting_shown(first_run_marker_path());
+                if (!marked.ok)
+                    themed_message_box(text(marked.detail), "AudioHole welcome",
+                                       wxOK | wxICON_WARNING, frame);
+            }
+        }
         if (shell_action == ShellAction::Controls)
             frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::Controls); });
         if (smoke)

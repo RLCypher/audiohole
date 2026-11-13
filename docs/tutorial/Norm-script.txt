@@ -1,5 +1,5 @@
 AUDIOHOLE — NORM TUTORIAL DIALOGUE
-Version 2.6 — Event-driven sandbox, selection guidance, and definitive farewell
+Version 2.7 — Focused guidance, smooth scrolling, restart, and working greetings
 
 PURPOSE
 A guided, completely fictional sandbox exercise. This is the dialogue for the owner's original tutorial workflow, NOT a replacement curriculum. No real devices are scanned, no audio is routed, and no profile/device files are written. The only permitted persistent change is the tutorial-complete flag. All lines appear in the status/personality panel. Settings keeps Personality, Animation, and DFA fields visible but disabled (grayed out), with “(Disabled for tutorial)” appended to their section headers; Replay Tutorial becomes Skip Tutorial.
@@ -180,7 +180,7 @@ NORM: One more thing before we send this back the other way. Check Prefer exclus
 
 N022 [talking]
 Cue: Forward assignment and Prefer exclusive mode confirmed. Highlight Return Source selector.
-NORM: Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back.
+NORM: Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you.
 
 N023 [happy]
 Cue: Correct Return Source chosen. Highlight Return Destination selector.
@@ -208,11 +208,11 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
 ======================================================================
 
 N027 [working]
-Cue: Start Routing click starts an approximately 20-second exaggerated pretend activation progress sequence; do not open real audio devices. On successful completion emit simulated_routing_running and enter N027B. No response buttons while pending; do not use a separate delay to advance dialogue.
+Cue: Start Routing click starts an approximately 10-second exaggerated pretend activation sequence, without a progress bar; do not open real audio devices. On successful completion emit simulated_routing_running and enter N027B. No response buttons while pending; do not use a separate delay to advance dialogue.
 NORM: Starting up... forwarding pretend audio, returning pretend audio, generally making a convincing show of competence...
 
-N027B [working]
-Cue: Enter on simulated_routing_running completion event, after approximately 20 seconds of pretend startup. The overdramatic wait is now over; hold this message until a user choice, with NO extra timed theatrical pause. No real audio is opened.
+N027B [mischievous]
+Cue: Enter on simulated_routing_running completion event, after approximately 10 seconds of pretend startup. The overdramatic wait is now over; hold this message until a user choice, with NO extra timed theatrical pause. No real audio is opened.
 NORM: Hmmm. Lights are blinking. Numbers are numbering. I'm going to need you to appreciate how very serious this procedure is.
 UI: Show two response buttons: "Is it supposed to do that?" and "Should I be worried?". Both immediately advance to the matching complete N027A dialogue variant; no intermediate reaction.
 
@@ -229,7 +229,7 @@ N028 [happy]
 Cue: Either N027A response selected and simulated status remains Running. Require a response-button acknowledgement before advancing; do not access, detect, infer or measure real microphone input. The choice is a user assertion only.
 UI: Two vertically stacked dating-sim buttons at Norm's feet, EXACT LABELS: "I said something" and "Testing 1, 2". Clicking either acknowledges the instruction to speak (without voice detection) and advances immediately to the corresponding complete N030 state. No generic Continue and no automatic advancement.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
-  Variant A — from N027A / Oscar-worthy performance [smug]
+  Variant A — from N027A / Oscar-worthy performance [laughing]
   NORM: Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. Yes, even though this is fake. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much.
   Variant B — from N027A / You made me wait for THAT? [laughing]
   NORM: Look, a little dramatic tension never killed anybody. The imaginary routing engine needed its moment. Now comes the actually useful habit, say something into your microphone. Out loud. Whatever comes to mind. We always test a connection before assuming it works. Don't just stare at me. I can do that all day.
@@ -257,7 +257,7 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
   NORM: I did. You walked straight into the world's least scientific microphone test. Nicely done, though. That's the basic workflow: find your devices, connect the right ends, save it, start it, and test the result. Revolutionary stuff.
   Variant C — from N030-B / Fair point [deadpan]
   NORM: I have those occasionally. Nicely done, though. That's the basic workflow: find your devices, connect the right ends, save it, start it, and test the result. Revolutionary stuff.
-  Variant D — from N030-B / You set me up [smug]
+  Variant D — from N030-B / You set me up [laughing]
   NORM: A little. Builds character. Nicely done, though. That's the basic workflow: find your devices, connect the right ends, save it, start it, and make sure it actually does what you intended. Revolutionary stuff.
 UI: Show two response buttons: "I think I’ve got it" and "What if it doesn’t work for real?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
@@ -297,12 +297,28 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
 UI: Show two response buttons: "Keep exploring" and "Can I break anything?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N036 [smug]
-Cue: Final tutorial message; remain in sandbox until the user exits. Do not automatically swap to real devices. Show an "Exit tutorial" action at Norm's feet; tutorial is complete and the user can freely explore or exit.
+Cue: Final tutorial message; remain in sandbox until the user exits. Do not automatically swap to real devices. Show an "End tutorial" action at Norm's feet; tutorial is complete and the user can freely explore or exit.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N035 / Keep exploring [smug]
   NORM: That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
   Variant B — from N035 / Can I break anything? [deadpan]
   NORM: Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
+
+======================================================================
+07 — RETURN TO THE REAL WORLD
+======================================================================
+
+N037 [mischievous]
+Cue: First working launch after tutorial completion, only when Norm is selected. Display once in the normal personality panel, then record that it was shown. No tutorial controls or interruption of ordinary operation.
+NORM: Well, look who came back. Training wheels are off, and it's all on you now. I'll be over here drinking my coffee, watching you make questionable decisions, and offering absolutely no assistance whatsoever. Try not to disappoint me. I've got low expectations.
+
+N037A [mischievous]
+Cue: First eligible working launch after skipping the tutorial, when Norm is selected. Display once, then record that it was shown. This is working-mode commentary, not a tutorial lesson.
+NORM: Oh, skipping the tutorial? Bold move. Well, I admire your confidence, misplaced or otherwise. I'll be over here with my coffee, watching you make questionable decisions, and offering absolutely no assistance whatsoever. Try not to disappoint me. I've got low expectations.
+
+N037B [mischievous]
+Cue: First eligible working launch after skipping the tutorial, when Horu was already selected in the saved working preferences. Display once, then record that it was shown. Horu never delivers the tutorial.
+NORM: Ehehe~ Skipping the tutorial? And here I thought you already knew your way around a hole! (¬‿¬) Well, I'm not gonna hold your hand, unless you ask nicely~ ♡ I'll just sit here looking cute while you figure out where everything goes. Ganbatte, senpai~! (≧◡≦) ♡
 
 ======================================================================
 CONDITIONAL / RECOVERY LINES

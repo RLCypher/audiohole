@@ -2123,9 +2123,10 @@ for matching Start-time assignments. Performance Diagnostics stays pinned and
 scrollable, with real configurations/access receipts/counters and preserved
 scroll position. Save does not modify the live plan; Stop/Start applies changes.
 
-Operation-mode avatar top/height match the personality frame and its narrower
-right-hand region gives width back to the personality card/action row. Tutorial
-sizing stays independent. Settings names are Application and Tray and
+Operation-mode header reserves five wrapped status lines and lets the personality
+card fill the remaining height below the action row, leaving standard spacing
+above the tabs. The proportional avatar occupies the full header height in its
+right-hand region. Tutorial sizing stays independent. Settings names are Application and Tray and
 Personality and Animation; Restart belongs to Application and Tray. Unsupported
 automatic reconnect/live-switch controls are disabled for engine 0.6.
 
@@ -2144,4 +2145,18 @@ than entire lists, following stable IDs and remaining only until their saved
 renames. Click-through outlines pulse outward by 3 DIP for one second, return
 over one second and rest for one second; Low motion/Windows animation preferences
 retain static outlines. The final authored message explicitly announces completion
-and provides an Exit tutorial action at Norm's feet without changing environments.
+and provides an End tutorial action at Norm's feet. Skip and End confirm their
+named restart actions; details and the one-time working greetings are in TUTORIAL.md.
+
+### Current tutorial guidance and wheel polish
+
+Device name guidance requires the intended selected device; name/Save guidance
+ends on its confirmed save. Profile/hole renames outline only the stable-ID row.
+Device-card guidance centers smoothly over three seconds, exclusive preference
+over 1.5 seconds; manual wheel input cancels automatic movement. Norm's response
+buttons pulse like the other outlines, except the static End tutorial button.
+
+On Profiles, an overflowing text/list field scrolls itself while it can move in
+the requested direction. At either limit, or when content already fits, the
+wheel passes to the nearest scrollable ancestor that can move. Dropdown and DFA
+values remain protected from wheel changes. Performance Diagnostics stays pinned.

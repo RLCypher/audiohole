@@ -835,6 +835,10 @@ void Frame::build_profiles() {
     right_container->SetSizer(right_column);
     auto* editor = new wxScrolledWindow(right_container);
     profile_editor_ = editor;
+    editor->Bind(wxEVT_CHILD_FOCUS, [this](wxChildFocusEvent& event) {
+        if (!tutorial_scroll_duration_)
+            event.Skip();
+    });
     right_column->Add(editor, 1, wxEXPAND);
     editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
@@ -892,6 +896,7 @@ void Frame::build_profiles() {
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
     page->SetSizer(page_layout);
     notebook_->AddPage(page, "Profiles");
+    enable_field_wheel_chaining(*page);
     profiles_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
         const int i = profiles_->GetSelection();
         if (i >= 0 && discard()) {

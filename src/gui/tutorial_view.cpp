@@ -6,6 +6,7 @@
 #include <sstream>
 #include <wx/dcbuffer.h>
 #include <wx/dcscreen.h>
+#include <wx/generic/msgdlgg.h>
 #include <wx/modalhook.h>
 #include <wx/popupwin.h>
 #include <wx/textdlg.h>
@@ -111,10 +112,10 @@ void Frame::tutorial_event(std::string_view action) {
                      notebook_->GetSelection());
     render_tutorial();
 }
-bool Frame::finish_tutorial() {
+bool Frame::finish_tutorial(OnboardingOutcome outcome) {
     if (tutorial_marker_saved_ || smoke_)
         return true;
-    const auto result = mark_first_run(first_run_marker_path());
+    const auto result = mark_first_run(first_run_marker_path(), outcome);
     if (!result.ok) {
         themed_message_box(
             text(result.detail + " The tutorial will appear again until completion can be saved."),
@@ -124,34 +125,106 @@ bool Frame::finish_tutorial() {
     tutorial_marker_saved_ = true;
     return true;
 }
+bool Frame::show_onboarding_greeting(OnboardingOutcome outcome) {
+    if (tutorial_ || operational_warning_visible_ || !IsShown() || IsIconized())
+        return false;
+    const auto greeting = onboarding_greeting(outcome, personality_);
+    if (!greeting)
+        return false;
+    technical_copy_.clear();
+    commentary_copy_ = greeting->text;
+    fallback_copy_.clear();
+    sleep_copy_.clear();
+    presentation::Copy copy;
+    copy.personality_id = personality_;
+    copy.expression = greeting->expression;
+    avatar_host_->react(presentation::Message::Ready, copy, ++occurrence_, avatar::monotonic_ms());
+    layout_header();
+    Update();
+    return true;
+}
 void Frame::skip_tutorial() {
     if (!tutorial_)
         return;
-    if (tutorial_->complete()) {
-        if (finish_tutorial())
-            request_exit();
-        return;
+    const bool complete = tutorial_->complete();
+    const wxString action = complete ? "End tutorial" : "Skip tutorial";
+    if (!complete) {
+        tutorial_->remind("B010");
+        render_tutorial();
     }
-    tutorial_->remind("B010");
-    render_tutorial();
-    if (themed_message_box("Skip the tutorial and close AudioHole?\nNext launch opens the working "
-                           "environment. Fictional devices and profiles will be discarded.",
-                           "Skip Tutorial?", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
-                           this) != wxYES) {
+    wxGenericMessageDialog dialog(this,
+                                  complete ? "End the tutorial and restart AudioHole?"
+                                           : "Skip the tutorial and restart AudioHole?",
+                                  action, wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+    dialog.SetYesNoLabels(action, "Cancel");
+    dialog.SetEscapeId(wxID_NO);
+    theme_dialog(&dialog);
+    if (dialog.ShowModal() != wxID_YES) {
         tutorial_->dismiss_reminder();
         render_tutorial();
         return;
     }
-    tutorial_->skip();
-    if (finish_tutorial())
-        exit();
+    if (!finish_tutorial(complete ? OnboardingOutcome::Completed : OnboardingOutcome::Skipped))
+        return;
+    if (!complete)
+        tutorial_->skip();
+    if (restart_)
+        restart_();
+}
+// GUI-thread tween in scroll units. A region is revealed once, so changing the
+// source then destination in the same card does not restart or fight user input.
+void Frame::scroll_tutorial_to(wxWindow& target, std::string_view region, int duration) {
+    if (tutorial_scroll_region_ == region)
+        return;
+    tutorial_scroll_region_ = region;
+    const auto start = profile_editor_->GetViewStart();
+    int px = 0, py = 0;
+    profile_editor_->GetScrollPixelsPerUnit(&px, &py);
+    if (py <= 0)
+        return;
+    const auto point = profile_editor_->ScreenToClient(target.GetScreenPosition());
+    const int client = profile_editor_->GetClientSize().y;
+    const int maximum = std::max(0, (profile_editor_->GetVirtualSize().y - client + py - 1) / py);
+    tutorial_scroll_from_ = start;
+    tutorial_scroll_to_ =
+        wxPoint(start.x,
+                std::clamp(start.y + static_cast<int>(std::lround(
+                                         (point.y + target.GetSize().y / 2.0 - client / 2.0) / py)),
+                           0, maximum));
+    BOOL animation = TRUE;
+    SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &animation, 0);
+    if (preferences_->values().low_motion || animation == FALSE) {
+        profile_editor_->Scroll(tutorial_scroll_to_);
+        tutorial_scroll_duration_ = 0;
+        return;
+    }
+    tutorial_scroll_started_ = avatar::monotonic_ms();
+    tutorial_scroll_duration_ = duration;
+}
+bool Frame::advance_tutorial_scroll(std::int64_t now) {
+    if (!tutorial_scroll_duration_)
+        return false;
+    if (!IsShown() || IsIconized() || notebook_->GetSelection() != 0) {
+        tutorial_scroll_duration_ = 0;
+        return false;
+    }
+    const double progress = std::clamp(
+        static_cast<double>(now - tutorial_scroll_started_) / tutorial_scroll_duration_, 0.0, 1.0);
+    const double eased = (1 - std::cos(progress * 3.141592653589793)) / 2;
+    profile_editor_->Scroll(tutorial_scroll_from_.x,
+                            tutorial_scroll_from_.y +
+                                static_cast<int>(std::lround(
+                                    (tutorial_scroll_to_.y - tutorial_scroll_from_.y) * eased)));
+    if (progress >= 1)
+        tutorial_scroll_duration_ = 0;
+    return true;
 }
 void Frame::render_tutorial() {
     if (!tutorial_ || !notebook_)
         return;
-    const auto view = tutorial_->view();
+    const auto view = tutorial_->view(device_id_, device_dirty_);
     if (tutorial_end_) {
-        const wxString label = view.complete ? "End tutorial" : "Skip Tutorial";
+        const wxString label = view.complete ? "End tutorial" : "Skip tutorial";
         if (tutorial_end_->GetLabel() != label) {
             tutorial_end_->SetLabel(label);
             tutorial_end_->SetToolTip(button_help(label));
@@ -168,7 +241,7 @@ void Frame::render_tutorial() {
         choice_key += c.id + "\n";
     const bool farewell = view.beat == "N036";
     if (farewell)
-        choice_key += "exit-tutorial";
+        choice_key += "end-tutorial";
     if (choice_key != tutorial_choice_key_) {
         for (auto* choice : tutorial_choices_) {
             tutorial_choices_layout_->Detach(choice);
@@ -189,8 +262,8 @@ void Frame::render_tutorial() {
             tutorial_choices_.push_back(control);
         }
         if (farewell) {
-            auto* control = new ActionButton(tutorial_choices_panel_, "Exit tutorial");
-            control->SetName("Exit tutorial");
+            auto* control = new ActionButton(tutorial_choices_panel_, "End tutorial");
+            control->SetName("End tutorial");
             control->outline_colour = palette::magenta();
             control->UnsetToolTip();
             control->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { skip_tutorial(); });
@@ -218,6 +291,25 @@ void Frame::render_tutorial() {
         tutorial_reply_arrow_->Refresh();
     } else if (tutorial_reply_arrow_)
         tutorial_reply_arrow_->Hide();
+    BOOL reply_animation = TRUE;
+    SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &reply_animation, 0);
+    while (tutorial_reply_outlines_.size() < tutorial_choices_.size())
+        tutorial_reply_outlines_.push_back(new TutorialOutline(this));
+    for (std::size_t i = 0; i < tutorial_reply_outlines_.size(); ++i) {
+        auto* outline = static_cast<TutorialOutline*>(tutorial_reply_outlines_[i]);
+        if (farewell || i >= tutorial_choices_.size() || !IsShown() || IsIconized() ||
+            !tutorial_choices_[i]->IsShownOnScreen()) {
+            outline->Hide();
+            continue;
+        }
+        auto* button = static_cast<ActionButton*>(tutorial_choices_[i]);
+        if (button->outline_colour != button->GetBackgroundColour()) {
+            button->outline_colour = button->GetBackgroundColour();
+            button->Refresh();
+        }
+        outline->place(wxRect(tutorial_choices_[i]->GetScreenRect()).Inflate(FromDIP(1)),
+                       !preferences_->values().low_motion && reply_animation != FALSE);
+    }
     const auto signature = view.beat + "\n" + view.text + "\n" + view.expression;
     const bool changed = signature != tutorial_rendered_;
     const bool step_changed = !tutorial_rendered_.starts_with(view.beat + "\n");
@@ -249,7 +341,24 @@ void Frame::render_tutorial() {
     while (tutorial_highlights_.size() < view.targets.size())
         tutorial_highlights_.push_back(new TutorialOutline(this));
     int directed_row = -1;
+    bool listbox_row = false;
     auto target = [&](const std::string& key) -> wxWindow* {
+        if (key.starts_with("profile:") || key.starts_with("hole:")) {
+            const bool profile = key.starts_with("profile:");
+            const auto id = key.substr(profile ? 8 : 5);
+            if (profile) {
+                const auto found = std::find(profile_ids_.begin(), profile_ids_.end(), id);
+                if (found != profile_ids_.end())
+                    directed_row = static_cast<int>(found - profile_ids_.begin());
+            } else {
+                const auto found = std::find_if(draft_.holes.begin(), draft_.holes.end(),
+                                                [&](const auto& hole) { return hole.id == id; });
+                if (found != draft_.holes.end())
+                    directed_row = static_cast<int>(found - draft_.holes.begin());
+            }
+            listbox_row = true;
+            return directed_row >= 0 ? (profile ? profiles_ : holes_) : nullptr;
+        }
         if (key.starts_with("device:")) {
             const auto id = key.substr(7);
             for (const auto& [list, ids] : {std::pair{capture_devices_, &capture_device_ids_},
@@ -318,21 +427,18 @@ void Frame::render_tutorial() {
     for (std::size_t i = 0; i < tutorial_highlights_.size(); ++i) {
         auto* highlight = static_cast<TutorialOutline*>(tutorial_highlights_[i]);
         directed_row = -1;
+        listbox_row = false;
         auto* directed = i < view.targets.size() ? target(view.targets[i]) : nullptr;
         if (directed && step_changed && profile_editor_->IsDescendant(directed)) {
-            const auto point = profile_editor_->ScreenToClient(directed->GetScreenPosition());
-            int x = 0, y = 0, px = 0, py = 0;
-            profile_editor_->GetViewStart(&x, &y);
-            profile_editor_->GetScrollPixelsPerUnit(&px, &py);
-            int reveal_x = x;
-            if (px > 0 && point.x < 0)
-                reveal_x = std::max(0, x + point.x / px - 1);
-            else if (px > 0 && point.x + directed->GetSize().x > profile_editor_->GetClientSize().x)
-                reveal_x =
-                    x +
-                    (point.x + directed->GetSize().x - profile_editor_->GetClientSize().x) / px + 1;
-            if (py > 0)
-                profile_editor_->Scroll(reveal_x, std::max(0, y + point.y / py - 1));
+            const bool forward = view.beat == "N020" || view.beat == "N021";
+            const bool reverse = view.beat == "N022" || view.beat == "N023";
+            if (forward || reverse)
+                scroll_tutorial_to(*(forward ? forward_.source : reverse_.source)->GetParent(),
+                                   forward ? "forward" : "return", 3000);
+            else if (view.beat == "N021A")
+                scroll_tutorial_to(*directed, "exclusive", 1500);
+            else
+                scroll_tutorial_to(*directed, view.beat, 3000);
         }
         if (directed && !directed->IsShownOnScreen()) {
             for (std::size_t page = 0; page < notebook_->GetPageCount(); ++page)
@@ -347,7 +453,20 @@ void Frame::render_tutorial() {
             continue;
         }
         auto bounds = directed->GetScreenRect();
-        if (directed_row >= 0) {
+        if (directed_row >= 0 && listbox_row) {
+            auto* list = static_cast<wxListBox*>(directed);
+            if (step_changed)
+                list->SetFirstItem(directed_row);
+            RECT row{};
+            if (SendMessageW(static_cast<HWND>(list->GetHandle()), LB_GETITEMRECT, directed_row,
+                             reinterpret_cast<LPARAM>(&row)) == LB_ERR) {
+                highlight->Hide();
+                continue;
+            }
+            bounds = wxRect(list->ClientToScreen(wxPoint(row.left, row.top)),
+                            wxSize(row.right - row.left, row.bottom - row.top));
+            bounds.Intersect(wxRect(list->ClientToScreen(wxPoint(0, 0)), list->GetClientSize()));
+        } else if (directed_row >= 0) {
             auto* list = static_cast<DeviceList*>(directed);
             const auto item = list->RowToItem(static_cast<unsigned>(directed_row));
             if (step_changed)
@@ -391,11 +510,18 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             require(!personality_heading_->IsShown(), "Tutorial rendered a speaker prefix/heading");
             for (const auto* control : tutorial_choices_) {
                 const auto* button = dynamic_cast<const ActionButton*>(control);
-                require(button && button->outline_colour == palette::magenta(),
+                require(button && button->outline_colour == (tutorial_->beat() == "N036"
+                                                                 ? palette::magenta()
+                                                                 : button->GetBackgroundColour()),
                         "Tutorial reply is missing its pink outline");
                 require(control->GetToolTip() == nullptr,
                         "Tutorial reply must not have hover text");
             }
+            for (std::size_t i = 0; i < tutorial_choices_.size(); ++i)
+                require(tutorial_reply_outlines_.size() > i &&
+                            tutorial_reply_outlines_[i]->IsShownOnScreen() ==
+                                (tutorial_->beat() != "N036"),
+                        "Tutorial reply pulse visibility differs from its current choices");
         };
         auto click = [&](wxButton* control) {
             require(control != nullptr && control->IsEnabled(),
@@ -451,6 +577,58 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             list->GetEventHandler()->ProcessEvent(selected);
             require(device_id_ == id, "Tutorial device-list selection did not select its record");
         };
+        auto has_target = [&](const char* key) {
+            const auto targets = tutorial_->view(device_id_, device_dirty_).targets;
+            return std::find(targets.begin(), targets.end(), key) != targets.end();
+        };
+        auto listbox_highlight = [&](wxListBox* list, int row) {
+            render_tutorial();
+            require(tutorial_->view().targets.size() == 1,
+                    "Rename step highlights more than the specific record");
+            RECT native{};
+            require(SendMessageW(static_cast<HWND>(list->GetHandle()), LB_GETITEMRECT, row,
+                                 reinterpret_cast<LPARAM>(&native)) != LB_ERR,
+                    "Rename highlight row has no native item rectangle");
+            auto row_bounds =
+                wxRect(list->ClientToScreen(wxPoint(native.left, native.top)),
+                       wxSize(native.right - native.left, native.bottom - native.top));
+            row_bounds.Intersect(
+                wxRect(list->ClientToScreen(wxPoint(0, 0)), list->GetClientSize()));
+            require(tutorial_highlights_[0]->IsShownOnScreen() &&
+                        tutorial_highlights_[0]->GetScreenRect().Contains(row_bounds) &&
+                        tutorial_highlights_[0]->GetSize().y <=
+                            row_bounds.height + 2 * (FromDIP(4) + FromDIP(3)),
+                    "Rename highlights the list instead of the requested row");
+        };
+        auto settle_scroll = [&](const char* region, int duration, wxWindow* target) {
+            BOOL animation = TRUE;
+            SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &animation, 0);
+            require(tutorial_scroll_region_ == region,
+                    "Tutorial smooth scroll is targeting the wrong card");
+            if (!preferences_->values().low_motion && animation != FALSE) {
+                require(tutorial_scroll_duration_ == duration,
+                        "Tutorial smooth scroll has the wrong duration");
+                const auto from = tutorial_scroll_from_, to = tutorial_scroll_to_;
+                advance_tutorial_scroll(tutorial_scroll_started_ + duration / 2);
+                require(std::abs(profile_editor_->GetViewStart().y - (from.y + to.y) / 2) <= 1,
+                        "Tutorial smooth scroll skipped its intermediate position");
+                advance_tutorial_scroll(tutorial_scroll_started_ + duration);
+                require(profile_editor_->GetViewStart() == to && !tutorial_scroll_duration_,
+                        "Tutorial smooth scroll did not finish at its bounded destination");
+            }
+            render_tutorial();
+            const auto point = profile_editor_->ScreenToClient(target->GetScreenPosition());
+            const int center = point.y + target->GetSize().y / 2;
+            const int view_center = profile_editor_->GetClientSize().y / 2;
+            int px = 0, py = 0;
+            profile_editor_->GetScrollPixelsPerUnit(&px, &py);
+            const int position = profile_editor_->GetViewStart().y;
+            const bool clamped =
+                position == 0 || position * py + profile_editor_->GetClientSize().y >=
+                                     profile_editor_->GetVirtualSize().y - py;
+            require(clamped || std::abs(center - view_center) <= py,
+                    "Tutorial configuration target was not centered in the editor");
+        };
         auto capture = [&](const char* name) {
             if (directory.empty())
                 return;
@@ -485,6 +663,8 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             bitmap.SaveFile(directory + "/" + wxString::FromUTF8(name) + ".bmp", wxBITMAP_TYPE_BMP);
         };
         check("N001");
+        require(personality_ == "default" && !show_onboarding_greeting(OnboardingOutcome::Skipped),
+                "Tutorial did not remain Norm-only or admitted a working greeting");
         require(
             tutorial_reply_arrow_ && tutorial_reply_arrow_->IsShownOnScreen() &&
                 comment_surface_->GetScreenRect().Contains(tutorial_reply_arrow_->GetScreenRect()),
@@ -515,6 +695,37 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         tutorial_->dismiss_reminder();
         render_tutorial();
         require(commentary_copy_ == initial, "Early-start reminder lost the current dialogue");
+        {
+            BOOL animation = TRUE;
+            SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &animation, 0);
+            const auto bounds = tutorial_choices_[0]->GetScreenRect();
+            if (!preferences_->values().low_motion && animation != FALSE) {
+                int smallest = INT_MAX, largest = 0;
+                const auto deadline = avatar::monotonic_ms() + 3100;
+                while (avatar::monotonic_ms() < deadline) {
+                    wxYield();
+                    const auto width = tutorial_reply_outlines_[0]->GetSize().x;
+                    smallest = std::min(smallest, width);
+                    largest = std::max(largest, width);
+                    require(tutorial_choices_[0]->GetScreenRect() == bounds,
+                            "Reply pulse changed the actual button layout");
+                    wxMilliSleep(10);
+                }
+                require(smallest == bounds.width + 2 * FromDIP(1) &&
+                            largest == smallest + 2 * FromDIP(3),
+                        "Tutorial response outline did not pulse with the guidance timing");
+            }
+            const auto original = preferences_->values();
+            auto reduced = original;
+            reduced.low_motion = true;
+            require(preferences_->update(reduced).ok, "Cannot enable Low motion for replies");
+            render_tutorial();
+            require(tutorial_reply_outlines_[0]->GetScreenRect() ==
+                        wxRect(bounds).Inflate(FromDIP(1)),
+                    "Low motion did not leave tutorial replies statically outlined");
+            require(preferences_->update(original).ok, "Cannot restore reply motion preferences");
+            render_tutorial();
+        }
         capture("first-reply");
         choice(1);
         check("N002");
@@ -623,7 +834,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         capture("device-selection");
         auto row_highlight = [&](DeviceList* list, const std::vector<std::string>& ids,
                                  const char* id) {
-            const auto targets = tutorial_->view().targets;
+            const auto targets = tutorial_->view(device_id_, device_dirty_).targets;
             const auto key = std::string("device:") + id;
             const auto target = std::find(targets.begin(), targets.end(), key);
             require(target != targets.end(), "Tutorial is missing the intended device-row target");
@@ -694,11 +905,22 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             name->SetWidth(name_width);
             row_highlight(capture_devices_, capture_device_ids_, "tutorial-mic");
         }
+        require(!has_target("device_name") && !has_target("device_save"),
+                "Device rename/save highlighted before an intended selection");
+        select_list(capture_devices_, capture_device_ids_, "tutorial-mixer-in");
+        require(!has_target("device_name") && !has_target("device_save"),
+                "Wrong selected device received rename/save guidance");
         select_list(capture_devices_, capture_device_ids_, "tutorial-mic");
+        require(has_target("device_name") && !has_target("device_save"),
+                "Correct selected device is missing name guidance before editing");
         device_name_->SetValue("My headset microphone");
         check("N015");
+        require(has_target("device_name") && has_target("device_save"),
+                "Unsaved intended device is missing rename/save guidance");
         click(device_save_);
         check("N015");
+        require(!has_target("device_name") && !has_target("device_save"),
+                "Saved device retained rename/save guidance");
         row_highlight(playback_devices_, playback_device_ids_, "tutorial-speakers");
         select_list(playback_devices_, playback_device_ids_, "tutorial-speakers");
         device_name_->SetValue("My headset speakers");
@@ -709,18 +931,22 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         click(profile_new_);
         check("N018A");
         require(tutorial_choices_.empty(), "Profile rename incorrectly has dialogue buttons");
+        listbox_highlight(profiles_, profiles_->GetSelection());
         rename(true, text(draft_.display_name));
         check("N018A");
         rename(true, "  My tutorial profile  ");
         check("N018");
         click(hole_new_);
         check("N018B");
+        listbox_highlight(holes_, holes_->GetSelection());
         rename(false, "  My tutorial connection  ");
         check("N019");
         duplex_->SetValue(true);
         wxCommandEvent return_channel(wxEVT_CHECKBOX, duplex_->GetId());
         duplex_->GetEventHandler()->ProcessEvent(return_channel);
         check("N020");
+        settle_scroll("forward", 3000, forward_.source->GetParent());
+        capture("forward-centered");
         choose_endpoint(forward_.source, forward_.sources, "tutorial-mixer-in");
         check("N020");
         require(commentary_copy_.find("Almost") != std::string::npos,
@@ -729,10 +955,15 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N021");
         choose_endpoint(forward_.destination, forward_.destinations, "tutorial-mixer-out");
         check("N021A");
+        settle_scroll("exclusive", 1500, forward_.exclusive_preferred);
         forward_.exclusive_preferred->SetValue(true);
         wxCommandEvent exclusive(wxEVT_CHECKBOX, forward_.exclusive_preferred->GetId());
         forward_.exclusive_preferred->GetEventHandler()->ProcessEvent(exclusive);
         check("N022");
+        settle_scroll("return", 3000, reverse_.source->GetParent());
+        capture("return-centered");
+        require(commentary_copy_.find("Let me scroll down for you.") != std::string::npos,
+                "Return scroll introduction is missing its explanation");
         require(!reverse_.exclusive_preferred->GetValue(),
                 "Tutorial changed Return exclusive preference");
         choose_endpoint(reverse_.source, reverse_.sources, "tutorial-mixer-in");
@@ -779,7 +1010,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require(!personality_choice_->IsEnabled() && !animation_loops_->IsEnabled() &&
                     !dfa_slider_->IsEnabled(),
                 "Tutorial personality/animation/DFA controls remain interactive");
-        require(wxWindow::FindWindowByLabel("Skip Tutorial", this) != nullptr &&
+        require(wxWindow::FindWindowByLabel("Skip tutorial", this) != nullptr &&
                     wxWindow::FindWindowByLabel("Replay Tutorial", this) == nullptr,
                 "Tutorial Settings did not replace Replay with Skip");
         capture("settings");
@@ -792,7 +1023,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N036");
         require(controller_->snapshot().operating_mode == OperatingMode::Tutorial &&
                     tutorial_choices_.size() == 1 &&
-                    tutorial_choices_[0]->GetLabel() == "Exit tutorial" &&
+                    tutorial_choices_[0]->GetLabel() == "End tutorial" &&
                     commentary_copy_.find("young grasshopper") != std::string::npos,
                 "Completion switched environment or omitted the definitive farewell/exit action");
         capture("farewell");
@@ -800,7 +1031,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
           public:
             bool asked = false;
             int Enter(wxDialog* dialog) override {
-                if (dialog->GetTitle() != "Exit AudioHole?")
+                if (dialog->GetTitle() != "End tutorial")
                     return wxID_NONE;
                 asked = true;
                 return wxID_NO;
@@ -810,8 +1041,50 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         click(tutorial_choices_[0]);
         confirmation.Unregister();
         require(confirmation.asked && !closing_ && IsShown() && tutorial_->complete(),
-                "Exit tutorial did not offer a cancellable normal exit confirmation");
+                "End tutorial did not offer its cancellable restart confirmation");
         check("N036");
+        confirmation.Register();
+        click(tutorial_end_);
+        confirmation.Unregister();
+        require(!closing_ && tutorial_->complete(), "Settings End tutorial ignored Cancel");
+        class ConfirmRestart final : public wxModalDialogHook {
+          public:
+            wxString action;
+            bool asked = false;
+            int Enter(wxDialog* dialog) override {
+                if (dialog->GetTitle() != action)
+                    return wxID_NONE;
+                auto* message = dynamic_cast<wxGenericMessageDialog*>(dialog);
+                if (!message ||
+                    message->GetMessage() != (action == "End tutorial"
+                                                  ? "End the tutorial and restart AudioHole?"
+                                                  : "Skip the tutorial and restart AudioHole?") ||
+                    message->GetYesLabel() != action || message->GetNoLabel() != "Cancel")
+                    throw std::runtime_error(
+                        "Tutorial restart confirmation has incorrect copy/buttons");
+                asked = true;
+                return wxID_YES;
+            }
+        } confirm;
+        const auto restart = restart_;
+        bool restarted = false;
+        restart_ = [&] { restarted = true; };
+        confirm.action = "End tutorial";
+        confirm.Register();
+        click(tutorial_choices_[0]);
+        confirm.Unregister();
+        require(confirm.asked && restarted, "Norm End tutorial did not request a restart");
+        auto completed_lesson = std::move(tutorial_);
+        tutorial_ = std::make_unique<Tutorial>();
+        restarted = false;
+        confirm.action = "Skip tutorial";
+        confirm.asked = false;
+        confirm.Register();
+        skip_tutorial();
+        confirm.Unregister();
+        require(confirm.asked && restarted, "Skip tutorial did not request a restart");
+        tutorial_ = std::move(completed_lesson);
+        restart_ = restart;
         require(std::filesystem::exists(marker) == marker_existed,
                 "Tutorial smoke changed the installed completion flag");
         if (!directory.empty()) {
@@ -819,9 +1092,11 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             std::ofstream out(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt");
             out << "PASS: actual tutorial controls, authored branches, identity-based renames and "
                    "assignments, 20-second scan / 10-second activation completion events, "
-                   "microphone acknowledgement, pink replies without tooltips, first-reply arrow, "
+                   "microphone acknowledgement, pulsing replies without tooltips, first-reply "
+                   "arrow, "
                    "pulsing/clipped row guidance with Low motion, safe animated-popup teardown, "
-                   "farewell/exit confirmation, restricted Settings, no installed flag writes. "
+                   "centered scroll tweens, skip/end restart confirmations, restricted Settings, "
+                   "no installed flag writes. "
                    "DPI: "
                 << GetDPI().x << ".\n";
             require(bool(out), "Could not write tutorial smoke evidence");

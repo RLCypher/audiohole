@@ -12,21 +12,47 @@
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
-// Route wheel gestures to the nearest scrolling container. Never fall through
-// to the native combo procedure, which can change a focused selection silently.
-void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event) {
+namespace {
+bool can_scroll(wxWindow& control, const wxMouseEvent& event) {
+    const bool horizontal = event.GetWheelAxis() == wxMOUSE_WHEEL_HORIZONTAL;
+    SCROLLINFO info{};
+    info.cbSize = sizeof(info);
+    info.fMask = SIF_ALL;
+    if (!GetScrollInfo(static_cast<HWND>(control.GetHandle()), horizontal ? SB_HORZ : SB_VERT,
+                       &info))
+        return false;
+    const int last =
+        std::max(info.nMin, info.nMax - static_cast<int>(info.nPage > 0 ? info.nPage - 1 : 0));
+    const bool toward_end =
+        horizontal ? event.GetWheelRotation() > 0 : event.GetWheelRotation() < 0;
+    return toward_end ? info.nPos < last : info.nPos > info.nMin;
+}
+bool forward_container_wheel(wxWindow& control, wxMouseEvent& event) {
     for (auto* parent = control.GetParent(); parent; parent = parent->GetParent()) {
-        if (!dynamic_cast<wxScrolledWindow*>(parent))
+        if (!dynamic_cast<wxScrolledWindow*>(parent) || !can_scroll(*parent, event))
             continue;
         wxMouseEvent routed(event);
         routed.SetEventObject(parent);
         routed.SetPosition(parent->ScreenToClient(control.ClientToScreen(event.GetPosition())));
         parent->GetEventHandler()->ProcessEvent(routed);
-        return;
+        return true;
     }
+    return false;
+}
+bool scrollable_field(wxWindow& control) {
+    auto* text = dynamic_cast<wxTextCtrl*>(&control);
+    return (text && text->IsMultiLine()) || dynamic_cast<wxListBox*>(&control);
+}
+} // namespace
+void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event) {
+    forward_container_wheel(control, event);
+}
+bool chain_field_wheel(wxWindow& control, wxMouseEvent& event) {
+    return scrollable_field(control) && !can_scroll(control, event) &&
+           forward_container_wheel(control, event);
 }
 namespace {
-bool native_dropdown_wheel(wxWindow& control, UINT message, WPARAM wparam, LPARAM lparam) {
+bool native_wheel(wxWindow& control, UINT message, WPARAM wparam, LPARAM lparam, bool field) {
     if (message != WM_MOUSEWHEEL && message != WM_MOUSEHWHEEL)
         return false;
     wxMouseEvent event(wxEVT_MOUSEWHEEL);
@@ -38,8 +64,22 @@ bool native_dropdown_wheel(wxWindow& control, UINT message, WPARAM wparam, LPARA
     event.m_wheelAxis =
         message == WM_MOUSEHWHEEL ? wxMOUSE_WHEEL_HORIZONTAL : wxMOUSE_WHEEL_VERTICAL;
     event.SetPosition(control.ScreenToClient(wxPoint(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam))));
+    if (field)
+        return chain_field_wheel(control, event);
     forward_dropdown_wheel(control, event);
     return true;
+}
+bool native_dropdown_wheel(wxWindow& control, UINT message, WPARAM wparam, LPARAM lparam) {
+    return native_wheel(control, message, wparam, lparam, false);
+}
+constexpr UINT_PTR field_wheel_subclass = 0x41484657;
+LRESULT CALLBACK field_wheel_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lparam,
+                                  UINT_PTR id, DWORD_PTR owner) {
+    if (message == WM_NCDESTROY)
+        RemoveWindowSubclass(handle, field_wheel_proc, id);
+    else if (native_wheel(*reinterpret_cast<wxWindow*>(owner), message, wparam, lparam, true))
+        return 0;
+    return DefSubclassProc(handle, message, wparam, lparam);
 }
 constexpr UINT_PTR dropdown_wheel_subclass = 0x4148574c;
 LRESULT CALLBACK dropdown_wheel_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lparam,
@@ -105,6 +145,13 @@ bool measure_selection(wxWindow& control, WXMEASUREITEMSTRUCT* item) {
     return true;
 }
 } // namespace
+void enable_field_wheel_chaining(wxWindow& root) {
+    if (scrollable_field(root))
+        SetWindowSubclass(static_cast<HWND>(root.GetHandle()), field_wheel_proc,
+                          field_wheel_subclass, reinterpret_cast<DWORD_PTR>(&root));
+    for (auto* child : root.GetChildren())
+        enable_field_wheel_chaining(*child);
+}
 void prevent_wheel_adjustment(wxWindow& control) {
     SetWindowSubclass(static_cast<HWND>(control.GetHandle()), dropdown_wheel_proc,
                       dropdown_wheel_subclass, reinterpret_cast<DWORD_PTR>(&control));
@@ -473,10 +520,9 @@ wxString button_help(const wxString& title) {
          "Cancel the startup countdown and disarm pending activation."},
         {"Replay Tutorial", "Restart the welcome/tutorial after confirmation; your "
                             "saved configuration is preserved."},
-        {"Skip Tutorial", "Skip the remaining lesson and close AudioHole after confirmation. "
-                          "Next launch opens your saved working environment."},
+        {"Skip tutorial", "Skip the remaining lesson and restart AudioHole after confirmation."},
         {"End tutorial",
-         "Close the fictional tutorial. Next launch opens your saved working environment."},
+         "End the fictional tutorial and restart AudioHole in your saved working environment."},
         {"DFA", "Working as intended."},
         {"Test beep", "Test only the explicitly selected playback destination. Cancel stops the "
                       "test immediately."},

@@ -67,6 +67,8 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
 void Frame::select_page(std::size_t page, bool focus) {
     if (page >= notebook_->GetPageCount())
         return;
+    if (page != 0)
+        tutorial_scroll_duration_ = 0;
     notebook_->SetSelection(page);
     update_navigation();
     if (focus)
@@ -117,6 +119,12 @@ void Frame::apply_appearance() {
     prepare_native_theme(dark_appearance_, contrast);
     apply_palette(this, dark_appearance_, contrast);
     native_theme(this, dark_appearance_, contrast);
+    for (auto* control : tutorial_choices_) {
+        auto* button = static_cast<ActionButton*>(control);
+        button->outline_colour = control->GetLabel() == "End tutorial"
+                                     ? palette::magenta()
+                                     : control->GetBackgroundColour();
+    }
     if (!contrast) {
         // Explicit colors require the documented unthemed native gauge path.
         const auto handle = static_cast<HWND>(scan_progress_->GetHandle());

@@ -321,3 +321,38 @@ TEST_F(WorkflowRefinements, DuplicateEndpointImportNeverReplacesNamedProfile) {
     EXPECT_EQ(read(path), before);
 }
 } // namespace
+
+TEST_F(WorkflowRefinements, OnboardingOutcomeAndOneTimeGreetingPersistWithoutTouchingUserData) {
+    const auto marker = root / "bin" / "AudioHole.has-run";
+    std::filesystem::create_directories(root);
+    std::ofstream(root / "keep.json") << "retained preferences";
+    for (const auto outcome : {OnboardingOutcome::Completed, OnboardingOutcome::Skipped}) {
+        ASSERT_TRUE(mark_first_run(marker, outcome).ok);
+        OnboardingStatus status;
+        ASSERT_TRUE(read_onboarding_status(marker, status).ok);
+        EXPECT_EQ(status.outcome, outcome);
+        EXPECT_FALSE(status.greeting_shown);
+        // Repeated completion cannot replace an existing outcome or replay a greeting.
+        ASSERT_TRUE(mark_first_run(marker, OnboardingOutcome::None).ok);
+        ASSERT_TRUE(mark_onboarding_greeting_shown(marker).ok);
+        ASSERT_TRUE(read_onboarding_status(marker, status).ok);
+        EXPECT_EQ(status.outcome, outcome);
+        EXPECT_TRUE(status.greeting_shown);
+        const auto bytes = read(marker);
+        ASSERT_TRUE(mark_onboarding_greeting_shown(marker).ok);
+        EXPECT_EQ(read(marker), bytes);
+        ASSERT_TRUE(reset_first_run(marker).ok);
+    }
+    std::ofstream(marker) << "AudioHole has run.\n";
+    OnboardingStatus legacy;
+    ASSERT_TRUE(read_onboarding_status(marker, legacy).ok);
+    EXPECT_EQ(legacy.outcome, OnboardingOutcome::None);
+    EXPECT_TRUE(legacy.greeting_shown);
+    std::ofstream(marker)
+        << R"({"format":"audiohole-onboarding","schema_version":1,"outcome":"completed","greeting_shown":"false"})";
+    const auto malformed = read(marker);
+    EXPECT_FALSE(read_onboarding_status(marker, legacy).ok);
+    EXPECT_FALSE(mark_onboarding_greeting_shown(marker).ok);
+    EXPECT_EQ(read(marker), malformed);
+    EXPECT_EQ(read(root / "keep.json"), "retained preferences");
+}

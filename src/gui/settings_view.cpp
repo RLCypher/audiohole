@@ -178,7 +178,7 @@ void Frame::build_settings() {
     launch->Bind(wxEVT_CHECKBOX, save_launch);
     minimized->Bind(wxEVT_CHECKBOX, save_launch);
     auto* tutorial_action = button(
-        appearance_box, appearance_group, tutorial_ ? "Skip Tutorial" : "Replay Tutorial", [this] {
+        appearance_box, appearance_group, tutorial_ ? "Skip tutorial" : "Replay Tutorial", [this] {
             if (tutorial_) {
                 skip_tutorial();
                 return;

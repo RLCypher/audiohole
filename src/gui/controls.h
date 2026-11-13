@@ -69,6 +69,10 @@ class NavigationButton final : public wxToggleButton {
 // follows Windows app appearance, retaining native high-contrast presentation.
 void theme_dialog(wxWindow*);
 bool confirm_exit(wxWindow* parent);
+// Native scrollable fields consume the wheel only while they can move in that
+// direction. Otherwise route to the first ancestor with remaining scroll range.
+bool chain_field_wheel(wxWindow&, wxMouseEvent&);
+void enable_field_wheel_chaining(wxWindow& root);
 void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event);
 // Protect native controls that change values before wx dispatches a wheel event.
 // Parent windows still receive the gesture for page scrolling.

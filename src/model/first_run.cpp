@@ -1,6 +1,49 @@
 #include "model/first_run.h"
 #include "model/persistence.h"
+#include <fstream>
+#include <nlohmann/json.hpp>
 namespace audiohole {
+namespace {
+using Json = nlohmann::ordered_json;
+std::string outcome_name(OnboardingOutcome outcome) {
+    return outcome == OnboardingOutcome::Completed ? "completed"
+           : outcome == OnboardingOutcome::Skipped ? "skipped"
+                                                   : "none";
+}
+Json marker_document(OnboardingStatus status) {
+    return {{"format", "audiohole-onboarding"},
+            {"schema_version", 1},
+            {"outcome", outcome_name(status.outcome)},
+            {"greeting_shown", status.greeting_shown}};
+}
+std::string marker_bytes(const std::filesystem::path& marker) {
+    if (std::filesystem::file_size(marker) > 4096)
+        throw std::runtime_error("Onboarding marker is too large.");
+    std::ifstream input(marker, std::ios::binary);
+    if (!input)
+        throw std::runtime_error("Onboarding marker is unreadable.");
+    std::string bytes{std::istreambuf_iterator<char>(input), {}};
+    if (input.bad() || bytes.size() > 4096)
+        throw std::runtime_error("Onboarding marker read failed.");
+    return bytes;
+}
+OnboardingStatus decode_status(const std::string& bytes) {
+    const auto first = bytes.find_first_not_of(" \r\n\t");
+    if (first == std::string::npos || bytes[first] != '{')
+        return {}; // Older markers only recorded presence.
+    const auto json = Json::parse(bytes);
+    if (json.at("format") != "audiohole-onboarding" || json.at("schema_version") != 1 ||
+        !json.at("greeting_shown").is_boolean())
+        throw std::runtime_error("Invalid onboarding marker.");
+    const auto outcome = json.at("outcome").get<std::string>();
+    if (outcome != "none" && outcome != "completed" && outcome != "skipped")
+        throw std::runtime_error("Invalid onboarding outcome.");
+    return {outcome == "completed" ? OnboardingOutcome::Completed
+            : outcome == "skipped" ? OnboardingOutcome::Skipped
+                                   : OnboardingOutcome::None,
+            json.at("greeting_shown").get<bool>()};
+}
+} // namespace
 Result first_run_needed(const std::filesystem::path& marker, bool& needed) {
     try {
         if (std::filesystem::is_symlink(marker) ||
@@ -12,16 +55,45 @@ Result first_run_needed(const std::filesystem::path& marker, bool& needed) {
         return {false, "Cannot read the first-run marker in AudioHole/bin."};
     }
 }
-Result mark_first_run(const std::filesystem::path& marker) {
+Result mark_first_run(const std::filesystem::path& marker, OnboardingOutcome outcome) {
     bool needed = false;
     const auto checked = first_run_needed(marker, needed);
     if (!checked.ok || !needed)
         return checked;
     const auto written = replace_document(
-        marker, "AudioHole has been run. Delete this file to replay the welcome/tutorial.\n", {});
+        marker, marker_document({outcome, outcome == OnboardingOutcome::None}).dump(2) + "\n", {});
     return written.ok ? written
                       : Result{false, "Cannot save AudioHole.has-run in AudioHole/bin. Check "
                                       "folder permissions or external changes."};
+}
+Result read_onboarding_status(const std::filesystem::path& marker, OnboardingStatus& status) {
+    bool needed = false;
+    const auto checked = first_run_needed(marker, needed);
+    if (!checked.ok)
+        return checked;
+    status = {};
+    if (needed)
+        return {true, "No onboarding receipt."};
+    try {
+        status = decode_status(marker_bytes(marker));
+        return {true, "Onboarding receipt read."};
+    } catch (const std::exception& error) {
+        return {false, std::string("Cannot read onboarding receipt: ") + error.what()};
+    }
+}
+Result mark_onboarding_greeting_shown(const std::filesystem::path& marker) {
+    OnboardingStatus status;
+    const auto read = read_onboarding_status(marker, status);
+    if (!read.ok || status.greeting_shown)
+        return read;
+    try {
+        const auto expected = marker_bytes(marker);
+        status = decode_status(expected);
+        status.greeting_shown = true;
+        return replace_document(marker, marker_document(status).dump(2) + "\n", expected);
+    } catch (const std::exception& error) {
+        return {false, std::string("Cannot save onboarding greeting receipt: ") + error.what()};
+    }
 }
 Result reset_first_run(const std::filesystem::path& marker) {
     bool needed = false;

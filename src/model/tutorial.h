@@ -1,5 +1,6 @@
 #pragma once
 #include "model/controller.h"
+#include "model/first_run.h"
 #include <map>
 #include <set>
 #include <string_view>
@@ -26,7 +27,7 @@ class Tutorial {
     bool complete() const {
         return complete_;
     }
-    TutorialView view() const;
+    TutorialView view(std::string_view selected_device = {}, bool device_dirty = false) const;
     bool choose(const std::string& id);
     void event(std::string_view action, const Snapshot&, const Profile&, int hole, int page);
     void click(std::int64_t now);
@@ -53,4 +54,10 @@ class Tutorial {
 // Exact stable sandbox identities. Display-name edits never affect matching.
 std::vector<Endpoint> tutorial_devices();
 bool tutorial_assignment(const Hole&);
+struct OnboardingGreeting {
+    std::string text, expression;
+};
+// No environment/personality switch. Missing matching authored greeting stays pending.
+std::optional<OnboardingGreeting> onboarding_greeting(OnboardingOutcome,
+                                                      std::string_view personality);
 } // namespace audiohole
