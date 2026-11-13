@@ -253,7 +253,30 @@ int main(int argc, char** argv) {
         auto result = repository.load("uwu", "chibi", "idle");
         expect(result->frames.size() == 12, "real manifest frames");
         result = repository.load("uwu", "chibi", "nonexistent");
-        expect(result->resolved == "idle", "owned unknown fallback");
+        expect(result->resolved == "idle" && result->source == "idle_animation" &&
+                   result->frames.size() == 12 && result->personality == "uwu" &&
+                   result->requested == "nonexistent" && !result->diagnostics.empty(),
+               "unknown request must retain identity/diagnostics and use owned Idle animation");
+        result = repository.load("uwu", "chibi", "nonexistent", true);
+        expect(result->resolved == "idle" && result->source == "idle_static" &&
+                   result->frames.size() == 1,
+               "static-only unknown request must use owned Idle still");
+    });
+    test("Intentional static animations stay quiet while malformed metadata falls back", [] {
+        Fixture f;
+        auto& animation = f.manifest["styles"]["chibi"]["states"]["idle"]["animation"];
+        animation["status"] = "not_generated";
+        f.save();
+        auto result = f.repository().load("uwu", "chibi", "idle");
+        expect(result->source == "static" && result->frames.size() == 1 &&
+                   result->diagnostics.empty(),
+               "intentional static must not produce an animation warning");
+        animation = nullptr;
+        f.save();
+        result = f.repository().load("uwu", "chibi", "idle");
+        expect(result->source == "static" && result->frames.size() == 1 &&
+                   !result->diagnostics.empty(),
+               "malformed animation metadata must report failure and try owned static");
     });
     test("Corrupt or missing animation falls back to own static", [] {
         Fixture f;

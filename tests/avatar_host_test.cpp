@@ -58,6 +58,29 @@ TEST(AvatarIntegration, AllOwnedPacksLoadAndIdleAnimationAdvances) {
     EXPECT_FALSE(host.enabled());
     EXPECT_FALSE(host.tick(now).image);
 }
+TEST(AvatarIntegration, UnknownExpressionFallsBackToTheSelectedPackIdle) {
+    p::Messages messages;
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    for (const auto* id : {"default", "uwu", "vanilla"}) {
+        const auto* package = messages.package(id);
+        ASSERT_TRUE(package && package->avatar_available);
+        av::Repository repository(package->avatar_registry.parent_path(), fake_decoder());
+        for (const bool static_only : {false, true}) {
+            const auto result =
+                repository.load(id, package->avatar_style, "nonexistent", static_only);
+            ASSERT_FALSE(result->frames.empty()) << id;
+            EXPECT_EQ(result->requested, "nonexistent");
+            EXPECT_EQ(result->resolved, "idle");
+            EXPECT_EQ(result->personality, id);
+            EXPECT_EQ(result->source, static_only ? "idle_static" : "idle_animation");
+            EXPECT_FALSE(result->diagnostics.empty());
+            if (static_only)
+                EXPECT_EQ(result->frames.size(), 1u);
+            else
+                EXPECT_GT(result->frames.size(), 1u);
+        }
+    }
+}
 TEST(AvatarIntegration, TutorialExpressionsAnimateAndIntentionalDeadpanIsQuiet) {
     p::Messages messages;
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());

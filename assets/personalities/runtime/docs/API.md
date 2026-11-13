@@ -88,6 +88,12 @@ freeze the previously decoded owned frame. Switching personality/style clears
 it, so Vanilla can never become a universal fallback. No I/O or implicit repair
 occurs during playback/paint.
 
+Unknown expression names retain the requested name and diagnostic, then resolve
+to the selected pack's own IDLE. An animation declared `not_generated` is an
+intentional static expression and stays quiet. Other missing/malformed animation
+metadata is reported per attempt and must still permit the corresponding static
+or owned IDLE fallback; it must not abort the entire fallback chain.
+
 ## Resource bounds and platform notes
 
 JSON inputs are at most 2 MiB; operating PNGs at most 8 MiB each; clips at most

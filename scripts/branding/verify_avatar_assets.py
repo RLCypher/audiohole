@@ -28,6 +28,9 @@ args = parser.parse_args()
 if args.decoded_report:
     reference = json.loads((root / 'assets/personalities/runtime/validation/native-tests.json').read_text(encoding="utf-8"))
     actual = json.loads(args.decoded_report.read_text(encoding="utf-8"))
-    assert actual['failed'] == 0, actual
+    assert actual['failed'] == 0, (
+        f"avatar_engine reported {actual['failed']} failed test(s); "
+        "see its FAIL lines before checking decoded pixels."
+    )
     assert actual['decoded_rgba_sha256'] == reference['decoded_rgba_sha256'], 'Native decoded RGBA differs from approved validation'
     print(f'PASS: native decoder matches all {pngs} reference RGBA buffers')

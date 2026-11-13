@@ -321,10 +321,7 @@ ClipPtr Repository::load(const std::string& personality, const std::string& styl
             idle = load_asset("idle", true).front();
         }
         std::vector<std::pair<std::string, bool>> attempts;
-        // Intentional static-only expressions (for example deadpan) are not
-        // broken/unapproved animations. Real approved-asset load failures below
-        // still produce diagnostics and fall back through the existing policy.
-        if (!static_only && states.at(state).at("animation").value("status", "") != "not_generated")
+        if (!static_only)
             attempts.emplace_back(state, true);
         attempts.emplace_back(state, false);
         if (state != "idle") {
@@ -334,6 +331,12 @@ ClipPtr Repository::load(const std::string& personality, const std::string& styl
         }
         for (const auto& [target, animated] : attempts) {
             try {
+                const auto& entry = states.at(target);
+                // Intentionally static expressions are quiet. Keep metadata
+                // lookup inside this attempt's failure boundary so unknown
+                // states or malformed animations still reach owned fallbacks.
+                if (animated && entry.at("animation").value("status", "") == "not_generated")
+                    continue;
                 auto images = load_asset(target, animated);
                 result->frames = std::move(images);
                 result->resolved = target;
