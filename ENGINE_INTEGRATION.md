@@ -7,9 +7,10 @@ root and profile schema 3 / transfer schema 7 are unchanged.
 
 The source handoff archive SHA-256 is
 `516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e`.
-Its hashes were checked before import. Streaming algorithms and adapters are
-unchanged; integration adjusts CMake/test-fixture paths, disables the standalone
-host, and assigns Runtime package components. Current handoff reference documents
+Its hashes were checked before import. Streaming algorithms and adapter behavior
+are unchanged; integration fixes Windows SDK include dependencies, adjusts CMake/
+test-fixture paths, disables the standalone host, and assigns Runtime package
+components. Current handoff reference documents
 are retained under `engine/handoff/`; older build-time notes remain in `engine/`.
 
 ## Ownership and lifecycle

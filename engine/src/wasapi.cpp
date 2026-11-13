@@ -14,16 +14,19 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+// Establish Win32/COM types before SDK interfaces. Property keys used below
+// are local constants; the SDK's function-discovery key catalog is not needed.
+#include <windows.h>
+
 #include <audioclient.h>
 #include <avrt.h>
 #include <cstring>
-#include <functiondiscoverykeys_devpkey.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <limits>
 #include <mmdeviceapi.h>
+#include <propsys.h>
 #include <propvarutil.h>
-#include <windows.h>
 
 namespace audiohole::engine::detail {
 namespace {
