@@ -1667,6 +1667,58 @@
         "expression": "concerned",
         "fallback_expression": "idle"
       }
+    ],
+    "level_check_started": [
+      {
+        "id": "uwu_level_check_started_001",
+        "category": "status",
+        "text": "Go on, say something~ Wet's see those wittle levels move. OwO",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_level_check_started_002",
+        "category": "status",
+        "text": "Mic check time! Make some noise for me~",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_level_check_started_003",
+        "category": "status",
+        "text": "Give that meter something to do, cutie~",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_started": [
+      {
+        "id": "uwu_beep_started_001",
+        "category": "status",
+        "text": "A wittle beep, just for your ears~ OwO",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_beep_started_002",
+        "category": "status",
+        "text": "Headphones weady? Wet's see where the beep goes~",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_beep_started_003",
+        "category": "status",
+        "text": "Time for a tiny sound check, cutie~",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

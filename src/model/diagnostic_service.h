@@ -7,6 +7,7 @@ struct DiagnosticReading {
     bool active = false, capture = false;
     std::optional<float> peak;
     std::string target, detail;
+    bool failed = false;
 };
 // Control-side interface. start/cancel never wait for audio or driver cleanup.
 // A second operation is rejected until the preceding worker has released its

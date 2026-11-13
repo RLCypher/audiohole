@@ -21,7 +21,9 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         preferences_ = std::make_shared<BuildPreferences>(std::filesystem::path{}, true);
         preferences_->load();
     }
-    personality_ = preferences_->values().personality_id;
+    if (controller_->snapshot().operating_mode == OperatingMode::Tutorial)
+        tutorial_ = std::make_unique<Tutorial>();
+    personality_ = tutorial_ ? "default" : preferences_->values().personality_id;
     Bind(
         wxEVT_TIMER,
         [this](wxTimerEvent&) {
@@ -44,22 +46,24 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* header = new wxBoxSizer(wxHORIZONTAL);
     auto* information = new wxBoxSizer(wxVERTICAL);
-    information->SetMinSize(FromDIP(wxSize(300, -1)));
+    information->SetMinSize(FromDIP(wxSize(320, -1)));
     header->Add(information, 0, wxEXPAND | wxALL, FromDIP(10));
     auto* brand_row = new wxBoxSizer(wxHORIZONTAL);
-    auto* brand_logo = new AgentDisplay(this, wxSize(64, 64));
+    auto* brand_logo = new AgentDisplay(this, wxSize(80, 80));
     brand_row->Add(brand_logo, 0, wxALIGN_CENTER_VERTICAL);
     information->Add(brand_row, 0, wxEXPAND);
     auto* heading = label(this, brand_row, "Audio");
     brand_row->GetItem(heading)->SetFlag(wxALIGN_BOTTOM | wxLEFT);
     auto* hole_wordmark = label(this, brand_row, "Hole");
     hole_wordmark->SetName("brand-wordmark-hole");
-    hole_wordmark->SetFont(wxFont(wxFontInfo(20).Bold()));
+    hole_wordmark->SetFont(wxFont(wxFontInfo(26).Bold()));
     brand_row->GetItem(hole_wordmark)->SetFlag(wxALIGN_BOTTOM);
     brand_row->GetItem(hole_wordmark)->SetBorder(0);
     heading->SetName("brand-wordmark");
-    heading->SetFont(wxFont(wxFontInfo(20).Bold()));
-    label(this, information, "Put your audio wherever you want.");
+    heading->SetFont(wxFont(wxFontInfo(26).Bold()));
+    auto* subtitle = label(this, information, "Put your audio wherever you want.");
+    subtitle->SetFont(wxFont(wxFontInfo(12)));
+    information->AddSpacer(FromDIP(10));
     auto* status_row = new wxBoxSizer(wxHORIZONTAL);
     status_dot_ = new wxPanel(this, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(22, 22)));
     status_dot_->SetMinSize(FromDIP(wxSize(22, 22)));
@@ -75,16 +79,16 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     });
     status_row->Add(status_dot_, 0, wxALIGN_TOP | wxLEFT, FromDIP(4));
     // Neither label length nor wrapping may change the branding-column width.
-    // Six reserved lines cover routing, profiles, startup, advisory and scan.
-    status_ = new wxStaticText(this, wxID_ANY, "Routing: Stopped", wxDefaultPosition,
-                               FromDIP(wxSize(280, 120)), wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
-    status_->SetMinSize(FromDIP(wxSize(280, 120)));
-    status_row->Add(status_, 0, wxALL, FromDIP(4));
+    // Reserve wrapped lines for routing, profiles, startup, advisory and scan.
+    status_ = new wxStaticText(this, wxID_ANY, "Routing: Stopped", wxDefaultPosition, wxDefaultSize,
+                               wxST_NO_AUTORESIZE);
+    status_->SetMinSize(wxSize(0, status_->GetCharHeight() * 9));
+    status_row->Add(status_, 1, wxEXPAND | wxALL, FromDIP(4));
     information->Add(status_row, 0, wxEXPAND | wxBOTTOM, FromDIP(6));
     auto* middle = new wxBoxSizer(wxVERTICAL);
-    // This column follows the buttons' natural width, not the remaining window
-    // width. The avatar follows this column, leaving spare space at the right.
-    header->Add(middle, 0, wxEXPAND | wxALL, FromDIP(8));
+    // Branding and the centered avatar have reserved regions. The dialogue and
+    // equal-width action buttons grow together into the remaining header width.
+    header->Add(middle, 1, wxEXPAND | wxALL, FromDIP(8));
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
     routing_actions_ = actions;
     start_ = button(this, actions, "Start Routing", [this] { activate(false); });
@@ -95,10 +99,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     button(this, actions, "Exit AudioHole", [this] { request_exit(); });
     // Align the card with the actual first/last button edges. Keep spacing only
     // between buttons, with DPI-scaled borders rather than outer side margins.
-    for (auto* item : actions->GetChildren())
+    for (auto* item : actions->GetChildren()) {
         item->SetBorder(FromDIP(3));
-    actions->GetChildren().front()->SetFlag(wxTOP | wxBOTTOM | wxRIGHT);
-    actions->GetChildren().back()->SetFlag(wxTOP | wxBOTTOM | wxLEFT);
+        item->SetProportion(1);
+        item->SetFlag(wxEXPAND | wxALL);
+    }
+    actions->GetChildren().front()->SetFlag(wxEXPAND | wxTOP | wxBOTTOM | wxRIGHT);
+    actions->GetChildren().back()->SetFlag(wxEXPAND | wxTOP | wxBOTTOM | wxLEFT);
     middle->Add(actions, 0, wxEXPAND);
     auto* comment_surface = new SurfacePanel(this, "commentary-card");
     comment_surface_ = comment_surface;
@@ -123,12 +130,26 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     fallback_notice_ = label(commentary_panel_, messages, "");
     // Existing commentary remains to the left of the replaceable agent image;
     // animation uses the shared avatar engine; branding stays independent.
-    agent_display_ = new avatar::Panel(this);
+    avatar_region_ = new wxPanel(this);
+    avatar_region_->SetMinSize(FromDIP(wxSize(tutorial_ ? 260 : 220, -1)));
+    avatar_layout_ = new wxBoxSizer(wxVERTICAL);
+    avatar_region_->SetSizer(avatar_layout_);
+    agent_display_ = new avatar::Panel(avatar_region_);
     agent_display_->checkerboard(false);
     avatar::initialize_image_decoder();
     avatar_host_ = std::make_unique<presentation::AvatarHost>(avatar::native_decoder());
     agent_display_->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&) { bother(); });
-    header->Add(agent_display_, 0, wxEXPAND | wxALL, FromDIP(6));
+    avatar_layout_->Add(agent_display_, 1, wxALIGN_CENTER_HORIZONTAL);
+    if (tutorial_) {
+        tutorial_choices_panel_ = new wxPanel(avatar_region_);
+        tutorial_choices_panel_->SetName("Tutorial choices at Norm's feet");
+        tutorial_choices_panel_->SetMinSize(wxSize(0, FromDIP(84)));
+        tutorial_choices_panel_->SetMaxSize(wxSize(-1, FromDIP(84)));
+        tutorial_choices_layout_ = new wxBoxSizer(wxVERTICAL);
+        tutorial_choices_panel_->SetSizer(tutorial_choices_layout_);
+        avatar_layout_->Add(tutorial_choices_panel_, 0, wxEXPAND);
+    }
+    header->Add(avatar_region_, 0, wxEXPAND | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
     for (std::size_t index = 0; index < 4; ++index) {
@@ -157,6 +178,18 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     build_devices();
     build_scan();
     build_settings();
+    if (tutorial_) {
+        auto disable_files = [&](const auto& self, wxWindow* parent) -> void {
+            if (auto* action = dynamic_cast<wxButton*>(parent)) {
+                const auto caption = action->GetLabel();
+                if (caption.StartsWith("Export") || caption.StartsWith("Import"))
+                    action->Disable();
+            }
+            for (auto* child : parent->GetChildren())
+                self(self, child);
+        };
+        disable_files(disable_files, this);
+    }
     CreateStatusBar();
     // The native Windows status bar ignores SetForegroundColour for its text.
     // Paint only its dark presentation; native fields, updates, tooltips and
@@ -236,6 +269,11 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
             e.Skip();
             return;
         }
+        if (tutorial_) {
+            e.Veto();
+            request_exit();
+            return;
+        }
         if (smoke_) {
             e.Veto();
             exit();
@@ -260,6 +298,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     notebook_->Bind(wxEVT_BOOKCTRL_PAGE_CHANGED, [this](wxBookCtrlEvent& e) {
         end_observation();
         update_navigation();
+        tutorial_event("navigation");
         e.Skip();
     });
     apply_appearance();
@@ -324,6 +363,12 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
 }
 int Frame::FilterEvent(wxEvent& event) {
     const auto type = event.GetEventType();
+    if (tutorial_ && type == wxEVT_CHAR_HOOK &&
+        static_cast<wxKeyEvent&>(event).GetKeyCode() == WXK_F1) {
+        tutorial_->repeat();
+        render_tutorial();
+        return wxEventFilter::Event_Processed;
+    }
     if (type == wxEVT_MOUSEWHEEL) {
         auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
         for (auto* control = window; control && control != this; control = control->GetParent()) {
@@ -359,8 +404,18 @@ int Frame::FilterEvent(wxEvent& event) {
     return wxEventFilter::Event_Skip;
 }
 void Frame::request_exit() {
-    if (confirm_exit(this))
+    if (tutorial_ && !tutorial_->complete()) {
+        tutorial_->remind("B011");
+        render_tutorial();
+    }
+    if (confirm_exit(this)) {
+        if (tutorial_ && tutorial_->complete() && !tutorial_marker_saved_ && !finish_tutorial())
+            return;
         exit();
+    } else if (tutorial_) {
+        tutorial_->dismiss_reminder();
+        render_tutorial();
+    }
 }
 void Frame::stop_avatar() {
     avatar_timer_.Stop();
@@ -373,6 +428,8 @@ void Frame::poll_avatar() {
     if (!avatar_host_)
         return;
     const auto now = avatar::monotonic_ms();
+    if (tutorial_)
+        avatar_host_->activity(now);
     auto frame = avatar_host_->tick(now);
     if (frame.diagnostics != last_avatar_diagnostics_) {
         last_avatar_diagnostics_ = frame.diagnostics;
@@ -407,6 +464,11 @@ void Frame::poll_avatar() {
     }
 }
 void Frame::bother() {
+    if (tutorial_) {
+        tutorial_->click(avatar::monotonic_ms());
+        render_tutorial();
+        return;
+    }
     if (operational_warning_visible_ || personality_ == "vanilla" ||
         messages_.variants(presentation::Message::Bother, personality_).empty())
         return;
@@ -417,6 +479,8 @@ void Frame::bother() {
     present(presentation::Message::Bother);
 }
 void Frame::present(presentation::Message event) {
+    if (tutorial_)
+        return;
     const bool device_notice = event == presentation::Message::DeviceConnected ||
                                event == presentation::Message::DeviceDisconnected ||
                                event == presentation::Message::DeviceUnavailable;
@@ -446,27 +510,45 @@ void Frame::layout_header() {
         return;
     // Re-read native button metrics after DPI/font changes. Copy length never
     // participates in the commentary card's horizontal sizing.
-    comment_surface_->SetMinSize(wxSize(routing_actions_->GetMinSize().x, FromDIP(156)));
+    comment_surface_->SetMinSize(
+        wxSize(routing_actions_->GetMinSize().x, FromDIP(tutorial_ ? 266 : 156)));
     // Derive height solely from the branding and operations columns, excluding
     // the avatar to avoid a feedback loop. Never shrink it at compact widths.
-    auto* header = agent_display_->GetContainingSizer();
+    auto* header = avatar_region_->GetContainingSizer();
     int header_height = 0;
     for (auto* item : header->GetChildren()) {
-        if (item->GetWindow() == agent_display_)
+        if (item->GetWindow() == avatar_region_)
             continue;
         item->CalcMin();
         header_height = std::max(header_height, item->GetMinSizeWithBorder().y);
     }
-    agent_display_->fit_height(header_height - 2 * FromDIP(6));
+    agent_display_->fit_height(header_height - 2 * FromDIP(6) - (tutorial_ ? FromDIP(84) : 0));
     // Full-height artwork needs its real proportional width even at minimum
     // size. Increase the minimum instead of clipping or reducing the image.
     auto minimum = FromDIP(wxSize(980, 680));
+    if (GetSizer() && profile_rows_ && notebook_ && !navigation_.empty()) {
+        constrain_profile_rows();
+        int borders = 2 * profile_columns_->GetBorderSize();
+        if (const auto* item = GetSizer()->GetItem(notebook_))
+            borders += item->GetBorder() * 2;
+        auto* page_layout = notebook_->GetPage(0)->GetSizer();
+        if (const auto* item = page_layout->GetItem(profile_actions_))
+            borders += item->GetBorder() * 2;
+        if (const auto* item = page_layout->GetItem(profile_columns_))
+            borders += item->GetBorder() * 2;
+        minimum.y =
+            std::max(minimum.y,
+                     header_height + navigation_[0]->GetContainingSizer()->GetMinSize().y +
+                         profile_actions_->GetEffectiveMinSize().y + profile_rows_->GetMinSize().y +
+                         borders + GetSize().y - GetClientSize().y);
+    }
     minimum.x = std::max(minimum.x, header->GetMinSize().x + GetSize().x - GetClientSize().x);
     if (GetMinSize() != minimum)
         SetMinSize(minimum);
-    if (GetSize().x < minimum.x)
-        SetSize(wxSize(minimum.x, GetSize().y));
+    if (GetSize().x < minimum.x || GetSize().y < minimum.y)
+        SetSize(wxSize(std::max(minimum.x, GetSize().x), std::max(minimum.y, GetSize().y)));
     Layout(); // Allocate fixed branding/avatar regions before measuring text space.
+    constrain_profile_rows();
     const int width = std::max(120, commentary_panel_->GetClientSize().x - FromDIP(24));
     auto wrap = [width](wxStaticText* control, const std::string& copy) {
         control->Show(!copy.empty());
@@ -474,13 +556,15 @@ void Frame::layout_header() {
         control->Wrap(width);
     };
     status_->SetLabel(text(status_copy_));
+    status_->Wrap(std::max(100, status_->GetClientSize().x));
     status_->SetToolTip(text(status_copy_));
     const bool asleep = !sleep_copy_.empty() && !operational_warning_visible_ &&
                         avatar_host_->enabled() &&
                         avatar_host_->baseline().expression == "sleeping";
     wrap(technical_, asleep ? std::string{} : technical_copy_);
     technical_->SetToolTip(text(technical_copy_));
-    if (!operational_warning_visible_ && !asleep && technical_->GetLabel().Freq('\n') > 1) {
+    if (!tutorial_ && !operational_warning_visible_ && !asleep &&
+        technical_->GetLabel().Freq('\n') > 1) {
         const auto lines = wxSplit(technical_->GetLabel(), '\n');
         wxClientDC dc(technical_);
         dc.SetFont(technical_->GetFont());
@@ -499,6 +583,12 @@ void Frame::layout_header() {
     Layout();
 }
 void Frame::show_result(const audiohole::Result& result, bool operational) {
+    if (tutorial_) {
+        if (!result.ok)
+            tutorial_->remind(dirty_ ? "B007" : "B006");
+        render_tutorial();
+        return;
+    }
     // Input/file-action failures are recoverable locally. They do not authorize
     // a persistent operational warning or suppress cosmetic interactions.
     if (!result.ok && !operational) {
@@ -564,8 +654,9 @@ void Frame::refresh() {
         } else if (s.scanner.result != "completed")
             show_result({false, s.scanner.detail});
     }
-    avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
-    const bool preview = s.operating_mode == OperatingMode::Preview;
+    if (!tutorial_)
+        avatar_host_->observe(s, operational_warning_visible_, avatar::monotonic_ms());
+    const bool preview = s.operating_mode != OperatingMode::Test;
     start_->Enable(s.capabilities.routing);
     stop_->Enable(s.capabilities.routing);
     profile_apply_->Enable(s.capabilities.routing && !viewed_.empty());
@@ -649,8 +740,9 @@ void Frame::refresh() {
     }
     const auto* active = audiohole::profile(s, s.active_profile);
     std::string status =
-        (preview ? std::string("Preview Mode | Routing: ") + audiohole::name(s.state)
-                 : std::string("Test Mode | Engine: unavailable")) +
+        (tutorial_ ? std::string("Tutorial Mode | Pretend routing: ") + audiohole::name(s.state)
+         : preview ? std::string("Preview Mode | Routing: ") + audiohole::name(s.state)
+                   : std::string("Test Mode | Engine: unavailable")) +
         "\nActive: " + (active ? active->display_name : "none") +
         "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
     if (!s.pending_profile.empty())
@@ -672,12 +764,14 @@ void Frame::refresh() {
         return event.type == "error" || event.type == "scan-failed";
     });
     const auto holes = draft_.holes.size();
-    SetStatusText(
-        text(std::string(preview ? "AudioHole (Preview Mode) | Engine: " : "AudioHole | Engine: ") +
-             (preview ? name(s.state) : "unavailable") +
-             " | Devices: " + std::to_string(s.endpoints.size()) + " | Profiles: " +
-             std::to_string(s.profiles.size()) + " | Viewed holes: " + std::to_string(holes) +
-             " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
+    SetStatusText(text(std::string(tutorial_ ? "AudioHole (Tutorial Mode) | Simulated: "
+                                   : preview ? "AudioHole (Preview Mode) | Engine: "
+                                             : "AudioHole | Engine: ") +
+                       (preview ? name(s.state) : "unavailable") +
+                       " | Devices: " + std::to_string(s.endpoints.size()) +
+                       " | Profiles: " + std::to_string(s.profiles.size()) +
+                       " | Viewed holes: " + std::to_string(holes) +
+                       " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
     update_status_indicator();
     std::string paths;
     for (const auto& p : s.paths)
@@ -706,7 +800,9 @@ void Frame::refresh() {
                                          .count()));
         scan_status += "\n" + text(s.scanner.detail);
     } else
-        scan_status = s.scanning ? "Preview scan in progress" : "No scan in progress";
+        scan_status = s.scanning ? (tutorial_ ? "Fictional tutorial scan in progress"
+                                              : "Preview scan in progress")
+                                 : "No scan in progress";
     if (scan_state_->GetValue() != scan_status) {
         scan_state_->ChangeValue(scan_status);
         scan_state_->SetToolTip(scan_status);
@@ -737,6 +833,8 @@ void Frame::refresh() {
     for (const auto& e : s.events)
         if (e.sequence > seen_event_) {
             seen_event_ = e.sequence;
+            if (tutorial_)
+                continue;
             bool routine = true;
             presentation::Message message = presentation::Message::Ready;
             if (e.type == "scan-start")
@@ -780,7 +878,8 @@ void Frame::refresh() {
                 commentary_copy_.clear();
                 layout_header();
             }
-            if (!smoke_ && tray_->IsIconInstalled() && notifications_->GetSelection() != 2 &&
+            if (!smoke_ && !tutorial_ && tray_->IsIconInstalled() &&
+                notifications_->GetSelection() != 2 &&
                 (e.type == "error" ||
                  (notifications_->GetSelection() == 1 &&
                   (e.type == "reconnected" || e.type == "disconnected" || e.type == "stopped")))) {
@@ -799,6 +898,18 @@ void Frame::refresh() {
         present(device_notices.back().message);
     }
     tray_->update(s);
+    if (tutorial_) {
+        std::vector<std::string> observed;
+        for (const auto& event : s.events)
+            if (event.sequence > tutorial_seen_event_) {
+                observed.push_back(event.type);
+                tutorial_seen_event_ = event.sequence;
+            }
+        for (const auto& event : observed)
+            tutorial_event(event);
+        tutorial_->tick(avatar::monotonic_ms());
+        render_tutorial();
+    }
 }
 bool Frame::smoke(const wxString& directory) {
     try {
@@ -1262,10 +1373,27 @@ bool Frame::smoke(const wxString& directory) {
                 require(action->IsShownOnScreen() &&
                             profile_actions_->GetClientRect().Contains(action->GetRect()),
                         "A profile save action is hidden or clipped");
-            for (wxWindow* field : std::vector<wxWindow*>{profiles_, profile_notes_, holes_})
-                require(profile_sidebar_->IsDescendant(field) &&
-                            profile_sidebar_->GetScreenRect().Contains(field->GetScreenRect()),
-                        "An independently scrolling profile field is clipped");
+            for (wxWindow* field : std::vector<wxWindow*>{profiles_, profile_notes_, holes_}) {
+                if (!profile_sidebar_->IsDescendant(field) ||
+                    !profile_sidebar_->GetScreenRect().Contains(field->GetScreenRect())) {
+                    const auto sidebar = profile_sidebar_->GetScreenRect(),
+                               bounds = field->GetScreenRect();
+                    throw std::runtime_error(
+                        "Profile field clipped: " + utf8(field->GetName()) +
+                        "; client=" + std::to_string(GetClientSize().x) + "x" +
+                        std::to_string(GetClientSize().y) +
+                        "; sidebar=" + std::to_string(sidebar.x) + "," + std::to_string(sidebar.y) +
+                        "," + std::to_string(sidebar.width) + "," + std::to_string(sidebar.height) +
+                        "; field=" + std::to_string(bounds.x) + "," + std::to_string(bounds.y) +
+                        "," + std::to_string(bounds.width) + "," + std::to_string(bounds.height) +
+                        "; window-min=" + std::to_string(GetMinSize().y) +
+                        "; rows-min=" + std::to_string(profile_rows_->GetMinSize().y) +
+                        "; rows-height=" + std::to_string(profile_rows_->GetClientSize().y) +
+                        "; outer-sash=" + std::to_string(profile_rows_->GetSashPosition()) +
+                        "; lower-height=" + std::to_string(profile_lower_rows_->GetClientSize().y) +
+                        "; lower-sash=" + std::to_string(profile_lower_rows_->GetSashPosition()));
+                }
+            }
         };
         layout_header();
         check_profile_layout();
@@ -1798,6 +1926,7 @@ bool Frame::smoke(const wxString& directory) {
         layout_header();
         check_profile_layout();
         wxSize previous_card_size = wxDefaultSize;
+        int previous_header_width = 0;
         wxSize previous_avatar_size = wxDefaultSize;
         for (const auto size :
              {wxSize(980, 680), wxSize(1000, 1000), wxSize(980, 740), wxSize(1250, 850),
@@ -1817,28 +1946,37 @@ bool Frame::smoke(const wxString& directory) {
             require(card.GetLeft() == start_->GetRect().GetLeft() &&
                         card.GetRight() == exit_button->GetRect().GetRight(),
                     "Commentary card does not match the routing button row edges");
-            require(previous_card_size == wxDefaultSize || card.GetSize() == previous_card_size,
-                    "Window resizing changes the commentary card size");
+            if (previous_header_width && GetClientSize().x > previous_header_width)
+                require(card.GetWidth() > previous_card_size.x,
+                        "A wider window did not widen the personality panel");
+            if (previous_header_width && GetClientSize().x < previous_header_width)
+                require(card.GetWidth() < previous_card_size.x,
+                        "A narrower window did not resize the personality panel");
+            previous_header_width = GetClientSize().x;
             previous_card_size = card.GetSize();
-            const auto avatar = agent_display_->GetRect();
+            const auto avatar = wxRect(ScreenToClient(agent_display_->GetScreenPosition()),
+                                       agent_display_->GetSize());
+            const auto region = wxRect(ScreenToClient(avatar_region_->GetScreenPosition()),
+                                       avatar_region_->GetSize());
             require(previous_avatar_size == wxDefaultSize ||
                         avatar.GetSize() == previous_avatar_size,
                     "Window resizing reduces the full-height avatar");
             previous_avatar_size = avatar.GetSize();
-            const auto* header = agent_display_->GetContainingSizer();
+            const auto* header = avatar_region_->GetContainingSizer();
             require(avatar.GetTop() == header->GetPosition().y + FromDIP(6) &&
                         avatar.GetHeight() == header->GetSize().y - 2 * FromDIP(6),
                     "Avatar does not fill the header height");
             require(static_cast<long long>(avatar.GetWidth()) * 768 >=
                         static_cast<long long>(avatar.GetHeight()) * 512,
                     "Avatar width constrains its rendered height");
-            require(agent_display_->GetPosition().x - card.GetRight() - 1 ==
-                        FromDIP(8) + FromDIP(6),
-                    "Avatar no longer follows the commentary card with a fixed gap");
-            require(card.GetRight() <= agent_display_->GetPosition().x &&
-                        agent_display_->GetRect().GetRight() < GetClientSize().x &&
-                        agent_display_->GetRect().GetBottom() < navigation_[0]->GetPosition().y,
-                    "Header regions overlap or avatar reaches navigation");
+            require(region.GetLeft() - card.GetRight() - 1 == FromDIP(8) + FromDIP(6),
+                    "Avatar region no longer follows the widened personality panel");
+            require(std::abs(avatar.GetLeft() * 2 + avatar.GetWidth() - region.GetLeft() * 2 -
+                             region.GetWidth()) <= 1,
+                    "Avatar is not centered in its right-hand region");
+            require(card.GetRight() <= region.GetLeft() && avatar.GetRight() < GetClientSize().x &&
+                        avatar.GetBottom() < navigation_[0]->GetPosition().y,
+                    "Header regions overlap or clip the avatar");
             require(personality_heading_->GetPosition().x >= FromDIP(12) &&
                         personality_heading_->GetPosition().y >= FromDIP(12),
                     "Personality heading covers the rounded corner");

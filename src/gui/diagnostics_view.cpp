@@ -5,6 +5,16 @@
 #include <wx/ffile.h>
 
 namespace audiohole::gui {
+namespace {
+wxString diagnostic_provenance(OperatingMode mode) {
+    if (mode == OperatingMode::Tutorial)
+        return wxS(
+            "AudioHole Tutorial — fictional devices and simulated operations; no real audio.\n\n");
+    if (mode == OperatingMode::Preview)
+        return wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n");
+    return wxS("AudioHole Test Mode — real scanner evidence; no routing/playback backend.\n\n");
+}
+} // namespace
 void Frame::bundle_dialog(bool profiles, bool importing) {
     if (dirty_ || device_dirty_) {
         show_result(
@@ -55,10 +65,15 @@ void Frame::build_scan() {
     scan_scope_->SetToolTip(
         "Update tests only newly discovered devices and refreshes known metadata. Full retests "
         "all. Per-device scans are available by right-clicking a device on Devices.");
-    scan_mode_->Bind(wxEVT_CHOICE,
-                     [this](wxCommandEvent&) { present(presentation::Message::ScanLevelChanged); });
+    scan_mode_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
+        present(presentation::Message::ScanLevelChanged);
+        if (tutorial_ && scan_mode_->GetSelection() == 1 && scan_scope_->GetSelection() == 1)
+            tutorial_event("scan_options");
+    });
     scan_scope_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         present(presentation::Message::ScanScopeChanged);
+        if (tutorial_ && scan_mode_->GetSelection() == 1 && scan_scope_->GetSelection() == 1)
+            tutorial_event("scan_options");
     });
     root->Add(options, 0, wxEXPAND);
     auto* row = new wxBoxSizer(wxHORIZONTAL);
@@ -201,11 +216,7 @@ void Frame::build_scan() {
         // wxClipboard owns the supplied data object. Close on either SetData
         // outcome; never announce success when the clipboard rejects the data.
         const bool copied = wxTheClipboard->SetData(new wxTextDataObject(
-            (controller_->snapshot().operating_mode == OperatingMode::Preview
-                 ? wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n")
-                 : wxS("AudioHole Test Mode — real scanner evidence; no routing/playback "
-                       "backend.\n\n")) +
-            console_->GetValue()));
+            diagnostic_provenance(controller_->snapshot().operating_mode) + console_->GetValue()));
         wxTheClipboard->Close();
         if (copied)
             present(presentation::Message::DiagnosticsCopied);
@@ -255,6 +266,17 @@ void Frame::build_scan() {
 // Every entry point shares the same exact target and consent path. Widgets issue
 // typed requests; only the background scanner opens Windows devices or files.
 void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
+    if (tutorial_) {
+        if (!deep || scope != ScanScope::Full) {
+            tutorial_->repeat();
+            render_tutorial();
+            return;
+        }
+        controller_->scan(true, true, ScanScope::Full);
+        tutorial_event("scan_started");
+        refresh();
+        return;
+    }
     if (device_dirty_) {
         show_result({false, "Save device edits or reload/discard them before scanning."});
         return;
@@ -385,13 +407,9 @@ void Frame::export_log() {
     // simulator provenance after it leaves the context of the startup notice.
     wxFFile output(dialog.GetPath(), "wb");
     if (!output.IsOpened() ||
-        !output.Write(
-            (controller_->snapshot().operating_mode == OperatingMode::Preview
-                 ? wxS("AudioHole Preview Build — simulated data; no hardware measurements.\n\n")
-                 : wxS("AudioHole Test Mode — real scanner evidence; no routing/playback "
-                       "backend.\n\n")) +
-                console_->GetValue(),
-            wxConvUTF8) ||
+        !output.Write(diagnostic_provenance(controller_->snapshot().operating_mode) +
+                          console_->GetValue(),
+                      wxConvUTF8) ||
         !output.Close())
         show_result({false, "Could not write diagnostics to the selected file. Check permissions "
                             "and available space."});

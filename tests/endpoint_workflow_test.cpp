@@ -121,6 +121,24 @@ TEST_F(EndpointChecks, SubscribersReceiveMeasuredLevelAndReleasedState) {
     EXPECT_FALSE(update.state->monitoring);
     EXPECT_FALSE(update.state->input_peak);
 }
+TEST_F(EndpointChecks, AsynchronousFailureIsPublishedAndClearedForTheNextCheck) {
+    ApplicationController app(std::move(controller));
+    auto subscription = app.subscribe();
+    subscription.poll();
+    ASSERT_TRUE(app.beep("playback").ok);
+    checks->finish();
+    checks->state.failed = true;
+    checks->state.detail = "The playback endpoint was disconnected.";
+    app.advance(100);
+    const auto update = subscription.poll();
+    ASSERT_TRUE(update.state);
+    EXPECT_TRUE(update.state->beep_destination.empty());
+    EXPECT_TRUE(update.state->diagnostic_failed);
+    EXPECT_EQ(update.state->diagnostic_detail, checks->state.detail);
+    ASSERT_TRUE(app.check_level("capture").ok);
+    EXPECT_FALSE(app.snapshot().diagnostic_failed);
+    EXPECT_EQ(store->saves, 0);
+}
 TEST_F(EndpointChecks, ChangedBindingOrAvailabilityCancelsWithoutRetargeting) {
     ASSERT_TRUE(controller->check_level("capture").ok);
     auto info =

@@ -1727,3 +1727,19 @@ profile schema or engine semantics change. The previous reported smoke failure
 was identified by the owner's build log as MSVC C2445 in diagnostic_view.cpp,
 caused by mixed literal/wxString conditional operands. Explicit typed assignment
 fixes that compile failure; native execution must still be reported separately.
+
+### 2026-11-13 — Owner-authored tutorial replaces user-facing Preview
+
+Implement the supplied Norm tutorial version 2.4 without replacing its curriculum
+or dialogue. Tutorial is a distinct in-memory mode, not a path into Test storage,
+scanner or audio services. Only completion or explicit skip may persist the
+existing bin/AudioHole.has-run marker. Preserve welcome; use the owner's exact
+choices and incoming variants, actual GUI events, identity-based assignments and
+20-second operation completion events. Only clicking Norm has a 10-second dialogue
+overlay; it never advances the lesson. See TUTORIAL.md for the storage/event and
+presentation contracts. Internal simulation fixtures remain solely for regression
+coverage. Production audio-engine architecture and profile schema are unchanged.
+
+Also implement the pending compact diagnostic rows/personality responses, wider
+personality card/actions, centered avatar, larger branding and wrapped status.
+No extra audio diagnostic sessions or playback algorithms are introduced.

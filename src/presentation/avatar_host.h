@@ -17,6 +17,7 @@ class AvatarHost {
     // Waking never changes routing state or selects new dialogue.
     void activity(std::int64_t now);
     avatar::Decision react(Message, const Copy&, std::uint64_t occurrence, std::int64_t now);
+    void tutorial_expression(const std::string&, std::uint64_t occurrence, std::int64_t now);
     avatar::Presentation tick(std::int64_t now);
     void reduced_motion(bool enabled);
     void first_frame_only(bool enabled);

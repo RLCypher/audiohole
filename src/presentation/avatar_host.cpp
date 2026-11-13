@@ -97,6 +97,18 @@ avatar::Decision AvatarHost::react(Message event, const Copy& copy, std::uint64_
                             2000, priority, reaction_final_hold_ms},
                            now);
 }
+void AvatarHost::tutorial_expression(const std::string& expression, std::uint64_t occurrence,
+                                     std::int64_t now) {
+    if (!session_)
+        return;
+    activity(now);
+    const auto owned =
+        std::find(supported_.begin(), supported_.end(), expression) != supported_.end();
+    session_->player().reaction_playback(1, true);
+    session_->react({owned ? expression : "idle", "tutorial:" + std::to_string(occurrence),
+                     revision_, now, 2000, 120, 0},
+                    now);
+}
 avatar::Presentation AvatarHost::tick(std::int64_t now) {
     if (!session_)
         return {};

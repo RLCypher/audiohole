@@ -81,6 +81,7 @@ class Session final : public DiagnosticService {
         if (FAILED(initialized)) {
             std::lock_guard lock(mutex_);
             state_.detail = "Cannot initialize the device-check worker.";
+            state_.failed = true;
             state_.active = false;
             busy_ = false;
             return;
@@ -272,6 +273,8 @@ class Session final : public DiagnosticService {
                                                "on the selected device.");
             } catch (const std::exception& error) {
                 detail(error.what());
+                std::lock_guard lock(mutex_);
+                state_.failed = !stop.stop_requested();
             }
             if (started) {
                 const auto stopped = client->Stop();

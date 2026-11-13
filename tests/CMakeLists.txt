@@ -1,7 +1,7 @@
 include(GoogleTest)
 add_executable(audiohole_model_tests model_test.cpp avatar_host_test.cpp avatar_player_test.cpp sleep_commentary_test.cpp text_layout_test.cpp personality_files_test.cpp icon_outline_test.cpp dfa_test.cpp persistence_test.cpp configuration_bundle_test.cpp application_controller_test.cpp scanner_service_test.cpp scan_text_test.cpp scan_progress_test.cpp)
 target_compile_definitions(audiohole_model_tests PRIVATE AUDIOHOLE_TEST_PERSONALITIES_DIR="${PROJECT_SOURCE_DIR}/personalities")
-target_sources(audiohole_model_tests PRIVATE advanced_tuning_test.cpp profile_builder_test.cpp workflow_refinements_test.cpp endpoint_workflow_test.cpp)
+target_sources(audiohole_model_tests PRIVATE advanced_tuning_test.cpp profile_builder_test.cpp workflow_refinements_test.cpp endpoint_workflow_test.cpp tutorial_test.cpp)
 target_link_libraries(audiohole_model_tests PRIVATE audiohole_model audiohole_zip GTest::gtest_main)
 if(MSVC)
   target_compile_options(audiohole_model_tests PRIVATE /W4 /permissive- /utf-8)
@@ -28,12 +28,15 @@ if(NOT AUDIOHOLE_MODEL_ONLY)
   set_tests_properties(Gui.Smoke PROPERTIES TIMEOUT 45)
   add_test(NAME Gui.TestModeSmoke COMMAND audiohole --test-mode-smoke --screenshot-dir "${CMAKE_BINARY_DIR}/gui-smoke/$<CONFIG>/test-mode")
   set_tests_properties(Gui.TestModeSmoke PROPERTIES TIMEOUT 45)
+  add_test(NAME Gui.TutorialSmoke COMMAND audiohole --tutorial-smoke --screenshot-dir "${CMAKE_BINARY_DIR}/gui-smoke/$<CONFIG>/tutorial")
+  set_tests_properties(Gui.TutorialSmoke PROPERTIES TIMEOUT 45)
 endif()
 
 # Optional locally; the Windows CI workflow explicitly runs the same dependency-
 # free Python check. Regenerating icons alone additionally needs Pillow.
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
+  add_test(NAME Tutorial.CatalogIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/GenerateTutorial.py" --check)
   add_test(NAME Branding.AssetIntegrity
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_assets.py")
   add_test(NAME Avatar.AssetIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_avatar_assets.py")

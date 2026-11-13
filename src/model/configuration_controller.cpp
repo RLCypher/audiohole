@@ -217,6 +217,7 @@ Result ConfigurationController::start_check(const std::string& id, bool capture)
     state_.monitor_source = capture ? id : "";
     state_.beep_destination = capture ? "" : id;
     state_.input_peak.reset();
+    state_.diagnostic_failed = false;
     ++state_.revision;
     return {true, capture ? "Opening the selected capture endpoint."
                           : "Opening the selected playback endpoint."};
@@ -353,7 +354,7 @@ void ConfigurationController::advance(int) {
             state_.monitor_source != (value.active && value.capture ? value.target : "") ||
             state_.input_peak != (value.active && value.capture ? value.peak : std::nullopt) ||
             state_.beep_destination != (value.active && !value.capture ? value.target : "") ||
-            state_.diagnostic_detail != value.detail;
+            state_.diagnostic_detail != value.detail || state_.diagnostic_failed != value.failed;
         if (changed)
             ++state_.revision;
         state_.monitoring = value.active && value.capture;
@@ -361,6 +362,7 @@ void ConfigurationController::advance(int) {
         state_.input_peak = state_.monitoring ? value.peak : std::nullopt;
         state_.beep_destination = value.active && !value.capture ? value.target : "";
         state_.diagnostic_detail = value.detail;
+        state_.diagnostic_failed = value.failed;
         if (value.active) {
             const auto* target = endpoint(state_, value.target);
             if (!target || target->availability != Availability::Available || !target->inspection ||

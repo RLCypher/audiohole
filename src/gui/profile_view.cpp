@@ -152,6 +152,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (!loading_) {
             capture_draft();
             dirty_ = true;
+            tutorial_event("exclusive");
             refresh();
         }
     });
@@ -310,6 +311,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         populate_direction(forward_, hole.forward);
         populate_direction(reverse_, hole.reverse);
         dirty_ = true;
+        tutorial_event("endpoints");
         present(source ? presentation::Message::Source : presentation::Message::Destination);
         refresh();
     };
@@ -617,6 +619,7 @@ void Frame::add_hole() {
     load_holes();
     load_hole(static_cast<int>(draft_.holes.size()) - 1);
     present(presentation::Message::Created);
+    tutorial_event("hole_created");
     refresh();
 }
 void Frame::duplicate_hole() {
@@ -764,8 +767,10 @@ void Frame::build_profiles() {
             const auto id = controller_->create_profile("New Profile");
             if (id.empty())
                 show_result({false, controller_->last_edit_error()});
-            else
+            else {
                 select_profile(id);
+                tutorial_event("profile_created");
+            }
         });
     profile_remove_ = add_control(
         profile_panel, profile_heading, "Delete profile",
@@ -803,6 +808,18 @@ void Frame::build_profiles() {
     holes_panel->SetSizer(holes_layout);
     profile_lower_rows_->SplitHorizontally(holes_panel, notes_panel);
     profile_rows_->SplitHorizontally(profile_panel, profile_lower_rows_);
+    for (auto* rows : {profile_rows_, profile_lower_rows_})
+        rows->Bind(wxEVT_SIZE, [this](wxSizeEvent& event) {
+            constrain_profile_rows();
+            event.Skip();
+        });
+    profile_rows_->Bind(wxEVT_SPLITTER_SASH_POS_CHANGING, [this](wxSplitterEvent& event) {
+        const int low = profile_rows_->GetMinimumPaneSize();
+        const int high = profile_rows_->GetClientSize().y - profile_rows_->GetSashSize() -
+                         profile_lower_rows_->GetMinSize().y;
+        if (high >= low)
+            event.SetSashPosition(std::clamp(event.GetSashPosition(), low, high));
+    });
     sidebar_layout->Add(profile_rows_, 1, wxEXPAND);
     sidebar->SetSizer(sidebar_layout);
     auto* right_container = new wxPanel(profile_columns_);
@@ -856,6 +873,10 @@ void Frame::build_profiles() {
     performance_panel_->SetSizer(performance);
     label(performance->GetStaticBox(), performance,
           "Latency / buffer occupancy / clock drift / CPU: unavailable.");
+    tutorial_routing_progress_ = new wxGauge(performance->GetStaticBox(), wxID_ANY, 100);
+    tutorial_routing_progress_->SetName("Pretend routing activation progress");
+    performance->Add(tutorial_routing_progress_, 0, wxEXPAND | wxALL, FromDIP(4));
+    tutorial_routing_progress_->Hide();
     path_status_ = label(performance->GetStaticBox(), performance, "No active directions.");
     path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 3));
     path_status_->SetMaxSize(wxSize(-1, path_status_->GetCharHeight() * 3));
@@ -944,6 +965,7 @@ void Frame::build_profiles() {
         reverse_.tuning_group->ShowItems(duplex_->GetValue());
         editor->FitInside();
         editor->Layout();
+        tutorial_event("return");
         present(duplex_->GetValue() ? presentation::Message::Duplex
                                     : presentation::Message::Simplex);
     });
@@ -1396,6 +1418,7 @@ void Frame::save(bool apply) {
         }
         load_holes();
         holes_->SetSelection(hole_index_);
+        tutorial_event("saved");
     }
     refresh();
 }
@@ -1410,6 +1433,13 @@ void Frame::activate(bool ready) {
     activate_saved_profile(id, ready);
 }
 void Frame::activate_saved_profile(const std::string& id, bool ready) {
+    if (tutorial_ && !tutorial_->complete() &&
+        (tutorial_->beat() != "N026" || !tutorial_->ready_to_route(draft_, hole_index_) ||
+         id != draft_.id)) {
+        tutorial_->remind(tutorial_->beat() == "N028" ? "B008" : "B007");
+        render_tutorial();
+        return;
+    }
     const auto& snapshot = controller_->snapshot();
     const auto* selected = profile(snapshot, id);
     controller_->wait_for_devices(preferences_->values().automatically_wait_for_devices);
@@ -1438,7 +1468,10 @@ void Frame::activate_saved_profile(const std::string& id, bool ready) {
             ready = true;
         }
     }
-    show_result(controller_->activate(id, ready));
+    const auto activation = controller_->activate(id, ready);
+    show_result(activation);
+    if (activation.ok)
+        tutorial_event("routing_started");
     refresh();
 }
 
@@ -1471,5 +1504,48 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
         refresh();
     });
     simulation->Add(failures);
+}
+// An outer splitter must reserve room for BOTH nested panes, not just its
+// generic minimum for one child. Clamp immediately on resize and user drags.
+void Frame::constrain_profile_rows() {
+    if (!profile_rows_ || !profile_lower_rows_ || !profile_rows_->IsSplit() ||
+        !profile_lower_rows_->IsSplit())
+        return;
+    auto minimum = [](wxWindow* window, int fallback) {
+        return window->GetSizer() ? std::max(fallback, window->GetSizer()->GetMinSize().y)
+                                  : fallback;
+    };
+    const int top = minimum(profile_rows_->GetWindow1(), profile_rows_->GetMinimumPaneSize());
+    const int holes =
+        minimum(profile_lower_rows_->GetWindow1(), profile_lower_rows_->GetMinimumPaneSize());
+    const int notes =
+        minimum(profile_lower_rows_->GetWindow2(), profile_lower_rows_->GetMinimumPaneSize());
+    const int inner_border = profile_lower_rows_->GetBorderSize();
+    const int outer_border = profile_rows_->GetBorderSize();
+    const int lower = holes + notes + profile_lower_rows_->GetSashSize() + 2 * inner_border;
+    profile_lower_rows_->SetMinSize(wxSize(0, lower));
+    profile_rows_->SetMinSize(
+        wxSize(0, top + lower + profile_rows_->GetSashSize() + 2 * outer_border));
+    const int max_top =
+        profile_rows_->GetClientSize().y - profile_rows_->GetSashSize() - lower - outer_border;
+    if (max_top >= top + outer_border) {
+        const int position =
+            std::clamp(profile_rows_->GetSashPosition(), top + outer_border, max_top);
+        if (position != profile_rows_->GetSashPosition())
+            profile_rows_->SetSashPosition(position);
+    }
+    profile_rows_->UpdateSize();
+    const int max_holes = profile_lower_rows_->GetClientSize().y -
+                          profile_lower_rows_->GetSashSize() - notes - inner_border;
+    if (max_holes >= holes + inner_border) {
+        const int position =
+            std::clamp(profile_lower_rows_->GetSashPosition(), holes + inner_border, max_holes);
+        if (position != profile_lower_rows_->GetSashPosition())
+            profile_lower_rows_->SetSashPosition(position);
+    }
+    profile_lower_rows_->UpdateSize();
+    profile_rows_->GetWindow1()->Layout();
+    profile_lower_rows_->GetWindow1()->Layout();
+    profile_lower_rows_->GetWindow2()->Layout();
 }
 } // namespace audiohole::gui

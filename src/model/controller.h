@@ -114,7 +114,7 @@ struct Event {
 // Read-only view owned by the controller. References/pointers into its vectors
 // must not survive a mutating command. No audio buffers or measured telemetry.
 enum class ScanScope { Update, Full, Selected };
-enum class OperatingMode { Preview, Test };
+enum class OperatingMode { Preview, Test, Tutorial };
 // Command availability, never evidence that hardware opened or audio flowed.
 struct BackendCapabilities {
     bool simulated = true, routing = true, scanning = true, beep = true, monitoring = true;
@@ -131,6 +131,8 @@ struct Snapshot {
     bool armed = false, monitoring = false, scanning = false;
     std::string monitor_source, diagnostic_detail;
     std::optional<float> input_peak;
+    bool diagnostic_failed = false;
+    int tutorial_activation_percent = -1;
     int pending_ms = 0, scan_percent = 0;
     std::string beep_destination;
     std::vector<PathStatus> paths;
@@ -268,7 +270,7 @@ class Controller {
 // single-threaded fixture is replaceable and implements no Windows audio APIs.
 class SimulatedController final : public Controller {
   public:
-    SimulatedController();
+    explicit SimulatedController(bool tutorial = false);
     const Snapshot& snapshot() const override {
         return state_;
     }

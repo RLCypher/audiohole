@@ -2088,3 +2088,27 @@ the Settings page without changing DFA or selecting commentary. Deliberate
 slider drags, typed values, keyboard arrows and button clicks still work. The
 arrow control matches the numeric editor height instead of its native oversized
 default. DFA remains transient cosmetic state and is not serialized.
+
+### Tutorial replaces Preview and header/diagnostic refinement (2026-11-13)
+
+The user-facing Preview environment is replaced by the isolated, event-driven
+Norm tutorial specified in TUTORIAL.md and the owner's version-2.4 script. The
+first-run marker is written only after tutorial completion or an explicit skip.
+An early exit restarts the lesson next launch; completion keeps the current
+sandbox open until exit. Ordinary working-mode startup ignores legacy
+preview_mode preferences. Internal fixture-only smoke coverage remains intact.
+
+The header now enlarges the logo, two-color wordmark and subtitle. Status text
+sits below them, wraps longer profile names and retains full text in its tooltip.
+The personality card and equal-width action buttons share the available middle
+width; the avatar is centered in the right-hand reserved region. Status/copy
+length cannot resize these regions. Tutorial narration has a larger viewport and
+a reserved two-choice area at Norm's feet.
+
+Capture checks use one compact row: Check level / Cancel check with a half-width
+meter beside it. Playback keeps Test beep / Cancel beep in a single row. The
+extra confirmation labels underneath are removed from all Forward/Return cards
+and Devices. Start/cancel/completion commentary uses the selected personality;
+Vanilla retains neutral facts. Errors remain visible through the existing error dialog
+and status response. Temporary streams still cancel on navigation, hide,
+minimize, close, Stop or endpoint/binding change. No routing backend is added.

@@ -703,3 +703,36 @@ portable or cross-build success.
   9ff069b failure was C2445 in diagnostic_view.cpp (mixed string-literal/wxString
   conditional), before smoke execution. The diagnostic detail assignment now uses
   explicit wxString branches; do not count a cross-build as native MSVC execution.
+
+### Norm tutorial and pending layout changes (2026-11-13)
+
+- Start with a backed-up/absent bin/AudioHole.has-run. Welcome is unchanged.
+  Choose It's my first time: no real inventory appears, no microphone/speaker
+  stream opens, and no saved profile/device data is loaded or changed.
+- Walk both reply branches. Every narration choice advances once into its full
+  response variant. Check exact microphone choices, two distinct explicit rename
+  saves, four exact logical assignments despite renamed labels, Return enabled,
+  Forward exclusive preference only, Save, Start and Settings acknowledgement.
+- The pretend Deep/Full scan and routing activation each run about 20 seconds.
+  Cancel, retry, change tabs and click Norm while pending: no false completion.
+  Dialogue waits for controller completion events and never times out to a new beat.
+- Click Norm on a narration beat and an action beat. After about 10 seconds the
+  exact previous variant/choices/target/expression return. Click a reply or finish
+  the required action during the overlay: it still works once. F1 repeats guidance.
+- Highlights match the pink frame, follow scrolling/resizing, remain click-through
+  and never appear outside the window. Reply buttons are stacked at Norm's feet;
+  appearing/disappearing choices must not resize Norm. Ordinary errors/status,
+  scan output and routing notifications must not displace his current dialogue.
+- Personality, animation and DFA remain visible but disabled with labelled
+  sections. Skip replaces Replay. Appearance/tray/startup changes stay in memory;
+  exports/imports, real folders, custom files and startup registry writes are blocked.
+- Close early: no completion flag. Confirm Skip: only the flag changes and the app
+  closes. Complete normally: flag changes at N035, then free exploration remains
+  fictional until exit. Next launch is working mode. Replay deletes the flag and
+  restarts welcome/tutorial, preserving real data. Test unwritable marker handling.
+- Review larger logo/wordmark/subtitle, lower wrapped status, wider card/buttons
+  and centered avatar at compact/wide sizes and 100–200% DPI. Check source meters
+  beside buttons at half row width, no tool confirmation labels, personality
+  responses in both hole cards and Devices, and visible asynchronous check errors.
+- Run all three native GUI smoke modes before package publication. Tutorial smoke
+  is a complete actual-control walkthrough, not a nonempty-widget traversal.

@@ -49,6 +49,8 @@ const PreviewPreferences& BuildPreferences::values() const {
     return impl_->values;
 }
 std::filesystem::path BuildPreferences::data_root(OperatingMode mode) const {
+    if (mode == OperatingMode::Tutorial)
+        throw std::logic_error("Tutorial has no persistent device/profile data root.");
     return impl_->root / (mode == OperatingMode::Preview ? "preview" : "test");
 }
 std::filesystem::path BuildPreferences::test_configuration() const {

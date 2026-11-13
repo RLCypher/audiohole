@@ -6,7 +6,7 @@ void Frame::build_device_check(wxWindow* parent, wxSizer* layout, DiagnosticWidg
     widgets.capture = capture;
     widgets.panel = new wxPanel(parent);
     widgets.panel->SetName(name + " diagnostic controls");
-    auto* content = new wxBoxSizer(wxVERTICAL);
+    auto* content = new wxBoxSizer(wxHORIZONTAL);
     widgets.panel->SetSizer(content);
     widgets.action = button(widgets.panel, content, capture ? "Check level" : "Test beep",
                             [this, &widgets] { start_device_check(widgets); });
@@ -26,10 +26,15 @@ void Frame::build_device_check(wxWindow* parent, wxSizer* layout, DiagnosticWidg
     widgets.meter = new wxGauge(widgets.panel, wxID_ANY, 100);
     widgets.meter->SetName(name + " input level");
     widgets.meter->SetMinSize(FromDIP(wxSize(1, 12)));
-    content->Add(widgets.meter, 0, wxEXPAND | wxALL, FromDIP(4));
+    content->Add(widgets.meter, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    content->AddStretchSpacer();
+    widgets.panel->Bind(wxEVT_SIZE, [panel = widgets.panel,
+                                     meter = widgets.meter](wxSizeEvent& event) {
+        meter->SetMinSize(wxSize(std::max(20, panel->GetClientSize().x / 2), panel->FromDIP(12)));
+        panel->Layout();
+        event.Skip();
+    });
     widgets.meter->Show(capture);
-    widgets.detail = label(widgets.panel, content, "Not checking.");
-    widgets.detail->SetMinSize(wxSize(0, widgets.detail->GetCharHeight() * 2));
     layout->Add(widgets.panel, 0, wxEXPAND | wxALL, FromDIP(3));
 }
 void Frame::start_device_check(DiagnosticWidgets& widgets) {
@@ -41,6 +46,7 @@ void Frame::start_device_check(DiagnosticWidgets& widgets) {
                                               state.beep_destination == widgets.target;
     if (active) {
         end_observation();
+        present(presentation::Message::Cancelled);
         refresh();
         return;
     }
@@ -52,7 +58,15 @@ void Frame::start_device_check(DiagnosticWidgets& widgets) {
                                         : controller_->beep(widgets.target);
     if (result.ok)
         active_check_ = &widgets;
-    show_result(result);
+    if (result.ok) {
+        present(widgets.capture ? presentation::Message::LevelCheckStarted
+                                : presentation::Message::BeepStarted);
+        if (state.capabilities.simulated) {
+            technical_copy_ = "Simulated device check; no real audio is opened.";
+            layout_header();
+        }
+    } else
+        show_result(result);
     refresh();
 }
 void Frame::refresh_device_checks() {
@@ -97,24 +111,19 @@ void Frame::refresh_device_checks() {
                              : 0;
         if (widgets->meter->GetValue() != peak)
             widgets->meter->SetValue(peak);
-        wxString detail = wxS("Not checking.");
-        if (!supported)
-            detail = wxS("Device checking unavailable.");
-        else if (active) {
-            if (state.capabilities.simulated)
-                detail = wxS("Preview check (simulated).");
-            else
-                detail = text(state.diagnostic_detail);
-        }
-        if (active && widgets->capture && !state.capabilities.simulated && !state.input_peak)
-            detail += " Waiting for capture samples.";
-        if (!active && active_check_ == widgets && !state.diagnostic_detail.empty())
-            detail = text(state.diagnostic_detail);
-        if (widgets->detail->GetLabel() != detail) {
-            widgets->detail->SetLabel(detail);
-            widgets->detail->Wrap(std::max(80, widgets->panel->GetClientSize().x - FromDIP(8)));
-        }
+        if (active && !state.diagnostic_detail.empty())
+            widgets->action->SetToolTip(text(state.diagnostic_detail));
         widgets->panel->Layout();
+    }
+    if (active_check_ && !state.monitoring && state.beep_destination.empty()) {
+        const bool playback = !active_check_->capture;
+        active_check_ = nullptr;
+        if (state.diagnostic_failed) {
+            show_result({false, state.diagnostic_detail});
+            technical_copy_ = state.diagnostic_detail;
+            layout_header();
+        } else if (playback && !state.capabilities.simulated)
+            present(presentation::Message::BeepComplete);
     }
 }
 } // namespace audiohole::gui

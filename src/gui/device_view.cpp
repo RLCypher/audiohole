@@ -129,6 +129,7 @@ void Frame::build_devices() {
                 populate_devices();
                 present(presentation::Message::DeviceSaved);
             }
+            tutorial_event("device_saved");
             refresh();
         }
     });
@@ -238,6 +239,8 @@ void Frame::build_devices() {
     for (auto* editor : {device_name_, device_notes_})
         editor->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
             device_dirty_ = true;
+            if (!loading_)
+                tutorial_event("device_edit");
             refresh();
         });
 }
@@ -394,22 +397,25 @@ void Frame::load_device() {
     if (e->inspection)
         details = e->inspection->views.at(static_cast<std::size_t>(device_view_->GetSelection()));
     else {
-        const bool preview = controller_->snapshot().operating_mode == OperatingMode::Preview;
-        details =
-            "Display name: " + e->display_name +
-            "\nDevice type: " + (e->capture ? "Capture / Recording" : "Playback") +
-            "\nAvailability: " + name(e->availability) + "\nSource: " +
-            (preview ? "Preview demonstration data" : "Legacy saved configuration, unverified") +
-            "\n\nRecorded formats:\n";
+        const auto mode = controller_->snapshot().operating_mode;
+        const bool simulated = mode != OperatingMode::Test;
+        details = "Display name: " + e->display_name +
+                  "\nDevice type: " + (e->capture ? "Capture / Recording" : "Playback") +
+                  "\nAvailability: " + name(e->availability) + "\nSource: " +
+                  (mode == OperatingMode::Tutorial ? "Fictional tutorial device"
+                   : simulated                     ? "Preview demonstration data"
+                                                   : "Legacy saved configuration, unverified") +
+                  "\n\nRecorded formats:\n";
         for (const auto& f : e->formats)
             details += "  " + f.label() + "\n";
         if (e->formats.empty())
             details += "  Unknown / not tested.\n";
-        details += "\nWindows name: " + e->windows_name + "\nLogical ID: " + e->id +
-                   "\nHidden: " + (e->hidden ? "yes" : "no") + "\n\n" +
-                   (preview ? "Preview fixture; no hardware measurements."
-                            : "Legacy saved observations are unverified; scan hardware to collect "
-                              "current evidence.");
+        details +=
+            "\nWindows name: " + e->windows_name + "\nLogical ID: " + e->id +
+            "\nHidden: " + (e->hidden ? "yes" : "no") + "\n\n" +
+            (simulated ? "Simulated device; no hardware measurements."
+                       : "Legacy saved observations are unverified; scan hardware to collect "
+                         "current evidence.");
     }
     const auto rendered =
         e->inspection && (device_view_->GetSelection() == 0 || device_view_->GetSelection() == 2)

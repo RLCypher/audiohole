@@ -8,6 +8,8 @@ bin/audiohole-probe.exe
 docs/CONFIGURATION_BUNDLES.md
 docs/MANUAL_GUI_CHECKLIST.md
 docs/PROFILE_BUILDER.md
+docs/TUTORIAL.md
+docs/tutorial/Norm-script.txt
 licenses/MaterialIcons-LICENSE.txt
 licenses/MaterialIcons-NOTICE.txt
 licenses/miniz-LICENSE.txt

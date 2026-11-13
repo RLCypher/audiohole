@@ -94,6 +94,8 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"device_connected", "Device connected."},
     {"device_disconnected", "Device disconnected."},
     {"device_unavailable", "Device became unavailable."},
+    {"level_check_started", "Checking the selected capture device's level."},
+    {"beep_started", "Test beep requested on the selected playback device."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;

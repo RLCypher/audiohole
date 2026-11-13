@@ -57,8 +57,8 @@ It's easier than it looks. Usually.)");
           std::pair{wxID_CANCEL, "I'm not ready yet"}}) {
         auto* button = new ActionButton(this, option.second, 0, option.first);
         button->SetToolTip(
-            option.first == wxID_YES
-                ? "Open the Preview demonstration; the guided tutorial is coming later."
+            option.first == wxID_YES ? "Learn with Norm in a fictional tutorial. Your real devices "
+                                       "and profiles stay untouched."
             : option.first == wxID_NO
                 ? "Open your saved Test environment with real device scanning. Routing/playback "
                   "are not available in this build."

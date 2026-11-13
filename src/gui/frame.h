@@ -6,6 +6,7 @@
 #include "gui/shell_actions.h"
 #include "model/build_preferences.h"
 #include "model/controller.h"
+#include "model/tutorial.h"
 #include "platform/windows/com_apartment.h"
 #include "presentation/avatar_host.h"
 #include "presentation/device_events.h"
@@ -59,7 +60,6 @@ struct DiagnosticWidgets {
     wxPanel* panel{};
     wxButton* action{};
     wxGauge* meter{};
-    wxStaticText* detail{};
     std::string target;
     bool capture = false;
 };
@@ -146,6 +146,13 @@ class Frame final : public wxFrame, private wxEventFilter {
     // Reads one controller snapshot; changes commentary only for new event occurrences.
     void refresh();
     // Internal developer check; dispatches native events and writes explicit evidence.
+    void tutorial_replay_intro() {
+        if (tutorial_) {
+            tutorial_->remind("B012");
+            render_tutorial();
+        }
+    }
+    bool tutorial_smoke(const wxString& directory);
     bool smoke(const wxString& directory);
 
   private:
@@ -167,6 +174,20 @@ class Frame final : public wxFrame, private wxEventFilter {
     void poll_avatar();
     void stop_avatar();
     bool smoke_ = false, loading_ = false, dirty_ = false;
+    std::unique_ptr<Tutorial> tutorial_;
+    wxPanel* avatar_region_{};
+    wxBoxSizer* avatar_layout_{};
+    wxPanel* tutorial_choices_panel_{};
+    wxBoxSizer* tutorial_choices_layout_{};
+    std::vector<wxButton*> tutorial_choices_;
+    std::vector<wxWindow*> tutorial_highlights_;
+    std::string tutorial_rendered_, tutorial_choice_key_;
+    std::uint64_t tutorial_seen_event_ = 0;
+    bool tutorial_marker_saved_ = false, tutorial_completion_attempted_ = false;
+    void tutorial_event(std::string_view);
+    void render_tutorial();
+    void skip_tutorial();
+    bool finish_tutorial();
     bool enter_save_pending_ = false;
     void queue_field_save(bool device);
     bool profile_edits_pending();
@@ -225,6 +246,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         *startup_target_{}, *notifications_{};
     wxSpinCtrl* delay_{};
     wxGauge* scan_progress_{};
+    wxGauge* tutorial_routing_progress_{};
     DirectionWidgets forward_, reverse_;
     DiagnosticWidgets device_check_;
     DiagnosticWidgets* active_check_ = nullptr;
@@ -319,6 +341,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void activate(bool);
     void populate_devices();
     void load_device();
+    void constrain_profile_rows();
     bool select_device(const std::string&);
     void device_context(DeviceList*, const std::vector<std::string>&, wxContextMenuEvent&);
     void request_scan(bool deep, ScanScope, const std::string&);

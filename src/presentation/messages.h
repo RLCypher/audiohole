@@ -92,6 +92,8 @@ enum class Message {
     DeviceConnected,
     DeviceDisconnected,
     DeviceUnavailable,
+    LevelCheckStarted,
+    BeepStarted,
     Count
 };
 struct Variant {

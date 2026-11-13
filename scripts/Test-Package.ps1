@@ -54,14 +54,16 @@ try {
     if ($helper.ExitCode -ne 2) { throw 'Private probe helper accepted a public invocation.' }
     # Run the GUI's internal smoke mode from the extracted tree. It dispatches
     # native widget events and writes evidence; stdout is not a GUI contract.
-    $evidence = Join-Path $temporary 'gui-evidence'
-    $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -ArgumentList @('--smoke-test', '--screenshot-dir', "`"$evidence`"")
-    if (-not $process.WaitForExit(45000)) { throw 'Extracted GUI did not finish within 45 seconds.' }
-    $process.WaitForExit()
-    if ($process.ExitCode -ne 0) { throw "Extracted GUI smoke failed with exit code $($process.ExitCode)." }
-    $result = Join-Path $evidence 'smoke-result.txt'
-    if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
-        throw 'Extracted GUI did not produce successful smoke evidence.'
+    foreach ($mode in @('smoke-test', 'test-mode-smoke', 'tutorial-smoke')) {
+        $evidence = Join-Path $temporary "gui-evidence/$mode"
+        $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -ArgumentList @("--$mode", '--screenshot-dir', "`"$evidence`"")
+        if (-not $process.WaitForExit(45000)) { throw "Extracted GUI $mode did not finish within 45 seconds." }
+        $process.WaitForExit()
+        if ($process.ExitCode -ne 0) { throw "Extracted GUI $mode failed with exit code $($process.ExitCode)." }
+        $result = Join-Path $evidence 'smoke-result.txt'
+        if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
+            throw "Extracted GUI $mode did not produce successful smoke evidence."
+        }
     }
     if ((Test-Path (Join-Path $root 'bin/AudioHole.has-run')) -or (Test-Path (Join-Path $root 'AudioHole.has-run'))) {
         throw 'Smoke execution modified the installed first-run marker.'

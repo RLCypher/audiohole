@@ -1640,6 +1640,58 @@
         "expression": "concerned",
         "fallback_expression": "idle"
       }
+    ],
+    "level_check_started": [
+      {
+        "id": "default_level_check_started_001",
+        "category": "status",
+        "text": "Go on. Say something. We'll let the meter do the judging.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_level_check_started_002",
+        "category": "status",
+        "text": "Let's see what the microphone has to say. No pressure.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_level_check_started_003",
+        "category": "status",
+        "text": "Give that microphone something to work with.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "beep_started": [
+      {
+        "id": "default_beep_started_001",
+        "category": "status",
+        "text": "One small beep for your speakers. One less mystery for us.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_beep_started_002",
+        "category": "status",
+        "text": "Ears on. Let's check where this lands.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_beep_started_003",
+        "category": "status",
+        "text": "A little noise now beats a lot of troubleshooting later.",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

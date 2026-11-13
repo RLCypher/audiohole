@@ -148,7 +148,7 @@ void Frame::build_settings() {
     auto save_launch = [this, launch, minimized](wxCommandEvent&) {
         auto next = preferences_->values();
         const bool previous = next.start_with_windows;
-        if (launch->GetValue() != previous && !smoke_) {
+        if (launch->GetValue() != previous && !smoke_ && !tutorial_) {
             const auto result = configure_windows_startup(launch->GetValue());
             if (!result.ok) {
                 launch->SetValue(previous);
@@ -160,7 +160,7 @@ void Frame::build_settings() {
         next.start_minimized = minimized->GetValue();
         const auto result = preferences_->update(next);
         if (!result.ok) {
-            if (!smoke_)
+            if (!smoke_ && !tutorial_)
                 (void)configure_windows_startup(previous);
             launch->SetValue(previous);
             minimized->SetValue(preferences_->values().start_minimized);
@@ -169,30 +169,35 @@ void Frame::build_settings() {
     };
     launch->Bind(wxEVT_CHECKBOX, save_launch);
     minimized->Bind(wxEVT_CHECKBOX, save_launch);
-    button(appearance_box, appearance_group, "Replay Tutorial", [this] {
-        if (themed_message_box("AudioHole will restart in Tutorial mode", "Replay Tutorial?",
-                               wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
-            return;
-        if (!discard())
-            return;
-        if (device_dirty_ &&
-            themed_message_box("Discard unsaved device edits before restarting? Saved device "
-                               "records will be retained.",
-                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
-                               this) != wxYES)
-            return;
-        // CI never changes the installed marker or launches a replay child.
-        // The filesystem reset contract is exercised by portable tests.
-        if (smoke_)
-            return;
-        const auto result = reset_first_run(first_run_marker_path());
-        if (!result.ok) {
-            show_result(result);
-            return;
-        }
-        if (restart_)
-            restart_();
-    });
+    button(
+        appearance_box, appearance_group, tutorial_ ? "Skip Tutorial" : "Replay Tutorial", [this] {
+            if (tutorial_) {
+                skip_tutorial();
+                return;
+            }
+            if (themed_message_box("AudioHole will restart in Tutorial mode", "Replay Tutorial?",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+                return;
+            if (!discard())
+                return;
+            if (device_dirty_ &&
+                themed_message_box("Discard unsaved device edits before restarting? Saved device "
+                                   "records will be retained.",
+                                   "Unsaved device changes",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+                return;
+            // CI never changes the installed marker or launches a replay child.
+            // The filesystem reset contract is exercised by portable tests.
+            if (smoke_)
+                return;
+            const auto result = reset_first_run(first_run_marker_path());
+            if (!result.ok) {
+                show_result(result);
+                return;
+            }
+            if (restart_)
+                restart_();
+        });
     auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality & animation");
     auto* personality_box = personality_group->GetStaticBox();
     personality_box->SetName("Personality & animation settings");
@@ -374,6 +379,12 @@ void Frame::build_settings() {
     dfa_value_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     dfa_stepper_->Bind(wxEVT_KILL_FOCUS, leave_numeric);
     root->Add(advanced, 0, wxEXPAND | wxALL, 4);
+    if (tutorial_) {
+        personality_box->SetLabel("Personality & animation (Disabled for tutorial)");
+        box->SetLabel("Advanced / DFA (Disabled for tutorial)");
+        personality_box->Disable();
+        box->Disable();
+    }
     auto* restart_button = button(page, root, "Restart AudioHole", [this] {
         if (!discard())
             return;

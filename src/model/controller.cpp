@@ -1,4 +1,5 @@
 #include "model/controller.h"
+#include "model/tutorial.h"
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -170,8 +171,7 @@ const Endpoint* endpoint(const Snapshot& snapshot, const std::string& id) {
 std::vector<const Endpoint*> configuration_devices(const Snapshot& snapshot) {
     std::vector<const Endpoint*> devices;
     for (const auto& device : snapshot.endpoints)
-        if (!device.hidden &&
-            (snapshot.operating_mode == OperatingMode::Preview || device.inspection))
+        if (!device.hidden && (snapshot.operating_mode != OperatingMode::Test || device.inspection))
             devices.push_back(&device);
     return devices;
 }
@@ -487,7 +487,12 @@ Result Controller::update_buffer(const std::string& profile_id, const std::strin
     return result.ok ? Result{true, "Buffer preference saved. No live engine buffer was applied."}
                      : result;
 }
-SimulatedController::SimulatedController() {
+SimulatedController::SimulatedController(bool tutorial) {
+    if (tutorial) {
+        state_.operating_mode = OperatingMode::Tutorial;
+        return;
+    }
+
     state_.capabilities.live_buffer = true;
     const std::vector<Format> common{{}, {96000, 2, "float32"}, {48000, 2, "PCM24"}};
     state_.endpoints = {{"mixer-in", "Mixer microphone", "USB Audio Interface (Capture)",
@@ -660,6 +665,8 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
         hole.forward = effective_direction(hole);
         hole.reverse = effective_direction(hole, true);
     }
+    if (state_.operating_mode == OperatingMode::Tutorial)
+        state_.tutorial_activation_percent = 0;
     state_.active_profile = id;
     state_.pending_profile.clear();
     state_.pending_ms = 0;
@@ -671,7 +678,8 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     state_.armed = true;
     state_.state = State::Starting;
     state_.paths.clear(); // A newly activated plan owns fresh simulated path lifetimes.
-    transition_ms_ = transition_duration_ms;
+    transition_ms_ =
+        state_.operating_mode == OperatingMode::Tutorial ? 20000 : transition_duration_ms;
     refresh_paths();
     event("activated", "Activated profile: " + candidate->display_name);
     return result;
@@ -727,6 +735,7 @@ void SimulatedController::stop() {
     state_.monitor_source.clear();
     state_.input_peak.reset();
     failures_.clear();
+    state_.tutorial_activation_percent = -1;
     state_.state = State::Stopping;
     transition_ms_ = stop_duration_ms;
     for (auto& p : state_.paths)
@@ -818,7 +827,18 @@ void SimulatedController::advance(int ms) {
         }
     }
     if (transition_ms_ > 0) {
+        const auto before = transition_ms_;
         transition_ms_ = std::max(0, transition_ms_ - ms);
+        if (state_.operating_mode == OperatingMode::Tutorial &&
+            state_.tutorial_activation_percent >= 0 && state_.armed) {
+            state_.tutorial_activation_percent = 100 * (20000 - transition_ms_) / 20000;
+            ++state_.revision;
+            if (before / 1000 != transition_ms_ / 1000)
+                event("tutorial-routing-progress",
+                      "Pretend audio activation: " +
+                          std::to_string(state_.tutorial_activation_percent) +
+                          "% (no streams opened).");
+        }
         if (!transition_ms_) {
             if (!state_.armed) {
                 state_.state = State::Stopped;
@@ -826,6 +846,9 @@ void SimulatedController::advance(int ms) {
             } else
                 refresh_paths();
             event("state", std::string("Routing state: ") + name(state_.state));
+            if (state_.operating_mode == OperatingMode::Tutorial && state_.state == State::Running)
+                event("simulated_routing_running",
+                      "Pretend routing activation completed; no real audio opened.");
             if (pending_manual_ack_) {
                 pending_manual_ack_ = false;
                 if (std::any_of(state_.paths.begin(), state_.paths.end(), [&](const auto& path) {
@@ -850,10 +873,41 @@ void SimulatedController::advance(int ms) {
     }
     if (state_.scanning) {
         scan_ms_ += ms;
-        state_.scan_percent = std::min(100, scan_ms_ / scan_ms_per_percent);
+        state_.scan_percent =
+            std::min(100, scan_ms_ / (state_.operating_mode == OperatingMode::Tutorial
+                                          ? 200
+                                          : scan_ms_per_percent));
+        if (state_.operating_mode == OperatingMode::Tutorial) {
+            ++state_.revision;
+            if (scan_ms_ / 1000 != (scan_ms_ - ms) / 1000) {
+                const auto devices = tutorial_devices();
+                const int stage = std::min(19, std::max(0, (scan_ms_ - 1) / 1000));
+                static const char* checks[] = {
+                    "Reading imaginary identity", "Shared: 48000 Hz / stereo / float32",
+                    "Exclusive: 48000 Hz / stereo / PCM16", "Checking fictional buffers",
+                    "Fictional capability checks complete"};
+                event("scan-progress", "[Pretend] Device " + std::to_string(stage / 5 + 1) +
+                                           "/4 | " + devices[stage / 5].display_name + " | Check " +
+                                           std::to_string(stage % 5 + 1) + "/5 | " +
+                                           checks[stage % 5]);
+            }
+        }
         if (state_.scan_percent == 100) {
             state_.scanning = false;
-            event("scan-complete", "Device scan completed.");
+            if (state_.operating_mode == OperatingMode::Tutorial) {
+                auto discovered = tutorial_devices();
+                for (auto& device : discovered)
+                    if (const auto* previous = endpoint(state_, device.id)) {
+                        device.display_name = previous->display_name;
+                        device.notes = previous->notes;
+                        device.hidden = previous->hidden;
+                    }
+                state_.endpoints = std::move(discovered);
+                ++state_.scanner.inventory_revision;
+                event("scan_completed",
+                      "Four fictional endpoints discovered. No real device enumeration performed.");
+            } else
+                event("scan-complete", "Device scan completed.");
         }
     }
 }

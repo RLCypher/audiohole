@@ -105,7 +105,7 @@ void Frame::initialize_shell_controls() {
         AppendMenuW(menu, MF_STRING, shell_controls_command, L"AudioHole controls…");
         AppendMenuW(menu, MF_STRING, shell_exit_command, L"Exit AudioHole");
     }
-    if (!smoke_) {
+    if (!smoke_ && !tutorial_) {
         const auto result = publish_shell_tasks(controller_->snapshot().capabilities.routing);
         if (FAILED(result))
             wxLogDebug("Windows could not publish AudioHole taskbar tasks (HRESULT 0x%08lx).",
