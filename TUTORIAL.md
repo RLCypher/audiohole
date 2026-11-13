@@ -7,6 +7,14 @@ version 2.4. It is compiled into inert UTF-8 catalogue data by
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
 rendered prefix. Existing welcome wording and the three choices stay intact.
 
+The generated catalogue is split by the six named lesson phases, followed by
+recovery lines and avatar-click reactions. Each component keeps complete beat
+records in a separate UTF-8 literal, capped at 8,192 bytes to stay below MSVC's
+C2026 limit. Oversized components fail generation with the phase name. Components
+are joined once on the control thread into process-lifetime storage; no dialogue
+is shortened or loaded from an external file. Catalogue integrity checks verify
+the byte limit and exact reconstructed JSON before the Windows build and in CTest.
+
 ## Launch and storage boundary
 
 On an unmarked launch, **It's my first time** opens Tutorial. **Show me them

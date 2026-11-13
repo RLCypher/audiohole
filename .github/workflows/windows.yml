@@ -24,6 +24,8 @@ jobs:
         run: ./tests/scripts/Test-DistributionTools.ps1
       - name: Verify canonical branding and icon resources
         run: python scripts/branding/verify_assets.py
+      - name: Verify tutorial catalogue and MSVC literal sizes
+        run: python scripts/GenerateTutorial.py --check
       - name: Configure Windows x64
         run: cmake --preset windows-msvc
       - name: Build
