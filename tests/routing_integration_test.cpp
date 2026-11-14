@@ -223,3 +223,112 @@ TEST(RoutingService, ApplicationMailboxWaitsForAdmissionAndReportsFailureRatherT
     until(app, [&] { return app.snapshot().state == State::Stopped; });
 }
 } // namespace
+
+TEST(RoutingService, WaitingDirectionResumesWithoutReopeningHealthySiblingAndStopWins) {
+    auto control = std::make_shared<testing_engine::Control>();
+    auto service = testing_engine::service(control);
+    auto wait = [&](auto done) {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!done() && std::chrono::steady_clock::now() < deadline)
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        ASSERT_TRUE(done());
+    };
+    wait([&] { return service->reading().ready; });
+    testing_engine::Store store;
+    Snapshot snapshot;
+    snapshot.endpoints = store.records.devices;
+    snapshot.endpoints.back().availability = Availability::Unavailable;
+    const auto projected = routing_profile(store.records.profiles[0]);
+    ASSERT_TRUE(projected.ok());
+    ASSERT_NE(service->start(*projected.value, routing_bindings(snapshot)), 0u);
+    wait([&] {
+        const auto r = service->reading();
+        return r.state && r.state->state == engine::State::Degraded;
+    });
+    EXPECT_EQ(control->opens, 1);
+    snapshot.endpoints.back().availability = Availability::Ambiguous;
+    ASSERT_TRUE(service->update_bindings(routing_bindings(snapshot)));
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
+    EXPECT_EQ(control->opens, 1);
+    snapshot.endpoints.back().availability = Availability::Available;
+    ASSERT_TRUE(service->update_bindings(routing_bindings(snapshot)));
+    wait([&] {
+        const auto r = service->reading();
+        return r.state && r.state->state == engine::State::Running;
+    });
+    EXPECT_EQ(control->opens, 2);
+    EXPECT_EQ(control->releases, 0);
+    service->stop();
+    EXPECT_FALSE(service->update_bindings(routing_bindings(snapshot)));
+    wait([&] {
+        const auto r = service->reading();
+        return r.state && r.state->state == engine::State::Stopped;
+    });
+    EXPECT_EQ(control->releases, 2);
+}
+
+TEST(RoutingIntegrationAudit, AutomaticAndAdvancedBufferRequestsFlowThroughAllBackends) {
+    for (const auto& [name, backend] :
+         {std::pair{"wasapi", engine::BackendId::Wasapi},
+          std::pair{"miniaudio", engine::BackendId::Miniaudio},
+          std::pair{"experimental", engine::BackendId::Experimental}}) {
+        SCOPED_TRACE(name);
+        auto control = std::make_shared<testing_engine::Control>();
+        auto provider = std::make_unique<testing_engine::Store>();
+        auto saved = provider->records.profiles[0];
+        saved.holes[0].routing_engine = name;
+        saved.holes[0].forward.advanced_tuning = saved.holes[0].reverse.advanced_tuning = true;
+        provider->records.profiles[0] = saved;
+        ConfigurationController controller(
+            std::move(provider), nullptr, nullptr, make_routing_service([control, backend] {
+                std::vector<std::unique_ptr<engine::BackendAdapter>> adapters;
+                adapters.push_back(std::make_unique<testing_engine::Adapter>(control, backend));
+                return std::make_unique<engine::Runtime>(std::move(adapters));
+            }));
+        until(controller, [&] { return controller.snapshot().capabilities.routing; });
+        // Merely enabling the switch with every field Automatic must open both directions.
+        ASSERT_TRUE(controller.activate(saved.id).ok);
+        until(controller, [&] { return controller.snapshot().state == State::Running; });
+        for (const auto& path : controller.snapshot().routing_status->paths) {
+            ASSERT_TRUE(path.negotiated);
+            EXPECT_FALSE(path.negotiated->source.applied_buffer_request_ms);
+            EXPECT_EQ(path.negotiated->source.mode, engine::AccessMode::Shared);
+        }
+        controller.stop();
+        until(controller, [&] { return controller.snapshot().state == State::Stopped; });
+        for (int milliseconds : {1, 6, 20, 50}) {
+            auto& hole = saved.holes[0];
+            auto& p = hole.forward.settings.preferences;
+            p.common.sample_rate_hz = 44100;
+            p.common.sample_format = "pcm_s16";
+            p.common.channel_count = 1;
+            p.destination.channel_count = 2;
+            p.common.mode = "Shared";
+            p.common.buffer_ms = milliseconds;
+            p.destination.buffer_ms = 12;
+            hole.reverse.settings.preferences.common.mode = "Exclusive";
+            hole.reverse.settings.preferences.common.buffer_ms = 50;
+            ASSERT_TRUE(controller.save(saved, false).ok);
+            ASSERT_TRUE(controller.activate(saved.id).ok);
+            until(controller, [&] { return controller.snapshot().state == State::Running; });
+            const auto& paths = controller.snapshot().routing_status->paths;
+            ASSERT_EQ(paths.size(), 2u);
+            const auto& forward = *paths[0].negotiated;
+            const auto& reverse = *paths[1].negotiated;
+            EXPECT_EQ(forward.backend, backend);
+            EXPECT_EQ(forward.source.applied_buffer_request_ms, milliseconds);
+            EXPECT_EQ(forward.destination.applied_buffer_request_ms, 12);
+            EXPECT_EQ(forward.source.client_format.sample_rate_hz, 44100);
+            EXPECT_EQ(forward.source.client_format.channel_count, 1);
+            EXPECT_EQ(forward.destination.client_format.channel_count, 2);
+            EXPECT_EQ(reverse.source.applied_buffer_request_ms, 50);
+            EXPECT_EQ(reverse.destination.mode, engine::AccessMode::Exclusive);
+            EXPECT_NE(routing_diagnostics(*controller.snapshot().routing_status, &saved)
+                          .find("Buffer request supplied"),
+                      std::string::npos);
+            controller.stop();
+            until(controller, [&] { return controller.snapshot().state == State::Stopped; });
+        }
+        EXPECT_EQ(control->opens, control->releases);
+    }
+}

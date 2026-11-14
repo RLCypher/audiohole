@@ -336,7 +336,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         if (event.IsShown() && !IsIconized()) {
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
-            avatar_timer_.Start(16);
+            avatar_timer_.Start(11);
         } else {
             avatar_timer_.Stop();
             tutorial_scroll_duration_ = 0;
@@ -347,7 +347,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         if (!event.IsIconized() && IsShown()) {
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
-            avatar_timer_.Start(16);
+            avatar_timer_.Start(11);
         } else {
             avatar_timer_.Stop();
             tutorial_scroll_duration_ = 0;
@@ -991,6 +991,16 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        const auto check_endpoint_heights = [this] {
+            for (auto* direction : {&forward_, &reverse_})
+                for (auto* field : {direction->source, direction->destination})
+                    if (field->IsShownOnScreen() &&
+                        field->GetSize().y < field->GetCharHeight() + FromDIP(12))
+                        throw std::runtime_error(
+                            "Endpoint dropdown collapsed: " + utf8(field->GetName()) +
+                            " height=" + std::to_string(field->GetSize().y) +
+                            " best=" + std::to_string(field->GetBestSize().y));
+        };
         {
             WelcomeDialog welcome(true);
             require(welcome.has_norm_image(), "Welcome Norm image missing");
@@ -1242,6 +1252,29 @@ bool Frame::smoke(const wxString& directory) {
             choose(true);
             forward_.buffer->SetValue(19);
             reverse_.buffer->SetValue(23);
+            reverse_.group->ShowItems(true);
+            reverse_.tuning_group->ShowItems(true);
+            for (int pass = 0; pass < 3; ++pass) {
+                for (auto* widgets : {&forward_, &reverse_}) {
+                    widgets->tuning->Expand();
+                    layout_direction(*widgets);
+                    if (widgets->clock->GetSize().y < widgets->mode->GetBestSize().y ||
+                        widgets->clock->GetSize().y < widgets->clock->GetCharHeight() + FromDIP(12))
+                        throw std::runtime_error(
+                            "Clock dropdown height: " + utf8(widgets->clock->GetName()) +
+                            " actual=" + std::to_string(widgets->clock->GetSize().y) +
+                            " best=" + std::to_string(widgets->clock->GetBestSize().y) +
+                            " mode=" + std::to_string(widgets->mode->GetSize().y) +
+                            " pane=" + std::to_string(widgets->tuning->GetPane()->GetSize().y) +
+                            " font=" + std::to_string(widgets->clock->GetCharHeight()));
+                    widgets->tuning->Collapse();
+                    layout_direction(*widgets);
+                }
+            }
+            reverse_.group->ShowItems(before.duplex);
+            reverse_.tuning_group->ShowItems(before.duplex);
+            disclose(forward_, true);
+            disclose(reverse_, false);
             forward_.clock->SetSelection(1);
             reverse_.clock->SetSelection(2);
             capture_draft();
@@ -1367,6 +1400,12 @@ bool Frame::smoke(const wxString& directory) {
             require(performance_panel_->GetParent() == profile_editor_->GetParent() &&
                         performance_panel_->GetParent() != profile_editor_,
                     "Performance diagnostics must be outside the scrolling hole editor");
+            performance_split_->UpdateSize();
+            const int sash = performance_split_->GetSashPosition();
+            performance_split_->SetSashPosition(sash - FromDIP(24));
+            require(performance_split_->GetSashPosition() != sash,
+                    "Performance diagnostics divider cannot resize the pinned panel");
+            performance_split_->SetSashPosition(sash);
             const auto position = performance_panel_->GetPosition();
             profile_editor_->Scroll(0, 100);
             profile_editor_->GetParent()->Layout();
@@ -1471,6 +1510,7 @@ bool Frame::smoke(const wxString& directory) {
         };
         layout_header();
         check_profile_layout();
+        check_endpoint_heights();
         require(profile_new_->GetLabel() == "+" && hole_new_->GetLabel() == "+" &&
                     profile_new_->GetName() == "New Profile" && hole_new_->GetName() == "Add hole",
                 "Compact add controls lost their labels or accessible names");
@@ -1539,10 +1579,34 @@ bool Frame::smoke(const wxString& directory) {
                     ", minimum pane=" + std::to_string(split->GetMinimumPaneSize()));
             return before;
         };
+        auto check_blank_list = [&](wxListBox* list) {
+            const auto handle = static_cast<HWND>(list->GetHandle());
+            RECT last{};
+            int begin = FromDIP(4);
+            if (list->GetCount() && SendMessageW(handle, LB_GETITEMRECT, list->GetCount() - 1,
+                                                 reinterpret_cast<LPARAM>(&last)) != LB_ERR)
+                begin = std::max(begin, static_cast<int>(last.bottom) + FromDIP(3));
+            // Paint pending native damage only. A forced full invalidation here
+            // would erase the very stale frame trails this regression checks.
+            UpdateWindow(handle);
+            const auto dc = GetDC(handle);
+            require(dc != nullptr, "Cannot inspect resized list client pixels");
+            const auto colour = list->GetBackgroundColour();
+            const auto expected = RGB(colour.Red(), colour.Green(), colour.Blue());
+            bool clean = true;
+            for (int y = begin; y < list->GetClientSize().y - FromDIP(4); ++y)
+                clean = clean && GetPixel(dc, list->GetClientSize().x / 2, y) == expected;
+            ReleaseDC(handle, dc);
+            require(clean, "Resizing left border trails inside a profile/hole list");
+        };
         for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_}) {
             const int before = move_divider(split);
             check_profile_layout();
+            check_blank_list(profiles_);
+            check_blank_list(holes_);
             split->SetSashPosition(before);
+            check_blank_list(profiles_);
+            check_blank_list(holes_);
         }
         require(profile_notes_->GetValue() == original_notes &&
                     controller_->snapshot().revision == overflow_revision,
@@ -1752,6 +1816,7 @@ bool Frame::smoke(const wxString& directory) {
                     "Test buffer-only save did not persist or saved unrelated draft edits");
             require(!profile_apply_->IsEnabled(),
                     "Test Mode enabled Apply after creating a profile");
+            check_endpoint_heights();
             if (!directory.empty()) {
                 wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
                 wxBitmap bitmap(GetClientSize());
@@ -2517,6 +2582,9 @@ bool Frame::smoke(const wxString& directory) {
         refresh();
         require(controller_->snapshot().state == audiohole::State::Stopped,
                 "GUI Stop did not disarm");
+        notebook_->SetSelection(0);
+        Layout();
+        check_endpoint_heights();
         if (!directory.empty()) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             for (std::size_t i = 0; i < notebook_->GetPageCount(); ++i) {

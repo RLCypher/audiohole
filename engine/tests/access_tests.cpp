@@ -49,7 +49,7 @@ struct Acquisition {
             if (wrong_rate)
                 value.client_format.sample_rate_hz = 44100;
             if (wrong_buffer)
-                value.allocated_buffer_frames = 1056;
+                value.applied_buffer_request_ms = 11;
             if (wrong_mode)
                 value.mode = AccessMode::Shared;
             if (cancel)

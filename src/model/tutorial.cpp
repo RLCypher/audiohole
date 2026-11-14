@@ -113,6 +113,17 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
         out.targets.push_back("profile:" + profile_id_);
     if (beat_ == "N018B")
         out.targets.push_back("hole:" + hole_id_);
+    if (sightseeing_page_ >= 0) {
+        const auto& reminder = catalog().at("B001");
+        out.text = reminder.at("text").get<std::string>();
+        out.expression = reminder.at("expression").get<std::string>();
+        out.choices.clear();
+        out.targets = {sightseeing_page_ == 0   ? "profiles_tab"
+                       : sightseeing_page_ == 1 ? "devices_tab"
+                       : sightseeing_page_ == 2 ? "scan_tab"
+                                                : "settings_tab"};
+        out.sightseeing = true;
+    }
     return out;
 }
 std::optional<OnboardingGreeting> onboarding_greeting(OnboardingOutcome outcome,
@@ -194,10 +205,7 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         if (action == user_action)
             overlay_.clear();
     if (action == "navigation") {
-        if (beat_ == "N028" && page != 0) {
-            remind("N029");
-            return;
-        }
+        sightseeing_page_ = -1;
         if (beat_ == "N004" && page == 1)
             enter("N005");
         else if (beat_ == "N005" && page == 2)
@@ -210,11 +218,12 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
             settings_ = true;
             enter("N034");
         } else {
-            const int expected = beat_ >= "N014" && beat_ <= "N015"   ? 1
-                                 : beat_ >= "N017" && beat_ <= "N032" ? 0
-                                 : beat_ >= "N006" && beat_ <= "N010" ? 2
-                                                                      : page;
-            if (page != expected)
+            const int expected = beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? 1
+                                 : beat_ >= "N005" && beat_ <= "N010"                    ? 2
+                                 : beat_ >= "N033"                                       ? 3
+                                                                                         : 0;
+            sightseeing_page_ = !complete_ && page != expected ? expected : -1;
+            if (sightseeing_page_ >= 0)
                 remind("B001");
             else {
                 reminder_.clear();

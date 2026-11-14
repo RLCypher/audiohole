@@ -76,25 +76,11 @@ Result<StreamConfiguration> check_stream(const EndpointRequirements& required,
             issues.push_back(
                 {ErrorCode::ContractViolation, path + "/buffer_ms",
                  "Cannot verify the explicit buffer without actual allocation and rate."});
-        } else {
-            // Buffer duration is evaluated in its OWN sample-rate domain.
-            // Permit only integral-frame rounding, not a silently enlarged
-            // allocation or a library treating a requirement as a hint.
-            const auto actual_scaled = std::int64_t(*stream.allocated_buffer_frames) * 1000;
-            const auto requested_scaled =
-                std::int64_t(*stream.timing_sample_rate_hz) * *required.buffer_ms;
-            const auto difference = actual_scaled > requested_scaled
-                                        ? actual_scaled - requested_scaled
-                                        : requested_scaled - actual_scaled;
-            if (difference > 1000)
-                issues.push_back({ErrorCode::UnsupportedRequirement, path + "/buffer_ms",
-                                  "Required buffer " + std::to_string(*required.buffer_ms) +
-                                      " ms differs from the actual allocation of " +
-                                      std::to_string(*stream.allocated_buffer_frames) +
-                                      " frames at " +
-                                      std::to_string(*stream.timing_sample_rate_hz) +
-                                      " Hz. Use Automatic or another supported configuration."});
         }
+        // buffer_ms is the explicit API request, not a promise that a driver
+        // allocates an exact frame count. Native periods/alignment and library
+        // period counts can change allocation. Keep both values in receipts;
+        // missing/ignored requests still fail above, formats/modes remain strict.
     }
     if ((stream.period_frames && *stream.period_frames == 0) ||
         (stream.allocated_buffer_frames && *stream.allocated_buffer_frames == 0))

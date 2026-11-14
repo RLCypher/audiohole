@@ -1,6 +1,7 @@
 #include "gui/native_theme.h"
 #include <algorithm>
 #include <commctrl.h>
+#include <string>
 #include <uxtheme.h>
 #include <windows.h>
 namespace audiohole::gui {
@@ -14,10 +15,50 @@ LRESULT CALLBACK border_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lp
         RemoveWindowSubclass(handle, border_proc, id);
         return DefSubclassProc(handle, message, wparam, lparam);
     }
+    // Native resize blits otherwise copy our old frame into the new client,
+    // leaving horizontal trails when list/edit controls grow during sash drags.
+    if (message == WM_WINDOWPOSCHANGING && !(policy & 16)) {
+        auto* position = reinterpret_cast<WINDOWPOS*>(lparam);
+        if (!(position->flags & SWP_NOSIZE))
+            position->flags |= SWP_NOCOPYBITS;
+    }
+    if (message == WM_SIZE && !(policy & 16))
+        RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME);
+    if (message == WM_PAINT && (policy & 8) && !(policy & 2)) {
+        bool enabled = true;
+        for (HWND current = handle; current; current = GetParent(current))
+            enabled = enabled && IsWindowEnabled(current);
+        if (!enabled) {
+            PAINTSTRUCT paint{};
+            const auto dc = BeginPaint(handle, &paint);
+            const auto brush = reinterpret_cast<HBRUSH>(
+                SendMessageW(GetParent(handle), WM_CTLCOLORSTATIC, reinterpret_cast<WPARAM>(dc),
+                             reinterpret_cast<LPARAM>(handle)));
+            RECT bounds{};
+            GetClientRect(handle, &bounds);
+            FillRect(dc, &bounds, brush ? brush : GetSysColorBrush(COLOR_BTNFACE));
+            const int saved = SaveDC(dc);
+            SelectObject(dc, reinterpret_cast<HFONT>(SendMessageW(handle, WM_GETFONT, 0, 0)));
+            SetBkMode(dc, TRANSPARENT);
+            SetTextColor(dc, (policy & 1) ? RGB(150, 160, 175) : RGB(110, 110, 110));
+            const int length = GetWindowTextLengthW(handle);
+            std::wstring caption(length + 1, L'\0');
+            GetWindowTextW(handle, caption.data(), length + 1);
+            const auto style = GetWindowLongPtrW(handle, GWL_STYLE) & SS_TYPEMASK;
+            DrawTextW(dc, caption.c_str(), length, &bounds,
+                      DT_NOPREFIX | DT_WORDBREAK |
+                          (style == SS_CENTER  ? DT_CENTER
+                           : style == SS_RIGHT ? DT_RIGHT
+                                               : DT_LEFT));
+            RestoreDC(dc, saved);
+            EndPaint(handle, &paint);
+            return 0;
+        }
+    }
     const auto result = DefSubclassProc(handle, message, wparam, lparam);
     if (message == WM_SETFOCUS || message == WM_KILLFOCUS)
         RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
-    if ((message != WM_PAINT && message != WM_NCPAINT) || (policy & 2))
+    if ((message != WM_PAINT && message != WM_NCPAINT) || (policy & (2 | 8)))
         return result;
     RECT bounds{};
     GetWindowRect(handle, &bounds);
@@ -104,9 +145,11 @@ void apply(HWND handle, bool dark, bool contrast) {
     const bool framed_child =
         (style & WS_CHILD) &&
         ((style & WS_BORDER) || (GetWindowLongPtrW(handle, GWL_EXSTYLE) & WS_EX_CLIENTEDGE));
-    if (combo || group || framed_child)
+    const bool label = wcscmp(name, L"Static") == 0;
+    if (combo || group || framed_child || label)
         SetWindowSubclass(handle, border_proc, border_subclass,
-                          (dark ? 1 : 0) | (contrast ? 2 : 0) | (group ? 4 : 0));
+                          (dark ? 1 : 0) | (contrast ? 2 : 0) | (group ? 4 : 0) | (label ? 8 : 0) |
+                              (combo ? 16 : 0));
     SetWindowTheme(handle,
                    contrast ? nullptr
                    : dark   ? (combo ? L"DarkMode_CFD" : L"DarkMode_Explorer")

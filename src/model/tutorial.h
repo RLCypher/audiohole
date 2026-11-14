@@ -14,6 +14,7 @@ struct TutorialView {
     std::vector<TutorialChoice> choices;
     std::vector<std::string> targets;
     bool complete = false;
+    bool sightseeing = false;
 };
 // In-memory control-thread state machine. It observes confirmed UI/controller
 // events; it cannot scan hardware, open streams, or read/write configuration.
@@ -47,6 +48,7 @@ class Tutorial {
     std::map<std::string, std::pair<std::string, std::string>> incoming_;
     std::set<std::string> renamed_;
     std::string profile_id_, hole_id_, initial_profile_name_, initial_hole_name_;
+    int sightseeing_page_ = -1;
     bool saved_ = false, routed_ = false, acknowledged_ = false, settings_ = false,
          complete_ = false;
     void enter(const std::string&);

@@ -160,6 +160,11 @@ ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
     Create(parent, id);
     protect_dropdown_children(*this);
 }
+wxSize ThemedChoice::DoGetBestSize() const {
+    auto size = wxChoice::DoGetBestSize();
+    size.y = std::max(size.y, GetCharHeight() + FromDIP(12));
+    return size;
+}
 WXDWORD ThemedChoice::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxChoice::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
 }
@@ -171,6 +176,19 @@ bool ThemedChoice::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     return paint_selection(*this, id < GetCount() ? GetString(id) : wxString{}, item);
 }
 WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    // wxChoice can request an item height below zero while a disclosure is
+    // collapsed or deferred layout is settling. Native ComboBox accepts that
+    // as a nearly invisible selection field; retain one normal text row.
+    // wxChoice adds six physical pixels to CB_SETITEMHEIGHT (COMBO_HEIGHT_ADJ),
+    // including at scaled DPI, so subtract that from our full logical row height.
+    if (message == CB_SETITEMHEIGHT && wparam == static_cast<WXWPARAM>(-1))
+        lparam = std::max(static_cast<int>(lparam), GetCharHeight() + FromDIP(12) - 6);
+    if (message == WM_THEMECHANGED) {
+        const auto result = wxChoice::MSWWindowProc(message, wparam, lparam);
+        SendMessageW(static_cast<HWND>(GetHandle()), CB_SETITEMHEIGHT, static_cast<WPARAM>(-1),
+                     GetCharHeight() + FromDIP(12) - 6);
+        return result;
+    }
     if (native_dropdown_wheel(*this, message, wparam, lparam))
         return 0;
     if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||
@@ -214,6 +232,11 @@ ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
 WXDWORD ThemedCombo::MSWGetStyle(long style, WXDWORD* extra) const {
     return wxComboBox::MSWGetStyle(style, extra) | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
 }
+wxSize ThemedCombo::DoGetBestSize() const {
+    auto size = wxComboBox::DoGetBestSize();
+    size.y = std::max(size.y, GetCharHeight() + FromDIP(12));
+    return size;
+}
 bool ThemedCombo::MSWOnMeasure(WXMEASUREITEMSTRUCT* item) {
     return measure_selection(*this, item);
 }
@@ -225,6 +248,16 @@ bool ThemedCombo::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
                            reinterpret_cast<WXDRAWITEMSTRUCT*>(&draw));
 }
 WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
+    // Editable endpoint selectors share wxChoice's visible-height adjustment.
+    // Preserve a text row when a hidden pane or theme change resets that height.
+    if (message == CB_SETITEMHEIGHT && wparam == static_cast<WXWPARAM>(-1))
+        lparam = std::max(static_cast<int>(lparam), GetCharHeight() + FromDIP(12) - 6);
+    if (message == WM_THEMECHANGED) {
+        const auto result = wxComboBox::MSWWindowProc(message, wparam, lparam);
+        SendMessageW(static_cast<HWND>(GetHandle()), CB_SETITEMHEIGHT, static_cast<WPARAM>(-1),
+                     GetCharHeight() + FromDIP(12) - 6);
+        return result;
+    }
     if (native_dropdown_wheel(*this, message, wparam, lparam))
         return 0;
     if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC ||

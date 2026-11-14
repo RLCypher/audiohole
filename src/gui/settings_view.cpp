@@ -94,10 +94,7 @@ void Frame::build_settings() {
     startup_group->Add(wait, 0, wxALL, FromDIP(4));
     startup_group->Add(switch_profile, 0, wxALL, FromDIP(4));
     if (controller_->snapshot().capabilities.real_engine) {
-        wait->Disable();
         switch_profile->Disable();
-        wait->SetToolTip(
-            "This engine currently requires an explicit Stop and Start after device changes.");
         switch_profile->SetToolTip("Stop routing before selecting and starting another profile.");
     }
     auto save_routing_policy = [this, wait, switch_profile](wxCommandEvent&) {
@@ -240,7 +237,8 @@ void Frame::build_settings() {
     loop_until_event_ = new wxCheckBox(personality_box, wxID_ANY, "Loop until next event");
     playback->Add(hold_expressions_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     auto* loop_count = new wxBoxSizer(wxHORIZONTAL);
-    label(personality_box, loop_count, "Animation loop count");
+    auto* animation_count_label = label(personality_box, loop_count, "Animation loop count");
+    animation_count_label->SetName("Animation loop count label");
     loop_count->Add(animation_loops_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     playback->Add(loop_count, 0, wxALIGN_CENTER_VERTICAL);
     playback->Add(loop_until_event_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
@@ -411,6 +409,10 @@ void Frame::build_settings() {
         box->SetLabel("Advanced / DFA (Disabled for tutorial)");
         personality_box->Disable();
         box->Disable();
+        // Disable the composite's own native edit/arrows too; ancestor disable
+        // alone can leave buddy edits painted with the enabled text palette.
+        animation_loops_->Disable();
+        animation_count_label->Disable();
     }
     page->Bind(wxEVT_SIZE, [page, wrapping_notes, last_width = 0](wxSizeEvent& event) mutable {
         const int width = page->GetClientSize().x;

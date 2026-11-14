@@ -4,8 +4,27 @@
 #include <algorithm>
 #include <cstdint>
 #include <optional>
+#include <sstream>
 
 namespace audiohole::engine::detail {
+
+// Preserve the native code while distinguishing ownership refusal from a
+// malformed format/buffer. No process-owner identity can be inferred from it.
+inline Issue native_open_issue(const char* stage, std::uint32_t code) {
+    std::ostringstream native;
+    native << "0x" << std::hex << std::uppercase << code;
+    const bool in_use = code == 0x8889000Au;
+    return {in_use                                       ? ErrorCode::ResourceConflict
+            : code == 0x88890004u                        ? ErrorCode::UnavailableEndpoint
+            : code == 0x88890008u || code == 0x8889000Eu ? ErrorCode::UnsupportedRequirement
+                                                         : ErrorCode::BackendFailure,
+            stage,
+            std::string(stage) + " failed: HRESULT " + native.str() + "." +
+                (in_use ? " Windows reports the endpoint is in use (AUDCLNT_E_DEVICE_IN_USE). "
+                          "Close applications holding exclusive access, then Stop and Start again."
+                        : ""),
+            native.str()};
+}
 
 // Pure arithmetic shared by native opening and portable regression tests. No
 // Windows interfaces or synthetic endpoint implementation are needed to verify

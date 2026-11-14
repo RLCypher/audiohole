@@ -14,16 +14,40 @@ struct Control {
 };
 class Session final : public engine::RouteSession {
   public:
-    explicit Session(std::shared_ptr<Control> control) : control_(std::move(control)) {}
+    Session(std::shared_ptr<Control> control, engine::BoundRoute route, engine::BackendId backend)
+        : control_(std::move(control)), route_(std::move(route)), backend_(backend) {}
     ~Session() override {
         stop();
     }
     engine::NegotiatedRoute configuration() const override {
         engine::NegotiatedRoute result;
-        result.source.client_format =
-            result.destination.client_format = {48000, 2, engine::SampleFormat::Float32};
-        result.source.allocated_buffer_frames = result.destination.allocated_buffer_frames = 480;
-        result.source.period_frames = result.destination.period_frames = 240;
+        result.backend = backend_;
+        auto stream = [&](const engine::EndpointRequirements& request) {
+            engine::StreamConfiguration value;
+            value.client_format = {request.sample_rate_hz.value_or(48000),
+                                   request.channel_count.value_or(2),
+                                   request.sample_format.value_or(engine::SampleFormat::Float32)};
+            value.mode = request.mode.value_or(route_.request.exclusive_mode_preferred
+                                                   ? engine::AccessMode::Exclusive
+                                                   : engine::AccessMode::Shared);
+            value.requested_mode = request.mode;
+            value.exclusive_mode_preferred = route_.request.exclusive_mode_preferred;
+            value.access_policy =
+                engine::access_policy(request, route_.request.exclusive_mode_preferred);
+            value.access_attempts = {{value.mode, true, true, {}}};
+            value.applied_buffer_request_ms = request.buffer_ms;
+            value.timing_sample_rate_hz = value.client_format.sample_rate_hz;
+            const auto requested = (std::uint64_t(value.client_format.sample_rate_hz) *
+                                        request.buffer_ms.value_or(10) +
+                                    999) /
+                                   1000;
+            value.allocated_buffer_frames =
+                static_cast<std::uint32_t>((requested + 479) / 480 * 480);
+            value.period_frames = 240;
+            return value;
+        };
+        result.source = stream(route_.request.source);
+        result.destination = stream(route_.request.destination);
         result.processing = "Software fixture; no audio";
         result.selection_reason = "Explicit test adapter";
         return result;
@@ -52,14 +76,18 @@ class Session final : public engine::RouteSession {
 
   private:
     std::shared_ptr<Control> control_;
+    engine::BoundRoute route_;
+    engine::BackendId backend_;
     bool started_ = false, released_ = false;
     std::uint64_t frames_ = 0;
 };
 class Adapter final : public engine::BackendAdapter {
   public:
-    explicit Adapter(std::shared_ptr<Control> control) : control_(std::move(control)) {}
+    explicit Adapter(std::shared_ptr<Control> control,
+                     engine::BackendId backend = engine::BackendId::Wasapi)
+        : control_(std::move(control)), backend_(backend) {}
     engine::BackendDescriptor descriptor() const override {
-        return {engine::BackendId::Wasapi, true, "Software contract fixture; no audio"};
+        return {backend_, true, "Software contract fixture; no audio"};
     }
     engine::Result<std::unique_ptr<engine::RouteSession>> open(const engine::BoundRoute& request,
                                                                std::stop_token stop) override {
@@ -74,11 +102,12 @@ class Adapter final : public engine::BackendAdapter {
             return {std::nullopt,
                     {{engine::ErrorCode::BackendFailure, "fixture/open", "Requested mode refused",
                       "TEST-EXCLUSIVE"}}};
-        return {std::make_unique<Session>(control_), {}};
+        return {std::make_unique<Session>(control_, request, backend_), {}};
     }
 
   private:
     std::shared_ptr<Control> control_;
+    engine::BackendId backend_;
 };
 inline Profile profile() {
     Profile p;

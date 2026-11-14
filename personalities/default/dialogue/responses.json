@@ -1430,7 +1430,7 @@
         "id": "default_bother_026",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Completely fabricated fact: the moon is a retired volume knob.",
+        "text": "The moon is a retired volume knob.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1438,7 +1438,7 @@
         "id": "default_bother_027",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Made-up fact: every seventh pigeon contains a tiny patch bay.",
+        "text": "Every seventh pigeon contains a tiny patch bay.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1446,7 +1446,7 @@
         "id": "default_bother_028",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Fictional discovery: socks migrate through bass ports every Thursday.",
+        "text": "Socks migrate through bass ports every Thursday.",
         "expression": "confused",
         "fallback_expression": "idle"
       },
@@ -1454,7 +1454,7 @@
         "id": "default_bother_029",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Invented fact: clouds are upholstered flight cases for exhausted thunderstorms.",
+        "text": "Clouds are upholstered flight cases for exhausted thunderstorms.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1462,7 +1462,7 @@
         "id": "default_bother_030",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Entirely fictional fact: the first cable tie was elected mayor of Neptune.",
+        "text": "The first cable tie was elected mayor of Neptune.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       }

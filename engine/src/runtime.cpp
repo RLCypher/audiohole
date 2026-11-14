@@ -42,6 +42,7 @@ struct Runtime::Impl {
     mutable std::mutex mutex;
     RuntimeSnapshot state;
     std::vector<std::unique_ptr<BackendAdapter>> adapters;
+    std::optional<BindingSnapshot> pending_bindings;
     std::jthread worker;
 
     explicit Impl(LatencyPreset preset) {
@@ -142,7 +143,17 @@ struct Runtime::Impl {
                 }
                 auto opened = adapter(*selected.value)->open(*bound.value, stop);
                 if (!opened.ok()) {
-                    path.state = State::Failed;
+                    path.state =
+                        !opened.issues.empty() &&
+                                std::all_of(
+                                    opened.issues.begin(), opened.issues.end(),
+                                    [](const auto& issue) {
+                                        return issue.code == ErrorCode::UnavailableEndpoint ||
+                                               issue.code == ErrorCode::UnresolvedEndpoint ||
+                                               issue.code == ErrorCode::AmbiguousEndpoint;
+                                    })
+                            ? State::Ready
+                            : State::Failed;
                     path.issues = std::move(opened.issues);
                     if (startup_failure)
                         path.issues.insert(path.issues.begin(), *startup_failure);
@@ -212,6 +223,31 @@ struct Runtime::Impl {
                 }
             }
             while (!stop.stop_requested()) {
+                std::optional<BindingSnapshot> refreshed;
+                {
+                    std::lock_guard lock(mutex);
+                    refreshed.swap(pending_bindings);
+                }
+                if (refreshed) {
+                    bindings = std::move(*refreshed);
+                    // Wait until every required binding is unambiguous and available.
+                    // Retry only unstarted Ready paths, never Failed or healthy siblings.
+                    const bool all_available = std::all_of(
+                        prepared.routes.begin(), prepared.routes.end(),
+                        [&](const auto& request) { return bind_route(request, bindings).ok(); });
+                    if (all_available)
+                        for (std::size_t i = 0; i < next.paths.size() && !stop.stop_requested();
+                             ++i)
+                            if (next.paths[i].state == State::Ready && !sessions[i]) {
+                                activate(i, prepared.routes[i]);
+                                const auto& path = next.paths[i];
+                                if (path.state == State::Failed && !path.issues.empty() &&
+                                    path.issues[0].code == ErrorCode::BackendFailure) {
+                                    const auto failure = path.issues[0];
+                                    (void)retry_startup(i, failure);
+                                }
+                            }
+                }
                 std::size_t running = 0, failed = 0, ready = 0, starting = 0, degraded = 0;
                 for (std::size_t i = 0; i < next.paths.size(); ++i) {
                     auto& path = next.paths[i];
@@ -405,6 +441,14 @@ Result<std::uint64_t> Runtime::start(const Profile& profile, const BindingSnapsh
             });
     return {generation, {}};
 }
+bool Runtime::update_bindings(const BindingSnapshot& bindings) {
+    impl_->check_thread();
+    std::lock_guard lock(impl_->mutex);
+    if (!impl_->state.armed || impl_->state.state == State::Stopping)
+        return false;
+    impl_->pending_bindings = bindings;
+    return true;
+}
 void Runtime::stop() {
     impl_->check_thread();
     {
@@ -413,6 +457,7 @@ void Runtime::stop() {
             return;
         impl_->state.state = State::Stopping;
         ++impl_->state.revision;
+        impl_->pending_bindings.reset();
     }
     if (impl_->worker.joinable())
         impl_->worker.request_stop();

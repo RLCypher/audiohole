@@ -20,6 +20,7 @@ class ThemedChoice final : public wxChoice {
 
   protected:
     WXDWORD MSWGetStyle(long, WXDWORD*) const override;
+    wxSize DoGetBestSize() const override;
 
   private:
     wxBrush input_brush_;
@@ -38,6 +39,7 @@ class ThemedCombo final : public wxComboBox {
 
   protected:
     WXDWORD MSWGetStyle(long, WXDWORD*) const override;
+    wxSize DoGetBestSize() const override;
 
   private:
     wxBrush input_brush_;

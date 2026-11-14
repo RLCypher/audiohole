@@ -20,6 +20,7 @@ class RoutingService {
     virtual ~RoutingService() = default;
     virtual std::uint64_t start(engine::Profile, engine::BindingSnapshot) = 0;
     virtual std::uint64_t stop() = 0;
+    virtual bool update_bindings(engine::BindingSnapshot) = 0;
     virtual RoutingReading reading() const = 0;
 };
 // The factory runs on the service's thread. Injection is for portable contract

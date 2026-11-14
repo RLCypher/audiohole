@@ -252,6 +252,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     DiagnosticWidgets device_check_;
     DiagnosticWidgets* active_check_ = nullptr;
     wxPanel* performance_panel_{};
+    wxSplitterWindow* performance_split_{};
     wxScrolledWindow* profile_editor_{};
     void build_device_check(wxWindow*, wxSizer*, DiagnosticWidgets&, bool capture,
                             const wxString& name);

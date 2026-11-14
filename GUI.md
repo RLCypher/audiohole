@@ -2152,11 +2152,30 @@ named restart actions; details and the one-time working greetings are in TUTORIA
 
 Device name guidance requires the intended selected device; name/Save guidance
 ends on its confirmed save. Profile/hole renames outline only the stable-ID row.
-Device-card guidance centers smoothly over three seconds, exclusive preference
-over 1.5 seconds; manual wheel input cancels automatic movement. Norm's response
+Device-card guidance centers smoothly over two seconds, exclusive preference
+over one second; manual wheel input cancels automatic movement. Norm's response
 buttons pulse like the other outlines, except the static End tutorial button.
 
 On Profiles, an overflowing text/list field scrolls itself while it can move in
 the requested direction. At either limit, or when content already fits, the
 wheel passes to the nearest scrollable ancestor that can move. Dropdown and DFA
 values remain protected from wheel changes. Performance Diagnostics stays pinned.
+
+### Current owner-requested tutorial and operation fixes
+
+Sightseeing hides reply buttons and all unrelated outlines; only the required tab
+is outlined until the user returns to the same step/branch. Talking reactions play
+four to six times and return to the owned baseline, yielding to operational warnings.
+Hole reveal tweens now take two seconds (one for exclusive preference) with an
+11-ms sample interval. The authored dialogue and underlying scroll distances stay
+unchanged. Invented-fact reactions in both Norm and Horu omit fictional disclaimers.
+Disabled tutorial settings use flat gray text and disable the animation edit/arrows
+explicitly. Clock and editable endpoint selectors retain a normal row height across disclosure,
+theme and DPI changes.
+Custom input/list borders discard copied resize pixels to avoid interior trails.
+Performance Diagnostics has its own vertical sash and remains outside the hole editor.
+
+Advanced buffer controls explicitly say Buffer request and explain driver alignment.
+Stop/Start applies saved requests; negotiated actual buffers appear in diagnostics,
+including the request and the actual frame/rate domain. Ready device-arrival behavior
+and the engine audit's limitations are documented in ENGINE_INTEGRATION.md.

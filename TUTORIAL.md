@@ -113,7 +113,7 @@ then rests for one second; Low motion and Windows animation settings disable
 the pulse. The name field is outlined only for the intended selected device, and Save only
 while that device has unsaved edits. Both disappear after its confirmed save.
 Forward and Return device-card rows scroll toward the center of the editor over
-three seconds; the exclusive-preference checkbox centers over 1.5 seconds. Scroll
+two seconds; the exclusive-preference checkbox centers over one second. Scroll
 bounds are clamped to content, Low motion uses an immediate reveal, and manual
 wheel input cancels a tween. Moving from source to destination within the same
 card does not recenter again. F1 repeats guidance. Personality/animation/DFA stay visible
@@ -161,3 +161,10 @@ restored does the test drain that queued refresh and verify the real information
 and controller revision. This guards the Windows CI race where an event-loop
 yield replaced the 80-line fixture with the short live summary between gesture
 and assertion; the original inner/outer scroll checks remain required.
+
+Wrong-tab sightseeing now suppresses choices and outlines only the tab required
+by the underlying beat. Returning restores its exact branch, choices and targets;
+background completion does not leave the user with choices on the wrong tab.
+Talking expressions play four to six passes rather than looping until another
+lesson message. Disabled Settings labels use a flat gray palette with no embossed
+shadow, including the animation-count label, numeric field and arrows.

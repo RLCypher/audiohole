@@ -566,6 +566,10 @@ int main() {
     try {
         processing();
         packet_cadence_regression();
+        const auto in_use = detail::native_open_issue("InitializeAudioStream", 0x8889000Au);
+        expect(in_use.code == ErrorCode::ResourceConflict && in_use.native_code == "0x8889000A" &&
+                   in_use.detail.find("exclusive access") != std::string::npos,
+               "native ownership refusal keeps its HRESULT and actionable feedback");
         low_latency_policy();
         startup_refill_regression();
         underrun_context();

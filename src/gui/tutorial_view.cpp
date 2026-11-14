@@ -239,7 +239,7 @@ void Frame::render_tutorial() {
     std::string choice_key;
     for (const auto& c : view.choices)
         choice_key += c.id + "\n";
-    const bool farewell = view.beat == "N036";
+    const bool farewell = view.beat == "N036" && !view.sightseeing;
     if (farewell)
         choice_key += "end-tutorial";
     if (choice_key != tutorial_choice_key_) {
@@ -434,11 +434,11 @@ void Frame::render_tutorial() {
             const bool reverse = view.beat == "N022" || view.beat == "N023";
             if (forward || reverse)
                 scroll_tutorial_to(*(forward ? forward_.source : reverse_.source)->GetParent(),
-                                   forward ? "forward" : "return", 3000);
+                                   forward ? "forward" : "return", 2000);
             else if (view.beat == "N021A")
-                scroll_tutorial_to(*directed, "exclusive", 1500);
+                scroll_tutorial_to(*directed, "exclusive", 1000);
             else
-                scroll_tutorial_to(*directed, view.beat, 3000);
+                scroll_tutorial_to(*directed, view.beat, 2000);
         }
         if (directed && !directed->IsShownOnScreen()) {
             for (std::size_t page = 0; page < notebook_->GetPageCount(); ++page)
@@ -759,6 +759,18 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         choice();
         check("N007");
+        const auto expected_scan_dialogue = commentary_copy_;
+        select_page(3);
+        require(tutorial_choices_.empty() && tutorial_->view().sightseeing &&
+                    tutorial_->view().targets == std::vector<std::string>{"scan_tab"} &&
+                    tutorial_highlights_[0]->IsShownOnScreen(),
+                "Sightseeing did not replace replies/guidance with the required tab only");
+        for (std::size_t i = 1; i < tutorial_highlights_.size(); ++i)
+            require(!tutorial_highlights_[i]->IsShown(), "Sightseeing retained unrelated outlines");
+        select_page(2);
+        check("N007");
+        require(commentary_copy_ == expected_scan_dialogue && !tutorial_->view().sightseeing,
+                "Returning from sightseeing lost the saved tutorial step");
         scan_mode_->SetSelection(1);
         wxCommandEvent level(wxEVT_CHOICE, scan_mode_->GetId());
         scan_mode_->GetEventHandler()->ProcessEvent(level);
@@ -945,7 +957,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         wxCommandEvent return_channel(wxEVT_CHECKBOX, duplex_->GetId());
         duplex_->GetEventHandler()->ProcessEvent(return_channel);
         check("N020");
-        settle_scroll("forward", 3000, forward_.source->GetParent());
+        settle_scroll("forward", 2000, forward_.source->GetParent());
         capture("forward-centered");
         choose_endpoint(forward_.source, forward_.sources, "tutorial-mixer-in");
         check("N020");
@@ -955,12 +967,12 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N021");
         choose_endpoint(forward_.destination, forward_.destinations, "tutorial-mixer-out");
         check("N021A");
-        settle_scroll("exclusive", 1500, forward_.exclusive_preferred);
+        settle_scroll("exclusive", 1000, forward_.exclusive_preferred);
         forward_.exclusive_preferred->SetValue(true);
         wxCommandEvent exclusive(wxEVT_CHECKBOX, forward_.exclusive_preferred->GetId());
         forward_.exclusive_preferred->GetEventHandler()->ProcessEvent(exclusive);
         check("N022");
-        settle_scroll("return", 3000, reverse_.source->GetParent());
+        settle_scroll("return", 2000, reverse_.source->GetParent());
         capture("return-centered");
         require(commentary_copy_.find("Let me scroll down for you.") != std::string::npos,
                 "Return scroll introduction is missing its explanation");
@@ -1013,6 +1025,21 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require(wxWindow::FindWindowByLabel("Skip tutorial", this) != nullptr &&
                     wxWindow::FindWindowByLabel("Replay Tutorial", this) == nullptr,
                 "Tutorial Settings did not replace Replay with Skip");
+        auto* animation_label = wxWindow::FindWindowByName("Animation loop count label", this);
+        require(animation_label && !animation_label->IsEnabled() &&
+                    !IsWindowEnabled(static_cast<HWND>(animation_loops_->GetHandle())),
+                "Tutorial animation count label/native editor remain enabled");
+        for (int appearance : {0, 1}) {
+            theme_choice_->SetSelection(appearance);
+            wxCommandEvent theme(wxEVT_CHOICE, theme_choice_->GetId());
+            theme_choice_->GetEventHandler()->ProcessEvent(theme);
+            require(!animation_loops_->IsEnabled() && !animation_label->IsEnabled(),
+                    "Appearance change re-enabled tutorial animation settings");
+            capture(appearance == 0 ? "settings-dark" : "settings-light");
+        }
+        theme_choice_->SetSelection(2);
+        wxCommandEvent system_theme(wxEVT_CHOICE, theme_choice_->GetId());
+        theme_choice_->GetEventHandler()->ProcessEvent(system_theme);
         capture("settings");
         choice();
         check("N035");

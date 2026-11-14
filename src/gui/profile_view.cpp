@@ -235,7 +235,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         dirty_ = true;
         refresh();
     });
-    label(box, tuning, "Buffer (ms; 0 = Automatic)");
+    label(box, tuning, "Buffer request (ms; 0 = Automatic)");
     w.buffer = new wxSpinCtrl(box, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
                               wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
     auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
@@ -248,17 +248,14 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.buffer_apply->SetMaxSize(wxSize(-1, buffer_height));
     w.buffer_apply->Disable();
     w.buffer_apply->SetToolTip(
-        "Save just this direction's buffer preference. A matching active Preview direction also "
-        "updates its simulated buffer. Test Mode saves configuration only; no hardware buffer is "
-        "applied.");
+        "Save this direction's buffer request. Stop and Start to apply it to a real route.");
     tuning->Add(buffer_row, 0, wxEXPAND);
-    w.buffer_state = label(box, tuning, "Edited/saved preferences; engine values unavailable.");
+    w.buffer_state = label(box, tuning, "Edited/saved requests; engine values unavailable.");
     w.buffer_state->SetMinSize(wxSize(1, -1));
-    w.buffer->SetToolTip("Use 0 for Automatic, or request a duration in milliseconds. Smaller "
-                         "values can reduce latency but "
-                         "increase dropout risk. This is an edited preference, not a measured or "
-                         "confirmed hardware buffer. Apply saves this preference; status shows any "
-                         "simulated confirmation.");
+    w.buffer->SetToolTip(
+        "Use 0 for Automatic, or request 1–100 milliseconds. Drivers can align or resize "
+        "the allocation; Performance Diagnostics shows the supplied request and actual frames. "
+        "Smaller requests can increase dropout risk. Save, then Stop and Start to apply.");
     w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
                          "visible evidence explains the recommendation.");
     w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
@@ -268,6 +265,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.mode = choices(box, tuning, "Operating mode",
                      {"Automatic", "Force exclusive mode", "Force shared mode"});
     w.clock = choices(box, tuning, "Preferred clock device", {"Automatic", "Capture", "Playback"});
+    w.clock->SetMinSize(
+        wxSize(-1, std::max(w.mode->GetBestSize().y, w.clock->GetCharHeight() + FromDIP(12))));
     w.clock->SetToolTip("Save the preferred timing reference for this direction.");
     w.clock->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         if (!loading_) {
@@ -830,16 +829,19 @@ void Frame::build_profiles() {
     });
     sidebar_layout->Add(profile_rows_, 1, wxEXPAND);
     sidebar->SetSizer(sidebar_layout);
-    auto* right_container = new wxPanel(profile_columns_);
-    auto* right_column = new wxBoxSizer(wxVERTICAL);
-    right_container->SetSizer(right_column);
+    auto* right_container = new wxSplitterWindow(profile_columns_, wxID_ANY, wxDefaultPosition,
+                                                 wxDefaultSize, wxSP_LIVE_UPDATE | wxSP_3D);
+    performance_split_ = right_container;
+    right_container->SetName("Resize performance diagnostics height");
+    right_container->SetMinimumPaneSize(FromDIP(80));
+    right_container->SetSashGravity(1.0);
     auto* editor = new wxScrolledWindow(right_container);
     profile_editor_ = editor;
     editor->Bind(wxEVT_CHILD_FOCUS, [this](wxChildFocusEvent& event) {
         if (!tutorial_scroll_duration_)
             event.Skip();
     });
-    right_column->Add(editor, 1, wxEXPAND);
+
     editor->SetScrollRate(FromDIP(12), FromDIP(12));
     auto* right = new wxBoxSizer(wxVERTICAL);
     editor->SetSizer(right);
@@ -891,8 +893,8 @@ void Frame::build_profiles() {
                                   wxTE_MULTILINE | wxTE_READONLY | wxTE_WORDWRAP);
     path_status_->SetName("Routing performance observations");
     path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 4 + FromDIP(12)));
-    performance->Add(path_status_, 0, wxEXPAND | wxALL, FromDIP(4));
-    right_column->Add(performance_panel_, 0, wxEXPAND | wxALL, FromDIP(4));
+    performance->Add(path_status_, 1, wxEXPAND | wxALL, FromDIP(4));
+    right_container->SplitHorizontally(editor, performance_panel_, -FromDIP(140));
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
     page->SetSizer(page_layout);
     notebook_->AddPage(page, "Profiles");
@@ -1237,6 +1239,8 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
 // Relayout only after actual content/selection changes, never on unchanged
 // polling. FitInside updates the editor's virtual extent without resizing Frame.
 void Frame::layout_direction(DirectionWidgets& widgets) {
+    widgets.tuning->GetPane()->Layout();
+    widgets.tuning->InvalidateBestSize();
     widgets.group->Layout();
     auto* editor = static_cast<wxScrolledWindow*>(widgets.group->GetStaticBox()->GetParent());
     editor->FitInside();

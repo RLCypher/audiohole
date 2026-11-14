@@ -46,12 +46,7 @@ struct AccessFailure {
 };
 
 [[noreturn]] void native_failure(const char* stage, HRESULT code) {
-    std::ostringstream message;
-    message << stage << " failed: HRESULT 0x" << std::hex << std::uppercase
-            << static_cast<std::uint32_t>(code) << ".";
-    std::ostringstream native;
-    native << "0x" << std::hex << std::uppercase << static_cast<std::uint32_t>(code);
-    throw NativeFailure{{ErrorCode::BackendFailure, stage, message.str(), native.str()}};
+    throw NativeFailure{native_open_issue(stage, static_cast<std::uint32_t>(code))};
 }
 void checked(HRESULT code, const char* stage) {
     if (FAILED(code))

@@ -67,13 +67,45 @@ bool Frame::engine_smoke(const wxString& directory) {
         require(controller_->snapshot().profiles == original,
                 "Engine GUI rewrote saved routing intent");
         require(start_->IsEnabled(), "Confirmed cleanup did not enable the next Start");
+        for (int milliseconds : {1, 6, 20, 50}) {
+            for (auto* direction : {&forward_, &reverse_}) {
+                direction->advanced_tuning->SetValue(true);
+                wxCommandEvent tune(wxEVT_CHECKBOX, direction->advanced_tuning->GetId());
+                direction->advanced_tuning->GetEventHandler()->ProcessEvent(tune);
+                direction->buffer->SetValue(milliseconds + (direction == &reverse_ ? 1 : 0));
+                direction->mode->SetSelection(2);
+                wxCommandEvent mode(wxEVT_CHOICE, direction->mode->GetId());
+                direction->mode->GetEventHandler()->ProcessEvent(mode);
+            }
+            tuning_timer_.Stop();
+            refresh();
+            click(profile_save_);
+            require(!dirty_, "Advanced buffer request did not save through actual GUI controls");
+            click(start_);
+            until([&] { return controller_->snapshot().state == State::Running; });
+            const auto& paths = controller_->snapshot().routing_status->paths;
+            require(paths.size() == 2 && paths[0].negotiated && paths[1].negotiated &&
+                        paths[0].negotiated->destination.applied_buffer_request_ms ==
+                            milliseconds &&
+                        paths[1].negotiated->destination.applied_buffer_request_ms ==
+                            milliseconds + 1 &&
+                        path_status_->GetValue().Contains("Buffer request supplied"),
+                    "Advanced GUI requests failed startup, crossed directions or lost allocation "
+                    "feedback");
+            click(stop_);
+            until([&] {
+                return controller_->snapshot().state == State::Stopped &&
+                       !controller_->snapshot().routing_pending;
+            });
+        }
         if (!directory.empty()) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             std::ofstream output(std::filesystem::path(directory.ToStdWstring()) /
                                  "smoke-result.txt");
             output << "PASS: GUI Start/Stop through real engine Runtime with software-only "
                       "adapters; confirmed duplex progress, telemetry, cleanup and unchanged saved "
-                      "intent. No hardware opened.\n";
+                      "intent; advanced tuning Save/Start/Stop with independent 1/6/20/50-ms "
+                      "requests and quantized buffers. No hardware opened.\n";
             require(bool(output), "Could not write engine GUI smoke evidence");
         }
         return true;

@@ -252,10 +252,13 @@ TEST(Tutorial, UserActionsDismissClickQuipsAndBypassReminderRetainsMicrophoneCho
     EXPECT_EQ(h.lesson.view().text, before.text);
     h.navigate(3);
     EXPECT_EQ(h.lesson.beat(), "N028");
-    EXPECT_NE(h.lesson.view().text.find("personal confession"), std::string::npos);
-    EXPECT_EQ(h.lesson.view().choices[0].id, before.choices[0].id);
+    EXPECT_TRUE(h.lesson.view().sightseeing);
+    EXPECT_TRUE(h.lesson.view().choices.empty());
+    EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
+    EXPECT_FALSE(h.lesson.choose(before.choices[0].id));
     h.navigate(0);
     EXPECT_EQ(h.lesson.view().text, before.text);
+    EXPECT_EQ(h.lesson.view().choices[0].id, before.choices[0].id);
     EXPECT_FALSE(h.lesson.complete());
 }
 TEST(Tutorial, ExclusivePreferenceAndNamesDoNotChangeStableAssignments) {
@@ -353,4 +356,27 @@ TEST(Tutorial, WorkingGreetingsNeverSwitchPersonalityOrAddTutorialChoices) {
     EXPECT_EQ(
         lesson.view().expression,
         nlohmann::json::parse(tutorial_catalog()).at("N001").at("expression").get<std::string>());
+}
+
+TEST(Tutorial, SightseeingOnlyHighlightsRequiredTabAndRestoresExactBranch) {
+    Lesson h;
+    h.to_scan();
+    const auto before = h.lesson.view();
+    h.navigate(3);
+    EXPECT_TRUE(h.lesson.view().sightseeing);
+    EXPECT_TRUE(h.lesson.view().choices.empty());
+    EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"scan_tab"});
+    h.lesson.click(1000);
+    EXPECT_TRUE(h.lesson.view().sightseeing);
+    EXPECT_TRUE(h.lesson.view().choices.empty());
+    h.navigate(2);
+    EXPECT_FALSE(h.lesson.view().sightseeing);
+    EXPECT_EQ(h.lesson.view().beat, before.beat);
+    EXPECT_EQ(h.lesson.view().text, before.text);
+    EXPECT_EQ(h.lesson.view().targets, before.targets);
+    h.scan();
+    h.navigate(3);
+    EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"scan_tab"});
+    h.navigate(2);
+    EXPECT_FALSE(h.lesson.view().choices.empty());
 }

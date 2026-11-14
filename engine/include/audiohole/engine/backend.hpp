@@ -181,8 +181,9 @@ class BackendAdapter {
 // requirements are not fallback hints. Without an effective forced mode, the
 // independent preference allows Exclusive followed by a reported Shared retry.
 // Otherwise Automatic remains Shared. Buffer request application
-// is distinct from scheduling period and latency. In this prototype, a manual
-// duration must match actual endpoint allocation within one frame of rounding.
+// is distinct from scheduling period and latency. Supplied requests must be
+// confirmed unchanged; driver-aligned allocation is reported separately in its
+// own sample-rate domain and need not match the requested duration.
 Result<NegotiatedRoute> check_negotiated(const RouteRequest&, const NegotiatedRoute&);
 
 // Validate one concrete attempt before accepting it or retrying another mode.

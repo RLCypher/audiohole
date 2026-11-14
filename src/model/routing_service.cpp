@@ -105,6 +105,7 @@ class Service final : public RoutingService {
     std::uint64_t stop() override {
         std::lock_guard lock(mutex_);
         const auto generation = ++reading_.generation;
+        bindings_.reset();
         if (!reading_.ready) {
             reading_.pending = false;
             reading_.admission_issues.clear();
@@ -117,6 +118,15 @@ class Service final : public RoutingService {
         command_ = Command{generation, true, {}, {}};
         wake_.notify_all();
         return generation;
+    }
+    bool update_bindings(engine::BindingSnapshot bindings) override {
+        std::lock_guard lock(mutex_);
+        if (!reading_.ready || reading_.pending || !reading_.state || !reading_.state->armed ||
+            reading_.state->state == engine::State::Stopping)
+            return false;
+        bindings_ = std::move(bindings);
+        wake_.notify_all();
+        return true;
     }
     RoutingReading reading() const override {
         std::lock_guard lock(mutex_);
@@ -134,6 +144,7 @@ class Service final : public RoutingService {
     std::condition_variable wake_;
     RoutingReading reading_;
     std::optional<Command> command_;
+    std::optional<engine::BindingSnapshot> bindings_;
     std::jthread worker_; // Last member: every referenced field is initialized first.
     void run(std::stop_token stop, const RuntimeFactory& factory) noexcept {
         try {
@@ -151,11 +162,15 @@ class Service final : public RoutingService {
             std::uint64_t generation = 0;
             while (!stop.stop_requested()) {
                 std::optional<Command> command;
+                std::optional<engine::BindingSnapshot> bindings;
                 {
                     std::unique_lock lock(mutex_);
-                    wake_.wait_for(lock, std::chrono::milliseconds(50),
-                                   [&] { return command_.has_value() || stop.stop_requested(); });
+                    wake_.wait_for(lock, std::chrono::milliseconds(50), [&] {
+                        return command_.has_value() || bindings_.has_value() ||
+                               stop.stop_requested();
+                    });
                     command.swap(command_);
+                    bindings.swap(bindings_);
                 }
                 if (stop.stop_requested())
                     break;
@@ -170,6 +185,8 @@ class Service final : public RoutingService {
                             issues = std::move(accepted.issues);
                     }
                 }
+                if (!command && bindings)
+                    runtime->update_bindings(*bindings);
                 auto state = std::make_shared<const engine::RuntimeSnapshot>(runtime->snapshot());
                 std::lock_guard lock(mutex_);
                 if (generation != reading_.generation)
@@ -290,6 +307,34 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
         out << title
             << (path.direction == engine::DirectionId::Reverse ? " / Return: " : " / Forward: ")
             << engine::name(path.state) << '\n';
+        if (profile)
+            for (const auto& hole : profile->holes)
+                if (hole.id == path.hole_id) {
+                    const auto& direction = path.direction == engine::DirectionId::Reverse
+                                                ? hole.reverse
+                                                : hole.forward;
+                    out << "Requested engine: " << hole.routing_engine
+                        << " | Advanced tuning: " << (direction.advanced_tuning ? "enabled" : "off")
+                        << '\n';
+                    for (const auto& [label, overrides] :
+                         {std::pair{"Capture request", &direction.settings.preferences.source},
+                          std::pair{"Playback request",
+                                    &direction.settings.preferences.destination}}) {
+                        const auto p = direction.advanced_tuning
+                                           ? inherit_preferences(
+                                                 direction.settings.preferences.common, *overrides)
+                                           : EndpointPreferences{};
+                        out << label << ": Rate "
+                            << (p.sample_rate_hz ? std::to_string(*p.sample_rate_hz) : "Automatic")
+                            << " | Channels "
+                            << (p.channel_count ? std::to_string(*p.channel_count) : "Automatic")
+                            << " | Format " << p.sample_format.value_or("Automatic") << " | Mode "
+                            << p.mode.value_or("Automatic") << " | Buffer "
+                            << (p.buffer_ms ? std::to_string(*p.buffer_ms) + " ms" : "Automatic")
+                            << " | Exclusive preferred: "
+                            << (direction.exclusive_mode_preferred ? "yes" : "no") << '\n';
+                    }
+                }
         if (path.negotiated) {
             const auto& n = *path.negotiated;
             out << "Engine: " << engine::name(n.backend) << " | " << n.selection_reason << '\n';
@@ -299,12 +344,17 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
                 out << " | Requested: "
                     << (s.requested_mode ? engine::name(*s.requested_mode) : "Automatic")
                     << " | Exclusive preferred: " << (s.exclusive_mode_preferred ? "yes" : "no");
-                if (s.allocated_buffer_frames)
+                if (s.allocated_buffer_frames) {
                     out << " | Allocated buffer: " << *s.allocated_buffer_frames << " frames";
+                    if (s.timing_sample_rate_hz && *s.timing_sample_rate_hz > 0)
+                        out << " ("
+                            << 1000.0 * *s.allocated_buffer_frames / *s.timing_sample_rate_hz
+                            << " ms)";
+                }
                 if (s.period_frames)
                     out << " | Period: " << *s.period_frames << " frames";
                 if (s.applied_buffer_request_ms)
-                    out << " | Applied request: " << *s.applied_buffer_request_ms << " ms";
+                    out << " | Buffer request supplied: " << *s.applied_buffer_request_ms << " ms";
                 if (s.access_fell_back)
                     out << " | Preferred Exclusive fell back to Shared";
                 out << '\n';

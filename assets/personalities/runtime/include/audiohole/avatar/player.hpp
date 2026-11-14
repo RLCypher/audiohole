@@ -18,6 +18,9 @@ struct Reaction {
     // Extra display time after one authored pass (or the static hold), 0..5000 ms.
     // Independent of event freshness/TTL; operational interruption still applies.
     int final_hold_ms = 0;
+    // A nonzero event-local play count (1..20) overrides global repeats/hold.
+    // Used for finite speech gestures without altering saved playback policy.
+    int total_plays = 0;
 };
 struct Presentation {
     Image image;
@@ -42,7 +45,9 @@ class Player {
     Presentation tick(std::int64_t now);
     void pause(bool value, std::int64_t now);
     void speed(double multiplier, std::int64_t now);
-    void first_frame_only(bool value) { first_frame_only_ = value; }
+    void first_frame_only(bool value) {
+        first_frame_only_ = value;
+    }
     void reduced_motion(bool value) {
         reduced_ = value;
     }
@@ -79,7 +84,16 @@ class Player {
     ClipPtr baseline_, active_;
     std::uint64_t revision_ = 0;
     int baseline_priority_ = 0, active_priority_ = 0;
-    int active_hold_ms_ = 0;
+    int active_hold_ms_ = 0, active_total_plays_ = 0;
+    int plays() const {
+        return active_total_plays_ ? active_total_plays_ : reaction_loops_;
+    }
+    bool continuous() const {
+        return !active_total_plays_ && loop_until_event_;
+    }
+    bool held() const {
+        return !active_total_plays_ && hold_expressions_;
+    }
     int reaction_loops_ = 1;
     bool loop_until_event_ = false, first_frame_only_ = false;
     std::int64_t last_now_ = 0;

@@ -302,13 +302,22 @@ void formats_and_maps() {
     negotiated.destination.timing_sample_rate_hz = 48000;
     expect(check_negotiated(request, negotiated).ok(), "manual buffer confirmation admits");
     negotiated.destination.allocated_buffer_frames = 1056;
-    expect(!check_negotiated(request, negotiated).ok(),
-           "API request echo cannot hide a larger actual buffer");
+    expect(check_negotiated(request, negotiated).ok() &&
+               negotiated.destination.applied_buffer_request_ms == 10 &&
+               negotiated.destination.allocated_buffer_frames == 1056,
+           "driver-aligned allocation retains both actual frames and the supplied request");
     negotiated.destination.allocated_buffer_frames = 481;
     expect(check_negotiated(request, negotiated).ok(),
            "one frame of allocation rounding is permitted");
     negotiated.destination.allocated_buffer_frames = 482;
-    expect(!check_negotiated(request, negotiated).ok(), "larger manual-buffer mismatch rejects");
+    expect(check_negotiated(request, negotiated).ok(),
+           "driver allocation need not equal the request");
+    negotiated.destination.applied_buffer_request_ms = 11;
+    expect(!check_negotiated(request, negotiated).ok(),
+           "an ignored or substituted request rejects");
+    negotiated.destination.applied_buffer_request_ms = 10;
+    negotiated.destination.allocated_buffer_frames = 0;
+    expect(!check_negotiated(request, negotiated).ok(), "zero actual allocation still rejects");
 }
 } // namespace
 

@@ -49,7 +49,8 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
     window->SetForegroundColour(
         contrast
             ? wxSystemSettings::GetColour(editor ? wxSYS_COLOUR_WINDOWTEXT : wxSYS_COLOUR_BTNTEXT)
-            : foreground);
+        : !window->IsEnabled() ? (dark ? wxColour(150, 160, 175) : wxColour(110, 110, 110))
+                               : foreground);
     if (!contrast && window->GetName() == "brand-wordmark")
         window->SetForegroundColour(palette::mint());
     if (!contrast && window->GetName() == "brand-wordmark-hole")

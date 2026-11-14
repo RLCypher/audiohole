@@ -1,6 +1,7 @@
 #include "audiohole/scoped_scan.hpp"
 #include "model/application_controller.h"
 #include "model/configuration_controller.h"
+#include "support/engine_fixture.h"
 #include <atomic>
 #include <chrono>
 #include <fstream>
@@ -1121,4 +1122,70 @@ TEST_F(ScannerIntegration, PackedAndContainer24BitFormatsRemainDistinctAndReadab
     EXPECT_EQ(choices.compatible[0].wave->valid_bits, 24);
     EXPECT_EQ(choices.compatible[0].wave->container_bits, 32);
 }
+} // namespace audiohole
+
+namespace audiohole {
+TEST_F(ScannerIntegration, ReadyRoutingStartsOnRequiredDeviceReturnAndStopCancelsWaiting) {
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    auto runtime = std::make_shared<testing_engine::Control>();
+    ConfigurationController controller(
+        std::make_unique<TestJsonPersistence>(portable / "configuration.json"), service(), nullptr,
+        testing_engine::service(runtime));
+    finish(controller);
+    auto wait = [&](auto done) {
+        const auto deadline = std::chrono::steady_clock::now() + 5s;
+        while (!done() && std::chrono::steady_clock::now() < deadline) {
+            controller.advance(10);
+            std::this_thread::sleep_for(2ms);
+        }
+        ASSERT_TRUE(done());
+    };
+    wait([&] { return controller.snapshot().capabilities.routing; });
+    const auto id = controller.create_profile("Wireless ready fixture");
+    auto saved = *profile(controller.snapshot(), id);
+    auto hole = controller.make_hole();
+    for (const auto& device : controller.snapshot().endpoints)
+        (device.capture ? hole.forward.source : hole.forward.destination) = device.id;
+    saved.holes.push_back(hole);
+    ASSERT_TRUE(controller.save(saved, false).ok);
+    auto refresh = [&] {
+        ScannerActionRequest request;
+        request.kind = ScannerActionKind::RefreshAvailability;
+        ASSERT_TRUE(controller.scanner_action(request).ok);
+        finish(controller);
+    };
+    for (auto& device : evidence->endpoints)
+        device.state = "unplugged";
+    refresh();
+    ASSERT_TRUE(controller.activate(id).ok);
+    wait([&] { return controller.snapshot().state == State::Ready; });
+    EXPECT_EQ(runtime->opens, 0);
+    evidence->endpoints.front().state = "active";
+    refresh();
+    controller.advance(100);
+    EXPECT_EQ(runtime->opens, 0);
+    evidence->endpoints.back().state = "active";
+    refresh();
+    wait([&] { return controller.snapshot().state == State::Running; });
+    EXPECT_EQ(runtime->opens, 1);
+    EXPECT_EQ(controller.snapshot().routing_intent->holes[0].forward.source, hole.forward.source);
+    controller.stop();
+    wait([&] { return controller.snapshot().state == State::Stopped; });
+    for (auto& device : evidence->endpoints)
+        device.state = "unplugged";
+    refresh();
+    ASSERT_TRUE(controller.activate(id).ok);
+    wait([&] { return controller.snapshot().state == State::Ready; });
+    controller.stop();
+    wait([&] { return controller.snapshot().state == State::Stopped; });
+    for (auto& device : evidence->endpoints)
+        device.state = "active";
+    refresh();
+    for (int tick = 0; tick < 10; ++tick)
+        controller.advance(100);
+    EXPECT_EQ(controller.snapshot().state, State::Stopped);
+    EXPECT_FALSE(controller.snapshot().armed);
+    EXPECT_EQ(runtime->opens, 1);
+}
+
 } // namespace audiohole

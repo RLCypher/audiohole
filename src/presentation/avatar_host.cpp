@@ -93,9 +93,16 @@ avatar::Decision AvatarHost::react(Message event, const Copy& copy, std::uint64_
     const auto expression = owns(copy.expression)            ? copy.expression
                             : owns(copy.fallback_expression) ? copy.fallback_expression
                                                              : std::string("idle");
-    return session_->react({expression, "dialogue:" + std::to_string(occurrence), revision_, now,
-                            2000, priority, reaction_final_hold_ms},
-                           now);
+    avatar::Reaction reaction{expression,
+                              "dialogue:" + std::to_string(occurrence),
+                              revision_,
+                              now,
+                              2000,
+                              priority,
+                              reaction_final_hold_ms};
+    if (expression == "talking")
+        reaction.total_plays = 4 + static_cast<int>(occurrence % 3);
+    return session_->react(reaction, now);
 }
 void AvatarHost::tutorial_expression(const std::string& expression, std::uint64_t occurrence,
                                      std::int64_t now) {
@@ -105,9 +112,16 @@ void AvatarHost::tutorial_expression(const std::string& expression, std::uint64_
     const auto owned =
         std::find(supported_.begin(), supported_.end(), expression) != supported_.end();
     session_->player().reaction_playback(1, true);
-    session_->react({owned ? expression : "idle", "tutorial:" + std::to_string(occurrence),
-                     revision_, now, 2000, 100, 0},
-                    now);
+    avatar::Reaction reaction{owned ? expression : "idle",
+                              "tutorial:" + std::to_string(occurrence),
+                              revision_,
+                              now,
+                              2000,
+                              100,
+                              0};
+    if (owned && expression == "talking")
+        reaction.total_plays = 4 + static_cast<int>(occurrence % 3);
+    session_->react(reaction, now);
 }
 avatar::Presentation AvatarHost::tick(std::int64_t now) {
     if (!session_)

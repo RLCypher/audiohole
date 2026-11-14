@@ -111,16 +111,17 @@ retains the original JSON. Legacy aggregate migration belongs to the builder.
   does not promise hardware or adapter support.
 - Effective forced Shared/Exclusive wins over preference. Otherwise a true
   `exclusive_mode_preferred` tries Exclusive first, then Shared after stopped
-  acquisition/requirement failure or failed pre-transfer startup, preserving explicit format/rate/channel/buffer
-  requirements. A required Exclusive failure is never downgraded. The policy and
+  acquisition/requirement failure or failed pre-transfer startup, preserving explicit
+  format/rate/channel requirements and the supplied buffer request. A required Exclusive failure is never downgraded. The policy and
   per-endpoint attempt history are available to a future GUI host and the logs.
-- For this validation prototype, explicit `buffer_ms` requires the allocated
-  endpoint buffer duration, allowing at most one frame of integer rounding.
-  The request is supplied unchanged to the API/library, then the actual allocation
-  is checked in its own sample-rate domain. A mismatch rejects before Start,
-  rather than treating a library hint as success. Automatic permits negotiated
-  allocation. A scheduling period and an end-to-end latency limit are different
-  concepts; neither is encoded by this field in this validation interpretation.
+- Integration amendment: `buffer_ms` is an explicit API buffer request. The
+  supplied request must be confirmed unchanged, while device/library alignment
+  may produce a different allocation. Receipts retain actual positive frames and
+  their rate; diagnostics show requested and allocated durations separately.
+  Formats, rates, channels and forced access modes remain strict requirements.
+  Missing or changed request receipts reject before Start. Automatic permits
+  negotiated allocation. A scheduling period and an end-to-end latency limit
+  are different concepts; neither is encoded by this field.
 - An empty map connects matching indexes up to the smaller width, silences extra
   outputs and discards unmatched inputs. Explicit `{source, destination}` pairs
   use zero-based indexes, allow one source to feed several outputs, and reject

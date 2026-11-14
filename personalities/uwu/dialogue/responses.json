@@ -1457,7 +1457,7 @@
         "id": "uwu_bother_026",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Made-up fact: Satuwn's wings awe space-cat haiw ties~ I want the spawkly one~ :3",
+        "text": "Satuwn's wings awe space-cat haiw ties~ I want the spawkly one~ :3",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1465,7 +1465,7 @@
         "id": "uwu_bother_027",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Fictional fact: mawshmawwows howd secwet ewections in youw pockets~ I demand a wecount~ OwO",
+        "text": "Mawshmawwows howd secwet ewections in youw pockets~ I demand a wecount~ OwO",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1473,7 +1473,7 @@
         "id": "uwu_bother_028",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Entirely invented fact: evewy wainbow has a snack supewvisow~ Mine ate the papewwork~ UwU",
+        "text": "Evewy wainbow has a snack supewvisow~ Mine ate the papewwork~ UwU",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1481,7 +1481,7 @@
         "id": "uwu_bother_029",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Made-up fact: sweepy dwagons keep pajamas in tiny ovewhead wockews~ Can I bowwow a paiw~? >w<",
+        "text": "Sweepy dwagons keep pajamas in tiny ovewhead wockews~ Can I bowwow a paiw~? >w<",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1489,7 +1489,7 @@
         "id": "uwu_bother_030",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Completely fictional fact: Jupitew's mayow is thwee fewwets in a cawdigan~ Nice taiw, though~ :3",
+        "text": "Jupitew's mayow is thwee fewwets in a cawdigan~ Nice taiw, though~ :3",
         "expression": "laughing",
         "fallback_expression": "idle"
       }

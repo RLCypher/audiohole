@@ -7,9 +7,10 @@ root and profile schema 3 / transfer schema 7 are unchanged.
 
 The source handoff archive SHA-256 is
 `516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e`.
-Its hashes were checked before import. Streaming algorithms and adapter behavior
-are unchanged; integration fixes Windows SDK include dependencies, adjusts CMake/
-test-fixture paths, disables the standalone host, and assigns Runtime package
+Its hashes were checked before import. Streaming algorithms remain unchanged;
+current integration amendments below cover binding refresh, buffer requests and
+acquisition diagnostics. Integration fixes Windows SDK include dependencies,
+adjusts CMake/test-fixture paths, disables the standalone host, and assigns Runtime package
 components. Current handoff reference documents
 are retained under `engine/handoff/`; older build-time notes remain in `engine/`.
 
@@ -51,7 +52,9 @@ there are no detached workers or forced thread termination.
   selects an available native adapter first, then an available Miniaudio adapter;
   it does not retry a failed native route through another backend.
 - Direction flags, endpoint/common inheritance, channel mapping and strict
-  overrides follow the supplied contract. Only unforced Exclusive preference
+  format/access overrides follow the supplied contract. Buffer values are API
+  requests with driver-selected allocation, as described in the audit below.
+  Only unforced Exclusive preference
   permits the engine's documented pre-transfer Shared fallback. Its refused
   Exclusive receipt remains visible without presenting successful fallback as
   a fatal issue. Preferred clock metadata remains unapplied by this module.
@@ -65,13 +68,16 @@ there are no detached workers or forced thread termination.
   output proof or CPU measurements. Unknown observations stay absent.
 - Real routing and temporary checks/scans cannot be started together. Metadata
   Save retains edits for the next Start; there is no implicit live reconfiguration.
-  Read-only device availability refresh can update the inventory without
-  replacing the engine's copied bindings.
+  Read-only device availability refresh updates inventory. Ready paths can receive
+  newer exact bindings through the waiting policy below; running paths retain
+  their copied bindings.
 
-The handoff does **not** implement automatic endpoint reconnection, transactional
-live profile switching, live tuning changes or destination mixing. Stop and
-Start are explicit. Saved automatic-wait/switch preferences remain preserved,
-but those controls are disabled for this engine with explanatory help. Selecting
+The integration now refreshes exact bindings for Ready paths after inventory
+changes. It opens waiting paths once all required bindings are available, without
+reopening healthy siblings or reloading saved edits. Stop disarms waiting.
+Failed/running streams are not silently reconfigured or reconnected. Transactional
+live profile switching, live tuning changes and destination mixing remain unsupported;
+the live-switch preference stays disabled. The wait-for-devices preference is active. Selecting
 a different profile while routing changes only the viewed editor. Startup
 activation supports a saved profile with Immediate/Delayed/Manual policy; Stop
 cancels its pending deadline.
@@ -85,8 +91,8 @@ choices receive the selected appearance palette. Tutorial reactions now use a
 valid player priority; intentionally static deadpan skips an ungenerated animation
 without suppressing failures of approved assets.
 
-Operation-mode avatar canvas height matches the personality frame; the frame
-and action row expand into the released right-hand space. Tutorial sizing is
+Operation-mode avatar canvas uses the compact header height; the frame and
+action row expand into the available right-hand space. Tutorial sizing is
 independent. Settings uses Application and Tray and Personality and Animation,
 with Restart AudioHole inside Application and Tray. Restart uses a restricted
 inherited process handle, avoiding PID reuse and filesystem path-identity checks.
@@ -109,3 +115,56 @@ Cross-compilation and Wine execution do not establish native Windows/MSVC or
 physical audio behavior. Native Windows CI and manual hardware testing remain
 required. Repeat the handoff's known working profile in Low, then compare
 Baseline separately before making latency or recovery claims.
+
+## Owner-requested integration audit
+
+The audit traced GUI capture/save, canonical preference projection, engine parsing,
+inheritance/validation, binding, access negotiation, WASAPI/Experimental and
+Miniaudio initialization, startup progress, receipts, cancellation and cleanup.
+Profile record v3 and transfer v7 remain unchanged; edits never rewrite a live plan.
+
+A concrete tuning blocker was found in `check_stream`: successful opens were
+rejected when allocation differed from the requested milliseconds by more than
+one frame. WASAPI can align allocations to engine/device periods; Miniaudio can
+allocate several periods. The GUI now explicitly labels `Buffer request` and
+explains alignment. `buffer_ms` still must be supplied unchanged to the native
+API and confirmed in the adapter receipt. Actual allocation and its sample-rate
+domain must be positive/known, and both requested milliseconds and actual
+frames/milliseconds are shown. Exact rate, representation, channel count and
+forced access modes remain requirements. This is a buffer-request policy
+amendment, not a promise of reduced acoustic latency or an exact allocation.
+
+The screenshot's **0x8889000A** is a separate endpoint-ownership refusal at
+InitializeAudioStream. It is now classified as ResourceConflict with its HRESULT
+and actionable exclusive-owner guidance; failures also identify Forward/Return,
+and diagnostics include the frozen effective requests even if no stream opened.
+No external owner is terminated, no forced mode is silently weakened, and no
+claim is made that a specific application caused it. A real hardware reproduction
+is still needed to identify that owner or a driver transition on the user's PC.
+Native device-invalidated opens remain Ready for a later exact binding refresh;
+format/exclusive-permission refusals remain explicit unsupported requirements.
+
+Ready updates are marshalled through RoutingService to its owning Runtime thread
+and copied to the lifecycle worker. Only Ready paths without sessions are opened;
+all required bindings must be available and unambiguous. Healthy and Failed paths
+are untouched. No scans, JSON, allocations, locks or GUI work were added to audio
+callbacks. Endpoint releases, joins, COM ownership and backend startup were reviewed:
+failed mode attempts release on their owning worker before fallback, Stop cancels
+queued binding updates, and confirmed Stopped follows session cleanup.
+
+New regressions exercise initially missing devices, partial return, ambiguity,
+Stop cancellation and healthy duplex sibling preservation. The real GUI engine
+smoke saves/starts/stops independent advanced buffers at 1/6/20/50 ms using
+explicit software adapters. Model tests cover all three backend selectors,
+Automatic fields with advanced tuning enabled, strict formats/modes, endpoint
+inheritance, rounded buffers and matched acquisition/release counts. These tests
+exercise the actual service and Runtime, but software adapters do not establish
+physical WASAPI/Miniaudio compatibility or wireless latency. Native Windows CI
+and hardware playtesting remain necessary.
+
+Verification for this increment: the Linux Debug suite passed 251/251 tests.
+The MinGW Release build passed; supplemental Wine runs passed all five GUI
+smoke modes at 96 and 144 DPI, 21 targeted Windows model regressions, 30 avatar
+checks and byte comparisons for all 699 approved decoded PNGs. Dark and Light
+disabled Settings and selector/resize screenshots were reviewed. These results
+do not replace native Windows CI or the hardware validation above.

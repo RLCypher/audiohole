@@ -85,7 +85,11 @@ Access modes are `Shared` and `Exclusive`. Sample formats are `float32`,
 fractional integers, invalid enums and out-of-range values reject separately from
 Automatic. These are serialization limits, not promises about hardware support.
 
-Explicit settings are **requirements**, with no silent fallback. Explain known
+Explicit rates, formats, channel counts and access modes are **requirements**,
+with no silent fallback. A positive `buffer_ms` is a **buffer request** supplied
+unchanged to the backend. Drivers/libraries may align or resize the allocation;
+actual frames and duration are reported separately in Performance Diagnostics.
+The request is never treated as a guaranteed allocation or measured latency. Explain known
 unsupported tuples and runtime initialization failures. Missing/inconclusive scan
 evidence is not rejection. Native tags, GUIDs, block alignment and byte rate are
 derived and validated from effective formats; users do not enter them. Channel

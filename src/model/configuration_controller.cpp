@@ -245,6 +245,7 @@ Result ConfigurationController::activate(const std::string& id, bool) {
             false,
             "The engine is initializing or still cleaning up. Wait for Stopped, then try again."};
     routing_generation_ = generation;
+    routed_inventory_revision_ = state_.scanner.inventory_revision;
     state_.routing_intent = std::make_shared<const Profile>(*selected);
     state_.routing_status.reset();
     state_.routing_admission_issues.clear();
@@ -482,13 +483,16 @@ void ConfigurationController::poll_routing() {
                 std::string issues;
                 for (const auto& p : actual.paths)
                     if (!p.issues.empty())
-                        issues += routing_issues(p.issues) + "\n";
+                        issues += p.hole_id +
+                                  (p.direction == engine::DirectionId::Reverse ? " / Return: "
+                                                                               : " / Forward: ") +
+                                  routing_issues(p.issues) + "\n";
                 event("error", issues.empty()
                                    ? "Routing failed. Stop, inspect the device status, then retry."
                                    : issues);
             } else if (state_.state == State::Ready)
-                event("routing-waiting", "Devices are unavailable or ambiguous. Refresh "
-                                         "availability, then Stop and Start again.");
+                event("routing-waiting",
+                      "Waiting for this profile's required devices to become available.");
         }
     }
     if (update.state && update.admission_issues.empty()) {
@@ -542,8 +546,10 @@ void ConfigurationController::advance(int milliseconds) {
         }
     }
 
-    if (!scanner_)
+    if (!scanner_) {
+        refresh_waiting_routes();
         return;
+    }
     for (auto& update : scanner_->drain()) {
         if (update.generation != state_.scanner.generation)
             continue; // A superseded operation cannot publish into a newer view.
@@ -595,6 +601,17 @@ void ConfigurationController::advance(int milliseconds) {
                       : "scanner-action-failed",
                   update.detail);
     }
+    refresh_waiting_routes();
+}
+void ConfigurationController::refresh_waiting_routes() {
+    if (!routing_ || !wait_for_devices_ || !state_.armed || state_.routing_pending ||
+        state_.state == State::Stopping || !state_.routing_intent ||
+        routed_inventory_revision_ == state_.scanner.inventory_revision ||
+        std::none_of(state_.paths.begin(), state_.paths.end(),
+                     [](const auto& path) { return path.state == State::Ready; }))
+        return;
+    if (routing_->update_bindings(routing_bindings(state_)))
+        routed_inventory_revision_ = state_.scanner.inventory_revision;
 }
 void ConfigurationController::clear_diagnostics() {
     state_.events.clear();

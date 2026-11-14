@@ -41,6 +41,9 @@ class ConfigurationController final : public Controller {
     void monitor(bool enabled) override;
     void fail_path(const std::string&, bool) override;
     void recover() override;
+    void wait_for_devices(bool enabled) override {
+        wait_for_devices_ = enabled;
+    }
     void clear_diagnostics() override;
     void scan(bool enabled, bool = false, ScanScope = ScanScope::Update, const std::string& = {},
               const ScanOptions& = {}) override;
@@ -54,6 +57,9 @@ class ConfigurationController final : public Controller {
     std::unique_ptr<RoutingService> routing_;
     std::uint64_t routing_generation_ = 0, routing_revision_ = 0;
     std::chrono::steady_clock::time_point last_engine_log_{};
+    bool wait_for_devices_ = true;
+    std::uint64_t routed_inventory_revision_ = 0;
+    void refresh_waiting_routes();
     bool routing_active() const;
     void poll_routing();
     std::string diagnostic_binding_;

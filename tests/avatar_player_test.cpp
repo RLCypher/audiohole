@@ -150,3 +150,22 @@ TEST(AvatarPlayback, ContinuousOverridesHoldAndYieldsToNextEventAndWarning) {
     EXPECT_FALSE(playback.tick(2600).reaction);
 }
 } // namespace
+
+TEST(AvatarPlayback, FiniteSpeechIgnoresGlobalContinuousAndHoldThenReturnsToIdle) {
+    for (int plays : {4, 5, 6}) {
+        auto playback = player();
+        playback.reaction_playback(20, true);
+        playback.hold_expressions(true);
+        av::Reaction speech{"talking", "speech", 1, 0, 2000, 10, 2000};
+        speech.total_plays = plays;
+        ASSERT_TRUE(playback.react(clip("talking", true), speech, 0).accepted);
+        EXPECT_TRUE(playback.tick(300 * plays - 1).reaction);
+        EXPECT_FALSE(playback.tick(300 * plays).reaction);
+        EXPECT_EQ(playback.tick(300 * plays).state, "idle");
+        ASSERT_TRUE(playback
+                        .react(clip("happy", true), {"happy", "normal", 1, 300 * plays, 2000, 10},
+                               300 * plays)
+                        .accepted);
+        EXPECT_TRUE(playback.tick(300 * plays + 10000).looping);
+    }
+}

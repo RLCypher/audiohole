@@ -41,13 +41,14 @@ struct RuntimeSnapshot {
 // never be polled from an audio callback.
 //
 // Validation prototype limitations: explicit Stop/Start is required for edits,
-// changed bindings or device recovery. This does not replace the GUI supervisor
-// or implement transactional profile switching. Healthy sibling paths continue.
-// Before first transfer, a backend startup failure or 2-s zero-transfer watchdog
-// can retry unforced preferred Exclusive endpoints in Shared, once per route,
-// after joining old ownership. Strict modes fail instead. There is no mode
-// change after first transfer; the timeout is validation policy, not a production
-// SLA. Driver opening/cleanup can block cooperative cancellation beyond it.
+// changed running bindings or Failed-stream recovery. Ready paths can receive
+// exact binding updates without disturbing healthy siblings. This does not replace the GUI
+// supervisor or implement transactional profile switching. Healthy sibling paths continue. Before
+// first transfer, a backend startup failure or 2-s zero-transfer watchdog can retry unforced
+// preferred Exclusive endpoints in Shared, once per route, after joining old ownership. Strict
+// modes fail instead. There is no mode change after first transfer; the timeout is validation
+// policy, not a production SLA. Driver opening/cleanup can block cooperative cancellation beyond
+// it.
 class Runtime {
   public:
     Runtime();
@@ -62,6 +63,9 @@ class Runtime {
     Runtime& operator=(const Runtime&) = delete;
     std::vector<BackendDescriptor> backends() const;
     Result<std::uint64_t> start(const Profile&, const BindingSnapshot&);
+    // Refresh exact physical bindings for Ready paths only. Saved intent and
+    // operating sessions stay frozen; Stop takes precedence over pending updates.
+    bool update_bindings(const BindingSnapshot&);
     void stop();
     RuntimeSnapshot snapshot() const;
 
