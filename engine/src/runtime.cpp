@@ -2,6 +2,7 @@
 #include "access_negotiation.hpp"
 #include "stream_pipeline.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <mutex>
 #include <stdexcept>
