@@ -2096,14 +2096,21 @@ bool Frame::smoke(const wxString& directory) {
             const auto view = profile_editor_->GetViewStart();
             const auto revision = controller_->snapshot().revision;
             auto* field = forward_.information;
+            wxString wheel_fixture = "Short information that fits.";
             auto wheel = [&](int rotation) {
+                require(field->GetValue() == wheel_fixture,
+                        "Wheel fixture was replaced before the native gesture");
                 const auto point = field->ClientToScreen(wxPoint(2, 2));
+                // The edit procedure and container handoff finish in SendMessage.
+                // Yielding here lets the normal refresh replace our temporary
+                // evidence text before its scroll position can be asserted.
                 SendMessageW(static_cast<HWND>(field->GetHandle()), WM_MOUSEWHEEL,
                              MAKEWPARAM(0, rotation), MAKELPARAM(point.x, point.y));
-                wxYield();
+                require(field->GetValue() == wheel_fixture,
+                        "Native wheel changed the information fixture's contents");
             };
             auto field_position = [&] { return field->GetScrollPos(wxVERTICAL); };
-            field->ChangeValue("Short information that fits.");
+            field->ChangeValue(wheel_fixture);
             profile_editor_->Scroll(0, 1);
             const int initial = profile_editor_->GetViewStart().y;
             wheel(-WHEEL_DELTA);
@@ -2116,7 +2123,8 @@ bool Frame::smoke(const wxString& directory) {
             wxString overflow;
             for (int line = 0; line < 80; ++line)
                 overflow += wxString::Format("Scrollable evidence line %d\n", line);
-            field->ChangeValue(overflow);
+            wheel_fixture = overflow;
+            field->ChangeValue(wheel_fixture);
             field->ShowPosition(0);
             profile_editor_->Scroll(0, 1);
             const auto outer = profile_editor_->GetViewStart();
@@ -2129,6 +2137,13 @@ bool Frame::smoke(const wxString& directory) {
             profile_editor_->Scroll(0, 1);
             const auto before_bottom = profile_editor_->GetViewStart();
             const int bottom = field_position();
+            // Force the CI race: a runnable refresh must wait until we have
+            // asserted the gesture and restored controller-owned information.
+            const auto refresh_completed = std::make_shared<bool>(false);
+            CallAfter([this, refresh_completed] {
+                refresh();
+                *refresh_completed = true;
+            });
             wheel(-WHEEL_DELTA);
             if (field_position() != bottom ||
                 profile_editor_->GetViewStart().y <= before_bottom.y) {
@@ -2151,8 +2166,13 @@ bool Frame::smoke(const wxString& directory) {
             wheel(WHEEL_DELTA);
             require(field_position() == 0 && profile_editor_->GetViewStart().y < at_bottom.y,
                     "A field at its top failed to hand the wheel to the editor");
+            require(!*refresh_completed,
+                    "Wheel assertions unexpectedly dispatched the queued application refresh");
             field->ChangeValue(information);
             profile_editor_->Scroll(view);
+            wxTheApp->ProcessPendingEvents();
+            require(*refresh_completed && field->GetValue() == information,
+                    "Queued refresh did not preserve restored controller-owned information");
             require(controller_->snapshot().revision == revision,
                     "Scrolling information modified controller state");
         }

@@ -153,3 +153,11 @@ afterwards. Screenshots of the compact header and centered Return cards were
 reviewed. These are supplemental results; MSVC/native Windows CI and hardware
 playtesting remain required. The wheel-boundary smoke uses native SB_BOTTOM
 rather than assuming that revealing the last character reaches the scroll limit.
+
+The wheel smoke also queues a real presentation refresh before its bottom-edge
+handoff. Native SendMessage completes scrolling synchronously, so content and
+positions are asserted before yielding. Only after the temporary field text is
+restored does the test drain that queued refresh and verify the real information
+and controller revision. This guards the Windows CI race where an event-loop
+yield replaced the 80-line fixture with the short live summary between gesture
+and assertion; the original inner/outer scroll checks remain required.
