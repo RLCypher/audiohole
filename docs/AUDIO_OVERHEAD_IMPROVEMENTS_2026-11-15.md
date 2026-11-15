@@ -145,5 +145,6 @@ exclusions for MinGW/Wine path handling, with those tests still enabled in nativ
 Windows CI. All five GUI smoke modes passed at 96 DPI, including the restart child;
 EngineSmoke was repeated after the final experimental-guard change.
 
-GitHub publication could not be verified because the environment's GitHub
-credentials were rejected. No remote CI result is claimed.
+Publication to `work` succeeded using the GitHub CLI credential helper. Remote
+CI completion is not monitored, at the owner's request; no remote CI result is
+claimed here.
