@@ -84,8 +84,8 @@ CI attempts BMP screenshots of each page for human review; an available image is
 
 ## Artifact identity and tester regression checks
 
-- [ ] Compare the **build** identifier in the window title with the first 12
-  characters of the commit in the extracted `build-info.json`. Use a newly
+- [ ] Confirm the window title is **AudioHole**. Compare the build identifier in
+  Settings → Update with the commit in `docs/build-info.json`. Use a newly
   extracted package, not an executable retained from a previous download.
 - [ ] Verify the button reads exactly **DFA**, the top heading becomes
   **DFA Acknowledged**, and the slider/numeric entry reaches every defined
@@ -123,8 +123,8 @@ Production buffer/queue policy remains unresolved.
   applies. Try negative/out-of-range/non-numeric input: controls remain consistent.
   Duplicate Enter/focus notifications do not repeat commentary. Vanilla hides DFA.
 - [ ] Start a second copy from a different extraction directory. The current
-  instance should reopen instead of silently failing because its title has a build
-  suffix. Exit completely before testing a newly downloaded executable.
+  instance should reopen through its stable window identity. Exit completely
+  before testing a newly downloaded executable.
 - [ ] Copy/export diagnostics in Preview: the output retains a simulated-data header even
   though the on-screen console previews production wording. Latency, clock drift,
   CPU and hardware verification remain unavailable; no measurements are invented.

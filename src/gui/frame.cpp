@@ -38,8 +38,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
                             : presentation::Message::AutomaticRestored);
         },
         tuning_timer_.GetId());
-    SetTitle(GetTitle() + wxS(" — build ") + text(AUDIOHOLE_BUILD_COMMIT));
-    // A stable window property supports second-launch focus across build titles.
+    // A stable window property supports second-launch focus and shell actions.
     // It is removed before the native window is destroyed (see the destructor).
     SetPropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow", reinterpret_cast<HANDLE>(1));
     SetMinSize(FromDIP(wxSize(980, 680)));
@@ -1017,6 +1016,7 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        require(GetTitle() == "AudioHole", "Window title must omit the build identifier");
         const auto check_centered_input = [](wxWindow* control) {
             // Collapsed panes can temporarily assign one-pixel native bounds.
             // Each direction is checked again with its tuning pane visible.
@@ -2814,7 +2814,7 @@ bool Frame::smoke(const wxString& directory) {
         dfa_value_->ChangeValue(wxS("11.001"));
         dfa_value_->GetEventHandler()->ProcessEvent(enter);
         require(technical_copy_ == warning && operational_warning_visible_ &&
-                    !dfa_feedback_->GetLabel().empty(),
+                    !dfa_feedback_->GetLabel().empty() && dfa_feedback_->IsShown(),
                 "DFA validation suppressed a warning");
         present(presentation::Message::Ready);
         forward_.buffer->SetValue(forward_.buffer->GetValue() + 1);
@@ -2843,8 +2843,10 @@ bool Frame::smoke(const wxString& directory) {
             require(dfa_->IsShown() == (i != 1) && dfa_slider_->IsShown() == (i != 1),
                     "DFA visibility mismatch");
             require(dfa_value_->IsShown() == (i != 1) && dfa_stepper_->IsShown() == (i != 1) &&
-                        dfa_feedback_->IsShown() == (i != 1),
+                        !dfa_feedback_->IsShown(),
                     "DFA numeric controls visible in Vanilla");
+            require(!personality_notice_->IsShown(),
+                    "Empty personality notice reserves a Settings row");
             if (i == 1) {
                 const auto vanilla_occurrence = occurrence_;
                 const int previous = dfa_hundredths_;

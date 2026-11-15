@@ -6,6 +6,12 @@
 #include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
+namespace {
+void optional_note(wxStaticText* control, const wxString& message) {
+    control->SetLabel(message);
+    control->Show(!message.empty());
+}
+} // namespace
 void Frame::show_update_information() {
     wxDialog dialog(this, wxID_ANY, "AudioHole Update");
     dialog.SetName("AudioHole update information");
@@ -325,6 +331,7 @@ void Frame::build_settings() {
     personality_box->SetName("Personality and Animation settings");
     personality_choice_ = choices(personality_box, personality_group, "Personality", {});
     personality_notice_ = label(personality_box, personality_group, "");
+    personality_notice_->Hide();
     auto* playback = new wxWrapSizer(wxHORIZONTAL);
     hold_expressions_ =
         new wxCheckBox(personality_box, wxID_ANY, "Hold expressions between events");
@@ -420,7 +427,7 @@ void Frame::build_settings() {
             messages_.load_file(std::filesystem::path(dialog.GetPath().ToStdWstring()));
         sync_personality_choices();
         select_personality(loaded.ok ? loaded.id : "vanilla");
-        personality_notice_->SetLabel(text(loaded.detail));
+        optional_note(personality_notice_, text(loaded.detail));
         notebook_->GetPage(3)->Layout();
         static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
     });
@@ -454,6 +461,7 @@ void Frame::build_settings() {
     dfa_stepper_->SetValue(0);
     dfa_stepper_->SetName("Adjust DFA by one hundredth");
     dfa_feedback_ = label(box, advanced, "");
+    dfa_feedback_->Hide();
     numeric->Add(dfa_value_, 0, wxALIGN_CENTER_VERTICAL);
     numeric->Add(dfa_stepper_, 0, wxALIGN_CENTER_VERTICAL);
     numeric->Add(dfa_slider_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(8));
@@ -465,7 +473,7 @@ void Frame::build_settings() {
                            "Enter; raw values must be between 0 and 11.");
     dfa_stepper_->SetToolTip(
         "Nudge the nonsense by 0.01. Values outside 0.00 to 11.00 are rejected, not clamped.");
-    dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_, dfa_stepper_, dfa_feedback_};
+    dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_, dfa_stepper_};
     // Tracking updates the visible number only. A release/keyboard settlement
     // selects at most one acknowledgment, never one per drag tick.
     dfa_slider_->Bind(wxEVT_SCROLL_THUMBTRACK, [this](wxScrollEvent&) {
@@ -580,14 +588,16 @@ void Frame::reload_personalities() {
     const auto requested = personality_;
     select_personality(requested);
     if (!warnings.empty()) {
-        personality_notice_->SetLabel(
-            text(warnings.front() + " Fix the file and Reload to retry."));
+        optional_note(personality_notice_,
+                      text(warnings.front() + " Fix the file and Reload to retry."));
         personality_notice_->Wrap(950);
+        notebook_->GetPage(3)->Layout();
+        static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
     }
 }
 void Frame::select_personality(const std::string& requested) {
     if (dfa_feedback_)
-        dfa_feedback_->SetLabel("");
+        optional_note(dfa_feedback_, "");
     personality_ = messages_.resolve_selection(requested);
     agent_display_->present({});
     const auto* selected_package = messages_.package(personality_);
@@ -618,9 +628,9 @@ void Frame::select_personality(const std::string& requested) {
                                           : static_cast<int>(found - personality_ids_.begin()));
     for (auto* control : dfa_controls_)
         control->Show(has_dfa);
-    personality_notice_->SetLabel(text(personality_fallback_note_));
+    optional_note(personality_notice_, text(personality_fallback_note_));
     if (!preference_result.ok)
-        personality_notice_->SetLabel(text(preference_result.detail));
+        optional_note(personality_notice_, text(preference_result.detail));
     if (technical_) {
         if (operational_warning_visible_) {
             // A personality switch clears the previous character's flavor but
@@ -685,15 +695,18 @@ void Frame::present_dfa(presentation::Message event) {
     if (messages_.variants(presentation::Message::Dfa, personality_).empty())
         return;
     if (!operational_warning_visible_) {
-        dfa_feedback_->SetLabel("");
+        optional_note(dfa_feedback_, "");
+        notebook_->GetPage(3)->Layout();
+        static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
         present(event);
         return;
     }
     const auto copy = messages_.show(event, personality_, ++occurrence_);
     // Preserve the warning, its commentary policy and last_message_ in the header.
     // This local feedback still uses the same authored catalog/selection machinery.
-    dfa_feedback_->SetLabel(text(presentation::keep_kaomoji_together(
-        copy.technical + " " + copy.commentary + " " + copy.fallback_detail)));
+    optional_note(dfa_feedback_,
+                  text(presentation::keep_kaomoji_together(copy.technical + " " + copy.commentary +
+                                                           " " + copy.fallback_detail)));
     dfa_feedback_->Wrap(700);
     notebook_->GetPage(3)->Layout();
     static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();

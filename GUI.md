@@ -487,6 +487,9 @@ including advanced tuning, device search/name, technical diagnostics search and
 the Settings delay, animation-loop and DFA editors. Their native single-line
 editing, caret, selection, paste and Enter behavior is retained. The DFA slider
 sits to the right of the numeric editor and stepper on the same row.
+Empty personality notices and local DFA feedback are hidden so they reserve no
+blank rows; real notices remain visible. The main window title is AudioHole,
+with the build identifier available in Update and package metadata.
 
 Settings places Update beside Restart AudioHole (Restart Tutorial in a lesson).
 Update opens an informational dialog with the current product version, build ID,

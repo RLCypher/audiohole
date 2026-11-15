@@ -1,4 +1,4 @@
-# The title identifies the executable itself, even if an older artifact is extracted
+# The Update dialog identifies the executable, even if an older artifact is extracted
 # beside newer personality files. CI configures afresh for each checked-out revision.
 find_package(Git QUIET)
 set(audiohole_build_commit "unknown")

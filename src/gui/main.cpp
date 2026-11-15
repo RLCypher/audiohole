@@ -178,8 +178,8 @@ class App final : public wxApp {
                                                                   wxGetUserId());
             if (instance_->IsAnotherRunning()) {
                 HWND existing = nullptr;
-                // Build identifiers change the title; identify our window by its
-                // stable property instead. Legacy titles support older test builds.
+                // Identify our window by its stable property. Legacy preview
+                // titles support older test builds.
                 EnumWindows(
                     [](HWND window, LPARAM context) -> BOOL {
                         wchar_t title[256]{};
