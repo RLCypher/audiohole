@@ -455,6 +455,31 @@ Detailed technical reasoning should remain accessible through a tooltip or expan
 
 AudioHole must not claim that a format is verified, conversion-free, or stable without supporting evidence.
 
+### Owner-authorized endpoint and format polish
+
+Profile endpoint selectors are selection-only dropdowns. Hidden or missing saved
+bindings remain visible without becoming selectable new bindings. The format
+preset list includes Manual; choosing it retains typed values. Partial format
+overrides display Manual. Choosing Automatic clears the visible format overrides
+without changing timing, routing or an explicit channel map.
+
+The GUI assesses independent endpoint formats against the selected backend.
+A matching mono capture/stereo playback pair is a bridge candidate labeled
+`2 ch (dual mono)` while retaining native capture 1 ch and playback 2 ch details.
+Reported candidates are advisory, never saved intent or proof of running audio.
+Explicit channel maps stay authoritative. Remaining unknown format differences
+or unsupported backend representations receive specific explanations.
+
+Single-line editors and their steppers match the themed dropdown height with
+DPI-aware padding. Device Notes defaults to three complete text lines plus
+padding. Light device rows use consistent selection/focus colors, preserving
+keyboard focus and Windows high contrast.
+
+Confirmed Skip/End tutorial actions always restart into working mode, including
+when tutorial edits are unsaved or the completion marker cannot be written. A
+marker failure is reported and can cause the tutorial to return on a later
+ordinary launch; it does not cancel the already-confirmed restart.
+
 ---
 
 ## 8. Buffer Size Selection

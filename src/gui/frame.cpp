@@ -1017,13 +1017,18 @@ bool Frame::smoke(const wxString& directory) {
         };
         const auto check_endpoint_heights = [this] {
             for (auto* direction : {&forward_, &reverse_})
-                for (auto* field : {direction->source, direction->destination})
+                for (auto* field : {direction->source, direction->destination}) {
+                    if (!field->HasFlag(wxCB_READONLY) ||
+                        (GetWindowLongPtrW(static_cast<HWND>(field->GetHandle()), GWL_STYLE) &
+                         CBS_DROPDOWNLIST) != CBS_DROPDOWNLIST)
+                        throw std::runtime_error("Endpoint selector still permits text editing");
                     if (field->IsShownOnScreen() &&
                         field->GetSize().y < field->GetCharHeight() + FromDIP(12))
                         throw std::runtime_error(
                             "Endpoint dropdown collapsed: " + utf8(field->GetName()) +
                             " height=" + std::to_string(field->GetSize().y) +
                             " best=" + std::to_string(field->GetBestSize().y));
+                }
         };
         {
             WelcomeDialog welcome(true, preferences_->values().appearance);
@@ -1138,7 +1143,9 @@ bool Frame::smoke(const wxString& directory) {
                         auto effective = candidate;
                         effective.settings = Settings{};
                         const auto explanation =
-                            text(recommend(controller_->snapshot(), effective).explanation);
+                            text(assess_formats(controller_->snapshot(), effective,
+                                                draft_.holes[hole_index_].routing_engine)
+                                     .explanation);
                         require(widgets->information->GetSize().y == height &&
                                     widgets->information->GetMaxSize().y == height &&
                                     !widgets->information->IsEditable() &&
@@ -1258,6 +1265,43 @@ bool Frame::smoke(const wxString& directory) {
                 }
             }
             disclose(forward_, true);
+            for (auto* control :
+                 std::vector<wxWindow*>{forward_.rate, forward_.channels, forward_.source_channels,
+                                        forward_.destination_channels, forward_.representation,
+                                        forward_.channel_map, forward_.buffer})
+                require(control->GetSize().y == forward_.format->GetSize().y,
+                        "Advanced format/buffer field height differs from dropdown height");
+            for (auto* control : forward_.timings)
+                if (control)
+                    require(control->GetSize().y == forward_.format->GetSize().y,
+                            "Advanced timing field height differs from dropdown height");
+            {
+                const auto original = draft_.holes[hole_index_].forward;
+                forward_.rate->SetValue("44100");
+                require(forward_.format->GetStringSelection() == "Manual",
+                        "Typing a partial format override did not select Manual");
+                forward_.format->SetSelection(1);
+                wxCommandEvent preset(wxEVT_CHOICE, forward_.format->GetId());
+                forward_.format->GetEventHandler()->ProcessEvent(preset);
+                require(forward_.rate->GetValue() == "44100",
+                        "Selecting Manual discarded typed format values");
+                capture_draft();
+                const auto edited = draft_.holes[hole_index_].forward;
+                populate_direction(forward_, edited);
+                require(forward_.format->GetStringSelection() == "Manual",
+                        "Refreshing a partial format override reverted Manual to Automatic");
+                forward_.format->SetSelection(0);
+                forward_.format->GetEventHandler()->ProcessEvent(preset);
+                capture_draft();
+                require(
+                    !draft_.holes[hole_index_].forward.settings.preferences.common.sample_rate_hz &&
+                        draft_.holes[hole_index_].forward.settings.preferences.channel_map ==
+                            original.settings.preferences.channel_map,
+                    "Automatic did not clear format overrides or changed the explicit map");
+                draft_.holes[hole_index_].forward = original;
+                forward_.manual_format = false;
+                populate_direction(forward_, original);
+            }
             require(forward_.buffer->GetSize().y == forward_.buffer_apply->GetSize().y &&
                         forward_.buffer->GetPosition().y == forward_.buffer_apply->GetPosition().y,
                     "Buffer input and Apply button must have matching heights and alignment");
@@ -1596,6 +1640,11 @@ bool Frame::smoke(const wxString& directory) {
             };
             lines(profile_notes_, 4);
             lines(device_notes_, 3);
+            RECT text_area{};
+            SendMessageW(static_cast<HWND>(device_notes_->GetHandle()), EM_GETRECT, 0,
+                         reinterpret_cast<LPARAM>(&text_area));
+            require(text_area.bottom - text_area.top >= 3 * device_notes_->GetCharHeight(),
+                    "Device Notes does not fit three complete native edit rows");
             lines(path_status_, 2);
             require(std::abs(capture_devices_->GetParent()->GetScreenRect().GetRight() -
                              devices_folder_->GetScreenRect().GetRight()) <= 2 &&
@@ -1719,6 +1768,11 @@ bool Frame::smoke(const wxString& directory) {
         }
         notebook_->SetSelection(2);
         notebook_->GetPage(2)->Layout();
+        for (auto* control :
+             std::vector<wxWindow*>{device_search_, device_name_, log_search_, delay_,
+                                    animation_loops_, dfa_value_, dfa_stepper_})
+            require(control->GetSize().y == theme_choice_->GetSize().y,
+                    "Device/Scan/Settings editable field height differs from dropdown height");
         {
             const auto original_status = scan_state_->GetValue();
             scan_output_split_->SetSashPosition(scan_output_split_->GetClientSize().y / 3);
@@ -2785,6 +2839,12 @@ bool Frame::smoke(const wxString& directory) {
             reset_layout();
             for (unsigned i : {0u, 1u, 3u}) {
                 notebook_->SetSelection(i);
+                if (i == 1 && playback_devices_->GetSelection() >= 0) {
+                    playback_devices_->SetCurrentItem(playback_devices_->RowToItem(
+                        static_cast<unsigned>(playback_devices_->GetSelection())));
+                    playback_devices_->GetMainWindow()->SetFocus();
+                    playback_devices_->GetMainWindow()->Refresh();
+                }
                 capture_extra(wxString::Format("light-page-%u", i));
             }
             theme_choice_->SetSelection(appearance);

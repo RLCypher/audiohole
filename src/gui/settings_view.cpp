@@ -97,6 +97,7 @@ void Frame::build_settings() {
     delay_ = new wxSpinCtrl(startup_box, wxID_ANY, "5", wxDefaultPosition, FromDIP(wxSize(75, -1)),
                             wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 300, 5);
     startup_group->Add(delay_, 0, wxALL, FromDIP(4));
+    match_input_height(*delay_);
     notifications_->SetSelection(preferences_->values().notifications);
     startup_->SetSelection((preferences_->values().startup_mode + 2) % 3);
     delay_->SetValue(preferences_->values().startup_delay_seconds);
@@ -300,6 +301,7 @@ void Frame::build_settings() {
                                       FromDIP(wxSize(75, -1)), wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER,
                                       1, 20, preferences_->values().animation_loops);
     animation_loops_->SetName("Animation loop count");
+    match_input_height(*animation_loops_);
     loop_until_event_ = new wxCheckBox(personality_box, wxID_ANY, "Loop until next event");
     playback->Add(hold_expressions_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     auto* loop_count = new wxBoxSizer(wxHORIZONTAL);
@@ -410,7 +412,8 @@ void Frame::build_settings() {
     dfa_value_ = new wxTextCtrl(box, wxID_ANY, "0.00", wxDefaultPosition, FromDIP(wxSize(100, -1)),
                                 wxTE_PROCESS_ENTER);
     dfa_value_->SetName("DFA exact value, normalized to two decimal places");
-    const auto stepper_size = wxSize(FromDIP(18), dfa_value_->GetBestSize().y);
+    match_input_height(*dfa_value_);
+    const auto stepper_size = wxSize(FromDIP(18), input_height(*dfa_value_));
     dfa_stepper_ = new wxSpinButton(box, wxID_ANY, wxDefaultPosition, stepper_size, wxSP_VERTICAL);
     dfa_stepper_->SetMinSize(stepper_size);
     dfa_stepper_->SetMaxSize(stepper_size);

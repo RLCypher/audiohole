@@ -2,10 +2,50 @@
 #include "gui/palette.h"
 #include <windows.h>
 #include <wx/dc.h>
+#include <wx/renderer.h>
 #include <wx/settings.h>
 #include <wx/tooltip.h>
 namespace audiohole::gui {
 namespace {
+bool device_rows(wxWindow* window) {
+    for (auto* current = window; current; current = current->GetParent())
+        if (dynamic_cast<DeviceList*>(current)) {
+            HIGHCONTRASTW contrast{};
+            contrast.cbSize = sizeof(contrast);
+            return !SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) ||
+                   !(contrast.dwFlags & HCF_HIGHCONTRASTON);
+        }
+    return false;
+}
+// The generic data view paints its row focus BEFORE the custom cells. Use one
+// palette for that whole row so native black edges do not survive around cells.
+// All other controls and Windows high contrast retain their native renderer.
+class DeviceRowRenderer final : public wxDelegateRendererNative {
+  public:
+    explicit DeviceRowRenderer(wxRendererNative& renderer) : wxDelegateRendererNative(renderer) {}
+    void DrawItemSelectionRect(wxWindow* window, wxDC& dc, const wxRect& rect,
+                               int flags = 0) override {
+        if (!device_rows(window)) {
+            wxDelegateRendererNative::DrawItemSelectionRect(window, dc, rect, flags);
+            return;
+        }
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(
+            wxBrush(palette::selection(window->GetBackgroundColour().GetLuminance() < 0.5)));
+        dc.DrawRectangle(rect);
+        if (flags & wxCONTROL_FOCUSED)
+            DrawFocusRect(window, dc, rect, flags);
+    }
+    void DrawFocusRect(wxWindow* window, wxDC& dc, const wxRect& rect, int flags = 0) override {
+        if (!device_rows(window)) {
+            wxDelegateRendererNative::DrawFocusRect(window, dc, rect, flags);
+            return;
+        }
+        dc.SetPen(wxPen(palette::mint(), std::max(1, window->FromDIP(1))));
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
+        dc.DrawRectangle(rect);
+    }
+};
 class StatusDot final : public wxDataViewCustomRenderer {
   public:
     StatusDot() : wxDataViewCustomRenderer("string", wxDATAVIEW_CELL_INERT, wxALIGN_CENTER) {}
@@ -28,12 +68,6 @@ class StatusDot final : public wxDataViewCustomRenderer {
     bool Render(wxRect rect, wxDC* dc, int state) override {
         if (status_.empty())
             return true;
-        if (state & wxDATAVIEW_CELL_SELECTED) {
-            dc->SetPen(*wxTRANSPARENT_PEN);
-            dc->SetBrush(
-                wxBrush(palette::selection(GetView()->GetBackgroundColour().GetLuminance() < 0.5)));
-            dc->DrawRectangle(rect);
-        }
         wxColour colour = status_ == "Available"     ? wxColour(40, 170, 105)
                           : status_ == "Unavailable" ? wxColour(145, 154, 168)
                           : status_ == "Unusable"    ? wxColour(230, 70, 70)
@@ -42,10 +76,6 @@ class StatusDot final : public wxDataViewCustomRenderer {
         contrast.cbSize = sizeof(contrast);
         if (SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
             (contrast.dwFlags & HCF_HIGHCONTRASTON)) {
-            if (state & wxDATAVIEW_CELL_SELECTED) {
-                dc->SetBrush(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
-                dc->DrawRectangle(rect);
-            }
             colour = wxSystemSettings::GetColour(state & wxDATAVIEW_CELL_SELECTED
                                                      ? wxSYS_COLOUR_HIGHLIGHTTEXT
                                                      : wxSYS_COLOUR_WINDOWTEXT);
@@ -91,12 +121,6 @@ class DeviceName final : public wxDataViewCustomRenderer {
             (contrast.dwFlags & HCF_HIGHCONTRASTON);
         const bool selected = state & wxDATAVIEW_CELL_SELECTED;
         const bool dark = GetView()->GetBackgroundColour().GetLuminance() < 0.5;
-        if (selected) {
-            dc->SetPen(*wxTRANSPARENT_PEN);
-            dc->SetBrush(wxBrush(system ? wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)
-                                        : palette::selection(dark)));
-            dc->DrawRectangle(rect);
-        }
         dc->SetTextForeground(system             ? wxSystemSettings::GetColour(selected
                                                                                    ? wxSYS_COLOUR_HIGHLIGHTTEXT
                                                                                    : wxSYS_COLOUR_WINDOWTEXT)
@@ -114,6 +138,8 @@ class DeviceName final : public wxDataViewCustomRenderer {
 DeviceList::DeviceList(wxWindow* parent)
     : wxDataViewListCtrl(parent, wxID_ANY, wxDefaultPosition, wxSize(300, 100),
                          wxDV_SINGLE | wxDV_NO_HEADER) {
+    if (!dynamic_cast<DeviceRowRenderer*>(&wxRendererNative::Get()))
+        wxRendererNative::Set(new DeviceRowRenderer(wxRendererNative::Get()));
     SetMinSize(wxSize(120, 40));
     AppendColumn(new wxDataViewColumn("Status", new StatusDot, 0, FromDIP(30), wxALIGN_CENTER, 0));
     auto* renderer = new DeviceName;

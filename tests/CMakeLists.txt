@@ -3,6 +3,7 @@ add_executable(audiohole_model_tests model_test.cpp avatar_host_test.cpp avatar_
 target_compile_definitions(audiohole_model_tests PRIVATE AUDIOHOLE_TEST_PERSONALITIES_DIR="${PROJECT_SOURCE_DIR}/personalities")
 target_sources(audiohole_model_tests PRIVATE advanced_tuning_test.cpp profile_builder_test.cpp workflow_refinements_test.cpp endpoint_workflow_test.cpp tutorial_test.cpp todo_batch_test.cpp latency_v4_test.cpp routing_integration_test.cpp)
 target_link_libraries(audiohole_model_tests PRIVATE audiohole_model audiohole_zip GTest::gtest_main)
+target_sources(audiohole_model_tests PRIVATE format_assessment_test.cpp)
 if(MSVC)
   target_compile_options(audiohole_model_tests PRIVATE /W4 /permissive- /utf-8)
 endif()

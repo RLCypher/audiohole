@@ -10,7 +10,7 @@
 
 namespace audiohole::gui {
 // Keep Windows keyboard/accessibility behavior while painting matched selection
-// foregrounds and surfaces for lists and popup/editable combo boxes.
+// foregrounds and surfaces for lists and selection-only dropdowns.
 class ThemedChoice final : public wxChoice {
   public:
     ThemedChoice(wxWindow*, wxWindowID = wxID_ANY);
@@ -29,6 +29,8 @@ class ThemedCombo final : public wxComboBox {
   public:
     ThemedCombo(wxWindow*, wxWindowID = wxID_ANY);
     std::vector<unsigned> disabled_items;
+    // A saved hidden/missing binding is display-only, never a selectable item.
+    wxString retained_caption;
     bool item_enabled(unsigned item) const {
         return std::find(disabled_items.begin(), disabled_items.end(), item) ==
                disabled_items.end();
@@ -79,6 +81,9 @@ void forward_dropdown_wheel(wxWindow& control, wxMouseEvent& event);
 // Protect native controls that change values before wx dispatches a wheel event.
 // Parent windows still receive the gesture for page scrolling.
 void prevent_wheel_adjustment(wxWindow& control);
+// Match the visible native dropdown row, including DPI-aware text padding.
+int input_height(const wxWindow& control);
+void match_input_height(wxWindow& control);
 int themed_message_box(const wxString& message, const wxString& caption = "AudioHole",
                        long style = wxOK, wxWindow* parent = nullptr);
 wxString button_help(const wxString& title);
@@ -125,6 +130,8 @@ inline wxButton* button(wxWindow* parent, wxSizer* layout, const wxString& title
 inline wxTextCtrl* field(wxWindow* parent, wxSizer* layout, const wxString& title, long style = 0) {
     label(parent, layout, title);
     auto* control = new wxTextCtrl(parent, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, style);
+    if (!(style & wxTE_MULTILINE))
+        match_input_height(*control);
     control->SetName(title); // Stable functional name for assistive technology.
     layout->Add(control, 0, wxEXPAND | wxALL, parent->FromDIP(4));
     return control;

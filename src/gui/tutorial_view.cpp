@@ -113,9 +113,11 @@ void Frame::tutorial_event(std::string_view action) {
     render_tutorial();
 }
 bool Frame::finish_tutorial(OnboardingOutcome outcome) {
-    if (tutorial_marker_saved_ || smoke_)
+    if (tutorial_marker_saved_ || (smoke_ && tutorial_marker_override_.empty()))
         return true;
-    const auto result = mark_first_run(first_run_marker_path(), outcome);
+    const auto result = mark_first_run(
+        tutorial_marker_override_.empty() ? first_run_marker_path() : tutorial_marker_override_,
+        outcome);
     if (!result.ok) {
         themed_message_box(
             text(result.detail + " The tutorial will appear again until completion can be saved."),
@@ -164,10 +166,12 @@ void Frame::skip_tutorial() {
         render_tutorial();
         return;
     }
-    if (!finish_tutorial(complete ? OnboardingOutcome::Completed : OnboardingOutcome::Skipped))
-        return;
+    // A read-only installation may prevent saving the marker. Report that
+    // failure, but honor the confirmed restart into working mode regardless.
+    (void)finish_tutorial(complete ? OnboardingOutcome::Completed : OnboardingOutcome::Skipped);
     if (!complete)
         tutorial_->skip();
+    tutorial_exit_requested_ = true;
     if (restart_)
         restart_();
 }
@@ -1110,7 +1114,12 @@ bool Frame::tutorial_smoke(const wxString& directory) {
           public:
             wxString action;
             bool asked = false;
+            unsigned marker_warnings = 0;
             int Enter(wxDialog* dialog) override {
+                if (dialog->GetTitle() == "Tutorial completion") {
+                    ++marker_warnings;
+                    return wxID_OK;
+                }
                 if (dialog->GetTitle() != action)
                     return wxID_NONE;
                 auto* message = dynamic_cast<wxGenericMessageDialog*>(dialog);
@@ -1141,8 +1150,38 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         confirm.Register();
         skip_tutorial();
         confirm.Unregister();
-        require(confirm.asked && restarted, "Skip tutorial did not request a restart");
+        require(confirm.asked && restarted && tutorial_exit_requested(),
+                "Skip tutorial did not request a working-mode restart");
         tutorial_ = std::move(completed_lesson);
+        // Exercise actual marker I/O failure, with both completion states and
+        // unsaved tutorial edits. Never write the installed completion marker.
+        const auto blocked = std::filesystem::temp_directory_path() /
+                             ("AudioHole-marker-blocked-" + std::to_string(GetCurrentProcessId()));
+        std::ofstream(blocked) << "Not a directory";
+        tutorial_marker_override_ = blocked / "AudioHole.has-run";
+        const bool was_saved = tutorial_marker_saved_;
+        for (bool complete : {true, false}) {
+            auto previous = std::move(tutorial_);
+            if (complete)
+                tutorial_ = std::move(previous);
+            else
+                tutorial_ = std::make_unique<Tutorial>();
+            tutorial_marker_saved_ = false;
+            tutorial_exit_requested_ = false;
+            dirty_ = device_dirty_ = true;
+            restarted = confirm.asked = false;
+            confirm.action = complete ? "End tutorial" : "Skip tutorial";
+            confirm.Register();
+            click(tutorial_end_);
+            confirm.Unregister();
+            require(confirm.asked && restarted && tutorial_exit_requested_,
+                    "Marker failure or unsaved edits blocked the confirmed tutorial restart");
+        }
+        require(confirm.marker_warnings == 2, "Marker-failure restart cases were not exercised");
+        tutorial_marker_override_.clear();
+        std::filesystem::remove(blocked);
+        tutorial_marker_saved_ = was_saved;
+        dirty_ = device_dirty_ = false;
         restart_ = restart;
         require(std::filesystem::exists(marker) == marker_existed,
                 "Tutorial smoke changed the installed completion flag");

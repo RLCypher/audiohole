@@ -39,7 +39,7 @@ std::wstring quote_argument(const std::wstring& value) {
     result += L'\"';
     return result;
 }
-bool launch_restart(bool smoke, const wxString& screenshot_dir, bool replay) {
+bool launch_restart(bool smoke, const wxString& screenshot_dir, bool replay, bool working) {
     const auto executable = wxStandardPaths::Get().GetExecutablePath().ToStdWstring();
     HANDLE parent = nullptr;
     if (!DuplicateHandle(GetCurrentProcess(), GetCurrentProcess(), GetCurrentProcess(), &parent,
@@ -51,6 +51,8 @@ bool launch_restart(bool smoke, const wxString& screenshot_dir, bool replay) {
         command += L" --smoke-test";
     if (replay)
         command += L" --replay-tutorial";
+    if (working)
+        command += L" --working-after-tutorial";
     if (!screenshot_dir.empty())
         command += L" --screenshot-dir " + quote_argument(screenshot_dir.ToStdWstring());
     STARTUPINFOEXW startup{};
@@ -93,7 +95,8 @@ class App final : public wxApp {
     bool OnInit() override {
         SetAppName("AudioHole");
         bool smoke = false, test_mode_smoke = false, tutorial_smoke = false,
-             replay_tutorial = false, engine_smoke = false, restart_smoke = false;
+             replay_tutorial = false, engine_smoke = false, restart_smoke = false,
+             working_after_tutorial = false;
         wxString screenshot_dir;
         HANDLE restart_parent = nullptr;
         std::optional<ShellAction> shell_action;
@@ -108,6 +111,8 @@ class App final : public wxApp {
                 smoke = tutorial_smoke = true;
             else if (wxString(argv[i]) == "--replay-tutorial")
                 replay_tutorial = true;
+            else if (wxString(argv[i]) == "--working-after-tutorial")
+                working_after_tutorial = true;
             else if (wxString(argv[i]) == "--test-mode-smoke")
                 smoke = test_mode_smoke = true;
             else if (wxString(argv[i]) == "--screenshot-dir" && i + 1 < argc)
@@ -136,6 +141,8 @@ class App final : public wxApp {
             if (*shell_action != ShellAction::Open && *shell_action != ShellAction::Controls)
                 return false;
         }
+        if (working_after_tutorial && (!restart_parent || replay_tutorial))
+            return false;
         if (restart_parent && !wait_for_restart_parent(restart_parent)) {
             themed_message_box(
                 "The previous AudioHole process did not shut down cleanly. No second "
@@ -215,7 +222,7 @@ class App final : public wxApp {
                        !engine_smoke; // Internal fixture smoke only.
         bool tutorial = tutorial_smoke;
         bool first_time = false;
-        if (!smoke) {
+        if (!smoke && !working_after_tutorial) {
             const auto checked = first_run_needed(first_run_marker_path(), first_time);
             if (!checked.ok) {
                 first_time = true;
@@ -271,10 +278,12 @@ class App final : public wxApp {
         }
         auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
             restart_requested_ = true;
+            auto* frame = static_cast<Frame*>(GetTopWindow());
+            restart_working_ = frame->tutorial_exit_requested();
             bool needed = false;
-            restart_replay_ =
-                !smoke_ && first_run_needed(first_run_marker_path(), needed).ok && needed;
-            static_cast<Frame*>(GetTopWindow())->exit();
+            restart_replay_ = !restart_working_ && !smoke_ &&
+                              first_run_needed(first_run_marker_path(), needed).ok && needed;
+            frame->exit();
         });
         SetTopWindow(frame);
         frame->Show();
@@ -308,6 +317,7 @@ class App final : public wxApp {
             CallAfter([this, frame, screenshot_dir, tutorial_smoke, engine_smoke, restart_smoke] {
                 if (restart_smoke) {
                     restart_requested_ = true;
+                    restart_working_ = true;
                     frame->exit();
                     return;
                 }
@@ -336,7 +346,7 @@ class App final : public wxApp {
             // launching; the child still waits for this process to exit fully.
             instance_.reset();
             apartment_.reset();
-            if (!launch_restart(smoke_, screenshot_dir_, restart_replay_)) {
+            if (!launch_restart(smoke_, screenshot_dir_, restart_replay_, restart_working_)) {
                 themed_message_box(
                     "AudioHole closed safely, but could not relaunch. Start it normally; "
                     "saved files are preserved.",
@@ -351,7 +361,8 @@ class App final : public wxApp {
     std::unique_ptr<audiohole::windows::ComApartment> apartment_;
     std::unique_ptr<wxSingleInstanceChecker> instance_;
     int result_ = 0;
-    bool restart_requested_ = false, smoke_ = false, restart_replay_ = false;
+    bool restart_requested_ = false, smoke_ = false, restart_replay_ = false,
+         restart_working_ = false;
     wxString screenshot_dir_;
     std::filesystem::path smoke_root_;
     std::shared_ptr<BuildPreferences> preferences_;

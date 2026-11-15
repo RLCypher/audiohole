@@ -6,6 +6,7 @@
 #include "gui/shell_actions.h"
 #include "model/build_preferences.h"
 #include "model/controller.h"
+#include "model/format_assessment.h"
 #include "model/tutorial.h"
 #include "platform/windows/com_apartment.h"
 #include "presentation/avatar_host.h"
@@ -89,7 +90,8 @@ struct DirectionWidgets {
     std::string retained_source,
         retained_destination; // Hidden/missing saved bindings, never dropdown options.
     wxString retained_source_caption, retained_destination_caption;
-    std::vector<audiohole::Format> formats;
+    std::vector<audiohole::FormatCandidate> formats;
+    bool manual_format = false;
 };
 // Native view/controller adapter. Owns the controller and tray; wx owns child widgets.
 // Editor drafts are separate from saved session records and the copied live plan.
@@ -121,6 +123,9 @@ class Frame final : public wxFrame, private wxEventFilter {
     }
     void request_exit();
     void exit();
+    bool tutorial_exit_requested() const {
+        return tutorial_exit_requested_;
+    }
     bool show_onboarding_greeting(OnboardingOutcome);
     void show_testing_notice() {
         testing_notice();
@@ -155,6 +160,9 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::unique_ptr<audiohole::Controller> controller_;
     std::shared_ptr<BuildPreferences> preferences_;
     std::function<void()> restart_;
+    bool tutorial_exit_requested_ = false;
+    // Disposable native-smoke override; empty in every interactive host.
+    std::filesystem::path tutorial_marker_override_;
     std::unique_ptr<Tray> tray_;
     wxTimer timer_;
     wxTimer avatar_timer_;

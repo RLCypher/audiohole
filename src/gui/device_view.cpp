@@ -110,6 +110,7 @@ void Frame::build_devices() {
         new wxTextCtrl(details, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
     device_name_->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent&) { queue_field_save(true); });
     device_name_->SetName("Display name");
+    match_input_height(*device_name_);
     name_row->Add(device_name_, 1, wxALIGN_CENTER_VERTICAL | wxALL, 3);
     device_save_ = button(details, name_row, "Save device", [this] {
         if (const auto* e = endpoint(controller_->snapshot(), device_id_)) {

@@ -209,9 +209,12 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         auto& d =
             &w == &forward_ ? draft_.holes[hole_index_].forward : draft_.holes[hole_index_].reverse;
         auto& p = d.settings.preferences;
-        if (section == 3)
+        if (section == 3) {
             p = {};
+            w.manual_format = false;
+        }
         if (section == 0) {
+            w.manual_format = false;
             for (auto* e : {&p.common, &p.source, &p.destination}) {
                 e->sample_rate_hz.reset();
                 e->channel_count.reset();
@@ -267,18 +270,25 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.format = new ThemedChoice(box, wxID_ANY);
     format_layout->Add(w.format, 0, wxEXPAND | wxALL, 3);
     auto* format_grid = new wxGridSizer(0, 4, FromDIP(6), FromDIP(8));
-    const auto scalar = [this, &title](wxWindow* parent, wxSizer* grid, const char* caption,
-                                       bool inherit) {
+    const auto scalar = [this, &title, &w](wxWindow* parent, wxSizer* grid, const char* caption,
+                                           bool inherit) {
         auto* column = new wxBoxSizer(wxVERTICAL);
         label(parent, column, text(caption));
         auto* field = new wxTextCtrl(parent, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                                      wxTE_PROCESS_ENTER);
         field->SetMinSize(wxSize(1, -1));
+        match_input_height(*field);
         field->SetName(title + " " + text(caption));
         field->SetHint(inherit ? "Inherit" : "Auto");
-        field->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
-            if (!loading_)
+        field->Bind(wxEVT_TEXT, [this, &w, field](wxCommandEvent&) {
+            if (!loading_) {
                 dirty_ = true;
+                if (field == w.rate || field == w.channels || field == w.source_channels ||
+                    field == w.destination_channels || field == w.channel_map) {
+                    w.manual_format = true;
+                    w.format->SetSelection(1);
+                }
+            }
         });
         column->Add(field, 0, wxEXPAND | wxALL, 3);
         grid->Add(column, 1, wxEXPAND);
@@ -327,7 +337,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
         w.buffer = new wxSpinCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
                                   wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
-        const int height = std::max(w.buffer->GetBestSize().y, FromDIP(32));
+        const int height = input_height(*w.buffer);
         w.buffer->SetMinSize(wxSize(1, height));
         w.buffer->SetMaxSize(wxSize(-1, height));
         SendMessageW(static_cast<HWND>(w.buffer->GetHandle()), EM_SETCUEBANNER, TRUE,
@@ -523,24 +533,22 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             }
             e.Skip();
         });
-    w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
-                         "visible evidence explains the recommendation.");
-    w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
-                         "listed device to bind it.");
+    w.format->SetToolTip(
+        "Choose Automatic, retain typed format values with Manual, or select a "
+        "complete format candidate. Timing and explicit channel maps stay selected.");
+    w.source->SetToolTip("Choose a listed capture endpoint for this direction. Use arrow keys or "
+                         "type a name to select a matching list item.");
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
     w.mode->SetToolTip("Save an access-mode choice for this direction. Use advanced tuning must be "
                        "enabled for it to apply. Forced modes take precedence over Exclusive mode "
                        "preferred; Automatic initially uses shared access.");
-    for (auto* field :
-         {w.rate, w.channels, w.source_channels, w.destination_channels, w.channel_map})
-        field->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
-            if (!loading_)
-                dirty_ = true;
-        });
-    w.representation->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
-        if (!loading_)
+    w.representation->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
+        if (!loading_) {
             dirty_ = true;
+            w.manual_format = true;
+            w.format->SetSelection(1);
+        }
     });
     auto changed = [this, &w](bool source) {
         if (loading_ || hole_index_ < 0)
@@ -574,16 +582,33 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (loading_)
             return;
         const auto selected = w.format->GetSelection();
-        if (selected > 0 && static_cast<std::size_t>(selected) <= w.formats.size()) {
-            const auto& f = w.formats[selected - 1];
+        w.manual_format = selected == 1;
+        if (selected == 1) {
+            dirty_ = true;
+            return;
+        }
+        if (selected > 1 && static_cast<std::size_t>(selected - 2) < w.formats.size()) {
+            const auto& candidate = w.formats[selected - 2];
+            const auto& f = candidate.source;
             w.rate->ChangeValue(std::to_string(f.rate));
-            w.channels->ChangeValue(std::to_string(f.channels));
+            w.channels->ChangeValue(f.channels == candidate.destination.channels
+                                        ? std::to_string(f.channels)
+                                        : std::string{});
+            w.source_channels->ChangeValue(f.channels == candidate.destination.channels
+                                               ? std::string{}
+                                               : std::to_string(f.channels));
+            w.destination_channels->ChangeValue(
+                f.channels == candidate.destination.channels
+                    ? std::string{}
+                    : std::to_string(candidate.destination.channels));
             auto representation =
                 f.representation == "PCM16" ? std::string("pcm_s16") : f.representation;
             w.representation->SetStringSelection(text(representation));
         } else {
             w.rate->ChangeValue("");
             w.channels->ChangeValue("");
+            w.source_channels->ChangeValue("");
+            w.destination_channels->ChangeValue("");
             w.representation->SetSelection(0);
         }
         dirty_ = true;
@@ -1122,6 +1147,11 @@ void Frame::build_profiles() {
     routing_engine_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         if (!loading_) {
             capture_draft();
+            if (hole_index_ >= 0) {
+                const auto& hole = draft_.holes[hole_index_];
+                populate_direction(forward_, hole.forward);
+                populate_direction(reverse_, hole.reverse);
+            }
             dirty_ = true;
             refresh();
         }
@@ -1253,7 +1283,8 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     w.destinations.clear();
     w.retained_source = d.source;
     w.retained_destination = d.destination;
-    wxArrayString source_search, dest_search;
+    static_cast<ThemedCombo*>(w.source)->retained_caption.clear();
+    static_cast<ThemedCombo*>(w.destination)->retained_caption.clear();
     static_cast<ThemedCombo*>(w.source)->disabled_items.clear();
     static_cast<ThemedCombo*>(w.destination)->disabled_items.clear();
     const auto offered_devices = configuration_devices(controller_->snapshot());
@@ -1273,8 +1304,6 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
             endpoint_used_elsewhere(draft_.holes[hole_index_], &w == &reverse_, e.capture, e.id))
             static_cast<ThemedCombo*>(list)->disabled_items.push_back(
                 static_cast<unsigned>(ids.size() - 1));
-        if (static_cast<ThemedCombo*>(list)->item_enabled(static_cast<unsigned>(ids.size() - 1)))
-            (e.capture ? source_search : dest_search).Add(caption);
         if (e.id == (e.capture ? d.source : d.destination)) {
             list->SetSelection(static_cast<int>(ids.size()) - 1);
             list->SetToolTip(text(e.windows_name + " | logical ID: " + e.id));
@@ -1292,26 +1321,37 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
         return text("Saved binding (hidden or missing): " + display_name + " [" + id + "]");
     };
     if (w.source->GetSelection() == wxNOT_FOUND && !d.source.empty())
-        w.source->SetValue(retained_caption(d.source, d.source_name));
+        static_cast<ThemedCombo*>(w.source)->retained_caption =
+            retained_caption(d.source, d.source_name);
     if (w.destination->GetSelection() == wxNOT_FOUND && !d.destination.empty())
-        w.destination->SetValue(retained_caption(d.destination, d.destination_name));
+        static_cast<ThemedCombo*>(w.destination)->retained_caption =
+            retained_caption(d.destination, d.destination_name);
     w.retained_source_caption = w.source->GetValue();
     w.retained_destination_caption = w.destination->GetValue();
-    w.source->AutoComplete(source_search);
-    w.destination->AutoComplete(dest_search);
-    const auto r = audiohole::recommend(controller_->snapshot(), d);
-    w.formats = r.compatible;
+    w.source->Refresh();
+    w.destination->Refresh();
+    const auto r =
+        assess_formats(controller_->snapshot(), d,
+                       hole_index_ >= 0 ? draft_.holes[hole_index_].routing_engine : "automatic");
+    w.formats = r.candidates;
     w.format->Clear();
     // Keep the literal branch a wxString too; mixed types are ambiguous on MSVC.
-    w.format->Append(r.compatible.empty()
+    w.format->Append(r.candidates.empty()
                          ? wxString(wxS("Automatic — unverified compatibility"))
-                         : wxS("Automatic — ") + text(r.compatible.front().label()) + "");
-    int selection = 0;
-    for (const auto& f : r.compatible) {
-        w.format->Append(text(f.label()) + "");
-        if (d.settings.preferences.common.sample_rate_hz == f.rate &&
-            d.settings.preferences.common.channel_count == f.channels &&
-            d.settings.preferences.common.sample_format == f.representation)
+                         : wxS("Automatic — ") + text(r.candidates.front().label()));
+    w.format->Append("Manual");
+    const auto& p = d.settings.preferences;
+    const bool format_overrides =
+        p.common.sample_rate_hz || p.common.channel_count || p.common.sample_format ||
+        p.source.sample_rate_hz || p.source.channel_count || p.source.sample_format ||
+        p.destination.sample_rate_hz || p.destination.channel_count || p.destination.sample_format;
+    int selection = format_overrides || w.manual_format ? 1 : 0;
+    for (const auto& candidate : r.candidates) {
+        const auto& f = candidate.source;
+        w.format->Append(text(candidate.label()));
+        if (!w.manual_format && p.common.sample_rate_hz == f.rate &&
+            p.common.channel_count == f.channels && candidate.destination.channels == f.channels &&
+            p.common.sample_format == f.representation)
             selection = static_cast<int>(w.format->GetCount()) - 1;
     }
     w.format->SetSelection(selection);
@@ -1432,15 +1472,22 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     const bool advanced = w.advanced_tuning->GetValue();
     if (!advanced)
         effective.settings = Settings{};
-    const auto recommendation = audiohole::recommend(snapshot, effective);
-    const bool compatible = !recommendation.compatible.empty();
-    const auto selected =
-        compatible ? recommendation.compatible.front()
-                   : derive_pcm_format(effective.settings.preferences.common).value_or(Format{});
-    auto detail = [&](const std::string& id) {
+    const auto recommendation =
+        assess_formats(snapshot, effective,
+                       hole_index_ >= 0 ? draft_.holes[hole_index_].routing_engine : "automatic");
+    const bool compatible = !recommendation.candidates.empty();
+    auto detail = [&](const std::string& id, bool capture) {
         const auto* device = endpoint(snapshot, id);
-        return device ? std::string(name(device->availability)) + " | " +
-                            (compatible ? "Candidate: " + selected.label() : "Format unverified")
+        const auto candidate = compatible ? &recommendation.candidates.front() : nullptr;
+        const auto description =
+            candidate
+                ? "Candidate: " + candidate->label() +
+                      (candidate->source.channels != candidate->destination.channels
+                           ? " | Native endpoint: " +
+                                 (capture ? candidate->source : candidate->destination).label()
+                           : "")
+                : recommendation.explanation;
+        return device ? std::string(name(device->availability)) + " | " + description
                       : std::string("No endpoint selected");
     };
     const engine::PathSnapshot* observed = nullptr;
@@ -1477,11 +1524,11 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     };
     const bool source_changed = update_detail(
         w.source_detail, w.source_detail_copy,
-        text(observed ? observed_detail(observed->negotiated->source) : detail(d.source)));
+        text(observed ? observed_detail(observed->negotiated->source) : detail(d.source, true)));
     const bool destination_changed =
         update_detail(w.destination_detail, w.destination_detail_copy,
                       text(observed ? observed_detail(observed->negotiated->destination)
-                                    : detail(d.destination)));
+                                    : detail(d.destination, false)));
     std::string summary;
     if (d.source.empty() || d.destination.empty())
         summary = "Automatic configuration — awaiting endpoint selection.";
@@ -1619,6 +1666,7 @@ void Frame::load_hole(int index) {
     loading_ = true;
     end_observation(); // An observation never follows navigation to a different source implicitly.
     hole_index_ = index;
+    forward_.manual_format = reverse_.manual_format = false;
     const audiohole::Hole h =
         index >= 0 ? draft_.holes.at(static_cast<std::size_t>(index)) : audiohole::Hole{};
     holes_->SetSelection(index);
@@ -1868,7 +1916,8 @@ void Frame::reset_layout() {
         split->UpdateSize();
         split->GetWindow2()->Layout();
         const int frame = field->GetSize().y - field->GetClientSize().y;
-        const int client = std::max(lines * field->GetCharHeight(), field->GetMinSize().y - frame);
+        const int client = std::max(lines * field->GetCharHeight() + field->FromDIP(8),
+                                    field->GetMinSize().y - frame);
         const int surrounding = split->GetWindow2()->GetSize().y - field->GetClientSize().y;
         split->SetSashPosition(split->GetClientSize().y - client - surrounding -
                                split->GetSashSize() - split->GetBorderSize());

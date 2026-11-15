@@ -156,6 +156,15 @@ void prevent_wheel_adjustment(wxWindow& control) {
     SetWindowSubclass(static_cast<HWND>(control.GetHandle()), dropdown_wheel_proc,
                       dropdown_wheel_subclass, reinterpret_cast<DWORD_PTR>(&control));
 }
+int input_height(const wxWindow& control) {
+    return control.GetCharHeight() + control.FromDIP(12);
+}
+void match_input_height(wxWindow& control) {
+    auto size = control.GetMinSize();
+    size.y = input_height(control);
+    control.SetMinSize(size);
+    control.SetMaxSize(wxSize(-1, size.y));
+}
 ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
     Create(parent, id);
     protect_dropdown_children(*this);
@@ -208,7 +217,7 @@ WXLRESULT ThemedChoice::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM 
     return wxChoice::MSWWindowProc(message, wparam, lparam);
 }
 ThemedCombo::ThemedCombo(wxWindow* parent, wxWindowID id) {
-    Create(parent, id, {}, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxTE_PROCESS_ENTER);
+    Create(parent, id, {}, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
     protect_dropdown_children(*this);
     Bind(wxEVT_KEY_DOWN, [this](wxKeyEvent& event) {
         const int key = event.GetKeyCode();
@@ -244,11 +253,12 @@ bool ThemedCombo::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     auto draw = *reinterpret_cast<DRAWITEMSTRUCT*>(item);
     if (!item_enabled(draw.itemID))
         draw.itemState |= ODS_DISABLED;
-    return paint_selection(*this, draw.itemID < GetCount() ? GetString(draw.itemID) : wxString{},
+    return paint_selection(*this,
+                           draw.itemID < GetCount() ? GetString(draw.itemID) : retained_caption,
                            reinterpret_cast<WXDRAWITEMSTRUCT*>(&draw));
 }
 WXLRESULT ThemedCombo::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam) {
-    // Editable endpoint selectors share wxChoice's visible-height adjustment.
+    // Selection-only endpoint selectors share wxChoice's visible-height adjustment.
     // Preserve a text row when a hidden pane or theme change resets that height.
     if (message == CB_SETITEMHEIGHT && wparam == static_cast<WXWPARAM>(-1))
         lparam = std::max(static_cast<int>(lparam), GetCharHeight() + FromDIP(12) - 6);

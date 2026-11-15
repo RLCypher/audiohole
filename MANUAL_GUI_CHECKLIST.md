@@ -1,5 +1,27 @@
 # AudioHole Milestone 0.2 manual acceptance
 
+## Endpoint and tutorial-exit polish regression
+
+- In Light mode, select each Capture/Playback row with the mouse and keyboard.
+  Selection must fill the row consistently with a visible theme-colored focus
+  cue, without a black cell frame. Repeat with Windows high contrast enabled.
+- Check Forward/Return selectors: names cannot be edited or selected as text;
+  arrows and name-prefix typing select real list items. Hidden saved bindings
+  remain visible and retain their IDs when saving unrelated edits.
+- Open both advanced panels. Format, timing, map, buffer and stepper heights
+  must match dropdowns at 100% and 150% DPI. Repeat for the named Device, Scan
+  and Settings editors. Device Notes must show three full lines after Reset layout.
+- Select Manual, type a partial format, save/reload, and select Automatic.
+  Manual retains values; Automatic clears format overrides while preserving
+  timing, routing and explicit channel maps.
+- For compatible mono capture/stereo playback records, inspect the dual-mono
+  candidate and the independent 1 ch/2 ch native details. No scan evidence may
+  be invented. Confirm actual channel duplication separately with the engine
+  agent's implementation; this GUI batch leaves engine mapping unchanged.
+- Confirm Skip and End from Settings and Norm, with unsaved tutorial edits,
+  completed/replayed lessons and an unwritable installation marker. Each
+  confirmation must restart into working mode; Cancel must keep the session.
+
 Use the **Release** artifact for the exact commit under review. Extract the ZIP, read `build-info.json`, and launch `audiohole.exe`. Visual inspection and real desktop/tray behavior require a Windows 10/11 x64 user session. This is a GUI evaluation: **no real devices, audio, or persistent configuration**.
 
 - [ ] Launch outside the source/build tree on a PC without Visual Studio. Confirm the startup simulation notice, build identifier, four pages, readable controls, keyboard navigation, high-DPI scaling, resize/scroll behavior, and clear error dialogs.
