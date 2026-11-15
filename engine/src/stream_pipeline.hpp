@@ -32,7 +32,7 @@ class StreamPipeline {
   public:
     StreamPipeline(StreamFormat source, StreamFormat destination,
                    const std::vector<ChannelRoute>& map, bool experimental,
-                   unsigned target_milliseconds = 20);
+                   double target_milliseconds = 20, bool explicit_target = false);
     bool push(const void* input, std::size_t frames, bool silent = false) noexcept;
     // Returns valid source-derived output frames, including valid source silence.
     // A short return can mean priming or starvation; counters distinguish them.
@@ -90,14 +90,15 @@ class StreamPipeline {
     // fractional progress between arbitrary endpoint block sizes.
     double phase_ = 0, filtered_error_ = 0, integral_ = 0;
     std::uint32_t previous_target_ = 0;
-    bool primed_ = false, experimental_ = false;
+    bool primed_ = false, experimental_ = false, explicit_target_ = false;
 };
 
 // No cross-thread device ownership is exposed. Concrete adapters create their
 // own workers and report unavailable on unsupported platforms/builds.
 std::unique_ptr<BackendAdapter> make_wasapi_adapter(bool experimental = false,
-                                                    LatencyPreset = LatencyPreset::Baseline);
-std::unique_ptr<BackendAdapter> make_miniaudio_adapter();
+                                                    LatencyPreset = LatencyPreset::Baseline,
+                                                    WorkerSettings = {});
+std::unique_ptr<BackendAdapter> make_miniaudio_adapter(WorkerSettings = {});
 unsigned queue_target_milliseconds(const NegotiatedRoute&, LatencyPreset = LatencyPreset::Baseline);
 
 } // namespace audiohole::engine::detail

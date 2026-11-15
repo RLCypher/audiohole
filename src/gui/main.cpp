@@ -224,7 +224,7 @@ class App final : public wxApp {
             }
         }
         if (!smoke && first_time) {
-            WelcomeDialog dialog(true);
+            WelcomeDialog dialog(true, preferences_->values().appearance);
             const auto choice = dialog.ShowModal();
             if (choice == wxID_CANCEL)
                 return false;

@@ -1,6 +1,6 @@
 {
   "format": "audiohole-profile",
-  "schema_version": 3,
+  "schema_version": 4,
   "profile": {
     "display_name": "Microphone monitoring",
     "notes": "Illustrative provisional Test configuration; device IDs must exist in the separate scanned inventory.",
@@ -10,55 +10,89 @@
         "display_name": "Desk microphone to headphones",
         "notes": "Names are readable hints; logical device IDs identify the devices. Buffer is a requested duration.",
         "id": "hole-example",
+        "routing": "automatic",
         "enabled": true,
         "duplex": false,
         "forward": {
+          "advanced_tuning": false,
+          "exclusive_mode_preferred": false,
           "source_name": "Desk microphone",
           "source": "capture-example",
           "destination_name": "Headphones",
           "destination": "render-example",
           "settings": {
             "preferences": {
+              "queue_target_ms": null,
               "common": {
                 "sample_rate_hz": null,
                 "channel_count": null,
                 "sample_format": null,
                 "mode": null,
-                "buffer_ms": null
+                "buffer_ms": null,
+                "period_ms": null
               },
-              "source": {},
-              "destination": {},
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null,
+                "render_ahead_ms": null
+              },
               "channel_map": [],
               "preferred_clock_device": "automatic"
             }
-          },
-          "advanced_tuning": false,
-          "exclusive_mode_preferred": false
+          }
         },
         "reverse": {
+          "advanced_tuning": false,
+          "exclusive_mode_preferred": false,
           "source_name": "",
           "source": "",
           "destination_name": "",
           "destination": "",
           "settings": {
             "preferences": {
+              "queue_target_ms": null,
               "common": {
                 "sample_rate_hz": null,
                 "channel_count": null,
                 "sample_format": null,
                 "mode": null,
-                "buffer_ms": null
+                "buffer_ms": null,
+                "period_ms": null
               },
-              "source": {},
-              "destination": {},
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null,
+                "render_ahead_ms": null
+              },
               "channel_map": [],
               "preferred_clock_device": "automatic"
             }
-          },
-          "advanced_tuning": false,
-          "exclusive_mode_preferred": false
-        },
-        "routing": "automatic"
+          }
+        }
       }
     ]
   }

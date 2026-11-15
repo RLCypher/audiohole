@@ -1,0 +1,6 @@
+{
+  "engine": {
+    "audio_thread_priority": "automatic",
+    "scheduling_task": "automatic"
+  }
+}

@@ -110,7 +110,7 @@ TEST_F(WorkflowRefinements,
     records.profiles.push_back(p);
     ASSERT_TRUE(store.save(records).ok);
     const auto doc = Json::parse(read(root / "profiles" / "VR Workflow.json"));
-    EXPECT_EQ(doc["schema_version"], 3);
+    EXPECT_EQ(doc["schema_version"], 4);
     EXPECT_EQ(doc["profile"]["holes"][0]["routing"], "experimental");
     EXPECT_TRUE(doc["profile"]["holes"][0]["forward"]["exclusive_mode_preferred"].get<bool>());
     EXPECT_FALSE(doc["profile"]["holes"][0].contains("routing_engine"));
@@ -119,7 +119,7 @@ TEST_F(WorkflowRefinements,
     EXPECT_EQ(loaded, p);
     std::string transfer;
     ASSERT_TRUE(read_profile_document(file, transfer).ok);
-    EXPECT_EQ(Json::parse(transfer)["schema_version"], 7);
+    EXPECT_EQ(Json::parse(transfer)["schema_version"], 8);
     ConfigurationRecords decoded;
     ASSERT_TRUE(validate_test_document(transfer, decoded).ok);
     EXPECT_EQ(decoded.profiles[0], p);

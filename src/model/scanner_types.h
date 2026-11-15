@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace audiohole {
@@ -47,7 +48,10 @@ inline constexpr std::array<const char*, 9> inspection_view_names{
 struct DeviceInspection {
     std::string source, path, observed_state, last_observed;
     std::string diagnostic_endpoint_id; // Local binding only; never serialized in a profile.
-    std::string edit_bytes;             // Opaque snapshot used only for checked metadata saves.
+    std::optional<double> default_period_ms, minimum_period_ms;
+    std::optional<int> period_sample_rate_hz, period_channels;
+    std::string period_sample_format;
+    std::string edit_bytes; // Opaque snapshot used only for checked metadata saves.
     bool warning = false;
     bool unusable =
         false; // Reserved for explicit backend evidence; never inferred from one rejected tuple.

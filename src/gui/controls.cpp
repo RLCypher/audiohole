@@ -295,12 +295,12 @@ bool ThemedList::MSWOnDraw(WXDRAWITEMSTRUCT* item) {
     RestoreDC(draw->hDC, saved);
     return true;
 }
-void theme_dialog(wxWindow* window) {
+void theme_dialog(wxWindow* window, const std::string& appearance) {
     // wxGenericMessageDialog constructs its native children lazily in ShowModal.
     // Apply only once InitDialog has created them, before the first visible paint.
     if (!window->GetHandle()) {
-        window->Bind(wxEVT_INIT_DIALOG, [window](wxInitDialogEvent& event) {
-            theme_dialog(window);
+        window->Bind(wxEVT_INIT_DIALOG, [window, appearance](wxInitDialogEvent& event) {
+            theme_dialog(window, appearance);
             event.Skip();
         });
         return;
@@ -309,7 +309,15 @@ void theme_dialog(wxWindow* window) {
     RegGetValueW(HKEY_CURRENT_USER,
                  L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
                  L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &light, &size);
-    const bool contrast = contrast_active(), dark = !light && !contrast;
+    const bool contrast = contrast_active();
+    // Owned dialogs inherit the application's resolved appearance, rather than
+    // consulting Windows again and ignoring an explicit Light/Dark preference.
+    const auto* owner = window->GetParent();
+    const bool dark = !contrast && (appearance == "dark"    ? true
+                                    : appearance == "light" ? false
+                                    : owner && owner->GetBackgroundColour().IsOk()
+                                        ? owner->GetBackgroundColour().GetLuminance() < 0.5
+                                        : !light);
     std::function<void(wxWindow*)> paint = [&](wxWindow* child) {
         if (!contrast) {
             child->SetBackgroundColour(dark ? palette::charcoal() : wxColour(245, 247, 250));

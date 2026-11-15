@@ -68,6 +68,7 @@ struct EndpointRequirements {
     std::optional<SampleFormat> sample_format;
     std::optional<AccessMode> mode;
     std::optional<int> buffer_ms;
+    std::optional<double> period_ms, render_ahead_ms;
     bool operator==(const EndpointRequirements&) const = default;
 };
 
@@ -85,6 +86,7 @@ struct Preferences {
     std::vector<ChannelRoute> channel_map;
     // Saved metadata only. No clock switching or latency promise is implied.
     std::string preferred_clock_device = "automatic";
+    std::optional<double> queue_target_ms;
     bool operator==(const Preferences&) const = default;
 };
 
@@ -119,7 +121,7 @@ struct Profile {
     std::string display_name;
     std::string notes;
     std::vector<Hole> holes;
-    int source_schema_version = 3;
+    int source_schema_version = 4;
     bool operator==(const Profile&) const = default;
 };
 
@@ -152,6 +154,7 @@ struct RouteRequest {
     EndpointRequirements source;
     EndpointRequirements destination;
     std::vector<ChannelRoute> channel_map;
+    std::optional<double> queue_target_ms;
 };
 
 struct PreparedProfile {

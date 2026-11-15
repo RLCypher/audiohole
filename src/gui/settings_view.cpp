@@ -39,6 +39,55 @@ void Frame::build_settings() {
                                                                                : 2);
     theme_choice_->SetToolTip("Follow Windows app appearance, or save a Light/Dark preference. "
                               "Windows high contrast takes precedence.");
+    auto* workers_panel = new wxPanel(appearance_box);
+    auto* workers_row = new wxBoxSizer(wxHORIZONTAL);
+    workers_panel->SetSizer(workers_row);
+    auto* task_box = new wxBoxSizer(wxVERTICAL);
+    auto* priority_box = new wxBoxSizer(wxVERTICAL);
+    auto* scheduling =
+        choices(workers_panel, task_box, "Scheduling", {"Automatic", "Audio", "Pro Audio"});
+    auto* priority =
+        choices(workers_panel, priority_box, "Priority", {"Automatic", "Normal", "High"});
+    workers_row->Add(task_box, 1, wxEXPAND);
+    workers_row->Add(priority_box, 1, wxEXPAND);
+    appearance_group->Add(workers_panel, 0, wxEXPAND);
+    const auto& worker_preferences = preferences_->values();
+    scheduling->SetSelection(worker_preferences.scheduling_task == "audio"       ? 1
+                             : worker_preferences.scheduling_task == "pro_audio" ? 2
+                                                                                 : 0);
+    priority->SetSelection(worker_preferences.audio_thread_priority == "normal" ? 1
+                           : worker_preferences.audio_thread_priority == "high" ? 2
+                                                                                : 0);
+    scheduling->SetToolTip(
+        "Audio workers only; applies on the next Start. Automatic requests Pro Audio MMCSS.");
+    priority->SetToolTip(
+        "Audio worker MMCSS priority; applies on the next Start. Automatic requests Normal.");
+    auto save_workers = [this, scheduling, priority](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.scheduling_task = scheduling->GetSelection() == 1   ? "audio"
+                               : scheduling->GetSelection() == 2 ? "pro_audio"
+                                                                 : "automatic";
+        next.audio_thread_priority = priority->GetSelection() == 1   ? "normal"
+                                     : priority->GetSelection() == 2 ? "high"
+                                                                     : "automatic";
+        const auto result = preferences_->update(next);
+        if (result.ok)
+            controller_->audio_worker_policy(next.scheduling_task, next.audio_thread_priority);
+        else {
+            scheduling->SetSelection(preferences_->values().scheduling_task == "audio"       ? 1
+                                     : preferences_->values().scheduling_task == "pro_audio" ? 2
+                                                                                             : 0);
+            priority->SetSelection(preferences_->values().audio_thread_priority == "normal" ? 1
+                                   : preferences_->values().audio_thread_priority == "high" ? 2
+                                                                                            : 0);
+        }
+        show_result(result);
+    };
+    scheduling->Bind(wxEVT_CHOICE, save_workers);
+    priority->Bind(wxEVT_CHOICE, save_workers);
+    if (tutorial_) {
+        workers_panel->Disable();
+    }
     notifications_ = choices(appearance_box, appearance_group, "Tray notifications",
                              {"Important changes only", "All routine events", "None"});
     startup_ = choices(startup_box, startup_group, "Routing on startup",
@@ -174,8 +223,14 @@ void Frame::build_settings() {
     };
     launch->Bind(wxEVT_CHECKBOX, save_launch);
     minimized->Bind(wxEVT_CHECKBOX, save_launch);
+    auto* application_actions = new wxWrapSizer(wxHORIZONTAL);
+    appearance_group->Add(application_actions, 0, wxEXPAND);
+    auto* reset = button(appearance_box, application_actions, "Reset layout to default",
+                         [this] { reset_layout(); });
+    reset->SetToolTip("Restore panel widths and heights throughout AudioHole to their defaults.");
     auto* tutorial_action = button(
-        appearance_box, appearance_group, tutorial_ ? "Skip tutorial" : "Replay Tutorial", [this] {
+        appearance_box, application_actions, tutorial_ ? "Skip tutorial" : "Replay Tutorial",
+        [this] {
             if (tutorial_) {
                 skip_tutorial();
                 return;
@@ -204,21 +259,32 @@ void Frame::build_settings() {
                 restart_();
         });
     tutorial_end_ = tutorial_ ? tutorial_action : nullptr;
-    auto* restart_button = button(appearance_box, appearance_group, "Restart AudioHole", [this] {
-        if (!discard())
-            return;
-        if (device_dirty_ &&
-            themed_message_box("Discard unsaved device edits before restarting? Saved device "
-                               "records will be retained.",
-                               "Unsaved device changes", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
-                               this) != wxYES)
-            return;
-        if (restart_)
-            restart_();
-        else
-            show_result({false, "Restart is unavailable for this host."});
-    });
-    restart_button->SetName("Restart AudioHole");
+    auto* restart_button = button(
+        appearance_box, application_actions, tutorial_ ? "Restart Tutorial" : "Restart AudioHole",
+        [this] {
+            if (!discard())
+                return;
+            if (device_dirty_ &&
+                themed_message_box("Discard unsaved device edits before restarting? Saved device "
+                                   "records will be retained.",
+                                   "Unsaved device changes",
+                                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION, this) != wxYES)
+                return;
+            if (tutorial_) {
+                if (smoke_)
+                    return;
+                const auto reset = reset_first_run(first_run_marker_path());
+                if (!reset.ok) {
+                    show_result(reset);
+                    return;
+                }
+            }
+            if (restart_)
+                restart_();
+            else
+                show_result({false, "Restart is unavailable for this host."});
+        });
+    restart_button->SetName(tutorial_ ? "Restart Tutorial" : "Restart AudioHole");
     restart_button->SetToolTip(
         "Restart AudioHole after cleanly closing this session. Saved settings and data are "
         "preserved; unsaved edits require confirmation.");

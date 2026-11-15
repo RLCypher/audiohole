@@ -13,6 +13,7 @@
 #include "presentation/messages.h"
 #include "presentation/sleep_commentary.h"
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -74,6 +75,9 @@ struct DirectionWidgets {
     wxChoice *format{}, *mode{}, *representation{};
     wxTextCtrl *rate{}, *channels{}, *source_channels{}, *destination_channels{}, *channel_map{};
     wxSpinCtrl* buffer{};
+    std::array<wxTextCtrl*, 8> timings{};
+    std::array<wxCollapsiblePane*, 3> sections{};
+    std::array<wxStaticText*, 3> section_summaries{};
     wxButton*
         buffer_apply{}; // Commits one buffer preference; backend reports any live confirmation.
     wxStaticText* buffer_state{};
@@ -344,7 +348,10 @@ class Frame final : public wxFrame, private wxEventFilter {
     void populate_devices();
     void load_device();
     void constrain_profile_rows();
+    void reset_layout();
+    wxSizer* device_bundle_actions_{};
     bool select_device(const std::string&);
+    std::unique_ptr<wxMenu> device_menu(const std::string&);
     void device_context(DeviceList*, const std::vector<std::string>&, wxContextMenuEvent&);
     void request_scan(bool deep, ScanScope, const std::string&);
     void scanner_action(const ScannerActionRequest&);

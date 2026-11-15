@@ -2,6 +2,7 @@
 #include "stream_pipeline.hpp"
 
 #if defined(_WIN32) && defined(AUDIOHOLE_ENGINE_MINIAUDIO)
+#include "worker_scheduling.hpp"
 #include <atomic>
 #include <cstring>
 #include <miniaudio.h>
@@ -54,7 +55,8 @@ SampleFormat format(ma_format value) {
 
 class MiniaudioSession final : public RouteSession {
   public:
-    explicit MiniaudioSession(BoundRoute route) : route_(std::move(route)) {}
+    MiniaudioSession(BoundRoute route, WorkerSettings workers)
+        : route_(std::move(route)), capture_scheduling_(workers), playback_scheduling_(workers) {}
     ~MiniaudioSession() override {
         stop();
     }
@@ -67,8 +69,17 @@ class MiniaudioSession final : public RouteSession {
             // or null-backend fallback. Separate devices avoid stock duplex's
             // blocking coupling and common callback sample-rate restriction.
             const ma_backend backend = ma_backend_wasapi;
-            checked(ma_context_init(&backend, 1, nullptr, &context_), "ma_context_init");
+            ma_context_config context_config = ma_context_config_init();
+            context_config.threadPriority = ma_thread_priority_normal;
+            checked(ma_context_init(&backend, 1, &context_config, &context_), "ma_context_init");
             context_ready_ = true;
+            // The pinned WASAPI backend is synchronous: miniaudio invokes these
+            // lifecycle callbacks on each device's audio worker before/after its
+            // data loop. Wrap them without touching its sample callbacks or jobs.
+            native_start_ = context_.callbacks.onDeviceStart;
+            native_stop_ = context_.callbacks.onDeviceStop;
+            context_.callbacks.onDeviceStart = start_worker;
+            context_.callbacks.onDeviceStop = stop_worker;
             const auto source = open_endpoint(capture_, capture_ready_, route_.source.endpoint_id,
                                               route_.request.source, true, stop_token);
             if (!source.ok())
@@ -90,14 +101,18 @@ class MiniaudioSession final : public RouteSession {
                 "Prototype occupancy PI; application linear adaptive SRC";
             configuration_.selection_reason =
                 "Explicit miniaudio request; WASAPI-only device access";
+            pipeline_ = std::make_unique<StreamPipeline>(
+                configuration_.source.client_format, configuration_.destination.client_format,
+                route_.request.channel_map, false,
+                route_.request.queue_target_ms ? *route_.request.queue_target_ms
+                                               : queue_target_milliseconds(configuration_),
+                route_.request.queue_target_ms.has_value());
+            configuration_.requested_queue_target_ms = route_.request.queue_target_ms;
+            configuration_.fifo_target_source_frames = pipeline_->target_frames();
+            configuration_.fifo_capacity_source_frames = pipeline_->capacity_frames();
             const auto validation = check_negotiated(route_.request, configuration_);
             if (!validation.ok())
                 return {std::nullopt, validation.issues};
-            pipeline_ = std::make_unique<StreamPipeline>(
-                configuration_.source.client_format, configuration_.destination.client_format,
-                route_.request.channel_map, false, queue_target_milliseconds(configuration_));
-            configuration_.fifo_target_source_frames = pipeline_->target_frames();
-            configuration_.fifo_capacity_source_frames = pipeline_->capacity_frames();
             return {true, {}};
         } catch (const LibraryFailure& failure) {
             return {std::nullopt, {failure.issue}};
@@ -122,6 +137,8 @@ class MiniaudioSession final : public RouteSession {
     }
     RouteObservation observe() override {
         auto result = pipeline_->observe();
+        result.worker_scheduling = "Capture " + capture_scheduling_.describe() + "; Playback " +
+                                   playback_scheduling_.describe();
         // The library callback does not expose native packet flags. Absence is
         // honest telemetry; a fabricated zero would suggest those flags passed.
         result.discontinuities.reset();
@@ -153,6 +170,9 @@ class MiniaudioSession final : public RouteSession {
 
   private:
     BoundRoute route_;
+    WorkerScheduling capture_scheduling_, playback_scheduling_;
+    ma_result (*native_start_)(ma_device*) = nullptr;
+    ma_result (*native_stop_)(ma_device*) = nullptr;
     ma_context context_{};
     ma_device capture_{}, playback_{};
     bool context_ready_ = false, capture_ready_ = false, playback_ready_ = false;
@@ -160,6 +180,25 @@ class MiniaudioSession final : public RouteSession {
     NegotiatedRoute configuration_;
     std::unique_ptr<StreamPipeline> pipeline_;
 
+    static ma_result start_worker(ma_device* device) {
+        auto* self = static_cast<MiniaudioSession*>(device->pUserData);
+        auto& scheduling = device->type == ma_device_type_capture ? self->capture_scheduling_
+                                                                  : self->playback_scheduling_;
+        scheduling.start();
+        const auto result = self->native_start_ ? self->native_start_(device) : MA_SUCCESS;
+        if (result != MA_SUCCESS)
+            scheduling.stop();
+        return result;
+    }
+    static ma_result stop_worker(ma_device* device) {
+        auto* self = static_cast<MiniaudioSession*>(device->pUserData);
+        const auto result = self->native_stop_ ? self->native_stop_(device) : MA_SUCCESS;
+        // Always release on this worker, even when stopping the native stream fails.
+        (device->type == ma_device_type_capture ? self->capture_scheduling_
+                                                : self->playback_scheduling_)
+            .stop();
+        return result;
+    }
     static void data(ma_device* device, void* output, const void* input, ma_uint32 frames) {
         auto* self = static_cast<MiniaudioSession*>(device->pUserData);
         if (!self->pipeline_)
@@ -219,6 +258,10 @@ class MiniaudioSession final : public RouteSession {
 
     void initialize_device(ma_device& device, bool& ready, const std::string& binding,
                            const EndpointRequirements& required, bool input) {
+        if (required.period_ms || required.render_ahead_ms)
+            throw LibraryFailure{{ErrorCode::UnsupportedRequirement, "timing",
+                                  "Independent processing interval and playback lead require the "
+                                  "native WASAPI backend."}};
         ma_device_id id{};
         const int length = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, binding.data(),
                                                static_cast<int>(binding.size()), nullptr, 0);
@@ -236,7 +279,8 @@ class MiniaudioSession final : public RouteSession {
         config.noFixedSizedCallback = MA_TRUE;
         config.noClip = MA_TRUE;
         config.wasapi.noAutoStreamRouting = MA_TRUE;
-        config.wasapi.usage = ma_wasapi_usage_pro_audio;
+        // The wrapper owns registration; avoid a second library-owned MMCSS handle.
+        config.wasapi.usage = ma_wasapi_usage_default;
         config.dataCallback = data;
         config.notificationCallback = notification;
         config.pUserData = this;
@@ -289,14 +333,17 @@ class MiniaudioSession final : public RouteSession {
 };
 
 class MiniaudioAdapter final : public BackendAdapter {
+    WorkerSettings workers_;
+
   public:
+    explicit MiniaudioAdapter(WorkerSettings workers) : workers_(workers) {}
     BackendDescriptor descriptor() const override {
         return {BackendId::Miniaudio, true,
                 "miniaudio 0.11.25 WASAPI I/O; restricted converter paths"};
     }
     Result<std::unique_ptr<RouteSession>> open(const BoundRoute& route,
                                                std::stop_token stop) override {
-        auto session = std::make_unique<MiniaudioSession>(route);
+        auto session = std::make_unique<MiniaudioSession>(route, workers_);
         const auto result = session->initialize(stop);
         if (!result.ok())
             return {std::nullopt, result.issues};
@@ -304,13 +351,13 @@ class MiniaudioAdapter final : public BackendAdapter {
     }
 };
 } // namespace
-std::unique_ptr<BackendAdapter> make_miniaudio_adapter() {
-    return std::make_unique<MiniaudioAdapter>();
+std::unique_ptr<BackendAdapter> make_miniaudio_adapter(WorkerSettings workers) {
+    return std::make_unique<MiniaudioAdapter>(workers);
 }
 } // namespace audiohole::engine::detail
 #else
 namespace audiohole::engine::detail {
-std::unique_ptr<BackendAdapter> make_miniaudio_adapter() {
+std::unique_ptr<BackendAdapter> make_miniaudio_adapter(WorkerSettings) {
     return {};
 }
 } // namespace audiohole::engine::detail

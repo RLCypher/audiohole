@@ -69,6 +69,12 @@ void Tutorial::enter(const std::string& beat) {
     reminder_.clear();
     overlay_.clear();
 }
+int Tutorial::expected_page() const {
+    return beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? 1
+           : beat_ >= "N005" && beat_ <= "N010"                    ? 2
+           : beat_ >= "N033"                                       ? 3
+                                                                   : 0;
+}
 TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty) const {
     TutorialView out;
     out.beat = beat_;
@@ -113,15 +119,38 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
         out.targets.push_back("profile:" + profile_id_);
     if (beat_ == "N018B")
         out.targets.push_back("hole:" + hole_id_);
-    if (sightseeing_page_ >= 0) {
-        const auto& reminder = catalog().at("B001");
-        out.text = reminder.at("text").get<std::string>();
-        out.expression = reminder.at("expression").get<std::string>();
+    if (beat_ == "N017" && early_profiles_ && reminder_.empty() && overlay_.empty())
+        out.text = "Looks like you got a little ahead of me, but management still wants me to walk "
+                   "you through this part to make sure you understand. " +
+                   out.text;
+    if (!complete_ && !recovery_.empty()) {
+        out.text = "Hey! We weren't done with that yet, put it back! Now management says I have to "
+                   "explain that part over again...";
+        out.expression = "surprised";
         out.choices.clear();
-        out.targets = {sightseeing_page_ == 0   ? "profiles_tab"
-                       : sightseeing_page_ == 1 ? "devices_tab"
-                       : sightseeing_page_ == 2 ? "scan_tab"
-                                                : "settings_tab"};
+    }
+    if (!complete_ && !prerequisite_target_.empty()) {
+        out.text = catalog().at("B009").at("text").get<std::string>();
+        out.expression = catalog().at("B009").at("expression").get<std::string>();
+        out.targets = {prerequisite_target_};
+        out.choices.clear();
+    }
+    const int guide_page =
+        !complete_ && current_page_ != expected_page() &&
+                (!reminder_.empty() || !recovery_.empty() || !prerequisite_target_.empty())
+            ? expected_page()
+            : sightseeing_page_;
+    if (guide_page >= 0) {
+        const auto& reminder = catalog().at("B001");
+        if (recovery_.empty() && reminder_ != "B009") {
+            out.text = reminder.at("text").get<std::string>();
+            out.expression = reminder.at("expression").get<std::string>();
+        }
+        out.choices.clear();
+        out.targets = {guide_page == 0   ? "profiles_tab"
+                       : guide_page == 1 ? "devices_tab"
+                       : guide_page == 2 ? "scan_tab"
+                                         : "settings_tab"};
         out.sightseeing = true;
     }
     return out;
@@ -173,6 +202,8 @@ bool Tutorial::ready_to_route(const Profile& p, int hole) const {
 }
 void Tutorial::skip() {
     complete_ = true;
+    recovery_.clear();
+    prerequisite_target_.clear();
     enter("B010");
 }
 void Tutorial::click(std::int64_t now) {
@@ -196,6 +227,73 @@ void Tutorial::tick(std::int64_t now) {
 }
 void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& draft, int hole,
                      int page) {
+    current_page_ = page;
+    prerequisite_target_.clear();
+    if (!complete_) {
+        const bool lost_profile = !profile_id_.empty() && !profile(s, profile_id_);
+        const bool lost_hole = action == "hole_deleted" && draft.id == profile_id_ &&
+                               !hole_id_.empty() &&
+                               std::none_of(draft.holes.begin(), draft.holes.end(),
+                                            [this](const auto& h) { return h.id == hole_id_; });
+        if (lost_profile || lost_hole) {
+            saved_ = routed_ = acknowledged_ = settings_ = false;
+            hole_id_.clear();
+            if (lost_profile)
+                profile_id_.clear();
+            enter(lost_profile ? "N017" : "N018");
+            recovery_ = lost_profile ? "profile" : "hole";
+            sightseeing_page_ = page == 0 ? -1 : 0;
+            return;
+        }
+    }
+    if (!complete_ && beat_ >= "N020" && beat_ <= "N026" && draft.id == profile_id_ && hole >= 0 &&
+        static_cast<std::size_t>(hole) < draft.holes.size() && draft.holes[hole].id == hole_id_) {
+        const auto& current = draft.holes[hole];
+        std::string rewind;
+        if (!current.duplex)
+            rewind = "N019";
+        else if (beat_ > "N020" && current.forward.source != "tutorial-mic")
+            rewind = "N020";
+        else if (beat_ > "N021" && current.forward.destination != "tutorial-mixer-out")
+            rewind = "N021";
+        else if (beat_ > "N021A" && !current.forward.exclusive_mode_preferred)
+            rewind = "N021A";
+        else if (beat_ > "N022" && current.reverse.source != "tutorial-mixer-in")
+            rewind = "N022";
+        else if (beat_ > "N023" && current.reverse.destination != "tutorial-speakers")
+            rewind = "N023";
+        if (!rewind.empty()) {
+            saved_ = false;
+            enter(rewind);
+            remind("B009");
+        }
+    }
+    if (!complete_ && beat_ >= "N018" && beat_ <= "N026" && !profile_id_.empty()) {
+        if (draft.id != profile_id_)
+            prerequisite_target_ = "profile:" + profile_id_;
+        else if (!hole_id_.empty() &&
+                 (hole < 0 || static_cast<std::size_t>(hole) >= draft.holes.size() ||
+                  draft.holes[hole].id != hole_id_))
+            prerequisite_target_ = "hole:" + hole_id_;
+        else if (beat_ >= "N019" && !hole_id_.empty() && !draft.holes[hole].enabled)
+            prerequisite_target_ = "hole_enabled";
+        else if (saved_ && beat_ >= "N025") {
+            const auto* stored = profile(s, profile_id_);
+            if (action == "observe_dirty" || !stored || *stored != draft) {
+                saved_ = false;
+                enter("N024");
+                remind("B009");
+            }
+        }
+    }
+    if (action == "observe" || action == "observe_dirty")
+        return;
+    if (action == "scan_options_invalid") {
+        if (beat_ == "N008")
+            enter("N007");
+        remind("B009");
+        return;
+    }
     // Confirmed user actions dismiss a click quip even when they do not finish
     // the objective. Background progress events must leave its timer intact.
     for (const auto user_action :
@@ -212,16 +310,14 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
             enter("N006");
         else if (beat_ == "N011" && page == 1)
             enter("N012");
-        else if (beat_ == "N016" && page == 0)
+        else if (beat_ == "N016" && page == 0) {
+            early_profiles_ = !s.profiles.empty();
             enter("N017");
-        else if (beat_ == "N033" && page == 3) {
+        } else if (beat_ == "N033" && page == 3) {
             settings_ = true;
             enter("N034");
         } else {
-            const int expected = beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? 1
-                                 : beat_ >= "N005" && beat_ <= "N010"                    ? 2
-                                 : beat_ >= "N033"                                       ? 3
-                                                                                         : 0;
+            const int expected = expected_page();
             sightseeing_page_ = !complete_ && page != expected ? expected : -1;
             if (sightseeing_page_ >= 0)
                 remind("B001");
@@ -273,6 +369,7 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         return;
     }
     if (action == "profile_created" && beat_ == "N017" && !draft.id.empty()) {
+        recovery_.clear();
         profile_id_ = draft.id;
         initial_profile_name_ = draft.display_name;
         enter("N018A");
@@ -289,6 +386,7 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         return;
     const auto& h = draft.holes[hole];
     if (action == "hole_created" && beat_ == "N018" && draft.id == profile_id_) {
+        recovery_.clear();
         hole_id_ = h.id;
         initial_hole_name_ = h.display_name;
         enter("N018B");

@@ -1,6 +1,7 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
 #include <wx/datetime.h>
+#include <wx/textdlg.h>
 #include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
@@ -38,6 +39,7 @@ void Frame::build_devices() {
     auto* page = new wxPanel(notebook_);
     auto* layout = new wxBoxSizer(wxVERTICAL);
     auto* bundles = new wxBoxSizer(wxHORIZONTAL);
+    device_bundle_actions_ = bundles;
     scanner_actions_.push_back(
         button(page, bundles, "Export devices…", [this] { bundle_dialog(false, false); }));
     scanner_actions_.push_back(
@@ -65,7 +67,7 @@ void Frame::build_devices() {
         box->SetName(text(title));
         box->SetToolTip(
             "Status dots: green available; gray unavailable; yellow attention or unknown; red "
-            "explicitly unusable. Right-click for scans and Hide / Unhide.");
+            "explicitly unusable. Right-click for Rename, scans and Hide / Unhide.");
         content->Add(box, 1, wxEXPAND | wxALL, 3);
         card->set_content_sizer(content);
         left->Add(card, 1, wxEXPAND | wxALL, 3);
@@ -143,7 +145,7 @@ void Frame::build_devices() {
     device_rows_ = new wxSplitterWindow(details, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                         wxSP_LIVE_UPDATE | wxSP_3D);
     device_rows_->SetName("Resize device notes and overview heights");
-    device_rows_->SetMinimumPaneSize(FromDIP(72));
+    device_rows_->SetMinimumPaneSize(FromDIP(48));
     device_rows_->SetSashGravity(1.0);
     auto* notes_panel = new wxPanel(device_rows_);
     auto* notes_layout = new wxBoxSizer(wxVERTICAL);
@@ -321,19 +323,27 @@ void Frame::device_context(DeviceList* box, const std::vector<std::string>& ids,
     const auto id = ids[static_cast<std::size_t>(index)]; // Snapshot before list rebuilding.
     if (!select_device(id))
         return;
+    if (auto menu = device_menu(id))
+        box->PopupMenu(menu.get());
+}
+std::unique_ptr<wxMenu> Frame::device_menu(const std::string& id) {
     const auto* device = endpoint(controller_->snapshot(), id);
     if (!device)
-        return;
+        return {};
     const bool hidden = device->hidden;
-    wxMenu menu;
+    auto menu = std::make_unique<wxMenu>();
     const int update = wxWindow::NewControlId(), deep = wxWindow::NewControlId(),
               hide = wxWindow::NewControlId();
-    menu.Append(update, "Update device");
-    menu.Append(deep, "Deep update device");
+    menu->Append(wxID_EDIT, wxS("Rename…"),
+                 "Rename and save this device, preserving its Windows name and logical identity.");
+    menu->AppendSeparator();
+    menu->Append(update, "Update device");
+    menu->Append(deep, "Deep update device");
     const auto reveal = wxWindow::NewControlId();
-    menu.Append(reveal, "Show in Explorer", "Open the folder and select this device's saved JSON.");
-    menu.Enable(reveal, bool(device->inspection));
-    menu.Bind(
+    menu->Append(reveal, "Show in Explorer",
+                 "Open the folder and select this device's saved JSON.");
+    menu->Enable(reveal, bool(device->inspection));
+    menu->Bind(
         wxEVT_MENU,
         [this, id](wxCommandEvent&) {
             const auto* current = endpoint(controller_->snapshot(), id);
@@ -344,19 +354,20 @@ void Frame::device_context(DeviceList* box, const std::vector<std::string>& ids,
                 show_result({false, "This device has no saved scanner JSON file."});
         },
         reveal);
-    menu.AppendSeparator();
-    menu.Append(hide, hidden ? "Unhide device" : "Hide device");
+    menu->AppendSeparator();
+    menu->Append(hide, hidden ? "Unhide device" : "Hide device");
     const bool idle = !controller_->snapshot().scanner.busy && !controller_->snapshot().scanning;
-    menu.Enable(update, idle && controller_->snapshot().capabilities.scanning);
-    menu.Enable(deep, idle && controller_->snapshot().capabilities.scanning);
-    menu.Enable(hide, idle);
-    menu.Bind(
+    menu->Enable(wxID_EDIT, idle);
+    menu->Enable(update, idle && controller_->snapshot().capabilities.scanning);
+    menu->Enable(deep, idle && controller_->snapshot().capabilities.scanning);
+    menu->Enable(hide, idle);
+    menu->Bind(
         wxEVT_MENU, [this, id](wxCommandEvent&) { request_scan(false, ScanScope::Selected, id); },
         update);
-    menu.Bind(
+    menu->Bind(
         wxEVT_MENU, [this, id](wxCommandEvent&) { request_scan(true, ScanScope::Selected, id); },
         deep);
-    menu.Bind(
+    menu->Bind(
         wxEVT_MENU,
         [this, id, hidden](wxCommandEvent&) {
             if (device_dirty_) {
@@ -370,7 +381,34 @@ void Frame::device_context(DeviceList* box, const std::vector<std::string>& ids,
             scanner_action(request);
         },
         hide);
-    box->PopupMenu(&menu);
+    menu->Bind(
+        wxEVT_MENU,
+        [this, id](wxCommandEvent&) {
+            if (controller_->snapshot().scanner.busy || controller_->snapshot().scanning ||
+                !endpoint(controller_->snapshot(), id) || !select_device(id))
+                return;
+            wxTextEntryDialog dialog(this, "Device display name", "Rename device",
+                                     device_name_->GetValue());
+            theme_dialog(&dialog);
+            if (dialog.ShowModal() != wxID_OK)
+                return;
+            auto name = dialog.GetValue();
+            name.Trim(true).Trim(false);
+            if (name.empty()) {
+                show_result({false, "Enter a device name."});
+                return;
+            }
+            // Use the existing editor/save path: it retains notes, validates file
+            // names and stale snapshots, and waits for scanner-owned saves to finish.
+            device_name_->SetValue(name);
+            refresh();
+            if (device_save_->IsEnabled()) {
+                wxCommandEvent save(wxEVT_BUTTON, device_save_->GetId());
+                device_save_->GetEventHandler()->ProcessEvent(save);
+            }
+        },
+        wxID_EDIT);
+    return menu;
 }
 void Frame::load_device() {
     const auto* e = endpoint(controller_->snapshot(), device_id_);

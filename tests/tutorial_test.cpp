@@ -380,3 +380,115 @@ TEST(Tutorial, SightseeingOnlyHighlightsRequiredTabAndRestoresExactBranch) {
     h.navigate(2);
     EXPECT_FALSE(h.lesson.view().choices.empty());
 }
+
+TEST(Tutorial, DeletedDependenciesRecoverAndCompletionLiftsRecovery) {
+    Lesson f;
+    f.to_route();
+    f.draft.holes.clear();
+    f.event("hole_deleted");
+    EXPECT_EQ(f.lesson.beat(), "N018");
+    EXPECT_EQ(f.lesson.view().expression, "surprised");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"hole_new"});
+    EXPECT_NE(f.lesson.view().text.find("put it back"), std::string::npos);
+    f.draft.holes.push_back(f.sandbox.make_hole());
+    f.event("hole_created");
+    EXPECT_EQ(f.lesson.beat(), "N018B");
+    EXPECT_NE(f.lesson.view().text.find("Same deal"), std::string::npos);
+    ASSERT_TRUE(f.sandbox.remove_profile(f.draft.id).ok);
+    f.draft = {};
+    f.event("observe");
+    EXPECT_EQ(f.lesson.beat(), "N017");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profile_new"});
+    const auto id = f.sandbox.create_profile("Replacement");
+    f.draft = *profile(f.sandbox.snapshot(), id);
+    f.event("profile_created");
+    EXPECT_EQ(f.lesson.beat(), "N018A");
+    f.lesson.skip();
+    ASSERT_TRUE(f.sandbox.remove_profile(id).ok);
+    f.event("observe");
+    EXPECT_TRUE(f.lesson.complete());
+    EXPECT_EQ(f.lesson.beat(), "B010");
+}
+TEST(Tutorial, InvalidScanChoicesGuideBackToOptionsAndEarlyProfilesAreExplained) {
+    Lesson f;
+    f.to_scan();
+    f.event("scan_options_invalid");
+    EXPECT_EQ(f.lesson.beat(), "N007");
+    EXPECT_EQ(f.lesson.view().targets, (std::vector<std::string>{"scan_level", "scan_scope"}));
+    f.event("scan_options");
+    f.scan();
+    f.choice();
+    f.navigate(1);
+    f.choice();
+    f.choice();
+    auto mic = *endpoint(f.sandbox.snapshot(), "tutorial-mic");
+    mic.display_name = "Mic";
+    f.sandbox.update_endpoint(mic);
+    f.event("device_saved");
+    auto speakers = *endpoint(f.sandbox.snapshot(), "tutorial-speakers");
+    speakers.display_name = "Phones";
+    f.sandbox.update_endpoint(speakers);
+    f.event("device_saved");
+    f.sandbox.create_profile("Ahead of Norm");
+    f.navigate(0);
+    EXPECT_EQ(f.lesson.beat(), "N017");
+    EXPECT_TRUE(f.lesson.view().text.starts_with("Looks like you got a little ahead of me"));
+    f.page = 2;
+    f.event("observe");
+    f.lesson.repeat();
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
+    EXPECT_TRUE(f.lesson.view().choices.empty());
+}
+
+TEST(Tutorial, ClearingEarlierAssignmentGuidesBackUntilThatRequirementIsRepaired) {
+    Lesson f;
+    f.to_route();
+    ASSERT_EQ(f.lesson.beat(), "N026");
+    f.draft.holes[0].forward.destination.clear();
+    f.event("observe");
+    EXPECT_EQ(f.lesson.beat(), "N021");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"forward_destination"});
+    EXPECT_NE(f.lesson.view().text.find("Sure. No rush"), std::string::npos);
+    f.navigate(2);
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
+    f.navigate(0);
+    f.draft.holes[0].forward.destination = "tutorial-mixer-out";
+    f.event("endpoints");
+    EXPECT_EQ(f.lesson.beat(), "N021A");
+}
+
+TEST(Tutorial, WrongSelectionDisabledHoleAndUnsavedEditsGuideTheirActualPrerequisites) {
+    Lesson f;
+    f.to_route();
+    const auto owned = f.draft;
+    f.draft = {};
+    f.event("observe");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profile:" + owned.id});
+    f.draft = owned;
+    const auto hole = f.draft.holes[0];
+    auto other_hole = hole;
+    other_hole.id = "other-hole";
+    f.draft.holes.push_back(other_hole);
+    f.lesson.event("observe", f.sandbox.snapshot(), f.draft, 1, f.page);
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"hole:" + hole.id});
+    f.draft.holes.pop_back();
+    f.draft.holes[0].enabled = false;
+    f.event("observe");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"hole_enabled"});
+    f.draft.holes[0].enabled = true;
+    f.draft.notes = "A later unsaved edit";
+    f.event("observe");
+    EXPECT_EQ(f.lesson.beat(), "N024");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profile_save"});
+    f.lesson.skip();
+    EXPECT_TRUE(f.lesson.view().targets.empty());
+}
+
+TEST(Tutorial, ARevertedButStillDirtyEditorRequiresSaveBeforeStarting) {
+    Lesson f;
+    f.to_route();
+    f.event("observe_dirty");
+    EXPECT_EQ(f.lesson.beat(), "N024");
+    EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profile_save"});
+    EXPECT_FALSE(f.lesson.ready_to_route(f.draft, 0));
+}

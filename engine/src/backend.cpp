@@ -2,6 +2,7 @@
 #include "audiohole/engine/channel_mapping.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <set>
 
 namespace audiohole::engine {
@@ -76,12 +77,30 @@ Result<StreamConfiguration> check_stream(const EndpointRequirements& required,
             issues.push_back(
                 {ErrorCode::ContractViolation, path + "/buffer_ms",
                  "Cannot verify the explicit buffer without actual allocation and rate."});
-        }
+        } else if (double(*stream.allocated_buffer_frames) + 1 <
+                   double(*stream.timing_sample_rate_hz) * *required.buffer_ms / 1000)
+            issues.push_back({ErrorCode::UnsupportedRequirement, path + "/buffer_ms",
+                              "Allocated capacity is smaller than the requested capacity."});
         // buffer_ms is the explicit API request, not a promise that a driver
         // allocates an exact frame count. Native periods/alignment and library
         // period counts can change allocation. Keep both values in receipts;
         // missing/ignored requests still fail above, formats/modes remain strict.
     }
+    auto timing = [&](const std::optional<double>& requested, const std::optional<double>& applied,
+                      const std::optional<std::uint32_t>& frames, const char* field) {
+        if (!requested)
+            return;
+        if (applied != requested || !frames || !stream.timing_sample_rate_hz ||
+            *stream.timing_sample_rate_hz <= 0 ||
+            std::abs(double(frames.value_or(0)) -
+                     *requested * stream.timing_sample_rate_hz.value_or(0) / 1000) > 1.000001)
+            issues.push_back(
+                {ErrorCode::UnsupportedRequirement, path + "/" + field,
+                 "Requested timing is unsupported; no larger target was substituted."});
+    };
+    timing(required.period_ms, stream.applied_period_request_ms, stream.period_frames, "period_ms");
+    timing(required.render_ahead_ms, stream.applied_render_ahead_request_ms,
+           stream.render_ahead_target_frames, "render_ahead_ms");
     if ((stream.period_frames && *stream.period_frames == 0) ||
         (stream.allocated_buffer_frames && *stream.allocated_buffer_frames == 0))
         issues.push_back({ErrorCode::ContractViolation, path + "/timing",
@@ -138,6 +157,14 @@ Result<NegotiatedRoute> check_negotiated(const RouteRequest& request,
     };
     check(request.source, actual.source, "source");
     check(request.destination, actual.destination, "destination");
+    if (request.queue_target_ms &&
+        (actual.requested_queue_target_ms != request.queue_target_ms ||
+         !actual.fifo_target_source_frames ||
+         std::abs(double(actual.fifo_target_source_frames.value_or(0)) -
+                  *request.queue_target_ms * actual.source.client_format.sample_rate_hz / 1000) >
+             1.000001))
+        issues.push_back({ErrorCode::UnsupportedRequirement, "queue_target_ms",
+                          "The explicit routing queue target was not applied."});
     if (actual.clock_preference_applied)
         issues.push_back({ErrorCode::ContractViolation, "preferred_clock_device",
                           "Clock preference is metadata only in this engine build."});

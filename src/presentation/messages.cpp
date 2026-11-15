@@ -96,6 +96,9 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"device_unavailable", "Device became unavailable."},
     {"level_check_started", "Checking the selected capture device's level."},
     {"beep_started", "Test beep requested on the selected playback device."},
+    {"error_minor", "The action could not be completed. Review the detailed error."},
+    {"error_major",
+     "AudioHole could not continue the requested operation. Review the detailed error."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;
@@ -519,6 +522,7 @@ Copy Messages::show(Message event, const std::string& id, std::uint64_t occurren
         result.category = "technical";
         result.expression = "idle";
         switch (event) {
+        case Message::ErrorMajor:
         case Message::Invalid:
         case Message::ScanFailed:
             result.expression = "error";

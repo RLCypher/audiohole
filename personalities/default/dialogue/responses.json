@@ -1692,6 +1692,250 @@
         "expression": "happy",
         "fallback_expression": "idle"
       }
+    ],
+    "error_minor": [
+      {
+        "id": "default_error_minor_001",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Huh. That's weird.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_002",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Well, that wasn't supposed to happen.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_003",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "That's... unusual.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_004",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Something's being difficult.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_005",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Interesting. Not in a good way.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_006",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "That didn't quite work.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_007",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Windows is being Windows again.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_008",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Something's not cooperating.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_009",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Didn't see that coming.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_010",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "I don't like that.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_011",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Well, that's mildly inconvenient.",
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_012",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Okay, that's a new one.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_013",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "That's probably fine. Probably.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_014",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Something went sideways.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_minor_015",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Huh. That's worth looking into.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "error_major": [
+      {
+        "id": "default_error_major_001",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Well, shit. That's not working.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_002",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Okay, we've got a problem.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_003",
+        "category": "error",
+        "subcategory": "major",
+        "text": "That's a pretty significant problem.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_004",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Well, something's properly fucked.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_005",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Yeah, that's broken.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_006",
+        "category": "error",
+        "subcategory": "major",
+        "text": "We've lost something important.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_007",
+        "category": "error",
+        "subcategory": "major",
+        "text": "That went poorly.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_008",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Okay. That's bad.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_009",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Well, there goes that.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_010",
+        "category": "error",
+        "subcategory": "major",
+        "text": "That's a hard stop.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_011",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Something's seriously wrong.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_012",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Well, this isn't ideal.",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_013",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Yeah, we're not getting anywhere like this.",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_014",
+        "category": "error",
+        "subcategory": "major",
+        "text": "That didn't just fail. It failed impressively.",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_error_major_015",
+        "category": "error",
+        "subcategory": "major",
+        "text": "I was hoping we wouldn't see that.",
+        "expression": "error",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

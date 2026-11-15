@@ -44,14 +44,15 @@ struct Runtime::Impl {
     RuntimeSnapshot state;
     std::vector<std::unique_ptr<BackendAdapter>> adapters;
     std::optional<BindingSnapshot> pending_bindings;
+    bool pending_resume = true;
     std::jthread worker;
 
-    explicit Impl(LatencyPreset preset) {
-        if (auto native = detail::make_wasapi_adapter(false, preset))
+    explicit Impl(LatencyPreset preset, WorkerSettings workers = {}) {
+        if (auto native = detail::make_wasapi_adapter(false, preset, workers))
             adapters.push_back(std::move(native));
-        if (auto library = detail::make_miniaudio_adapter())
+        if (auto library = detail::make_miniaudio_adapter(workers))
             adapters.push_back(std::move(library));
-        if (auto experimental = detail::make_wasapi_adapter(true, preset))
+        if (auto experimental = detail::make_wasapi_adapter(true, preset, workers))
             adapters.push_back(std::move(experimental));
     }
     explicit Impl(std::vector<std::unique_ptr<BackendAdapter>> supplied)
@@ -214,7 +215,45 @@ struct Runtime::Impl {
                 activate(i, *retry, &previous, &failure);
                 return true;
             };
+            const auto available_hole = [&](const std::string& id) {
+                return std::all_of(
+                    prepared.routes.begin(), prepared.routes.end(), [&](const auto& route) {
+                        return route.hole_id != id || bind_route(route, bindings).ok();
+                    });
+            };
+            const auto wait_for_hole = [&](std::size_t i) {
+                auto& path = next.paths[i];
+                path.hole_id = prepared.routes[i].hole_id;
+                path.direction = prepared.routes[i].direction;
+                path.state = State::Ready;
+                path.negotiated.reset();
+                path.observation = {};
+                path.progress_age_ms.reset();
+                path.issues = {{ErrorCode::UnavailableEndpoint, "waiting",
+                                "Waiting for this hole's required devices to become available."}};
+                for (const auto& sibling : prepared.routes) {
+                    if (sibling.hole_id != path.hole_id)
+                        continue;
+                    const auto bound = bind_route(sibling, bindings);
+                    for (const auto& issue : bound.issues) {
+                        const bool waiting = issue.code == ErrorCode::UnavailableEndpoint ||
+                                             issue.code == ErrorCode::UnresolvedEndpoint ||
+                                             issue.code == ErrorCode::AmbiguousEndpoint;
+                        if (!waiting) {
+                            path.state = State::Failed;
+                            path.issues = {issue};
+                            return;
+                        }
+                    }
+                    if (!bound.ok() && sibling.direction == path.direction)
+                        path.issues = bound.issues;
+                }
+            };
             for (std::size_t i = 0; i < prepared.routes.size() && !stop.stop_requested(); ++i) {
+                if (!available_hole(prepared.routes[i].hole_id)) {
+                    wait_for_hole(i);
+                    continue;
+                }
                 activate(i, prepared.routes[i]);
                 const auto& path = next.paths[i];
                 if (path.state == State::Failed && !path.issues.empty() &&
@@ -225,30 +264,53 @@ struct Runtime::Impl {
             }
             while (!stop.stop_requested()) {
                 std::optional<BindingSnapshot> refreshed;
+                bool resume = true;
                 {
                     std::lock_guard lock(mutex);
                     refreshed.swap(pending_bindings);
+                    resume = pending_resume;
                 }
                 if (refreshed) {
+                    const auto previous_bindings = std::move(bindings);
                     bindings = std::move(*refreshed);
-                    // Wait until every required binding is unambiguous and available.
-                    // Retry only unstarted Ready paths, never Failed or healthy siblings.
-                    const bool all_available = std::all_of(
-                        prepared.routes.begin(), prepared.routes.end(),
-                        [&](const auto& request) { return bind_route(request, bindings).ok(); });
-                    if (all_available)
-                        for (std::size_t i = 0; i < next.paths.size() && !stop.stop_requested();
-                             ++i)
-                            if (next.paths[i].state == State::Ready && !sessions[i]) {
-                                activate(i, prepared.routes[i]);
-                                const auto& path = next.paths[i];
-                                if (path.state == State::Failed && !path.issues.empty() &&
-                                    path.issues[0].code == ErrorCode::BackendFailure) {
-                                    const auto failure = path.issues[0];
-                                    (void)retry_startup(i, failure);
-                                }
+                    // A hole owns all its required endpoints. Device removal or
+                    // re-enumeration releases that hole, preserving other holes.
+                    for (std::size_t i = 0; i < prepared.routes.size(); ++i) {
+                        const auto& route = prepared.routes[i];
+                        bool changed = false;
+                        for (const auto& sibling : prepared.routes) {
+                            if (sibling.hole_id != route.hole_id)
+                                continue;
+                            const auto before = bind_route(sibling, previous_bindings);
+                            const auto after = bind_route(sibling, bindings);
+                            changed = changed || (before.ok() && after.ok() &&
+                                                  (before.value->source.endpoint_id !=
+                                                       after.value->source.endpoint_id ||
+                                                   before.value->destination.endpoint_id !=
+                                                       after.value->destination.endpoint_id));
+                        }
+                        if (!available_hole(route.hole_id) || changed) {
+                            if (sessions[i]) {
+                                sessions[i]->stop();
+                                sessions[i].reset();
                             }
+                            wait_for_hole(i);
+                        }
+                    }
+                    for (std::size_t i = 0; i < next.paths.size() && !stop.stop_requested(); ++i)
+                        if (resume && available_hole(prepared.routes[i].hole_id) &&
+                            next.paths[i].state == State::Ready && !sessions[i]) {
+                            startup_retried[i] = false;
+                            activate(i, prepared.routes[i]);
+                            const auto& path = next.paths[i];
+                            if (path.state == State::Failed && !path.issues.empty() &&
+                                path.issues[0].code == ErrorCode::BackendFailure) {
+                                const auto failure = path.issues[0];
+                                (void)retry_startup(i, failure);
+                            }
+                        }
                 }
+
                 std::size_t running = 0, failed = 0, ready = 0, starting = 0, degraded = 0;
                 for (std::size_t i = 0; i < next.paths.size(); ++i) {
                     auto& path = next.paths[i];
@@ -367,6 +429,8 @@ struct Runtime::Impl {
 
 Runtime::Runtime() : Runtime(LatencyPreset::Baseline) {}
 Runtime::Runtime(LatencyPreset preset) : impl_(std::make_unique<Impl>(preset)) {}
+Runtime::Runtime(LatencyPreset preset, WorkerSettings workers)
+    : impl_(std::make_unique<Impl>(preset, workers)) {}
 Runtime::Runtime(std::vector<std::unique_ptr<BackendAdapter>> supplied)
     : impl_(std::make_unique<Impl>(std::move(supplied))) {}
 Runtime::~Runtime() = default;
@@ -442,12 +506,13 @@ Result<std::uint64_t> Runtime::start(const Profile& profile, const BindingSnapsh
             });
     return {generation, {}};
 }
-bool Runtime::update_bindings(const BindingSnapshot& bindings) {
+bool Runtime::update_bindings(const BindingSnapshot& bindings, bool resume_ready) {
     impl_->check_thread();
     std::lock_guard lock(impl_->mutex);
     if (!impl_->state.armed || impl_->state.state == State::Stopping)
         return false;
     impl_->pending_bindings = bindings;
+    impl_->pending_resume = resume_ready;
     return true;
 }
 void Runtime::stop() {

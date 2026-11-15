@@ -3,11 +3,11 @@
 Normal operation now uses the supplied engine behind ConfigurationController.
 Tutorial remains a separate in-memory simulator and never constructs the real
 engine, scanner, persistence or device-check providers. The original user data
-root and profile schema 3 / transfer schema 7 are unchanged.
+root is unchanged. The current timing amendment uses profile schema 4 / transfer schema 8; see [Profile v4 timing controls](docs/LATENCY_V4.md). Older records remain readable.
 
 The source handoff archive SHA-256 is
 `516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e`.
-Its hashes were checked before import. Streaming algorithms remain unchanged;
+Its hashes were checked before import. The original streaming baseline is retained; explicit timing and availability recovery are amended in [Profile v4 timing controls](docs/LATENCY_V4.md).
 current integration amendments below cover binding refresh, buffer requests and
 acquisition diagnostics. Integration fixes Windows SDK include dependencies,
 adjusts CMake/test-fixture paths, disables the standalone host, and assigns Runtime package
@@ -145,9 +145,11 @@ Native device-invalidated opens remain Ready for a later exact binding refresh;
 format/exclusive-permission refusals remain explicit unsupported requirements.
 
 Ready updates are marshalled through RoutingService to its owning Runtime thread
-and copied to the lifecycle worker. Only Ready paths without sessions are opened;
-all required bindings must be available and unambiguous. Healthy and Failed paths
-are untouched. No scans, JSON, allocations, locks or GUI work were added to audio
+and copied to the lifecycle worker. The v4 availability amendment opens complete
+holes independently. A missing or changed physical binding releases only its
+hole; it may resume once that hole's bindings are all available and unambiguous.
+Other holes retain their sessions, and Stop cancels all waiting. A failure without
+a binding change still requires Stop/Start. No scans, JSON, allocations, locks or GUI work were added to audio
 callbacks. Endpoint releases, joins, COM ownership and backend startup were reviewed:
 failed mode attempts release on their owning worker before fallback, Stop cancels
 queued binding updates, and confirmed Stopped follows session cleanup.

@@ -43,7 +43,9 @@ class ConfigurationController final : public Controller {
     void recover() override;
     void wait_for_devices(bool enabled) override {
         wait_for_devices_ = enabled;
+        routed_inventory_revision_ = 0;
     }
+    void audio_worker_policy(const std::string&, const std::string&) override;
     void clear_diagnostics() override;
     void scan(bool enabled, bool = false, ScanScope = ScanScope::Update, const std::string& = {},
               const ScanOptions& = {}) override;

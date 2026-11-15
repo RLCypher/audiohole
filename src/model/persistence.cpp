@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -141,11 +142,8 @@ Json encode(const Format& f) {
     return result;
 }
 Json encode(const EndpointPreferences& p) {
-    Json j{{"sample_rate_hz", nullptr},
-           {"channel_count", nullptr},
-           {"sample_format", nullptr},
-           {"mode", nullptr},
-           {"buffer_ms", nullptr}};
+    Json j{{"sample_rate_hz", nullptr}, {"channel_count", nullptr}, {"sample_format", nullptr},
+           {"mode", nullptr},           {"buffer_ms", nullptr},     {"period_ms", nullptr}};
     if (p.sample_rate_hz)
         j["sample_rate_hz"] = *p.sample_rate_hz;
     if (p.channel_count)
@@ -156,6 +154,8 @@ Json encode(const EndpointPreferences& p) {
         j["mode"] = *p.mode;
     if (p.buffer_ms)
         j["buffer_ms"] = *p.buffer_ms;
+    if (p.period_ms)
+        j["period_ms"] = *p.period_ms;
     return j;
 }
 EndpointPreferences endpoint_preferences(const Json& j) {
@@ -165,6 +165,15 @@ EndpointPreferences endpoint_preferences(const Json& j) {
         return !j.contains(key) || j.at(key).is_null() || j.at(key) == "" ||
                j.at(key) == "Automatic";
     };
+    for (const auto& [key, value] :
+         {std::pair{"period_ms", &p.period_ms}, std::pair{"render_ahead_ms", &p.render_ahead_ms}}) {
+        if (!j.contains(key) || j.at(key).is_null())
+            continue;
+        require(j.at(key).is_number());
+        const auto n = j.at(key).get<double>();
+        require(std::isfinite(n) && n > 0);
+        *value = n;
+    }
     if (!automatic("sample_rate_hz"))
         p.sample_rate_hz = integer(j, "sample_rate_hz", 1, 768000);
     if (!automatic("channel_count"))
@@ -184,9 +193,13 @@ Json encode(const Preferences& p) {
     Json map = Json::array();
     for (const auto& r : p.channel_map)
         map.push_back({{"source", r.source}, {"destination", r.destination}});
-    return {{"common", encode(p.common)},
+    auto destination = encode(p.destination);
+    destination["render_ahead_ms"] =
+        p.destination.render_ahead_ms ? Json(*p.destination.render_ahead_ms) : Json(nullptr);
+    return {{"queue_target_ms", p.queue_target_ms ? Json(*p.queue_target_ms) : Json(nullptr)},
+            {"common", encode(p.common)},
             {"source", encode(p.source)},
-            {"destination", encode(p.destination)},
+            {"destination", destination},
             {"channel_map", map},
             {"preferred_clock_device", p.preferred_clock_device}};
 }
@@ -208,6 +221,12 @@ Direction direction(const Json& value, int version) {
     require(settings.is_object());
     const auto p = version >= 4 ? settings.value("preferences", Json::object()) : Json::object();
     require(p.is_object());
+    if (p.contains("queue_target_ms") && !p.at("queue_target_ms").is_null()) {
+        require(p.at("queue_target_ms").is_number());
+        const double n = p.at("queue_target_ms").get<double>();
+        require(std::isfinite(n) && n > 0);
+        d.settings.preferences.queue_target_ms = n;
+    }
     d.settings.preferences.common = endpoint_preferences(p.value("common", Json::object()));
     d.settings.preferences.source = endpoint_preferences(p.value("source", Json::object()));
     d.settings.preferences.destination =
@@ -275,7 +294,7 @@ Json encode(const Direction& d) {
 }
 Json encode(const ConfigurationRecords& records) {
     Json result = {{"format", "audiohole-test-configuration"},
-                   {"schema_version", 7},
+                   {"schema_version", 8},
                    {"profiles", Json::array()},
                    {"devices", Json::array()}};
     for (const auto& d : records.devices) {
@@ -310,7 +329,7 @@ Json encode(const ConfigurationRecords& records) {
 }
 ConfigurationRecords decode(const Json& root) {
     require(root.at("format") == "audiohole-test-configuration" &&
-            integer(root, "schema_version", 1, 7) >= 1);
+            integer(root, "schema_version", 1, 8) >= 1);
     ConfigurationRecords records;
     const auto& devices = root.at("devices");
     const auto& profiles = root.at("profiles");
@@ -565,7 +584,7 @@ Result merge_test_profiles(const std::optional<std::string>& existing, const std
                 current["profile_record_extensions"][id] = extension;
             }
         }
-        current["schema_version"] = 7;
+        current["schema_version"] = 8;
         std::set<std::string> filenames;
         for (const auto& profile : current.at("profiles")) {
             auto filename = profile_filename(string(profile, "display_name"));
@@ -607,7 +626,7 @@ Result TestJsonPersistence::save(const ConfigurationRecords& records) {
         auto document = merge(impl_->original, encode(records));
         (void)decode(document);
         const auto bytes = document.dump(2) + "\n";
-        if (impl_->expected && impl_->original.at("schema_version") != 7) {
+        if (impl_->expected && impl_->original.at("schema_version") != 8) {
             // No load-time migration. The first explicit save keeps the exact
             // legacy original; never overwrite a different earlier backup.
             if (read_document(impl_->file) != impl_->expected)
@@ -674,11 +693,12 @@ Json current_document(const Json& document) {
 }
 Json record_document(const Json& record) {
     require(record.at("format") == "audiohole-profile" &&
-            integer(record, "schema_version", 1, 3) >= 1);
+            integer(record, "schema_version", 1, 4) >= 1);
     auto wrapper = encode(ConfigurationRecords{});
     wrapper["schema_version"] = record.at("schema_version") == 1   ? 5
                                 : record.at("schema_version") == 2 ? 6
-                                                                   : 7;
+                                : record.at("schema_version") == 3 ? 7
+                                                                   : 8;
     wrapper["profiles"].push_back(record.at("profile"));
     return current_document(wrapper);
 }
@@ -855,7 +875,7 @@ Result ProfileDirectoryPersistence::save(const ConfigurationRecords& records) {
             if (!extension.empty())
                 active_envelopes[id] = extension;
             Json single{
-                {"format", "audiohole-profile"}, {"schema_version", 3}, {"profile", profile}};
+                {"format", "audiohole-profile"}, {"schema_version", 4}, {"profile", profile}};
             for (const auto& [key, value] : extension.items())
                 if (!single.contains(key))
                     single[key] = value;

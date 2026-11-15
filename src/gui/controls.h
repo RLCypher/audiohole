@@ -69,7 +69,7 @@ class NavigationButton final : public wxToggleButton {
 // GUI-thread only. Helpers own no windows or GDI resources beyond a paint call.
 // Generic wx dialogs avoid Windows' light-only message-box body. The palette
 // follows Windows app appearance, retaining native high-contrast presentation.
-void theme_dialog(wxWindow*);
+void theme_dialog(wxWindow*, const std::string& appearance = {});
 bool confirm_exit(wxWindow* parent);
 // Native scrollable fields consume the wheel only while they can move in that
 // direction. Otherwise route to the first ancestor with remaining scroll range.

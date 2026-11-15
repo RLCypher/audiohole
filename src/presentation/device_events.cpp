@@ -6,7 +6,7 @@ std::vector<DeviceNotice> DeviceEvents::observe(const std::vector<Endpoint>& end
     for (const auto& device : endpoints) {
         const auto state = device.inspection ? device.inspection->observed_state : std::string{};
         const auto found = previous_.find(device.id);
-        if (seeded_) {
+        if (seeded_ && !device.hidden) {
             const bool available = device.availability == Availability::Available;
             if (available &&
                 (found == previous_.end() || found->second.availability != Availability::Available))

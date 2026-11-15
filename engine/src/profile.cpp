@@ -1,5 +1,6 @@
 #include "audiohole/engine/profile.hpp"
 
+#include <cmath>
 #include <nlohmann/json.hpp>
 #include <set>
 #include <stdexcept>
@@ -74,9 +75,22 @@ bool inherited(const Json& object, const char* key) {
     return value.is_null() || value == "" || value == "Automatic";
 }
 
+std::optional<double> timing(const Json& object, const char* key, const std::string& path) {
+    if (!object.contains(key) || object.at(key).is_null())
+        return {};
+    const auto& v = object.at(key);
+    if (!v.is_number())
+        fail(path + "/" + key, "Expected positive finite milliseconds or null.");
+    const double n = v.get<double>();
+    if (!std::isfinite(n) || n <= 0)
+        fail(path + "/" + key, "Expected positive finite milliseconds or null.");
+    return n;
+}
 EndpointRequirements requirements(const Json& value, const std::string& path) {
     require_object(value, path);
     EndpointRequirements result;
+    result.period_ms = timing(value, "period_ms", path);
+    result.render_ahead_ms = timing(value, "render_ahead_ms", path);
     if (!inherited(value, "sample_rate_hz"))
         result.sample_rate_hz =
             integer(value.at("sample_rate_hz"), 1, 768000, path + "/sample_rate_hz");
@@ -128,6 +142,7 @@ Direction direction(const Json& value, const std::string& path, int version) {
     const auto& settings = object_member(value, "settings", path);
     const auto& preferences = object_member(settings, "preferences", path + "/settings");
     const std::string base = path + "/settings/preferences";
+    result.preferences.queue_target_ms = timing(preferences, "queue_target_ms", base);
     if (version >= 2 && preferences.contains("preferred_clock_device"))
         result.preferences.preferred_clock_device =
             text(preferences, "preferred_clock_device", base, 128);
@@ -219,8 +234,8 @@ Result<Profile> parse_profile(std::string_view bytes) {
         if (!document.contains("schema_version") ||
             !document.at("schema_version").is_number_integer() ||
             (document.at("schema_version") != 1 && document.at("schema_version") != 2 &&
-             document.at("schema_version") != 3))
-            fail("/schema_version", "Supported individual profile versions are 1, 2 and 3.",
+             document.at("schema_version") != 3 && document.at("schema_version") != 4))
+            fail("/schema_version", "Supported individual profile versions are 1 through 4.",
                  ErrorCode::UnsupportedVersion);
         const int version = document.at("schema_version").get<int>();
         if (!document.contains("profile"))
@@ -298,6 +313,10 @@ EndpointRequirements inherit(const EndpointRequirements& common,
         result.mode = common.mode;
     if (!result.buffer_ms)
         result.buffer_ms = common.buffer_ms;
+    if (!result.period_ms)
+        result.period_ms = common.period_ms;
+    if (!result.render_ahead_ms)
+        result.render_ahead_ms = common.render_ahead_ms;
     return result;
 }
 } // namespace audiohole::engine

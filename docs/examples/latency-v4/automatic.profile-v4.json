@@ -1,0 +1,99 @@
+{
+  "format": "audiohole-profile",
+  "schema_version": 4,
+  "profile": {
+    "display_name": "automatic",
+    "notes": "Illustrative portable intent with fictional logical endpoint identities. Numeric timing is not evidence of device support; validate on Start.",
+    "id": "example-automatic",
+    "holes": [
+      {
+        "display_name": "Example connection",
+        "notes": "",
+        "id": "example-hole",
+        "routing": "automatic",
+        "enabled": true,
+        "duplex": false,
+        "forward": {
+          "advanced_tuning": false,
+          "exclusive_mode_preferred": false,
+          "source_name": "",
+          "source": "example-capture-device",
+          "destination_name": "",
+          "destination": "example-playback-device",
+          "settings": {
+            "preferences": {
+              "queue_target_ms": null,
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null,
+                "render_ahead_ms": null
+              },
+              "channel_map": [],
+              "preferred_clock_device": "automatic"
+            }
+          }
+        },
+        "reverse": {
+          "advanced_tuning": false,
+          "exclusive_mode_preferred": false,
+          "source_name": "",
+          "source": "",
+          "destination_name": "",
+          "destination": "",
+          "settings": {
+            "preferences": {
+              "queue_target_ms": null,
+              "common": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "source": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null
+              },
+              "destination": {
+                "sample_rate_hz": null,
+                "channel_count": null,
+                "sample_format": null,
+                "mode": null,
+                "buffer_ms": null,
+                "period_ms": null,
+                "render_ahead_ms": null
+              },
+              "channel_map": [],
+              "preferred_clock_device": "automatic"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

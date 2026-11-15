@@ -785,3 +785,24 @@ portable or cross-build success.
   the four imported engine suites and controller contracts. Extracted-package
   validation runs the four direct modes and audits Miniaudio's license/runtime.
   Wine and cross-builds are supplemental, not native/hardware confirmation.
+
+## Profile v4 timing and availability amendment
+
+- Open each direction's Advanced tuning. Expand Audio Format, Latency and
+  Buffering, and Routing and Clock independently. Confirm the window size is
+  unchanged and the sibling direction retains its values.
+- Clear timing/format fields, then type and clear a value. Auto/Inherit should
+  be hints only. Save/reload must preserve nulls, fractional timing, and explicit
+  values. Copy/paste and each reset affect only the intended section/direction.
+- On native Windows, compare requested capacity, actual allocation, adjustment,
+  processing interval, queue target, and playback lead in Performance Diagnostics.
+  Driver-rounded larger allocation must not inflate explicit queue/lead targets.
+  Unsupported explicit intervals/lead must produce a clear refusal.
+- Change Scheduling and Priority, then Stop/Start. Inspect actual MMCSS outcomes
+  for native and miniaudio workers. GUI/scanner/process priority must not change.
+- Start a profile with one complete hole and another missing devices. Verify the
+  running fraction, then disconnect/reconnect each hole's devices. Other holes
+  must remain running; Stop must prevent a later reconnect from re-arming.
+- Resize Profiles/Holes/Notes repeatedly in Light and Dark. Check for stale
+  outlines. Reset layout must restore all pane geometry and the 2/4/3-line field
+  defaults while preserving window size and saved configuration.

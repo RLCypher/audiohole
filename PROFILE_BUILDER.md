@@ -4,7 +4,8 @@ This is the current development contract, authorized by the owner after review
 with the engine agent. It replaces the earlier Test v4 contract. The owner may
 regenerate development profiles; compatibility with older development builds is
 not an acceptance requirement. Production storage decisions O-004/O-006 and the
-streaming backend remain open. Test Mode does not route audio.
+streaming backend remain open. The working environment uses the provisional
+Engine 0.6 runtime; the tutorial remains an isolated in-memory simulator.
 
 ## Canonical storage boundary
 
@@ -13,7 +14,7 @@ streaming backend remain open. Test Mode does not route audio.
 ```json
 {
   "format": "audiohole-profile",
-  "schema_version": 3,
+  "schema_version": 4,
   "profile": {
     "display_name": "Desktop audio",
     "notes": "User notes",
@@ -23,9 +24,11 @@ streaming backend remain open. Test Mode does not route audio.
 }
 ```
 
-See [the complete example](docs/test-profile-example.json). Record version 3 is
+The [v4 timing amendment](docs/LATENCY_V4.md) adds independent processing intervals, queue/lead requests and worker settings.
+
+See [the complete example](docs/test-profile-example.json). Record version 4 is
 independent of the **aggregate transfer wrapper** used inside profile bundles:
-`audiohole-test-configuration`, `schema_version: 7`, `profiles: [...]`,
+`audiohole-test-configuration`, `schema_version: 8`, `profiles: [...]`,
 `devices: []`. The wrapper can also carry `profile_record_extensions`, an opaque
 map of individual-envelope extensions keyed by profile ID. It is transfer
 metadata, not routing intent. `validate_profile_record` validates individual

@@ -732,3 +732,8 @@ personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
 docs/ENGINE_INTEGRATION.md
 licenses/miniaudio-LICENSE.txt
+docs/LATENCY_V4.md
+docs/examples/latency-v4/automatic.profile-v4.json
+docs/examples/latency-v4/stable.profile-v4.json
+docs/examples/latency-v4/inheritance.profile-v4.json
+docs/examples/latency-v4/app-engine-settings.fragment.json

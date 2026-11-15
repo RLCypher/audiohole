@@ -37,7 +37,7 @@ Software regression results do not establish a fix on the user's devices.
 ## Run the Windows validation application
 
 1. Extract the validation ZIP into a writable folder.
-2. Put an individual `audiohole-profile` record, current version 3, into its `Profile`
+2. Put an individual `audiohole-profile` record, current version 4, into its `Profile`
    folder. The host never hardcodes a route or imports demonstration devices.
 3. Run `audiohole-engine-validation.exe`.
 4. Use `list`, then `select 1` (or another listed number), then `start`.

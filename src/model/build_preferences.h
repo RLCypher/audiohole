@@ -12,6 +12,7 @@ struct PreviewPreferences {
     int animation_loops = 1;
     std::string personality_id = "default";
     std::string appearance = "system";
+    std::string scheduling_task = "automatic", audio_thread_priority = "automatic";
     int notifications = 0, startup_mode = 0, startup_delay_seconds = 5;
     std::string startup_profile_id;
     bool operator==(const PreviewPreferences&) const = default;

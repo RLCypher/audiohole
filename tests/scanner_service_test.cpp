@@ -182,6 +182,28 @@ class ScannerIntegration : public ::testing::Test {
         FAIL() << "Controller scanner remained busy";
     }
 };
+TEST_F(ScannerIntegration, TimingPresetsReceiveOnlySupportedFundamentalPeriodValues) {
+    auto& e = evidence->endpoints[0];
+    e.reported_capabilities["shared_engine_periods"] = {
+        {"format", e.reported_capabilities["default_mix_format"]},
+        {"minimum_frames", 128},
+        {"fundamental_frames", 48},
+        {"maximum_frames", 960},
+        {"default_frames", 480}};
+    ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
+    auto worker = service();
+    ScannerActionRequest reload;
+    reload.kind = ScannerActionKind::Reload;
+    const auto update = finish(*worker, worker->action(reload));
+    ASSERT_TRUE(update.inventory_valid);
+    const auto found = std::find_if(update.devices.begin(), update.devices.end(),
+                                    [](const auto& d) { return d.capture; });
+    ASSERT_NE(found, update.devices.end());
+    ASSERT_TRUE(found->inspection);
+    EXPECT_EQ(found->inspection->minimum_period_ms,
+              3); // 144 legal frames, not the raw 128 minimum.
+    EXPECT_EQ(found->inspection->default_period_ms, 10);
+}
 TEST_F(ScannerIntegration, ReadOnlyInventoryHonorsFilenameAndPreservesHiddenExtensions) {
     ASSERT_EQ(store.reconcile(discovery(evidence->endpoints), first).result, "completed");
     auto record = store.inventory().devices.front();
@@ -1040,7 +1062,7 @@ TEST_F(ScannerIntegration, ScannerBackedProfileSurvivesRestartRenameHideAndUnava
     EXPECT_EQ(saved.holes[0].forward.source_name, "Capture");
     const auto json = Json::parse(bytes(file));
     EXPECT_TRUE(json.at("devices").empty());
-    EXPECT_EQ(json.at("schema_version"), 7);
+    EXPECT_EQ(json.at("schema_version"), 8);
     EXPECT_EQ(json.at("profiles")[0]["holes"][0]["forward"]["source"], h.forward.source);
     EXPECT_FALSE(json["profiles"][0]["holes"][0]["forward"]["settings"].contains("format"));
     EXPECT_EQ(bytes(file).find("endpoint_id"), std::string::npos);

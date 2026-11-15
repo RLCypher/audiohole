@@ -222,6 +222,8 @@ bool Frame::advance_tutorial_scroll(std::int64_t now) {
 void Frame::render_tutorial() {
     if (!tutorial_ || !notebook_)
         return;
+    tutorial_->event(dirty_ ? "observe_dirty" : "observe", controller_->snapshot(), draft_,
+                     hole_index_, notebook_->GetSelection());
     const auto view = tutorial_->view(device_id_, device_dirty_);
     if (tutorial_end_) {
         const wxString label = view.complete ? "End tutorial" : "Skip tutorial";
@@ -310,9 +312,14 @@ void Frame::render_tutorial() {
         outline->place(wxRect(tutorial_choices_[i]->GetScreenRect()).Inflate(FromDIP(1)),
                        !preferences_->values().low_motion && reply_animation != FALSE);
     }
-    const auto signature = view.beat + "\n" + view.text + "\n" + view.expression;
+    std::string targets_signature = "\ntargets:";
+    for (const auto& target : view.targets)
+        targets_signature += target + "|";
+    const auto signature =
+        view.beat + "\n" + view.text + "\n" + view.expression + targets_signature;
     const bool changed = signature != tutorial_rendered_;
-    const bool step_changed = !tutorial_rendered_.starts_with(view.beat + "\n");
+    const bool step_changed = !tutorial_rendered_.starts_with(view.beat + "\n") ||
+                              !tutorial_rendered_.ends_with(targets_signature);
     const bool interrupted =
         technical_copy_.size() || commentary_copy_ != view.text || operational_warning_visible_;
     operational_warning_visible_ = false;
@@ -401,6 +408,8 @@ void Frame::render_tutorial() {
             return profiles_;
         if (key == "hole_list")
             return holes_;
+        if (key == "hole_enabled")
+            return enabled_;
         if (key == "return")
             return duplex_;
         if (key == "forward_source")
@@ -711,9 +720,12 @@ bool Frame::tutorial_smoke(const wxString& directory) {
                             "Reply pulse changed the actual button layout");
                     wxMilliSleep(10);
                 }
-                require(smallest == bounds.width + 2 * FromDIP(1) &&
-                            largest == smallest + 2 * FromDIP(3),
-                        "Tutorial response outline did not pulse with the guidance timing");
+                if (smallest != bounds.width + 2 * FromDIP(1) ||
+                    largest != smallest + 2 * FromDIP(3))
+                    throw std::runtime_error(
+                        "Tutorial reply pulse bounds: button=" + std::to_string(bounds.width) +
+                        ", minimum=" + std::to_string(smallest) +
+                        ", maximum=" + std::to_string(largest));
             }
             const auto original = preferences_->values();
             auto reduced = original;
@@ -935,8 +947,28 @@ bool Frame::tutorial_smoke(const wxString& directory) {
                 "Saved device retained rename/save guidance");
         row_highlight(playback_devices_, playback_device_ids_, "tutorial-speakers");
         select_list(playback_devices_, playback_device_ids_, "tutorial-speakers");
-        device_name_->SetValue("My headset speakers");
-        click(device_save_);
+        {
+            class RenameDevice final : public wxModalDialogHook {
+              public:
+                bool asked = false;
+                int Enter(wxDialog* dialog) override {
+                    auto* edit = dynamic_cast<wxTextEntryDialog*>(dialog);
+                    if (!edit || edit->GetTitle() != "Rename device")
+                        return wxID_NONE;
+                    asked = true;
+                    edit->SetValue("My headset speakers");
+                    return wxID_OK;
+                }
+            } hook;
+            hook.Register();
+            auto menu = device_menu("tutorial-speakers");
+            require(menu && menu->FindItem(wxID_EDIT), "Tutorial device context menu lacks Rename");
+            wxCommandEvent event(wxEVT_MENU, wxID_EDIT);
+            menu->ProcessEvent(event);
+            hook.Unregister();
+            require(hook.asked && !device_dirty_,
+                    "Tutorial context Rename did not save the device");
+        }
         check("N016");
         select_page(0);
         check("N017");

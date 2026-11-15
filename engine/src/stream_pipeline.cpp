@@ -73,8 +73,9 @@ void encode(unsigned char* bytes, float sample, SampleFormat format) noexcept {
 
 StreamPipeline::StreamPipeline(StreamFormat source, StreamFormat destination,
                                const std::vector<ChannelRoute>& routes, bool experimental,
-                               unsigned target_milliseconds)
-    : source_(source), destination_(destination), experimental_(experimental) {
+                               double target_milliseconds, bool explicit_target)
+    : source_(source), destination_(destination), experimental_(experimental),
+      explicit_target_(explicit_target) {
     const auto input = pcm_geometry(source);
     const auto output = pcm_geometry(destination);
     auto mapping = compile_mapping(source.channel_count, destination.channel_count, routes);
@@ -83,18 +84,21 @@ StreamPipeline::StreamPipeline(StreamFormat source, StreamFormat destination,
     mapping_ = *mapping.value;
     input_stride_ = input.value->block_align_bytes;
     output_stride_ = output.value->block_align_bytes;
-    if (target_milliseconds < 1 || target_milliseconds > 1000)
-        throw std::invalid_argument("Prototype queue target must be 1..1000 ms.");
+    if (!std::isfinite(target_milliseconds) || target_milliseconds <= 0 ||
+        target_milliseconds > 1000)
+        throw std::invalid_argument("Queue target must be positive and at most 1000 ms.");
     // Prototype constants, NOT a production recommendation or latency promise:
     // at least 200-ms capacity and normally 20-ms target, at most 16 MiB/route.
     // An actual large endpoint block needs a proportionately larger target.
     // Capacity and target are separate; actual occupancy is reported to the host.
-    const unsigned capacity_ms = std::max(200u, target_milliseconds * 2);
+    const double capacity_ms = std::max(200.0, target_milliseconds * 2);
     capacity_ = std::max<std::uint32_t>(
         64, static_cast<std::uint32_t>(std::uint64_t(source.sample_rate_hz) * capacity_ms / 1000));
     target_ =
-        std::max<std::uint32_t>(2, static_cast<std::uint32_t>(std::uint64_t(source.sample_rate_hz) *
-                                                              target_milliseconds / 1000));
+        static_cast<std::uint32_t>(std::ceil(source.sample_rate_hz * target_milliseconds / 1000));
+    if (explicit_target && target_ < 2)
+        throw std::invalid_argument("Queue target requires at least two source frames.");
+    target_ = std::max(2u, target_);
     const auto samples = std::size_t(capacity_) * std::size_t(source.channel_count);
     if (samples > 4 * 1024 * 1024)
         throw std::invalid_argument("Prototype queue would exceed 16 MiB for this route.");
@@ -105,13 +109,12 @@ StreamPipeline::StreamPipeline(StreamFormat source, StreamFormat destination,
 unsigned queue_target_milliseconds(const NegotiatedRoute& route, LatencyPreset preset) {
     // A 100-ms output callback cannot be serviced reliably by a 20-ms target.
     // Derive a conservative prototype target from both actual period domains,
-    // falling back to allocation duration when the period is unknown.
+    // using the preset floor when the period is unknown. Allocation is capacity.
     // Low reduces only the floor, not the two-period reserve or the observed
     // packet guard in render(). A 10-ms device can therefore still need 20 ms.
     std::uint64_t target = preset == LatencyPreset::Low ? 5 : 20;
     for (const auto* stream : {&route.source, &route.destination}) {
-        const auto frames =
-            stream->period_frames ? stream->period_frames : stream->allocated_buffer_frames;
+        const auto frames = stream->period_frames;
         const auto rate = stream->timing_sample_rate_hz;
         if (frames && rate && *rate > 0)
             target = std::max<std::uint64_t>(target, (2000ULL * *frames + *rate - 1) / *rate);
@@ -189,8 +192,11 @@ std::size_t StreamPipeline::render(void* output, std::size_t frames,
     // expressed in SOURCE frames, and interpolation lookahead. No RT resize.
     const auto render_source_frames = static_cast<std::uint64_t>(
         std::ceil(double(largest_render) * source_.sample_rate_hz / destination_.sample_rate_hz));
-    const auto desired_target = std::max<std::uint64_t>(
-        target_, packet_max_.load(std::memory_order_relaxed) + render_source_frames + 2);
+    const auto desired_target =
+        explicit_target_
+            ? target_
+            : std::max<std::uint64_t>(target_, packet_max_.load(std::memory_order_relaxed) +
+                                                   render_source_frames + 2);
     const auto effective_target =
         static_cast<std::uint32_t>(std::min<std::uint64_t>(desired_target, capacity_ - 2));
     if (desired_target > capacity_ - 2)

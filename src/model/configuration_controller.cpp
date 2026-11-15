@@ -479,6 +479,11 @@ void ConfigurationController::poll_routing() {
                 event("stopped", "All routing streams stopped and released.");
             else if (state_.state == State::Running)
                 event("state", "Routing is running; frame progress confirmed by the engine.");
+            else if (state_.state == State::Degraded &&
+                     std::all_of(state_.paths.begin(), state_.paths.end(), [](const auto& p) {
+                         return p.state == State::Running || p.state == State::Ready;
+                     }))
+                event("state", "Available holes are running; other holes are waiting for devices.");
             else if (state_.state == State::Failed || state_.state == State::Degraded) {
                 std::string issues;
                 for (const auto& p : actual.paths)
@@ -603,14 +608,21 @@ void ConfigurationController::advance(int milliseconds) {
     }
     refresh_waiting_routes();
 }
+void ConfigurationController::audio_worker_policy(const std::string& task,
+                                                  const std::string& priority) {
+    if (routing_)
+        routing_->configure_workers({task == "audio"       ? engine::SchedulingTask::Audio
+                                     : task == "pro_audio" ? engine::SchedulingTask::ProAudio
+                                                           : engine::SchedulingTask::Automatic,
+                                     priority == "high"     ? engine::AudioPriority::High
+                                     : priority == "normal" ? engine::AudioPriority::Normal
+                                                            : engine::AudioPriority::Automatic});
+}
 void ConfigurationController::refresh_waiting_routes() {
-    if (!routing_ || !wait_for_devices_ || !state_.armed || state_.routing_pending ||
-        state_.state == State::Stopping || !state_.routing_intent ||
-        routed_inventory_revision_ == state_.scanner.inventory_revision ||
-        std::none_of(state_.paths.begin(), state_.paths.end(),
-                     [](const auto& path) { return path.state == State::Ready; }))
+    if (!routing_ || !state_.armed || state_.routing_pending || state_.state == State::Stopping ||
+        !state_.routing_intent || routed_inventory_revision_ == state_.scanner.inventory_revision)
         return;
-    if (routing_->update_bindings(routing_bindings(state_)))
+    if (routing_->update_bindings(routing_bindings(state_), wait_for_devices_))
         routed_inventory_revision_ = state_.scanner.inventory_revision;
 }
 void ConfigurationController::clear_diagnostics() {

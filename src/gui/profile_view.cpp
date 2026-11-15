@@ -1,8 +1,13 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "model/latency_preferences.h"
 #include "model/persistence.h"
+#include "model/routing_service.h"
+#include <cmath>
+#include <commctrl.h>
 #include <sstream>
 #include <wx/access.h>
+#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 namespace {
@@ -24,6 +29,8 @@ std::string buffer_caption(int milliseconds) {
 }
 std::optional<int> buffer_value(const wxSpinCtrl* control) {
     long value = 0;
+    if (control->GetTextValue().empty())
+        return 0;
     if (!control->GetTextValue().ToLong(&value) || value < 0 || value > 100)
         return {};
     return static_cast<int>(value);
@@ -71,7 +78,14 @@ bool read_preferences(const DirectionWidgets& w, Preferences& p) {
     }
     if (!map.empty() && map.back() == ',')
         return false;
-    return validate_preferences(p).ok;
+    std::array<std::string, 8> fields;
+    for (std::size_t i = 0; i < fields.size(); ++i) {
+        auto raw = i == 3 ? w.buffer->GetTextValue() : w.timings[i]->GetValue();
+        raw.Trim(true).Trim(false);
+        fields[i] = i == 3 && raw == "0" ? std::string{} : utf8(raw);
+    }
+    TimingValues values;
+    return parse_timing_values(fields, values).ok && set_timing_values(p, values).ok;
 }
 wxButton* add_control(wxWindow* parent, wxSizer* row, const wxString& name, const wxString& help,
                       std::function<void()> action, const wxString& glyph = wxS("+")) {
@@ -118,7 +132,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                             const wxString& title) {
     w.group = new wxStaticBoxSizer(wxVERTICAL, parent, title);
     sizer->Add(w.group, 0, wxEXPAND | wxALL, 4);
-    auto* box = w.group->GetStaticBox();
+    wxWindow* box = w.group->GetStaticBox();
     auto* endpoints = new wxBoxSizer(wxHORIZONTAL);
     auto* capture = new SurfacePanel(box, "capture-card");
     auto* playback = new SurfacePanel(box, "playback-card");
@@ -177,97 +191,321 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.advanced_tuning->SetName(title + " use advanced tuning");
     w.advanced_tuning->SetToolTip(
         "Use saved tuning for this direction. Opening the panel only changes visibility.");
-    pane_layout->Add(w.advanced_tuning, 0, wxALL, FromDIP(4));
+    auto* tuning_header = new wxBoxSizer(wxHORIZONTAL);
+    tuning_header->Add(w.advanced_tuning, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+    tuning_header->AddStretchSpacer();
+    pane_layout->Add(tuning_header, 0, wxEXPAND);
     w.advanced_tuning->Bind(wxEVT_CHECKBOX, [this, &w](wxCommandEvent&) { tuning_changed(w); });
     auto* tuning = new wxStaticBoxSizer(wxVERTICAL, pane, title + " tuning");
     w.tuning_group = tuning;
     pane_layout->Add(tuning, 0, wxEXPAND);
     pane->SetSizer(pane_layout);
-    w.tuning->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [this, &w](wxCollapsiblePaneEvent&) {
-        layout_direction(w); // Visibility only; no draft capture, policy toggle or Fit().
-    });
-    box = tuning->GetStaticBox();
-    label(box, tuning, "Complete format preset (optional)");
-    w.format = new ThemedChoice(box, wxID_ANY);
-    tuning->Add(w.format, 0, wxEXPAND | wxALL, 3);
-    auto* preferences = new wxFlexGridSizer(2, FromDIP(6), FromDIP(8));
-    preferences->AddGrowableCol(1, 1);
-    label(box, preferences, "Sample rate (Hz; blank = Automatic)");
-    w.rate =
-        new wxTextCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    preferences->Add(w.rate, 1, wxEXPAND);
-    label(box, preferences, "Stream channels, both endpoints (blank = Automatic)");
-    w.channels =
-        new wxTextCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    preferences->Add(w.channels, 1, wxEXPAND);
-    label(box, preferences, "Source channels (blank = inherit)");
-    w.source_channels =
-        new wxTextCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    preferences->Add(w.source_channels, 1, wxEXPAND);
-    label(box, preferences, "Destination channels (blank = inherit)");
-    w.destination_channels =
-        new wxTextCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    preferences->Add(w.destination_channels, 1, wxEXPAND);
-    w.channels->SetToolTip("Requests the endpoint stream channel count, not a channel selection. "
-                           "Use source/destination overrides for different counts; use the map to "
-                           "choose specific channels.");
-    label(box, preferences, "Sample format");
-    w.representation = new ThemedChoice(box);
-    for (const auto* value :
-         {"Automatic", "float32", "pcm_s16", "pcm_s24_packed", "pcm_s24_in_32", "pcm_s32"})
-        w.representation->Append(value);
-    preferences->Add(w.representation, 1, wxEXPAND);
-    label(box, preferences, "Channel map (source:destination)");
-    w.channel_map =
-        new wxTextCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    preferences->Add(w.channel_map, 1, wxEXPAND);
-    w.channel_map->SetToolTip(
-        "One-based channel numbers, for example 1:3, 2:4. Blank maps matching channel indexes; "
-        "extra outputs are silent. No hardware bus is inferred.");
-    tuning->Add(preferences, 0, wxEXPAND | wxALL, FromDIP(4));
-    button(box, tuning, "Reset to Automatic", [this, &w] {
+    w.tuning->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED,
+                   [this, &w](wxCollapsiblePaneEvent&) { layout_direction(w); });
+    auto changed_settings = [this, &w](unsigned section) {
         if (hole_index_ < 0)
             return;
         capture_draft();
-        auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
-        (&w == &forward_ ? hole.forward : hole.reverse).settings = Settings{};
-        populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+        auto& d =
+            &w == &forward_ ? draft_.holes[hole_index_].forward : draft_.holes[hole_index_].reverse;
+        auto& p = d.settings.preferences;
+        if (section == 3)
+            p = {};
+        if (section == 0) {
+            for (auto* e : {&p.common, &p.source, &p.destination}) {
+                e->sample_rate_hz.reset();
+                e->channel_count.reset();
+                e->sample_format.reset();
+            }
+            p.channel_map.clear();
+        }
+        if (section == 1)
+            set_timing_values(p, {});
+        if (section == 2) {
+            p.common.mode.reset();
+            p.source.mode.reset();
+            p.destination.mode.reset();
+            p.preferred_clock_device = "automatic";
+        }
+        d.settings.refresh_projection();
+        populate_direction(w, d);
+        dirty_ = true;
+        refresh();
+    };
+    auto* reset_all = button(pane, tuning_header, "Reset all advanced tuning settings",
+                             [changed_settings] { changed_settings(3); });
+    reset_all->SetToolTip("Reset this direction's format, timing, access-mode and clock "
+                          "preferences. Endpoint assignments stay selected.");
+    constexpr const char* sections[]{"Audio Format", "Latency and Buffering", "Routing and Clock"};
+    std::array<wxBoxSizer*, 3> contents{};
+    for (unsigned i = 0; i < 3; ++i) {
+        auto* disclosure =
+            new wxCollapsiblePane(tuning->GetStaticBox(), wxID_ANY, sections[i], wxDefaultPosition,
+                                  wxDefaultSize, wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
+        disclosure->SetName(title + " " + sections[i]);
+        w.sections[i] = disclosure;
+        tuning->Add(disclosure, 0, wxEXPAND | wxALL, FromDIP(3));
+        contents[i] = new wxBoxSizer(wxVERTICAL);
+        disclosure->GetPane()->SetSizer(contents[i]);
+        w.section_summaries[i] =
+            new wxStaticText(disclosure, wxID_ANY, "Auto", wxDefaultPosition, wxDefaultSize,
+                             wxST_NO_AUTORESIZE | wxST_ELLIPSIZE_END);
+        w.section_summaries[i]->SetMinSize(wxSize(1, -1));
+        disclosure->Bind(wxEVT_SIZE, [this, &w, i, disclosure](wxSizeEvent& e) {
+            auto* summary = w.section_summaries[i];
+            const int width = std::min(FromDIP(200), disclosure->GetClientSize().x / 3);
+            summary->SetSize(disclosure->GetClientSize().x - width - FromDIP(8), FromDIP(2), width,
+                             summary->GetCharHeight() + FromDIP(4));
+            e.Skip();
+        });
+        disclosure->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED,
+                         [this, &w](wxCollapsiblePaneEvent&) { layout_direction(w); });
+    }
+    box = w.sections[0]->GetPane();
+    auto* format_layout = contents[0];
+    label(box, format_layout, "Complete format preset (optional)");
+    w.format = new ThemedChoice(box, wxID_ANY);
+    format_layout->Add(w.format, 0, wxEXPAND | wxALL, 3);
+    auto* format_grid = new wxGridSizer(0, 4, FromDIP(6), FromDIP(8));
+    const auto scalar = [this, &title](wxWindow* parent, wxSizer* grid, const char* caption,
+                                       bool inherit) {
+        auto* column = new wxBoxSizer(wxVERTICAL);
+        label(parent, column, text(caption));
+        auto* field = new wxTextCtrl(parent, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+                                     wxTE_PROCESS_ENTER);
+        field->SetMinSize(wxSize(1, -1));
+        field->SetName(title + " " + text(caption));
+        field->SetHint(inherit ? "Inherit" : "Auto");
+        field->Bind(wxEVT_TEXT, [this](wxCommandEvent&) {
+            if (!loading_)
+                dirty_ = true;
+        });
+        column->Add(field, 0, wxEXPAND | wxALL, 3);
+        grid->Add(column, 1, wxEXPAND);
+        return field;
+    };
+    w.rate = scalar(box, format_grid, "Sample rate (Hz)", false);
+    w.channels = scalar(box, format_grid, "Stream channels", false);
+    w.source_channels = scalar(box, format_grid, "Source channels", true);
+    w.destination_channels = scalar(box, format_grid, "Destination channels", true);
+    format_layout->Add(format_grid, 0, wxEXPAND);
+    auto* map_grid = new wxGridSizer(1, 2, FromDIP(8), FromDIP(8));
+    auto* sample = new wxBoxSizer(wxVERTICAL);
+    w.representation =
+        choices(box, sample, "Sample format",
+                {"Automatic", "float32", "pcm_s16", "pcm_s24_packed", "pcm_s24_in_32", "pcm_s32"});
+    w.representation->SetMinSize(wxSize(1, -1));
+    map_grid->Add(sample, 1, wxEXPAND);
+    w.channel_map = scalar(box, map_grid, "Channel map (source:destination)", false);
+    w.channel_map->SetToolTip("One-based channel indexes, for example 1:3, 2:4. Auto maps matching "
+                              "indexes; extra outputs are silent.");
+    format_layout->Add(map_grid, 0, wxEXPAND);
+    button(box, format_layout, "Reset Format", [changed_settings] {
+        changed_settings(0);
+    })->SetToolTip("Restore Automatic format and channel mapping in this direction.");
+    box = w.sections[1]->GetPane();
+    auto* timing_layout = contents[1];
+    auto* timing_grid = new wxGridSizer(0, 4, FromDIP(6), FromDIP(8));
+    constexpr const char* timing_labels[]{
+        "Routing audio queue",   "Playback audio queue",      "Default processing interval",
+        "Default device buffer", "Input processing interval", "Output processing interval",
+        "Input device buffer",   "Output device buffer"};
+    for (unsigned i = 0; i < 8; ++i) {
+        if (i != 3) {
+            w.timings[i] = scalar(box, timing_grid, timing_labels[i], i >= 4);
+            w.timings[i]->Bind(wxEVT_TEXT_ENTER,
+                               [this](wxCommandEvent&) { queue_field_save(false); });
+            w.timings[i]->SetToolTip(
+                i >= 6   ? "Whole milliseconds, 1–100. Clear to inherit the default device buffer."
+                : i >= 4 ? "Positive milliseconds; fractions allowed. Clear to inherit the default "
+                           "processing interval."
+                         : "Positive milliseconds; fractions allowed. Clear for Automatic.");
+            continue;
+        }
+        auto* column = new wxBoxSizer(wxVERTICAL);
+        label(box, column, timing_labels[i]);
+        auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
+        w.buffer = new wxSpinCtrl(box, wxID_ANY, {}, wxDefaultPosition, wxDefaultSize,
+                                  wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
+        const int height = std::max(w.buffer->GetBestSize().y, FromDIP(32));
+        w.buffer->SetMinSize(wxSize(1, height));
+        w.buffer->SetMaxSize(wxSize(-1, height));
+        SendMessageW(static_cast<HWND>(w.buffer->GetHandle()), EM_SETCUEBANNER, TRUE,
+                     reinterpret_cast<LPARAM>(L"Auto"));
+        buffer_row->Add(w.buffer, 1, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+        w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
+        w.buffer_apply->SetMinSize(wxSize(-1, height));
+        w.buffer_apply->SetMaxSize(wxSize(-1, height));
+        w.buffer_apply->SetToolTip("Save only this direction's default device-buffer request. Stop "
+                                   "and Start to apply changes to routing.");
+        w.buffer_apply->Disable();
+        column->Add(buffer_row, 0, wxEXPAND);
+        timing_grid->Add(column, 1, wxEXPAND);
+    }
+    timing_layout->Add(timing_grid, 0, wxEXPAND);
+    auto* buffer_actions = new wxWrapSizer(wxHORIZONTAL);
+    auto* defaults = button(box, buffer_actions, "Load safe defaults", [this, &w] {
+        auto menu = std::make_unique<wxMenu>();
+        constexpr const char* names[]{"Responsive", "Balanced", "Stable", "Conservative"};
+        for (unsigned i = 0; i < 4; ++i) {
+            const auto id = wxWindow::NewControlId();
+            menu->Append(id, names[i]);
+            if (i == 1)
+                SetMenuDefaultItem(reinterpret_cast<HMENU>(menu->GetHMenu()), static_cast<UINT>(id),
+                                   FALSE);
+            menu->Bind(
+                wxEVT_MENU,
+                [this, &w, i](wxCommandEvent&) {
+                    if (hole_index_ < 0)
+                        return;
+                    capture_draft();
+                    auto& d = &w == &forward_ ? draft_.holes[hole_index_].forward
+                                              : draft_.holes[hole_index_].reverse;
+                    const auto& s = controller_->snapshot();
+                    auto values = timing_preset(i, endpoint(s, d.source),
+                                                endpoint(s, d.destination), d.settings.preferences);
+                    // A current native receipt can validate a lead preset only for
+                    // the same endpoint, format, capacity request and period.
+                    if (s.routing_status && s.routing_intent && s.routing_intent->id == draft_.id) {
+                        const auto saved = std::find_if(
+                            s.routing_intent->holes.begin(), s.routing_intent->holes.end(),
+                            [&](const auto& h) { return h.id == draft_.holes[hole_index_].id; });
+                        if (saved != s.routing_intent->holes.end()) {
+                            const auto& original =
+                                &w == &forward_ ? saved->forward : saved->reverse;
+                            const auto effective = inherit_preferences(
+                                d.settings.preferences.common, d.settings.preferences.destination);
+                            for (const auto& path : s.routing_status->paths) {
+                                if (path.hole_id != saved->id ||
+                                    (path.direction == engine::DirectionId::Reverse) !=
+                                        (&w == &reverse_) ||
+                                    !path.negotiated || original.destination != d.destination)
+                                    continue;
+                                const auto& n = path.negotiated->destination;
+                                if (n.mode != engine::AccessMode::Shared ||
+                                    !n.allocated_buffer_frames || !n.timing_sample_rate_hz ||
+                                    !n.period_frames || !values[5] ||
+                                    n.applied_buffer_request_ms != effective.buffer_ms ||
+                                    (effective.sample_rate_hz &&
+                                     *effective.sample_rate_hz != n.client_format.sample_rate_hz) ||
+                                    (effective.channel_count &&
+                                     *effective.channel_count != n.client_format.channel_count) ||
+                                    (effective.sample_format &&
+                                     *effective.sample_format !=
+                                         engine::name(n.client_format.sample_format)) ||
+                                    std::abs(*values[5] - 1000.0 * *n.period_frames /
+                                                              *n.timing_sample_rate_hz) > 0.001)
+                                    continue;
+                                values = timing_preset(
+                                    i, endpoint(s, d.source), endpoint(s, d.destination),
+                                    d.settings.preferences,
+                                    1000.0 * *n.allocated_buffer_frames / *n.timing_sample_rate_hz);
+                            }
+                        }
+                    }
+                    const auto result = set_timing_values(d.settings.preferences, values);
+                    if (!result.ok) {
+                        show_result(result);
+                        return;
+                    }
+                    d.settings.refresh_projection();
+                    populate_direction(w, d);
+                    dirty_ = true;
+                    refresh();
+                },
+                id);
+        }
+        w.sections[1]->PopupMenu(menu.get());
+    });
+    defaults->SetToolTip(
+        "Starting requests for this direction, validated on Start. Unknown or incompatible device "
+        "periods remain Auto/Inherit; presets are not measured stability guarantees.");
+    defaults->SetToolTip("Uses matching scanner evidence for processing intervals and queue "
+                         "sizing. Unknown periods stay Auto. Playback lead stays Auto until "
+                         "capacity is confirmed; no device allocation is guessed.");
+    auto* copy = button(box, buffer_actions, "Copy buffer values", [this, &w] {
+        Preferences p;
+        if (!read_preferences(w, p)) {
+            show_result({false, "Correct the timing values before copying."});
+            return;
+        }
+        if (!wxTheClipboard->Open()) {
+            show_result({false, "Could not open the clipboard."});
+            return;
+        }
+        const bool ok = wxTheClipboard->SetData(
+            new wxTextDataObject(text(encode_timing_clipboard(timing_values(p)))));
+        wxTheClipboard->Close();
+        if (!ok)
+            show_result({false, "Could not copy buffer values."});
+    });
+    copy->SetToolTip("Copy only these eight timing/buffer values, including Auto/Inherit choices.");
+    auto* paste = button(box, buffer_actions, "Paste buffer values", [this, &w] {
+        wxTextDataObject data;
+        if (!wxTheClipboard->Open()) {
+            show_result({false, "Could not open the clipboard."});
+            return;
+        }
+        const bool got = wxTheClipboard->GetData(data);
+        wxTheClipboard->Close();
+        TimingValues values{};
+        const auto result = got ? decode_timing_clipboard(utf8(data.GetText()), values)
+                                : Result{false, "No buffer settings on the clipboard."};
+        if (!result.ok) {
+            show_result(result);
+            return;
+        }
+        if (hole_index_ < 0)
+            return;
+        capture_draft();
+        auto& d =
+            &w == &forward_ ? draft_.holes[hole_index_].forward : draft_.holes[hole_index_].reverse;
+        const auto valid = set_timing_values(d.settings.preferences, values);
+        if (!valid.ok) {
+            show_result(valid);
+            return;
+        }
+        d.settings.refresh_projection();
+        populate_direction(w, d);
         dirty_ = true;
         refresh();
     });
-    label(box, tuning, "Buffer request (ms; 0 = Automatic)");
-    w.buffer = new wxSpinCtrl(box, wxID_ANY, "0", wxDefaultPosition, wxDefaultSize,
-                              wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
-    auto* buffer_row = new wxBoxSizer(wxHORIZONTAL);
-    buffer_row->Add(w.buffer, 0, wxALL | wxALIGN_CENTER_VERTICAL, FromDIP(4));
-    w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
-    const int buffer_height = std::max(w.buffer->GetBestSize().y, FromDIP(32));
-    w.buffer->SetMinSize(wxSize(FromDIP(96), buffer_height));
-    w.buffer->SetMaxSize(wxSize(-1, buffer_height));
-    w.buffer_apply->SetMinSize(wxSize(-1, buffer_height));
-    w.buffer_apply->SetMaxSize(wxSize(-1, buffer_height));
-    w.buffer_apply->Disable();
-    w.buffer_apply->SetToolTip(
-        "Save this direction's buffer request. Stop and Start to apply it to a real route.");
-    tuning->Add(buffer_row, 0, wxEXPAND);
-    w.buffer_state = label(box, tuning, "Edited/saved requests; engine values unavailable.");
+    paste->SetToolTip("Paste only the eight timing/buffer values into this direction. Other "
+                      "settings stay selected.");
+    button(box, buffer_actions, "Reset Buffers", [changed_settings] {
+        changed_settings(1);
+    })->SetToolTip("Restore Automatic/inherited timing values in this direction.");
+    timing_layout->Add(buffer_actions, 0, wxEXPAND);
+    label(box, timing_layout,
+          "All values in milliseconds (ms). Auto chooses automatically; Inherit uses the default. "
+          "Allocated capacity may be rounded upward; queue and lead targets are validated "
+          "independently.")
+        ->Wrap(FromDIP(520));
+    w.buffer_state = label(box, timing_layout, "");
     w.buffer_state->SetMinSize(wxSize(1, -1));
     w.buffer->SetToolTip(
-        "Use 0 for Automatic, or request 1–100 milliseconds. Drivers can align or resize "
-        "the allocation; Performance Diagnostics shows the supplied request and actual frames. "
-        "Smaller requests can increase dropout risk. Save, then Stop and Start to apply.");
-    w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
-                         "visible evidence explains the recommendation.");
-    w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
-                         "listed device to bind it.");
-    w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
-                              "is shown for the selected device.");
-    w.mode = choices(box, tuning, "Operating mode",
+        "Requested endpoint capacity in whole milliseconds, 1–100; clear or enter 0 for Automatic. "
+        "Drivers may round capacity upward. This does not set queue occupancy or playback lead.");
+    box = w.sections[2]->GetPane();
+    auto* routing = contents[2];
+    auto* routing_grid = new wxGridSizer(1, 2, FromDIP(8), FromDIP(8));
+    auto* mode_column = new wxBoxSizer(wxVERTICAL);
+    auto* clock_column = new wxBoxSizer(wxVERTICAL);
+    w.mode = choices(box, mode_column, "Operating mode",
                      {"Automatic", "Force exclusive mode", "Force shared mode"});
-    w.clock = choices(box, tuning, "Preferred clock device", {"Automatic", "Capture", "Playback"});
+    w.clock =
+        choices(box, clock_column, "Placebo clock device", {"Automatic", "Capture", "Playback"});
     w.clock->SetMinSize(
-        wxSize(-1, std::max(w.mode->GetBestSize().y, w.clock->GetCharHeight() + FromDIP(12))));
-    w.clock->SetToolTip("Save the preferred timing reference for this direction.");
+        wxSize(1, std::max(w.mode->GetBestSize().y, w.clock->GetCharHeight() + FromDIP(12))));
+    w.mode->SetMinSize(wxSize(1, -1));
+    w.clock->SetToolTip(
+        "Saved for future compatibility. Currently has no effect on routing or latency.");
+    routing_grid->Add(mode_column, 1, wxEXPAND);
+    routing_grid->Add(clock_column, 1, wxEXPAND);
+    routing->Add(routing_grid, 0, wxEXPAND);
+    button(box, routing, "Reset Routing and Clock", [changed_settings] {
+        changed_settings(2);
+    })->SetToolTip("Restore Automatic routing mode and clock metadata in this direction.");
     w.clock->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         if (!loading_) {
             capture_draft();
@@ -275,6 +513,22 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             refresh();
         }
     });
+    for (const auto& [panel, grid] :
+         {std::pair{w.sections[0], format_grid}, std::pair{w.sections[1], timing_grid}})
+        panel->Bind(wxEVT_SIZE, [this, &w, panel, grid](wxSizeEvent& e) {
+            const int columns = panel->GetClientSize().x < FromDIP(740) ? 2 : 4;
+            if (grid->GetCols() != columns) {
+                grid->SetCols(columns);
+                panel->GetPane()->Layout();
+            }
+            e.Skip();
+        });
+    w.format->SetToolTip("Choose the recommended compatible format or an explicit format. The "
+                         "visible evidence explains the recommendation.");
+    w.source->SetToolTip("Choose the capture endpoint for this direction. Type to search; select a "
+                         "listed device to bind it.");
+    w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
+                              "is shown for the selected device.");
     w.mode->SetToolTip("Save an access-mode choice for this direction. Use advanced tuning must be "
                        "enabled for it to apply. Forced modes take precedence over Exclusive mode "
                        "preferred; Automatic initially uses shared access.");
@@ -656,6 +910,7 @@ void Frame::remove_hole() {
     load_hole(draft_.holes.empty()
                   ? -1
                   : std::min(hole_index_, static_cast<int>(draft_.holes.size()) - 1));
+    tutorial_event("hole_deleted");
     refresh();
 }
 // Reuse the context-menu command so keyboard and glyph actions share targeting,
@@ -833,7 +1088,7 @@ void Frame::build_profiles() {
                                                  wxDefaultSize, wxSP_LIVE_UPDATE | wxSP_3D);
     performance_split_ = right_container;
     right_container->SetName("Resize performance diagnostics height");
-    right_container->SetMinimumPaneSize(FromDIP(80));
+    right_container->SetMinimumPaneSize(FromDIP(48));
     right_container->SetSashGravity(1.0);
     auto* editor = new wxScrolledWindow(right_container);
     profile_editor_ = editor;
@@ -892,7 +1147,7 @@ void Frame::build_profiles() {
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_MULTILINE | wxTE_READONLY | wxTE_WORDWRAP);
     path_status_->SetName("Routing performance observations");
-    path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 4 + FromDIP(12)));
+    path_status_->SetMinSize(wxSize(0, path_status_->GetCharHeight() * 2 + FromDIP(12)));
     performance->Add(path_status_, 1, wxEXPAND | wxALL, FromDIP(4));
     right_container->SplitHorizontally(editor, performance_panel_, -FromDIP(140));
     page_layout->Add(profile_columns_, 1, wxEXPAND | wxALL, 3);
@@ -1080,7 +1335,14 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
         mapping += std::to_string(route.source + 1) + ":" + std::to_string(route.destination + 1);
     }
     w.channel_map->ChangeValue(text(mapping));
-    w.buffer->SetValue(d.settings.preferences.common.buffer_ms.value_or(0));
+    w.buffer->SetValue(d.settings.preferences.common.buffer_ms
+                           ? wxString::Format("%d", *d.settings.preferences.common.buffer_ms)
+                           : wxString{});
+    const auto values = timing_values(preference);
+    for (unsigned i = 0; i < 8; ++i)
+        if (i != 3)
+            w.timings[i]->ChangeValue(values[i] ? wxString::Format("%.12g", *values[i])
+                                                : wxString{});
     w.acknowledged_buffer_ms = d.settings.buffer_ms;
     const auto mode = d.settings.preferences.common.mode.value_or("Automatic");
     w.mode->SetSelection(mode == "Exclusive" ? 1 : mode == "Shared" ? 2 : 0);
@@ -1093,6 +1355,19 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
 // Read-only display of requested settings and available endpoint records; never
 // label these as negotiated runtime measurements or verified hardware evidence.
 void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direction& d) {
+    const auto values = timing_values(d.settings.preferences);
+    const auto count =
+        std::count_if(values.begin(), values.end(), [](const auto& n) { return n.has_value(); });
+    const auto format = derive_pcm_format(d.settings.preferences.common);
+    const std::array<wxString, 3> summaries{
+        format ? text(format->label()) : wxString("Auto / Inherit"),
+        text(std::to_string(count) + (count == 1 ? " override" : " overrides")),
+        text(d.settings.preferences.common.mode.value_or("Automatic"))};
+    for (unsigned i = 0; i < 3; ++i)
+        if (w.section_summaries[i] && w.section_summaries[i]->GetLabel() != summaries[i]) {
+            w.section_summaries[i]->SetLabel(summaries[i]);
+            w.section_summaries[i]->SetToolTip(summaries[i]);
+        }
     const auto& snapshot = controller_->snapshot();
     std::string saved = "unsaved";
     const bool reverse = &w == &reverse_;
@@ -1562,6 +1837,56 @@ void Frame::build_hole_diagnostics(wxWindow* parent, wxSizer* layout) {
 }
 // An outer splitter must reserve room for BOTH nested panes, not just its
 // generic minimum for one child. Clamp immediately on resize and user drags.
+// Restore only view geometry; never reload records or discard pending edits.
+void Frame::reset_layout() {
+    for (auto* direction : {&forward_, &reverse_}) {
+        for (auto* section : direction->sections)
+            section->Collapse();
+        direction->tuning->Collapse();
+        layout_direction(*direction);
+    }
+    if (auto* deep =
+            dynamic_cast<wxCollapsiblePane*>(wxWindow::FindWindowByName("Deep scan limits", this)))
+        deep->Collapse();
+    for (auto* page : notebook_->GetChildren())
+        if (auto* scroll = dynamic_cast<wxScrolledWindow*>(page)) {
+            scroll->Layout();
+            scroll->FitInside();
+            scroll->Scroll(0, 0);
+        }
+    profile_editor_->Scroll(0, 0);
+    Layout();
+    // Settle parents before positioning nested dividers. Resizing a parent after
+    // its child applies sash gravity again and changes the requested default.
+    profile_columns_->SetSashPosition(FromDIP(300));
+    profile_columns_->UpdateSize();
+    profile_columns_->GetWindow1()->Layout();
+    constrain_profile_rows();
+    profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
+    profile_rows_->UpdateSize();
+    auto size_bottom_field = [](wxSplitterWindow* split, wxTextCtrl* field, int lines) {
+        split->UpdateSize();
+        split->GetWindow2()->Layout();
+        const int frame = field->GetSize().y - field->GetClientSize().y;
+        const int client = std::max(lines * field->GetCharHeight(), field->GetMinSize().y - frame);
+        const int surrounding = split->GetWindow2()->GetSize().y - field->GetClientSize().y;
+        split->SetSashPosition(split->GetClientSize().y - client - surrounding -
+                               split->GetSashSize() - split->GetBorderSize());
+        split->UpdateSize();
+    };
+    size_bottom_field(profile_lower_rows_, profile_notes_, 4);
+    device_columns_->SetSashPosition(device_bundle_actions_->GetMinSize().x - FromDIP(4));
+    device_columns_->UpdateSize();
+    device_columns_->GetWindow2()->Layout();
+    size_bottom_field(device_rows_, device_notes_, 3);
+    size_bottom_field(performance_split_, path_status_, 2);
+    scan_output_split_->SetSashPosition(scan_state_->GetCharHeight() * 3 + FromDIP(16));
+    scan_output_split_->UpdateSize();
+    for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_, performance_split_,
+                        device_columns_, device_rows_, scan_output_split_}) {
+        split->Refresh();
+    }
+}
 void Frame::constrain_profile_rows() {
     if (!profile_rows_ || !profile_lower_rows_ || !profile_rows_->IsSplit() ||
         !profile_lower_rows_->IsSplit())

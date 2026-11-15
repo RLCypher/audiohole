@@ -30,6 +30,7 @@ void Frame::bundle_dialog(bool profiles, bool importing) {
                             wxDateTime::Now().Format("%Y%m%d-%H%M%S") + ".zip",
                         "AudioHole bundles (*.zip)|*.zip",
                         importing ? wxFD_OPEN | wxFD_FILE_MUST_EXIST : wxFD_SAVE);
+    theme_dialog(&dialog);
     if (dialog.ShowModal() != wxID_OK)
         return;
     if (!importing && wxFileExists(dialog.GetPath())) {
@@ -56,11 +57,20 @@ void Frame::bundle_dialog(bool profiles, bool importing) {
     refresh();
 }
 void Frame::build_scan() {
-    auto* page = new wxPanel(notebook_);
+    auto* page = new wxScrolledWindow(notebook_);
+    page->SetScrollRate(0, FromDIP(12));
     auto* root = new wxBoxSizer(wxVERTICAL);
     auto* options = new wxBoxSizer(wxHORIZONTAL);
     scan_mode_ = choices(page, options, "Testing level", {"Basic / Easy", "Deep / Advanced"});
     scan_scope_ = choices(page, options, "Scope", {"Update (new devices)", "Full scan"});
+    int dropdown_width = 0;
+    for (auto* choice : {scan_mode_, scan_scope_})
+        for (unsigned i = 0; i < choice->GetCount(); ++i)
+            dropdown_width =
+                std::max(dropdown_width,
+                         choice->GetTextExtent(choice->GetString(i) + "MMMM").x + FromDIP(32));
+    for (auto* choice : {scan_mode_, scan_scope_})
+        choice->SetMinSize(wxSize(dropdown_width, -1));
     scan_mode_->SetToolTip(
         "Basic reads Windows-reported capabilities without experimental streams. Deep adds bounded "
         "stream tests with explicit consent. Tutorial simulates both.");
@@ -88,9 +98,12 @@ void Frame::build_scan() {
         refresh();
     });
     root->Add(row);
-    auto* deep = new wxCollapsiblePane(page, wxID_ANY, "Deep scan limits and test context");
+    auto* deep = new wxCollapsiblePane(page, wxID_ANY, "Deep scan limits and test context",
+                                       wxDefaultPosition, wxDefaultSize,
+                                       wxCP_DEFAULT_STYLE | wxCP_NO_TLW_RESIZE);
     deep->SetName("Deep scan settings");
     auto* pane = deep->GetPane();
+    deep->SetName("Deep scan limits");
     auto* limits = new wxBoxSizer(wxVERTICAL);
     deep_mode_ = choices(pane, limits, "Operating mode", {"shared", "exclusive", "both"});
     deep_mode_->SetToolTip("Select shared, exclusive, or both for bounded Deep tests; exclusive "
@@ -156,7 +169,10 @@ void Frame::build_scan() {
     pane->SetSizer(limits);
     root->Add(deep, 0, wxEXPAND | wxALL, 3);
     deep->Show(controller_->snapshot().operating_mode == OperatingMode::Test);
-    deep->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [page](wxCollapsiblePaneEvent&) { page->Layout(); });
+    deep->Bind(wxEVT_COLLAPSIBLEPANE_CHANGED, [page](wxCollapsiblePaneEvent&) {
+        page->Layout();
+        page->FitInside();
+    });
     scan_progress_ =
         new wxGauge(page, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_SMOOTH);
     root->Add(scan_progress_, 0, wxEXPAND | wxALL, 4);
@@ -263,6 +279,7 @@ void Frame::build_scan() {
     scanner_actions_.push_back(bundle);
     root->Add(export_row);
     page->SetSizer(root);
+    page->FitInside();
     notebook_->AddPage(page, "Scanning / Diagnostics");
 }
 // Every entry point shares the same exact target and consent path. Widgets issue
@@ -270,8 +287,7 @@ void Frame::build_scan() {
 void Frame::request_scan(bool deep, ScanScope scope, const std::string& id) {
     if (tutorial_) {
         if (!deep || scope != ScanScope::Full) {
-            tutorial_->repeat();
-            render_tutorial();
+            tutorial_event("scan_options_invalid");
             return;
         }
         controller_->scan(true, true, ScanScope::Full);
@@ -403,6 +419,7 @@ void Frame::update_console(const wxString& output) {
 void Frame::export_log() {
     wxFileDialog dialog(this, "Export technical diagnostics", {}, "AudioHole-diagnostics.txt",
                         "Text files (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    theme_dialog(&dialog);
     if (dialog.ShowModal() != wxID_OK)
         return;
     // On-screen wording previews production; copied/exported evidence must retain

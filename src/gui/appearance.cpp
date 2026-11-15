@@ -26,7 +26,7 @@ bool system_dark() {
 void apply_palette(wxWindow* window, bool dark, bool contrast) {
     const wxColour surface = dark ? palette::charcoal() : wxColour(245, 247, 250);
     const wxColour input = dark ? palette::input() : wxColour(255, 255, 255);
-    const wxColour foreground = dark ? wxColour(237, 240, 246) : wxColour(23, 30, 40);
+    const wxColour foreground = dark ? *wxWHITE : *wxBLACK;
     // Pair application text/background first. The native-theme pass then applies
     // scrollbar/arrow styles; app-owned buttons keep their matched custom paint.
     // High contrast uses Windows' own colors and native styles throughout.
@@ -49,8 +49,7 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
     window->SetForegroundColour(
         contrast
             ? wxSystemSettings::GetColour(editor ? wxSYS_COLOUR_WINDOWTEXT : wxSYS_COLOUR_BTNTEXT)
-        : !window->IsEnabled() ? (dark ? wxColour(150, 160, 175) : wxColour(110, 110, 110))
-                               : foreground);
+            : foreground);
     if (!contrast && window->GetName() == "brand-wordmark")
         window->SetForegroundColour(palette::mint());
     if (!contrast && window->GetName() == "brand-wordmark-hole")
@@ -94,7 +93,7 @@ void Frame::update_navigation() {
                                                                           : wxSYS_COLOUR_BTNFACE)
                                  : active           ? palette::mint()
                                  : dark_appearance_ ? wxColour(59, 66, 79)
-                                                    : wxColour(220, 226, 235));
+                                                    : *wxWHITE);
         tab->SetForegroundColour(
             contrast           ? wxSystemSettings::GetColour(active ? wxSYS_COLOUR_HIGHLIGHTTEXT
                                                                     : wxSYS_COLOUR_BTNTEXT)

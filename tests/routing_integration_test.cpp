@@ -235,6 +235,13 @@ TEST(RoutingService, WaitingDirectionResumesWithoutReopeningHealthySiblingAndSto
     };
     wait([&] { return service->reading().ready; });
     testing_engine::Store store;
+    // Separate logical holes: one can run while the other's endpoint is absent.
+    auto second = store.records.profiles[0].holes[0];
+    second.id = "waiting-hole";
+    second.forward = second.reverse;
+    second.duplex = false;
+    store.records.profiles[0].holes[0].duplex = false;
+    store.records.profiles[0].holes.push_back(second);
     Snapshot snapshot;
     snapshot.endpoints = store.records.devices;
     snapshot.endpoints.back().availability = Availability::Unavailable;
@@ -258,13 +265,27 @@ TEST(RoutingService, WaitingDirectionResumesWithoutReopeningHealthySiblingAndSto
     });
     EXPECT_EQ(control->opens, 2);
     EXPECT_EQ(control->releases, 0);
+    snapshot.endpoints.back().availability = Availability::Unavailable;
+    ASSERT_TRUE(service->update_bindings(routing_bindings(snapshot)));
+    wait([&] { return service->reading().state->state == engine::State::Degraded; });
+    EXPECT_EQ(control->opens, 2);
+    EXPECT_EQ(control->releases, 1);
+    EXPECT_EQ(service->reading().state->paths[0].state, engine::State::Running);
+    snapshot.endpoints.back().availability = Availability::Available;
+    ASSERT_TRUE(service->update_bindings(routing_bindings(snapshot), false));
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
+    EXPECT_EQ(control->opens, 2);
+    ASSERT_TRUE(service->update_bindings(routing_bindings(snapshot), true));
+    wait([&] { return service->reading().state->state == engine::State::Running; });
+    EXPECT_EQ(control->opens, 3);
+    EXPECT_EQ(control->releases, 1);
     service->stop();
     EXPECT_FALSE(service->update_bindings(routing_bindings(snapshot)));
     wait([&] {
         const auto r = service->reading();
         return r.state && r.state->state == engine::State::Stopped;
     });
-    EXPECT_EQ(control->releases, 2);
+    EXPECT_EQ(control->releases, 3);
 }
 
 TEST(RoutingIntegrationAudit, AutomaticAndAdvancedBufferRequestsFlowThroughAllBackends) {
@@ -331,4 +352,33 @@ TEST(RoutingIntegrationAudit, AutomaticAndAdvancedBufferRequestsFlowThroughAllBa
         }
         EXPECT_EQ(control->opens, control->releases);
     }
+}
+
+TEST(RoutingService, WrongDirectionFailsTheHoleWithoutOpeningAnyOfItsEndpoints) {
+    auto control = std::make_shared<testing_engine::Control>();
+    auto service = testing_engine::service(control);
+    auto wait = [&](auto done) {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!done() && std::chrono::steady_clock::now() < deadline)
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        ASSERT_TRUE(done());
+    };
+    wait([&] { return service->reading().ready; });
+    testing_engine::Store store;
+    Snapshot snapshot;
+    snapshot.endpoints = store.records.devices;
+    snapshot.endpoints[0].capture = false;
+    const auto projected = routing_profile(store.records.profiles[0]);
+    ASSERT_TRUE(projected.ok());
+    ASSERT_NE(service->start(*projected.value, routing_bindings(snapshot)), 0u);
+    wait([&] {
+        const auto r = service->reading();
+        return r.state && r.state->state == engine::State::Failed;
+    });
+    EXPECT_EQ(control->opens, 0);
+    const auto failed = service->reading().state;
+    ASSERT_FALSE(failed->paths[0].issues.empty());
+    EXPECT_EQ(failed->paths[0].issues[0].code, engine::ErrorCode::DirectionMismatch);
+    service->stop();
+    wait([&] { return service->reading().state->state == engine::State::Stopped; });
 }

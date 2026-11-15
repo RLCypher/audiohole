@@ -80,11 +80,13 @@ avatar::Decision AvatarHost::react(Message event, const Copy& copy, std::uint64_
     if (event == Message::ScanCompleted && scanning_)
         return {false, "stale_scan_completion"};
     activity(now);
-    const int priority = event == Message::Invalid || event == Message::ScanFailed ? 100
-                         : event == Message::Disconnected || event == Message::Recovering ||
-                                 event == Message::Questionable
-                             ? 80
-                             : 10;
+    const int priority =
+        event == Message::ErrorMajor || event == Message::Invalid || event == Message::ScanFailed
+            ? 100
+        : event == Message::Disconnected || event == Message::Recovering ||
+                event == Message::Questionable
+            ? 80
+            : 10;
     if (baseline_.priority > priority)
         return {false, "operational_priority"};
     auto owns = [this](const std::string& state) {

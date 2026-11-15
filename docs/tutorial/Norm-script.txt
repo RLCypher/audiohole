@@ -146,7 +146,7 @@ NORM: Much better. Two devices, two names, no mysterious strings of numbers. Loo
 
 N017 [talking]
 Cue: Profiles tab entered; highlight Create Profile.
-NORM: Profiles are just saved setups. One for your headset, one for your desk, one for whatever cursed collection of USB gadgets you're running next Tuesday. Let's make one. Click Create Profile.
+NORM: Profiles are just saved setups. You can have one for everyday use, one for live streaming, one for turning a bluetooth speaker into an ad hoc PA system, one for whatever cursed collection of USB gadgets you're running next Tuesday. Really any configuration of devices you might want to quickly switch between depending on the situation or what you need to do at any given moment. Let's make one. Click Create Profile.
 
 N018A [thinking]
 Cue: Profile created. Highlight the new profile with an AudioHole Pink border. Require user to right-click the profile, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
@@ -155,7 +155,7 @@ Advancement: Confirmed profile rename. No dialogue buttons.
 
 N018 [mischievous]
 Cue: Profile renamed; highlight Create Hole.
-NORM: Excellent. Now the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. Go ahead and create one.
+NORM: Excellent! Now for the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. A hole simply tells the profile what audio endpoints you want to connect together. Think of it like a wormhole for your audio, very sophisticated technology, very science, and simpler than it seems. You can have as many as you need in a single profile, but I wouldn't have more than 8, things might get a little weird. Because our little tutorial session is a simple connection between two devices, we'll only need one hole, go ahead and make it.
 
 N018B [smug]
 Cue: Hole created. Highlight the new hole with an AudioHole Pink border. Require user to right-click the hole, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
@@ -230,22 +230,22 @@ Cue: Either N027A response selected and simulated status remains Running. Requir
 UI: Two vertically stacked dating-sim buttons at Norm's feet, EXACT LABELS: "I said something" and "Testing 1, 2". Clicking either acknowledges the instruction to speak (without voice detection) and advances immediately to the corresponding complete N030 state. No generic Continue and no automatic advancement.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N027A / Oscar-worthy performance [laughing]
-  NORM: Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. Yes, even though this is fake. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much.
+  NORM: Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much.
   Variant B — from N027A / You made me wait for THAT? [laughing]
-  NORM: Look, a little dramatic tension never killed anybody. The imaginary routing engine needed its moment. Now comes the actually useful habit, say something into your microphone. Out loud. Whatever comes to mind. We always test a connection before assuming it works. Don't just stare at me. I can do that all day.
+  NORM: Look, a little dramatic tension never killed anybody. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. Now comes the actually useful habit, say something into your microphone. Out loud. Whatever comes to mind. We always test a connection before assuming it works. Don't just stare at me. I can do that all day.
 
 N029 [suspicious]
 Cue: Only on an explicit attempt to bypass the microphone acknowledgement, not on a timer or ordinary inactivity. Stay on N028 and preserve both choices. This is a temporary tutorial-owned reminder, not a progress event.
-NORM: Nope, I mean actually say something. 'Testing, one, two' works. So does a deeply personal confession to your monitor. Your secret's safe with this imaginary mixer.
+NORM: Nope, I mean actually say something. 'Testing, one, two' works. So does a deeply personal confession to your monitor. Your secret's safe with me.
 
 N030-A [deadpan]
 Cue: User selects "Testing 1, 2" in N028; immediately display this complete state. Do not imply audio was captured or assessed.
-NORM: Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and this entire setup is imaginary. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters.
+NORM: Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and checking the route is how you know the audio is going where intended. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters.
 UI: Show two response buttons: "A timeless masterpiece" and "You got me". Both advance directly to the matching full N031 dialogue variant; no intermediate reaction.
 
 N030-B [mischievous]
 Cue: User selects "I said something" in N028; immediately display this complete state. Do not imply audio was captured or assessed.
-NORM: And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. Also, this is a pretend setup, so I couldn't hear a damn thing. The important bit is you actually tried the mic check. Do that when you set up real routing, too.
+NORM: And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. The important bit is you actually tried the mic check. Do that when you set up real routing, too.
 UI: Show two vertically stacked response buttons: "Fair point" and "You set me up". Both advance directly to the matching full N031 dialogue variant; no intermediate reaction.
 
 N031 [happy]

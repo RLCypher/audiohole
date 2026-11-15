@@ -18,6 +18,7 @@
 // are local constants; the SDK's function-discovery key catalog is not needed.
 #include <windows.h>
 
+#include "worker_scheduling.hpp"
 #include <audioclient.h>
 #include <avrt.h>
 #include <cstring>
@@ -333,7 +334,7 @@ struct Client {
         HRESULT initialized = E_FAIL;
         configuration.period_selection =
             share == AUDCLNT_SHAREMODE_EXCLUSIVE ? "exclusive" : "legacy-shared";
-        if (share == AUDCLNT_SHAREMODE_SHARED && !requested.buffer_ms) {
+        if (share == AUDCLNT_SHAREMODE_SHARED) {
             Com<IAudioClient3> low_latency;
             if (SUCCEEDED(audio->QueryInterface(__uuidof(IAudioClient3),
                                                 reinterpret_cast<void**>(low_latency.put())))) {
@@ -345,39 +346,62 @@ struct Client {
                     configuration.shared_minimum_period_frames = minimum;
                     configuration.shared_maximum_period_frames = maximum;
                     const auto smallest = minimum_shared_period(fundamental, minimum, maximum);
-                    const bool try_minimum = preset == LatencyPreset::Low && smallest.has_value();
-                    const auto chosen = try_minimum ? *smallest : normal;
-                    initialized = low_latency->InitializeSharedAudioStream(
-                        AUDCLNT_STREAMFLAGS_EVENTCALLBACK, chosen, &format.Format, nullptr);
-                    if (SUCCEEDED(initialized)) {
-                        configuration.period_frames = chosen;
-                        configuration.period_selection = try_minimum ? "minimum" : "default";
-                    } else if (try_minimum) {
-                        std::ostringstream reason;
-                        reason << "Minimum shared period rejected: HRESULT 0x" << std::hex
-                               << std::uppercase << static_cast<std::uint32_t>(initialized)
-                               << "; retrying default shared period.";
-                        configuration.low_latency_fallback = reason.str();
-                        // A rejected minimum (including a period lock held by
-                        // another shared stream) must not trigger Exclusive or
-                        // change the PCM tuple. Re-create the client before a
-                        // default-period retry; failed Initialize state is not
-                        // assumed reusable. The old Client3 reference is dropped
-                        // before releasing its IAudioClient reference.
-                        (void)low_latency.put();
-                        checked(device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr,
-                                                 reinterpret_cast<void**>(audio.put())),
-                                "ReactivateDefaultPeriodClient");
-                        if (SUCCEEDED(audio->QueryInterface(
-                                __uuidof(IAudioClient3),
-                                reinterpret_cast<void**>(low_latency.put())))) {
-                            initialized = low_latency->InitializeSharedAudioStream(
-                                AUDCLNT_STREAMFLAGS_EVENTCALLBACK, normal, &format.Format, nullptr);
-                            if (SUCCEEDED(initialized)) {
-                                configuration.period_frames = normal;
-                                configuration.period_selection = "default-after-minimum-rejected";
+                    const bool try_minimum = !requested.period_ms && preset == LatencyPreset::Low &&
+                                             smallest.has_value();
+                    auto chosen = try_minimum ? *smallest : normal;
+                    if (requested.period_ms) {
+                        const auto explicit_period =
+                            requested_shared_period(*requested.period_ms, selected.sample_rate_hz,
+                                                    fundamental, minimum, maximum);
+                        if (!explicit_period)
+                            throw NativeFailure{{ErrorCode::UnsupportedRequirement, "period_ms",
+                                                 "Processing interval is not supported within "
+                                                 "ordinary frame rounding."}};
+                        chosen = *explicit_period;
+                    }
+                    if (!requested.buffer_ms) {
+                        initialized = low_latency->InitializeSharedAudioStream(
+                            AUDCLNT_STREAMFLAGS_EVENTCALLBACK, chosen, &format.Format, nullptr);
+                        if (SUCCEEDED(initialized)) {
+                            configuration.period_frames = chosen;
+                            configuration.period_selection = requested.period_ms ? "explicit-period"
+                                                             : try_minimum       ? "minimum"
+                                                                                 : "default";
+                        } else if (try_minimum) {
+                            std::ostringstream reason;
+                            reason << "Minimum shared period rejected: HRESULT 0x" << std::hex
+                                   << std::uppercase << static_cast<std::uint32_t>(initialized)
+                                   << "; retrying default shared period.";
+                            configuration.low_latency_fallback = reason.str();
+                            // A rejected minimum (including a period lock held by
+                            // another shared stream) must not trigger Exclusive or
+                            // change the PCM tuple. Re-create the client before a
+                            // default-period retry; failed Initialize state is not
+                            // assumed reusable. The old Client3 reference is dropped
+                            // before releasing its IAudioClient reference.
+                            (void)low_latency.put();
+                            checked(device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr,
+                                                     reinterpret_cast<void**>(audio.put())),
+                                    "ReactivateDefaultPeriodClient");
+                            if (SUCCEEDED(audio->QueryInterface(
+                                    __uuidof(IAudioClient3),
+                                    reinterpret_cast<void**>(low_latency.put())))) {
+                                initialized = low_latency->InitializeSharedAudioStream(
+                                    AUDCLNT_STREAMFLAGS_EVENTCALLBACK, normal, &format.Format,
+                                    nullptr);
+                                if (SUCCEEDED(initialized)) {
+                                    configuration.period_frames = normal;
+                                    configuration.period_selection =
+                                        "default-after-minimum-rejected";
+                                }
                             }
                         }
+                    }
+                    if (requested.period_ms && !requested.buffer_ms && FAILED(initialized)) {
+                        auto issue = native_open_issue("InitializeExplicitSharedPeriod",
+                                                       static_cast<std::uint32_t>(initialized));
+                        issue.code = ErrorCode::UnsupportedRequirement;
+                        throw NativeFailure{std::move(issue)};
                     }
                     if (preset == LatencyPreset::Low && !smallest)
                         configuration.low_latency_fallback =
@@ -389,6 +413,11 @@ struct Client {
                 configuration.low_latency_fallback =
                     "Minimum-period negotiation unavailable; retained shared compatibility path.";
         }
+        if (requested.period_ms && share == AUDCLNT_SHAREMODE_SHARED && !requested.buffer_ms &&
+            !configuration.period_frames)
+            throw NativeFailure{
+                {ErrorCode::UnsupportedRequirement, "period_ms",
+                 "The requested format has no controllable shared processing interval."}};
         if (FAILED(initialized)) {
             // Re-activate after any Client3 attempt. COM initialization state
             // must not be assumed reusable following a failed Initialize call.
@@ -418,6 +447,16 @@ struct Client {
                         format = plain;
                 }
                 checked(supported, "IsExclusiveFormatSupported");
+                if (requested.period_ms) {
+                    const auto requested_duration =
+                        static_cast<REFERENCE_TIME>(std::ceil(*requested.period_ms * 10000));
+                    if (duration && std::abs(double(duration - requested_duration)) >
+                                        10000000.0 / selected.sample_rate_hz)
+                        throw NativeFailure{{ErrorCode::UnsupportedRequirement, "period_ms",
+                                             "Exclusive event mode couples processing interval and "
+                                             "device capacity."}};
+                    duration = requested_duration;
+                }
                 if (!duration) {
                     REFERENCE_TIME normal = 0, minimum = 0;
                     checked(audio->GetDevicePeriod(&normal, &minimum), "GetDevicePeriod");
@@ -427,7 +466,7 @@ struct Client {
             }
             initialized =
                 audio->Initialize(share, flags, duration, periodicity, &format.Format, nullptr);
-            if (initialized == AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED && !requested.buffer_ms) {
+            if (initialized == AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED) {
                 UINT32 aligned = 0;
                 checked(audio->GetBufferSize(&aligned), "GetAlignedBufferSize");
                 duration = static_cast<REFERENCE_TIME>(
@@ -450,13 +489,39 @@ struct Client {
         configuration.timing_sample_rate_hz = selected.sample_rate_hz;
         if (share == AUDCLNT_SHAREMODE_EXCLUSIVE)
             configuration.period_frames = buffer_frames;
+        else if (!configuration.period_frames) {
+            Com<IAudioClient3> current;
+            WAVEFORMATEX* current_format = nullptr;
+            UINT32 current_frames = 0;
+            if (SUCCEEDED(audio->QueryInterface(__uuidof(IAudioClient3),
+                                                reinterpret_cast<void**>(current.put()))) &&
+                SUCCEEDED(
+                    current->GetCurrentSharedModeEnginePeriod(&current_format, &current_frames))) {
+                const std::unique_ptr<WAVEFORMATEX, decltype(&CoTaskMemFree)> owned(current_format,
+                                                                                    CoTaskMemFree);
+                if (current_format && current_frames)
+                    configuration.period_frames = static_cast<UINT32>(
+                        std::ceil(double(current_frames) * selected.sample_rate_hz /
+                                  current_format->nSamplesPerSec));
+            }
+        }
+        configuration.applied_period_request_ms = requested.period_ms;
+        configuration.applied_render_ahead_request_ms = requested.render_ahead_ms;
         // This confirms the requested duration was supplied to Initialize.
         // Windows can quantize allocation; report its actual frames separately.
         configuration.applied_buffer_request_ms = requested.buffer_ms;
         if (requested.buffer_ms)
             configuration.period_selection = "explicit-buffer";
-        if (!input)
+        if (!input) {
             configuration.render_ahead_target_frames = render_ahead_target(configuration, preset);
+            if (!*configuration.render_ahead_target_frames ||
+                *configuration.render_ahead_target_frames > buffer_frames ||
+                (share == AUDCLNT_SHAREMODE_EXCLUSIVE &&
+                 *configuration.render_ahead_target_frames != buffer_frames))
+                throw NativeFailure{
+                    {ErrorCode::UnsupportedRequirement, "render_ahead_ms",
+                     "Playback lead cannot fit the device capacity or exclusive packet size."}};
+        }
         checked(audio->SetEventHandle(event.get()), "SetEventHandle");
         if (input)
             checked(audio->GetService(__uuidof(IAudioCaptureClient),
@@ -626,8 +691,9 @@ class NativeTiming {
 
 class WasapiSession final : public RouteSession {
   public:
-    WasapiSession(BoundRoute route, bool experimental, LatencyPreset preset)
-        : route_(std::move(route)), experimental_(experimental), preset_(preset) {}
+    WasapiSession(BoundRoute route, bool experimental, LatencyPreset preset, WorkerSettings workers)
+        : route_(std::move(route)), experimental_(experimental), preset_(preset),
+          worker_scheduling_(workers) {}
     ~WasapiSession() override {
         stop();
     }
@@ -665,6 +731,7 @@ class WasapiSession final : public RouteSession {
     RouteObservation observe() override {
         auto result = pipeline_ ? pipeline_->observe() : RouteObservation{};
         timing_.append(result);
+        result.worker_scheduling = worker_scheduling_.describe();
         std::lock_guard lock(mutex_);
         if (!access_failures_.empty())
             result.issues = access_failures_;
@@ -684,6 +751,7 @@ class WasapiSession final : public RouteSession {
     BoundRoute route_;
     bool experimental_;
     LatencyPreset preset_;
+    WorkerScheduling worker_scheduling_;
     NativeTiming timing_;
     mutable std::mutex mutex_;
     std::condition_variable condition_;
@@ -733,7 +801,10 @@ class WasapiSession final : public RouteSession {
             pipeline_ = std::make_unique<StreamPipeline>(
                 source.configuration.client_format, destination.configuration.client_format,
                 route_.request.channel_map, experimental_,
-                queue_target_milliseconds(negotiated, preset_));
+                route_.request.queue_target_ms ? *route_.request.queue_target_ms
+                                               : queue_target_milliseconds(negotiated, preset_),
+                route_.request.queue_target_ms.has_value());
+            negotiated.requested_queue_target_ms = route_.request.queue_target_ms;
             negotiated.fifo_target_source_frames = pipeline_->target_frames();
             negotiated.fifo_capacity_source_frames = pipeline_->capacity_frames();
             const auto valid = check_negotiated(route_.request, negotiated);
@@ -748,6 +819,13 @@ class WasapiSession final : public RouteSession {
             }
             if (stop.stop_requested())
                 return;
+            worker_scheduling_.start();
+            struct ScheduleGuard {
+                WorkerScheduling& value;
+                ~ScheduleGuard() {
+                    value.stop();
+                }
+            } schedule{worker_scheduling_};
             const auto render_target = *destination.configuration.render_ahead_target_frames;
             BYTE* prime = nullptr;
             checked(destination.render->GetBuffer(render_target, &prime), "PrimeRenderBuffer");
@@ -762,17 +840,6 @@ class WasapiSession final : public RouteSession {
             source.started = true;
             checked(destination.audio->Start(), "StartRender");
             destination.started = true;
-            DWORD task_index = 0;
-            HANDLE scheduling = AvSetMmThreadCharacteristicsW(L"Pro Audio", &task_index);
-            // MMCSS failure is not fabricated success. Scheduling registration is
-            // best effort in this validation prototype; no priority claim follows.
-            struct ScheduleGuard {
-                HANDLE value;
-                ~ScheduleGuard() {
-                    if (value)
-                        AvRevertMmThreadCharacteristics(value);
-                }
-            } schedule{scheduling};
             const HANDLE events[]{cancelled.get(), source.event.get(), destination.event.get()};
             bool first_capture_packet = true;
             bool awaiting_first_transfer = true;
@@ -921,15 +988,15 @@ class WasapiSession final : public RouteSession {
 
 class WasapiAdapter final : public BackendAdapter {
   public:
-    WasapiAdapter(bool experimental, LatencyPreset preset)
-        : experimental_(experimental), preset_(preset) {}
+    WasapiAdapter(bool experimental, LatencyPreset preset, WorkerSettings workers)
+        : experimental_(experimental), preset_(preset), workers_(workers) {}
     BackendDescriptor descriptor() const override {
         return {experimental_ ? BackendId::Experimental : BackendId::Wasapi, true,
                 "Windows event-driven I/O; unvalidated prototype processing"};
     }
     Result<std::unique_ptr<RouteSession>> open(const BoundRoute& route,
                                                std::stop_token stop) override {
-        auto session = std::make_unique<WasapiSession>(route, experimental_, preset_);
+        auto session = std::make_unique<WasapiSession>(route, experimental_, preset_, workers_);
         const auto initialized = session->initialize(stop);
         if (!initialized.ok())
             return {std::nullopt, initialized.issues};
@@ -939,16 +1006,18 @@ class WasapiAdapter final : public BackendAdapter {
   private:
     bool experimental_;
     LatencyPreset preset_;
+    WorkerSettings workers_;
 };
 } // namespace
 
-std::unique_ptr<BackendAdapter> make_wasapi_adapter(bool experimental, LatencyPreset preset) {
-    return std::make_unique<WasapiAdapter>(experimental, preset);
+std::unique_ptr<BackendAdapter> make_wasapi_adapter(bool experimental, LatencyPreset preset,
+                                                    WorkerSettings workers) {
+    return std::make_unique<WasapiAdapter>(experimental, preset, workers);
 }
 } // namespace audiohole::engine::detail
 #else
 namespace audiohole::engine::detail {
-std::unique_ptr<BackendAdapter> make_wasapi_adapter(bool, LatencyPreset) {
+std::unique_ptr<BackendAdapter> make_wasapi_adapter(bool, LatencyPreset, WorkerSettings) {
     return {};
 }
 } // namespace audiohole::engine::detail

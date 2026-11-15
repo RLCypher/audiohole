@@ -121,7 +121,7 @@ void profile_contracts() {
     }
     expect(!parse_profile("{\"format\":1,\"format\":2}").ok(), "duplicate keys reject");
     auto bad = document();
-    bad["schema_version"] = 4;
+    bad["schema_version"] = 5;
     expect(!parse_profile(bad.dump()).ok(), "future profile versions reject");
     bad = document();
     bad["format"] = "audiohole-test-configuration";

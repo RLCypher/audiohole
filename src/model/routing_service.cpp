@@ -56,6 +56,10 @@ Json preferences_json(const EndpointPreferences& p) {
         out["mode"] = *p.mode;
     if (p.buffer_ms)
         out["buffer_ms"] = *p.buffer_ms;
+    if (p.period_ms)
+        out["period_ms"] = *p.period_ms;
+    if (p.render_ahead_ms)
+        out["render_ahead_ms"] = *p.render_ahead_ms;
     return out;
 }
 Json direction_json(const Direction& d) {
@@ -71,7 +75,8 @@ Json direction_json(const Direction& d) {
             {"exclusive_mode_preferred", d.exclusive_mode_preferred},
             {"settings",
              {{"preferences",
-               {{"common", preferences_json(p.common)},
+               {{"queue_target_ms", p.queue_target_ms ? Json(*p.queue_target_ms) : Json(nullptr)},
+                {"common", preferences_json(p.common)},
                 {"source", preferences_json(p.source)},
                 {"destination", preferences_json(p.destination)},
                 {"channel_map", map},
@@ -98,7 +103,7 @@ class Service final : public RoutingService {
         const auto generation = ++reading_.generation;
         reading_.pending = true;
         reading_.admission_issues.clear();
-        command_ = Command{generation, false, std::move(profile), std::move(bindings)};
+        command_ = Command{generation, false, std::move(profile), std::move(bindings), workers_};
         wake_.notify_all();
         return generation;
     }
@@ -115,18 +120,22 @@ class Service final : public RoutingService {
             return generation;
         }
         reading_.pending = true;
-        command_ = Command{generation, true, {}, {}};
+        command_ = Command{generation, true, {}, {}, {}};
         wake_.notify_all();
         return generation;
     }
-    bool update_bindings(engine::BindingSnapshot bindings) override {
+    bool update_bindings(engine::BindingSnapshot bindings, bool resume_ready) override {
         std::lock_guard lock(mutex_);
         if (!reading_.ready || reading_.pending || !reading_.state || !reading_.state->armed ||
             reading_.state->state == engine::State::Stopping)
             return false;
-        bindings_ = std::move(bindings);
+        bindings_ = std::pair{std::move(bindings), resume_ready};
         wake_.notify_all();
         return true;
+    }
+    void configure_workers(engine::WorkerSettings workers) override {
+        std::lock_guard lock(mutex_);
+        workers_ = workers;
     }
     RoutingReading reading() const override {
         std::lock_guard lock(mutex_);
@@ -139,16 +148,19 @@ class Service final : public RoutingService {
         bool stop;
         engine::Profile profile;
         engine::BindingSnapshot bindings;
+        engine::WorkerSettings workers;
     };
+    engine::WorkerSettings workers_;
     mutable std::mutex mutex_;
     std::condition_variable wake_;
     RoutingReading reading_;
     std::optional<Command> command_;
-    std::optional<engine::BindingSnapshot> bindings_;
+    std::optional<std::pair<engine::BindingSnapshot, bool>> bindings_;
     std::jthread worker_; // Last member: every referenced field is initialized first.
     void run(std::stop_token stop, const RuntimeFactory& factory) noexcept {
         try {
-            auto runtime = factory();
+            auto runtime =
+                factory ? factory() : std::make_unique<engine::Runtime>(engine::LatencyPreset::Low);
             if (!runtime)
                 throw std::runtime_error("Engine factory returned no runtime.");
             {
@@ -162,7 +174,7 @@ class Service final : public RoutingService {
             std::uint64_t generation = 0;
             while (!stop.stop_requested()) {
                 std::optional<Command> command;
-                std::optional<engine::BindingSnapshot> bindings;
+                std::optional<std::pair<engine::BindingSnapshot, bool>> bindings;
                 {
                     std::unique_lock lock(mutex_);
                     wake_.wait_for(lock, std::chrono::milliseconds(50), [&] {
@@ -180,13 +192,16 @@ class Service final : public RoutingService {
                     if (command->stop)
                         runtime->stop();
                     else {
+                        if (!factory)
+                            runtime = std::make_unique<engine::Runtime>(engine::LatencyPreset::Low,
+                                                                        command->workers);
                         auto accepted = runtime->start(command->profile, command->bindings);
                         if (!accepted.ok())
                             issues = std::move(accepted.issues);
                     }
                 }
                 if (!command && bindings)
-                    runtime->update_bindings(*bindings);
+                    runtime->update_bindings(bindings->first, bindings->second);
                 auto state = std::make_shared<const engine::RuntimeSnapshot>(runtime->snapshot());
                 std::lock_guard lock(mutex_);
                 if (generation != reading_.generation)
@@ -213,8 +228,6 @@ class Service final : public RoutingService {
 };
 } // namespace
 std::unique_ptr<RoutingService> make_routing_service(RuntimeFactory factory) {
-    if (!factory)
-        factory = [] { return std::make_unique<engine::Runtime>(engine::LatencyPreset::Low); };
     return std::make_unique<Service>(std::move(factory));
 }
 engine::Result<engine::Profile> routing_profile(const Profile& p) {
@@ -232,7 +245,7 @@ engine::Result<engine::Profile> routing_profile(const Profile& p) {
     // original JSON/unknown fields and is never rewritten from this value.
     return engine::parse_profile(Json{
         {"format", "audiohole-profile"},
-        {"schema_version", 3},
+        {"schema_version", 4},
         {"profile",
          {{"id", p.id}, {"display_name", p.display_name}, {"notes", p.notes}, {"holes", holes}}}}
                                      .dump());
@@ -291,9 +304,29 @@ std::string routing_issues(const std::vector<engine::Issue>& issues) {
     }
     return out;
 }
+std::string routing_progress(const Snapshot& state) {
+    const auto* intent =
+        state.routing_intent ? state.routing_intent.get() : profile(state, state.active_profile);
+    if (!intent || !state.armed)
+        return {};
+    unsigned total = 0, running = 0;
+    for (const auto& hole : intent->holes) {
+        if (!hole.enabled)
+            continue;
+        ++total;
+        const auto path_running = [&](bool reverse) {
+            return std::any_of(state.paths.begin(), state.paths.end(), [&](const auto& p) {
+                return p.hole_id == hole.id && p.reverse == reverse && p.state == State::Running;
+            });
+        };
+        if (path_running(false) && (!hole.duplex || path_running(true)))
+            ++running;
+    }
+    return std::to_string(running) + "/" + std::to_string(total) + " running";
+}
 std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Profile* profile) {
     std::ostringstream out;
-    out << "Engine 0.6 | Native scheduling preset: Low (host policy)\n";
+    out << "Engine 0.6 | Automatic native latency policy: Low\n";
     auto format = [](const engine::StreamFormat& f) {
         return std::to_string(f.sample_rate_hz) + " Hz / " + std::to_string(f.channel_count) +
                " ch / " + engine::name(f.sample_format);
@@ -353,8 +386,24 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
                 }
                 if (s.period_frames)
                     out << " | Period: " << *s.period_frames << " frames";
-                if (s.applied_buffer_request_ms)
+                if (s.applied_buffer_request_ms) {
                     out << " | Buffer request supplied: " << *s.applied_buffer_request_ms << " ms";
+                    if (s.allocated_buffer_frames && s.timing_sample_rate_hz)
+                        out << " | Capacity adjustment: "
+                            << 1000.0 * *s.allocated_buffer_frames / *s.timing_sample_rate_hz -
+                                   *s.applied_buffer_request_ms
+                            << " ms";
+                }
+                if (s.applied_period_request_ms)
+                    out << " | Processing interval requested: " << *s.applied_period_request_ms
+                        << " ms";
+                if (s.applied_render_ahead_request_ms)
+                    out << " | Playback lead requested: " << *s.applied_render_ahead_request_ms
+                        << " ms";
+                if (s.render_ahead_target_frames && s.timing_sample_rate_hz)
+                    out << " | Playback lead: "
+                        << 1000.0 * *s.render_ahead_target_frames / *s.timing_sample_rate_hz
+                        << " ms";
                 if (s.access_fell_back)
                     out << " | Preferred Exclusive fell back to Shared";
                 out << '\n';
@@ -370,10 +419,18 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
             };
             stream("Capture", n.source);
             stream("Playback", n.destination);
+            if (n.requested_queue_target_ms)
+                out << "Routing queue requested: " << *n.requested_queue_target_ms << " ms\n";
+            if (n.fifo_target_source_frames)
+                out << "Routing queue target: "
+                    << 1000.0 * *n.fifo_target_source_frames / n.source.client_format.sample_rate_hz
+                    << " ms\n";
             out << "Processing: " << n.processing << " | Synchronization: " << n.synchronization
                 << '\n';
         }
         const auto& o = path.observation;
+        if (!o.worker_scheduling.empty())
+            out << "Audio worker: " << o.worker_scheduling << '\n';
         auto counter = [&](const char* label, const auto& value) {
             if (value)
                 out << label << ": " << *value << " | ";

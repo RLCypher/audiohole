@@ -22,12 +22,15 @@ LRESULT CALLBACK border_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lp
         if (!(position->flags & SWP_NOSIZE))
             position->flags |= SWP_NOCOPYBITS;
     }
-    if (message == WM_SIZE && !(policy & 16))
-        RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME);
     if (message == WM_PAINT && (policy & 8) && !(policy & 2)) {
         bool enabled = true;
-        for (HWND current = handle; current; current = GetParent(current))
+        for (HWND current = handle; current; current = GetParent(current)) {
             enabled = enabled && IsWindowEnabled(current);
+            // A modal dialog's owner is disabled intentionally. It is not an
+            // ancestor control and must not gray the dialog's own labels.
+            if (!(GetWindowLongPtrW(current, GWL_STYLE) & WS_CHILD))
+                break;
+        }
         if (!enabled) {
             PAINTSTRUCT paint{};
             const auto dc = BeginPaint(handle, &paint);
@@ -56,6 +59,9 @@ LRESULT CALLBACK border_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lp
         }
     }
     const auto result = DefSubclassProc(handle, message, wparam, lparam);
+    if (message == WM_SIZE && !(policy & 16))
+        RedrawWindow(handle, nullptr, nullptr,
+                     RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN);
     if (message == WM_SETFOCUS || message == WM_KILLFOCUS)
         RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
     if ((message != WM_PAINT && message != WM_NCPAINT) || (policy & (2 | 8)))

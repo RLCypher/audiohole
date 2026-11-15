@@ -169,25 +169,36 @@ void low_latency_policy() {
     expect(!minimum_shared_period(0, 128, 480) && !minimum_shared_period(48, 128, 130) &&
                !minimum_shared_period(48, 0, 480) && !minimum_shared_period(48, 480, 128),
            "invalid period bounds cannot produce a guessed minimum");
+    expect(requested_shared_period(10.001, 48000, 48, 144, 960) == 480,
+           "sub-frame input precision rounds to a supported period");
+    expect(!requested_shared_period(10.1, 48000, 48, 144, 960),
+           "fundamental alignment cannot silently add several frames to an explicit period");
     StreamConfiguration stream;
     stream.allocated_buffer_frames = 1056;
     stream.period_frames = 480;
     stream.timing_sample_rate_hz = 48000;
-    expect(render_ahead_target(stream, LatencyPreset::Baseline) == 1056,
-           "baseline continues to fill the entire render allocation");
+    expect(render_ahead_target(stream, LatencyPreset::Baseline) == 528,
+           "shared render lead follows cadence independently of allocation");
     expect(render_ahead_target(stream, LatencyPreset::Low) == 528,
            "low preset limits 10-ms shared rendering to 11-ms queued audio");
-    stream.applied_buffer_request_ms = 22;
+    stream.applied_render_ahead_request_ms = 22.0001;
     expect(render_ahead_target(stream, LatencyPreset::Low) == 1056,
-           "explicit endpoint buffer retains baseline render submission");
+           "sub-frame lead precision may round to the allocation boundary");
+    stream.applied_render_ahead_request_ms = 22.1;
+    expect(render_ahead_target(stream, LatencyPreset::Low) == 0,
+           "a materially excessive explicit lead is rejected instead of clamped");
+    stream.applied_render_ahead_request_ms.reset();
+    stream.applied_buffer_request_ms = 22;
+    expect(render_ahead_target(stream, LatencyPreset::Low) == 528,
+           "explicit capacity does not inflate shared playback lead");
     stream.applied_buffer_request_ms.reset();
     stream.mode = AccessMode::Exclusive;
     expect(render_ahead_target(stream, LatencyPreset::Low) == 1056,
            "exclusive event packets retain the full buffer contract");
     stream.mode = AccessMode::Shared;
     stream.period_frames.reset();
-    expect(render_ahead_target(stream, LatencyPreset::Low) == 1056,
-           "unknown periods retain full-buffer compatibility behavior");
+    expect(render_ahead_target(stream, LatencyPreset::Low) == 1008,
+           "unknown cadence uses a bounded automatic lead independent of capacity");
     stream.period_frames = 128;
     stream.timing_sample_rate_hz = 44100;
     expect(render_ahead_target(stream, LatencyPreset::Low) == 173,
@@ -256,8 +267,8 @@ void startup_refill_regression() {
                "startup plan covers exactly the bounded native write extent");
     }
     stream.applied_buffer_request_ms = 22;
-    expect(startup_render_plan(stream, 1056, true).pipeline_frames == 1056,
-           "explicit buffer retains its prior startup behavior");
+    expect(startup_render_plan(stream, 1056, true).pipeline_frames == 480,
+           "capacity requests do not enlarge the startup processing block");
     stream.applied_buffer_request_ms.reset();
     stream.mode = AccessMode::Exclusive;
     expect(startup_render_plan(stream, 1056, true).pipeline_frames == 1056,
@@ -547,6 +558,47 @@ void lifecycle() {
     expect(runtime.snapshot().state == State::Stopped, "Stop is idempotent");
 }
 
+void explicit_timing_contract() {
+    using namespace audiohole::engine::detail;
+    EndpointRequirements required;
+    required.buffer_ms = 1;
+    required.period_ms = 10;
+    required.render_ahead_ms = 10.5;
+    StreamConfiguration stream;
+    stream.client_format = {48000, 2, SampleFormat::Float32};
+    stream.timing_sample_rate_hz = 48000;
+    stream.allocated_buffer_frames = 1056;
+    stream.applied_buffer_request_ms = 1;
+    stream.period_frames = 480;
+    stream.applied_period_request_ms = 10;
+    stream.render_ahead_target_frames = 504;
+    stream.applied_render_ahead_request_ms = 10.5;
+    expect(check_stream(required, stream, "destination").ok(),
+           "one-ms capacity can round up to 22 ms without increasing explicit cadence/lead");
+    stream.period_frames = 528;
+    expect(!check_stream(required, stream, "destination").ok(),
+           "larger processing interval is rejected");
+    stream.period_frames = 481;
+    expect(check_stream(required, stream, "destination").ok(),
+           "ordinary one-frame rounding is accepted");
+    stream.render_ahead_target_frames = 1056;
+    expect(!check_stream(required, stream, "destination").ok(), "larger playback lead is rejected");
+    StreamPipeline pipeline({48000, 1, SampleFormat::Float32}, {48000, 1, SampleFormat::Float32},
+                            {}, false, 12.25, true);
+    std::vector<float> packet(2000, 0.25f), output(480);
+    expect(pipeline.push(packet.data(), packet.size()),
+           "manual queue fixture accepts capture packet");
+    pipeline.render(output.data(), output.size());
+    expect(pipeline.target_frames() == 588 &&
+               pipeline.observe().controller_target_source_frames == 588,
+           "explicit fractional queue is not raised by a historical packet-size guard");
+    NegotiatedRoute route;
+    route.source.allocated_buffer_frames = route.destination.allocated_buffer_frames = 48000;
+    route.source.timing_sample_rate_hz = route.destination.timing_sample_rate_hz = 48000;
+    expect(queue_target_milliseconds(route) == 20,
+           "unknown periods never derive queue occupancy from capacity");
+}
+
 void owner_thread_contract() {
     Runtime runtime;
     std::atomic<bool> rejected{false};
@@ -575,6 +627,7 @@ int main() {
         underrun_context();
         late_capture_regression();
         lifecycle();
+        explicit_timing_contract();
         owner_thread_contract();
         std::cout << checks
                   << " portable processing/lifecycle checks passed; synthetic fixtures only.\n";

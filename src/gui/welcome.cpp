@@ -5,7 +5,7 @@
 #include <wx/stdpaths.h>
 #include <wx/wrapsizer.h>
 namespace audiohole::gui {
-WelcomeDialog::WelcomeDialog(bool first_time)
+WelcomeDialog::WelcomeDialog(bool first_time, const std::string& appearance)
     : wxDialog(nullptr, wxID_ANY, "Welcome to AudioHole!", wxDefaultPosition, wxDefaultSize,
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER) {
     SetIcons(application_icons());
@@ -78,7 +78,7 @@ It's easier than it looks. Usually.)");
     SetMinSize(wxSize(std::min(FromDIP(650), width), std::min(FromDIP(390), height)));
     SetSize(wxSize(std::min(GetSize().x, width), std::min(GetSize().y, height)));
     SetEscapeId(wxID_CANCEL);
-    theme_dialog(this);
+    theme_dialog(this, appearance);
     Centre();
 }
 } // namespace audiohole::gui

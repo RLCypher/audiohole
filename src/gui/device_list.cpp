@@ -130,9 +130,10 @@ DeviceList::DeviceList(wxWindow* parent)
     });
     client->Bind(wxEVT_MOTION, [this, client](wxMouseEvent& event) {
         const auto row = HitTest(ScreenToClient(client->ClientToScreen(event.GetPosition())));
-        const auto tip = row >= 0 ? GetTextValue(static_cast<unsigned>(row), 0) + ": " +
-                                        GetTextValue(static_cast<unsigned>(row), 1)
-                                  : wxString("Right-click a device for scans and Hide / Unhide.");
+        const auto tip =
+            row >= 0 ? GetTextValue(static_cast<unsigned>(row), 0) + ": " +
+                           GetTextValue(static_cast<unsigned>(row), 1)
+                     : wxString("Right-click a device for Rename, scans and Hide / Unhide.");
         if (!client->GetToolTip() || client->GetToolTip()->GetTip() != tip)
             client->SetToolTip(tip);
         event.Skip();

@@ -1719,6 +1719,250 @@
         "expression": "happy",
         "fallback_expression": "idle"
       }
+    ],
+    "error_minor": [
+      {
+        "id": "uwu_error_minor_001",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Huh? That's weiwd... OwO",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_002",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "U-umm... that wasn't supposed to happen. (・・;)",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_003",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Eh? Something's being naughty! >w<",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_004",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Oop! Tiny pwoblem! (；ω；)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_005",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Hmmm... that's a wittle suspicious. OwO",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_006",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Nyaa? What's going on hewe? (・_・;)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_007",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Eep! That didn't quite wowk! >~<",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_008",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "O-oh? Someone's being difficult~",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_009",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Huhuhu... that's not quite wight. (￣▽￣;)",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_010",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Something's acting kinda funky! (・・?)",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_011",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "W-wait, what was that?! OwO",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_012",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Aww... it didn't wanna cooperate. (╥﹏╥)",
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_013",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Hmm? I don't wemember asking for that. >w<",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_014",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "Owie... tiny hiccup! (；´∀｀)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_minor_015",
+        "category": "error",
+        "subcategory": "minor",
+        "text": "That was a wittle unexpected! (⊙_⊙)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "error_major": [
+      {
+        "id": "uwu_error_major_001",
+        "category": "error",
+        "subcategory": "major",
+        "text": "AAAA! IT'S BWOKEN!! (╥﹏╥)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_002",
+        "category": "error",
+        "subcategory": "major",
+        "text": "H-HEWP! SOMETHING'S WONG!! >~<",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_003",
+        "category": "error",
+        "subcategory": "major",
+        "text": "N-NO NO NO! THAT'S BAD! (；ﾟДﾟ)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_004",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Eeeee! I can't make it wowk! (｡ŏ﹏ŏ)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_005",
+        "category": "error",
+        "subcategory": "major",
+        "text": "O-oh no... we have a BIG pwoblem! QwQ",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_006",
+        "category": "error",
+        "subcategory": "major",
+        "text": "I-I think something just died! (╥_╥)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_007",
+        "category": "error",
+        "subcategory": "major",
+        "text": "UWAHH! IT'S NOT WOWKING!! (つД｀)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_008",
+        "category": "error",
+        "subcategory": "major",
+        "text": "M-my holes stopped wowking!! QwQ",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_009",
+        "category": "error",
+        "subcategory": "major",
+        "text": "P-pwease don't panic! I'M PANICKING!! (；ω；)",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_010",
+        "category": "error",
+        "subcategory": "major",
+        "text": "WAAAH! Something went vewy, vewy wong! >~<",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_011",
+        "category": "error",
+        "subcategory": "major",
+        "text": "I-I don't know how to fix this one! (｡•́︿•̀｡)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_012",
+        "category": "error",
+        "subcategory": "major",
+        "text": "Oh nyooo! Everything's being mean! (╥﹏╥)",
+        "expression": "angry",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_013",
+        "category": "error",
+        "subcategory": "major",
+        "text": "T-this is a sewious malfunction!! (；´Д｀)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_014",
+        "category": "error",
+        "subcategory": "major",
+        "text": "W-wait! Come back, audio!! QwQ",
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_error_major_015",
+        "category": "error",
+        "subcategory": "major",
+        "text": "AAAA! SOMETHING'S FUCKY WUCKY!! (╥﹏╥)",
+        "expression": "error",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

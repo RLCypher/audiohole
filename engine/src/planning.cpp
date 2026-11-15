@@ -1,6 +1,7 @@
 #include "audiohole/engine/profile.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <set>
 
 namespace audiohole::engine {
@@ -15,6 +16,11 @@ void validate(const EndpointRequirements& r, const std::string& location,
     range(r.sample_rate_hz, 768000, "sample_rate_hz");
     range(r.channel_count, 256, "channel_count");
     range(r.buffer_ms, 100, "buffer_ms");
+    for (const auto& [key, n] :
+         {std::pair{"period_ms", r.period_ms}, std::pair{"render_ahead_ms", r.render_ahead_ms}})
+        if (n && (!std::isfinite(*n) || *n <= 0))
+            issues.push_back({ErrorCode::InvalidConfiguration, location + "/" + key,
+                              "Expected positive finite milliseconds or null."});
     if (r.sample_format && std::string_view(name(*r.sample_format)) == "invalid")
         issues.push_back({ErrorCode::InvalidConfiguration, location + "/sample_format",
                           "Invalid typed sample format."});
@@ -127,6 +133,15 @@ Result<PreparedProfile> prepare_profile(const Profile& profile) {
                 validate(p.common, prefs + "/common", issues);
                 validate(p.source, prefs + "/source", issues);
                 validate(p.destination, prefs + "/destination", issues);
+                if (p.queue_target_ms &&
+                    (!std::isfinite(*p.queue_target_ms) || *p.queue_target_ms <= 0))
+                    issues.push_back({ErrorCode::InvalidConfiguration, prefs + "/queue_target_ms",
+                                      "Expected positive finite milliseconds or null."});
+                if (p.common.render_ahead_ms || p.source.render_ahead_ms)
+                    issues.push_back(
+                        {ErrorCode::InvalidConfiguration, prefs,
+                         "Playback queue belongs only to destination.render_ahead_ms."});
+                request.queue_target_ms = p.queue_target_ms;
                 request.source = inherit(p.common, p.source);
                 request.destination = inherit(p.common, p.destination);
                 request.channel_map = p.channel_map;

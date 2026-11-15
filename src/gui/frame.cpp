@@ -24,6 +24,8 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     }
     if (controller_->snapshot().operating_mode == OperatingMode::Tutorial)
         tutorial_ = std::make_unique<Tutorial>();
+    controller_->audio_worker_policy(preferences_->values().scheduling_task,
+                                     preferences_->values().audio_thread_priority);
     personality_ = tutorial_ ? "default" : preferences_->values().personality_id;
     Bind(
         wxEVT_TIMER,
@@ -179,6 +181,18 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     build_devices();
     build_scan();
     build_settings();
+    for (auto* split : {profile_columns_, profile_rows_, profile_lower_rows_, device_columns_,
+                        device_rows_, performance_split_, scan_output_split_}) {
+        split->Bind(wxEVT_SPLITTER_SASH_POS_CHANGED, [split](wxSplitterEvent& event) {
+            event.Skip();
+            split->CallAfter([split] {
+                if (!split->IsBeingDeleted())
+                    RedrawWindow(static_cast<HWND>(split->GetHandle()), nullptr, nullptr,
+                                 RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN |
+                                     RDW_UPDATENOW);
+            });
+        });
+    }
     if (tutorial_) {
         auto disable_files = [&](const auto& self, wxWindow* parent) -> void {
             if (auto* action = dynamic_cast<wxButton*>(parent)) {
@@ -240,15 +254,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     CallAfter([this] {
         if (IsBeingDeleted())
             return;
-        profile_columns_->SetSashPosition(FromDIP(300));
-        profile_rows_->SetSashPosition(profile_rows_->GetClientSize().y / 3);
-        profile_lower_rows_->SetSashPosition(
-            std::max(FromDIP(72), profile_lower_rows_->GetClientSize().y -
-                                      profile_notes_->GetCharHeight() * 3 - FromDIP(36)));
-        device_columns_->SetSashPosition(FromDIP(300));
-        device_rows_->SetSashPosition(std::max(FromDIP(72), device_rows_->GetClientSize().y -
-                                                                device_notes_->GetCharHeight() * 3 -
-                                                                FromDIP(36)));
+        reset_layout();
     });
     Bind(
         wxEVT_TIMER,
@@ -525,18 +531,18 @@ void Frame::bother() {
     present(presentation::Message::Bother);
 }
 void Frame::present(presentation::Message event) {
-    if (tutorial_)
+    if (tutorial_ || (event == presentation::Message::ErrorMinor && operational_warning_visible_))
         return;
     const bool device_notice = event == presentation::Message::DeviceConnected ||
                                event == presentation::Message::DeviceDisconnected ||
                                event == presentation::Message::DeviceUnavailable;
     if (!device_notice)
         device_event_copy_.clear();
-    operational_warning_visible_ = event == presentation::Message::ScanFailed ||
-                                   event == presentation::Message::Disconnected ||
-                                   event == presentation::Message::Recovering ||
-                                   event == presentation::Message::Questionable ||
-                                   event == presentation::Message::Invalid;
+    operational_warning_visible_ =
+        event == presentation::Message::ErrorMajor || event == presentation::Message::ScanFailed ||
+        event == presentation::Message::Disconnected ||
+        event == presentation::Message::Recovering ||
+        event == presentation::Message::Questionable || event == presentation::Message::Invalid;
     last_message_ = event;
     const auto c = messages_.show(event, personality_, ++occurrence_);
     avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
@@ -642,6 +648,11 @@ void Frame::show_result(const audiohole::Result& result, bool operational) {
     // Input/file-action failures are recoverable locally. They do not authorize
     // a persistent operational warning or suppress cosmetic interactions.
     if (!result.ok && !operational) {
+        if (!operational_warning_visible_) {
+            present(presentation::Message::ErrorMinor);
+            technical_copy_ = result.detail;
+            layout_header();
+        }
         if (!smoke_)
             themed_message_box(text(result.detail), "AudioHole — action unavailable",
                                wxOK | wxICON_INFORMATION, this);
@@ -649,6 +660,8 @@ void Frame::show_result(const audiohole::Result& result, bool operational) {
     }
     if (result.ok && operational_warning_visible_ && !operational)
         return;
+    if (!result.ok)
+        present(presentation::Message::ErrorMajor);
     operational_warning_visible_ = !result.ok;
     avatar_host_->observe(controller_->snapshot(), operational_warning_visible_,
                           avatar::monotonic_ms());
@@ -804,6 +817,8 @@ void Frame::refresh() {
                                              : std::string("Engine: unavailable"))) +
         "\nActive: " + (active ? active->display_name : "none") +
         "\nViewed: " + draft_.display_name + (dirty_ ? " (unsaved edits)" : "");
+    if (s.capabilities.real_engine && s.armed)
+        status = "Routing: " + routing_progress(s) + status.substr(status.find('\n'));
     if (!s.pending_profile.empty())
         status += "\nStartup pending: " + std::to_string((s.pending_ms + 999) / 1000) + " s";
     std::vector<std::string> enabled_holes;
@@ -918,7 +933,7 @@ void Frame::refresh() {
             else if (e.type == "scan-cancelled")
                 message = presentation::Message::ScanCancelled;
             else if (e.type == "scan-failed")
-                message = presentation::Message::ScanFailed;
+                routine = false;
             else if (e.type == "manual-override-applied")
                 message = presentation::Message::ManualOverrideApplied;
             else if (e.type == "activated")
@@ -941,16 +956,25 @@ void Frame::refresh() {
                 routine = false;
             if (routine)
                 present(message);
+            if ((e.type == "scanner-action-failed" || e.type == "configuration-save-failed" ||
+                 e.type == "action-rejected") &&
+                !operational_warning_visible_) {
+                present(presentation::Message::ErrorMinor);
+                technical_copy_ = e.detail;
+                layout_header();
+            }
             if (e.type == "scanner-action-failed" && !smoke_)
                 themed_message_box(text(e.detail), "Device / export operation", wxOK | wxICON_ERROR,
                                    this);
             if (e.type == "error" || e.type == "scan-failed" || e.severity == Severity::Error ||
                 e.severity == Severity::Critical) {
-                operational_warning_visible_ = true;
-                avatar_host_->observe(s, true, avatar::monotonic_ms());
-                technical_copy_ = e.detail;
-                commentary_copy_.clear();
-                layout_header();
+                const bool major = e.type == "error" || e.severity == Severity::Critical;
+                if (major || !operational_warning_visible_) {
+                    present(major ? presentation::Message::ErrorMajor
+                                  : presentation::Message::ErrorMinor);
+                    technical_copy_ = e.detail;
+                    layout_header();
+                }
             }
             if (!smoke_ && !tutorial_ && tray_->IsIconInstalled() &&
                 notifications_->GetSelection() != 2 &&
@@ -1002,7 +1026,7 @@ bool Frame::smoke(const wxString& directory) {
                             " best=" + std::to_string(field->GetBestSize().y));
         };
         {
-            WelcomeDialog welcome(true);
+            WelcomeDialog welcome(true, preferences_->values().appearance);
             require(welcome.has_norm_image(), "Welcome Norm image missing");
             require(welcome.FindWindow(wxID_YES)->GetLabel() == "It's my first time" &&
                         welcome.FindWindow(wxID_NO)->GetLabel() == "Show me them holes!" &&
@@ -1170,8 +1194,10 @@ bool Frame::smoke(const wxString& directory) {
                 require(widgets->tuning->GetPane()
                                 ->GetSizer()
                                 ->GetItem(static_cast<std::size_t>(0))
+                                ->GetSizer()
+                                ->GetItem(static_cast<std::size_t>(0))
                                 ->GetWindow() == widgets->advanced_tuning,
-                        "Use advanced tuning must be the first control inside its disclosure");
+                        "Use advanced tuning must lead the disclosure header row");
             }
             const auto original = draft_.holes.at(static_cast<std::size_t>(hole_index_));
             const auto saved_profiles = controller_->snapshot().profiles;
@@ -1219,6 +1245,18 @@ bool Frame::smoke(const wxString& directory) {
                 widgets.tuning->GetEventHandler()->ProcessEvent(event);
                 require(GetSize() == window_size, "Direction disclosure resized the window");
             };
+            for (auto* widgets : {&forward_, &reverse_}) {
+                for (auto* section : widgets->sections)
+                    require(section->IsCollapsed(),
+                            "Advanced tuning subsection must initially be collapsed");
+                for (auto* section : widgets->sections) {
+                    section->Expand();
+                    wxCollapsiblePaneEvent event(section, section->GetId(), false);
+                    section->GetEventHandler()->ProcessEvent(event);
+                    require(GetSize() == window_size,
+                            "Advanced subsection resized the application window");
+                }
+            }
             disclose(forward_, true);
             require(forward_.buffer->GetSize().y == forward_.buffer_apply->GetSize().y &&
                         forward_.buffer->GetPosition().y == forward_.buffer_apply->GetPosition().y,
@@ -1306,6 +1344,11 @@ bool Frame::smoke(const wxString& directory) {
             wxCommandEvent return_toggle(wxEVT_CHECKBOX, reverse_.advanced_tuning->GetId());
             reverse_.advanced_tuning->GetEventHandler()->ProcessEvent(return_toggle);
             tuning_timer_.Stop();
+            for (auto* widgets : {&forward_, &reverse_}) {
+                for (auto* section : widgets->sections)
+                    section->Collapse();
+                layout_direction(*widgets);
+            }
         };
         auto decline_delete = [&](wxListBox* list, wxButton* remove = nullptr) {
             capture_draft();
@@ -1459,9 +1502,12 @@ bool Frame::smoke(const wxString& directory) {
         const auto warning_before_input = operational_warning_visible_;
         show_result({false, "Invalid numeric field fixture"});
         require(operational_warning_visible_ == warning_before_input &&
-                    technical_copy_ == retained_technical &&
-                    commentary_copy_ == retained_commentary,
-                "Recoverable validation error changed avatar/personality state");
+                    (warning_before_input ? technical_copy_ == retained_technical &&
+                                                commentary_copy_ == retained_commentary
+                                          : technical_copy_ == "Invalid numeric field fixture" &&
+                                                !commentary_copy_.empty()),
+                "Minor error lost its technical detail/personality response or replaced a major "
+                "warning");
         wxCommandEvent continuous_event(wxEVT_CHECKBOX, loop_until_event_->GetId());
         loop_until_event_->SetValue(true);
         loop_until_event_->GetEventHandler()->ProcessEvent(continuous_event);
@@ -1507,6 +1553,55 @@ bool Frame::smoke(const wxString& directory) {
                         "; lower-sash=" + std::to_string(profile_lower_rows_->GetSashPosition()));
                 }
             }
+        };
+        auto check_reset_layout = [&] {
+            const auto window = GetSize();
+            const auto saved = controller_->snapshot().profiles;
+            auto* reset = wxWindow::FindWindowByLabel("Reset layout to default", this);
+            require(reset, "Settings is missing Reset layout to default");
+            auto click_reset = [&] {
+                wxCommandEvent event(wxEVT_BUTTON, reset->GetId());
+                reset->GetEventHandler()->ProcessEvent(event);
+                Layout();
+            };
+            click_reset();
+            std::vector<int> positions;
+            for (auto* split :
+                 {profile_columns_, profile_rows_, profile_lower_rows_, performance_split_,
+                  device_columns_, device_rows_, scan_output_split_}) {
+                positions.push_back(split->GetSashPosition());
+            }
+            for (auto* split :
+                 {profile_columns_, profile_rows_, profile_lower_rows_, performance_split_,
+                  device_columns_, device_rows_, scan_output_split_})
+                split->SetSashPosition(split->GetSashPosition() + FromDIP(16));
+            click_reset();
+            unsigned index = 0;
+            for (auto* split :
+                 {profile_columns_, profile_rows_, profile_lower_rows_, performance_split_,
+                  device_columns_, device_rows_, scan_output_split_})
+                if (std::abs(split->GetSashPosition() - positions[index++]) > 1)
+                    throw std::runtime_error("Reset splitter " + utf8(split->GetName()) + ": " +
+                                             std::to_string(positions[index - 1]) + " -> " +
+                                             std::to_string(split->GetSashPosition()));
+            require(GetSize() == window && controller_->snapshot().profiles == saved,
+                    "Reset layout resized the window or changed saved profiles");
+            auto lines = [&](wxTextCtrl* control, int count) {
+                const int actual = control->GetClientSize().y,
+                          target = count * control->GetCharHeight();
+                if (actual < target || actual > target + FromDIP(24))
+                    throw std::runtime_error("Default field height: " + utf8(control->GetName()) +
+                                             " actual=" + std::to_string(actual) +
+                                             " target=" + std::to_string(target));
+            };
+            lines(profile_notes_, 4);
+            lines(device_notes_, 3);
+            lines(path_status_, 2);
+            require(std::abs(capture_devices_->GetParent()->GetScreenRect().GetRight() -
+                             devices_folder_->GetScreenRect().GetRight()) <= 2 &&
+                        std::abs(playback_devices_->GetParent()->GetScreenRect().GetRight() -
+                                 devices_folder_->GetScreenRect().GetRight()) <= 2,
+                    "Device panels do not align with the folder toolbar button by default");
         };
         layout_header();
         check_profile_layout();
@@ -1817,6 +1912,7 @@ bool Frame::smoke(const wxString& directory) {
             require(!profile_apply_->IsEnabled(),
                     "Test Mode enabled Apply after creating a profile");
             check_endpoint_heights();
+            check_reset_layout();
             if (!directory.empty()) {
                 wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
                 wxBitmap bitmap(GetClientSize());
@@ -1836,6 +1932,54 @@ bool Frame::smoke(const wxString& directory) {
         }
         require(capture_devices_ && playback_devices_ && capture_devices_ != playback_devices_,
                 "Devices must have separate capture and playback lists");
+        for (const bool capture : {true, false}) {
+            const auto found = std::find_if(
+                controller_->snapshot().endpoints.begin(), controller_->snapshot().endpoints.end(),
+                [capture](const auto& e) { return e.capture == capture; });
+            require(found != controller_->snapshot().endpoints.end(),
+                    "Device rename needs both directions");
+            const auto original = *found;
+            auto rename_device = [&](const std::string& name, bool cancel) {
+                class ConfirmDevice final : public wxModalDialogHook {
+                  public:
+                    std::string name;
+                    bool cancel = false, asked = false;
+                    int Enter(wxDialog* dialog) override {
+                        auto* edit = dynamic_cast<wxTextEntryDialog*>(dialog);
+                        if (!edit || edit->GetTitle() != "Rename device")
+                            return wxID_NONE;
+                        asked = true;
+                        edit->SetValue(text(name));
+                        return cancel ? wxID_CANCEL : wxID_OK;
+                    }
+                } hook;
+                hook.name = name;
+                hook.cancel = cancel;
+                hook.Register();
+                auto menu = device_menu(original.id);
+                require(menu && menu->FindItem(wxID_EDIT) && menu->IsEnabled(wxID_EDIT),
+                        "Device context menu lacks Rename");
+                wxCommandEvent event(wxEVT_MENU, wxID_EDIT);
+                menu->ProcessEvent(event);
+                hook.Unregister();
+                require(hook.asked, "Device context Rename did not open its native dialog");
+            };
+            rename_device("Cancelled device rename", true);
+            const auto* cancelled = endpoint(controller_->snapshot(), original.id);
+            require(cancelled && cancelled->display_name == original.display_name &&
+                        cancelled->windows_name == original.windows_name &&
+                        cancelled->notes == original.notes &&
+                        cancelled->capture == original.capture,
+                    "Cancelling Rename changed a device");
+            rename_device(original.display_name + " renamed", false);
+            const auto* saved = endpoint(controller_->snapshot(), original.id);
+            require(saved && saved->display_name == original.display_name + " renamed" &&
+                        saved->windows_name == original.windows_name &&
+                        saved->notes == original.notes && saved->capture == original.capture,
+                    "Device Rename changed identity/notes or did not save the selected record");
+            rename_device(original.display_name, false);
+        }
+
         {
             const auto* selected = endpoint(controller_->snapshot(), device_id_);
             require(selected != nullptr, "Enter-save device fixture missing");
@@ -2029,6 +2173,12 @@ bool Frame::smoke(const wxString& directory) {
         select_page(0, true);
         show_result({false, "Operational warning retained."}, true);
         const auto warning_occurrence = occurrence_;
+        const auto warning_commentary = commentary_copy_;
+        present(presentation::Message::ErrorMinor);
+        require(technical_copy_ == "Operational warning retained." &&
+                    commentary_copy_ == warning_commentary && occurrence_ == warning_occurrence &&
+                    operational_warning_visible_,
+                "A minor error displaced an unresolved operational failure");
         bother();
         require(technical_copy_ == "Operational warning retained." &&
                     occurrence_ == warning_occurrence,
@@ -2585,6 +2735,7 @@ bool Frame::smoke(const wxString& directory) {
         notebook_->SetSelection(0);
         Layout();
         check_endpoint_heights();
+        check_reset_layout();
         if (!directory.empty()) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             for (std::size_t i = 0; i < notebook_->GetPageCount(); ++i) {
@@ -2602,6 +2753,42 @@ bool Frame::smoke(const wxString& directory) {
                 bitmap.SaveFile(directory + wxString::Format("/page-%zu.bmp", i),
                                 wxBITMAP_TYPE_BMP);
             }
+            auto capture_extra = [&](const wxString& name) {
+                Layout();
+                Update();
+                wxYield();
+                wxBitmap bitmap(GetClientSize());
+                wxMemoryDC destination(bitmap);
+                wxClientDC source(this);
+                destination.Blit(0, 0, GetClientSize().x, GetClientSize().y, &source, 0, 0);
+                destination.SelectObject(wxNullBitmap);
+                bitmap.SaveFile(directory + "/" + name + ".bmp", wxBITMAP_TYPE_BMP);
+            };
+            notebook_->SetSelection(0);
+            for (unsigned section = 0; section < 3; ++section) {
+                forward_.tuning->Expand();
+                for (unsigned i = 0; i < 3; ++i)
+                    forward_.sections[i]->Collapse(i != section);
+                layout_direction(forward_);
+                const auto position = profile_editor_->CalcUnscrolledPosition(
+                    profile_editor_->ScreenToClient(forward_.tuning->GetScreenPosition()));
+                int step_x = 0, step_y = 0;
+                profile_editor_->GetScrollPixelsPerUnit(&step_x, &step_y);
+                profile_editor_->Scroll(
+                    -1, std::max(0, (position.y - FromDIP(4)) / std::max(1, step_y)));
+                capture_extra(wxString::Format("advanced-%u", section));
+            }
+            const auto appearance = theme_choice_->GetSelection();
+            theme_choice_->SetSelection(1);
+            wxCommandEvent theme(wxEVT_CHOICE, theme_choice_->GetId());
+            theme_choice_->GetEventHandler()->ProcessEvent(theme);
+            reset_layout();
+            for (unsigned i : {0u, 1u, 3u}) {
+                notebook_->SetSelection(i);
+                capture_extra(wxString::Format("light-page-%u", i));
+            }
+            theme_choice_->SetSelection(appearance);
+            theme_choice_->GetEventHandler()->ProcessEvent(theme);
             std::ofstream result(std::filesystem::path(directory.ToStdWstring()) /
                                  "smoke-result.txt");
             result << "PASS: native widgets, controller Start/Stop, duplex, personality/DFA, "

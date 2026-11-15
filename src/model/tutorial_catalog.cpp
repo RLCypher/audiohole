@@ -235,7 +235,7 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Profiles are just saved setups. One for your headset, one for your desk, one for whatever cursed collection of USB gadgets you're running next Tuesday. Let's make one. Click Create Profile."
+    "text": "Profiles are just saved setups. You can have one for everyday use, one for live streaming, one for turning a bluetooth speaker into an ad hoc PA system, one for whatever cursed collection of USB gadgets you're running next Tuesday. Really any configuration of devices you might want to quickly switch between depending on the situation or what you need to do at any given moment. Let's make one. Click Create Profile."
   },
   "N018A": {
     "expression": "thinking",
@@ -247,7 +247,7 @@ std::string_view tutorial_catalog() {
     "expression": "mischievous",
     "variants": [],
     "choices": [],
-    "text": "Excellent. Now the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. Go ahead and create one."
+    "text": "Excellent! Now for the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. A hole simply tells the profile what audio endpoints you want to connect together. Think of it like a wormhole for your audio, very sophisticated technology, very science, and simpler than it seems. You can have as many as you need in a single profile, but I wouldn't have more than 8, things might get a little weird. Because our little tutorial session is a simple connection between two devices, we'll only need one hole, go ahead and make it."
   },
   "N018B": {
     "expression": "smug",
@@ -368,13 +368,13 @@ std::string_view tutorial_catalog() {
         "from": "N027A",
         "label": "Oscar-worthy performance",
         "expression": "laughing",
-        "text": "Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. Yes, even though this is fake. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much."
+        "text": "Thank you. I'll be accepting my award in the diagnostics tab. Alright, moment of truth... say something into your microphone. Out loud. Anything. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. Testing is the important part, make a habit of checking a route before trusting it. Go on. I won't judge. Much."
       },
       {
         "from": "N027A",
         "label": "You made me wait for THAT?",
         "expression": "laughing",
-        "text": "Look, a little dramatic tension never killed anybody. The imaginary routing engine needed its moment. Now comes the actually useful habit, say something into your microphone. Out loud. Whatever comes to mind. We always test a connection before assuming it works. Don't just stare at me. I can do that all day."
+        "text": "Look, a little dramatic tension never killed anybody. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. Now comes the actually useful habit, say something into your microphone. Out loud. Whatever comes to mind. We always test a connection before assuming it works. Don't just stare at me. I can do that all day."
       }
     ],
     "choices": [
@@ -386,7 +386,7 @@ std::string_view tutorial_catalog() {
     "expression": "suspicious",
     "variants": [],
     "choices": [],
-    "text": "Nope, I mean actually say something. 'Testing, one, two' works. So does a deeply personal confession to your monitor. Your secret's safe with this imaginary mixer."
+    "text": "Nope, I mean actually say something. 'Testing, one, two' works. So does a deeply personal confession to your monitor. Your secret's safe with me."
   },
   "N030-A": {
     "expression": "deadpan",
@@ -395,7 +395,7 @@ std::string_view tutorial_catalog() {
       "A timeless masterpiece",
       "You got me"
     ],
-    "text": "Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and this entire setup is imaginary. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters."
+    "text": "Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and checking the route is how you know the audio is going where intended. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters."
   },
   "N030-B": {
     "expression": "mischievous",
@@ -404,7 +404,7 @@ std::string_view tutorial_catalog() {
       "Fair point",
       "You set me up"
     ],
-    "text": "And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. Also, this is a pretend setup, so I couldn't hear a damn thing. The important bit is you actually tried the mic check. Do that when you set up real routing, too."
+    "text": "And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. The important bit is you actually tried the mic check. Do that when you set up real routing, too."
   },
   "N031": {
     "expression": "happy",
@@ -678,7 +678,7 @@ std::string_view tutorial_catalog() {
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(28946);
+        result.reserve(29816);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

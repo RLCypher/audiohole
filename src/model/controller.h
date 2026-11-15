@@ -49,6 +49,7 @@ struct Endpoint {
 struct EndpointPreferences {
     std::optional<int> sample_rate_hz, channel_count, buffer_ms;
     std::optional<std::string> sample_format, mode;
+    std::optional<double> period_ms, render_ahead_ms;
     bool operator==(const EndpointPreferences&) const = default;
 };
 struct ChannelRoute {
@@ -59,6 +60,7 @@ struct Preferences {
     EndpointPreferences common, source, destination;
     std::vector<ChannelRoute> channel_map;
     std::string preferred_clock_device = "automatic"; // Reserved intent; no current engine effect.
+    std::optional<double> queue_target_ms;
     bool operator==(const Preferences&) const = default;
 };
 struct Settings {
@@ -258,6 +260,7 @@ class Controller {
         return {false, "Capture checks are unavailable."};
     }
     virtual void wait_for_devices(bool) {}
+    virtual void audio_worker_policy(const std::string&, const std::string&) {}
     // Simulates a bounded interval for one explicit playback endpoint. Rejects
     // missing/ambiguous/capture endpoints and exclusive conflicts. Emits NO SOUND.
     virtual Result beep(const std::string& destination) = 0;

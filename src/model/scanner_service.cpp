@@ -210,6 +210,29 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
                     {*format, mode == "shared" ? "Shared" : "Exclusive", support});
             }
         auto detail = std::make_shared<DeviceInspection>();
+        const auto& periods = field(reported, "shared_engine_periods");
+        const auto period_format = routing_format(field(periods, "format"));
+        if (period_format) {
+            detail->period_sample_rate_hz = period_format->rate;
+            detail->period_channels = period_format->channels;
+            detail->period_sample_format = period_format->representation;
+            const auto frames = [&](const char* key) -> std::uint64_t {
+                const auto& n = field(periods, key);
+                return n.is_number_integer() && n > 0 && n <= 4 * 1024 * 1024
+                           ? n.get<std::uint64_t>()
+                           : 0;
+            };
+            const auto fundamental = frames("fundamental_frames"),
+                       minimum = frames("minimum_frames"), maximum = frames("maximum_frames"),
+                       normal = frames("default_frames");
+            if (fundamental && minimum && minimum <= maximum) {
+                const auto legal_minimum = (minimum + fundamental - 1) / fundamental * fundamental;
+                if (legal_minimum <= maximum)
+                    detail->minimum_period_ms = 1000.0 * legal_minimum / period_format->rate;
+                if (normal >= minimum && normal <= maximum && normal % fundamental == 0)
+                    detail->default_period_ms = 1000.0 * normal / period_format->rate;
+            }
+        }
         detail->source = source;
         detail->path = scan::path_utf8(saved.path);
         detail->edit_bytes = saved.original_bytes;

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cmath>
 #include <stdexcept>
 
 namespace audiohole {
@@ -19,7 +20,8 @@ bool manual_settings(const Direction& direction) {
     // Reserved clock metadata is saved intent, not an applied audio override.
     return preference.common != EndpointPreferences{} ||
            preference.source != EndpointPreferences{} ||
-           preference.destination != EndpointPreferences{} || !preference.channel_map.empty();
+           preference.destination != EndpointPreferences{} || !preference.channel_map.empty() ||
+           preference.queue_target_ms.has_value();
 }
 bool supports(const Endpoint& device, const Format& format, const std::string& mode) {
     bool supported = false;
@@ -47,6 +49,10 @@ EndpointPreferences inherit_preferences(const EndpointPreferences& common,
         result.mode = endpoint.mode;
     if (endpoint.buffer_ms)
         result.buffer_ms = endpoint.buffer_ms;
+    if (endpoint.period_ms)
+        result.period_ms = endpoint.period_ms;
+    if (endpoint.render_ahead_ms)
+        result.render_ahead_ms = endpoint.render_ahead_ms;
     return result;
 }
 void Settings::refresh_projection() {
@@ -110,10 +116,18 @@ std::optional<Format> derive_pcm_format(const EndpointPreferences& p) {
                              rate * alignment}};
 }
 Result validate_preferences(const Preferences& p) {
+    const auto valid_time = [](const std::optional<double>& n) {
+        return !n || (std::isfinite(*n) && *n > 0);
+    };
+    if (!valid_time(p.queue_target_ms) || p.common.render_ahead_ms || p.source.render_ahead_ms)
+        return {false, "Invalid routing queue or misplaced playback queue preference."};
     if (p.preferred_clock_device != "automatic" && p.preferred_clock_device != "capture" &&
         p.preferred_clock_device != "playback")
         return {false, "Choose Automatic, Capture or Playback as the preferred clock device."};
     for (const auto* e : {&p.common, &p.source, &p.destination}) {
+        if (!valid_time(e->period_ms) || !valid_time(e->render_ahead_ms))
+            return {false,
+                    "Timing values must be positive finite milliseconds, or Automatic/Inherit."};
         if ((e->sample_rate_hz && (*e->sample_rate_hz < 1 || *e->sample_rate_hz > 768000)) ||
             (e->channel_count && (*e->channel_count < 1 || *e->channel_count > 256)) ||
             (e->buffer_ms && (*e->buffer_ms < 1 || *e->buffer_ms > 100)))
@@ -930,8 +944,9 @@ Result SimulatedController::update_endpoint(const Endpoint& device) {
             transition_ms_ = transition_duration_ms;
             refresh_paths(device.availability == Availability::Available);
         }
-        event(device.availability == Availability::Available ? "reconnected" : "disconnected",
-              device.display_name + ": " + name(device.availability));
+        if (!device.hidden)
+            event(device.availability == Availability::Available ? "reconnected" : "disconnected",
+                  device.display_name + ": " + name(device.availability));
     } else
         event("device-edited",
               "Updated display name and notes; Windows name and logical ID preserved.");

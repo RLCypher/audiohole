@@ -20,7 +20,8 @@ class RoutingService {
     virtual ~RoutingService() = default;
     virtual std::uint64_t start(engine::Profile, engine::BindingSnapshot) = 0;
     virtual std::uint64_t stop() = 0;
-    virtual bool update_bindings(engine::BindingSnapshot) = 0;
+    virtual bool update_bindings(engine::BindingSnapshot, bool resume_ready = true) = 0;
+    virtual void configure_workers(engine::WorkerSettings) {}
     virtual RoutingReading reading() const = 0;
 };
 // The factory runs on the service's thread. Injection is for portable contract
@@ -34,5 +35,6 @@ engine::BindingSnapshot routing_bindings(const Snapshot&);
 State routing_state(engine::State);
 std::string routing_issues(const std::vector<engine::Issue>&);
 // Actual configurations/counters and access receipts, never acoustic latency.
+std::string routing_progress(const Snapshot&);
 std::string routing_diagnostics(const engine::RuntimeSnapshot&, const Profile*);
 } // namespace audiohole

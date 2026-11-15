@@ -10,6 +10,13 @@ namespace audiohole::engine {
 // Baseline preserves 0.2 scheduling. Low requests smaller automatic buffers
 // from native WASAPI only; it never weakens explicit profile requirements.
 enum class LatencyPreset { Baseline, Low };
+enum class SchedulingTask { Automatic, Audio, ProAudio };
+enum class AudioPriority { Automatic, Normal, High };
+struct WorkerSettings {
+    SchedulingTask scheduling = SchedulingTask::Automatic;
+    AudioPriority priority = AudioPriority::Automatic;
+    bool operator==(const WorkerSettings&) const = default;
+};
 
 // Descriptor for an actual adapter implementation. Merely recognizing its JSON
 // selector does not mean this build implements or has validated that adapter.
@@ -54,6 +61,8 @@ struct StreamConfiguration {
     std::optional<std::uint32_t> allocated_buffer_frames;
     std::optional<int> timing_sample_rate_hz;
     std::optional<int> applied_buffer_request_ms;
+    std::optional<double> applied_period_request_ms;
+    std::optional<double> applied_render_ahead_request_ms;
     // Client3's advertised bounds are capabilities, not confirmation that the
     // requested period was accepted. period_frames above reports acceptance.
     std::optional<std::uint32_t> shared_default_period_frames;
@@ -74,6 +83,7 @@ struct NegotiatedRoute {
     std::string selection_reason;
     std::optional<std::uint32_t> fifo_target_source_frames;
     std::optional<std::uint32_t> fifo_capacity_source_frames;
+    std::optional<double> requested_queue_target_ms;
     std::string preferred_clock_device = "automatic";
     bool clock_preference_applied = false;
 };
@@ -149,6 +159,7 @@ struct RouteObservation {
     std::optional<std::uint32_t> native_render_request_max_frames;
     std::optional<UnderrunEvent> last_underrun;
     std::optional<std::uint64_t> dropped_underrun_contexts;
+    std::string worker_scheduling;
     std::vector<Issue> issues;
 };
 

@@ -34,6 +34,13 @@ install(FILES "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
   "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/TUTORIAL.md" "${PROJECT_SOURCE_DIR}/ENGINE_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/LATENCY_V4.md" DESTINATION docs COMPONENT Runtime)
+install(FILES
+  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/automatic.profile-v4.json"
+  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/stable.profile-v4.json"
+  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/inheritance.profile-v4.json"
+  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/app-engine-settings.fragment.json"
+  DESTINATION docs/examples/latency-v4 COMPONENT Runtime)
 
 add_custom_target(audiohole_personality_files ALL
   # Remove only obsolete source-owned flat catalogs from an incremental build's

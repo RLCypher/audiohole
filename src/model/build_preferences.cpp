@@ -7,7 +7,11 @@
 namespace audiohole {
 namespace {
 bool valid(const PreviewPreferences& values) {
-    return values.animation_loops >= 1 && values.animation_loops <= 20 &&
+    return (values.scheduling_task == "automatic" || values.scheduling_task == "audio" ||
+            values.scheduling_task == "pro_audio") &&
+           (values.audio_thread_priority == "automatic" ||
+            values.audio_thread_priority == "normal" || values.audio_thread_priority == "high") &&
+           values.animation_loops >= 1 && values.animation_loops <= 20 &&
            !values.personality_id.empty() && values.personality_id.size() <= 64 &&
            std::all_of(values.personality_id.begin(), values.personality_id.end(),
                        [](unsigned char c) {
@@ -107,6 +111,14 @@ Result BuildPreferences::load() {
             values.loop_until_event = document.value("loop_until_event", false);
             values.animation_loops = optional_integer(document, "animation_loops", 1);
             values.personality_id = document.value("personality_id", std::string("default"));
+            if (document.contains("engine")) {
+                const auto& engine = document.at("engine");
+                if (!engine.is_object())
+                    throw std::runtime_error("Invalid engine preferences");
+                values.scheduling_task = engine.value("scheduling_task", std::string("automatic"));
+                values.audio_thread_priority =
+                    engine.value("audio_thread_priority", std::string("automatic"));
+            }
             values.appearance = document.value("appearance", std::string("system"));
             values.notifications = optional_integer(document, "notifications", 0);
             values.startup_mode = optional_integer(document, "startup_mode", 0);
@@ -153,6 +165,10 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["automatically_wait_for_devices"] = values.automatically_wait_for_devices;
         document["activate_selected_profile"] = values.activate_selected_profile;
         document["appearance"] = values.appearance;
+        if (!document.contains("engine"))
+            document["engine"] = nlohmann::json::object();
+        document["engine"]["scheduling_task"] = values.scheduling_task;
+        document["engine"]["audio_thread_priority"] = values.audio_thread_priority;
         document["notifications"] = values.notifications;
         document["startup_mode"] = values.startup_mode;
         document["startup_delay_seconds"] = values.startup_delay_seconds;

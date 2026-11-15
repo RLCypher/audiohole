@@ -94,6 +94,8 @@ enum class Message {
     DeviceUnavailable,
     LevelCheckStarted,
     BeepStarted,
+    ErrorMinor,
+    ErrorMajor,
     Count
 };
 struct Variant {

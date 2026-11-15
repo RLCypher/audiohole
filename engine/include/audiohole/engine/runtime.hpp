@@ -40,9 +40,10 @@ struct RuntimeSnapshot {
 // threads or hard cleanup deadline is claimed. Snapshots allocate/copy and must
 // never be polled from an audio callback.
 //
-// Validation prototype limitations: explicit Stop/Start is required for edits,
-// changed running bindings or Failed-stream recovery. Ready paths can receive
-// exact binding updates without disturbing healthy siblings. This does not replace the GUI
+// Validation prototype limitations: explicit Stop/Start is required for edits
+// or Failed-stream recovery without a binding change. Availability updates stop
+// affected holes and can re-arm them when all their endpoints return, preserving
+// other running holes. This does not replace the GUI
 // supervisor or implement transactional profile switching. Healthy sibling paths continue. Before
 // first transfer, a backend startup failure or 2-s zero-transfer watchdog can retry unforced
 // preferred Exclusive endpoints in Shared, once per route, after joining old ownership. Strict
@@ -55,6 +56,7 @@ class Runtime {
     // Validation-only native scheduling comparison; default remains Baseline.
     // Miniaudio retains its existing settings under either preset.
     explicit Runtime(LatencyPreset);
+    Runtime(LatencyPreset, WorkerSettings);
     // Optional adapter injection for module hosts and portable lifecycle tests.
     // The validation executable uses the default real-platform factory only.
     explicit Runtime(std::vector<std::unique_ptr<BackendAdapter>>);
@@ -63,9 +65,10 @@ class Runtime {
     Runtime& operator=(const Runtime&) = delete;
     std::vector<BackendDescriptor> backends() const;
     Result<std::uint64_t> start(const Profile&, const BindingSnapshot&);
-    // Refresh exact physical bindings for Ready paths only. Saved intent and
-    // operating sessions stay frozen; Stop takes precedence over pending updates.
-    bool update_bindings(const BindingSnapshot&);
+    // Refresh exact physical bindings without changing saved intent. Missing or
+    // changed bindings release the affected hole. resume_ready permits its return;
+    // other holes keep their sessions. Stop takes precedence over pending updates.
+    bool update_bindings(const BindingSnapshot&, bool resume_ready = true);
     void stop();
     RuntimeSnapshot snapshot() const;
 

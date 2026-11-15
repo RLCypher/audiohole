@@ -2,6 +2,7 @@
 
 #include "audiohole/engine/backend.hpp"
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <optional>
 #include <sstream>
@@ -40,22 +41,47 @@ inline std::optional<std::uint32_t> minimum_shared_period(std::uint32_t fundamen
     return static_cast<std::uint32_t>(rounded);
 }
 
+// Explicit requests may round by one frame, never by an entire fundamental
+// period. Values far from the advertised lattice remain unsupported.
+inline std::optional<std::uint32_t> requested_shared_period(double milliseconds, int rate,
+                                                            std::uint32_t fundamental,
+                                                            std::uint32_t minimum,
+                                                            std::uint32_t maximum) noexcept {
+    if (!std::isfinite(milliseconds) || milliseconds <= 0 || rate <= 0 || !fundamental ||
+        !minimum || minimum > maximum)
+        return {};
+    const double frames = milliseconds * rate / 1000;
+    const double chosen = std::round(frames / fundamental) * fundamental;
+    if (!std::isfinite(chosen) || chosen < minimum || chosen > maximum ||
+        std::abs(chosen - frames) > 1.000001)
+        return {};
+    return static_cast<std::uint32_t>(chosen);
+}
+
 inline std::uint32_t render_ahead_target(const StreamConfiguration& stream,
-                                         LatencyPreset preset) noexcept {
+                                         LatencyPreset) noexcept {
     const auto capacity = stream.allocated_buffer_frames.value_or(0);
-    // Explicit endpoint buffers retain baseline submission behavior. Unknown
-    // periods also retain it rather than guessing a scheduling deadline.
-    if (preset != LatencyPreset::Low || stream.mode != AccessMode::Shared ||
-        stream.applied_buffer_request_ms || !stream.period_frames || !*stream.period_frames ||
-        !stream.timing_sample_rate_hz || *stream.timing_sample_rate_hz <= 0)
+    if (stream.applied_render_ahead_request_ms && stream.timing_sample_rate_hz) {
+        const double requested =
+            *stream.applied_render_ahead_request_ms * *stream.timing_sample_rate_hz / 1000;
+        const double frames = std::max(1.0, std::round(requested));
+        if (!std::isfinite(requested) || requested <= 0 || frames > capacity)
+            return 0; // Opening diagnoses an unsupported explicit lead, without narrowing overflow.
+        return static_cast<std::uint32_t>(frames);
+    }
+    // Exclusive packets must fill their allocation. Shared lead is independent
+    // of capacity, including when a driver rounds a capacity request upward.
+    if (stream.mode != AccessMode::Shared || !stream.timing_sample_rate_hz ||
+        *stream.timing_sample_rate_hz <= 0)
         return capacity;
     // One actual engine period plus a 1-ms submission margin is an opt-in test
     // setting, not a production threshold. Allocation can remain larger while
     // unfilled capacity adds no intentional render lead. Late wakes can still
     // starve Windows; padding observations do not prove a hardware underrun.
     const auto margin = (std::uint64_t(*stream.timing_sample_rate_hz) + 999) / 1000;
-    return static_cast<std::uint32_t>(
-        std::min<std::uint64_t>(capacity, std::uint64_t(*stream.period_frames) + margin));
+    return static_cast<std::uint32_t>(std::min<std::uint64_t>(
+        capacity, stream.period_frames ? std::uint64_t(*stream.period_frames) + margin
+                                       : (21ULL * *stream.timing_sample_rate_hz + 999) / 1000));
 }
 
 inline std::uint32_t render_fill_frames(std::uint32_t capacity, std::uint32_t padding,
@@ -97,9 +123,8 @@ inline RenderPlan startup_render_plan(const StreamConfiguration& stream,
                                       std::uint32_t requested_frames,
                                       bool awaiting_first_transfer) noexcept {
     RenderPlan result{0, requested_frames};
-    if (!awaiting_first_transfer || stream.mode != AccessMode::Shared ||
-        stream.applied_buffer_request_ms || !stream.period_frames || !*stream.period_frames ||
-        !stream.timing_sample_rate_hz ||
+    if (!awaiting_first_transfer || stream.mode != AccessMode::Shared || !stream.period_frames ||
+        !*stream.period_frames || !stream.timing_sample_rate_hz ||
         *stream.timing_sample_rate_hz != stream.client_format.sample_rate_hz)
         return result;
     result.pipeline_frames = std::min(requested_frames, *stream.period_frames);
