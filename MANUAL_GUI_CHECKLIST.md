@@ -861,3 +861,18 @@ This supersedes earlier small-buffer-only Apply expectations in this checklist.
   Apply: saved configuration stays disabled and routing reaches Stopped. Test a
   rejected write and invalid requirement: the original running route must survive.
   Test a backend refusal: retain saved edits and show the actual error.
+
+## Processing overhead and queue recovery (2026-11-15)
+
+- Route mono, stereo and explicitly mapped audio through each available backend.
+  Confirm mappings, silence and existing drift compensation remain intact.
+- Observe the current routing FIFO target and occupancy separately from capacity
+  and playback lead. A temporary large capture batch can expire from the standard
+  Automatic guard; occupancy should settle gradually, without intentional drops.
+  After an underrun following reduction, confirm one backoff and the lifetime
+  guard for that session. Explicit targets and the experimental DLL do not shrink.
+- Switch away from Profiles or minimize/hide the app. Routing and error/state
+  supervision continue; return and verify fresh diagnostics and preserved scroll
+  position. Visible counter text updates at five Hz; state/issues update promptly.
+- Change log search/severity, clear the log and produce new events. The cached
+  console must show the correct filtered content without resurrecting old entries.

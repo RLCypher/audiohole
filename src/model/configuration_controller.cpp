@@ -553,7 +553,8 @@ void ConfigurationController::poll_routing() {
     if (update.state && update.admission_issues.empty()) {
         const auto now = std::chrono::steady_clock::now();
         if (!update.state->paths.empty() &&
-            (previous != state_.state || now - last_engine_log_ >= std::chrono::seconds(2))) {
+            (previous != state_.state ||
+             (update.state->armed && now - last_engine_log_ >= std::chrono::seconds(2)))) {
             last_engine_log_ = now;
             event("engine-status", routing_diagnostics(*update.state, state_.routing_intent.get()));
         }

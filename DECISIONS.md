@@ -1775,3 +1775,15 @@ format fields. Explicit requirements and access policies remain authoritative.
 See [the audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md). No GUI or animation
 implementation is changed. Custom-driver and global Windows-format-setting
 research selects no new architectural dependency; production decisions remain open.
+
+### 2026-11-15 — Owner-authorized processing overhead improvements
+
+The owner authorized PCM kernel/ring indexing optimization, recovery from a
+transiently enlarged Automatic queue, and reduced host/interface diagnostic work.
+The standard prototype PI pipeline uses four one-second audio-frame peak buckets
+while preserving the negotiated period floor. An underrun after reduction
+restores the lifetime guard for the session. Explicit requests remain unchanged.
+The experimental DLL retains its original guard after stress testing found a
+reduction-induced underrun. No controller gains, ratio limits, SRC bypass policy,
+profile schema or permanent D-034/O-005 algorithm decision is selected here.
+See [evidence and thread contracts](docs/AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md).

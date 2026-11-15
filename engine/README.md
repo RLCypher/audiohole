@@ -1,5 +1,11 @@
 # AudioHole engine module and standalone validation host
 
+The owner's subsequent integrated
+[processing/queue overhead increment](../docs/AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md)
+adds optimized kernels, bounded Automatic queue recovery and an opt-in CPU
+benchmark. It also reduces host/UI diagnostic work. The module's original
+validation-host scope below remains historical context.
+
 This increment lives entirely under `engine/`. It does not modify or link the
 GUI, GUI controller, simulator, profile builder, personalities or tray. The
 parent repository baseline is `fda20900e8954993e267e2ca1d6d7be8a19840dc` (`work`).

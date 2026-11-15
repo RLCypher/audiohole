@@ -18,6 +18,11 @@ class ChannelMapping {
     int destination_channels() const noexcept {
         return destination_channels_;
     }
+    // Immutable, validated indexes for an engine kernel with its own checked
+    // frame extents. Negative indexes mean silence. Lifetime is this mapping's.
+    std::span<const int> source_indexes() const noexcept {
+        return std::span(source_for_output_).first(destination_channels_);
+    }
 
     // Bounded processing kernel for interleaved float32 frames at ONE rate.
     // No allocation, logging, locks, filesystem or GUI calls. The caller owns

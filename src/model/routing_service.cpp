@@ -179,10 +179,20 @@ class Service final : public RoutingService {
                 std::optional<std::pair<engine::BindingSnapshot, bool>> bindings;
                 {
                     std::unique_lock lock(mutex_);
-                    wake_.wait_for(lock, std::chrono::milliseconds(50), [&] {
+                    const auto requested = [&] {
                         return command_.has_value() || bindings_.has_value() ||
                                stop.stop_requested();
-                    });
+                    };
+                    // Stopped is confirmed cleanup, not a pending operation.
+                    // Keep its immutable reading until a command arrives rather
+                    // than waking/copying unchanged snapshots twenty times/sec.
+                    const bool idle = reading_.state &&
+                                      reading_.state->state == engine::State::Stopped &&
+                                      !reading_.state->armed && !reading_.pending;
+                    if (idle)
+                        wake_.wait(lock, requested);
+                    else
+                        wake_.wait_for(lock, std::chrono::milliseconds(50), requested);
                     command.swap(command_);
                     bindings.swap(bindings_);
                 }
@@ -470,9 +480,16 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
             stream("Playback", n.destination);
             if (n.requested_queue_target_ms)
                 out << "Routing queue requested: " << *n.requested_queue_target_ms << " ms\n";
-            if (n.fifo_target_source_frames)
+            const auto current_target = path.observation.controller_target_source_frames
+                                            ? path.observation.controller_target_source_frames
+                                            : n.fifo_target_source_frames;
+            if (current_target)
                 out << "Routing queue target: "
-                    << 1000.0 * *n.fifo_target_source_frames / n.source.client_format.sample_rate_hz
+                    << 1000.0 * *current_target / n.source.client_format.sample_rate_hz << " ms\n";
+            if (path.observation.queued_frames)
+                out << "Routing queue occupancy: "
+                    << 1000.0 * *path.observation.queued_frames /
+                           n.source.client_format.sample_rate_hz
                     << " ms\n";
             out << "Processing: " << n.processing << " | Synchronization: " << n.synchronization
                 << '\n';
@@ -488,6 +505,8 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
         counter("Rendered frames", o.rendered_frames);
         counter("Transferred frames", o.transferred_frames);
         counter("FIFO queued frames", o.queued_frames);
+        counter("Automatic queue reductions", o.automatic_queue_reductions);
+        counter("Automatic queue backoffs", o.automatic_queue_backoffs);
         counter("Native capture wakes", o.native_capture_wakes);
         counter("Native render wakes", o.native_render_wakes);
         counter("Native wait timeouts", o.native_wait_timeouts);

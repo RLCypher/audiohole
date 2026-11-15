@@ -2,6 +2,7 @@
 
 #include "audiohole/engine/backend.hpp"
 #include "audiohole/engine/channel_mapping.hpp"
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <limits>
@@ -21,6 +22,34 @@ struct RenderTiming {
     std::optional<std::uint64_t> capture_packet_age_last_us;
     std::optional<std::uint32_t> native_padding_before_frames;
     std::optional<std::uint32_t> native_render_request_frames;
+};
+
+// Endpoint-writer-owned history: four one-second buckets in that endpoint's
+// frame domain. Fixed work/storage, no wall-clock queries or cross-thread reads.
+// Lifetime peaks are tracked separately for diagnostics. This history expires
+// only as real offered audio advances; a stopped endpoint cannot age its peak.
+class RecentFramePeak {
+  public:
+    std::uint32_t record(std::uint32_t frames, std::uint32_t rate) noexcept {
+        elapsed_frames_ += frames;
+        const auto epoch = elapsed_frames_ / rate;
+        const auto slot = epoch % peaks_.size();
+        if (epochs_[slot] != epoch) {
+            epochs_[slot] = epoch;
+            peaks_[slot] = 0;
+        }
+        peaks_[slot] = std::max(peaks_[slot], frames);
+        std::uint32_t peak = 0;
+        for (std::size_t i = 0; i < peaks_.size(); ++i)
+            if (epoch - epochs_[i] < peaks_.size())
+                peak = std::max(peak, peaks_[i]);
+        return peak;
+    }
+
+  private:
+    std::array<std::uint32_t, 4> peaks_{};
+    std::array<std::uint64_t, 4> epochs_{};
+    std::uint64_t elapsed_frames_ = 0;
 };
 
 // Validation-only processing prototype, not a selected production converter.
@@ -61,6 +90,7 @@ class StreamPipeline {
   private:
     StreamFormat source_, destination_;
     ChannelMapping mapping_;
+    bool identity_map_ = false, mono_pair_ = false;
     std::uint32_t capacity_ = 0, target_ = 0;
     std::size_t input_stride_ = 0, output_stride_ = 0;
     std::vector<float> queue_;
@@ -77,6 +107,13 @@ class StreamPipeline {
     std::atomic<std::uint32_t> render_min_{std::numeric_limits<std::uint32_t>::max()},
         render_max_{0};
     std::atomic<std::uint32_t> active_target_{0};
+    RecentFramePeak capture_history_, render_history_;  // Each owned by its endpoint writer.
+    std::atomic<std::uint32_t> recent_capture_peak_{0}; // Producer publishes to consumer.
+    std::atomic<std::uint64_t> queue_reductions_{0}, queue_backoffs_{0};
+    // Consumer-only. Once a reduction is followed by starvation, retain the
+    // conservative lifetime margin for this session; never override user targets.
+    std::uint32_t largest_auto_target_ = 0, recovery_floor_ = 0;
+    bool automatic_reduced_ = false;
     std::atomic<bool> capacity_insufficient_{false};
     // A second bounded SPSC mailbox moves starvation context from render to the
     // single observer. Slots are ordinary POD owned by exactly one side; release

@@ -105,6 +105,32 @@ TEST_F(RoutingIntegration, ActualRuntimeStartAndStopPreserveSavedIntentAndPublis
     until(*controller, [&] { return controller->snapshot().state == State::Stopped; });
     EXPECT_EQ(control->releases, 2);
 }
+TEST(RoutingServiceIdle, StoppedSnapshotIsRetainedUntilTheNextCommand) {
+    auto control = std::make_shared<testing_engine::Control>();
+    auto service = testing_engine::service(control);
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (!service->reading().ready) {
+        ASSERT_LT(std::chrono::steady_clock::now(), deadline);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    const auto stopped = service->reading();
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    EXPECT_EQ(service->reading().revision, stopped.revision);
+    EXPECT_EQ(service->reading().state, stopped.state);
+    EXPECT_EQ(control->opens, 0);
+    // Stop wakes even an already-idle service and publishes a new generation.
+    const auto generation = service->stop();
+    while (service->reading().pending) {
+        ASSERT_LT(std::chrono::steady_clock::now(), deadline);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    const auto confirmed = service->reading();
+    EXPECT_EQ(confirmed.generation, generation);
+    EXPECT_EQ(confirmed.state->state, engine::State::Stopped);
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    EXPECT_EQ(service->reading().revision, confirmed.revision);
+    EXPECT_EQ(service->reading().state, confirmed.state);
+}
 TEST_F(RoutingIntegration, StopSupersedesQueuedStartAndLateProgress) {
     control->block_open = true;
     ASSERT_TRUE(controller->activate("engine-profile").ok);

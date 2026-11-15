@@ -1,5 +1,10 @@
 # Engine 0.6 integration
 
+The [processing and queue improvement audit](docs/AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md)
+documents optimized PCM/ring kernels, bounded Automatic queue recovery, idle
+service wakeups and diagnostic view caching. Explicit requests and the existing
+drift-correction algorithms remain authoritative.
+
 The [2026-11-15 engine audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md) amends
 Automatic mono mapping, scanner-assisted native format acquisition and Exclusive
 diagnostics. It changes no GUI/animation implementation or saved profile schema.

@@ -128,6 +128,9 @@ struct RouteObservation {
     std::optional<std::uint64_t> timestamp_errors;
     std::optional<std::uint32_t> queued_frames;
     std::optional<std::uint32_t> controller_target_source_frames;
+    // Automatic guard policy events, not dropped/corrected PCM frame counts.
+    std::optional<std::uint64_t> automatic_queue_reductions;
+    std::optional<std::uint64_t> automatic_queue_backoffs;
     std::optional<std::uint32_t> capture_packet_min_frames;
     std::optional<std::uint32_t> capture_packet_max_frames;
     std::optional<std::uint32_t> render_request_min_frames;

@@ -487,6 +487,7 @@ void Frame::poll_avatar() {
     auto frame = avatar_host_->tick(now);
     if (frame.diagnostics != last_avatar_diagnostics_) {
         last_avatar_diagnostics_ = frame.diagnostics;
+        ++avatar_log_revision_;
         for (const auto& line : frame.diagnostics) {
             avatar_diagnostics_.push_back("[avatar] " + line);
             if (avatar_diagnostics_.size() > 32)
@@ -686,8 +687,101 @@ void Frame::end_observation() {
     controller_->cancel_beep();
     active_check_ = nullptr;
 }
-// GUI timer polling does not create presentation events. A controller sequence
-// number gates commentary, so repainting/telemetry cannot consume more variants.
+// Rich diagnostic text is a view, not a control/supervision clock. Refresh
+// immediately on state/assignment/issues changes; counters need only 5 Hz.
+void Frame::refresh_performance() {
+    if (!IsShown() || IsIconized() || notebook_->GetSelection() != 0) {
+        performance_dirty_ = true;
+        return;
+    }
+    const auto& s = controller_->snapshot();
+    const auto now = std::chrono::steady_clock::now();
+    const bool paths_changed =
+        s.paths.size() != performance_paths_.size() ||
+        !std::equal(s.paths.begin(), s.paths.end(), performance_paths_.begin(),
+                    [](const auto& a, const auto& b) {
+                        return a.hole_id == b.hole_id && a.reverse == b.reverse &&
+                               a.state == b.state && a.detail == b.detail &&
+                               a.requested_buffer_ms == b.requested_buffer_ms &&
+                               a.applied_buffer_ms == b.applied_buffer_ms;
+                    });
+    const bool changed = performance_dirty_ || paths_changed || s.state != performance_state_ ||
+                         s.active_profile != performance_profile_ ||
+                         s.routing_intent != performance_intent_ ||
+                         !s.routing_admission_issues.empty();
+    if (!changed && (s.routing_status == performance_snapshot_ || now < performance_next_refresh_))
+        return;
+    performance_dirty_ = false;
+    performance_state_ = s.state;
+    performance_profile_ = s.active_profile;
+    performance_paths_ = s.paths;
+    performance_snapshot_ = s.routing_status;
+    performance_intent_ = s.routing_intent;
+    performance_next_refresh_ = now + std::chrono::milliseconds(200);
+    std::string paths;
+    for (const auto& p : s.paths)
+        paths += p.hole_id + (p.reverse ? " return: " : " forward: ") + audiohole::name(p.state) +
+                 " — " + p.detail + "\n";
+    if (s.routing_status)
+        paths = routing_diagnostics(*s.routing_status, s.routing_intent.get());
+    if (!s.routing_admission_issues.empty())
+        paths = routing_issues(s.routing_admission_issues);
+    const auto rendered_paths = text(paths.empty() ? "No active directions." : paths);
+    if (path_status_->GetValue() != rendered_paths) {
+        const auto handle = static_cast<HWND>(path_status_->GetHandle());
+        const auto first = SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+        long begin = 0, end = 0;
+        path_status_->GetSelection(&begin, &end);
+        path_status_->Freeze();
+        path_status_->ChangeValue(rendered_paths);
+        const auto length = path_status_->GetLastPosition();
+        path_status_->SetSelection(std::min(begin, length), std::min(end, length));
+        SendMessageW(handle, EM_LINESCROLL, 0,
+                     first - SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+        path_status_->Thaw();
+    }
+}
+
+// Events are append-only with monotonic sequences; clear changes their count.
+// Refilter only when source events, avatar diagnostics or filter controls change.
+void Frame::refresh_log() {
+    const auto& s = controller_->snapshot();
+    const auto query_text = log_search_->GetValue();
+    const auto sequence = s.events.empty() ? 0 : s.events.back().sequence;
+    const auto severity = severity_->GetSelection();
+    if (log_severity_ == severity && log_query_ == query_text && log_event_sequence_ == sequence &&
+        log_event_count_ == s.events.size() && log_avatar_revision_ == avatar_log_revision_)
+        return;
+    log_severity_ = severity;
+    log_query_ = query_text;
+    log_event_sequence_ = sequence;
+    log_event_count_ = s.events.size();
+    log_avatar_revision_ = avatar_log_revision_;
+    const auto query = query_text.Lower();
+    std::string logs;
+    for (const auto& e : s.events) {
+        if (severity == 1 && e.type != "error" && e.type != "scan-failed" &&
+            e.type != "scanner-action-failed" && e.type != "configuration-save-failed")
+            continue;
+        if (severity == 2 && e.type != "state" && e.type != "activated" && e.type != "stopped")
+            continue;
+        const std::string line =
+            std::to_string(e.sequence) + " [" + e.type + "] " + e.detail + "\n";
+        if (query.empty() || text(line).Lower().Contains(query))
+            logs += line;
+    }
+    if (severity == 0)
+        for (const auto& line : avatar_diagnostics_)
+            if (query.empty() || text(line).Lower().Contains(query))
+                logs += line + "\n";
+    if (logs != last_log_) {
+        update_console(text(logs));
+        last_log_ = logs;
+    }
+}
+
+// GUI polling never creates commentary events; monotonic controller event
+// sequences gate presentation independently of the diagnostic view caches.
 void Frame::refresh() {
     const auto& s = controller_->snapshot();
     if (bundle_generation_ && s.scanner.completed_generation == bundle_generation_) {
@@ -850,28 +944,7 @@ void Frame::refresh() {
                        " | Viewed holes: " + std::to_string(holes) +
                        " | Warnings: unavailable | Log errors: " + std::to_string(errors)));
     update_status_indicator();
-    std::string paths;
-    for (const auto& p : s.paths)
-        paths += p.hole_id + (p.reverse ? " return: " : " forward: ") + audiohole::name(p.state) +
-                 " — " + p.detail + "\n";
-    if (s.routing_status)
-        paths = routing_diagnostics(*s.routing_status, s.routing_intent.get());
-    if (!s.routing_admission_issues.empty())
-        paths = routing_issues(s.routing_admission_issues);
-    const auto rendered_paths = text(paths.empty() ? "No active directions." : paths);
-    if (path_status_->GetValue() != rendered_paths) {
-        const auto handle = static_cast<HWND>(path_status_->GetHandle());
-        const auto first = SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0);
-        long begin = 0, end = 0;
-        path_status_->GetSelection(&begin, &end);
-        path_status_->Freeze();
-        path_status_->ChangeValue(rendered_paths);
-        const auto length = path_status_->GetLastPosition();
-        path_status_->SetSelection(std::min(begin, length), std::min(end, length));
-        SendMessageW(handle, EM_LINESCROLL, 0,
-                     first - SendMessageW(handle, EM_GETFIRSTVISIBLELINE, 0, 0));
-        path_status_->Thaw();
-    }
+    refresh_performance();
     refresh_device_checks();
     if (s.scanner.busy && s.scan_percent < 0)
         scan_progress_->Pulse();
@@ -900,28 +973,7 @@ void Frame::refresh() {
         scan_state_->SetToolTip(scan_status);
         scan_state_->ShowPosition(0);
     }
-    const auto query = log_search_->GetValue().Lower();
-    std::string logs;
-    for (const auto& e : s.events) {
-        if (severity_->GetSelection() == 1 && e.type != "error" && e.type != "scan-failed" &&
-            e.type != "scanner-action-failed" && e.type != "configuration-save-failed")
-            continue;
-        if (severity_->GetSelection() == 2 && e.type != "state" && e.type != "activated" &&
-            e.type != "stopped")
-            continue;
-        const std::string line =
-            std::to_string(e.sequence) + " [" + e.type + "] " + e.detail + "\n";
-        if (query.empty() || text(line).Lower().Contains(query))
-            logs += line;
-    }
-    if (severity_->GetSelection() == 0)
-        for (const auto& line : avatar_diagnostics_)
-            if (query.empty() || text(line).Lower().Contains(query))
-                logs += line + "\n";
-    if (logs != last_log_) {
-        update_console(text(logs));
-        last_log_ = logs;
-    }
+    refresh_log();
     for (const auto& e : s.events)
         if (e.sequence > seen_event_) {
             seen_event_ = e.sequence;

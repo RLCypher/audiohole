@@ -133,6 +133,8 @@ Json snapshot(const engine::RuntimeSnapshot& s) {
             {"transferred_frames", optional(o.transferred_frames)},
             {"queued_source_frames", optional(o.queued_frames)},
             {"controller_target_source_frames", optional(o.controller_target_source_frames)},
+            {"automatic_queue_reductions", optional(o.automatic_queue_reductions)},
+            {"automatic_queue_backoffs", optional(o.automatic_queue_backoffs)},
             {"capture_packet_min_frames", optional(o.capture_packet_min_frames)},
             {"capture_packet_max_frames", optional(o.capture_packet_max_frames)},
             {"render_request_min_frames", optional(o.render_request_min_frames)},

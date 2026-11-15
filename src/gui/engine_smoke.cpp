@@ -55,6 +55,23 @@ bool Frame::engine_smoke(const wxString& directory) {
                     path_status_->GetValue().Contains("Allocated buffer") &&
                     path_status_->GetValue().Contains("Transferred frames"),
                 "GUI did not show actual engine format/buffer/frame observations");
+        const auto visible_diagnostics = path_status_->GetValue();
+        const auto transferred =
+            controller_->snapshot().routing_status->paths[0].observation.transferred_frames.value();
+        select_page(3);
+        until([&] {
+            return controller_->snapshot()
+                       .routing_status->paths[0]
+                       .observation.transferred_frames.value() > transferred + 960;
+        });
+        require(path_status_->GetValue() == visible_diagnostics &&
+                    controller_->snapshot().state == State::Running,
+                "Hidden diagnostics rebuilt text or paused routing supervision");
+        select_page(0);
+        refresh();
+        require(path_status_->GetValue() != visible_diagnostics &&
+                    path_status_->GetValue().Contains("Transferred frames"),
+                "Returning to Profiles did not refresh deferred diagnostic counters");
         require(!forward_.capture_check.action->IsEnabled() &&
                     !forward_.playback_check.action->IsEnabled(),
                 "Temporary device checks remain enabled during routing");
@@ -138,7 +155,9 @@ bool Frame::engine_smoke(const wxString& directory) {
             output << "PASS: GUI Start/Stop through real engine Runtime with software-only "
                       "adapters; confirmed duplex progress, telemetry, cleanup and unchanged saved "
                       "intent; all three Apply buttons save the full profile and restart both "
-                      "directions; advanced tuning Save/Start/Stop with independent 1/6/20/50-ms "
+                      "directions; hidden telemetry text pauses while routing continues and "
+                      "refreshes on return; advanced tuning Save/Start/Stop with independent "
+                      "1/6/20/50-ms "
                       "requests and quantized buffers. No hardware opened.\n";
             require(bool(output), "Could not write engine GUI smoke evidence");
         }

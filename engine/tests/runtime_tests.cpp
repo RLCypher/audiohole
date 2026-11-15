@@ -235,6 +235,95 @@ void packet_cadence_regression() {
     }
 }
 
+void automatic_queue_recovery() {
+    // Deterministic audio-frame time. No wall-clock sleeps or hardware claims.
+    // A single 100-ms startup batch must not set the next three minutes' target.
+    for (const bool experimental : {false, true})
+        for (const int source_rate : {44100, 48000}) {
+            const unsigned captured = source_rate / 100;
+            StreamPipeline pipeline({source_rate, 1, SampleFormat::Float32},
+                                    {48000, 1, SampleFormat::Float32}, {}, experimental, 5);
+            std::vector<float> input(10 * captured, 0.25f);
+            std::array<float, 480> output{};
+            expect(pipeline.push(input.data(), input.size()), "transient startup batch accepted");
+            std::uint32_t high_target = 0, initial_queued = 0;
+            for (unsigned tick = 0; tick < 18000; ++tick) {
+                expect(pipeline.push(input.data(), captured),
+                       "recovery never overruns its capacity");
+                pipeline.render(output.data(), output.size());
+                if (tick == 200) {
+                    const auto observation = pipeline.observe();
+                    high_target = *observation.controller_target_source_frames;
+                    initial_queued = *observation.queued_frames;
+                }
+            }
+            const auto recovered = pipeline.observe();
+            if (experimental) {
+                expect(recovered.controller_target_source_frames.value() >= high_target &&
+                           recovered.automatic_queue_reductions == 0 &&
+                           recovered.automatic_queue_backoffs == 0 && recovered.underruns == 0 &&
+                           recovered.overruns == 0,
+                       "experimental DLL retains its established lifetime queue guard");
+                continue;
+            }
+            expect(high_target >= 11 * captured &&
+                       recovered.controller_target_source_frames == 2 * captured + 2,
+                   "recent frame history expires a transient guard in the correct rate domain");
+            expect(recovered.capture_packet_max_frames == 10 * captured &&
+                       recovered.automatic_queue_reductions.value() > 0,
+                   "lifetime evidence survives automatic queue reductions");
+            expect(recovered.underruns == 0 && recovered.overruns == 0 &&
+                       recovered.queued_frames.value() + captured < initial_queued,
+                   "steady transfer drains excess occupancy without dropping audio or starving");
+
+            // An unexpected outage after a reduction must restore the conservative
+            // margin and disable further attempts to shrink it for this session.
+            for (unsigned tick = 0; tick < 100; ++tick)
+                pipeline.render(output.data(), output.size());
+            expect(pipeline.observe().automatic_queue_backoffs == 1,
+                   "starvation after a reduction latches one conservative backoff");
+            for (unsigned tick = 0; tick < 2000; ++tick) {
+                pipeline.push(input.data(), captured);
+                pipeline.render(output.data(), output.size());
+            }
+            const auto backed_off = pipeline.observe();
+            expect(backed_off.controller_target_source_frames.value() >= high_target &&
+                       backed_off.automatic_queue_backoffs == 1,
+                   "a failed reduction retains the lifetime guard after recent windows expire");
+        }
+    // Recurrent batching stays in the recent history. The steady cadence tests
+    // above and below exercise many ring wraps and independent block sizes.
+    StreamPipeline recurring({48000, 1, SampleFormat::Float32}, {48000, 1, SampleFormat::Float32},
+                             {}, false, 5);
+    // An 80-ms recurrent burst plus its reserve fits the fixed 200-ms capacity.
+    // A recurrent 100-ms burst + 110-ms guard would exceed that capacity.
+    std::array<float, 3840> input{};
+    std::array<float, 480> output{};
+    for (unsigned tick = 0; tick < 2000; ++tick) {
+        if (tick % 200 == 0)
+            recurring.push(input.data(), input.size());
+        else if (tick % 200 >= 8)
+            recurring.push(input.data(), output.size());
+        recurring.render(output.data(), output.size());
+    }
+    const auto observed = recurring.observe();
+    expect(observed.underruns == 0 && observed.overruns == 0 &&
+               observed.automatic_queue_reductions == 0 &&
+               observed.controller_target_source_frames.value() >= 4322,
+           "recurring large batches never lose their reserve through peak expiry");
+
+    StreamPipeline manual({48000, 1, SampleFormat::Float32}, {48000, 1, SampleFormat::Float32}, {},
+                          false, 1.25, true);
+    manual.push(input.data(), input.size());
+    for (unsigned tick = 0; tick < 100; ++tick)
+        manual.render(output.data(), output.size());
+    const auto explicit_request = manual.observe();
+    expect(explicit_request.controller_target_source_frames == 60 &&
+               explicit_request.automatic_queue_reductions == 0 &&
+               explicit_request.automatic_queue_backoffs == 0,
+           "explicit queue requests never participate in automatic recovery/backoff");
+}
+
 void low_latency_policy() {
     using namespace audiohole::engine::detail;
     expect(minimum_shared_period(48, 128, 480) == 144,
@@ -692,9 +781,11 @@ int main() {
         processing();
         scanner_format_selection();
         packet_cadence_regression();
+        automatic_queue_recovery();
         const auto in_use = detail::native_open_issue("InitializeAudioStream", 0x8889000Au);
         expect(in_use.code == ErrorCode::ResourceConflict && in_use.native_code == "0x8889000A" &&
-                   in_use.detail.find("Give exclusive mode applications priority") != std::string::npos,
+                   in_use.detail.find("Give exclusive mode applications priority") !=
+                       std::string::npos,
                "native ownership refusal keeps its HRESULT and actionable feedback");
         const auto disabled = detail::native_open_issue("InitializeAudioStream", 0x8889000Eu);
         expect(disabled.code == ErrorCode::UnsupportedRequirement &&

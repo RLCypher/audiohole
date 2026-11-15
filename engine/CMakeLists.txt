@@ -91,6 +91,13 @@ if(AUDIOHOLE_ENGINE_BUILD_VALIDATION)
   install(FILES "${nlohmann_json_SOURCE_DIR}/LICENSE.MIT" DESTINATION licenses RENAME nlohmann-json-LICENSE.txt)
 endif()
 
+option(AUDIOHOLE_ENGINE_BUILD_BENCHMARKS "Build software-only PCM microbenchmarks" OFF)
+if(AUDIOHOLE_ENGINE_BUILD_BENCHMARKS)
+  add_executable(audiohole_pipeline_benchmark benchmarks/pipeline_benchmark.cpp)
+  target_link_libraries(audiohole_pipeline_benchmark PRIVATE audiohole::engine)
+  target_include_directories(audiohole_pipeline_benchmark PRIVATE src)
+endif()
+
 if(BUILD_TESTING)
   add_executable(audiohole_engine_contract_tests tests/contract_tests.cpp)
   target_link_libraries(audiohole_engine_contract_tests PRIVATE

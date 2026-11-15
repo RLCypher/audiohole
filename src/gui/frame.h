@@ -172,6 +172,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxTimer tuning_timer_; // One settled policy reaction; never a controller command.
     std::unique_ptr<presentation::AvatarHost> avatar_host_;
     std::vector<std::string> avatar_diagnostics_, last_avatar_diagnostics_;
+    std::uint64_t avatar_log_revision_ = 0;
     presentation::SleepCommentary sleep_commentary_{
         static_cast<std::uint32_t>(std::chrono::steady_clock::now().time_since_epoch().count())};
     std::string sleep_copy_;
@@ -298,6 +299,20 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::chrono::steady_clock::time_point device_change_after_{};
     bool device_change_pending_ = false;
     std::string last_log_;
+    std::uint64_t log_event_sequence_ = 0, log_avatar_revision_ = 0;
+    std::size_t log_event_count_ = 0;
+    int log_severity_ = -1;
+    wxString log_query_;
+    void refresh_log();
+    // View caches only. The controller continues advancing while hidden.
+    bool performance_dirty_ = true;
+    State performance_state_ = State::Stopped;
+    std::string performance_profile_;
+    std::vector<PathStatus> performance_paths_;
+    std::shared_ptr<const engine::RuntimeSnapshot> performance_snapshot_;
+    std::shared_ptr<const Profile> performance_intent_;
+    std::chrono::steady_clock::time_point performance_next_refresh_{};
+    void refresh_performance();
     // Retain unwrapped copy so resizing never rerolls commentary or accumulates
     // line breaks. These are transient view strings, not controller state.
     std::string status_copy_ = "Stopped", technical_copy_, commentary_copy_, fallback_copy_;

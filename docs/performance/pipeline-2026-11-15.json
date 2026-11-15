@@ -1,0 +1,160 @@
+{
+  "method": "7 interleaved runs, same allowed CPU, C++20 -O3 -DNDEBUG; ns per output frame for push+render",
+  "baseline_commit": "721a0b9a68b3d7bb7a34a9e37a72f43391acba7d",
+  "medians": [
+    {
+      "case": "float-stereo",
+      "baseline_ns_per_frame": 15.5423,
+      "optimized_ns_per_frame": 9.51365,
+      "reduction_percent": 38.8
+    },
+    {
+      "case": "float-mono-pair",
+      "baseline_ns_per_frame": 15.127,
+      "optimized_ns_per_frame": 8.95819,
+      "reduction_percent": 40.8
+    },
+    {
+      "case": "pcm16-stereo",
+      "baseline_ns_per_frame": 19.8037,
+      "optimized_ns_per_frame": 10.3863,
+      "reduction_percent": 47.6
+    },
+    {
+      "case": "explicit-map",
+      "baseline_ns_per_frame": 19.3245,
+      "optimized_ns_per_frame": 9.82755,
+      "reduction_percent": 49.1
+    },
+    {
+      "case": "rate-conversion",
+      "baseline_ns_per_frame": 15.7643,
+      "optimized_ns_per_frame": 9.1046,
+      "reduction_percent": 42.2
+    },
+    {
+      "case": "pcm24-containers",
+      "baseline_ns_per_frame": 20.9265,
+      "optimized_ns_per_frame": 11.2178,
+      "reduction_percent": 46.4
+    }
+  ],
+  "runs": {
+    "baseline": {
+      "float-stereo": [
+        15.0445,
+        19.0267,
+        15.2943,
+        15.4577,
+        16.6871,
+        15.5423,
+        16.1445
+      ],
+      "float-mono-pair": [
+        14.1852,
+        14.2976,
+        14.4295,
+        15.127,
+        16.2619,
+        26.0702,
+        16.1438
+      ],
+      "pcm16-stereo": [
+        18.7893,
+        19.1185,
+        19.8927,
+        19.8037,
+        20.9914,
+        24.9652,
+        18.8918
+      ],
+      "explicit-map": [
+        18.3825,
+        19.1716,
+        19.3245,
+        20.4268,
+        20.712,
+        29.2148,
+        18.9561
+      ],
+      "rate-conversion": [
+        14.5698,
+        15.6255,
+        16.0286,
+        15.7643,
+        16.3033,
+        17.3124,
+        14.9122
+      ],
+      "pcm24-containers": [
+        20.1807,
+        20.4073,
+        21.6676,
+        20.9504,
+        20.9265,
+        25.0932,
+        20.3246
+      ]
+    },
+    "optimized": {
+      "float-stereo": [
+        8.80331,
+        8.83215,
+        9.97417,
+        10.8828,
+        9.53787,
+        9.51365,
+        9.00795
+      ],
+      "float-mono-pair": [
+        8.84796,
+        8.62106,
+        9.46955,
+        9.57448,
+        9.10133,
+        8.95819,
+        8.77311
+      ],
+      "pcm16-stereo": [
+        9.85621,
+        10.079,
+        16.0319,
+        10.879,
+        10.9712,
+        10.3863,
+        10.1812
+      ],
+      "explicit-map": [
+        9.60711,
+        9.70529,
+        15.8203,
+        9.78752,
+        10.4554,
+        10.3124,
+        9.82755
+      ],
+      "rate-conversion": [
+        8.72478,
+        9.1046,
+        9.35036,
+        9.98225,
+        9.08646,
+        12.1388,
+        8.9789
+      ],
+      "pcm24-containers": [
+        11.1681,
+        11.1526,
+        11.617,
+        11.9764,
+        11.9951,
+        11.2178,
+        11.1448
+      ]
+    }
+  },
+  "verification": {
+    "cases": 156,
+    "matching_sha256": "6d72dc2377a1fb27216a9a65b575a110234a75c7b217bdfe1988591f44932611"
+  }
+}

@@ -33,8 +33,13 @@ frame. Native Shared mode uses IAudioClient3 for an independent interval. With
 an explicit capacity request, legacy initialization supplies that capacity and
 the resulting current engine period must still match the requested interval.
 No fallback to a substantially larger explicit interval is accepted. Manual
-queue targets bypass the automatic historical packet guard; their effective
+queue targets bypass the automatic packet guard; their effective
 frame target remains visible in diagnostics. An aggressive target can underrun.
+
+The standard pipeline can now recover its Automatic guard after a transient
+packet/block spike, with conservative backoff after starvation. Explicit targets
+remain unchanged; the experimental DLL retains its original guard policy.
+See [processing/queue improvements](AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md).
 
 The native WASAPI adapter supports these independent controls. The miniaudio
 adapter rejects explicit independent processing intervals and playback lead

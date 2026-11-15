@@ -69,6 +69,27 @@ void encode(unsigned char* bytes, float sample, SampleFormat format) noexcept {
         static_cast<std::int32_t>(std::clamp(value * 2147483648.0, -2147483648.0, 2147483647.0));
     std::memcpy(bytes, &integer, 4);
 }
+// Select once per callback; the compiler specializes the inner conversion
+// loop for this fixed PCM container instead of branching for every sample.
+template <class Kernel> void with_sample_format(SampleFormat format, Kernel&& kernel) noexcept {
+    switch (format) {
+    case SampleFormat::Float32:
+        kernel.template operator()<SampleFormat::Float32>();
+        break;
+    case SampleFormat::PcmS16:
+        kernel.template operator()<SampleFormat::PcmS16>();
+        break;
+    case SampleFormat::PcmS24Packed:
+        kernel.template operator()<SampleFormat::PcmS24Packed>();
+        break;
+    case SampleFormat::PcmS24In32:
+        kernel.template operator()<SampleFormat::PcmS24In32>();
+        break;
+    case SampleFormat::PcmS32:
+        kernel.template operator()<SampleFormat::PcmS32>();
+        break;
+    }
+}
 } // namespace
 
 StreamPipeline::StreamPipeline(StreamFormat source, StreamFormat destination,
@@ -82,6 +103,12 @@ StreamPipeline::StreamPipeline(StreamFormat source, StreamFormat destination,
     if (!input.ok() || !output.ok() || !mapping.ok())
         throw std::invalid_argument("Invalid processing format or channel mapping.");
     mapping_ = *mapping.value;
+    const auto indexes = mapping_.source_indexes();
+    identity_map_ = source.channel_count == destination.channel_count;
+    for (int channel = 0; channel < destination.channel_count; ++channel)
+        identity_map_ = identity_map_ && indexes[channel] == channel;
+    mono_pair_ = source.channel_count == 1 && destination.channel_count == 2 && indexes[0] == 0 &&
+                 indexes[1] == 0;
     input_stride_ = input.value->block_align_bytes;
     output_stride_ = output.value->block_align_bytes;
     if (!std::isfinite(target_milliseconds) || target_milliseconds <= 0 ||
@@ -134,6 +161,9 @@ bool StreamPipeline::push(const void* input, std::size_t frames, bool silent) no
                       std::memory_order_relaxed);
     packet_max_.store(std::max(packet_max_.load(std::memory_order_relaxed), packet),
                       std::memory_order_relaxed);
+    if (!explicit_target_ && !experimental_)
+        recent_capture_peak_.store(capture_history_.record(packet, source_.sample_rate_hz),
+                                   std::memory_order_relaxed);
     captured_.fetch_add(frames, std::memory_order_relaxed);
     if (frames > capacity_) {
         overruns_.fetch_add(1, std::memory_order_relaxed);
@@ -148,12 +178,26 @@ bool StreamPipeline::push(const void* input, std::size_t frames, bool silent) no
     }
     const auto* bytes = static_cast<const unsigned char*>(input);
     const auto sample_bytes = input_stride_ / static_cast<std::size_t>(source_.channel_count);
-    for (std::size_t frame = 0; frame < frames; ++frame)
-        for (int channel = 0; channel < source_.channel_count; ++channel)
-            queue_[std::size_t((head + frame) % capacity_) * source_.channel_count + channel] =
-                silent ? 0.0f
-                       : decode(bytes + frame * input_stride_ + channel * sample_bytes,
-                                source_.sample_format);
+    // At most two contiguous spans. The producer never calculates modulo per
+    // frame/sample, and release of head still publishes only the complete packet.
+    std::size_t written = 0;
+    auto index = static_cast<std::uint32_t>(head % capacity_);
+    with_sample_format(source_.sample_format, [&]<SampleFormat format>() noexcept {
+        while (written < frames) {
+            const auto count = std::min<std::size_t>(frames - written, capacity_ - index);
+            auto* destination = queue_.data() + std::size_t(index) * source_.channel_count;
+            const auto samples = count * source_.channel_count;
+            if (silent)
+                std::fill_n(destination, samples, 0.0f);
+            else {
+                const auto* source = bytes + written * input_stride_;
+                for (std::size_t sample = 0; sample < samples; ++sample)
+                    destination[sample] = decode(source + sample * sample_bytes, format);
+            }
+            written += count;
+            index = 0;
+        }
+    });
     head_.store(head + frames, std::memory_order_release);
     return true;
 }
@@ -186,22 +230,46 @@ std::size_t StreamPipeline::render(void* output, std::size_t frames,
                       std::memory_order_relaxed);
     const auto largest_render = std::max(render_max_.load(std::memory_order_relaxed), block);
     render_max_.store(largest_render, std::memory_order_relaxed);
+    // The experimental DLL did not tolerate guard reductions in stress tests;
+    // preserve its original lifetime policy independently of kernel optimization.
+    const bool recover_queue = !explicit_target_ && !experimental_;
+    const auto recent_render =
+        recover_queue ? render_history_.record(block, destination_.sample_rate_hz) : largest_render;
     // Engine periods are not actual capture packet sizes. In 0.1, periodic
     // 20-ms packets plus 10-ms render requests exhausted the margin even with
     // identical clocks. Reserve one observed capture packet, one render block
     // expressed in SOURCE frames, and interpolation lookahead. No RT resize.
-    const auto render_source_frames = static_cast<std::uint64_t>(
-        std::ceil(double(largest_render) * source_.sample_rate_hz / destination_.sample_rate_hz));
-    const auto desired_target =
+    const auto source_frames = [&](std::uint32_t output_frames) noexcept {
+        return static_cast<std::uint64_t>(std::ceil(double(output_frames) * source_.sample_rate_hz /
+                                                    destination_.sample_rate_hz));
+    };
+    // A transient batch may grow the guard immediately, but need not set the
+    // session's latency forever. Only recent source/render history determines
+    // a reduction. Keep the negotiated period floor and drift-correction algorithm;
+    // lowering a target never drops audio or forces a catch-up render burst.
+    const auto capture_peak = recover_queue ? recent_capture_peak_.load(std::memory_order_relaxed)
+                                            : packet_max_.load(std::memory_order_relaxed);
+    auto desired_target =
         explicit_target_
             ? target_
-            : std::max<std::uint64_t>(target_, packet_max_.load(std::memory_order_relaxed) +
-                                                   render_source_frames + 2);
+            : std::max<std::uint64_t>(target_, capture_peak + source_frames(recent_render) + 2);
+    if (!explicit_target_ && recovery_floor_)
+        desired_target = std::max<std::uint64_t>(
+            desired_target,
+            std::max<std::uint64_t>(recovery_floor_, packet_max_.load(std::memory_order_relaxed) +
+                                                         source_frames(largest_render) + 2));
     const auto effective_target =
         static_cast<std::uint32_t>(std::min<std::uint64_t>(desired_target, capacity_ - 2));
     if (desired_target > capacity_ - 2)
         capacity_insufficient_.store(true, std::memory_order_relaxed);
     active_target_.store(effective_target, std::memory_order_relaxed);
+    if (recover_queue) {
+        largest_auto_target_ = std::max(largest_auto_target_, effective_target);
+        if (previous_target_ && effective_target < previous_target_) {
+            automatic_reduced_ = true;
+            queue_reductions_.fetch_add(1, std::memory_order_relaxed);
+        }
+    }
     if (effective_target != previous_target_) {
         filtered_error_ = integral_ = 0;
         previous_target_ = effective_target;
@@ -247,55 +315,75 @@ std::size_t StreamPipeline::render(void* output, std::size_t frames,
     const double step =
         (double(source_.sample_rate_hz) / destination_.sample_rate_hz) * (1.0 + correction);
     const auto output_sample_bytes = output_stride_ / std::size_t(destination_.channel_count);
-    std::array<float, 256> input_frame{}, mapped_frame{};
+    const auto indexes = mapping_.source_indexes();
+    auto read_index = static_cast<std::uint32_t>(tail % capacity_);
     std::size_t produced = 0;
     bool starved = false;
-    for (; primed_ && produced < frames; ++produced) {
-        const auto whole = static_cast<std::uint64_t>(phase_);
-        const float fraction = static_cast<float>(phase_ - double(whole));
-        const auto lookahead = fraction == 0 ? 1u : 2u;
-        if (head - tail < whole + lookahead) {
-            primed_ = false;
-            underruns_.fetch_add(1, std::memory_order_relaxed);
-            starved = true;
-            phase_ = filtered_error_ = integral_ = 0;
-            tail = head; // Consumer drops the residual fragment and re-primes.
-            break;
+    with_sample_format(destination_.sample_format, [&]<SampleFormat format>() noexcept {
+        for (; primed_ && produced < frames; ++produced) {
+            // phase_ is normalized to [0,1) after every frame. read_index is
+            // tail modulo capacity, advanced once per consumed frame block.
+            const float fraction = static_cast<float>(phase_);
+            const auto lookahead = fraction == 0 ? 1u : 2u;
+            if (head - tail < lookahead) {
+                primed_ = false;
+                underruns_.fetch_add(1, std::memory_order_relaxed);
+                starved = true;
+                phase_ = filtered_error_ = integral_ = 0;
+                tail = head;
+                break;
+            }
+            const auto next_index = read_index + 1 == capacity_ ? 0 : read_index + 1;
+            const auto* current = queue_.data() + std::size_t(read_index) * source_.channel_count;
+            const auto* next = queue_.data() + std::size_t(next_index) * source_.channel_count;
+            const auto interpolate = [&](int channel) noexcept {
+                const auto a = current[channel];
+                const auto b = fraction == 0 ? a : next[channel];
+                return a + (b - a) * fraction;
+            };
+            auto* output_frame = bytes + produced * output_stride_;
+            if (identity_map_) {
+                for (int channel = 0; channel < destination_.channel_count; ++channel)
+                    encode(output_frame + channel * output_sample_bytes, interpolate(channel),
+                           format);
+            } else if (mono_pair_) {
+                const auto sample = interpolate(0);
+                encode(output_frame, sample, format);
+                encode(output_frame + output_sample_bytes, sample, format);
+            } else {
+                // Compilation already validated widths/indexes. Unmapped outputs
+                // remain silent; no repeated span/overlap validation per frame.
+                for (int channel = 0; channel < destination_.channel_count; ++channel)
+                    encode(output_frame + channel * output_sample_bytes,
+                           indexes[channel] < 0 ? 0.0f : interpolate(indexes[channel]), format);
+            }
+            phase_ += step;
+            const auto consumed = static_cast<std::uint64_t>(phase_);
+            if (consumed > head - tail) {
+                tail = head;
+                primed_ = false;
+                phase_ = filtered_error_ = integral_ = 0;
+                underruns_.fetch_add(1, std::memory_order_relaxed);
+                starved = true;
+            } else {
+                tail += consumed;
+                phase_ -= double(consumed);
+                // consumed cannot exceed capacity: only published frames may
+                // be consumed, so one subtraction handles ring wraparound.
+                read_index += static_cast<std::uint32_t>(consumed);
+                if (read_index >= capacity_)
+                    read_index -= capacity_;
+            }
         }
-        for (int channel = 0; channel < source_.channel_count; ++channel) {
-            const auto a =
-                queue_[std::size_t((tail + whole) % capacity_) * source_.channel_count + channel];
-            // Never read an unpublished next frame when interpolation does not
-            // need it; it can still be owned by the capture producer.
-            const auto b =
-                fraction == 0
-                    ? a
-                    : queue_[std::size_t((tail + whole + 1) % capacity_) * source_.channel_count +
-                             channel];
-            input_frame[channel] = a + (b - a) * fraction;
-        }
-        (void)mapping_.process(std::span(input_frame).first(source_.channel_count),
-                               std::span(mapped_frame).first(destination_.channel_count), 1);
-        for (int channel = 0; channel < destination_.channel_count; ++channel)
-            encode(bytes + produced * output_stride_ + channel * output_sample_bytes,
-                   mapped_frame[channel], destination_.sample_format);
-        phase_ += step;
-        const auto consumed = static_cast<std::uint64_t>(phase_);
-        if (consumed > head - tail) {
-            tail = head;
-            primed_ = false;
-            phase_ = filtered_error_ = integral_ = 0;
-            underruns_.fetch_add(1, std::memory_order_relaxed);
-            starved = true;
-        } else {
-            tail += consumed;
-            phase_ -= double(consumed);
-        }
-    }
+    });
     // Priming/starvation is silent and counted; never repeat stale microphone
     // samples. The host distinguishes transferred frames from total render frames.
     std::memset(bytes + produced * output_stride_, 0, (frames - produced) * output_stride_);
     if (starved) {
+        if (!explicit_target_ && automatic_reduced_ && !recovery_floor_) {
+            recovery_floor_ = largest_auto_target_;
+            queue_backoffs_.fetch_add(1, std::memory_order_relaxed);
+        }
         const auto write = event_write_.load(std::memory_order_relaxed);
         const auto read = event_read_.load(std::memory_order_acquire);
         if (write - read < underrun_events_.size()) {
@@ -342,6 +430,8 @@ RouteObservation StreamPipeline::observe() {
         static_cast<std::uint32_t>(std::min<std::uint64_t>(head - tail, capacity_));
     result.correction_ppm = double(correction_ppb_.load(std::memory_order_relaxed)) / 1000.0;
     result.controller_target_source_frames = active_target_.load(std::memory_order_relaxed);
+    result.automatic_queue_reductions = queue_reductions_.load(std::memory_order_relaxed);
+    result.automatic_queue_backoffs = queue_backoffs_.load(std::memory_order_relaxed);
     auto read = event_read_.load(std::memory_order_relaxed);
     const auto write = event_write_.load(std::memory_order_acquire);
     // At most the fixed mailbox capacity is consumed per observation. The audio
