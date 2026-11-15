@@ -8,6 +8,7 @@ struct FormatCandidate {
     Format source, destination;
     bool dual_mono = false;
     std::string label() const;
+    std::string endpoint_label(bool capture) const;
 };
 struct FormatAssessment {
     std::vector<FormatCandidate> candidates;

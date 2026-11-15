@@ -2,9 +2,36 @@
 #include "gui/frame.h"
 #include "model/first_run.h"
 #include "presentation/text_layout.h"
+#include <wx/hyperlink.h>
 #include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
+void Frame::show_update_information() {
+    wxDialog dialog(this, wxID_ANY, "AudioHole Update");
+    dialog.SetName("AudioHole update information");
+    dialog.SetIcons(application_icons());
+    auto* layout = new wxBoxSizer(wxVERTICAL);
+    label(&dialog, layout, wxS("Current version: ") + text(AUDIOHOLE_VERSION))
+        ->SetName("Current AudioHole version");
+    label(&dialog, layout, wxS("Build: ") + text(AUDIOHOLE_BUILD_COMMIT));
+    auto* link = new wxHyperlinkCtrl(&dialog, wxID_ANY, "https://github.com/RLCypher/audiohole",
+                                     "https://github.com/RLCypher/audiohole");
+    link->SetName("AudioHole GitHub");
+    layout->Add(link, 0, wxALL, FromDIP(12));
+    auto* close = new ActionButton(&dialog, "Close", 0, wxID_CLOSE);
+    close->Bind(wxEVT_BUTTON, [&dialog](wxCommandEvent&) { dialog.EndModal(wxID_CLOSE); });
+    close->SetDefault();
+    layout->Add(close, 0, wxALIGN_RIGHT | wxALL, FromDIP(8));
+    dialog.SetEscapeId(wxID_CLOSE);
+    dialog.SetAffirmativeId(wxID_CLOSE);
+    dialog.SetSizerAndFit(layout);
+    theme_dialog(&dialog);
+    link->SetNormalColour(dialog.GetForegroundColour());
+    link->SetVisitedColour(dialog.GetForegroundColour());
+    link->SetHoverColour(dialog.GetForegroundColour());
+    dialog.CentreOnParent();
+    dialog.ShowModal();
+}
 void Frame::build_settings() {
     auto* page = new wxScrolledWindow(notebook_);
     page->SetScrollRate(0, 16);
@@ -97,6 +124,7 @@ void Frame::build_settings() {
     delay_ = new wxSpinCtrl(startup_box, wxID_ANY, "5", wxDefaultPosition, FromDIP(wxSize(75, -1)),
                             wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 300, 5);
     startup_group->Add(delay_, 0, wxALL, FromDIP(4));
+    delay_->SetName("Routing activation delay");
     match_input_height(*delay_);
     notifications_->SetSelection(preferences_->values().notifications);
     startup_->SetSelection((preferences_->values().startup_mode + 2) % 3);
@@ -260,8 +288,10 @@ void Frame::build_settings() {
                 restart_();
         });
     tutorial_end_ = tutorial_ ? tutorial_action : nullptr;
+    auto* restart_actions = new wxBoxSizer(wxHORIZONTAL);
+    application_actions->Add(restart_actions);
     auto* restart_button = button(
-        appearance_box, application_actions, tutorial_ ? "Restart Tutorial" : "Restart AudioHole",
+        appearance_box, restart_actions, tutorial_ ? "Restart Tutorial" : "Restart AudioHole",
         [this] {
             if (!discard())
                 return;
@@ -289,6 +319,7 @@ void Frame::build_settings() {
     restart_button->SetToolTip(
         "Restart AudioHole after cleanly closing this session. Saved settings and data are "
         "preserved; unsaved edits require confirmation.");
+    button(appearance_box, restart_actions, "Update", [this] { show_update_information(); });
     auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and Animation");
     auto* personality_box = personality_group->GetStaticBox();
     personality_box->SetName("Personality and Animation settings");
@@ -423,10 +454,10 @@ void Frame::build_settings() {
     dfa_stepper_->SetValue(0);
     dfa_stepper_->SetName("Adjust DFA by one hundredth");
     dfa_feedback_ = label(box, advanced, "");
-    advanced->Add(dfa_slider_, 0, wxEXPAND | wxALL, 4);
     numeric->Add(dfa_value_, 0, wxALIGN_CENTER_VERTICAL);
     numeric->Add(dfa_stepper_, 0, wxALIGN_CENTER_VERTICAL);
-    advanced->Add(numeric, 0, wxALL, 4);
+    numeric->Add(dfa_slider_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(8));
+    advanced->Add(numeric, 0, wxEXPAND | wxALL, FromDIP(4));
     dfa_slider_->SetToolTip(
         "Fiddle with this if you think it'll help. We're not making any promises.");
     dfa_value_->SetToolTip("Type your preferred amount of nonsense. Use a decimal point; extra "

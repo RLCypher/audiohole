@@ -6,6 +6,84 @@
 #include <windows.h>
 namespace audiohole::gui {
 namespace {
+constexpr UINT_PTR centered_edit_subclass = 0x41484345;
+int native_text_height(HWND handle) {
+    const auto dc = GetDC(handle);
+    if (!dc)
+        return 0;
+    const auto saved = SaveDC(dc);
+    const auto font = reinterpret_cast<HFONT>(SendMessageW(handle, WM_GETFONT, 0, 0));
+    if (font)
+        SelectObject(dc, font);
+    TEXTMETRICW metric{};
+    GetTextMetricsW(dc, &metric);
+    RestoreDC(dc, saved);
+    ReleaseDC(handle, dc);
+    return metric.tmHeight;
+}
+void paint_edit_padding(HWND handle, const wxWindow& owner) {
+    RECT window{}, client{};
+    GetWindowRect(handle, &window);
+    GetClientRect(handle, &client);
+    MapWindowPoints(handle, HWND_DESKTOP, reinterpret_cast<POINT*>(&client), 2);
+    OffsetRect(&client, -window.left, -window.top);
+    const auto dc = GetWindowDC(handle);
+    if (!dc)
+        return;
+    const auto saved = SaveDC(dc);
+    // Leave the native outer frame intact. The application border decorator
+    // draws its DPI-aware outline after this subclass returns.
+    const int edge = client.left;
+    RECT inner{edge, edge, window.right - window.left - edge, window.bottom - window.top - edge};
+    ExcludeClipRect(dc, client.left, client.top, client.right, client.bottom);
+    const auto colour = owner.GetBackgroundColour();
+    const auto brush =
+        CreateSolidBrush(colour.IsOk() ? RGB(colour.Red(), colour.Green(), colour.Blue())
+                                       : GetSysColor(COLOR_WINDOW));
+    FillRect(dc, &inner, brush);
+    DeleteObject(brush);
+    RestoreDC(dc, saved);
+    ReleaseDC(handle, dc);
+}
+LRESULT CALLBACK centered_edit_proc(HWND handle, UINT message, WPARAM wparam, LPARAM lparam,
+                                    UINT_PTR id, DWORD_PTR owner) {
+    if (message == WM_NCDESTROY) {
+        RemoveWindowSubclass(handle, centered_edit_proc, id);
+        return DefSubclassProc(handle, message, wparam, lparam);
+    }
+    if (message == WM_NCCALCSIZE) {
+        DefSubclassProc(handle, message, wparam, lparam);
+        auto* client = wparam ? &reinterpret_cast<NCCALCSIZE_PARAMS*>(lparam)->rgrc[0]
+                              : reinterpret_cast<RECT*>(lparam);
+        const int height = native_text_height(handle);
+        if (height > 0 && client->bottom - client->top > height) {
+            client->top += (client->bottom - client->top - height) / 2;
+            client->bottom = client->top + height;
+        }
+        return wparam ? WVR_REDRAW : 0;
+    }
+    const auto result = DefSubclassProc(handle, message, wparam, lparam);
+    if (message == WM_NCHITTEST) {
+        // Padding remains part of the field's click/selection area. Windows
+        // translates the resulting mouse coordinates to the native edit row.
+        RECT bounds{}, client{};
+        GetWindowRect(handle, &bounds);
+        GetClientRect(handle, &client);
+        MapWindowPoints(handle, HWND_DESKTOP, reinterpret_cast<POINT*>(&client), 2);
+        const int edge =
+            std::max(0L, std::min(client.left - bounds.left, bounds.right - client.right));
+        InflateRect(&bounds, -edge, -edge);
+        const POINT point{static_cast<short>(LOWORD(lparam)), static_cast<short>(HIWORD(lparam))};
+        if (PtInRect(&bounds, point))
+            return HTCLIENT;
+    }
+    if (message == WM_SETFONT || message == WM_THEMECHANGED)
+        SetWindowPos(handle, nullptr, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    if (message == WM_NCPAINT)
+        paint_edit_padding(handle, *reinterpret_cast<wxWindow*>(owner));
+    return result;
+}
 constexpr UINT_PTR border_subclass = 0x41484244;
 // Paint integral physical-pixel outlines after native paint. Only application
 // input/list/group frames participate; high contrast keeps Windows' own chrome.
@@ -180,6 +258,28 @@ void apply(HWND handle, bool dark, bool contrast) {
     RedrawWindow(handle, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 }
 } // namespace
+void center_input_text(wxWindow& control) {
+    const auto handle = static_cast<HWND>(control.MSWGetFocusHWND());
+    wchar_t name[32]{};
+    GetClassNameW(handle, name, 32);
+    if (lstrcmpiW(name, L"Edit") != 0 || (GetWindowLongPtrW(handle, GWL_STYLE) & ES_MULTILINE))
+        return;
+    SetWindowSubclass(handle, centered_edit_proc, centered_edit_subclass,
+                      reinterpret_cast<DWORD_PTR>(&control));
+    SetWindowPos(handle, nullptr, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+}
+wxRect field_screen_rect(const wxWindow& control) {
+    const auto edit = static_cast<HWND>(control.MSWGetFocusHWND());
+    DWORD_PTR owner = 0;
+    if (!GetWindowSubclass(edit, centered_edit_proc, centered_edit_subclass, &owner))
+        return control.GetScreenRect();
+    RECT bounds{}, primary{};
+    GetWindowRect(edit, &bounds);
+    GetWindowRect(static_cast<HWND>(control.GetHandle()), &primary);
+    UnionRect(&bounds, &bounds, &primary);
+    return wxRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+}
 void prepare_native_theme(bool dark, bool contrast) {
     if (api().preferred)
         api().preferred(contrast ? 0 : dark ? 2 : 3);

@@ -1,5 +1,6 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "gui/native_theme.h"
 #include "gui/shell_actions.h"
 #include "model/first_run.h"
 #include <cmath>
@@ -465,7 +466,7 @@ void Frame::render_tutorial() {
             highlight->Hide();
             continue;
         }
-        auto bounds = directed->GetScreenRect();
+        auto bounds = field_screen_rect(*directed);
         if (directed_row >= 0 && listbox_row) {
             auto* list = static_cast<wxListBox*>(directed);
             if (step_changed)

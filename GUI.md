@@ -475,6 +475,24 @@ DPI-aware padding. Device Notes defaults to three complete text lines plus
 padding. Light device rows use consistent selection/focus colors, preserving
 keyboard focus and Windows high contrast.
 
+Candidate matching compares sample rate, encoding, PCM precision and supported
+channel counts, rather than requiring identical Windows descriptors. Channel
+masks, native descriptor tags, GUID spelling, alignment and byte-rate metadata
+remain endpoint details. Matching mono capture/stereo playback pairs label only
+the mono endpoint `2 ch (dual mono)`; the playback card retains its stereo
+candidate label. Explicit requirements and channel maps remain authoritative.
+
+Text values and hints are vertically centered in the unified single-line fields,
+including advanced tuning, device search/name, technical diagnostics search and
+the Settings delay, animation-loop and DFA editors. Their native single-line
+editing, caret, selection, paste and Enter behavior is retained. The DFA slider
+sits to the right of the numeric editor and stepper on the same row.
+
+Settings places Update beside Restart AudioHole (Restart Tutorial in a lesson).
+Update opens an informational dialog with the current product version, build ID,
+clickable AudioHole GitHub link and Close action. It follows the current app
+theme and performs no update checks, downloads, restarts or configuration edits.
+
 Confirmed Skip/End tutorial actions always restart into working mode, including
 when tutorial edits are unsaved or the completion marker cannot be written. A
 marker failure is reported and can cause the tutorial to return on a later

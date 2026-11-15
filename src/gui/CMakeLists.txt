@@ -13,6 +13,7 @@ endif()
 add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
+target_compile_definitions(audiohole PRIVATE AUDIOHOLE_VERSION="${PROJECT_VERSION}")
 # uuid precedes wx's transitive oleacc import library to avoid duplicate GUID
 # objects in MinGW; MSVC uses the same system GUID library.
 target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base uuid uxtheme dwmapi advapi32 windowscodecs shlwapi propsys shell32)

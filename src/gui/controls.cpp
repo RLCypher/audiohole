@@ -164,6 +164,7 @@ void match_input_height(wxWindow& control) {
     size.y = input_height(control);
     control.SetMinSize(size);
     control.SetMaxSize(wxSize(-1, size.y));
+    center_input_text(control);
 }
 ThemedChoice::ThemedChoice(wxWindow* parent, wxWindowID id) {
     Create(parent, id);
@@ -518,6 +519,8 @@ wxColour routing_colour(audiohole::State state) {
 // Keep entries aligned with the visible action labels; smoke checks cover every button.
 wxString button_help(const wxString& title) {
     static const std::pair<const char*, const char*> help[] = {
+        {"Update", "Show the current AudioHole version and a link to its GitHub page."},
+        {"Close", "Close this window."},
         {"Start Routing", "Validate and activate the profile currently open in the editor."},
         {"Stop Routing", "Stop every direction and cancel pending startup and recovery."},
         {"Exit AudioHole",

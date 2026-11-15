@@ -315,6 +315,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void build_devices();
     void build_scan();
     void build_settings();
+    void show_update_information();
     // File I/O occurs only on explicit GUI load/reload, never during polling.
     void reload_personalities();
     void select_personality(const std::string& id);

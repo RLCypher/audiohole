@@ -1,5 +1,6 @@
 #include "model/format_assessment.h"
 #include <algorithm>
+#include <utility>
 namespace audiohole {
 namespace {
 std::string representation(const Format& format) {
@@ -39,13 +40,33 @@ bool supported_representation(const Format& f, engine::BackendId backend) {
            (backend != engine::BackendId::Miniaudio &&
             (sample == "pcm_s24_packed" || sample == "pcm_s24_in_32"));
 }
+std::pair<int, int> pcm_precision(const Format& format) {
+    const auto sample = representation(format);
+    const int container = sample == "pcm_s16" ? 16 : sample == "pcm_s24_packed" ? 24 : 32;
+    const int valid = sample == "pcm_s24_in_32" ? 24 : container;
+    // Zero denotes missing native metadata. The canonical sample representation
+    // still establishes PCM precision; preserve positive, explicit native values.
+    return {format.wave && format.wave->container_bits > 0 ? format.wave->container_bits
+                                                           : container,
+            format.wave && format.wave->valid_bits > 0 ? format.wave->valid_bits : valid};
+}
 } // namespace
+std::string FormatCandidate::endpoint_label(bool capture) const {
+    const auto& format = capture ? source : destination;
+    auto caption = format.label();
+    if (dual_mono && format.channels == 1) {
+        constexpr std::string_view mono_width = " / 1 ch / ";
+        const auto channel = caption.find(mono_width);
+        if (channel != std::string::npos)
+            caption.replace(channel, mono_width.size(), " / 2 ch (dual mono) / ");
+    }
+    return caption;
+}
 std::string FormatCandidate::label() const {
-    if (source == destination)
-        return source.label();
     if (dual_mono)
-        return std::to_string(destination.rate) + " Hz / 2 ch (dual mono) / " +
-               destination.representation;
+        return endpoint_label(true);
+    if (source.channels == destination.channels)
+        return source.label();
     return "Capture: " + source.label() + " → Playback: " + destination.label();
 }
 FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direction,
@@ -106,19 +127,14 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
             if (representation(a) != representation(b))
                 continue;
             encoding_pair = true;
-            if (a.wave && b.wave &&
-                (a.wave->container_bits != b.wave->container_bits ||
-                 a.wave->valid_bits != b.wave->valid_bits))
+            if (pcm_precision(a) != pcm_precision(b))
                 continue;
             precision_pair = true;
-            // Only this known bridge is added to exact tuple candidates. Other
-            // rate/representation/layout conversions remain specifically unverified.
-            const bool mono_stereo = a.channels == 1 && b.channels == 2 && a.rate == b.rate &&
-                                     representation(a) == representation(b) &&
-                                     (!a.wave || !b.wave ||
-                                      (a.wave->container_bits == b.wave->container_bits &&
-                                       a.wave->valid_bits == b.wave->valid_bits));
-            if (a != b && !mono_stereo)
+            // Rate, encoding and precision already match. Channel masks, native
+            // tags/GUID spelling, block alignment and byte rates describe each
+            // endpoint's transport; they need not be byte-identical across devices.
+            const bool mono_output_pair = a.channels == 1 && b.channels >= 2;
+            if (a.channels < 1 || a.channels > 256 || b.channels < 1 || b.channels > 256)
                 continue;
             width_pair = true;
             if (std::any_of(preferences.channel_map.begin(), preferences.channel_map.end(),
@@ -129,7 +145,8 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
                 continue;
             if (std::none_of(result.candidates.begin(), result.candidates.end(),
                              [&](const auto& c) { return c.source == a && c.destination == b; }))
-                result.candidates.push_back({a, b, mono_stereo && preferences.channel_map.empty()});
+                result.candidates.push_back(
+                    {a, b, mono_output_pair && preferences.channel_map.empty()});
         }
     if (result.candidates.empty()) {
         if (!engine_format)
@@ -147,19 +164,19 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
             result.explanation = "PCM precision conversion remains unverified: reported container "
                                  "or valid-bit widths differ.";
         else if (!width_pair)
-            result.explanation = "Channel count or layout conversion remains unverified for the "
-                                 "reported endpoint pair.";
+            result.explanation = "A reported channel count is outside the supported 1–256 range.";
         else
             result.explanation =
                 "Explicit channel map exceeds the reported capture or playback channel count.";
     } else {
         const bool bridge =
             std::any_of(result.candidates.begin(), result.candidates.end(), [](const auto& c) {
-                return c.source.channels == 1 && c.destination.channels == 2;
+                return c.source.channels == 1 && c.destination.channels >= 2;
             });
         result.explanation =
-            bridge ? "Compatible mono capture → stereo playback candidate. Capture stays 1 ch; "
-                     "playback stays 2 ch. Dual mono duplicates the mono signal; an explicit "
+            bridge ? "Compatible mono capture/playback candidate. Native endpoint widths are "
+                     "retained. "
+                     "Dual mono duplicates the mono signal; an explicit "
                      "channel map "
                      "stays authoritative. "
                    : "Compatible format candidates from available endpoint evidence. ";

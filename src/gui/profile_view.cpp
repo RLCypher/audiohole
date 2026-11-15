@@ -339,7 +339,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                                   wxSP_ARROW_KEYS | wxTE_PROCESS_ENTER, 0, 100, 0);
         const int height = input_height(*w.buffer);
         w.buffer->SetMinSize(wxSize(1, height));
-        w.buffer->SetMaxSize(wxSize(-1, height));
+        match_input_height(*w.buffer);
+        w.buffer->SetName(title + " Default device buffer");
         SendMessageW(static_cast<HWND>(w.buffer->GetHandle()), EM_SETCUEBANNER, TRUE,
                      reinterpret_cast<LPARAM>(L"Auto"));
         buffer_row->Add(w.buffer, 1, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1479,14 +1480,8 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     auto detail = [&](const std::string& id, bool capture) {
         const auto* device = endpoint(snapshot, id);
         const auto candidate = compatible ? &recommendation.candidates.front() : nullptr;
-        const auto description =
-            candidate
-                ? "Candidate: " + candidate->label() +
-                      (candidate->source.channels != candidate->destination.channels
-                           ? " | Native endpoint: " +
-                                 (capture ? candidate->source : candidate->destination).label()
-                           : "")
-                : recommendation.explanation;
+        const auto description = candidate ? "Candidate: " + candidate->endpoint_label(capture)
+                                           : recommendation.explanation;
         return device ? std::string(name(device->availability)) + " | " + description
                       : std::string("No endpoint selected");
     };

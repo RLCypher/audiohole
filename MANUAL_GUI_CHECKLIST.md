@@ -2,6 +2,19 @@
 
 ## Endpoint and tutorial-exit polish regression
 
+- Match otherwise-equal PCM formats with different Windows descriptor tags or
+  channel masks. Both cards must show Candidate. For mono capture/stereo
+  playback, only the capture card says `2 ch (dual mono)`. Check several rates
+  and sample representations; preserve explicit requirements and maps.
+- Open Settings Update in Dark, Light and Follow System. Verify current version,
+  build ID, clickable GitHub URL, readable unshadowed text and Close/Escape.
+  The dialog must preserve unsaved edits and the running route.
+- At 100% and 150% DPI, check centered values, hints, caret and selection in
+  Advanced tuning, device search/name, diagnostic search and Settings numeric
+  fields. Exercise typing, paste, undo, Enter-to-save and spin buttons.
+- Verify DFA's slider sits to the right of its numeric editor on the same row,
+  grows with available width, and retains keyboard, slider and exact-text input.
+
 - In Light mode, select each Capture/Playback row with the mouse and keyboard.
   Selection must fill the row consistently with a visible theme-colored focus
   cue, without a black cell frame. Repeat with Windows high contrast enabled.

@@ -1,5 +1,6 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include "gui/native_theme.h"
 #include "gui/welcome.h"
 #include "model/application_controller.h"
 #include "model/configuration_bundle.h"
@@ -8,6 +9,7 @@
 #include "presentation/text_layout.h"
 #include <cstdio>
 #include <wx/display.h>
+#include <wx/hyperlink.h>
 #include <wx/modalhook.h>
 #include <wx/stdpaths.h>
 
@@ -1015,6 +1017,46 @@ bool Frame::smoke(const wxString& directory) {
             if (!ok)
                 throw std::runtime_error(detail);
         };
+        const auto check_centered_input = [](wxWindow* control) {
+            // Collapsed panes can temporarily assign one-pixel native bounds.
+            // Each direction is checked again with its tuning pane visible.
+            if (!control->IsShownOnScreen())
+                return;
+            const auto handle = static_cast<HWND>(control->MSWGetFocusHWND());
+            RECT outer{}, client{};
+            GetWindowRect(handle, &outer);
+            ::GetClientRect(handle, &client);
+            POINT origin{};
+            ::ClientToScreen(handle, &origin);
+            const auto dc = GetDC(handle);
+            const auto saved = SaveDC(dc);
+            SelectObject(dc, reinterpret_cast<HFONT>(SendMessageW(handle, WM_GETFONT, 0, 0)));
+            TEXTMETRICW metric{};
+            GetTextMetricsW(dc, &metric);
+            RestoreDC(dc, saved);
+            ReleaseDC(handle, dc);
+            const auto position = SendMessageW(handle, EM_POSFROMCHAR, 0, 0);
+            const int text_y = position == -1 ? 0 : static_cast<short>(HIWORD(position));
+            const int actual = origin.y + text_y;
+            const int expected = outer.top + (outer.bottom - outer.top - metric.tmHeight) / 2;
+            const LONG padding_point =
+                std::max(2L, (outer.bottom - outer.top - metric.tmHeight) / 4);
+            for (LONG y : {outer.top + padding_point, outer.bottom - padding_point - 1})
+                if (SendMessageW(handle, WM_NCHITTEST, 0,
+                                 MAKELPARAM((outer.left + outer.right) / 2, y)) != HTCLIENT)
+                    throw std::runtime_error("Centered field padding stopped accepting input: " +
+                                             utf8(control->GetName()));
+            if ((GetWindowLongPtrW(handle, GWL_STYLE) & ES_MULTILINE) ||
+                std::abs(actual - expected) > 1 || client.bottom - client.top < metric.tmHeight)
+                throw std::runtime_error("Input text is not centered in its single-line field: " +
+                                         utf8(control->GetName()) +
+                                         " actual=" + std::to_string(actual) +
+                                         " expected=" + std::to_string(expected) +
+                                         " window=" + std::to_string(outer.bottom - outer.top) +
+                                         " client=" + std::to_string(client.bottom - client.top) +
+                                         " font=" + std::to_string(metric.tmHeight) +
+                                         " text_y=" + std::to_string(text_y));
+        };
         const auto check_endpoint_heights = [this] {
             for (auto* direction : {&forward_, &reverse_})
                 for (auto* field : {direction->source, direction->destination}) {
@@ -1275,6 +1317,16 @@ bool Frame::smoke(const wxString& directory) {
                 if (control)
                     require(control->GetSize().y == forward_.format->GetSize().y,
                             "Advanced timing field height differs from dropdown height");
+            for (auto* direction : {&forward_, &reverse_}) {
+                for (auto* control : std::vector<wxWindow*>{
+                         direction->rate, direction->channels, direction->source_channels,
+                         direction->destination_channels, direction->channel_map,
+                         direction->buffer})
+                    check_centered_input(control);
+                for (auto* control : direction->timings)
+                    if (control)
+                        check_centered_input(control);
+            }
             {
                 const auto original = draft_.holes[hole_index_].forward;
                 forward_.rate->SetValue("44100");
@@ -1340,6 +1392,13 @@ bool Frame::smoke(const wxString& directory) {
                 for (auto* widgets : {&forward_, &reverse_}) {
                     widgets->tuning->Expand();
                     layout_direction(*widgets);
+                    for (auto* input : std::vector<wxWindow*>{
+                             widgets->rate, widgets->channels, widgets->source_channels,
+                             widgets->destination_channels, widgets->channel_map, widgets->buffer})
+                        check_centered_input(input);
+                    for (auto* input : widgets->timings)
+                        if (input)
+                            check_centered_input(input);
                     if (widgets->clock->GetSize().y < widgets->mode->GetBestSize().y ||
                         widgets->clock->GetSize().y < widgets->clock->GetCharHeight() + FromDIP(12))
                         throw std::runtime_error(
@@ -1773,6 +1832,9 @@ bool Frame::smoke(const wxString& directory) {
                                     animation_loops_, dfa_value_, dfa_stepper_})
             require(control->GetSize().y == theme_choice_->GetSize().y,
                     "Device/Scan/Settings editable field height differs from dropdown height");
+        for (auto* control : std::vector<wxWindow*>{device_search_, device_name_, log_search_,
+                                                    delay_, animation_loops_, dfa_value_})
+            check_centered_input(control);
         {
             const auto original_status = scan_state_->GetValue();
             scan_output_split_->SetSashPosition(scan_output_split_->GetClientSize().y / 3);
@@ -1824,6 +1886,100 @@ bool Frame::smoke(const wxString& directory) {
                 "Settings must contain Personality and Advanced, with Restart in Application and "
                 "Tray, without the "
                 "environment panel");
+            const auto previous_page = notebook_->GetSelection();
+            notebook_->SetSelection(3);
+            settings->Layout();
+            auto* update = wxWindow::FindWindowByLabel("Update", appearance);
+            auto* restart = wxWindow::FindWindowByName("Restart AudioHole", appearance);
+            require(update && restart && update->IsShownOnScreen() &&
+                        update->GetContainingSizer() == restart->GetContainingSizer() &&
+                        update->GetScreenRect().GetLeft() > restart->GetScreenRect().GetRight(),
+                    "Update must appear beside Restart AudioHole");
+            if (!(dfa_slider_->GetContainingSizer() == dfa_value_->GetContainingSizer() &&
+                  field_screen_rect(*dfa_slider_).GetLeft() >
+                      field_screen_rect(*dfa_stepper_).GetRight() &&
+                  std::abs(field_screen_rect(*dfa_slider_).y + dfa_slider_->GetSize().y / 2 -
+                           field_screen_rect(*dfa_value_).y - dfa_value_->GetSize().y / 2) <=
+                      FromDIP(1))) {
+                auto geometry = [](wxWindow* control) {
+                    const auto rect = field_screen_rect(*control);
+                    return std::to_string(rect.x) + "," + std::to_string(rect.y) + "," +
+                           std::to_string(rect.width) + "," + std::to_string(rect.height);
+                };
+                throw std::runtime_error("DFA row geometry: slider=" + geometry(dfa_slider_) +
+                                         " editor=" + geometry(dfa_value_) +
+                                         " stepper=" + geometry(dfa_stepper_) + " same sizer=" +
+                                         std::to_string(dfa_slider_->GetContainingSizer() ==
+                                                        dfa_value_->GetContainingSizer()));
+            }
+            class UpdateDialogCheck final : public wxModalDialogHook {
+              public:
+                bool seen = false;
+                wxColour foreground;
+                wxString capture_path;
+                int Enter(wxDialog* dialog) override {
+                    if (dialog->GetTitle() != "AudioHole Update")
+                        return wxID_NONE;
+                    seen = true;
+                    auto* version = wxWindow::FindWindowByName("Current AudioHole version", dialog);
+                    auto* link = dynamic_cast<wxHyperlinkCtrl*>(
+                        wxWindow::FindWindowByName("AudioHole GitHub", dialog));
+                    auto* close = dialog->FindWindow(wxID_CLOSE);
+                    if (!version || !version->GetLabel().Contains(text(AUDIOHOLE_VERSION)) ||
+                        !link || link->GetURL() != "https://github.com/RLCypher/audiohole" ||
+                        !close || close->GetLabel() != "Close" ||
+                        dialog->GetEscapeId() != wxID_CLOSE ||
+                        version->GetForegroundColour() != foreground ||
+                        close->GetForegroundColour() != foreground ||
+                        link->GetNormalColour() != foreground)
+                        throw std::runtime_error(
+                            "Update dialog lost its version, link, Close action or theme");
+                    dialog->CallAfter([dialog, close, path = capture_path] {
+                        if (!path.empty()) {
+                            wxFileName::Mkdir(wxFileName(path).GetPath(), wxS_DIR_DEFAULT,
+                                              wxPATH_MKDIR_FULL);
+                            dialog->Update();
+                            wxBitmap bitmap(dialog->GetClientSize());
+                            wxMemoryDC destination(bitmap);
+                            wxClientDC source(dialog);
+                            destination.Blit(0, 0, bitmap.GetWidth(), bitmap.GetHeight(), &source,
+                                             0, 0);
+                            destination.SelectObject(wxNullBitmap);
+                            if (!bitmap.SaveFile(path, wxBITMAP_TYPE_BMP))
+                                throw std::runtime_error(
+                                    "Could not capture Update dialog evidence");
+                        }
+                        wxCommandEvent click(wxEVT_BUTTON, close->GetId());
+                        close->GetEventHandler()->ProcessEvent(click);
+                    });
+                    return wxID_NONE;
+                }
+            } hook;
+            const auto appearance_before = theme_choice_->GetSelection();
+            for (int choice : {0, 1}) {
+                theme_choice_->SetSelection(choice);
+                wxCommandEvent theme(wxEVT_CHOICE, theme_choice_->GetId());
+                theme_choice_->GetEventHandler()->ProcessEvent(theme);
+                hook.foreground = choice == 0 ? *wxWHITE : *wxBLACK;
+                hook.capture_path =
+                    directory.empty()
+                        ? wxString{}
+                        : directory + (choice == 0 ? "/update-dark.bmp" : "/update-light.bmp");
+                hook.seen = false;
+                const auto before = controller_->snapshot().revision;
+                const auto draft_before = draft_;
+                hook.Register();
+                wxCommandEvent click(wxEVT_BUTTON, update->GetId());
+                update->GetEventHandler()->ProcessEvent(click);
+                hook.Unregister();
+                require(hook.seen && controller_->snapshot().revision == before &&
+                            draft_ == draft_before,
+                        "Update failed to open its dialog or changed routing/editor state");
+            }
+            theme_choice_->SetSelection(appearance_before);
+            wxCommandEvent restore_theme(wxEVT_CHOICE, theme_choice_->GetId());
+            theme_choice_->GetEventHandler()->ProcessEvent(restore_theme);
+            notebook_->SetSelection(previous_page);
         }
         {
             const auto original_console = console_->GetValue();
