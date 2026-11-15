@@ -4,6 +4,28 @@
 #include <stdexcept>
 
 namespace audiohole {
+namespace {
+// Names/notes can be applied without releasing otherwise unchanged streams.
+// Retained tuning still participates: Apply must accept the complete intent.
+bool same_routing_settings(const Profile& a, const Profile& b) {
+    if (a.id != b.id || a.holes.size() != b.holes.size())
+        return false;
+    const auto same_direction = [](const Direction& x, const Direction& y) {
+        return x.source == y.source && x.destination == y.destination && x.settings == y.settings &&
+               x.advanced_tuning == y.advanced_tuning &&
+               x.exclusive_mode_preferred == y.exclusive_mode_preferred;
+    };
+    for (std::size_t i = 0; i < a.holes.size(); ++i) {
+        const auto& x = a.holes[i];
+        const auto& y = b.holes[i];
+        if (x.id != y.id || x.enabled != y.enabled || x.duplex != y.duplex ||
+            x.routing_engine != y.routing_engine || !same_direction(x.forward, y.forward) ||
+            !same_direction(x.reverse, y.reverse))
+            return false;
+    }
+    return true;
+}
+} // namespace
 ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPersistence> provider,
                                                  std::unique_ptr<ScannerService> scanner,
                                                  std::unique_ptr<DiagnosticService> checks,
@@ -141,9 +163,13 @@ Result ConfigurationController::remove_profile(const std::string& id) {
 Result ConfigurationController::save(Profile edited, bool apply) {
     if (apply && !routing_)
         return unavailable("Applying a live routing plan; use Save for configuration-only changes");
-    if (apply && routing_active())
-        return {false,
-                "Stop routing before applying changes. Save can retain edits for the next Start."};
+    if (apply && (state_.routing_pending || state_.state == State::Stopping))
+        return {false, "Wait for the current routing operation to finish before applying edits."};
+    if (apply && state_.armed && state_.active_profile != edited.id)
+        return {false, "Apply edits to the active profile, or stop routing before applying another "
+                       "profile."};
+    if (apply && (state_.scanner.busy || (device_checks_ && device_checks_->reading().active)))
+        return {false, "Finish the scan or device check before applying routing changes."};
     for (const auto& hole : edited.holes) {
         const auto checked = validate_endpoint_assignments(hole);
         if (!checked.ok)
@@ -156,6 +182,7 @@ Result ConfigurationController::save(Profile edited, bool apply) {
     if (found == records.profiles.end())
         return {false, "Profile no longer exists."};
     const auto id = edited.id;
+    bool has_routes = true;
     if (apply) {
         auto projected = routing_profile(edited);
         if (!projected.ok())
@@ -163,13 +190,32 @@ Result ConfigurationController::save(Profile edited, bool apply) {
         const auto prepared = engine::prepare_profile(*projected.value);
         if (!prepared.ok())
             return {false, routing_issues(prepared.issues)};
-        if (prepared.value->routes.empty())
-            return {false, "Enable at least one configured hole before applying routing."};
+        has_routes = !prepared.value->routes.empty();
     }
     *found = std::move(edited);
     const auto saved = commit(
         std::move(records), "Profile saved to Test configuration. No engine values were applied.");
-    return saved.ok && apply ? activate(id) : saved;
+    if (!saved.ok || !apply)
+        return saved;
+    const auto accepted = *profile(state_, id);
+    if (!has_routes) {
+        if (state_.armed)
+            stop();
+        state_.active_profile = id;
+        state_.routing_intent = std::make_shared<const Profile>(accepted);
+        return {true, "Profile saved. All holes are disabled; routing will remain stopped."};
+    }
+    if (state_.armed) {
+        if (state_.state == State::Running && state_.routing_intent &&
+            same_routing_settings(accepted, *state_.routing_intent)) {
+            state_.routing_intent = std::make_shared<const Profile>(accepted);
+            return {true, "Profile saved and applied; routing settings are unchanged."};
+        }
+        stop();
+        pending_apply_ = accepted;
+        return {true, "Profile saved. Restarting routing with the applied settings."};
+    }
+    return activate(id);
 }
 Result ConfigurationController::update_buffer(const std::string& profile_id,
                                               const std::string& hole_id, bool reverse,
@@ -231,7 +277,10 @@ Result ConfigurationController::activate(const std::string& id, bool) {
     const auto* selected = profile(state_, id);
     if (!selected)
         return {false, "Select a saved profile before starting routing."};
-    auto projected = routing_profile(*selected);
+    return start_profile(*selected);
+}
+Result ConfigurationController::start_profile(const Profile& selected) {
+    auto projected = routing_profile(selected);
     if (!projected.ok())
         return {false, routing_issues(projected.issues)};
     auto prepared = engine::prepare_profile(*projected.value);
@@ -246,17 +295,17 @@ Result ConfigurationController::activate(const std::string& id, bool) {
             "The engine is initializing or still cleaning up. Wait for Stopped, then try again."};
     routing_generation_ = generation;
     routed_inventory_revision_ = state_.scanner.inventory_revision;
-    state_.routing_intent = std::make_shared<const Profile>(*selected);
+    state_.routing_intent = std::make_shared<const Profile>(selected);
     state_.routing_status.reset();
     state_.routing_admission_issues.clear();
     state_.paths.clear();
-    state_.active_profile = id;
+    state_.active_profile = selected.id;
     state_.pending_profile.clear();
     state_.pending_ms = 0;
     state_.routing_pending = true;
     state_.state = State::Starting;
     state_.armed = false;
-    event("routing-requested", "Start requested for " + selected->display_name +
+    event("routing-requested", "Start requested for " + selected.display_name +
                                    ". Waiting for engine admission and frame progress.");
     return {true, "Starting routing. Waiting for confirmed frame progress."};
 }
@@ -363,6 +412,7 @@ void ConfigurationController::scan(bool enabled, bool deep, ScanScope scope, con
     }
 }
 void ConfigurationController::stop() {
+    pending_apply_.reset();
     state_.pending_profile.clear();
     state_.pending_ms = 0;
     if (routing_) {
@@ -512,6 +562,20 @@ void ConfigurationController::poll_routing() {
 }
 void ConfigurationController::advance(int milliseconds) {
     poll_routing();
+    if (pending_apply_ && !state_.routing_pending && state_.state != State::Stopping) {
+        auto accepted = std::move(*pending_apply_);
+        pending_apply_.reset();
+        if (state_.state == State::Stopped) {
+            const auto applied = start_profile(accepted);
+            if (!applied.ok) {
+                state_.state = State::Failed;
+                event("error",
+                      "Profile was saved, but restarting routing failed: " + applied.detail);
+            }
+        } else {
+            event("error", "Profile was saved, but engine cleanup failed; Apply was cancelled.");
+        }
+    }
     if (!state_.pending_profile.empty() && milliseconds > 0) {
         ++state_.revision;
         state_.pending_ms = std::max(0, state_.pending_ms - milliseconds);

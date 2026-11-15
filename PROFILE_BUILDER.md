@@ -131,8 +131,11 @@ layout remains unknown until independently established.
 
 Save persists intent. Apply remains a separate operation. Enter in an editable
 configuration field saves through its existing Save action, never live Apply.
-Notes are multiline and Enter inserts a newline. Directional buffer Apply saves
-only that buffer preference, preserving other staged edits and the sibling.
+Notes are multiline and Enter inserts a newline. All Profile-tab Apply buttons,
+including those beside Default device buffer, save the entire draft and apply
+it to routing. Applying the active profile waits for native cleanup before
+restarting with the accepted settings; Stop cancels that restart. See the
+[profile persistence and Apply audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
 
 ## Channel mapping
 

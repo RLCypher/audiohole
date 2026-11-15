@@ -231,7 +231,9 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             p.preferred_clock_device = "automatic";
         }
         d.settings.refresh_projection();
-        populate_direction(w, d);
+        constexpr DirectionFields fields[]{DirectionFields::Format, DirectionFields::Timing,
+                                           DirectionFields::Routing, DirectionFields::All};
+        populate_direction(w, d, fields[section]);
         dirty_ = true;
         refresh();
     };
@@ -347,8 +349,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         w.buffer_apply = button(box, buffer_row, "Apply", [this, &w] { apply_buffer(w); });
         w.buffer_apply->SetMinSize(wxSize(-1, height));
         w.buffer_apply->SetMaxSize(wxSize(-1, height));
-        w.buffer_apply->SetToolTip("Save only this direction's default device-buffer request. Stop "
-                                   "and Start to apply changes to routing.");
+        w.buffer_apply->SetToolTip(button_help("Apply"));
         w.buffer_apply->Disable();
         column->Add(buffer_row, 0, wxEXPAND);
         timing_grid->Add(column, 1, wxEXPAND);
@@ -420,7 +421,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                         return;
                     }
                     d.settings.refresh_projection();
-                    populate_direction(w, d);
+                    populate_direction(w, d, DirectionFields::Timing);
                     dirty_ = true;
                     refresh();
                 },
@@ -477,7 +478,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             return;
         }
         d.settings.refresh_projection();
-        populate_direction(w, d);
+        populate_direction(w, d, DirectionFields::Timing);
         dirty_ = true;
         refresh();
     });
@@ -541,9 +542,10 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
                          "type a name to select a matching list item.");
     w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
                               "is shown for the selected device.");
-    w.mode->SetToolTip("Save an access-mode choice for this direction. Use advanced tuning must be "
-                       "enabled for it to apply. Forced modes take precedence over Exclusive mode "
-                       "preferred; Automatic initially uses shared access.");
+    w.mode->SetToolTip(
+        "Save an access-mode choice for this direction. Use advanced tuning must be "
+        "enabled for it to apply. Forced modes take precedence over Exclusive mode "
+        "preferred. Automatic prefers exclusive access when checked, otherwise shared access.");
     w.representation->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
         if (!loading_) {
             dirty_ = true;
@@ -559,7 +561,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         const int index = control->GetSelection();
         if (index >= 0 && !control->item_enabled(static_cast<unsigned>(index))) {
             const auto& hole = draft_.holes[hole_index_];
-            populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+            populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse,
+                               DirectionFields::Preserve);
             return;
         }
         capture_draft();
@@ -570,8 +573,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             (source ? direction.source_name : direction.destination_name).clear();
         }
         end_observation();
-        populate_direction(forward_, hole.forward);
-        populate_direction(reverse_, hole.reverse);
+        populate_direction(forward_, hole.forward, DirectionFields::Preserve);
+        populate_direction(reverse_, hole.reverse, DirectionFields::Preserve);
         dirty_ = true;
         tutorial_event("endpoints");
         present(source ? presentation::Message::Source : presentation::Message::Destination);
@@ -619,7 +622,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             return;
         capture_draft();
         const auto& hole = draft_.holes.at(static_cast<std::size_t>(hole_index_));
-        populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse);
+        populate_direction(w, &w == &forward_ ? hole.forward : hole.reverse,
+                           DirectionFields::Preserve);
         dirty_ = true;
         refresh();
     });
@@ -671,7 +675,7 @@ void Frame::tuning_changed(DirectionWidgets& widgets) {
     direction.advanced_tuning = enabled;
     if (!enabled)
         widgets.advanced_tuning->SetFocus();
-    populate_direction(widgets, direction);
+    populate_direction(widgets, direction, DirectionFields::Preserve);
     layout_direction(widgets);
     dirty_ = true;
     tuning_reaction_reverse_ = &widgets == &reverse_;
@@ -697,28 +701,9 @@ void Frame::acknowledge_buffer(DirectionWidgets& widgets) {
     refresh();
 }
 void Frame::apply_buffer(DirectionWidgets& widgets) {
-    tuning_timer_.Stop();
-    if (loading_ || hole_index_ < 0 || static_cast<std::size_t>(hole_index_) >= draft_.holes.size())
-        return;
-    const auto parsed = buffer_value(widgets.buffer);
-    if (!parsed) {
-        show_result(
-            {false, "Enter 0 for Automatic or a whole buffer value from 1 to 100 milliseconds."});
-        return;
-    }
-    capture_draft();
-    const auto& hole = draft_.holes[static_cast<std::size_t>(hole_index_)];
-    if (&widgets == &reverse_ && !hole.duplex)
-        return;
-    const auto result =
-        controller_->update_buffer(viewed_, hole.id, &widgets == &reverse_, *parsed);
-    commentary_copy_.clear(); // Replace the old "Save / Apply required" flavor after this result.
-    show_result(result);
-    if (result.ok) {
-        if (const auto* saved = profile(controller_->snapshot(), viewed_))
-            dirty_ = draft_ != *saved;
-    }
-    refresh();
+    // All Profile-tab Apply buttons save and apply the entire editor draft.
+    if (!loading_ && widgets.buffer_apply->IsEnabled())
+        save(true);
 }
 std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
     auto menu = std::make_unique<wxMenu>();
@@ -818,8 +803,11 @@ std::unique_ptr<wxMenu> Frame::hole_menu(const std::string& id) {
         if (found == draft_.holes.end())
             return false;
         const int index = static_cast<int>(found - draft_.holes.begin());
-        if (index != hole_index_)
+        if (index != hole_index_) {
+            if (!validate_profile_inputs())
+                return false;
             load_hole(index);
+        }
         return true;
     };
     menu->Bind(
@@ -892,7 +880,7 @@ void Frame::rename_hole(const std::string& name) {
     refresh();
 }
 void Frame::add_hole() {
-    if (viewed_.empty())
+    if (viewed_.empty() || !validate_profile_inputs())
         return;
     capture_draft();
     auto created = controller_->make_hole();
@@ -909,7 +897,7 @@ void Frame::add_hole() {
     refresh();
 }
 void Frame::duplicate_hole() {
-    if (hole_index_ < 0)
+    if (hole_index_ < 0 || !validate_profile_inputs())
         return;
     capture_draft();
     auto copy = draft_.holes.at(static_cast<std::size_t>(hole_index_));
@@ -1150,8 +1138,8 @@ void Frame::build_profiles() {
             capture_draft();
             if (hole_index_ >= 0) {
                 const auto& hole = draft_.holes[hole_index_];
-                populate_direction(forward_, hole.forward);
-                populate_direction(reverse_, hole.reverse);
+                populate_direction(forward_, hole.forward, DirectionFields::Preserve);
+                populate_direction(reverse_, hole.reverse, DirectionFields::Preserve);
             }
             dirty_ = true;
             refresh();
@@ -1205,6 +1193,10 @@ void Frame::build_profiles() {
     });
     holes_->Bind(wxEVT_LISTBOX, [this](wxCommandEvent&) {
         const int i = holes_->GetSelection();
+        if (!validate_profile_inputs()) {
+            holes_->SetSelection(hole_index_);
+            return;
+        }
         capture_draft();
         load_hole(i);
     });
@@ -1254,10 +1246,17 @@ void Frame::build_profiles() {
     duplex_->Bind(wxEVT_CHECKBOX, [this, editor](wxCommandEvent&) {
         if (loading_ || hole_index_ < 0)
             return;
+        if (!duplex_->GetValue()) {
+            // Do not hide an invalid Return edit and later save its old value.
+            duplex_->SetValue(true);
+            if (!validate_profile_inputs())
+                return;
+            duplex_->SetValue(false);
+        }
         capture_draft();
         const auto& hole = draft_.holes[hole_index_];
-        populate_direction(forward_, hole.forward);
-        populate_direction(reverse_, hole.reverse);
+        populate_direction(forward_, hole.forward, DirectionFields::Preserve);
+        populate_direction(reverse_, hole.reverse, DirectionFields::Preserve);
         load_holes();
         holes_->SetSelection(hole_index_);
         dirty_ = true;
@@ -1273,7 +1272,8 @@ void Frame::build_profiles() {
 }
 // Test uses exact worker-projected scanner tuples; Preview uses authored fixtures.
 // Rebuilding must not silently erase a manual choice or invent runtime evidence.
-void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& d) {
+void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& d,
+                               DirectionFields load_settings) {
     const bool old_loading = loading_;
     loading_ = true;
     w.advanced_tuning->SetValue(d.advanced_tuning);
@@ -1357,38 +1357,52 @@ void Frame::populate_direction(DirectionWidgets& w, const audiohole::Direction& 
     }
     w.format->SetSelection(selection);
     update_direction_details(w, d);
-    const auto& preference = d.settings.preferences;
-    w.rate->ChangeValue(
-        preference.common.sample_rate_hz ? std::to_string(*preference.common.sample_rate_hz) : "");
-    w.channels->ChangeValue(
-        preference.common.channel_count ? std::to_string(*preference.common.channel_count) : "");
-    w.source_channels->ChangeValue(
-        preference.source.channel_count ? std::to_string(*preference.source.channel_count) : "");
-    w.destination_channels->ChangeValue(preference.destination.channel_count
-                                            ? std::to_string(*preference.destination.channel_count)
-                                            : "");
-    w.representation->SetStringSelection(
-        text(preference.common.sample_format.value_or("Automatic")));
-    std::string mapping;
-    for (const auto& route : preference.channel_map) {
-        if (!mapping.empty())
-            mapping += ", ";
-        mapping += std::to_string(route.source + 1) + ":" + std::to_string(route.destination + 1);
+    // Inventory, endpoint, engine and mode refreshes update choices/details,
+    // retaining raw edits (including incomplete ones) until explicit Save/load.
+    if (load_settings == DirectionFields::All || load_settings == DirectionFields::Format) {
+        const auto& preference = d.settings.preferences;
+        w.rate->ChangeValue(preference.common.sample_rate_hz
+                                ? std::to_string(*preference.common.sample_rate_hz)
+                                : "");
+        w.channels->ChangeValue(preference.common.channel_count
+                                    ? std::to_string(*preference.common.channel_count)
+                                    : "");
+        w.source_channels->ChangeValue(preference.source.channel_count
+                                           ? std::to_string(*preference.source.channel_count)
+                                           : "");
+        w.destination_channels->ChangeValue(
+            preference.destination.channel_count
+                ? std::to_string(*preference.destination.channel_count)
+                : "");
+        w.representation->SetStringSelection(
+            text(preference.common.sample_format.value_or("Automatic")));
+        std::string mapping;
+        for (const auto& route : preference.channel_map) {
+            if (!mapping.empty())
+                mapping += ", ";
+            mapping +=
+                std::to_string(route.source + 1) + ":" + std::to_string(route.destination + 1);
+        }
+        w.channel_map->ChangeValue(text(mapping));
     }
-    w.channel_map->ChangeValue(text(mapping));
-    w.buffer->SetValue(d.settings.preferences.common.buffer_ms
-                           ? wxString::Format("%d", *d.settings.preferences.common.buffer_ms)
-                           : wxString{});
-    const auto values = timing_values(preference);
-    for (unsigned i = 0; i < 8; ++i)
-        if (i != 3)
-            w.timings[i]->ChangeValue(values[i] ? wxString::Format("%.12g", *values[i])
-                                                : wxString{});
-    w.acknowledged_buffer_ms = d.settings.buffer_ms;
-    const auto mode = d.settings.preferences.common.mode.value_or("Automatic");
-    w.mode->SetSelection(mode == "Exclusive" ? 1 : mode == "Shared" ? 2 : 0);
-    const auto clock = d.settings.preferences.preferred_clock_device;
-    w.clock->SetSelection(clock == "capture" ? 1 : clock == "playback" ? 2 : 0);
+    const auto& preference = d.settings.preferences;
+    if (load_settings == DirectionFields::All || load_settings == DirectionFields::Timing) {
+        w.buffer->SetValue(d.settings.preferences.common.buffer_ms
+                               ? wxString::Format("%d", *d.settings.preferences.common.buffer_ms)
+                               : wxString{});
+        const auto values = timing_values(preference);
+        for (unsigned i = 0; i < 8; ++i)
+            if (i != 3)
+                w.timings[i]->ChangeValue(values[i] ? wxString::Format("%.12g", *values[i])
+                                                    : wxString{});
+        w.acknowledged_buffer_ms = d.settings.buffer_ms;
+    }
+    if (load_settings == DirectionFields::All || load_settings == DirectionFields::Routing) {
+        const auto mode = d.settings.preferences.common.mode.value_or("Automatic");
+        w.mode->SetSelection(mode == "Exclusive" ? 1 : mode == "Shared" ? 2 : 0);
+        const auto clock = d.settings.preferences.preferred_clock_device;
+        w.clock->SetSelection(clock == "capture" ? 1 : clock == "playback" ? 2 : 0);
+    }
     loading_ = old_loading;
     if (!loading_)
         layout_direction(w);
@@ -1412,7 +1426,6 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
     const auto& snapshot = controller_->snapshot();
     std::string saved = "unsaved";
     const bool reverse = &w == &reverse_;
-    bool saved_direction = false;
     if (const auto* stored = profile(snapshot, viewed_)) {
         const auto selected =
             hole_index_ >= 0 && static_cast<std::size_t>(hole_index_) < draft_.holes.size()
@@ -1422,7 +1435,6 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                                        [&](const auto& record) { return record.id == selected; });
         if (hole != stored->holes.end() && (!reverse || hole->duplex)) {
             saved = buffer_caption((reverse ? hole->reverse : hole->forward).settings.buffer_ms);
-            saved_direction = true;
         }
     }
     const auto selected_hole =
@@ -1438,20 +1450,9 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
         path == snapshot.paths.end() ? std::optional<int>{} : path->requested_buffer_ms;
     const auto confirmed =
         path == snapshot.paths.end() ? std::optional<int>{} : path->applied_buffer_ms;
-    const bool saved_changed = saved != buffer_caption(d.settings.buffer_ms);
-    const bool active_changed =
-        snapshot.capabilities.live_buffer && requested && *requested != d.settings.buffer_ms;
     const auto parsed = buffer_value(w.buffer);
-    w.buffer_apply->Enable(w.advanced_tuning->GetValue() && saved_direction && parsed &&
-                           (saved_changed || active_changed));
-    const wxString buffer_help =
-        !parsed ? "Enter 0 for Automatic or a whole buffer value from 1 to 100 milliseconds."
-        : !saved_direction
-            ? "Save this profile and direction before applying an individual buffer preference."
-        : !saved_changed && !active_changed
-            ? "This buffer already matches the saved preference."
-            : "Save only this direction's buffer preference. A matching active Preview direction "
-              "updates its simulated buffer; working mode uses saved changes on the next Start.";
+    w.buffer_apply->Enable(profile_apply_->IsEnabled());
+    const wxString buffer_help = button_help("Apply");
     if (!w.buffer_apply->GetToolTip() || w.buffer_apply->GetToolTip()->GetTip() != buffer_help)
         w.buffer_apply->SetToolTip(buffer_help);
     auto value = [](std::optional<int> buffer) {
@@ -1467,7 +1468,7 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
                         " | confirmed: " + value(confirmed) + " (simulated)"
                   : (snapshot.capabilities.real_engine
                          ? "Playback applied buffer request: " + value(confirmed) +
-                               "; edits take effect on the next Start"
+                               "; Save stages edits, Apply restarts routing"
                          : "Engine requested/applied: unavailable"))));
     auto effective = d;
     const bool advanced = w.advanced_tuning->GetValue();
@@ -1541,8 +1542,8 @@ void Frame::update_direction_details(DirectionWidgets& w, const audiohole::Direc
             " Automatic policy active in this draft — retained manual settings are inactive.";
     }
     if (observed)
-        summary = "Opened endpoint formats are shown above. Saved edits take effect after Stop and "
-                  "Start. " +
+        summary = "Opened endpoint formats are shown above. Save stages edits; Apply saves and "
+                  "restarts routing. " +
                   summary;
     const auto information = text(summary + "\n\n" + recommendation.explanation);
     const bool information_changed = w.information->GetValue() != information;
@@ -1739,8 +1740,7 @@ bool Frame::profile_edits_pending() {
         }
     return false;
 }
-void Frame::save(bool apply) {
-    tuning_timer_.Stop();
+bool Frame::validate_profile_inputs() {
     // Typing in an endpoint search is not an assignment. Do not let Enter in
     // another field erase a retained binding, including a hidden/missing one.
     const auto assigned = [](wxComboBox* control, const wxString& retained) {
@@ -1755,7 +1755,7 @@ void Frame::save(bool apply) {
         (!direction_assigned(forward_) || (duplex_->GetValue() && !direction_assigned(reverse_)))) {
         show_result({false, "Select a listed capture or playback device to finish the search "
                             "before saving."});
-        return;
+        return false;
     }
     if (hole_index_ >= 0) {
         for (auto* widgets : {&forward_, &reverse_}) {
@@ -1765,12 +1765,20 @@ void Frame::save(bool apply) {
                                                     : draft_.holes[hole_index_].reverse)
                                   .settings.preferences;
             if (!buffer_value(widgets->buffer) || !read_preferences(*widgets, preference)) {
-                show_result({false, "Check this direction's buffer, sample rate, channel count and "
-                                    "channel map before saving."});
-                return;
+                show_result({false, std::string(widgets == &forward_ ? "Forward" : "Return") +
+                                        ": check the rate, channel counts, channel map and "
+                                        "latency/buffer values before saving. Clear a field "
+                                        "for Auto/Inherit. Your edits have been retained."});
+                return false;
             }
         }
     }
+    return true;
+}
+void Frame::save(bool apply) {
+    tuning_timer_.Stop();
+    if (!validate_profile_inputs())
+        return;
     capture_draft();
     const auto r = controller_->save(draft_, apply);
     show_result(r);

@@ -129,6 +129,7 @@ class Store final : public ConfigurationPersistence {
   public:
     ConfigurationRecords records;
     int saves = 0;
+    bool reject_save = false;
     Store() {
         records.profiles.push_back(profile());
         for (const auto& id :
@@ -147,6 +148,8 @@ class Store final : public ConfigurationPersistence {
         return {true, "Loaded software fixture"};
     }
     Result save(const ConfigurationRecords& in) override {
+        if (reject_save)
+            return {false, "Injected profile write failure"};
         records = in;
         ++saves;
         return {true, "Saved software fixture"};

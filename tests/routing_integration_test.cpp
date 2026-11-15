@@ -145,6 +145,165 @@ TEST_F(RoutingIntegration, SavedEditsCannotRewriteTheLiveAssignmentsOrLabels) {
               "another-render-endpoint");
     EXPECT_EQ(controller->snapshot().state, State::Running);
 }
+TEST_F(RoutingIntegration, ApplySavesBeforeCleanupThenRestartsWithExactlyAcceptedIntent) {
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    auto edited = store->records.profiles[0];
+    describe_profile(controller->snapshot(), edited);
+    edited.notes = "Saved together with Apply";
+    auto& direction = edited.holes[0].forward;
+    direction.exclusive_mode_preferred = true;
+    direction.advanced_tuning = true;
+    direction.settings.set_buffer_preference(17);
+    control->block_cleanup = true;
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    EXPECT_EQ(store->records.profiles[0], edited);
+    EXPECT_EQ(controller->snapshot().state, State::Stopping);
+    until(*controller, [&] { return control->cleaning.load(); });
+    EXPECT_EQ(control->opens, 2);
+    // Later Save is staged for the next Apply; it must not replace the accepted
+    // restart while native cleanup is still in progress.
+    auto later = edited;
+    later.holes[0].forward.settings.set_buffer_preference(23);
+    ASSERT_TRUE(controller->save(later, false).ok);
+    EXPECT_FALSE(controller->save(later, true).ok);
+    control->block_cleanup = false;
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    EXPECT_EQ(control->releases, 2);
+    EXPECT_EQ(control->opens, 4);
+    EXPECT_EQ(*controller->snapshot().routing_intent, edited);
+    EXPECT_EQ(store->records.profiles[0], later);
+    EXPECT_EQ(controller->snapshot()
+                  .routing_status->paths[0]
+                  .negotiated->destination.applied_buffer_request_ms,
+              17);
+}
+TEST_F(RoutingIntegration, FailedSaveAndInvalidApplyLeaveRunningStreamsUntouched) {
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    const auto original = store->records.profiles[0];
+    auto edited = original;
+    edited.holes[0].forward.exclusive_mode_preferred = true;
+    store->reject_save = true;
+    EXPECT_FALSE(controller->save(edited, true).ok);
+    store->reject_save = false;
+    edited.holes[0].forward.advanced_tuning = true;
+    edited.holes[0].forward.settings.preferences.common.channel_count = 0;
+    EXPECT_FALSE(controller->save(edited, true).ok);
+    EXPECT_EQ(store->records.profiles[0], original);
+    EXPECT_EQ(controller->snapshot().state, State::Running);
+    EXPECT_EQ(control->opens, 2);
+    EXPECT_EQ(control->releases, 0);
+}
+TEST_F(RoutingIntegration, ApplyingOnlyNamesAndNotesKeepsStreamsOpen) {
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    auto edited = store->records.profiles[0];
+    edited.display_name = "Renamed active profile";
+    edited.holes[0].display_name = "Renamed hole";
+    edited.notes = "Updated notes";
+    edited.holes[0].notes = "Updated hole notes";
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    EXPECT_EQ(controller->snapshot().state, State::Running);
+    EXPECT_EQ(controller->snapshot().routing_intent->notes, edited.notes);
+    EXPECT_EQ(store->records.profiles[0].holes[0].display_name, edited.holes[0].display_name);
+    EXPECT_EQ(control->opens, 2);
+    EXPECT_EQ(control->releases, 0);
+}
+TEST_F(RoutingIntegration, StopCancelsAnApplyWaitingForCleanup) {
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    auto edited = store->records.profiles[0];
+    describe_profile(controller->snapshot(), edited);
+    edited.holes[0].forward.exclusive_mode_preferred = true;
+    control->block_cleanup = true;
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    until(*controller, [&] { return control->cleaning.load(); });
+    controller->stop();
+    control->block_cleanup = false;
+    until(*controller, [&] {
+        return controller->snapshot().state == State::Stopped &&
+               !controller->snapshot().routing_pending;
+    });
+    for (int i = 0; i < 20; ++i)
+        controller->advance(10);
+    EXPECT_EQ(control->opens, 2);
+    EXPECT_EQ(store->records.profiles[0], edited);
+    EXPECT_FALSE(controller->snapshot().armed);
+}
+TEST_F(RoutingIntegration, ApplyCanDisableTheLastHoleAndBackendFailureRetainsSavedEdits) {
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    auto edited = store->records.profiles[0];
+    describe_profile(controller->snapshot(), edited);
+    edited.holes[0].enabled = false;
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    until(*controller, [&] {
+        return controller->snapshot().state == State::Stopped &&
+               !controller->snapshot().routing_pending;
+    });
+    EXPECT_FALSE(store->records.profiles[0].holes[0].enabled);
+    EXPECT_EQ(control->opens, 2);
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    EXPECT_EQ(controller->snapshot().state, State::Stopped);
+    EXPECT_EQ(control->opens, 2);
+    edited.holes[0].enabled = true;
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    edited.holes[0].forward.advanced_tuning = true;
+    edited.holes[0].forward.settings.preferences.common.mode = "Exclusive";
+    control->refuse_exclusive = true;
+    ASSERT_TRUE(controller->save(edited, true).ok);
+    until(*controller, [&] {
+        return controller->snapshot().state == State::Degraded ||
+               controller->snapshot().state == State::Failed;
+    });
+    EXPECT_EQ(store->records.profiles[0], edited);
+    EXPECT_NE(
+        routing_diagnostics(*controller->snapshot().routing_status, &edited).find("TEST-EXCLUSIVE"),
+        std::string::npos);
+}
+TEST(RoutingCommunication, ApplyingDisabledLastHoleCompletesAfterCleanup) {
+    auto control = std::make_shared<testing_engine::Control>();
+    ApplicationController application(std::make_unique<ConfigurationController>(
+        std::make_unique<testing_engine::Store>(), nullptr, nullptr,
+        testing_engine::service(control)));
+    until(application, [&] { return application.snapshot().capabilities.routing; });
+    ASSERT_TRUE(application.activate("engine-profile").ok);
+    until(application, [&] { return application.snapshot().state == State::Running; });
+    auto edits = application.snapshot().profiles[0];
+    auto subscription = application.subscribe();
+    subscription.poll();
+    edits.holes[0].forward.advanced_tuning = true;
+    edits.holes[0].forward.settings.set_buffer_preference(11);
+    const auto restart = application.submit(SaveConfiguration{edits, true});
+    EXPECT_EQ(restart.outcome, Outcome::Accepted);
+    until(application, [&] { return application.snapshot().state == State::Running; });
+    const auto restarted = subscription.poll();
+    EXPECT_TRUE(
+        std::any_of(restarted.results.begin(), restarted.results.end(), [&](const auto& value) {
+            return value.request_id == restart.request_id && value.outcome == Outcome::Completed;
+        }));
+    EXPECT_FALSE(
+        std::any_of(restarted.results.begin(), restarted.results.end(), [&](const auto& value) {
+            return value.request_id == restart.request_id && value.outcome == Outcome::Cancelled;
+        }));
+    edits.holes[0].enabled = false;
+    const auto request = application.submit(SaveConfiguration{edits, true});
+    EXPECT_EQ(request.outcome, Outcome::Accepted);
+    until(application, [&] {
+        return application.snapshot().state == State::Stopped &&
+               !application.snapshot().routing_pending;
+    });
+    const auto result = subscription.poll();
+    EXPECT_TRUE(std::any_of(result.results.begin(), result.results.end(), [&](const auto& value) {
+        return value.request_id == request.request_id && value.outcome == Outcome::Completed;
+    }));
+    EXPECT_FALSE(std::any_of(result.results.begin(), result.results.end(), [&](const auto& value) {
+        return value.request_id == request.request_id && value.outcome == Outcome::Cancelled;
+    }));
+    EXPECT_EQ(control->releases, 4);
+}
 TEST_F(RoutingIntegration, AmbiguousBindingsDoNotOpenAndHealthyDirectionSurvivesSiblingFailure) {
     control->fail_return = true;
     ASSERT_TRUE(controller->activate("engine-profile").ok);

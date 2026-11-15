@@ -841,3 +841,23 @@ portable or cross-build success.
 - Resize Profiles/Holes/Notes repeatedly in Light and Dark. Check for stale
   outlines. Reset layout must restore all pane geometry and the 2/4/3-line field
   defaults while preserving window size and saved configuration.
+
+## Profile persistence and unified Apply amendment (2026-11-15)
+
+This supersedes earlier small-buffer-only Apply expectations in this checklist.
+
+- Edit every Forward/Return format, timing, mode and clock field, both policy
+  checkboxes, profile/hole notes, names, enabled/duplex state and Routing Engine.
+  Use top-level Save, inspect the named profile JSON, reload, and compare. Clear
+  overrides and uncheck both policies; verify false/null replaces previous values.
+- Enter an incomplete channel map and another valid edit. Change mode, engine,
+  endpoints and advanced eligibility, then refresh inventory. Text must survive;
+  Save and hole navigation must reject invalid input without silently saving old
+  values. Correct the input, save, and verify the other edit persisted.
+- With physical duplex routing active, repeat edits using each of the three Apply
+  buttons. Each must save the entire draft, clean up, restart and report actual
+  requests/configurations. Save alone must leave the live route unchanged.
+- Press Stop during Apply cleanup: no delayed restart. Disable the last hole and
+  Apply: saved configuration stays disabled and routing reaches Stopped. Test a
+  rejected write and invalid requirement: the original running route must survive.
+  Test a backend refusal: retain saved edits and show the actual error.

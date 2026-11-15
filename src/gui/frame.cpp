@@ -5,6 +5,7 @@
 #include "model/application_controller.h"
 #include "model/configuration_bundle.h"
 #include "model/configuration_controller.h"
+#include "model/latency_preferences.h"
 #include "model/routing_service.h"
 #include "presentation/text_layout.h"
 #include <cstdio>
@@ -727,9 +728,10 @@ void Frame::refresh() {
                    !s.routing_pending && (!s.armed || s.capabilities.simulated) &&
                    s.state != State::Stopping);
     stop_->Enable(s.capabilities.routing);
-    profile_apply_->Enable(s.capabilities.routing && !viewed_.empty() &&
-                           (s.capabilities.simulated ||
-                            (!s.armed && !s.routing_pending && s.state != State::Stopping)));
+    profile_apply_->Enable(
+        s.capabilities.routing && !viewed_.empty() &&
+        (s.capabilities.simulated || (!s.routing_pending && s.state != State::Stopping &&
+                                      (!s.armed || s.active_profile == viewed_))));
     if (!loading_)
         dirty_ = profile_edits_pending();
     profile_save_->Enable(!viewed_.empty() && dirty_ && !bundle_generation_);
@@ -763,8 +765,8 @@ void Frame::refresh() {
         populate_devices();
         if (hole_index_ >= 0) {
             const auto& h = draft_.holes.at(static_cast<std::size_t>(hole_index_));
-            populate_direction(forward_, h.forward);
-            populate_direction(reverse_, h.reverse);
+            populate_direction(forward_, h.forward, DirectionFields::Preserve);
+            populate_direction(reverse_, h.reverse, DirectionFields::Preserve);
         }
         end_observation();
     }
@@ -2068,6 +2070,122 @@ bool Frame::smoke(const wxString& directory) {
             rename_hole("Persistent named hole");
             save(false);
             {
+                const auto original = draft_;
+                auto expected = original;
+                expected.notes = "Profile controls persistence";
+                auto& h = expected.holes[0];
+                h.notes = "Hole controls persistence";
+                h.duplex = true;
+                h.enabled = false;
+                h.routing_engine = "miniaudio";
+                profile_notes_->SetValue(text(expected.notes));
+                hole_notes_->SetValue(text(h.notes));
+                duplex_->SetValue(true);
+                wxCommandEvent duplex(wxEVT_CHECKBOX, duplex_->GetId());
+                duplex_->GetEventHandler()->ProcessEvent(duplex);
+                enabled_->SetValue(false);
+                routing_engine_->SetSelection(2);
+                for (auto* w : {&forward_, &reverse_}) {
+                    const bool reverse = w == &reverse_;
+                    auto& d = reverse ? h.reverse : h.forward;
+                    d.advanced_tuning = true;
+                    d.exclusive_mode_preferred = true;
+                    auto& p = d.settings.preferences;
+                    p.common.sample_rate_hz = reverse ? 44100 : 48000;
+                    p.common.channel_count = 2;
+                    p.source.channel_count = reverse ? 2 : 1;
+                    p.destination.channel_count = 2;
+                    p.common.sample_format = reverse ? "pcm_s16" : "float32";
+                    p.common.mode = reverse ? "Shared" : "Exclusive";
+                    p.preferred_clock_device = reverse ? "playback" : "capture";
+                    p.channel_map = reverse ? std::vector<ChannelRoute>{{0, 1}, {1, 0}}
+                                            : std::vector<ChannelRoute>{{0, 0}, {0, 1}};
+                    const TimingValues timings{31.5, 11.5, 8.5, 16, 7.5, 9.5, 12, 18};
+                    require(set_timing_values(p, timings).ok, "Invalid save fixture");
+                    d.settings.refresh_projection();
+                    w->advanced_tuning->SetValue(true);
+                    w->rate->SetValue(std::to_string(*p.common.sample_rate_hz));
+                    w->channels->SetValue("2");
+                    w->source_channels->SetValue(reverse ? "2" : "1");
+                    w->destination_channels->SetValue("2");
+                    w->representation->SetStringSelection(text(*p.common.sample_format));
+                    w->channel_map->SetValue(reverse ? "1:2, 2:1" : "1:1, 1:2");
+                    for (unsigned i = 0; i < 8; ++i)
+                        if (i != 3)
+                            w->timings[i]->SetValue(wxString::Format("%.12g", *timings[i]));
+                    w->buffer->SetValue(16);
+                    w->mode->SetSelection(reverse ? 2 : 1);
+                    w->clock->SetSelection(reverse ? 2 : 1);
+                    w->exclusive_preferred->SetValue(true);
+                    wxCommandEvent prefer(wxEVT_CHECKBOX, w->exclusive_preferred->GetId());
+                    w->exclusive_preferred->GetEventHandler()->ProcessEvent(prefer);
+                }
+                wxCommandEvent click(wxEVT_BUTTON, profile_save_->GetId());
+                profile_save_->GetEventHandler()->ProcessEvent(click);
+                ConfigurationController fresh(std::make_unique<ProfileDirectoryPersistence>(
+                    preferences_->test_configuration()));
+                const auto* actual = profile(fresh.snapshot(), viewed_);
+                require(actual && *actual == expected,
+                        "Profile controls did not round-trip through the saved JSON");
+                // Explicit false/null must replace old saved values as reliably
+                // as setting them; inherited intent must not revive old overrides.
+                auto cleared = expected;
+                for (auto* w : {&forward_, &reverse_}) {
+                    auto& d = w == &forward_ ? cleared.holes[0].forward : cleared.holes[0].reverse;
+                    d.advanced_tuning = false;
+                    d.exclusive_mode_preferred = false;
+                    d.settings.preferences = {};
+                    w->advanced_tuning->SetValue(false);
+                    SendMessageW(static_cast<HWND>(w->exclusive_preferred->GetHandle()), BM_CLICK,
+                                 0, 0);
+                    require(!w->exclusive_preferred->GetValue(),
+                            "Native checkbox click did not clear exclusive preference");
+                    for (auto* field : {w->rate, w->channels, w->source_channels,
+                                        w->destination_channels, w->channel_map})
+                        field->ChangeValue("");
+                    w->representation->SetSelection(0);
+                    w->mode->SetSelection(0);
+                    w->clock->SetSelection(0);
+                    for (unsigned i = 0; i < 8; ++i)
+                        if (i != 3)
+                            w->timings[i]->ChangeValue("");
+                    w->buffer->SetValue(wxString{});
+                }
+                refresh();
+                SendMessageW(static_cast<HWND>(profile_save_->GetHandle()), BM_CLICK, 0, 0);
+                ConfigurationController cleared_file(std::make_unique<ProfileDirectoryPersistence>(
+                    preferences_->test_configuration()));
+                require(profile(cleared_file.snapshot(), viewed_) &&
+                            *profile(cleared_file.snapshot(), viewed_) == cleared,
+                        "Profile Save revived cleared overrides or exclusive preferences");
+                require(controller_->save(original, false).ok, "Could not restore save fixture");
+                select_profile(original.id);
+                load_hole(0);
+                // A mode/engine change rebuilds the controls. Incomplete input
+                // must remain visible and block Save, not revert to older intent.
+                forward_.rate->SetValue("96000");
+                forward_.channel_map->SetValue("1:");
+                forward_.mode->SetSelection(2);
+                wxCommandEvent mode(wxEVT_CHOICE, forward_.mode->GetId());
+                forward_.mode->GetEventHandler()->ProcessEvent(mode);
+                require(forward_.rate->GetValue() == "96000" &&
+                            forward_.channel_map->GetValue() == "1:",
+                        "Changing operating mode discarded pending tuning input");
+                const auto revision = controller_->snapshot().revision;
+                save(false);
+                require(controller_->snapshot().revision == revision && dirty_,
+                        "Save silently committed older intent for incomplete tuning input");
+                forward_.channel_map->SetValue("");
+                save(false);
+                require(profile(controller_->snapshot(), viewed_)
+                                ->holes[0]
+                                .forward.settings.preferences.common.sample_rate_hz == 96000,
+                        "Corrected tuning input did not save the preserved sample rate");
+                require(controller_->save(original, false).ok,
+                        "Could not restore corrected fixture");
+                select_profile(original.id);
+            }
+            {
                 const auto original_notes = profile_notes_->GetValue();
                 const auto original_revision = controller_->snapshot().revision;
                 profile_notes_->AppendText("\nStaged note");
@@ -2100,15 +2218,13 @@ bool Frame::smoke(const wxString& directory) {
             decline_delete(holes_);
             decline_delete(profiles_, profile_remove_);
             decline_delete(holes_, hole_remove_);
-            profile_notes_->ChangeValue("Other draft edits must remain unsaved");
+            profile_notes_->ChangeValue("All draft edits save together");
             forward_.buffer->SetValue(14);
             acknowledge_buffer(forward_);
-            require(forward_.buffer_apply->IsEnabled(),
-                    "Test buffer preference Apply stayed disabled");
-            wxCommandEvent buffer_apply(wxEVT_BUTTON, forward_.buffer_apply->GetId());
-            forward_.buffer_apply->GetEventHandler()->ProcessEvent(buffer_apply);
-            require(!forward_.buffer_apply->IsEnabled() && dirty_,
-                    "Buffer-only save lost other staged edits");
+            require(!forward_.buffer_apply->IsEnabled() && !profile_apply_->IsEnabled(),
+                    "Apply requires a routing backend in both button locations");
+            save(false);
+            require(!dirty_, "Profile Save left pending edits");
             const auto saved_id = viewed_;
             ConfigurationController restarted(
                 std::make_unique<ProfileDirectoryPersistence>(preferences_->test_configuration()));
@@ -2117,8 +2233,8 @@ bool Frame::smoke(const wxString& directory) {
                         loaded->holes.front().id == persistent_hole_id &&
                         loaded->holes.front().display_name == "Persistent named hole" &&
                         loaded->holes.front().forward.settings.buffer_ms == 14 &&
-                        loaded->notes == "Native GUI Test data, saved without a routing backend.",
-                    "Test buffer-only save did not persist or saved unrelated draft edits");
+                        loaded->notes == "All draft edits save together",
+                    "Profile Save did not persist the buffer and all other staged edits");
             require(!profile_apply_->IsEnabled(),
                     "Test Mode enabled Apply after creating a profile");
             check_endpoint_heights();
@@ -2312,8 +2428,9 @@ bool Frame::smoke(const wxString& directory) {
         refresh();
         for (auto* tab : navigation_)
             require(tab->GetToolTip() == nullptr, "Navigation must not have generic hover text");
-        require(!forward_.buffer_apply->IsEnabled() && !reverse_.buffer_apply->IsEnabled(),
-                "Unchanged buffer preferences must keep Apply disabled");
+        require(forward_.buffer_apply->IsEnabled() == profile_apply_->IsEnabled() &&
+                    reverse_.buffer_apply->IsEnabled() == profile_apply_->IsEnabled(),
+                "Profile Apply buttons have inconsistent availability");
         exercise_tuning();
         save(false);
         require(!profile_save_->IsEnabled(), "Unchanged saved profile must keep Save disabled");
@@ -2719,9 +2836,11 @@ bool Frame::smoke(const wxString& directory) {
                 "Edited buffer did not enable its Apply button");
         wxCommandEvent buffer_apply(wxEVT_BUTTON, forward_.buffer_apply->GetId());
         forward_.buffer_apply->GetEventHandler()->ProcessEvent(buffer_apply);
-        require(!forward_.buffer_apply->IsEnabled(),
-                "Buffer Apply remained enabled after its saved value matched the editor");
-        require(!dirty_, "Buffer-only Apply left an otherwise unchanged profile marked unsaved");
+        require(forward_.buffer_apply->IsEnabled() == profile_apply_->IsEnabled(),
+                "Duplicate Apply buttons have inconsistent availability");
+        controller_->advance(300);
+        refresh();
+        require(!dirty_, "Apply left an otherwise unchanged profile marked unsaved");
         require(controller_->snapshot().paths[0].applied_buffer_ms == 13,
                 "Buffer Apply did not confirm the edited forward buffer of 13 ms");
         require(controller_->snapshot().paths[1].applied_buffer_ms == 6,

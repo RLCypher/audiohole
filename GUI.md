@@ -2167,7 +2167,7 @@ normal operation. Start/Stop use the provided engine 0.6 through the controller;
 Tutorial stays fictional. Actual opened formats appear in endpoint cards only
 for matching Start-time assignments. Performance Diagnostics stays pinned and
 scrollable, with real configurations/access receipts/counters and preserved
-scroll position. Save does not modify the live plan; Stop/Start applies changes.
+scroll position. Save does not modify the live plan; explicit Apply saves and restarts with the edits.
 
 Operation-mode header reserves five wrapped status lines and lets the personality
 card fill the remaining height below the action row, leaving standard spacing
@@ -2222,6 +2222,16 @@ Custom input/list borders discard copied resize pixels to avoid interior trails.
 Performance Diagnostics has its own vertical sash and remains outside the hole editor.
 
 Advanced buffer controls explicitly say Buffer request and explain driver alignment.
-Stop/Start applies saved requests; negotiated actual buffers appear in diagnostics,
+Apply saves and restarts with edited requests; negotiated actual buffers appear in diagnostics,
 including the request and the actual frame/rate domain. Ready device-arrival behavior
 and the engine audit's limitations are documented in ENGINE_INTEGRATION.md.
+
+### Profile Save and unified Apply (2026-11-15)
+
+All three Profile-tab Apply buttons validate/save the complete draft and apply
+it, restarting the active profile after confirmed cleanup. Save only persists
+intent. Apply availability is shared, including disabled controls without a
+routing backend. Stop cancels a pending restart; backend failures retain the
+saved edits and remain visible. Incidental panel refreshes preserve pending
+text; invalid tuning blocks Save/navigation instead of restoring older values.
+See the [field mapping and audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).

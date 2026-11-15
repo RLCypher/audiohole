@@ -328,10 +328,21 @@ void ApplicationController::settle(int elapsed_ms) {
         bool complete = false, failed = false, cancelled = false;
         if (result.command == "routing.start" || result.command == "configuration.save") {
             failed = current.state == State::Failed;
-            cancelled = !failed && (current.active_profile != iterator->target ||
-                                    (!current.armed && !current.routing_pending));
+            cancelled =
+                !failed &&
+                (current.active_profile != iterator->target ||
+                 (!current.armed && !current.routing_pending && current.state != State::Stopping));
             complete = current.state == State::Running || current.state == State::Ready ||
                        current.state == State::Degraded;
+            if (result.command == "configuration.save" && current.state == State::Stopped &&
+                !current.routing_pending && current.active_profile == iterator->target &&
+                current.routing_intent &&
+                std::none_of(current.routing_intent->holes.begin(),
+                             current.routing_intent->holes.end(),
+                             [](const auto& hole) { return hole.enabled; })) {
+                complete = true; // Apply disabled the last hole and confirmed cleanup.
+                cancelled = false;
+            }
         } else if (result.command == "routing.stop")
             complete = current.state == State::Stopped;
         else if (result.command == "beep.start" && current.beep_destination.empty()) {

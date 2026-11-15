@@ -61,6 +61,10 @@ class ConfigurationController final : public Controller {
     std::chrono::steady_clock::time_point last_engine_log_{};
     bool wait_for_devices_ = true;
     std::uint64_t routed_inventory_revision_ = 0;
+    // Exact accepted Apply intent survives asynchronous cleanup. A later Save
+    // does not replace it, and explicit Stop cancels it before another open.
+    std::optional<Profile> pending_apply_;
+    Result start_profile(const Profile&);
     void refresh_waiting_routes();
     bool routing_active() const;
     void poll_routing();

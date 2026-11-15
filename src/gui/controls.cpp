@@ -533,7 +533,8 @@ wxString button_help(const wxString& title) {
         {"Remove selected hole",
          "Remove this connection after confirmation. Apply to update active routing."},
         {"Save", "Save editor changes without changing the active routing plan."},
-        {"Apply", "Validate, save and activate the edited profile."},
+        {"Apply", "Validate and save the entire edited profile, then apply it to routing. Restart "
+                  "the active profile when needed."},
         {"Revert", "Discard unsaved edits and reload the saved profile after confirmation."},
         {"Reset to Automatic",
          "Reset this direction's format, channel mapping, access mode and buffer to Automatic. "

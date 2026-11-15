@@ -65,6 +65,8 @@ struct DiagnosticWidgets {
     std::string target;
     bool capture = false;
 };
+// A refresh preserves raw edits; explicit loads/resets replace only their section.
+enum class DirectionFields { Preserve, Format, Timing, Routing, All };
 struct DirectionWidgets {
     DiagnosticWidgets capture_check, playback_check;
     wxStaticBoxSizer* group{};
@@ -335,7 +337,9 @@ class Frame final : public wxFrame, private wxEventFilter {
     void build_direction(wxWindow*, wxSizer*, DirectionWidgets&, const wxString&);
     void tuning_changed(DirectionWidgets&);
     // Rebuilds evidence while retaining explicit unsupported overrides for correction.
-    void populate_direction(DirectionWidgets&, const audiohole::Direction&);
+    void populate_direction(DirectionWidgets&, const audiohole::Direction&,
+                            DirectionFields load_settings = DirectionFields::All);
+    bool validate_profile_inputs();
     void read_direction(DirectionWidgets&, audiohole::Direction&);
     void update_direction_details(DirectionWidgets&, const audiohole::Direction&);
     void layout_direction(DirectionWidgets&);

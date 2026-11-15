@@ -80,7 +80,7 @@ The integration now refreshes exact bindings for Ready paths after inventory
 changes. It opens waiting paths once all required bindings are available, without
 reopening healthy siblings or reloading saved edits. Stop disarms waiting.
 Failed/running streams are not silently reconfigured or reconnected. Transactional
-live profile switching, live tuning changes and destination mixing remain unsupported;
+live profile switching and destination mixing remain unsupported;
 the live-switch preference stays disabled. The wait-for-devices preference is active. Selecting
 a different profile while routing changes only the viewed editor. Startup
 activation supports a saved profile with Immediate/Delayed/Manual policy; Stop
@@ -100,6 +100,19 @@ action row expand into the available right-hand space. Tutorial sizing is
 independent. Settings uses Application and Tray and Personality and Animation,
 with Restart AudioHole inside Application and Tray. Restart uses a restricted
 inherited process handle, avoiding PID reuse and filesystem path-identity checks.
+
+## Explicit profile Apply
+
+All Profile-tab Apply buttons save the full draft before applying routing. For
+the active profile, the controller requests Stop, waits asynchronously for
+confirmed native cleanup, and starts the exact accepted settings. Save alone
+continues to leave the live plan unchanged. Explicit Stop cancels a queued Apply
+restart. This can briefly interrupt audio and does not provide seamless
+transactional profile switching. Applying only names/notes to a healthy route
+updates metadata without reopening its streams. Failed writes leave the working route intact;
+failed backend admission after restart retains saved edits and reports failure.
+See the [persistence audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md) for fields
+and validation evidence.
 
 ## Validation boundary
 
