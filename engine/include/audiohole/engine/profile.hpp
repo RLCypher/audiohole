@@ -173,6 +173,25 @@ Result<PreparedProfile> prepare_profile(const Profile&);
 enum class EndpointDirection { Capture, Render };
 enum class BindingState { Available, Unavailable, Ambiguous, Unknown };
 
+// Interleaved client PCM representation. Native layout is tracked separately;
+// channel count alone does not identify physical speaker positions or buses.
+struct StreamFormat {
+    int sample_rate_hz = 0;
+    int channel_count = 0;
+    SampleFormat sample_format = SampleFormat::Float32;
+    bool operator==(const StreamFormat&) const = default;
+};
+
+// Optional scanner evidence copied with an exact local binding, never saved
+// profile intent. A backend must query current support before using a hint.
+// The host supplies only positive, noncontradictory evidence; absence is valid.
+struct FormatHint {
+    StreamFormat format;
+    AccessMode mode = AccessMode::Shared;
+    std::optional<std::uint32_t> channel_mask;
+    bool operator==(const FormatHint&) const = default;
+};
+
 // A host-produced, machine-local observation. endpoint_id is an opaque backend
 // binding, never a portable identity and never a guessed match by display name.
 struct LocalBinding {
@@ -180,6 +199,7 @@ struct LocalBinding {
     std::string endpoint_id;
     EndpointDirection direction = EndpointDirection::Capture;
     BindingState state = BindingState::Unknown;
+    std::vector<FormatHint> format_hints{};
 };
 
 struct BindingSnapshot {
@@ -199,16 +219,8 @@ struct BoundRoute {
 // reject superseded operation generations. A bound route is not running audio.
 Result<BoundRoute> bind_route(const RouteRequest&, const BindingSnapshot&);
 
-// Client data format and derived PCM storage geometry. The backend separately
-// owns native device format, channel mask, WAVE tag and GUID. A native layout
-// can remain unknown even when interleaved client frame width is known.
-struct StreamFormat {
-    int sample_rate_hz = 0;
-    int channel_count = 0;
-    SampleFormat sample_format = SampleFormat::Float32;
-    bool operator==(const StreamFormat&) const = default;
-};
-
+// Derived PCM storage geometry for StreamFormat above. WAVE tags and GUIDs
+// remain backend-owned, and an absent native channel layout stays unknown.
 struct PcmGeometry {
     int container_bits = 0;
     int valid_bits = 0;

@@ -19,6 +19,11 @@ Result<ChannelMapping> compile_mapping(int source_channels, int destination_chan
     if (routes.empty()) {
         for (int channel = 0; channel < std::min(source_channels, destination_channels); ++channel)
             result.source_for_output_[channel] = channel;
+        // Automatic microphone monitoring sends a genuinely mono endpoint to
+        // the first playback pair. Do not collapse stereo, infer mixer buses,
+        // or fill extra surround channels; explicit maps stay authoritative.
+        if (source_channels == 1 && destination_channels >= 2)
+            result.source_for_output_[1] = 0;
     } else {
         for (const auto& route : routes) {
             if (route.source < 0 || route.source >= source_channels || route.destination < 0 ||

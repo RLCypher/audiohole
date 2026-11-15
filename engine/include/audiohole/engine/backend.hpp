@@ -72,6 +72,9 @@ struct StreamConfiguration {
     std::optional<std::uint32_t> render_ahead_target_frames;
     std::string period_selection;
     std::string low_latency_fallback;
+    // Initialization evidence only; does not establish physical playback or
+    // measured latency. Nonempty for native live/scanner candidate selection.
+    std::string format_selection;
 };
 
 struct NegotiatedRoute {

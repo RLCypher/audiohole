@@ -140,16 +140,19 @@ only that buffer preference, preserving other staged edits and the sibling.
 frame indexes in JSON. The GUI uses one-based pairs, e.g. `1:3, 2:4`.
 
 - Empty `channel_map: []` means **automatic default index mapping**, not no audio:
-  connect matching indexes up to the smaller channel count, silence additional
-  outputs, and discard unmatched source channels.
+  duplicate a one-channel source into the first two playback channels when present;
+  otherwise connect matching indexes up to the smaller channel count. Silence
+  additional outputs and discard unmatched source channels. Stereo stays stereo.
 - A nonempty map connects the specified indexes; unmapped outputs are silent and
   unmatched sources are discarded. One output has one source; a source may feed
   several outputs. This does not sum/mix channels.
 - Indexes must be 0–255 and fit explicit channel counts; runtime validates them
   against negotiated counts. There are at most 256 routes.
 
-This does not identify physical mixer buses, duplicate mono automatically, or
-infer a multichannel downmix. Forward and Return, and each endpoint's requirements,
+This does not identify physical mixer buses or infer a multichannel downmix.
+Automatic mono duplication follows negotiated native stream widths, without
+forcing a mono capture device to open as stereo or saving an explicit map.
+Forward and Return, and each endpoint's requirements,
 remain independent through preparation, failure and recovery.
 
 ## Engine boundary

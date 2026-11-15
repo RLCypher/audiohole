@@ -287,6 +287,22 @@ void formats_and_maps() {
     mapping = compile_mapping(2, 1, {});
     expect(mapping.value->process(input, output, 2) && output[0] == 1 && output[1] == 3,
            "default mapping discards unmatched inputs without a downmix");
+    // Automatic mono monitoring must reach both ears without a saved manual
+    // map. Multichannel destinations use their first pair; extras stay silent.
+    mapping = compile_mapping(1, 4, {});
+    float mono[]{0.25f, -0.5f};
+    expect(mapping.value->process(mono, output, 2) && output[0] == mono[0] &&
+               output[1] == mono[0] && output[2] == 0 && output[3] == 0 &&
+               output[4] == mono[1] && output[5] == mono[1] && output[6] == 0 && output[7] == 0,
+           "automatic mono duplicates into the first playback pair only");
+    mapping = compile_mapping(1, 2, {{0, 1}});
+    expect(mapping.value->process(mono, output, 2) && output[0] == 0 && output[1] == mono[0] &&
+               output[2] == 0 && output[3] == mono[1],
+           "an explicit mono map overrides automatic duplication");
+    mapping = compile_mapping(2, 2, {});
+    expect(mapping.value->process(input, output, 2) &&
+               std::equal(std::begin(input), std::end(input), std::begin(output)),
+           "automatic stereo preserves separate left and right samples");
     RouteRequest request;
     NegotiatedRoute negotiated;
     negotiated.source.client_format = negotiated.destination.client_format =

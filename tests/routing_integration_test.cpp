@@ -3,6 +3,49 @@
 #include <gtest/gtest.h>
 
 using namespace audiohole;
+
+TEST(RoutingBindings, CopiesOnlyUsableExclusiveEvidenceWithoutMutatingInventory) {
+    Snapshot snapshot;
+    Endpoint device{"capture-proof", "Fixture", "", "User notes", true};
+    auto inspection = std::make_shared<DeviceInspection>();
+    inspection->diagnostic_endpoint_id = "exact-local-endpoint";
+    device.inspection = inspection;
+    const Format pcm{48000, 1, "pcm_s24_in_32", WaveFormat{32, 24, 65534, 4, "PCM", 4, 192000}};
+    device.capabilities = {{pcm, "Exclusive", FormatSupport::Supported},
+                           {pcm, "Exclusive", FormatSupport::Supported},
+                           {pcm, "Shared", FormatSupport::Supported},
+                           {{44100, 1, "float32"}, "Exclusive", FormatSupport::Unknown},
+                           {{32000, 1, "float32"}, "Exclusive", FormatSupport::Supported},
+                           {{32000, 1, "float32"}, "Exclusive", FormatSupport::Unsupported}};
+    auto bad_precision = pcm;
+    bad_precision.wave->valid_bits = 32;
+    device.capabilities.push_back({bad_precision, "Exclusive", FormatSupport::Supported});
+    auto bad_mask = pcm;
+    bad_mask.wave->channel_mask = 3;
+    device.capabilities.push_back({bad_mask, "Exclusive", FormatSupport::Supported});
+    snapshot.endpoints.push_back(device);
+    snapshot.scanner.inventory_revision = 42;
+    auto bindings = routing_bindings(snapshot);
+    ASSERT_EQ(bindings.endpoints.size(), 1u);
+    const auto& actual = bindings.endpoints[0];
+    ASSERT_EQ(actual.format_hints.size(), 1u);
+    EXPECT_EQ(actual.format_hints[0].format,
+              (engine::StreamFormat{48000, 1, engine::SampleFormat::PcmS24In32}));
+    EXPECT_EQ(actual.format_hints[0].channel_mask, 4u);
+    EXPECT_EQ(actual.endpoint_id, "exact-local-endpoint");
+    EXPECT_EQ(actual.logical_id, device.id);
+    EXPECT_EQ(bindings.revision, 42u);
+    EXPECT_EQ(snapshot.endpoints[0].notes, "User notes");
+    EXPECT_EQ(snapshot.endpoints[0].capabilities.size(), device.capabilities.size());
+    // Unavailable inventory may retain evidence, but binding admission must
+    // still refuse it rather than guessing a similarly named/default device.
+    snapshot.endpoints[0].availability = Availability::Unavailable;
+    bindings = routing_bindings(snapshot);
+    engine::RouteRequest request;
+    request.source_id = request.destination_id = device.id;
+    EXPECT_FALSE(engine::bind_route(request, bindings).ok());
+}
+
 namespace {
 template <class Predicate> void until(Controller& controller, Predicate done) {
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);

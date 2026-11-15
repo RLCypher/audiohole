@@ -1,4 +1,6 @@
 #include "model/routing_service.h"
+#include <algorithm>
+#include <bit>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -267,6 +269,51 @@ engine::BindingSnapshot routing_bindings(const Snapshot& s) {
             binding.endpoint_id = device.inspection->diagnostic_endpoint_id;
         if (binding.endpoint_id.empty() && binding.state == engine::BindingState::Available)
             binding.state = engine::BindingState::Unknown;
+        // Carry advisory scanner tuples with their exact binding, not inside a
+        // profile or as forced preferences. Unknown/negative/contradictory
+        // evidence is excluded; WASAPI still queries current support at Start.
+        // Bound the projection and the later native format search separately.
+        for (const auto& capability : device.capabilities) {
+            if (binding.format_hints.size() >= 128)
+                break;
+            if (capability.support != FormatSupport::Supported || capability.mode != "Exclusive" ||
+                std::any_of(device.capabilities.begin(), device.capabilities.end(),
+                            [&](const auto& other) {
+                                return other.format == capability.format &&
+                                       other.mode == capability.mode &&
+                                       other.support == FormatSupport::Unsupported;
+                            }))
+                continue;
+            const auto& f = capability.format;
+            const auto representation = f.representation == "PCM16" || f.representation == "int16"
+                                            ? "pcm_s16"
+                                            : f.representation;
+            std::optional<engine::SampleFormat> sample;
+            for (const auto encoding : {engine::SampleFormat::Float32, engine::SampleFormat::PcmS16,
+                                        engine::SampleFormat::PcmS24Packed,
+                                        engine::SampleFormat::PcmS24In32,
+                                        engine::SampleFormat::PcmS32})
+                if (representation == engine::name(encoding))
+                    sample = encoding;
+            if (!sample)
+                continue;
+            engine::FormatHint hint{{f.rate, f.channels, *sample},
+                                    capability.mode == "Exclusive" ? engine::AccessMode::Exclusive
+                                                                    : engine::AccessMode::Shared,
+                                    f.wave ? f.wave->channel_mask : std::nullopt};
+            const auto geometry = engine::pcm_geometry(hint.format);
+            if (!geometry.ok() ||
+                (f.wave && ((f.wave->container_bits > 0 &&
+                             f.wave->container_bits != geometry.value->container_bits) ||
+                            (f.wave->valid_bits > 0 &&
+                             f.wave->valid_bits != geometry.value->valid_bits))) ||
+                (hint.channel_mask && *hint.channel_mask &&
+                 std::popcount(*hint.channel_mask) != f.channels))
+                continue;
+            if (std::find(binding.format_hints.begin(), binding.format_hints.end(), hint) ==
+                binding.format_hints.end())
+                binding.format_hints.push_back(std::move(hint));
+        }
         out.endpoints.push_back(std::move(binding));
     }
     return out;
@@ -406,6 +453,8 @@ std::string routing_diagnostics(const engine::RuntimeSnapshot& state, const Prof
                         << " ms";
                 if (s.access_fell_back)
                     out << " | Preferred Exclusive fell back to Shared";
+                if (!s.format_selection.empty())
+                    out << " | Format selection: " << s.format_selection;
                 out << '\n';
                 for (const auto& attempt : s.access_attempts) {
                     out << "  " << engine::name(attempt.mode) << ": "

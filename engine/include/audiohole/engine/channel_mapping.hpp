@@ -7,7 +7,8 @@
 namespace audiohole::engine {
 
 // Fixed-size, immutable mapping compiled on the control thread. An output has
-// one source or -1 for silence. No implicit sums, downmix or mono duplication.
+// one source or -1 for silence. Automatic mono duplicates into the first output
+// pair; otherwise matching indexes pass through. No implicit sums or downmix.
 // Repeated source indexes intentionally permit explicit duplication.
 class ChannelMapping {
   public:

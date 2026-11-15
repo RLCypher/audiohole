@@ -236,7 +236,7 @@ struct Client {
             requested, prefer_exclusive, stop, input ? "source" : "destination",
             [&](const EndpointRequirements& concrete) -> Result<StreamConfiguration> {
                 try {
-                    initialize_attempt(enumerator, binding, concrete, input, preset);
+                    initialize_attempt(enumerator, binding, concrete, input, preset, stop);
                     return {configuration, {}};
                 } catch (const NativeFailure& failure) {
                     return {std::nullopt, {failure.issue}};
@@ -263,7 +263,7 @@ struct Client {
 
     void initialize_attempt(IMMDeviceEnumerator* enumerator, const LocalBinding& binding,
                             const EndpointRequirements& requested, bool input,
-                            LatencyPreset preset) {
+                            LatencyPreset preset, std::stop_token stop) {
         const auto id = wide(binding.endpoint_id);
         checked(enumerator->GetDevice(id.c_str(), device.put()), "GetDevice");
         DWORD state = 0;
@@ -292,8 +292,8 @@ struct Client {
         if (configuration.mode == AccessMode::Exclusive) {
             // Exclusive's native starting candidate comes from the configured
             // device format, not the shared float mix format. Manual fields
-            // override it; a rejected tuple stays rejected rather than falling
-            // back to a different mode, width or representation.
+            // override it. Scanner hints can fill unspecified fields only;
+            // explicit fields remain requirements across every candidate.
             Com<IPropertyStore> properties;
             if (SUCCEEDED(device->OpenPropertyStore(STGM_READ, properties.put()))) {
                 struct PropertyValue {
@@ -323,12 +323,13 @@ struct Client {
         }
         configuration.native_format =
             base; // Reported mix/configured format, not hardware measurement.
-        const StreamFormat selected{requested.sample_rate_hz.value_or(base.sample_rate_hz),
-                                    requested.channel_count.value_or(base.channel_count),
-                                    requested.sample_format.value_or(base.sample_format)};
+        StreamFormat selected{requested.sample_rate_hz.value_or(base.sample_rate_hz),
+                              requested.channel_count.value_or(base.channel_count),
+                              requested.sample_format.value_or(base.sample_format)};
         if (selected.channel_count != base.channel_count)
             mask = 0; // Unknown custom channel order.
         auto format = wave_format(selected, mask);
+        configuration.format_selection = "Live shared mix format with active preferences";
         const auto share = configuration.mode == AccessMode::Shared ? AUDCLNT_SHAREMODE_SHARED
                                                                     : AUDCLNT_SHAREMODE_EXCLUSIVE;
         HRESULT initialized = E_FAIL;
@@ -432,21 +433,44 @@ struct Client {
                 flags |=
                     AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY;
             } else {
-                auto supported = audio->IsFormatSupported(share, &format.Format, nullptr);
-                if (FAILED(supported) && selected.channel_count <= 2 &&
-                    format.Samples.wValidBitsPerSample == format.Format.wBitsPerSample) {
-                    // Header aliases can describe the SAME PCM tuple. Trying
-                    // WAVEFORMATEX here does not weaken an explicit preference.
-                    auto plain = format;
-                    plain.Format.wFormatTag = selected.sample_format == SampleFormat::Float32
-                                                  ? WAVE_FORMAT_IEEE_FLOAT
-                                                  : WAVE_FORMAT_PCM;
-                    plain.Format.cbSize = 0;
-                    supported = audio->IsFormatSupported(share, &plain.Format, nullptr);
-                    if (SUCCEEDED(supported))
-                        format = plain;
-                }
-                checked(supported, "IsExclusiveFormatSupported");
+                const FormatHint initial{selected, AccessMode::Exclusive, mask};
+                const auto chosen = select_exclusive_format(
+                    requested, initial,
+                    binding.format_hints, stop,
+                    [&](const FormatHint& candidate) -> Result<bool> {
+                        auto trial = wave_format(candidate.format,
+                                                 candidate.channel_mask.value_or(0));
+                        auto supported = audio->IsFormatSupported(share, &trial.Format, nullptr);
+                        if (supported == AUDCLNT_E_UNSUPPORTED_FORMAT &&
+                            candidate.format.channel_count <= 2 &&
+                            trial.Samples.wValidBitsPerSample == trial.Format.wBitsPerSample) {
+                            // Header aliases describe the SAME PCM tuple. Query
+                            // them only after a format refusal, never to mask an
+                            // ownership/permission/device error.
+                            auto plain = trial;
+                            plain.Format.wFormatTag =
+                                candidate.format.sample_format == SampleFormat::Float32
+                                    ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
+                            plain.Format.cbSize = 0;
+                            supported = audio->IsFormatSupported(share, &plain.Format, nullptr);
+                            if (supported == S_OK)
+                                trial = plain;
+                        }
+                        if (supported == AUDCLNT_E_UNSUPPORTED_FORMAT)
+                            return {false, {}};
+                        if (supported != S_OK)
+                            return {std::nullopt,
+                                    {native_open_issue("IsExclusiveFormatSupported",
+                                                       static_cast<std::uint32_t>(supported))}};
+                        format = trial;
+                        return {true, {}};
+                    });
+                if (!chosen.ok())
+                    throw NativeFailure{chosen.issues.front()};
+                selected = chosen.value->format;
+                configuration.format_selection = *chosen.value == initial
+                    ? "Live configured format with active preferences; support queried"
+                    : "Scanner format hint revalidated by live IsFormatSupported";
                 if (requested.period_ms) {
                     const auto requested_duration =
                         static_cast<REFERENCE_TIME>(std::ceil(*requested.period_ms * 10000));

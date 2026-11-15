@@ -22,6 +22,26 @@ void expect(bool condition, const char* reason) {
 }
 
 void processing() {
+    // Exercise the actual conversion/FIFO path as well as the index kernel:
+    // mono reaches both ears, stereo remains two independent signals, and a
+    // retained manual one-ear map is honored only when the caller activates it.
+    for (const int channels : {1, 2}) {
+        StreamPipeline automatic({48000, channels, SampleFormat::Float32},
+                                  {48000, 2, SampleFormat::Float32}, {}, false);
+        std::vector<float> samples(4000 * channels, 0.25f);
+        if (channels == 2)
+            for (std::size_t frame = 0; frame < 4000; ++frame)
+                samples[frame * 2 + 1] = -0.5f;
+        expect(automatic.push(samples.data(), 2000) &&
+                   automatic.push(samples.data() + 2000 * channels, 2000),
+               "automatic channel fixture primes beyond the observed packet guard");
+        std::array<float, 512> playback{};
+        expect(automatic.render(playback.data(), 256) == 256, "automatic channel fixture renders");
+        for (std::size_t frame = 0; frame < 256; ++frame)
+            expect(playback[frame * 2] == 0.25f &&
+                       playback[frame * 2 + 1] == (channels == 1 ? 0.25f : -0.5f),
+                   "pipeline duplicates only mono, preserving stereo separation");
+    }
     StreamPipeline pipeline({48000, 2, SampleFormat::Float32}, {48000, 4, SampleFormat::Float32},
                             {{0, 2}, {1, 3}}, false);
     std::vector<float> input(2000 * 2);
@@ -132,6 +152,59 @@ void processing() {
         expect(rendered.front() == 0.25f && rendered.back() == 0.25f,
                "nominal rate conversion retains a constant signal across blocks");
     }
+}
+
+void scanner_format_selection() {
+    using namespace audiohole::engine::detail;
+    const FormatHint configured{{48000, 2, SampleFormat::Float32}, AccessMode::Exclusive, 3};
+    const FormatHint pcm{{48000, 2, SampleFormat::PcmS24In32}, AccessMode::Exclusive, 3};
+    const FormatHint mono{{48000, 1, SampleFormat::PcmS16}, AccessMode::Exclusive, 4};
+    auto shared = pcm;
+    shared.mode = AccessMode::Shared;
+    const std::vector<FormatHint> hints{configured, shared, pcm, mono};
+    EndpointRequirements required;
+    unsigned queries = 0;
+    auto probe = [&](const FormatHint& candidate) -> Result<bool> {
+        ++queries;
+        return {candidate.format.sample_format != SampleFormat::Float32, {}};
+    };
+    auto chosen = select_exclusive_format(required, configured, hints, {}, probe);
+    expect(chosen.ok() && *chosen.value == pcm && queries == 2,
+           "unsupported live tuple uses a revalidated Exclusive scanner candidate");
+    required.sample_format = SampleFormat::Float32;
+    queries = 0;
+    chosen = select_exclusive_format(required, configured, hints, {}, probe);
+    expect(!chosen.ok() && queries == 1 && chosen.issues[0].native_code == "0x88890008",
+           "scanner hint never weakens an explicit encoding requirement");
+    required = {};
+    required.channel_count = 1;
+    queries = 0;
+    chosen = select_exclusive_format(required, configured, hints, {}, probe);
+    expect(chosen.ok() && *chosen.value == mono && queries == 1,
+           "partial requirements filter each candidate without widening mono");
+    required = {};
+    queries = 0;
+    chosen = select_exclusive_format(required, configured, hints, {},
+        [&](const FormatHint&) -> Result<bool> {
+            ++queries;
+            return {std::nullopt, {native_open_issue("Query", 0x8889000Au)}};
+        });
+    expect(!chosen.ok() && queries == 1 && chosen.issues[0].code == ErrorCode::ResourceConflict,
+           "ownership refusal does not trigger a format hunt");
+    std::stop_source cancelled;
+    cancelled.request_stop();
+    queries = 0;
+    chosen = select_exclusive_format(required, configured, hints, cancelled.get_token(), probe);
+    expect(!chosen.ok() && queries == 0 && chosen.issues[0].code == ErrorCode::Cancelled,
+           "Stop prevents further native format queries");
+    std::vector<FormatHint> excessive(200, pcm);
+    for (std::size_t i = 0; i < excessive.size(); ++i)
+        excessive[i].format.sample_rate_hz = 8000 + static_cast<int>(i);
+    queries = 0;
+    chosen = select_exclusive_format(required, configured, excessive, {},
+        [&](const FormatHint&) -> Result<bool> { ++queries; return {false, {}}; });
+    expect(!chosen.ok() && queries == 129,
+           "native format queries remain bounded even for an oversized host snapshot");
 }
 
 void packet_cadence_regression() {
@@ -617,11 +690,19 @@ void owner_thread_contract() {
 int main() {
     try {
         processing();
+        scanner_format_selection();
         packet_cadence_regression();
         const auto in_use = detail::native_open_issue("InitializeAudioStream", 0x8889000Au);
         expect(in_use.code == ErrorCode::ResourceConflict && in_use.native_code == "0x8889000A" &&
-                   in_use.detail.find("exclusive access") != std::string::npos,
+                   in_use.detail.find("Give exclusive mode applications priority") != std::string::npos,
                "native ownership refusal keeps its HRESULT and actionable feedback");
+        const auto disabled = detail::native_open_issue("InitializeAudioStream", 0x8889000Eu);
+        expect(disabled.code == ErrorCode::UnsupportedRequirement &&
+                   disabled.detail.find("Allow applications") != std::string::npos,
+               "exclusive permission refusal explains the endpoint setting");
+        expect(detail::native_open_issue("InitializeAudioStream", 0x88890020u).code ==
+                   ErrorCode::UnsupportedRequirement,
+               "invalid device period is not misreported as an ownership conflict");
         low_latency_policy();
         startup_refill_regression();
         underrun_context();

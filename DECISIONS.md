@@ -1763,3 +1763,15 @@ End tutorial, smaller operation avatar with wider frame, Settings group names
 and relocated Restart. Use inherited process-handle restart coordination.
 Intentional static deadpan is not an unapproved animation; approved-asset failures
 still retain normal integrity/diagnostic behavior.
+
+### 2026-11-15 — Owner-requested audio module audit
+
+The owner's automatic mono-monitoring requirement amends empty-map behavior:
+one capture channel duplicates into the first playback pair; all other default
+index mapping and explicit-map behavior remains intact. This does not infer a
+multichannel downmix or alter saved profile fields. Native acquisition may use
+positive scanner tuples as bounded, revalidated hints for unspecified Exclusive
+format fields. Explicit requirements and access policies remain authoritative.
+See [the audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md). No GUI or animation
+implementation is changed. Custom-driver and global Windows-format-setting
+research selects no new architectural dependency; production decisions remain open.

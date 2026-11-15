@@ -1,5 +1,9 @@
 # Engine 0.6 integration
 
+The [2026-11-15 engine audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md) amends
+Automatic mono mapping, scanner-assisted native format acquisition and Exclusive
+diagnostics. It changes no GUI/animation implementation or saved profile schema.
+
 Normal operation now uses the supplied engine behind ConfigurationController.
 Tutorial remains a separate in-memory simulator and never constructs the real
 engine, scanner, persistence or device-check providers. The original user data

@@ -122,8 +122,10 @@ retains the original JSON. Legacy aggregate migration belongs to the builder.
   Missing or changed request receipts reject before Start. Automatic permits
   negotiated allocation. A scheduling period and an end-to-end latency limit
   are different concepts; neither is encoded by this field.
-- An empty map connects matching indexes up to the smaller width, silences extra
-  outputs and discards unmatched inputs. Explicit `{source, destination}` pairs
+- An empty map duplicates a mono source into the first playback pair when the
+  destination has at least two channels. Otherwise it connects matching indexes
+  up to the smaller width. Extra outputs stay silent and unmatched inputs are
+  discarded; stereo remains separate left/right. Explicit `{source, destination}` pairs
   use zero-based indexes, allow one source to feed several outputs, and reject
   duplicate destination assignments. Negotiated widths are rechecked.
 - Enabled holes must have assignments; saved drafts can be incomplete. Up to

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <sstream>
 
 namespace audiohole::engine::detail {
@@ -15,16 +16,65 @@ inline Issue native_open_issue(const char* stage, std::uint32_t code) {
     std::ostringstream native;
     native << "0x" << std::hex << std::uppercase << code;
     const bool in_use = code == 0x8889000Au;
+    const bool exclusive_disabled = code == 0x8889000Eu;
+    const bool invalid_period = code == 0x88890020u;
     return {in_use                                       ? ErrorCode::ResourceConflict
             : code == 0x88890004u                        ? ErrorCode::UnavailableEndpoint
-            : code == 0x88890008u || code == 0x8889000Eu ? ErrorCode::UnsupportedRequirement
+            : code == 0x88890008u || exclusive_disabled || invalid_period
+                                                        ? ErrorCode::UnsupportedRequirement
                                                          : ErrorCode::BackendFailure,
             stage,
             std::string(stage) + " failed: HRESULT " + native.str() + "." +
                 (in_use ? " Windows reports the endpoint is in use (AUDCLNT_E_DEVICE_IN_USE). "
-                          "Close applications holding exclusive access, then Stop and Start again."
-                        : ""),
+                          "Check the endpoint's Allow applications to take exclusive control and "
+                          "Give exclusive mode applications priority settings. Another exclusive "
+                          "owner must release it before retrying; session listings do not identify "
+                          "the owner. Stop and Start after resolving the conflict."
+                        : exclusive_disabled
+                              ? " Windows disallows exclusive access for this endpoint. Check "
+                                "Allow applications to take exclusive control of this device."
+                        : invalid_period
+                              ? " The driver rejected the requested device processing interval."
+                              : ""),
             native.str()};
+}
+
+// Initialization-only format selection, shared by native WASAPI and portable
+// regressions. The live configured tuple remains first; positive scanner hints
+// can fill Automatic fields after a format refusal. No saved override is ever
+// changed. Stale hints are harmless because each candidate is queried now.
+// Probe false means UNSUPPORTED_FORMAT only. Ownership, permission, invalidation
+// and cancellation errors terminate selection instead of masquerading as a
+// reason to cycle through formats. No audio thread/callback calls this helper.
+template <class Probe>
+Result<FormatHint> select_exclusive_format(const EndpointRequirements& required,
+                                          const FormatHint& initial,
+                                          std::span<const FormatHint> hints,
+                                          std::stop_token stop, Probe&& probe) {
+    std::vector<FormatHint> attempted;
+    attempted.reserve(129);
+    const auto count = std::min<std::size_t>(hints.size(), 128);
+    for (std::size_t index = 0; index <= count; ++index) {
+        if (stop.stop_requested())
+            return {std::nullopt,
+                    {{ErrorCode::Cancelled, "exclusive_format", "Format selection cancelled."}}};
+        const auto& candidate = index == 0 ? initial : hints[index - 1];
+        if (candidate.mode != AccessMode::Exclusive ||
+            !pcm_geometry(candidate.format).ok() ||
+            !check_format(required, candidate.format, "exclusive_format").ok() ||
+            std::find(attempted.begin(), attempted.end(), candidate) != attempted.end())
+            continue;
+        attempted.push_back(candidate);
+        auto supported = probe(candidate);
+        if (!supported.ok())
+            return {std::nullopt, std::move(supported.issues)};
+        if (stop.stop_requested())
+            return {std::nullopt,
+                    {{ErrorCode::Cancelled, "exclusive_format", "Format selection cancelled."}}};
+        if (*supported.value)
+            return {candidate, {}};
+    }
+    return {std::nullopt, {native_open_issue("IsExclusiveFormatSupported", 0x88890008u)}};
 }
 
 // Pure arithmetic shared by native opening and portable regression tests. No
