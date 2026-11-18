@@ -45,7 +45,7 @@ class DeviceEvents final : public IMMNotificationClient {
         if (!pointer)
             return E_POINTER;
         *pointer = nullptr;
-        if (id == IID_IUnknown || id == IID_IMMNotificationClient) {
+        if (id == IID_IUnknown || id == __uuidof(IMMNotificationClient)) {
             *pointer = static_cast<IMMNotificationClient*>(this);
             AddRef();
             return S_OK;
@@ -142,8 +142,8 @@ class WindowsBackend final : public PlatformBackend {
             try {
                 inventory_signal_ = std::make_shared<InventorySignal>();
                 inventory_signal_->changed = callbacks_.inventory_changed;
-                require(CoCreateInstance(CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL,
-                                         IID_IMMDeviceEnumerator, devices_.put_void()),
+                require(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                                         __uuidof(IMMDeviceEnumerator), devices_.put_void()),
                         "Create standalone inventory notification source");
                 *device_events_.put() = new DeviceEvents(inventory_signal_);
                 const auto registered =

@@ -59,8 +59,9 @@ MSVC Debug/Release, native Windows metadata/policy behavior and the exact ZIP
 launch checks run in GitHub Actions. Existing native-module hardware evidence
 is retained in the original handover; this integration does not claim a new
 hardware routing measurement or a new Windows-version support guarantee.
-Per the owner's latest instruction, publication does not wait for GitHub's
-compilation to finish.
+Per the owner's reinstated monitoring instruction, check native CI 20 minutes
+after publication, then every five minutes while it remains unfinished. Diagnose
+and correct failures, republish, and repeat until Debug and Release pass.
 
 The earlier Automatic channel compatibility/labeling request remains a separate
 pending task. The audio engine, profile/device JSON schemas, unrelated layout
@@ -113,3 +114,27 @@ The Windows x64 cross-build passed after these corrections. Preview,
 Test Mode and Tutorial GUI smoke passed under Wine, including the actual
 Plug Board drawer/row controls and complete tutorial. Formatting and whitespace
 checks passed. MSVC Debug/Release confirmation remains with native CI.
+
+## MSVC Core Audio GUID linkage correction
+
+The next MSVC build of `85147e2` compiled the embedded module but failed to link
+AudioHole with eight unresolved Core Audio GUID variables. Microsoft's MIDL
+headers declare these variables with `EXTERN_C`; including `initguid.h` does
+not define them. MinGW's headers use `DEFINE_GUID` instead, which concealed
+the missing definitions in the cross-build.
+
+The backend, environment inspector, destination validator and session monitor
+now obtain the same GUID values from `__uuidof` on the SDK interfaces and
+`MMDeviceEnumerator` coclass. This covers COM activation, interface queries
+and callback `QueryInterface` comparisons. The optional silent developer
+fixture uses the same approach. No GUID values are copied into application
+source, and the GUID-definition unit retains its ordered includes for the
+remaining `DEFINE_GUID` and property-key constants.
+
+The full Windows cross-build linked AudioHole and the native evidence
+executable successfully. An undefined-symbol inspection of the compiled
+`plug_board_windows` archive confirmed that all eight external GUID references
+were eliminated. The native adapter suite passed 23 tests under Wine, retaining
+its original process-metadata skip. `Gui.Smoke` also passed using the newly
+linked application. MSVC Debug/Release confirmation remains with native CI and
+the monitoring schedule above.

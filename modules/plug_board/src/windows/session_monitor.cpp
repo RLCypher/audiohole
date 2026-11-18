@@ -61,7 +61,7 @@ class SessionEvents final : public IAudioSessionEvents {
         if (!pointer)
             return E_POINTER;
         *pointer = nullptr;
-        if (id == IID_IUnknown || id == IID_IAudioSessionEvents) {
+        if (id == IID_IUnknown || id == __uuidof(IAudioSessionEvents)) {
             *pointer = static_cast<IAudioSessionEvents*>(this);
             AddRef();
             return S_OK;
@@ -130,7 +130,7 @@ class SessionCreated final : public IAudioSessionNotification {
         if (!pointer)
             return E_POINTER;
         *pointer = nullptr;
-        if (id == IID_IUnknown || id == IID_IAudioSessionNotification) {
+        if (id == IID_IUnknown || id == __uuidof(IAudioSessionNotification)) {
             *pointer = static_cast<IAudioSessionNotification*>(this);
             AddRef();
             return S_OK;
@@ -171,7 +171,7 @@ class SessionCreated final : public IAudioSessionNotification {
 SessionObservation read_session(IAudioSessionControl* session, const std::string& endpoint,
                                 SessionSnapshot& status) {
     ComPointer<IAudioSessionControl2> extended;
-    require(session->QueryInterface(IID_IAudioSessionControl2, extended.put_void()),
+    require(session->QueryInterface(__uuidof(IAudioSessionControl2), extended.put_void()),
             "Query monitored audio session");
     SessionObservation result;
     result.endpoint_id = endpoint;
@@ -320,7 +320,7 @@ struct SessionMonitor::Implementation {
                 require(enumerator->GetDevice(wide(id).c_str(), device.put()),
                         "Resolve host playback endpoint");
                 EndpointSubscription subscription;
-                require(device->Activate(IID_IAudioSessionManager2, CLSCTX_ALL, nullptr,
+                require(device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, nullptr,
                                          subscription.manager.put_void()),
                         "Activate visible session manager");
                 ComPointer<IAudioSessionEnumerator> initial;
@@ -426,8 +426,8 @@ struct SessionMonitor::Implementation {
         try {
             require(apartment.result(), "Initialize visible session MTA");
             ComPointer<IMMDeviceEnumerator> enumerator;
-            require(CoCreateInstance(CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL,
-                                     IID_IMMDeviceEnumerator, enumerator.put_void()),
+            require(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                                     __uuidof(IMMDeviceEnumerator), enumerator.put_void()),
                     "Create visible-session endpoint resolver");
             while (!stop.stop_requested()) {
                 WaitForSingleObject(signal->changed.get(), INFINITE);

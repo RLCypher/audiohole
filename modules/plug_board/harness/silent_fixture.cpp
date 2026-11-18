@@ -103,8 +103,8 @@ class SilentAudio {
                 Apartment apartment;
                 require(apartment.result(), "Initialize fixture audio MTA");
                 ComPointer<IMMDeviceEnumerator> enumerator;
-                require(CoCreateInstance(CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL,
-                                         IID_IMMDeviceEnumerator, enumerator.put_void()),
+                require(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                                         __uuidof(IMMDeviceEnumerator), enumerator.put_void()),
                         "Fixture enumerator");
                 std::vector<SilentStream> streams;
                 streams.reserve(3);

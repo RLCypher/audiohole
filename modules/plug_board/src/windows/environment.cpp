@@ -139,8 +139,9 @@ ProcessMetadata process_metadata(std::uint32_t pid) {
 void read_sessions(IMMDevice* device, const std::string& endpoint,
                    std::map<std::uint32_t, ProcessMetadata>& processes, SessionSnapshot& snapshot) {
     ComPointer<IAudioSessionManager2> manager;
-    require(device->Activate(IID_IAudioSessionManager2, CLSCTX_ALL, nullptr, manager.put_void()),
-            "Activate session manager");
+    require(
+        device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, nullptr, manager.put_void()),
+        "Activate session manager");
     ComPointer<IAudioSessionEnumerator> sessions;
     require(manager->GetSessionEnumerator(sessions.put()), "GetSessionEnumerator");
     int count = 0;
@@ -150,7 +151,7 @@ void read_sessions(IMMDevice* device, const std::string& endpoint,
             ComPointer<IAudioSessionControl> session;
             ComPointer<IAudioSessionControl2> extended;
             require(sessions->GetSession(index, session.put()), "GetSession");
-            require(session->QueryInterface(IID_IAudioSessionControl2, extended.put_void()),
+            require(session->QueryInterface(__uuidof(IAudioSessionControl2), extended.put_void()),
                     "Query IAudioSessionControl2");
             SessionObservation observation;
             observation.endpoint_id = endpoint;
@@ -277,8 +278,8 @@ WindowsInspection inspect_windows_sessions(bool include_sessions) {
         Apartment apartment;
         require(apartment.result(), "Initialize inspection MTA");
         ComPointer<IMMDeviceEnumerator> enumerator;
-        require(CoCreateInstance(CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL,
-                                 IID_IMMDeviceEnumerator, enumerator.put_void()),
+        require(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                                 __uuidof(IMMDeviceEnumerator), enumerator.put_void()),
                 "Create MMDevice enumerator");
         for (std::size_t index = 0; index < render_roles.size(); ++index) {
             ComPointer<IMMDevice> device;

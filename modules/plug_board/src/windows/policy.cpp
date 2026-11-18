@@ -215,8 +215,8 @@ class WindowsPolicy final : public PolicyAdapter {
 
     static OperationResult validate_destination(const std::string& endpoint) {
         ComPointer<IMMDeviceEnumerator> enumerator;
-        auto result = CoCreateInstance(CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL,
-                                       IID_IMMDeviceEnumerator, enumerator.put_void());
+        auto result = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                                       __uuidof(IMMDeviceEnumerator), enumerator.put_void());
         if (FAILED(result)) {
             return native_result(result, "Create destination validator");
         }
@@ -226,7 +226,7 @@ class WindowsPolicy final : public PolicyAdapter {
             return native_result(result, "Resolve explicit destination");
         }
         ComPointer<IMMEndpoint> endpoint_interface;
-        result = device->QueryInterface(IID_IMMEndpoint, endpoint_interface.put_void());
+        result = device->QueryInterface(__uuidof(IMMEndpoint), endpoint_interface.put_void());
         if (FAILED(result)) {
             return native_result(result, "Read destination direction");
         }

@@ -1,6 +1,7 @@
-// Instantiate the SDK's public GUID definitions once per standalone binary.
-// MinGW's uuid library does not provide every modern Core Audio interface IID.
-// Using the SDK declarations avoids hand-maintaining public GUID constants.
+// Instantiate DEFINE_GUID-based SDK constants for the linked binary.
+// Core Audio's MIDL declarations do not become definitions through initguid
+// with Microsoft's SDK; callers use __uuidof(interface/coclass) instead.
+// Keep SDK values authoritative rather than copying GUID constants by hand.
 // initguid must precede the interface headers; sorting this block changes their
 // DEFINE_GUID declarations into unresolved externs on the cross toolchain.
 // clang-format off

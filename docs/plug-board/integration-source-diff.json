@@ -7,6 +7,11 @@
       "integrated_sha256": "edc11a4329827d4ed8dc3ef66236f046db4c91f78f54987dd4103d4b58fae6c0"
     },
     {
+      "path": "harness/silent_fixture.cpp",
+      "handover_sha256": "41123aaf73d01e898d93133ca2d62476a12dd7bb4ce15038b76d730db570b492",
+      "integrated_sha256": "57d085614ec10e508dda1eb39bca7c33831bc10295d7a54e462c68d619015ece"
+    },
+    {
       "path": "include/audiohole/plug_board/module.hpp",
       "handover_sha256": "5f54390d4defb3697f12f86877ac1a56d2e582299eb4fccdb834a3d17bd2ba41",
       "integrated_sha256": "69ebcef1e6a039a85081fb2d3417b74739fa9e996b80d5d938388c0f0a0cc3dd"
@@ -54,17 +59,27 @@
     {
       "path": "src/windows/backend.cpp",
       "handover_sha256": "901857ab034a71e709fc0c164289a23560116f0a92e593cdecb93d874b6f48b8",
-      "integrated_sha256": "a7297e6d3ca2505c67a7bba35778c8334fc6396bf3ccfc12f8956f8c660707a2"
+      "integrated_sha256": "240496c94f68b52d370db32ae491afd1f5f837c4e5894061b166c1f271e8f3b5"
     },
     {
       "path": "src/windows/environment.cpp",
       "handover_sha256": "28394aab1df0c12943903d0102e2b6997a310215da3e91fe7d4d7e48bd567035",
-      "integrated_sha256": "267aba036cac4b67949253d9008a03f664c3a9f467a6dd184d2803717918c3a2"
+      "integrated_sha256": "bca99fefa79e45c0002780443522788c4297a638d0471591b67712a485d8c04f"
     },
     {
       "path": "src/windows/guids.cpp",
       "handover_sha256": "285cbc4690a9233541eaf64e9641f93a738bb54566c594010c793abac125ed01",
-      "integrated_sha256": "f989ecd4082213378b7f511f96c072c31f0ab1ab284212470e77261e9d6b6514"
+      "integrated_sha256": "1c5e6dd28a2c58d362864342e8c88b249acd72c64f2441046c3ab4584ac82d54"
+    },
+    {
+      "path": "src/windows/policy.cpp",
+      "handover_sha256": "953ea39c7e5b0779720ed5efefeb7b0febf54271754aff09a27bf931a3d1b6d7",
+      "integrated_sha256": "05269c5a30b1a84f8308ef5ad8b64ed931791cad8a64263c135550dcd92974c9"
+    },
+    {
+      "path": "src/windows/session_monitor.cpp",
+      "handover_sha256": "e6854409dba05508fc4adccef81c6a2661f001e14917f3dd437b5341ade0211e",
+      "integrated_sha256": "4cb8a874f4d8ade30ac94cc87a5d11ae7b39a911e689a84b986d1c5d79a0056a"
     },
     {
       "path": "src/wx/settings_drawer.cpp",
