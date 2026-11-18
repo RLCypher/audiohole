@@ -423,12 +423,13 @@ wxString ApplicationRows::accessible_name(std::size_t row) const {
                                     ? "expanded"
                                     : "collapsed");
     const auto* app = view.application(entry.application_id);
-    return app ? ui_text(app->display_name + ", " + detail_text(*app)) : "Unavailable application";
+    return app ? ui_text(app->display_name + ", " + detail_text(*app))
+               : wxString("Unavailable application");
 }
 wxString ApplicationRows::accessible_help(std::size_t row) const {
     return row < entries.size() && entries[row].heading
-               ? "Activate to expand or collapse this activity group. Inactive sources must also "
-                 "be enabled in Routing Board Settings."
+               ? wxString("Activate to expand or collapse this activity group. Inactive sources "
+                          "must also be enabled in Routing Board Settings.")
                : GetToolTipText();
 }
 wxCoord ApplicationRows::OnMeasureItem(std::size_t row) const {

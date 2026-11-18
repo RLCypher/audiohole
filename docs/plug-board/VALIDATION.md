@@ -95,3 +95,21 @@ The full MinGW Windows build, including AudioHole and the native evidence
 executable, linked successfully. The native adapter suite passed 23 tests under
 Wine, retaining its existing process-metadata skip. This supplemental
 reproduction does not replace the MSVC Debug/Release rebuild in GitHub Actions.
+
+## MSVC wxString conditional correction
+
+The Debug build of `ae1a308` passed the native backend and failed with C2445 in
+`settings_drawer.cpp`: the recent-activity label combined `"Last 24 hours"`
+with `wxString::Format` results in a conditional expression. MSVC found both
+pointer and `wxString` conversions eligible. That literal now constructs a
+`wxString` explicitly, giving every branch the same type.
+
+The same review found and corrected mixed literal/`wxString` conditionals in
+the application-row accessibility name and help text. All displayed text and
+control behavior are preserved. The remaining conditional expressions in the
+embedded view were reviewed for this conversion pattern.
+
+The Windows x64 cross-build passed after these corrections. Preview,
+Test Mode and Tutorial GUI smoke passed under Wine, including the actual
+Plug Board drawer/row controls and complete tutorial. Formatting and whitespace
+checks passed. MSVC Debug/Release confirmation remains with native CI.

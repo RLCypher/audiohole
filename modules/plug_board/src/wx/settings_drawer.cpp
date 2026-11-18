@@ -458,7 +458,7 @@ void PlugBoardView::Implementation::render_drawer() {
         recent_values = std::move(values);
         wxArrayString times;
         for (const auto value : recent_values)
-            times.Add(value == 86400    ? "Last 24 hours"
+            times.Add(value == 86400    ? wxString("Last 24 hours")
                       : value % 60 == 0 ? wxString::Format("Last %u minutes", value / 60)
                                         : wxString::Format("Last %u seconds", value));
         if (recent->GetStrings() != times)
