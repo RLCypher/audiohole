@@ -62,6 +62,8 @@ hardware routing measurement or a new Windows-version support guarantee.
 Per the owner's reinstated monitoring instruction, check native CI 20 minutes
 after publication, then every five minutes while it remains unfinished. Diagnose
 and correct failures, republish, and repeat until Debug and Release pass.
+Use a quiet timer; stop waiting and report a blocker if API access or another
+problem prevents checking.
 
 The earlier Automatic channel compatibility/labeling request remains a separate
 pending task. The audio engine, profile/device JSON schemas, unrelated layout
@@ -138,3 +140,28 @@ were eliminated. The native adapter suite passed 23 tests under Wine, retaining
 its original process-metadata skip. `Gui.Smoke` also passed using the newly
 linked application. MSVC Debug/Release confirmation remains with native CI and
 the monitoring schedule above.
+
+## Native CTest timing-budget correction
+
+Both MSVC configurations of `493f4c5` built and passed all five GUI smoke tests.
+The [native CI run](https://github.com/RLCypher/audiohole/actions/runs/44244248832)
+then passed 296 of 297 non-GUI checks in each configuration, with only
+`PlugBoard.WindowsEvidence` timing out at 30 seconds.
+
+Its `SessionMetadataChurnCannotExtendTheFiniteStartupRefreshWindow` test
+deliberately observes the production 30-second startup deadline, waits until
+31 seconds, then checks that metadata changes cannot restart recurring icon
+refreshes. The host presets' default 30-second timeout killed this legitimate
+wait. Earlier direct executable runs passed but bypassed that CTest limit.
+
+The suite now declares a bounded 90-second CTest timeout, covering the real
+deadline, remaining assertions and runner overhead. The host preset default
+and the production refresh schedule remain unchanged. Validation uses CTest
+with `--timeout 30` to exercise the same default/override behavior as native CI.
+
+The original registration reproduced the same failure under Wine at 30.44
+seconds, while executing that startup-window test. After reconfiguration,
+verbose CTest reported a computed timeout of 90 seconds and the complete suite
+passed in 36.57 seconds: 23 tests passed, retaining the original Wine metadata
+skip. The Windows cross-build and whitespace checks also passed. Native
+Debug/Release completion is checked after publication using the schedule above.

@@ -190,6 +190,10 @@ if(WIN32 AND PLUG_BOARD_BUILD_WINDOWS_BACKEND)
             target_link_options(plug_board_windows_tests PRIVATE -static)
         endif()
         add_test(NAME PlugBoard.WindowsEvidence COMMAND plug_board_windows_tests)
+        # This suite observes the real 30-second icon startup-refresh window,
+        # then checks that it stays idle. The host presets' 30-second default
+        # would kill that check before it can finish; retain a bounded CI budget.
+        set_tests_properties(PlugBoard.WindowsEvidence PROPERTIES TIMEOUT 90)
         if(PLUG_BOARD_BUILD_DEVELOPER_TOOLS)
             add_test(NAME PlugBoard.ProbeHelp COMMAND plug_board_probe --help)
         endif()

@@ -4,7 +4,7 @@
     {
       "path": "CMakeLists.txt",
       "handover_sha256": "5b296f40f1bedf142ee15e3f34c4b0830b04a74c5599047e968301f86da34bab",
-      "integrated_sha256": "edc11a4329827d4ed8dc3ef66236f046db4c91f78f54987dd4103d4b58fae6c0"
+      "integrated_sha256": "d03bb2e7be7f497a431a291a9380b2c269b9b0e78f3241305658735fa44a8cf9"
     },
     {
       "path": "harness/silent_fixture.cpp",
