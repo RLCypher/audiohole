@@ -58,7 +58,7 @@ bool Frame::engine_smoke(const wxString& directory) {
         const auto visible_diagnostics = path_status_->GetValue();
         const auto transferred =
             controller_->snapshot().routing_status->paths[0].observation.transferred_frames.value();
-        select_page(3);
+        select_page(SettingsPage);
         until([&] {
             return controller_->snapshot()
                        .routing_status->paths[0]
@@ -67,7 +67,7 @@ bool Frame::engine_smoke(const wxString& directory) {
         require(path_status_->GetValue() == visible_diagnostics &&
                     controller_->snapshot().state == State::Running,
                 "Hidden diagnostics rebuilt text or paused routing supervision");
-        select_page(0);
+        select_page(ProfilesPage);
         refresh();
         require(path_status_->GetValue() != visible_diagnostics &&
                     path_status_->GetValue().Contains("Transferred frames"),

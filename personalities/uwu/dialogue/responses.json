@@ -1963,6 +1963,346 @@
         "expression": "error",
         "fallback_expression": "idle"
       }
+    ],
+    "plug_board_socket_created": [
+      {
+        "id": "uwu_plug_board_socket_created_001",
+        "category": "plug_board",
+        "text": "A brand-new socket~! More places to plug things in! (≧▽≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_created_002",
+        "category": "plug_board",
+        "text": "Ooh, you made another hole for me to organize~ uwu",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_created_003",
+        "category": "plug_board",
+        "text": "New socket! What are we putting in this one? (・ω・)",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_created_004",
+        "category": "plug_board",
+        "text": "Ehehe, there's always room for one more~ ♡",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_moved": [
+      {
+        "id": "uwu_plug_board_socket_moved_001",
+        "category": "plug_board",
+        "text": "Scooching that socket over~ Make room! (ﾉ´ヮ`)ﾉ",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_moved_002",
+        "category": "plug_board",
+        "text": "Oop! Everybody shuffle~! (≧ω≦)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_moved_003",
+        "category": "plug_board",
+        "text": "A new spot for your socket? Such a perfectionist~ uwu",
+        "weight": 1,
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_moved_004",
+        "category": "plug_board",
+        "text": "All tucked into its new position~ ♡",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_deleted": [
+      {
+        "id": "uwu_plug_board_socket_deleted_001",
+        "category": "plug_board",
+        "text": "Aah! A socket vanished! The apps are safe in System~ (°ω°)",
+        "weight": 1,
+        "expression": "panicking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_deleted_002",
+        "category": "plug_board",
+        "text": "Bye-bye, little socket~ Your plugs have somewhere to go! ♡",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_deleted_003",
+        "category": "plug_board",
+        "text": "One less hole to fill... for now~ (¬‿¬)",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_deleted_004",
+        "category": "plug_board",
+        "text": "All cleaned up~ Nini, little socket. (－ω－) zzZ",
+        "weight": 1,
+        "expression": "sleeping",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_app_moved": [
+      {
+        "id": "uwu_plug_board_app_moved_001",
+        "category": "plug_board",
+        "text": "Right into the new socket~ Nice and snug! (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "weight": 1,
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_app_moved_002",
+        "category": "plug_board",
+        "text": "Ooh! That app just hopped holes! (≧▽≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_app_moved_003",
+        "category": "plug_board",
+        "text": "Plugged it in~ Now let's see if Windows plays nice! uwu",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_app_moved_004",
+        "category": "plug_board",
+        "text": "There you go, little app~ Find your happy place! ♡",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_renamed": [
+      {
+        "id": "uwu_plug_board_socket_renamed_001",
+        "category": "plug_board",
+        "text": "New name, same cute little socket~ uwu",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_renamed_002",
+        "category": "plug_board",
+        "text": "Ooh, a name makeover! So fancy! (✧ω✧)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_renamed_003",
+        "category": "plug_board",
+        "text": "Hehe, labels make finding the right hole easier~ ♡",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_renamed_004",
+        "category": "plug_board",
+        "text": "Renamed and ready for attention~ (｡•̀ᴗ-)✧",
+        "weight": 1,
+        "expression": "smug",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_icon_assigned": [
+      {
+        "id": "uwu_plug_board_socket_icon_assigned_001",
+        "category": "plug_board",
+        "text": "A little picture for your socket! Kyaa~ (≧▽≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_icon_assigned_002",
+        "category": "plug_board",
+        "text": "Cute icon! Now I know which hole is which~ uwu",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_icon_assigned_003",
+        "category": "plug_board",
+        "text": "Accessorizing your sockets? I approve~ ♡",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_icon_assigned_004",
+        "category": "plug_board",
+        "text": "Icon equipped! Looking adorable already~ (｡♥‿♥｡)",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_color_assigned": [
+      {
+        "id": "uwu_plug_board_socket_color_assigned_001",
+        "category": "plug_board",
+        "text": "Ooooh, pretty color! (✧▽✧)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_color_assigned_002",
+        "category": "plug_board",
+        "text": "A splash of color for your socket~ uwu",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_color_assigned_003",
+        "category": "plug_board",
+        "text": "Color-coded holes? You're spoiling me~ ♡",
+        "weight": 1,
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_color_assigned_004",
+        "category": "plug_board",
+        "text": "Now that socket has a little personality~ (≧ω≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_endpoint_changed": [
+      {
+        "id": "uwu_plug_board_socket_endpoint_changed_001",
+        "category": "plug_board",
+        "text": "New place for your sound to come out~ ehehe! (⁄ω⁄)",
+        "weight": 1,
+        "expression": "embarrassed",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_endpoint_changed_002",
+        "category": "plug_board",
+        "text": "Sending your plugs somewhere new~ Windows, behave! uwu",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_endpoint_changed_003",
+        "category": "plug_board",
+        "text": "Ooh, destination swap! Adventure time~ (≧▽≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_socket_endpoint_changed_004",
+        "category": "plug_board",
+        "text": "Socket redirected~ Fingers crossed the audio follows! ♡",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_board_profile_associated": [
+      {
+        "id": "uwu_plug_board_board_profile_associated_001",
+        "category": "plug_board",
+        "text": "Aww, this board and profile are a pair now~ ♡",
+        "weight": 1,
+        "expression": "happy",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_board_profile_associated_002",
+        "category": "plug_board",
+        "text": "It's official! They're together! (≧▽≦)",
+        "weight": 1,
+        "expression": "celebrating",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_board_profile_associated_003",
+        "category": "plug_board",
+        "text": "Matching board to profile~ Such good chemistry! uwu",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_board_profile_associated_004",
+        "category": "plug_board",
+        "text": "Linked up and ready for your next session~ (｡•̀ᴗ-)✧",
+        "weight": 1,
+        "expression": "smug",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_windows_mixer_opened": [
+      {
+        "id": "uwu_plug_board_windows_mixer_opened_001",
+        "category": "plug_board",
+        "text": "We're visiting the Windows mixer?! Ooh, field trip! (≧▽≦)",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_windows_mixer_opened_002",
+        "category": "plug_board",
+        "text": "Opening Windows Mixer~ Don't forget about me! uwu",
+        "weight": 1,
+        "expression": "concerned",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_windows_mixer_opened_003",
+        "category": "plug_board",
+        "text": "Into the Windows settings maze we go~ (・ω・;)",
+        "weight": 1,
+        "expression": "confused",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_plug_board_windows_mixer_opened_004",
+        "category": "plug_board",
+        "text": "Ehehe, say hi to the other mixer for me~ ♡",
+        "weight": 1,
+        "expression": "mischievous",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

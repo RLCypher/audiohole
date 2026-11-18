@@ -549,3 +549,12 @@ only acknowledges staged eligibility; manual-applied information requires actual
 simulated application and explicitly disclaims hardware confirmation. No catalog
 can change policy, validation or controller state. Expanding/collapsing Signal
 Testing & Monitoring produces no reaction and does not alter operations.
+
+## Plug Board response events
+
+The external Norm and Horu catalogs include ten `plug_board_*` event pools,
+with four owner-authored variants per event and approved expression metadata.
+Vanilla facts describe saved intent separately from actual playback. Unchanged
+publications and background discovery do not generate responses. Guided Norm
+tutorial copy takes precedence over these random pools. See
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).

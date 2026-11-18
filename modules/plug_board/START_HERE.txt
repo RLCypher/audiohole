@@ -1,0 +1,31 @@
+AudioHole Plug Board - standalone module 0.2.6
+
+1. Exit any older Plug Board instance through Exit or its tray menu.
+2. Extract the entire ZIP with Windows "Extract All".
+3. Double-click AudioHole-PlugBoard.exe in the extracted folder.
+
+- Add sockets with +, then choose each playback output.
+- Drag apps or right-click > Move to. Assignments are saved immediately and
+  remembered indefinitely; pressing Save is not required for an assignment.
+- Right-click sockets to Rename, Delete, Recolor or select an icon.
+- Drag the Sockets list to reorder columns. System remains first/protected.
+- Settings has a Windows Mixer button at the bottom.
+- Save updates the board checkpoint; Save As creates a copy.
+
+Last seen uses compact minutes, hours/minutes, whole days and weeks, then
+"a while ago" beyond four weeks. It does not use ellipses. Playback device
+names stay on one line; hover over a playback status for its full device name.
+Hover over the app name for the short drag hint.
+
+Learned taskbar icons are remembered after app closure and Plug Board restarts.
+Open the app once to let its taskbar icon be learned. Startup refreshes catch
+late icons for up to 30 seconds; Refresh or reopening rechecks later changes.
+
+Probe Tools, Diagnostics and session/debug menus have been removed. Internal
+error logs remain in the local data folder; nothing is uploaded automatically.
+The package contains no probe/helper/test executables.
+
+Close hides to the tray. Exit finishes owned work and retains Windows routing
+preferences. No global reset or forced application restart is performed.
+
+See README.md and docs/ for configuration, source builds and validation.

@@ -67,7 +67,7 @@ void apply_palette(wxWindow* window, bool dark, bool contrast) {
 void Frame::select_page(std::size_t page, bool focus) {
     if (page >= notebook_->GetPageCount())
         return;
-    if (page != 0)
+    if (page != ProfilesPage)
         tutorial_scroll_duration_ = 0;
     notebook_->SetSelection(page);
     update_navigation();
@@ -119,6 +119,7 @@ void Frame::apply_appearance() {
     prepare_native_theme(dark_appearance_, contrast);
     apply_palette(this, dark_appearance_, contrast);
     native_theme(this, dark_appearance_, contrast);
+    theme_plug_board(contrast);
     for (auto* control : tutorial_choices_) {
         auto* button = static_cast<ActionButton*>(control);
         button->outline_colour = control->GetLabel() == "End tutorial"
@@ -176,10 +177,12 @@ WXLRESULT Frame::MSWWindowProc(WXUINT message, WXWPARAM wparam, WXLPARAM lparam)
     }
     if (message == WM_SYSCOMMAND) {
         const auto command = static_cast<UINT>(wparam) & 0xFFF0;
-        if (command == shell_controls_command || command == shell_exit_command) {
+        if (command == shell_controls_command || command == shell_exit_command ||
+            command == shell_plug_board_command) {
             CallAfter([this, command] {
-                perform_shell_action(command == shell_controls_command ? ShellAction::Controls
-                                                                       : ShellAction::Exit);
+                perform_shell_action(command == shell_plug_board_command ? ShellAction::PlugBoard
+                                     : command == shell_controls_command ? ShellAction::Controls
+                                                                         : ShellAction::Exit);
             });
             return 0;
         }

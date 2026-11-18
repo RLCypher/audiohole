@@ -780,10 +780,13 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
                 return;
             const auto result = controller_->remove_profile(viewed_);
             show_result(result);
-            if (result.ok)
+            if (result.ok) {
+                if (plug_board_)
+                    plug_board_->profile_deleted(viewed_);
                 select_profile(controller_->snapshot().profiles.empty()
                                    ? ""
                                    : controller_->snapshot().profiles.front().id);
+            }
         },
         wxID_DELETE);
     return menu;

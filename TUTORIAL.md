@@ -71,18 +71,23 @@ endpoint assignment, exclusive preference, Save and Start all use the real GUI
 handlers. N018A requires a confirmed profile rename after creation; N018B requires
 a confirmed hole rename after creation. Both highlight only the specific record row, accept
 any valid name different from the initial name, and have no reply buttons. Two distinct renamed and saved device logical IDs
-are required. The four
+are required. The nine
 fictional identities are fixed independently of their editable display names:
 
 | ID | Original display name | Direction |
 |---|---|---|
-| tutorial-mixer-in | MixBoard Input | Capture |
+| tutorial-mixer-in | MixBoard Mic Input | Capture |
 | tutorial-mic | Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device) | Capture |
 | tutorial-mixer-out | MixBoard Output | Playback |
+| tutorial-boomslab | Soundbar - BoomSlab 9001 (USB Audio Device) | Playback |
+| tutorial-music | MixBoard Music | Playback |
+| tutorial-game | MixBoard Game | Playback |
+| tutorial-chat | MixBoard Chat | Playback |
+| tutorial-aux | MixBoard Aux | Playback |
 | tutorial-speakers | Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device) | Playback |
 
 Forward connects the fake microphone to MixBoard Output; Return connects MixBoard
-Input to the fake speakers. Forward Exclusive mode preferred must be enabled by
+Mic Input to the fake speakers. Forward Exclusive mode preferred must be enabled by
 the user; Return and unrelated overrides are not silently changed. Save is still
 explicit. Wrong assignments, premature Start, missing saves and unrelated
 navigation cannot complete an objective.
@@ -168,3 +173,13 @@ background completion does not leave the user with choices on the wrong tab.
 Talking expressions play four to six passes rather than looping until another
 lesson message. Disabled Settings labels use a flat gray palette with no embossed
 shadow, including the animation-count label, numeric field and arrows.
+
+## Plug Board lesson insert
+
+The owner script in `docs/tutorial/PlugBoard-Norm-script.txt` supplies PB001–PB014
+and optional recovery lines. Its two sockets and two app assignments are
+verified against stable IDs in a memory-only simulated module. Six fictional
+apps start on BoomSlab 9001. The scan adds BoomSlab and MixBoard Music/Game/Chat/Aux,
+and renames the existing capture to MixBoard Mic Input. PB014 bridges into the
+existing first Settings beat without an additional Continue control. See
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).

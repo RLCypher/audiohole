@@ -137,8 +137,9 @@ class App final : public wxApp {
                 return false;
             }
             // Persisted shell tasks do not authorize a fresh routing session.
-            // Only Open / Controls may launch the ordinary startup workflow.
-            if (*shell_action != ShellAction::Open && *shell_action != ShellAction::Controls)
+            // Open, Controls and Plug Board may launch the ordinary startup workflow.
+            if (*shell_action != ShellAction::Open && *shell_action != ShellAction::Controls &&
+                *shell_action != ShellAction::PlugBoard)
                 return false;
         }
         if (working_after_tutorial && (!restart_parent || replay_tutorial))
@@ -311,6 +312,8 @@ class App final : public wxApp {
                                        wxOK | wxICON_WARNING, frame);
             }
         }
+        if (shell_action == ShellAction::PlugBoard)
+            frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::PlugBoard); });
         if (shell_action == ShellAction::Controls)
             frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::Controls); });
         if (smoke)

@@ -45,6 +45,7 @@ endif()
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
   add_test(NAME Tutorial.CatalogIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/GenerateTutorial.py" --check)
+  add_test(NAME PlugBoard.InputIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/CheckPlugBoardInputs.py")
   add_test(NAME Branding.AssetIntegrity
     COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_assets.py")
   add_test(NAME Avatar.AssetIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/branding/verify_avatar_assets.py")

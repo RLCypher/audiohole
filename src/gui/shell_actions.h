@@ -11,10 +11,11 @@
 namespace audiohole::gui {
 // Private Windows shell shortcuts forward only these fixed actions to the
 // existing GUI. They are not a public routing API or persisted startup commands.
-enum class ShellAction : std::uint32_t { Open, Controls, Start, Stop, Close, Exit };
+enum class ShellAction : std::uint32_t { Open, Controls, Start, Stop, Close, Exit, PlugBoard };
 inline constexpr wchar_t shell_app_id[] = L"AudioHole.PreviewBuild";
 inline constexpr ULONG_PTR shell_message_tag = 0x41484F4C;
-inline constexpr UINT shell_controls_command = 0x1E00, shell_exit_command = 0x1E10;
+inline constexpr UINT shell_controls_command = 0x1E00, shell_exit_command = 0x1E10,
+                      shell_plug_board_command = 0x1E20;
 std::optional<ShellAction> parse_shell_action(std::wstring_view);
 std::optional<ShellAction> decode_shell_action(const COPYDATASTRUCT*);
 HWND find_application_window();

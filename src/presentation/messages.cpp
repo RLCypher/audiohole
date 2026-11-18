@@ -99,6 +99,17 @@ constexpr std::array<NeutralEntry, static_cast<std::size_t>(Message::Count)> neu
     {"error_minor", "The action could not be completed. Review the detailed error."},
     {"error_major",
      "AudioHole could not continue the requested operation. Review the detailed error."},
+    {"plug_board_socket_created", "Socket created."},
+    {"plug_board_socket_moved", "Socket order saved."},
+    {"plug_board_socket_deleted", "Socket deleted; its applications are assigned to System."},
+    {"plug_board_app_moved", "Application socket assignment saved. Windows policy and observed "
+                             "playback are reported separately."},
+    {"plug_board_socket_renamed", "Socket renamed."},
+    {"plug_board_socket_icon_assigned", "Socket icon saved."},
+    {"plug_board_socket_color_assigned", "Socket color saved."},
+    {"plug_board_socket_endpoint_changed", "Socket endpoint preference saved."},
+    {"plug_board_board_profile_associated", "Board association with the profile saved."},
+    {"plug_board_windows_mixer_opened", "Windows Volume Mixer opened."},
 }};
 constexpr std::uintmax_t maximum_file_bytes = 256 * 1024;
 constexpr std::size_t maximum_catalogs = 32;

@@ -89,7 +89,7 @@ std::string_view tutorial_catalog() {
       "Plug ’em in",
       "What could go wrong?"
     ],
-    "text": "Time to plug a few imaginary devices into imaginary USB ports. I've got four imaginary endpoints ready to go, and I assure you the cable management is immaculate."
+    "text": "Time to plug a few imaginary devices into imaginary USB ports. I've got nine imaginary endpoints ready to go, and I assure you the cable management is immaculate."
   },
   "N006A": {
     "expression": "thinking",
@@ -149,7 +149,7 @@ std::string_view tutorial_catalog() {
       "Show me the devices",
       "Did you actually scan anything?"
     ],
-    "text": "Well, would you look at that. Four brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated."
+    "text": "Well, would you look at that. Nine brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated."
   })AHTUTORIAL",
     // 03 — GIVE THE DEVICES NAMES A HUMAN WOULD USE
     R"AHTUTORIAL(  "N011": {
@@ -283,7 +283,7 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you."
+    "text": "Good. Now for the return trip. Set the Return Source to MixBoard Mic Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you."
   },
   "N023": {
     "expression": "happy",
@@ -673,12 +673,192 @@ std::string_view tutorial_catalog() {
     "variants": [],
     "choices": [],
     "text": "Careful. I'm part of the user interface. We're legally required to call that interaction."
+  })AHTUTORIAL",
+    // Plug Board introduction
+    R"AHTUTORIAL(  "PB001": {
+    "expression": "talking",
+    "variants": [],
+    "choices": [],
+    "text": "We've connected devices. Now let's tell individual apps where to send their audio. Open Plug Board; I've got a small organizational problem for you."
+  },
+  "PB002": {
+    "expression": "thinking",
+    "variants": [],
+    "choices": [
+      "So they're categories?",
+      "As many as I want?"
+    ],
+    "text": "These columns are sockets. Each points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds."
+  },
+  "PB003": {
+    "expression": "idle",
+    "variants": [
+      {
+        "from": "PB002",
+        "label": "So they're categories?",
+        "expression": "talking",
+        "text": "Exactly. Categories with an output device attached. I've lent you a few of my totally legit apps to try it out; they're all in System, currently using the BoomSlab 9001."
+      },
+      {
+        "from": "PB002",
+        "label": "As many as I want?",
+        "expression": "smug",
+        "text": "As many as you please. Whether you can organize that mess is another question. I've put my totally legit practice apps in System, pointing at our BoomSlab 9001."
+      }
+    ],
+    "choices": [
+      "Totally legit, huh?",
+      "Why System?"
+    ]
+  },
+  "PB004": {
+    "expression": "idle",
+    "variants": [
+      {
+        "from": "PB003",
+        "label": "Totally legit, huh?",
+        "expression": "suspicious",
+        "text": "They passed every inspection I performed in my imagination. Anyway, make a new socket for music; let's give those suspiciously legal tunes their own destination."
+      },
+      {
+        "from": "PB003",
+        "label": "Why System?",
+        "expression": "talking",
+        "text": "System catches new apps until you assign them somewhere else. Let's create a new socket for music, so it doesn't all have to go through System."
+      }
+    ],
+    "choices": []
+  },
+  "PB005": {
+    "expression": "talking",
+    "variants": [],
+    "choices": [],
+    "text": "Give that socket a music-related name. Whatever makes sense to you; we're not grading the poetry."
+  },
+  "PB006": {
+    "expression": "thinking",
+    "variants": [],
+    "choices": [],
+    "text": "Now set its output to MixBoard Music. That's the pretend mixer channel we'll use for music."
+  },
+  "PB007": {
+    "expression": "happy",
+    "variants": [],
+    "choices": [],
+    "text": "Good. Let's make a second socket for games, so the explosions don't have to share a channel with the playlist."
+  })AHTUTORIAL",
+    // Plug Board assignment
+    R"AHTUTORIAL(  "PB008": {
+    "expression": "working",
+    "variants": [],
+    "choices": [],
+    "text": "Name this one for games. Again, any sensible label will do."
+  },
+  "PB009": {
+    "expression": "talking",
+    "variants": [],
+    "choices": [],
+    "text": "Give the game socket MixBoard Game as its destination. One channel for games, one for music. Even I can keep track of that."
+  },
+  "PB010": {
+    "expression": "smug",
+    "variants": [],
+    "choices": [],
+    "text": "Find Felony Jaywalking LXVII in System and move it to your game socket. I still don't understand the hype. People act like it's the sixty-seventh coming."
+  },
+  "PB011": {
+    "expression": "deadpan",
+    "variants": [],
+    "choices": [],
+    "text": "There. Civilization survives. Now move Spooty into your music socket so it gets its own mixer channel."
+  },
+  "PB012": {
+    "expression": "happy",
+    "variants": [],
+    "choices": [
+      "So I can balance them separately?",
+      "And other apps work the same way?"
+    ],
+    "text": "And there it is. Game and music now feed separate channels on our pretend mixing board, so you can control them independently from the external device."
+  },
+  "PB013": {
+    "expression": "idle",
+    "variants": [
+      {
+        "from": "PB012",
+        "label": "So I can balance them separately?",
+        "expression": "talking",
+        "text": "Exactly. Separate physical volume controls for games and music. Feel free to experiment, and meet me in Settings when you're done. One last thing to show you."
+      },
+      {
+        "from": "PB012",
+        "label": "And other apps work the same way?",
+        "expression": "smug",
+        "text": "Yep. Move an app to a socket and it follows that socket's destination. Play around if you like; I'll be in Settings with one last thing to show you."
+      }
+    ],
+    "choices": []
+  },
+  "PB014": {
+    "expression": "idle",
+    "variants": [],
+    "choices": [],
+    "text": "Ah, there you are. Last stop: Settings."
+  })AHTUTORIAL",
+    // Plug Board reactions
+    R"AHTUTORIAL(  "PB-R01": {
+    "expression": "concerned",
+    "variants": [],
+    "choices": [],
+    "text": "Looks like one of our practice apps wandered off. Let's restore the tutorial's fake app list before we continue."
+  },
+  "PB-R02": {
+    "expression": "thinking",
+    "variants": [],
+    "choices": [],
+    "text": "The socket exists; it still needs its destination. Check the output dropdown at the top."
+  },
+  "PB-R03": {
+    "expression": "talking",
+    "variants": [],
+    "choices": [],
+    "text": "That name works. The device assignment is what matters here."
+  },
+  "PB-R04": {
+    "expression": "concerned",
+    "variants": [],
+    "choices": [],
+    "text": "Close, but that one's headed to the wrong place. Give it another drag, or use its right-click menu."
+  },
+  "PB-R05": {
+    "expression": "deadpan",
+    "variants": [],
+    "choices": [],
+    "text": "No. It's a fake board with fake devices and apps. Your actual Windows audio setup is untouched."
+  },
+  "PB-R06": {
+    "expression": "smug",
+    "variants": [],
+    "choices": [],
+    "text": "Still rearranging things? Take your time. I'll be in Settings when you've achieved socket enlightenment."
+  },
+  "PB-R07": {
+    "expression": "talking",
+    "variants": [],
+    "choices": [],
+    "text": "Grab the app and drop it into the destination socket. Right-clicking it works too, if you'd rather skip the dragging."
+  },
+  "PB-R08": {
+    "expression": "thinking",
+    "variants": [],
+    "choices": [],
+    "text": "Before we move on, Felony Jaywalking goes in Games and Spooty goes in Music. The labels can be yours; the destinations need to match."
   })AHTUTORIAL"
     };
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(29816);
+        result.reserve(36006);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

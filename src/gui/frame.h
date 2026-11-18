@@ -1,5 +1,8 @@
 #pragma once
 #include "audiohole/avatar/wx_panel.hpp"
+#include "audiohole/plug_board/module.hpp"
+#include "audiohole/plug_board/simulation.hpp"
+#include "audiohole/plug_board/view.hpp"
 #include "gui/branding.h"
 #include "gui/device_list.h"
 #include "gui/seconds_field.h"
@@ -106,6 +109,10 @@ class Frame final : public wxFrame, private wxEventFilter {
                    std::shared_ptr<BuildPreferences> preferences = {},
                    std::function<void()> restart = {});
     ~Frame() override {
+        if (plug_board_view_)
+            plug_board_view_->detach_module();
+        if (plug_board_)
+            (void)plug_board_->begin_shutdown();
         wxEvtHandler::RemoveFilter(this);
         RemovePropW(static_cast<HWND>(GetHandle()), L"AudioHole.GuiWindow");
         timer_.Stop();
@@ -183,6 +190,25 @@ class Frame final : public wxFrame, private wxEventFilter {
     bool closing_ = false;
     void finish_exit();
     std::unique_ptr<Tutorial> tutorial_;
+    // Module outlives its detached, parent-owned view. Its service owns policy
+    // calls and storage; GUI refresh only supplies/copies immutable values.
+    std::unique_ptr<plug_board::Module> plug_board_;
+    plug_board::desktop::PlugBoardView* plug_board_view_{};
+    std::shared_ptr<plug_board::Simulation> plug_simulation_;
+    std::shared_ptr<const plug_board::ModuleSnapshot> plug_seen_;
+    std::shared_future<plug_board::OperationResult> plug_shutdown_;
+    std::string plug_inventory_key_, plug_profiles_key_, plug_active_profile_;
+    std::shared_ptr<const Profile> plug_active_intent_;
+    std::uint64_t plug_inventory_revision_ = 0, plug_activation_generation_ = 0;
+    bool plug_visible_ = false;
+    std::string plug_simulated_default_ = "tutorial-boomslab";
+    std::optional<std::string> plug_smoke_menu_;
+    void build_plug_board();
+    void refresh_plug_board();
+    void theme_plug_board(bool high_contrast);
+    void prepare_plug_tutorial_apps();
+    wxWindow* plug_tutorial_target(const std::string&);
+    void plug_board_smoke(bool lesson);
     wxPanel* avatar_region_{};
     wxBoxSizer* avatar_layout_{};
     wxPanel* tutorial_choices_panel_{};

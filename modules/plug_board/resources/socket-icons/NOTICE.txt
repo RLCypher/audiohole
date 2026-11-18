@@ -1,0 +1,7 @@
+Material Symbols Outlined
+Google LLC
+Licensed under the Apache License, Version 2.0.
+
+Original SVG paths and their exact source hashes/URLs are in PROVENANCE.json.
+The module normalizes those paths into native vector commands and applies the
+chosen foreground color at rendering time. No Material font is required.

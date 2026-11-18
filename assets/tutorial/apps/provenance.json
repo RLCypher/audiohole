@@ -1,0 +1,36 @@
+{
+  "source": "Owner-provided Fake App Icons.zip",
+  "processing": "RGBA PNG, fit within 128 pixels, Lanczos; fictional tutorial only",
+  "files": [
+    {
+      "name": "Bar simulator.png",
+      "source_sha256": "eebced9ec445c45cc0807cc88e3c656ac5aba59ee16f8bbee415ca15c882056a",
+      "packaged_sha256": "3032dd1a1c7a911c542b459534bb91b1636bb5819cbb6d63967f2217c2e87b42"
+    },
+    {
+      "name": "Dissonance.png",
+      "source_sha256": "813da6cd6aac8cd9c7c24f4c444cab8fbe7934b1af54a0e6b60d176c855c1f6f",
+      "packaged_sha256": "b45da9816316244a71a976cb9f6ea85d55357e9b998859440501914e41099ed0"
+    },
+    {
+      "name": "Epic fail launcher.png",
+      "source_sha256": "6b2648de849e43c7932baf7b72112b501e3a6fa38201abb8e1e9aad08564c330",
+      "packaged_sha256": "a28ba8307eedfc762675d2a4246423eba99c5f04a5639bbc248176e00bd772b2"
+    },
+    {
+      "name": "Felony Jaywalking.png",
+      "source_sha256": "28c221d73ad1ffa8e22ab22c0ed601e70644f7eb8d219c10f73e4103974024d1",
+      "packaged_sha256": "c4a9f59cbaca7c1accbf12e96fd33a66a831dfbecca809512a67640ca52bb655"
+    },
+    {
+      "name": "Internet Exploder.png",
+      "source_sha256": "66b25689f7684e8e707f1db4f9aa1ee54de82acc621bc249a0fcaca323db6d28",
+      "packaged_sha256": "791e4d4b1f8ef70225b983715cb9daf39134924924980fe0090ab4700f7580fc"
+    },
+    {
+      "name": "Spooty.png",
+      "source_sha256": "b7dcdd4e0d8685c1c1029f67167fe0783c890e56cc3c31bcfbdc7bcce70f3fec",
+      "packaged_sha256": "7afa562357479eec6b36eebb0bfead312afd2351e6f9dc9ea15fdd1873b1da22"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+# AudioHole Plug Board — Norm personality responses
+# Format: EVENT_KEY | ANIMATION | RESPONSE
+# Randomly select one response from the matching event key.
+# Animation states use the existing personality vocabulary: idle, talking, listening, thinking, surprised, angry, error, sleepy.
+
+[SOCKET_CREATED]
+SOCKET_CREATED | talking | Another socket. Try not to make a mess.
+SOCKET_CREATED | thinking | New socket created. Give it a purpose.
+SOCKET_CREATED | talking | Added a socket. Apparently we needed another one.
+SOCKET_CREATED | surprised | Room for one more. Somehow.
+
+[SOCKET_MOVED]
+SOCKET_MOVED | talking | Socket moved. The pecking order changes.
+SOCKET_MOVED | idle | Reordered. Nothing exploded.
+SOCKET_MOVED | thinking | A little organization. How novel.
+SOCKET_MOVED | talking | Socket relocated. Its contents came along.
+
+[SOCKET_DELETED]
+SOCKET_DELETED | talking | Socket removed. The apps have been sent to System.
+SOCKET_DELETED | smug | One less socket to worry about.
+SOCKET_DELETED | thinking | Deleted the socket. Hope you meant that.
+SOCKET_DELETED | talking | Socket's gone. The applications survived.
+
+[APP_MOVED]
+APP_MOVED | talking | Application moved. Let's see if Windows cooperates.
+APP_MOVED | idle | New socket assigned. Simple enough.
+APP_MOVED | thinking | Rerouting requested. Actual results may vary.
+APP_MOVED | surprised | An app found its new home. Inspiring.
+
+[SOCKET_RENAMED]
+SOCKET_RENAMED | talking | Socket renamed. Same hole, different label.
+SOCKET_RENAMED | idle | New name applied.
+SOCKET_RENAMED | thinking | A fresh label. Very administrative.
+SOCKET_RENAMED | talking | Name changed. The wiring didn't.
+
+[SOCKET_ICON_ASSIGNED]
+SOCKET_ICON_ASSIGNED | talking | Icon assigned. Now you might recognize it.
+SOCKET_ICON_ASSIGNED | thinking | A picture. Worth at least one word.
+SOCKET_ICON_ASSIGNED | idle | Socket icon updated.
+SOCKET_ICON_ASSIGNED | talking | Identification improved. Marginally.
+
+[SOCKET_COLOR_ASSIGNED]
+SOCKET_COLOR_ASSIGNED | talking | Socket color updated. Very tasteful. Probably.
+SOCKET_COLOR_ASSIGNED | idle | Color assigned. Routing unchanged.
+SOCKET_COLOR_ASSIGNED | laughing | Color coding. Look at us being organized.
+SOCKET_COLOR_ASSIGNED | talking | New color, same destination.
+
+[SOCKET_ENDPOINT_CHANGED]
+SOCKET_ENDPOINT_CHANGED | talking | New destination selected. Windows gets the final say.
+SOCKET_ENDPOINT_CHANGED | thinking | Socket rerouted. Checking where the audio actually lands.
+SOCKET_ENDPOINT_CHANGED | idle | Endpoint assignment updated.
+SOCKET_ENDPOINT_CHANGED | laughing | Different output. Same questionable playlist.
+
+[BOARD_PROFILE_ASSOCIATED]
+BOARD_PROFILE_ASSOCIATED | talking | Board linked to profile. They'll travel together now.
+BOARD_PROFILE_ASSOCIATED | idle | Profile association saved.
+BOARD_PROFILE_ASSOCIATED | thinking | Linked. Future you might appreciate that.
+BOARD_PROFILE_ASSOCIATED | talking | This profile has a board now. Very official.
+
+[WINDOWS_MIXER_OPENED]
+WINDOWS_MIXER_OPENED | talking | Opening Windows Mixer. Try not to undo everything.
+WINDOWS_MIXER_OPENED | smug | Off to Windows Settings. Good luck in there.
+WINDOWS_MIXER_OPENED | thinking | Windows Mixer opened. The scenic route.
+WINDOWS_MIXER_OPENED | talking | Here's the Windows mixer. I was doing fine, thanks.

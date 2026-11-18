@@ -3,15 +3,33 @@ assets/avatar-assets.json
 assets/branding/audiohole-logo.png
 assets/branding/audiohole.ico
 assets/presentation/placeholder-avatar.png
+assets/tutorial/apps/Bar simulator.png
+assets/tutorial/apps/Dissonance.png
+assets/tutorial/apps/Epic fail launcher.png
+assets/tutorial/apps/Felony Jaywalking.png
+assets/tutorial/apps/Internet Exploder.png
+assets/tutorial/apps/Spooty.png
+assets/tutorial/apps/provenance.json
 assets/ui/MaterialIcons-Regular.ttf
 bin/audiohole-probe.exe
 docs/CONFIGURATION_BUNDLES.md
+docs/ENGINE_INTEGRATION.md
+docs/LATENCY_V4.md
 docs/MANUAL_GUI_CHECKLIST.md
+docs/PLUG_BOARD_INTEGRATION.md
 docs/PROFILE_BUILDER.md
 docs/TUTORIAL.md
+docs/examples/latency-v4/app-engine-settings.fragment.json
+docs/examples/latency-v4/automatic.profile-v4.json
+docs/examples/latency-v4/inheritance.profile-v4.json
+docs/examples/latency-v4/stable.profile-v4.json
 docs/tutorial/Norm-script.txt
+docs/tutorial/PlugBoard-Norm-script.txt
 licenses/MaterialIcons-LICENSE.txt
 licenses/MaterialIcons-NOTICE.txt
+licenses/PlugBoard-MaterialSymbols-LICENSE.txt
+licenses/PlugBoard-MaterialSymbols-NOTICE.txt
+licenses/miniaudio-LICENSE.txt
 licenses/miniz-LICENSE.txt
 licenses/nlohmann-json-LICENSE.txt
 licenses/wxWidgets-LGPL.txt
@@ -730,10 +748,3 @@ personalities/vanilla/avatar/pack/manifest.json
 personalities/vanilla/avatar/registry.json
 personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
-docs/ENGINE_INTEGRATION.md
-licenses/miniaudio-LICENSE.txt
-docs/LATENCY_V4.md
-docs/examples/latency-v4/automatic.profile-v4.json
-docs/examples/latency-v4/stable.profile-v4.json
-docs/examples/latency-v4/inheritance.profile-v4.json
-docs/examples/latency-v4/app-engine-settings.fragment.json

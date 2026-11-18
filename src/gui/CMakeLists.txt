@@ -10,13 +10,13 @@ if(Git_FOUND)
     set(audiohole_build_commit "unknown")
   endif()
 endif()
-add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp main.cpp frame.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
+add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_VERSION="${PROJECT_VERSION}")
 # uuid precedes wx's transitive oleacc import library to avoid duplicate GUID
 # objects in MinGW; MSVC uses the same system GUID library.
-target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows wx::core wx::base uuid uxtheme dwmapi advapi32 windowscodecs shlwapi propsys shell32)
+target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows audiohole::plug_board_windows uuid audiohole::plug_board_wx wx::core wx::base uxtheme dwmapi advapi32 windowscodecs shlwapi propsys shell32)
 if(MSVC)
   target_compile_definitions(audiohole PRIVATE AUDIOHOLE_MSVC_MANIFEST)
   target_compile_options(audiohole PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:/W4;/permissive-;/utf-8>")
@@ -27,6 +27,12 @@ if(MSVC)
     "/MANIFESTUAC:level='asInvoker' uiAccess='false'")
 endif()
 set_target_properties(audiohole PROPERTIES OUTPUT_NAME "AudioHole")
+if(TARGET plug_board_windows_tests)
+  # The handover's icon test reads an executable's resource without launching it.
+  # Embedding uses the real host, so no standalone fixture executable is needed.
+  add_dependencies(plug_board_windows_tests audiohole)
+  target_compile_definitions(plug_board_windows_tests PRIVATE PLUG_BOARD_ICON_FIXTURE_NAME="AudioHole.exe")
+endif()
 install(TARGETS audiohole RUNTIME DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
   "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt" DESTINATION licenses COMPONENT Runtime)
@@ -35,6 +41,15 @@ install(FILES "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
   "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/TUTORIAL.md" "${PROJECT_SOURCE_DIR}/ENGINE_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/PlugBoard-Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/NOTICE.txt"
+  DESTINATION licenses RENAME PlugBoard-MaterialSymbols-NOTICE.txt COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/PLUG_BOARD_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/LICENSE.txt"
+  DESTINATION licenses RENAME PlugBoard-MaterialSymbols-LICENSE.txt COMPONENT Runtime)
+add_custom_command(TARGET audiohole POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+  "${PROJECT_SOURCE_DIR}/assets/tutorial" "$<TARGET_FILE_DIR:audiohole>/assets/tutorial")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/tutorial/" DESTINATION assets/tutorial COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/LATENCY_V4.md" DESTINATION docs COMPONENT Runtime)
 install(FILES
   "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/automatic.profile-v4.json"

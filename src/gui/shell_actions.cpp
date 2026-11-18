@@ -24,6 +24,8 @@ struct ShellTask {
     ShellAction action;
 };
 constexpr std::array tasks{
+    ShellTask{L"Plug Board", L"plug-board", L"Open the AudioHole Plug Board tab.",
+              ShellAction::PlugBoard},
     ShellTask{L"Open AudioHole", L"open", L"Show the running AudioHole window.", ShellAction::Open},
     ShellTask{L"AudioHole controls…", L"controls",
               L"Open the full tray menu, including profiles and direction states.",

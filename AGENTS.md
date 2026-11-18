@@ -679,6 +679,7 @@ Follow `GUI.md`.
 ### 17.1 Primary Tabs
 
 - Profiles.
+- Plug Board.
 - Devices.
 - Scanning.
 - Settings.
@@ -1368,3 +1369,15 @@ waits asynchronously for confirmed native cleanup. Unsupported live switching,
 automatic reconnection and destination mixing must not be claimed. All permanent
 engine/algorithm/production-schema decisions remain open. Keep substantive GUI,
 restart and software-adapter smoke checks; cross/Wine results are supplemental.
+
+## Owner-authorized Plug Board integration
+
+The November 17 assignment authorizes embedding the supplied Plug Board 0.2.6
+module between Profiles and Devices, its tray/taskbar shortcut, authored response
+pools and fictional Norm tutorial insert. Read
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md) before changing this
+integration. Preserve the module layout/policy contract, scanner identity
+authority, memory-only tutorial and asynchronous shutdown. No standalone
+launcher/probe binaries enter the host package. Native GUI smoke covers the
+actual embedded controls. The separate pending Automatic channel labeling
+request is outside this integration.

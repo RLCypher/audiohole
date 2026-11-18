@@ -1936,6 +1936,346 @@
         "expression": "error",
         "fallback_expression": "idle"
       }
+    ],
+    "plug_board_socket_created": [
+      {
+        "id": "default_plug_board_socket_created_001",
+        "category": "plug_board",
+        "text": "Another socket. Try not to make a mess.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_created_002",
+        "category": "plug_board",
+        "text": "New socket created. Give it a purpose.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_created_003",
+        "category": "plug_board",
+        "text": "Added a socket. Apparently we needed another one.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_created_004",
+        "category": "plug_board",
+        "text": "Room for one more. Somehow.",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_moved": [
+      {
+        "id": "default_plug_board_socket_moved_001",
+        "category": "plug_board",
+        "text": "Socket moved. The pecking order changes.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_moved_002",
+        "category": "plug_board",
+        "text": "Reordered. Nothing exploded.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_moved_003",
+        "category": "plug_board",
+        "text": "A little organization. How novel.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_moved_004",
+        "category": "plug_board",
+        "text": "Socket relocated. Its contents came along.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_deleted": [
+      {
+        "id": "default_plug_board_socket_deleted_001",
+        "category": "plug_board",
+        "text": "Socket removed. The apps have been sent to System.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_deleted_002",
+        "category": "plug_board",
+        "text": "One less socket to worry about.",
+        "weight": 1,
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_deleted_003",
+        "category": "plug_board",
+        "text": "Deleted the socket. Hope you meant that.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_deleted_004",
+        "category": "plug_board",
+        "text": "Socket's gone. The applications survived.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_app_moved": [
+      {
+        "id": "default_plug_board_app_moved_001",
+        "category": "plug_board",
+        "text": "Application moved. Let's see if Windows cooperates.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_app_moved_002",
+        "category": "plug_board",
+        "text": "New socket assigned. Simple enough.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_app_moved_003",
+        "category": "plug_board",
+        "text": "Rerouting requested. Actual results may vary.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_app_moved_004",
+        "category": "plug_board",
+        "text": "An app found its new home. Inspiring.",
+        "weight": 1,
+        "expression": "surprised",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_renamed": [
+      {
+        "id": "default_plug_board_socket_renamed_001",
+        "category": "plug_board",
+        "text": "Socket renamed. Same hole, different label.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_renamed_002",
+        "category": "plug_board",
+        "text": "New name applied.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_renamed_003",
+        "category": "plug_board",
+        "text": "A fresh label. Very administrative.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_renamed_004",
+        "category": "plug_board",
+        "text": "Name changed. The wiring didn't.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_icon_assigned": [
+      {
+        "id": "default_plug_board_socket_icon_assigned_001",
+        "category": "plug_board",
+        "text": "Icon assigned. Now you might recognize it.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_icon_assigned_002",
+        "category": "plug_board",
+        "text": "A picture. Worth at least one word.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_icon_assigned_003",
+        "category": "plug_board",
+        "text": "Socket icon updated.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_icon_assigned_004",
+        "category": "plug_board",
+        "text": "Identification improved. Marginally.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_color_assigned": [
+      {
+        "id": "default_plug_board_socket_color_assigned_001",
+        "category": "plug_board",
+        "text": "Socket color updated. Very tasteful. Probably.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_color_assigned_002",
+        "category": "plug_board",
+        "text": "Color assigned. Routing unchanged.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_color_assigned_003",
+        "category": "plug_board",
+        "text": "Color coding. Look at us being organized.",
+        "weight": 1,
+        "expression": "laughing",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_color_assigned_004",
+        "category": "plug_board",
+        "text": "New color, same destination.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_socket_endpoint_changed": [
+      {
+        "id": "default_plug_board_socket_endpoint_changed_001",
+        "category": "plug_board",
+        "text": "New destination selected. Windows gets the final say.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_endpoint_changed_002",
+        "category": "plug_board",
+        "text": "Socket rerouted. Checking where the audio actually lands.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_endpoint_changed_003",
+        "category": "plug_board",
+        "text": "Endpoint assignment updated.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_socket_endpoint_changed_004",
+        "category": "plug_board",
+        "text": "Different output. Same questionable playlist.",
+        "weight": 1,
+        "expression": "laughing",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_board_profile_associated": [
+      {
+        "id": "default_plug_board_board_profile_associated_001",
+        "category": "plug_board",
+        "text": "Board linked to profile. They'll travel together now.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_board_profile_associated_002",
+        "category": "plug_board",
+        "text": "Profile association saved.",
+        "weight": 1,
+        "expression": "idle",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_board_profile_associated_003",
+        "category": "plug_board",
+        "text": "Linked. Future you might appreciate that.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_board_profile_associated_004",
+        "category": "plug_board",
+        "text": "This profile has a board now. Very official.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
+    ],
+    "plug_board_windows_mixer_opened": [
+      {
+        "id": "default_plug_board_windows_mixer_opened_001",
+        "category": "plug_board",
+        "text": "Opening Windows Mixer. Try not to undo everything.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_windows_mixer_opened_002",
+        "category": "plug_board",
+        "text": "Off to Windows Settings. Good luck in there.",
+        "weight": 1,
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_windows_mixer_opened_003",
+        "category": "plug_board",
+        "text": "Windows Mixer opened. The scenic route.",
+        "weight": 1,
+        "expression": "thinking",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_plug_board_windows_mixer_opened_004",
+        "category": "plug_board",
+        "text": "Here's the Windows mixer. I was doing fine, thanks.",
+        "weight": 1,
+        "expression": "talking",
+        "fallback_expression": "idle"
+      }
     ]
   }
 }

@@ -35,6 +35,7 @@ std::unique_ptr<wxMenu> Frame::shell_menu() {
         menu->Append(id, title)->Enable(enabled);
         menu->Bind(wxEVT_MENU, [action](wxCommandEvent&) { action(); }, id);
     };
+    add("Plug Board", [this] { perform_shell_action(ShellAction::PlugBoard); });
     add("Open AudioHole", [this] { perform_shell_action(ShellAction::Open); });
     add(
         "Start Routing", [this] { perform_shell_action(ShellAction::Start); },
@@ -70,6 +71,10 @@ void Frame::perform_shell_action(ShellAction action) {
     if (IsBeingDeleted())
         return;
     switch (action) {
+    case ShellAction::PlugBoard:
+        open();
+        select_page(PlugBoardPage, true);
+        break;
     case ShellAction::Open:
         open();
         break;
@@ -102,6 +107,7 @@ void Frame::initialize_shell_controls() {
         // Shift+right-click and Alt+Space retain the native window commands too.
         ModifyMenuW(menu, SC_CLOSE, MF_BYCOMMAND | MF_STRING, SC_CLOSE, L"Close window\tAlt+F4");
         AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+        AppendMenuW(menu, MF_STRING, shell_plug_board_command, L"Plug Board");
         AppendMenuW(menu, MF_STRING, shell_controls_command, L"AudioHole controls…");
         AppendMenuW(menu, MF_STRING, shell_exit_command, L"Exit AudioHole");
     }

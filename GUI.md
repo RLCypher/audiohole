@@ -48,11 +48,12 @@ AudioHole connects arbitrary Windows audio devices as though they were connected
 
 ## 3. Main Navigation
 
-The initial GUI should have four primary tabs:
+The GUI has five primary tabs:
 
 | Tab | Purpose |
 |---|---|
 | **Profiles** | Create, configure, and activate audio connections |
+| **Plug Board** | Assign applications to playback sockets and manage routing boards |
 | **Devices** | Browse, identify, rename, and inspect discovered devices |
 | **Scanning** | Discover and probe devices, with live diagnostic output |
 | **Settings** | Application behavior, notifications, defaults, and advanced preferences |
@@ -156,7 +157,7 @@ Explain that AudioHole may remain Ready until required hardware becomes availabl
 
 **Step 9 — Finish**
 
-Show where to find the Profiles, Devices, Scanning, and Settings tabs.
+Show where to find the Profiles, Plug Board, Devices, Scanning, and Settings tabs.
 
 ### 4.3 Skipping the Introduction
 
@@ -1626,7 +1627,7 @@ All common main-window, setup, diagnostics, profile, settings, and Test Beep use
 
 D-019's eight canonical states include Stopping; resolving is internal to Starting. Capacity displays count enabled holes in the armed plan, including those waiting/recovering, while actual operating paths and measured performance remain separately visible. Eight holes is not a hardware guarantee.
 
-wxWidgets is the leading candidate only. The D-031 prototype must demonstrate the existing four tabs, searchable selectors, recommendations, diagnostics, accessibility/DPI behavior, tray integration, and authored Norm/Vanilla/UwU modes before final selection.
+wxWidgets is the leading candidate only. The D-031 prototype must demonstrate the five tabs, searchable selectors, recommendations, diagnostics, accessibility/DPI behavior, tray integration, and authored Norm/Vanilla/UwU modes before final selection.
 
 A direction's single format/buffer control does not establish identical effective capture and render parameters. Show actual conversion/compensation and evidence limitations; exact endpoint-specific controls depend on O-004. Nominal-rate compatibility does not prove conversion-free or bit-perfect operation. O-005 leaves final direct-transfer eligibility, instability thresholds, compensation algorithms, and public controls undecided. Automatic is the proposed prototype default with proactive compensation permitted for evaluation; strict preservation remains internal/experimental. Do not expose an invented selector or silently promise unchanged samples.
 
@@ -2235,3 +2236,11 @@ routing backend. Stop cancels a pending restart; backend failures retain the
 saved edits and remain visible. Incidental panel refreshes preserve pending
 text; invalid tuning blocks Save/navigation instead of restoring older values.
 See the [field mapping and audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
+
+## Owner-authorized Plug Board tab
+
+Plug Board appears between Profiles and Devices. Embed the supplied 0.2.6
+socket workspace and settings drawer without changing their layout or controls.
+It follows the host appearance and personality setting. See
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md) for identity, policy,
+visibility, tutorial and lifetime contracts.

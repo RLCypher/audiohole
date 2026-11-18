@@ -2045,3 +2045,10 @@ preference files receive the defaults without being rewritten merely by loading.
 Temporary diagnostic state and transient Windows endpoint bindings are never
 written into profile records; the existing local scanner binding supplies an
 explicit device check's physical target.
+
+## Plug Board library
+
+The embedded module retains its supplied version-1 portable board library,
+checked JSON replacement and separate machine-local state. Existing profile
+and device schemas remain unchanged. The host storage location and tutorial
+isolation are documented in [PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).

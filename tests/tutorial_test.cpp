@@ -8,6 +8,7 @@ struct Lesson {
     Tutorial lesson;
     SimulatedController sandbox{true};
     Profile draft;
+    TutorialPlugBoard practice;
     int page = 0;
     void event(const char* action) {
         lesson.event(action, sandbox.snapshot(), draft, draft.holes.empty() ? -1 : 0, page);
@@ -25,8 +26,8 @@ struct Lesson {
         choice();
         choice();
         choice();
-        navigate(1);
-        navigate(2);
+        navigate(DevicesPage);
+        navigate(ScanningPage);
         choice();
         choice();
         ASSERT_EQ(lesson.beat(), "N007");
@@ -42,7 +43,7 @@ struct Lesson {
         to_scan();
         scan();
         choice();
-        navigate(1);
+        navigate(DevicesPage);
         choice();
         choice();
         event("device_edit");
@@ -54,7 +55,7 @@ struct Lesson {
         out.display_name = "My headphones";
         sandbox.update_endpoint(out);
         event("device_saved");
-        navigate(0);
+        navigate(ProfilesPage);
         const auto id = sandbox.create_profile("Practice");
         draft = *profile(sandbox.snapshot(), id);
         event("profile_created");
@@ -93,6 +94,58 @@ struct Lesson {
         event("saved");
         choice();
     }
+    void to_plug() {
+        to_route();
+        route();
+        for (int i = 0; i < 6; ++i)
+            choice();
+        ASSERT_EQ(lesson.beat(), "PB001");
+    }
+    void plug_lesson(int branch = 0, bool finish = true) {
+        ASSERT_EQ(lesson.beat(), "PB001");
+        auto& board = practice;
+        board = {};
+        board.sockets = {{"system", "System", ""}};
+        board.game_app = "game";
+        board.music_app = "music";
+        lesson.plug_board(board);
+        navigate(PlugBoardPage);
+        ASSERT_EQ(lesson.beat(), "PB002");
+        choice(branch);
+        ASSERT_EQ(lesson.beat(), "PB003");
+        EXPECT_TRUE(
+            lesson.view().text.starts_with(branch == 0 ? "Exactly." : "As many as you please."));
+        choice(branch);
+        ASSERT_EQ(lesson.beat(), "PB004");
+        board.sockets.push_back({"songs", "New Socket", ""});
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB005");
+        board.sockets[1].name = "My playlist";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB006");
+        board.sockets[1].endpoint = "tutorial-music";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB007");
+        board.sockets.push_back({"explosions", "New Socket", ""});
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB008");
+        board.sockets[2].name = "Explosions";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB009");
+        board.sockets[2].endpoint = "tutorial-game";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB010");
+        board.assignments["game"] = "explosions";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB011");
+        board.assignments["music"] = "songs";
+        lesson.plug_board(board);
+        ASSERT_EQ(lesson.beat(), "PB012");
+        if (finish) {
+            choice(branch);
+            ASSERT_EQ(lesson.beat(), "PB013");
+        }
+    }
     void route() {
         ASSERT_TRUE(sandbox.activate(draft.id).ok);
         event("routing_started");
@@ -105,7 +158,7 @@ struct Lesson {
 };
 TEST(Tutorial, CatalogKeepsExactDialogueBranchesAndNoSpeakerPrefix) {
     auto catalog = nlohmann::json::parse(tutorial_catalog());
-    EXPECT_EQ(catalog.size(), 67u);
+    EXPECT_EQ(catalog.size(), 89u);
     for (const auto& beat : catalog) {
         if (beat.contains("text"))
             EXPECT_FALSE(beat["text"].get<std::string>().starts_with("NORM:"));
@@ -135,14 +188,14 @@ TEST(Tutorial, CompletionComesOnlyFromConfirmedSimulationEvents) {
     h.sandbox.advance(1);
     h.event("scan_completed");
     EXPECT_EQ(h.lesson.beat(), "N010");
-    EXPECT_EQ(h.sandbox.snapshot().endpoints.size(), 4u);
+    EXPECT_EQ(h.sandbox.snapshot().endpoints.size(), tutorial_devices().size());
 }
 TEST(Tutorial, TwoDistinctExplicitDeviceSavesAreRequired) {
     Lesson h;
     h.to_scan();
     h.scan();
     h.choice();
-    h.navigate(1);
+    h.navigate(DevicesPage);
     h.choice();
     h.choice();
     const auto guided = h.lesson.view().targets;
@@ -191,8 +244,8 @@ TEST(Tutorial, BothMicrophoneBranchesCompleteWithoutMeasuringAnyAudio) {
         h.choice();
         h.choice();
         h.choice();
-        EXPECT_EQ(h.lesson.beat(), "N033");
-        h.navigate(3);
+        h.plug_lesson(branch);
+        h.navigate(SettingsPage);
         EXPECT_FALSE(h.lesson.complete());
         h.choice();
         EXPECT_TRUE(h.lesson.complete());
@@ -250,13 +303,13 @@ TEST(Tutorial, UserActionsDismissClickQuipsAndBypassReminderRetainsMicrophoneCho
     EXPECT_NE(h.lesson.view().text, before.text);
     h.event("exclusive"); // An unrelated, confirmed edit does not complete the step.
     EXPECT_EQ(h.lesson.view().text, before.text);
-    h.navigate(3);
+    h.navigate(SettingsPage);
     EXPECT_EQ(h.lesson.beat(), "N028");
     EXPECT_TRUE(h.lesson.view().sightseeing);
     EXPECT_TRUE(h.lesson.view().choices.empty());
     EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
     EXPECT_FALSE(h.lesson.choose(before.choices[0].id));
-    h.navigate(0);
+    h.navigate(ProfilesPage);
     EXPECT_EQ(h.lesson.view().text, before.text);
     EXPECT_EQ(h.lesson.view().choices[0].id, before.choices[0].id);
     EXPECT_FALSE(h.lesson.complete());
@@ -285,7 +338,7 @@ TEST(Tutorial, FictionalInventoryIsOfferedAndDiscoveryPreservesEditsOnRescan) {
     sandbox.scan(true, true, ScanScope::Full);
     sandbox.advance(20000);
     EXPECT_GT(sandbox.snapshot().scanner.inventory_revision, revision);
-    EXPECT_EQ(configuration_devices(sandbox.snapshot()).size(), 4u);
+    EXPECT_EQ(configuration_devices(sandbox.snapshot()).size(), tutorial_devices().size());
     auto edited = *endpoint(sandbox.snapshot(), "tutorial-mic");
     edited.display_name = "Desk mic";
     edited.notes = "Keep notes";
@@ -306,7 +359,7 @@ TEST(Tutorial, DeviceEditorGuidanceTracksIntendedSelectionAndConfirmedSave) {
     h.to_scan();
     h.scan();
     h.choice();
-    h.navigate(1);
+    h.navigate(DevicesPage);
     h.choice();
     h.choice();
     ASSERT_EQ(h.lesson.beat(), "N014");
@@ -362,22 +415,22 @@ TEST(Tutorial, SightseeingOnlyHighlightsRequiredTabAndRestoresExactBranch) {
     Lesson h;
     h.to_scan();
     const auto before = h.lesson.view();
-    h.navigate(3);
+    h.navigate(SettingsPage);
     EXPECT_TRUE(h.lesson.view().sightseeing);
     EXPECT_TRUE(h.lesson.view().choices.empty());
     EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"scan_tab"});
     h.lesson.click(1000);
     EXPECT_TRUE(h.lesson.view().sightseeing);
     EXPECT_TRUE(h.lesson.view().choices.empty());
-    h.navigate(2);
+    h.navigate(ScanningPage);
     EXPECT_FALSE(h.lesson.view().sightseeing);
     EXPECT_EQ(h.lesson.view().beat, before.beat);
     EXPECT_EQ(h.lesson.view().text, before.text);
     EXPECT_EQ(h.lesson.view().targets, before.targets);
     h.scan();
-    h.navigate(3);
+    h.navigate(SettingsPage);
     EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"scan_tab"});
-    h.navigate(2);
+    h.navigate(ScanningPage);
     EXPECT_FALSE(h.lesson.view().choices.empty());
 }
 
@@ -418,7 +471,7 @@ TEST(Tutorial, InvalidScanChoicesGuideBackToOptionsAndEarlyProfilesAreExplained)
     f.event("scan_options");
     f.scan();
     f.choice();
-    f.navigate(1);
+    f.navigate(DevicesPage);
     f.choice();
     f.choice();
     auto mic = *endpoint(f.sandbox.snapshot(), "tutorial-mic");
@@ -430,10 +483,10 @@ TEST(Tutorial, InvalidScanChoicesGuideBackToOptionsAndEarlyProfilesAreExplained)
     f.sandbox.update_endpoint(speakers);
     f.event("device_saved");
     f.sandbox.create_profile("Ahead of Norm");
-    f.navigate(0);
+    f.navigate(ProfilesPage);
     EXPECT_EQ(f.lesson.beat(), "N017");
     EXPECT_TRUE(f.lesson.view().text.starts_with("Looks like you got a little ahead of me"));
-    f.page = 2;
+    f.page = ScanningPage;
     f.event("observe");
     f.lesson.repeat();
     EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
@@ -449,9 +502,9 @@ TEST(Tutorial, ClearingEarlierAssignmentGuidesBackUntilThatRequirementIsRepaired
     EXPECT_EQ(f.lesson.beat(), "N021");
     EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"forward_destination"});
     EXPECT_NE(f.lesson.view().text.find("Sure. No rush"), std::string::npos);
-    f.navigate(2);
+    f.navigate(ScanningPage);
     EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profiles_tab"});
-    f.navigate(0);
+    f.navigate(ProfilesPage);
     f.draft.holes[0].forward.destination = "tutorial-mixer-out";
     f.event("endpoints");
     EXPECT_EQ(f.lesson.beat(), "N021A");
@@ -491,4 +544,65 @@ TEST(Tutorial, ARevertedButStillDirtyEditorRequiresSaveBeforeStarting) {
     EXPECT_EQ(f.lesson.beat(), "N024");
     EXPECT_EQ(f.lesson.view().targets, std::vector<std::string>{"profile_save"});
     EXPECT_FALSE(f.lesson.ready_to_route(f.draft, 0));
+}
+
+TEST(Tutorial, PlugBoardChecksAssignmentsAtTheChoiceAndPreservesOptionalExploration) {
+    Lesson h;
+    h.to_plug();
+    h.plug_lesson(1, false);
+    h.practice.assignments["game"] = "songs";
+    h.lesson.plug_board(h.practice);
+    const auto next = h.lesson.view().choices[0].id;
+    EXPECT_FALSE(h.lesson.choose(next));
+    EXPECT_EQ(h.lesson.beat(), "PB012");
+    EXPECT_NE(h.lesson.view().text.find("Before we move on"), std::string::npos);
+    h.practice.assignments["game"] = "explosions";
+    h.lesson.plug_board(h.practice);
+    ASSERT_TRUE(h.lesson.choose(next));
+    EXPECT_EQ(h.lesson.beat(), "PB013");
+    h.practice.sockets.clear(); // Exploration no longer enforces the exercise.
+    h.lesson.plug_board(h.practice);
+    EXPECT_EQ(h.lesson.beat(), "PB013");
+    h.navigate(SettingsPage);
+    EXPECT_EQ(h.lesson.beat(), "N034");
+    EXPECT_TRUE(h.lesson.view().text.starts_with("Ah, there you are. Last stop: Settings."));
+}
+TEST(Tutorial, DeletingARequiredPracticeSocketRestoresItsCreationSection) {
+    Lesson h;
+    h.to_plug();
+    h.plug_lesson(0, false);
+    h.practice.sockets.erase(h.practice.sockets.begin() + 2);
+    h.lesson.plug_board(h.practice);
+    EXPECT_EQ(h.lesson.beat(), "PB007");
+    EXPECT_EQ(h.lesson.view().expression, "surprised");
+    EXPECT_EQ(h.lesson.view().targets, std::vector<std::string>{"plug_create"});
+    EXPECT_TRUE(h.lesson.view().choices.empty());
+    h.lesson.tick(999999);
+    EXPECT_EQ(h.lesson.beat(), "PB007");
+}
+TEST(Tutorial, PracticeSocketCreationBeforeItsCueCannotSatisfyTheNewSocketObjective) {
+    Lesson h;
+    h.to_plug();
+    TutorialPlugBoard practice;
+    practice.sockets = {{"system", "System", ""}, {"early", "Early socket", "tutorial-music"}};
+    h.lesson.plug_board(practice);
+    h.navigate(PlugBoardPage);
+    h.choice();
+    h.choice();
+    h.lesson.plug_board(practice);
+    EXPECT_EQ(h.lesson.beat(), "PB004");
+    practice.sockets.push_back({"new", "New socket", ""});
+    h.lesson.plug_board(practice);
+    EXPECT_EQ(h.lesson.beat(), "PB005");
+    h.lesson.plug_board(practice); // The unchanged default name is not a rename.
+    EXPECT_EQ(h.lesson.beat(), "PB005");
+    practice.sockets.back().name = "Anything I choose";
+    h.lesson.plug_board(practice);
+    EXPECT_EQ(h.lesson.beat(), "PB006");
+    practice.sockets.back().endpoint = "tutorial-chat";
+    h.lesson.plug_board(practice);
+    EXPECT_EQ(h.lesson.beat(), "PB006");
+    practice.sockets.back().endpoint = "tutorial-music";
+    h.lesson.plug_board(practice);
+    EXPECT_EQ(h.lesson.beat(), "PB007");
 }

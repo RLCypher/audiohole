@@ -47,8 +47,9 @@ try {
         configuration = $Configuration
         platform = 'Windows x64'
         source_dirty = $dirty
-        purpose = 'AudioHole GUI, engine 0.6 integration and fictional tutorial evaluation'
+        purpose = 'AudioHole GUI, engine 0.6, Plug Board 0.2.6 and fictional tutorial evaluation'
         engine_module = '0.6'
+        plug_board_module = '0.2.6'
         native_latency_preset = 'Low'
         executable = 'AudioHole.exe'
         actions_run = $runUrl

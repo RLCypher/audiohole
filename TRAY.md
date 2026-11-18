@@ -1396,3 +1396,10 @@ configuration format. Unattended smoke tests never publish persistent Jump Lists
 Current direction-status captions use Forward and Return, matching Profiles and
 monitoring/beep selectors. This is display wording only; internal `reverse`
 identifiers remain unchanged. The shared taskbar controls inherit these captions.
+
+## Plug Board shortcut
+
+The tray context menu, native window/taskbar system menu and Jump List include
+**Plug Board**. It shows the existing AudioHole window and selects Plug Board,
+without starting or stopping routing. The existing same-executable shell relay
+handles `--taskbar-action plug-board`.

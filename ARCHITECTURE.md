@@ -1517,3 +1517,11 @@ See ENGINE_INTEGRATION.md for admission/progress, access/fallback, runtime-inten
 and diagnostic contracts. There is no production supervisor/recovery/transactional
 live-switch implementation added by this increment. Tutorial never creates the
 real service or touches stored device/profile data.
+
+## Embedded Plug Board
+
+The owner-authorized Plug Board 0.2.6 module has an application-lifetime control
+service and an embedded wx view. It consumes scanner bindings and committed
+profile activations; it never changes the engine or profile editor. Native app
+policy, discovery and storage remain on module-owned workers. See
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).

@@ -1,0 +1,137 @@
+AUDIOHOLE — PLUG BOARD TUTORIAL INSERT (NORM)
+Version: 1.1 — Branches select the next dialogue variant
+Placement: Immediately before the existing Settings section of the main tutorial.
+Source: Plug Board Tutorial workflow(2).txt
+
+INTEGRATION NOTES
+- This is a script for the existing fictional tutorial sandbox, not a command to modify real Windows audio routing.
+- Preserve the existing welcome, earlier device/profile lessons, and Settings walkthrough. The tutorial's previously scanned BoomSlab 9001 is the default playback device at the start of this insert.
+- The practice application roster includes Spooty and Felony Jaywalking LXVII. All practice applications initially appear in the System socket. Other apps may be present; do not require specific unlisted ones.
+- MixBoard Music and MixBoard Game are available as previously scanned pretend playback endpoints. The tutorial may accept any name for the newly created Music and Game sockets; advance by socket identity and endpoint, not literal socket label.
+- All assignments, endpoints, and mixing behavior in this walkthrough are simulated. No real applications, devices, Windows mixer preferences, or persistent user boards are changed.
+- Every beat has an expression, a cue, and authored dialogue. Use fallback expression: idle. Only advance after the required GUI interaction has completed and been verified. At choice beats, the selected button determines which variation of the NEXT scripted dialogue is displayed; never display a standalone choice reaction, require a separate Continue button, or insert another dialogue step.
+- The existing personality response catalog is not a substitute for this tutorial. Suppress unrelated random event chatter while guided tutorial dialogue is playing.
+- The System socket remains present and is not renamed or deleted. Do not require opening the settings drawer unless that is necessary to access socket creation in the implemented UI.
+- For all cues, identify the actual UI control rather than relying on an assumed button location; highlight the relevant tab, socket controls, endpoint dropdown, or app row as appropriate.
+- Treat successful simulated assignment separately from actual routing: never say real Windows playback was moved.
+
+======================================================================
+PLUG BOARD — A LITTLE APPLICATION ORGANIZATION
+======================================================================
+
+PB001 [talking]
+Cue: Begin this insert after the preceding tutorial section. Highlight the Plug Board tab; require the user to open it.
+NORM: We've connected devices. Now let's tell individual apps where to send their audio. Open Plug Board; I've got a small organizational problem for you.
+
+PB002 [thinking]
+Cue: Plug Board tab opened; highlight the socket columns.
+NORM: These columns are sockets. Each points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds.
+UI: Show two choice buttons: "So they're categories?" / "As many as I want?". The chosen button advances directly to PB003, selecting its corresponding dialogue variant; do not display a separate reaction or Continue control.
+
+PB003 — CHOICE-DEPENDENT NEXT LINE
+Cue: Show the fake-app entries in System; highlight System and its BoomSlab 9001 endpoint.
+IF PB002 CHOICE "So they're categories?" [talking]
+NORM: Exactly. Categories with an output device attached. I've lent you a few of my totally legit apps to try it out; they're all in System, currently using the BoomSlab 9001.
+IF PB002 CHOICE "As many as I want?" [smug]
+NORM: As many as you please. Whether you can organize that mess is another question. I've put my totally legit practice apps in System, pointing at our BoomSlab 9001.
+UI: Show two choice buttons: "Totally legit, huh?" / "Why System?". The chosen button advances directly to PB004, selecting its corresponding dialogue variant.
+
+PB004 — CHOICE-DEPENDENT NEXT LINE [working]
+Cue: Highlight the socket-creation control; require creation of one new socket after the line is displayed.
+IF PB003 CHOICE "Totally legit, huh?" [suspicious]
+NORM: They passed every inspection I performed in my imagination. Anyway, make a new socket for music; let's give those suspiciously legal tunes their own destination.
+IF PB003 CHOICE "Why System?" [talking]
+NORM: System catches new apps until you assign them somewhere else. Let's create a new socket for music, so it doesn't all have to go through System.
+
+PB005 [talking]
+Cue: New socket successfully created; highlight its rename action or editable name; require the user to rename it to any chosen name for music.
+NORM: Give that socket a music-related name. Whatever makes sense to you; we're not grading the poetry.
+
+PB006 [thinking]
+Cue: Music socket renamed; highlight its playback endpoint dropdown; require selecting MixBoard Music.
+NORM: Now set its output to MixBoard Music. That's the pretend mixer channel we'll use for music.
+
+PB007 [happy]
+Cue: Music socket assigned to MixBoard Music; require creation of another socket.
+NORM: Good. Let's make a second socket for games, so the explosions don't have to share a channel with the playlist.
+
+PB008 [working]
+Cue: Second socket created; highlight rename action; require any game-related name distinct from the music socket.
+NORM: Name this one for games. Again, any sensible label will do.
+
+PB009 [talking]
+Cue: Game socket renamed; highlight endpoint dropdown; require selecting MixBoard Game.
+NORM: Give the game socket MixBoard Game as its destination. One channel for games, one for music. Even I can keep track of that.
+
+PB010 [smug]
+Cue: Game socket assigned to MixBoard Game; highlight Felony Jaywalking LXVII in System and the game socket; require moving that application to the game socket by drag-and-drop or its context menu.
+NORM: Find Felony Jaywalking LXVII in System and move it to your game socket. I still don't understand the hype. People act like it's the sixty-seventh coming.
+
+PB011 [deadpan]
+Cue: Felony Jaywalking LXVII is assigned to the game socket; highlight Spooty in System and the music socket; require moving Spooty to the music socket.
+NORM: There. Civilization survives. Now move Spooty into your music socket so it gets its own mixer channel.
+
+PB012 [happy]
+Cue: Spooty is assigned to the music socket; highlight the two new sockets and their device dropdowns.
+NORM: And there it is. Game and music now feed separate channels on our pretend mixing board, so you can control them independently from the external device.
+UI: Show two choice buttons: "So I can balance them separately?" / "And other apps work the same way?". The choice advances directly to PB013 and selects its corresponding dialogue variant; no standalone reaction or Continue control.
+
+PB013 — CHOICE-DEPENDENT NEXT LINE
+Cue: Tutorial's Plug Board task completed. Remove required-action highlights; allow optional sandbox exploration. Highlight Settings as the next destination; wait for the user to open it.
+IF PB012 CHOICE "So I can balance them separately?" [talking]
+NORM: Exactly. Separate physical volume controls for games and music. Feel free to experiment, and meet me in Settings when you're done. One last thing to show you.
+IF PB012 CHOICE "And other apps work the same way?" [smug]
+NORM: Yep. Move an app to a socket and it follows that socket's destination. Play around if you like; I'll be in Settings with one last thing to show you.
+
+PB014 [idle]
+Cue: User opens Settings after PB013. Resume the existing Settings tutorial sequence at its first Settings beat; do not replay its prior sections.
+NORM: Ah, there you are. Last stop: Settings.
+
+======================================================================
+OPTIONAL REACTIONS AND GUARDRAILS
+======================================================================
+
+PB-R01 [concerned]
+Condition: Required app cannot currently be found in the fictional roster.
+NORM: Looks like one of our practice apps wandered off. Let's restore the tutorial's fake app list before we continue.
+
+PB-R02 [thinking]
+Condition: User creates the requested socket but has not assigned its required output yet.
+NORM: The socket exists; it still needs its destination. Check the output dropdown at the top.
+
+PB-R03 [talking]
+Condition: User chooses a different socket name from the example.
+NORM: That name works. The device assignment is what matters here.
+
+PB-R04 [concerned]
+Condition: User moves an app to the wrong practice socket.
+NORM: Close, but that one's headed to the wrong place. Give it another drag, or use its right-click menu.
+
+PB-R05 [deadpan]
+Condition: User asks whether the exercise affects real hardware.
+NORM: No. It's a fake board with fake devices and apps. Your actual Windows audio setup is untouched.
+
+PB-R06 [smug]
+Condition: User returns to the Plug Board during optional exploration.
+NORM: Still rearranging things? Take your time. I'll be in Settings when you've achieved socket enlightenment.
+
+PB-R07 [talking]
+Condition: User requests a reminder about dragging applications.
+NORM: Grab the app and drop it into the destination socket. Right-clicking it works too, if you'd rather skip the dragging.
+
+PB-R08 [thinking]
+Condition: User attempts to continue before both applications are correctly assigned.
+NORM: Before we move on, Felony Jaywalking goes in Games and Spooty goes in Music. The labels can be yours; the destinations need to match.
+
+IMPLEMENTATION CHECKLIST
+- PB001 requires Plug Board tab activation.
+- PB002 and PB003 present choices that determine PB003 and PB004 wording respectively; no intermediate reaction text.
+- PB004–PB009 create and configure two new sockets, without requiring exact names. Both PB004 variants require the same socket creation action.
+- PB010 requires Felony Jaywalking LXVII assigned to the game socket.
+- PB011 requires Spooty assigned to the music socket.
+- PB012 presents the independent channel-volume concept and two choices; PB013 has two corresponding variants of the following dialogue.
+- PB013 allows optional exploration and waits for Settings navigation.
+- PB014 bridges into the existing Settings tutorial; do not duplicate or replace that section.
+- All beats use approved Norm states. Deadpan uses the static pose, not an animation loop.
+
+END OF PLUG BOARD INSERT

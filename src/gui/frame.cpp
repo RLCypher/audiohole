@@ -157,7 +157,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     header->Add(avatar_region_, 0, wxEXPAND | wxALL, FromDIP(6));
     root->Add(header, 0, wxEXPAND);
     auto* navigation_row = new wxBoxSizer(wxHORIZONTAL);
-    for (std::size_t index = 0; index < 4; ++index) {
+    for (std::size_t index = 0; index < AppPageCount; ++index) {
         auto* tab = new NavigationButton(this);
         tab->SetMinSize(wxSize(190, 36));
         navigation_.push_back(tab);
@@ -165,13 +165,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         tab->Bind(wxEVT_TOGGLEBUTTON, [this, index](wxCommandEvent&) { select_page(index); });
         tab->Bind(wxEVT_KEY_DOWN, [this, index](wxKeyEvent& event) {
             if (event.GetKeyCode() == WXK_LEFT)
-                select_page((index + 3) % 4, true);
+                select_page((index + AppPageCount - 1) % AppPageCount, true);
             else if (event.GetKeyCode() == WXK_RIGHT)
-                select_page((index + 1) % 4, true);
+                select_page((index + 1) % AppPageCount, true);
             else if (event.GetKeyCode() == WXK_HOME)
-                select_page(0, true);
+                select_page(ProfilesPage, true);
             else if (event.GetKeyCode() == WXK_END)
-                select_page(3, true);
+                select_page(SettingsPage, true);
             else
                 event.Skip();
         });
@@ -180,6 +180,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     notebook_ = new wxSimplebook(this, wxID_ANY);
     root->Add(notebook_, 1, wxEXPAND | wxALL, 6);
     build_profiles();
+    build_plug_board();
     build_devices();
     build_scan();
     build_settings();
@@ -310,6 +311,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
     notebook_->Bind(wxEVT_BOOKCTRL_PAGE_CHANGED, [this](wxBookCtrlEvent& e) {
         end_observation();
         update_navigation();
+        refresh_plug_board();
         tutorial_event("navigation");
         e.Skip();
     });
@@ -323,12 +325,13 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         present(presentation::Message::Ready);
     Bind(wxEVT_CHAR_HOOK, [this](wxKeyEvent& event) {
         if (event.ControlDown() && !event.AltDown() && event.GetKeyCode() == 'S' &&
-            notebook_->GetSelection() == 0 && !bundle_generation_ && profile_edits_pending())
+            notebook_->GetSelection() == ProfilesPage && !bundle_generation_ &&
+            profile_edits_pending())
             save(false);
         else if (event.ControlDown() && event.GetKeyCode() == WXK_TAB)
             select_page((static_cast<std::size_t>(notebook_->GetSelection()) +
-                         (event.ShiftDown() ? 3 : 1)) %
-                            4,
+                         (event.ShiftDown() ? AppPageCount - 1 : 1)) %
+                            AppPageCount,
                         true);
         else
             event.Skip();
@@ -341,6 +344,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         },
         avatar_timer_.GetId());
     Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
+        refresh_plug_board();
         if (event.IsShown() && !IsIconized()) {
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
@@ -352,6 +356,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
         event.Skip();
     });
     Bind(wxEVT_ICONIZE, [this](wxIconizeEvent& event) {
+        refresh_plug_board();
         if (!event.IsIconized() && IsShown()) {
             avatar_host_->activity(avatar::monotonic_ms());
             poll_avatar();
@@ -390,7 +395,7 @@ int Frame::FilterEvent(wxEvent& event) {
         if (tutorial_ && window &&
             (window == profile_editor_ || profile_editor_->IsDescendant(window)))
             tutorial_scroll_duration_ = 0;
-        if (window && notebook_->GetPage(0)->IsDescendant(window) &&
+        if (window && notebook_->GetPage(ProfilesPage)->IsDescendant(window) &&
             chain_field_wheel(*window, static_cast<wxMouseEvent&>(event)))
             return wxEventFilter::Event_Processed;
         for (auto* control = window; control && control != this; control = control->GetParent()) {
@@ -405,8 +410,8 @@ int Frame::FilterEvent(wxEvent& event) {
         (type == wxEVT_KEY_DOWN || type == wxEVT_CHAR_HOOK || type == wxEVT_CHAR ||
          type == wxEVT_LEFT_DOWN || type == wxEVT_LEFT_DCLICK || type == wxEVT_RIGHT_DOWN)) {
         auto* window = dynamic_cast<wxWindow*>(event.GetEventObject());
-        if (window &&
-            (window == notebook_->GetPage(0) || notebook_->GetPage(0)->IsDescendant(window)))
+        if (window && (window == notebook_->GetPage(ProfilesPage) ||
+                       notebook_->GetPage(ProfilesPage)->IsDescendant(window)))
             return wxEventFilter::Event_Processed;
     }
     if (type == wxEVT_MENU) {
@@ -429,6 +434,11 @@ void Frame::exit() {
     if (closing_)
         return;
     closing_ = true;
+    if (plug_board_) {
+        plug_board_view_->set_host_visible(false);
+        plug_board_view_->detach_module();
+        plug_shutdown_ = plug_board_->begin_shutdown();
+    }
     controller_->stop();
     end_observation();
     const auto& state = controller_->snapshot();
@@ -445,6 +455,13 @@ void Frame::exit() {
     finish_exit();
 }
 void Frame::finish_exit() {
+    if (plug_shutdown_.valid() &&
+        plug_shutdown_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+        start_->Disable();
+        notebook_->Disable();
+        timer_.Start(100);
+        return;
+    }
     timer_.Stop();
     tuning_timer_.Stop();
     stop_avatar();
@@ -590,16 +607,16 @@ void Frame::layout_header() {
         int borders = 2 * profile_columns_->GetBorderSize();
         if (const auto* item = GetSizer()->GetItem(notebook_))
             borders += item->GetBorder() * 2;
-        auto* page_layout = notebook_->GetPage(0)->GetSizer();
+        auto* page_layout = notebook_->GetPage(ProfilesPage)->GetSizer();
         if (const auto* item = page_layout->GetItem(profile_actions_))
             borders += item->GetBorder() * 2;
         if (const auto* item = page_layout->GetItem(profile_columns_))
             borders += item->GetBorder() * 2;
-        minimum.y =
-            std::max(minimum.y,
-                     header_height + navigation_[0]->GetContainingSizer()->GetMinSize().y +
-                         profile_actions_->GetEffectiveMinSize().y + profile_rows_->GetMinSize().y +
-                         borders + GetSize().y - GetClientSize().y);
+        minimum.y = std::max(
+            minimum.y,
+            header_height + navigation_[ProfilesPage]->GetContainingSizer()->GetMinSize().y +
+                profile_actions_->GetEffectiveMinSize().y + profile_rows_->GetMinSize().y +
+                borders + GetSize().y - GetClientSize().y);
     }
     minimum.x = std::max(minimum.x, header->GetMinSize().x + GetSize().x - GetClientSize().x);
     if (GetMinSize() != minimum)
@@ -690,7 +707,7 @@ void Frame::end_observation() {
 // Rich diagnostic text is a view, not a control/supervision clock. Refresh
 // immediately on state/assignment/issues changes; counters need only 5 Hz.
 void Frame::refresh_performance() {
-    if (!IsShown() || IsIconized() || notebook_->GetSelection() != 0) {
+    if (!IsShown() || IsIconized() || notebook_->GetSelection() != ProfilesPage) {
         performance_dirty_ = true;
         return;
     }
@@ -783,6 +800,7 @@ void Frame::refresh_log() {
 // GUI polling never creates commentary events; monotonic controller event
 // sequences gate presentation independently of the diagnostic view caches.
 void Frame::refresh() {
+    refresh_plug_board();
     const auto& s = controller_->snapshot();
     if (bundle_generation_ && s.scanner.completed_generation == bundle_generation_) {
         const bool inspecting = bundle_inspecting_, importing = bundle_importing_;
@@ -1583,7 +1601,7 @@ bool Frame::smoke(const wxString& directory) {
                     hole_remove_->GetName() == "Delete hole",
                 "Minus controls must have readable functional names");
         {
-            auto* page = notebook_->GetPage(2);
+            auto* page = notebook_->GetPage(ScanningPage);
             page->Layout();
             scan_output_split_->UpdateSize();
             const auto text = scan_state_->GetValue();
@@ -1677,7 +1695,7 @@ bool Frame::smoke(const wxString& directory) {
                     hold_expressions_->IsEnabled(),
                 "Disabling continuous playback did not restore hold/count controls");
         const auto check_profile_layout = [this, &require] {
-            auto* page = notebook_->GetPage(0);
+            auto* page = notebook_->GetPage(ProfilesPage);
             page->Layout();
             require(dynamic_cast<wxScrolledWindow*>(profile_sidebar_) == nullptr,
                     "Profile column must not scroll as one section");
@@ -1868,19 +1886,21 @@ bool Frame::smoke(const wxString& directory) {
         require(profile_notes_->GetValue() == original_notes &&
                     controller_->snapshot().revision == overflow_revision,
                 "Resizing profile fields changed editor or saved state");
-        notebook_->SetSelection(1);
-        notebook_->GetPage(1)->Layout();
+        notebook_->SetSelection(DevicesPage);
+        notebook_->GetPage(DevicesPage)->Layout();
         device_rows_->SetSashPosition(std::max(FromDIP(72), device_rows_->GetClientSize().y -
                                                                 device_notes_->GetCharHeight() * 3 -
                                                                 FromDIP(36)));
         for (auto* split : {device_columns_, device_rows_}) {
             const int before = move_divider(split);
-            require(notebook_->GetPage(1)->GetScreenRect().Contains(device_save_->GetScreenRect()),
+            require(notebook_->GetPage(DevicesPage)
+                        ->GetScreenRect()
+                        .Contains(device_save_->GetScreenRect()),
                     "Resizing device fields hid Save");
             split->SetSashPosition(before);
         }
-        notebook_->SetSelection(2);
-        notebook_->GetPage(2)->Layout();
+        notebook_->SetSelection(ScanningPage);
+        notebook_->GetPage(ScanningPage)->Layout();
         for (auto* control :
              std::vector<wxWindow*>{device_search_, device_name_, log_search_, delay_,
                                     animation_loops_, dfa_value_, dfa_stepper_})
@@ -1898,9 +1918,9 @@ bool Frame::smoke(const wxString& directory) {
             const auto console_size = console_->GetSize();
             const wxString long_status = "Scan status detail " + wxString('x', 600);
             scan_state_->ChangeValue("Short status");
-            notebook_->GetPage(2)->Layout();
+            notebook_->GetPage(ScanningPage)->Layout();
             scan_state_->ChangeValue(long_status + "\nSecond line\nThird line\nFourth line");
-            notebook_->GetPage(2)->Layout();
+            notebook_->GetPage(ScanningPage)->Layout();
             require(scan_state_->GetValue().Contains(long_status) &&
                         scan_output_split_->GetSashPosition() == chosen_sash &&
                         scan_state_->GetSize() == status_size &&
@@ -1909,7 +1929,7 @@ bool Frame::smoke(const wxString& directory) {
             scan_state_->ChangeValue(original_status);
         }
         {
-            auto* settings = notebook_->GetPage(3);
+            auto* settings = notebook_->GetPage(SettingsPage);
             auto* appearance =
                 wxWindow::FindWindowByName("Application and Tray settings", settings);
             auto* startup = wxWindow::FindWindowByName("Routing Activation settings", settings);
@@ -1941,7 +1961,7 @@ bool Frame::smoke(const wxString& directory) {
                 "Tray, without the "
                 "environment panel");
             const auto previous_page = notebook_->GetSelection();
-            notebook_->SetSelection(3);
+            notebook_->SetSelection(SettingsPage);
             settings->Layout();
             auto* update = wxWindow::FindWindowByLabel("Update", appearance);
             auto* restart = wxWindow::FindWindowByName("Restart AudioHole", appearance);
@@ -2068,7 +2088,7 @@ bool Frame::smoke(const wxString& directory) {
             console_->ChangeValue(original_console);
             console_->ShowPosition(console_->GetLastPosition());
         }
-        notebook_->SetSelection(0);
+        notebook_->SetSelection(ProfilesPage);
         SetClientSize(workspace_client);
         layout_header();
         for (std::size_t i = 0; i < dividers.size(); ++i)
@@ -2086,6 +2106,7 @@ bool Frame::smoke(const wxString& directory) {
                 self(self, child);
         };
         check_button_help(check_button_help, this);
+        plug_board_smoke(false);
         if (controller_->snapshot().operating_mode == OperatingMode::Test) {
             require(controller_->snapshot().profiles.empty() &&
                         controller_->snapshot().endpoints.empty(),
@@ -2525,7 +2546,7 @@ bool Frame::smoke(const wxString& directory) {
                         draft_.holes[hole_index_].forward.source &&
                     forward_.capture_check.meter->GetValue() > 0,
                 "Capture check failed to publish the explicit source and simulated level");
-        select_page(1, true);
+        select_page(DevicesPage, true);
         require(!controller_->snapshot().monitoring &&
                     controller_->snapshot().beep_destination.empty(),
                 "Changing tabs left a device diagnostic running");
@@ -2536,20 +2557,20 @@ bool Frame::smoke(const wxString& directory) {
         require(controller_->snapshot().monitor_source == "mixer-in" &&
                     device_check_.meter->IsShown(),
                 "Devices capture check did not use its selected endpoint");
-        select_page(2, true);
+        select_page(ScanningPage, true);
         require(!controller_->snapshot().monitoring,
                 "Leaving Devices for Scanning kept capture open");
-        select_page(1, true);
+        select_page(DevicesPage, true);
         require(select_device("vr-out"), "Could not select the device playback test target");
         device_check_.action->GetEventHandler()->ProcessEvent(device_capture);
         require(
             controller_->snapshot().beep_destination == "vr-out" && !device_check_.meter->IsShown(),
             "Devices playback check did not use its selected endpoint or retained capture meter");
-        select_page(3, true);
+        select_page(SettingsPage, true);
         require(controller_->snapshot().beep_destination.empty(),
                 "Leaving Devices for Settings kept playback open");
         select_device(previous_device);
-        select_page(0, true);
+        select_page(ProfilesPage, true);
         show_result({false, "Operational warning retained."}, true);
         const auto warning_occurrence = occurrence_;
         const auto warning_commentary = commentary_copy_;
@@ -2638,7 +2659,7 @@ bool Frame::smoke(const wxString& directory) {
                     "Status changes move or resize the personality card");
             require(card.GetHeight() >= FromDIP(156) && card.GetHeight() < FromDIP(240),
                     "Operation-mode commentary card lost its compact bounded height");
-            require(navigation_[0]->GetPosition().y - card.GetBottom() <= FromDIP(16),
+            require(navigation_[ProfilesPage]->GetPosition().y - card.GetBottom() <= FromDIP(16),
                     "Empty header space remains between the personality card and tabs");
             const auto* exit_button = routing_actions_->GetChildren().back()->GetWindow();
             require(card.GetLeft() == start_->GetRect().GetLeft() &&
@@ -2660,11 +2681,11 @@ bool Frame::smoke(const wxString& directory) {
                         avatar.GetSize() == previous_avatar_size,
                     "Window resizing reduces the full-height avatar");
             previous_avatar_size = avatar.GetSize();
-            require(avatar.GetTop() == region.GetTop() &&
-                        avatar.GetHeight() == region.GetHeight() &&
-                        avatar.GetTop() < start_->GetPosition().y &&
-                        navigation_[0]->GetPosition().y - avatar.GetBottom() <= FromDIP(16),
-                    "Operation-mode avatar does not occupy the full compact header height");
+            require(
+                avatar.GetTop() == region.GetTop() && avatar.GetHeight() == region.GetHeight() &&
+                    avatar.GetTop() < start_->GetPosition().y &&
+                    navigation_[ProfilesPage]->GetPosition().y - avatar.GetBottom() <= FromDIP(16),
+                "Operation-mode avatar does not occupy the full compact header height");
             if (static_cast<long long>(avatar.GetWidth()) * 768 <
                 static_cast<long long>(avatar.GetHeight()) * 512)
                 throw std::runtime_error("Avatar width constrains its rendered height: avatar=" +
@@ -2678,14 +2699,14 @@ bool Frame::smoke(const wxString& directory) {
                              region.GetWidth()) <= 1,
                     "Avatar is not centered in its right-hand region");
             require(card.GetRight() <= region.GetLeft() && avatar.GetRight() < GetClientSize().x &&
-                        avatar.GetBottom() < navigation_[0]->GetPosition().y,
+                        avatar.GetBottom() < navigation_[ProfilesPage]->GetPosition().y,
                     "Header regions overlap or clip the avatar");
             require(personality_heading_->GetPosition().x >= FromDIP(12) &&
                         personality_heading_->GetPosition().y >= FromDIP(12),
                     "Personality heading covers the rounded corner");
         }
         {
-            select_page(0);
+            select_page(ProfilesPage);
             const auto information = forward_.information->GetValue();
             const auto view = profile_editor_->GetViewStart();
             const auto revision = controller_->snapshot().revision;
@@ -2798,7 +2819,8 @@ bool Frame::smoke(const wxString& directory) {
         const auto cached = icon_cache.size();
         (void)icon_cache.get(32, State::Running);
         require(icon_cache.size() == cached, "Unchanged tray state regenerated an icon");
-        require(notebook_->GetPageCount() == 4, "Expected four native GUI pages");
+        require(notebook_->GetPageCount() == AppPageCount,
+                "Expected five native GUI pages including Plug Board");
         require(wxWindow::FindWindowByLabel(wxS("Export visible diagnostics…"), this) != nullptr,
                 "UTF-8 control copy changed under the Windows locale");
         select_profile("profile-duplex");
@@ -3047,11 +3069,11 @@ bool Frame::smoke(const wxString& directory) {
         }
         theme_choice_->SetSelection(0);
         apply_appearance();
-        select_page(0);
-        require(navigation_[0]->GetValue() && !navigation_[1]->GetValue(),
+        select_page(ProfilesPage);
+        require(navigation_[ProfilesPage]->GetValue() && !navigation_[DevicesPage]->GetValue(),
                 "Selected navigation state mismatch");
-        require(navigation_[0]->GetLabel() == wxS("[Profiles]") &&
-                    navigation_[1]->GetLabel() == notebook_->GetPageText(1),
+        require(navigation_[ProfilesPage]->GetLabel() == wxS("[Profiles]") &&
+                    navigation_[DevicesPage]->GetLabel() == notebook_->GetPageText(DevicesPage),
                 "Selected tab lacks textual distinction");
         const auto scan_options_revision = controller_->snapshot().revision;
         scan_mode_->SetSelection(1);
@@ -3107,7 +3129,7 @@ bool Frame::smoke(const wxString& directory) {
                     !console_->GetValue().empty(),
                 "New events missing after diagnostics clear");
         controller_->monitor(true);
-        notebook_->SetSelection(1);
+        notebook_->SetSelection(DevicesPage);
         require(!controller_->snapshot().monitoring, "Monitor survived panel closure");
         wxCommandEvent stop(wxEVT_BUTTON, stop_->GetId());
         stop_->GetEventHandler()->ProcessEvent(stop);
@@ -3115,7 +3137,7 @@ bool Frame::smoke(const wxString& directory) {
         refresh();
         require(controller_->snapshot().state == audiohole::State::Stopped,
                 "GUI Stop did not disarm");
-        notebook_->SetSelection(0);
+        notebook_->SetSelection(ProfilesPage);
         Layout();
         check_endpoint_heights();
         check_reset_layout();
@@ -3147,7 +3169,7 @@ bool Frame::smoke(const wxString& directory) {
                 destination.SelectObject(wxNullBitmap);
                 bitmap.SaveFile(directory + "/" + name + ".bmp", wxBITMAP_TYPE_BMP);
             };
-            notebook_->SetSelection(0);
+            notebook_->SetSelection(ProfilesPage);
             for (unsigned section = 0; section < 3; ++section) {
                 forward_.tuning->Expand();
                 for (unsigned i = 0; i < 3; ++i)
@@ -3166,9 +3188,9 @@ bool Frame::smoke(const wxString& directory) {
             wxCommandEvent theme(wxEVT_CHOICE, theme_choice_->GetId());
             theme_choice_->GetEventHandler()->ProcessEvent(theme);
             reset_layout();
-            for (unsigned i : {0u, 1u, 3u}) {
+            for (int i : {ProfilesPage, DevicesPage, SettingsPage}) {
                 notebook_->SetSelection(i);
-                if (i == 1 && playback_devices_->GetSelection() >= 0) {
+                if (i == DevicesPage && playback_devices_->GetSelection() >= 0) {
                     playback_devices_->SetCurrentItem(playback_devices_->RowToItem(
                         static_cast<unsigned>(playback_devices_->GetSelection())));
                     playback_devices_->GetMainWindow()->SetFocus();

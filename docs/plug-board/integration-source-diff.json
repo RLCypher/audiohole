@@ -1,0 +1,75 @@
+{
+  "module": "AudioHole Plug Board 0.2.6",
+  "adaptations": [
+    {
+      "path": "CMakeLists.txt",
+      "handover_sha256": "5b296f40f1bedf142ee15e3f34c4b0830b04a74c5599047e968301f86da34bab",
+      "integrated_sha256": "edc11a4329827d4ed8dc3ef66236f046db4c91f78f54987dd4103d4b58fae6c0"
+    },
+    {
+      "path": "include/audiohole/plug_board/module.hpp",
+      "handover_sha256": "5f54390d4defb3697f12f86877ac1a56d2e582299eb4fccdb834a3d17bd2ba41",
+      "integrated_sha256": "69ebcef1e6a039a85081fb2d3417b74739fa9e996b80d5d938388c0f0a0cc3dd"
+    },
+    {
+      "path": "include/audiohole/plug_board/simulation.hpp",
+      "handover_sha256": "2bdd58d3d36d17abb630ef3923d69869f2b0bc2d206aff2df3d281ef03a3d296",
+      "integrated_sha256": "7c1f3fb4360706d6f7544dacd8fb422557b3f8141972e19bb72dabd2dbb65e02"
+    },
+    {
+      "path": "include/audiohole/plug_board/storage.hpp",
+      "handover_sha256": "4565a756f33e177bbe9cabffd93b73fce0868d0629692ca5b846bbd24e2f73d8",
+      "integrated_sha256": "134abf0285a77fced4eaecf63b5c684e4d57e39a6f16c54cade497e79d95306f"
+    },
+    {
+      "path": "include/audiohole/plug_board/view.hpp",
+      "handover_sha256": "eebba82e0e4e7c9e2a250544e54670ce539fa9df45f1d12f45a3c87f7b67ba3c",
+      "integrated_sha256": "5429111c0bbf0a7779b192717ff2e916069e2a94525bf1738bd34b21c396867c"
+    },
+    {
+      "path": "src/core/module.cpp",
+      "handover_sha256": "a63c6b19938633e78b746cd7320e8c1a1b7bb286841059cd922468f617f12b42",
+      "integrated_sha256": "c337d29c3d663ee0536643862e47ccdef2873f9bef59109b886c276299d12182"
+    },
+    {
+      "path": "src/core/module_persistence.cpp",
+      "handover_sha256": "d20234ceee032f94908b8885a0c2ca11f7fbbd7c6c69af11474fbaa48c4beff0",
+      "integrated_sha256": "190085d916cac2d283ce131357ecf382ad59213693557a04868b06878efde4a0"
+    },
+    {
+      "path": "src/core/module_state.cpp",
+      "handover_sha256": "96fe29324286b7af9712d199431e053b64a463104dde19814332a347f296bd28",
+      "integrated_sha256": "4d8110abda2f4199aafc67bd0dce6934bff5ece661a100e837b6feee8aa93604"
+    },
+    {
+      "path": "src/core/simulation.cpp",
+      "handover_sha256": "5f730147f1567a5714ec157eefa6561d0f4303710674e57942ecde5feebd73c9",
+      "integrated_sha256": "0a25c472398ce044931250a6f6ea11cabfbb809e6fbfb4d08143759ef8eaf9f6"
+    },
+    {
+      "path": "src/core/storage.cpp",
+      "handover_sha256": "39521980d9f29720d5fc9c692d1e18626186a41b85f0c8e5b9fae9b4d06d2b1a",
+      "integrated_sha256": "4269639e5ec60c7c30696ebac5b2d0872440b52e05e6b3d08bddf7b66cde7f2e"
+    },
+    {
+      "path": "src/windows/backend.cpp",
+      "handover_sha256": "901857ab034a71e709fc0c164289a23560116f0a92e593cdecb93d874b6f48b8",
+      "integrated_sha256": "a7297e6d3ca2505c67a7bba35778c8334fc6396bf3ccfc12f8956f8c660707a2"
+    },
+    {
+      "path": "src/wx/view.cpp",
+      "handover_sha256": "76a05d9182651c2f296042458be11c3e22d0beda020de1feeb0652f25858c004",
+      "integrated_sha256": "8ba2e0cbd845dd4bd72478e1c76b8c455a4ff6f1eb676f5bd295f5b9bae051db"
+    },
+    {
+      "path": "tests/module_test.cpp",
+      "handover_sha256": "f694114f19adebf004435406290d9daac5dd9f6f161e39915d5d56e1dc92f327",
+      "integrated_sha256": "cc2ce8bded3a65fb829f1f5490f97ed3e4295f2d82954fcfa35bbfbaf7121dc5"
+    },
+    {
+      "path": "tests/window_icon_test.cpp",
+      "handover_sha256": "b13a9a8a390b2ff1d4084af2800d868715653b27be0a1a4eb0d51abbd1ced24b",
+      "integrated_sha256": "18c2bd3429c4ce6e85fa4a4b79c5df9a62d70a670b8ffd94d4688b1742d52501"
+    }
+  ]
+}

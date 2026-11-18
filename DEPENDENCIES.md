@@ -565,3 +565,15 @@ is introduced. The module uses existing nlohmann/json and C++20 thread facilitie
 This authorizes the supplied prototype integration, not a permanent backend,
 resampler or synchronization algorithm selection. Parent static-CRT policy is
 preserved. See ENGINE_INTEGRATION.md and engine/handoff/GUI_AGENT_HANDOFF.md.
+## Plug Board integration dependencies
+
+The owner-supplied Plug Board 0.2.6 module reuses the host's pinned wxWidgets,
+nlohmann JSON and test-only GoogleTest versions. Its native adapter uses Windows
+COM, MMDevice/session APIs, process notifications, Shell metadata and system
+image decoding. It adds no mandatory third-party runtime DLL. Material Symbols
+SVG artwork is Apache-2.0; the packaged license and notice are named
+`PlugBoard-MaterialSymbols-LICENSE.txt` and `PlugBoard-MaterialSymbols-NOTICE.txt`.
+The module's private Windows policy interface remains capability-checked; see
+[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md) and the supplied module
+documentation for support limits. EarTrumpet research is provenance/reference,
+not imported implementation code.

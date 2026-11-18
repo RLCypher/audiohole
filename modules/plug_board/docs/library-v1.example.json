@@ -1,0 +1,63 @@
+{
+  "format": "audiohole-plug-board",
+  "schema_version": 1,
+  "revision": 1,
+  "default_board_id": "board-example-default",
+  "profile_associations": {
+    "profile-example": "board-example-default"
+  },
+  "applications": [
+    {
+      "id": "application-example-player",
+      "display_name": "Example Player",
+      "policy_managed": true,
+      "identity": {
+        "kind": "win32_image",
+        "executable_path": "C:\\Program Files\\Example Player\\Player.exe"
+      },
+      "verified_aliases": []
+    }
+  ],
+  "boards": [
+    {
+      "id": "board-example-default",
+      "display_name": "Default",
+      "created_utc": "2026-11-16T00:00:00Z",
+      "modified_utc": "2026-11-16T00:00:00Z",
+      "working_revision": 1,
+      "saved_revision": 1,
+      "working": {
+        "sockets": [
+          {
+            "id": "system",
+            "display_name": "System (Default)",
+            "endpoint": { "kind": "system_default" }
+          }
+        ],
+        "application_assignments": {
+          "application-example-player": "system"
+        },
+        "settings": {
+          "show_inactive_sources": false,
+          "recently_active_seconds": 300
+        }
+      },
+      "saved": {
+        "sockets": [
+          {
+            "id": "system",
+            "display_name": "System (Default)",
+            "endpoint": { "kind": "system_default" }
+          }
+        ],
+        "application_assignments": {
+          "application-example-player": "system"
+        },
+        "settings": {
+          "show_inactive_sources": false,
+          "recently_active_seconds": 300
+        }
+      }
+    }
+  ]
+}

@@ -428,8 +428,8 @@ void Frame::build_settings() {
         sync_personality_choices();
         select_personality(loaded.ok ? loaded.id : "vanilla");
         optional_note(personality_notice_, text(loaded.detail));
-        notebook_->GetPage(3)->Layout();
-        static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
+        notebook_->GetPage(SettingsPage)->Layout();
+        static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
     });
     personality_group->Add(catalogs, 0, wxEXPAND);
     personality_choice_->SetToolTip("Choose optional commentary. Vanilla keeps facts only; "
@@ -591,8 +591,8 @@ void Frame::reload_personalities() {
         optional_note(personality_notice_,
                       text(warnings.front() + " Fix the file and Reload to retry."));
         personality_notice_->Wrap(950);
-        notebook_->GetPage(3)->Layout();
-        static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
+        notebook_->GetPage(SettingsPage)->Layout();
+        static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
     }
 }
 void Frame::select_personality(const std::string& requested) {
@@ -642,8 +642,8 @@ void Frame::select_personality(const std::string& requested) {
             present(presentation::Message::Personality);
         }
     }
-    notebook_->GetPage(3)->Layout();
-    static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
+    notebook_->GetPage(SettingsPage)->Layout();
+    static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
 }
 // The raw decimal is range-checked before half-up rounding. Invalid text restores
 // the previous normalized presentation value; it never reaches the slider/state.
@@ -696,8 +696,8 @@ void Frame::present_dfa(presentation::Message event) {
         return;
     if (!operational_warning_visible_) {
         optional_note(dfa_feedback_, "");
-        notebook_->GetPage(3)->Layout();
-        static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
+        notebook_->GetPage(SettingsPage)->Layout();
+        static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
         present(event);
         return;
     }
@@ -708,7 +708,7 @@ void Frame::present_dfa(presentation::Message event) {
                   text(presentation::keep_kaomoji_together(copy.technical + " " + copy.commentary +
                                                            " " + copy.fallback_detail)));
     dfa_feedback_->Wrap(700);
-    notebook_->GetPage(3)->Layout();
-    static_cast<wxScrolledWindow*>(notebook_->GetPage(3))->FitInside();
+    notebook_->GetPage(SettingsPage)->Layout();
+    static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
 }
 } // namespace audiohole::gui

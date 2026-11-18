@@ -1,0 +1,64 @@
+# AudioHole Plug Board — Horu personality responses
+# Format: EVENT_KEY | ANIMATION | RESPONSE
+# Randomly select one response from the matching event key.
+# Animation states use the full approved AudioHole animation list; deadpan is static-only.
+
+[SOCKET_CREATED]
+SOCKET_CREATED | celebrating | A brand-new socket~! More places to plug things in! (≧▽≦)
+SOCKET_CREATED | mischievous | Ooh, you made another hole for me to organize~ uwu
+SOCKET_CREATED | thinking | New socket! What are we putting in this one? (・ω・)
+SOCKET_CREATED | happy | Ehehe, there's always room for one more~ ♡
+
+[SOCKET_MOVED]
+SOCKET_MOVED | happy | Scooching that socket over~ Make room! (ﾉ´ヮ`)ﾉ
+SOCKET_MOVED | surprised | Oop! Everybody shuffle~! (≧ω≦)
+SOCKET_MOVED | smug | A new spot for your socket? Such a perfectionist~ uwu
+SOCKET_MOVED | happy | All tucked into its new position~ ♡
+
+[SOCKET_DELETED]
+SOCKET_DELETED | panicking | Aah! A socket vanished! The apps are safe in System~ (°ω°)
+SOCKET_DELETED | concerned | Bye-bye, little socket~ Your plugs have somewhere to go! ♡
+SOCKET_DELETED | mischievous | One less hole to fill... for now~ (¬‿¬)
+SOCKET_DELETED | sleeping | All cleaned up~ Nini, little socket. (－ω－) zzZ
+
+[APP_MOVED]
+APP_MOVED | embarrassed | Right into the new socket~ Nice and snug! (⁄ ⁄>⁄ω⁄<⁄ ⁄)
+APP_MOVED | celebrating | Ooh! That app just hopped holes! (≧▽≦)
+APP_MOVED | concerned | Plugged it in~ Now let's see if Windows plays nice! uwu
+APP_MOVED | happy | There you go, little app~ Find your happy place! ♡
+
+[SOCKET_RENAMED]
+SOCKET_RENAMED | happy | New name, same cute little socket~ uwu
+SOCKET_RENAMED | surprised | Ooh, a name makeover! So fancy! (✧ω✧)
+SOCKET_RENAMED | mischievous | Hehe, labels make finding the right hole easier~ ♡
+SOCKET_RENAMED | smug | Renamed and ready for attention~ (｡•̀ᴗ-)✧
+
+[SOCKET_ICON_ASSIGNED]
+SOCKET_ICON_ASSIGNED | celebrating | A little picture for your socket! Kyaa~ (≧▽≦)
+SOCKET_ICON_ASSIGNED | happy | Cute icon! Now I know which hole is which~ uwu
+SOCKET_ICON_ASSIGNED | mischievous | Accessorizing your sockets? I approve~ ♡
+SOCKET_ICON_ASSIGNED | happy | Icon equipped! Looking adorable already~ (｡♥‿♥｡)
+
+[SOCKET_COLOR_ASSIGNED]
+SOCKET_COLOR_ASSIGNED | surprised | Ooooh, pretty color! (✧▽✧)
+SOCKET_COLOR_ASSIGNED | happy | A splash of color for your socket~ uwu
+SOCKET_COLOR_ASSIGNED | embarrassed | Color-coded holes? You're spoiling me~ ♡
+SOCKET_COLOR_ASSIGNED | celebrating | Now that socket has a little personality~ (≧ω≦)
+
+[SOCKET_ENDPOINT_CHANGED]
+SOCKET_ENDPOINT_CHANGED | embarrassed | New place for your sound to come out~ ehehe! (⁄ω⁄)
+SOCKET_ENDPOINT_CHANGED | concerned | Sending your plugs somewhere new~ Windows, behave! uwu
+SOCKET_ENDPOINT_CHANGED | celebrating | Ooh, destination swap! Adventure time~ (≧▽≦)
+SOCKET_ENDPOINT_CHANGED | thinking | Socket redirected~ Fingers crossed the audio follows! ♡
+
+[BOARD_PROFILE_ASSOCIATED]
+BOARD_PROFILE_ASSOCIATED | happy | Aww, this board and profile are a pair now~ ♡
+BOARD_PROFILE_ASSOCIATED | celebrating | It's official! They're together! (≧▽≦)
+BOARD_PROFILE_ASSOCIATED | mischievous | Matching board to profile~ Such good chemistry! uwu
+BOARD_PROFILE_ASSOCIATED | smug | Linked up and ready for your next session~ (｡•̀ᴗ-)✧
+
+[WINDOWS_MIXER_OPENED]
+WINDOWS_MIXER_OPENED | surprised | We're visiting the Windows mixer?! Ooh, field trip! (≧▽≦)
+WINDOWS_MIXER_OPENED | concerned | Opening Windows Mixer~ Don't forget about me! uwu
+WINDOWS_MIXER_OPENED | confused | Into the Windows settings maze we go~ (・ω・;)
+WINDOWS_MIXER_OPENED | mischievous | Ehehe, say hi to the other mixer for me~ ♡

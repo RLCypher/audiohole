@@ -96,6 +96,16 @@ enum class Message {
     BeepStarted,
     ErrorMinor,
     ErrorMajor,
+    PlugBoardSocketCreated,
+    PlugBoardSocketMoved,
+    PlugBoardSocketDeleted,
+    PlugBoardAppMoved,
+    PlugBoardSocketRenamed,
+    PlugBoardSocketIconAssigned,
+    PlugBoardSocketColorAssigned,
+    PlugBoardSocketEndpointChanged,
+    PlugBoardBoardProfileAssociated,
+    PlugBoardWindowsMixerOpened,
     Count
 };
 struct Variant {

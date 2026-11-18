@@ -65,7 +65,7 @@ NORM: Beautiful. A whole lot of nothing. That's where scanned devices will show 
 
 N006 [mischievous]
 Cue: Scanning tab entered.
-NORM: Time to plug a few imaginary devices into imaginary USB ports. I've got four imaginary endpoints ready to go, and I assure you the cable management is immaculate.
+NORM: Time to plug a few imaginary devices into imaginary USB ports. I've got nine imaginary endpoints ready to go, and I assure you the cable management is immaculate.
 UI: Show two response buttons: "Plug ’em in" and "What could go wrong?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N006A [thinking]
@@ -94,8 +94,8 @@ Cue: Start Scan event begins simulated Deep / Full scan lasting approximately 20
 NORM: Scanning... checking formats, poking at sample rates, asking Windows nicely, asking Windows less nicely. You know. Science.
 
 N010 [celebrating]
-Cue: Simulated scan completed; four exact endpoints now in sandbox device list.
-NORM: Well, would you look at that. Four brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated.
+Cue: Simulated scan completed; nine exact endpoints now in sandbox device list.
+NORM: Well, would you look at that. Nine brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated.
 UI: Show two response buttons: "Show me the devices" and "Did you actually scan anything?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 ======================================================================
@@ -111,7 +111,7 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
   NORM: Absolutely not. The ports were imaginary. The progress bar, however, gave a very convincing performance. Go back to Devices and see what our fake scan turned up.
 
 N012 [happy]
-Cue: Devices tab entered; show four populated endpoints.
+Cue: Devices tab entered; show nine populated endpoints.
 NORM: There we go. Capture devices send audio into AudioHole, playback devices receive it. Same headset, two separate entries: microphone on one side, headphones on the other. Windows likes to keep us on our toes.
 UI: Show two response buttons: "Neat" and "Why two entries for one headset?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
@@ -180,7 +180,7 @@ NORM: One more thing before we send this back the other way. Check Prefer exclus
 
 N022 [talking]
 Cue: Forward assignment and Prefer exclusive mode confirmed. Highlight Return Source selector.
-NORM: Good. Now for the return trip. Set the Return Source to MixBoard Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you.
+NORM: Good. Now for the return trip. Set the Return Source to MixBoard Mic Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you.
 
 N023 [happy]
 Cue: Correct Return Source chosen. Highlight Return Destination selector.
@@ -427,8 +427,8 @@ IMPLEMENTATION NOTES — NOT SPOKEN
 7. Two dialogue choices appear as **two vertically stacked buttons at the avatar's feet** in dating-sim dialogue-option format. They are never horizontal, never a generic Continue, and aren't stand-alone response screens. The selected button's flavor is baked into the next state's COMPLETE dialogue; both choices lead to the same underlying objective unless an explicit exception is authored. The two speech acknowledgments are EXACTLY `I said something` and `Testing 1, 2`.
 8. `NORM:` appears in this script solely as an author's dialogue-field designator. Do NOT render `Norm:`, `NORM:`, or any speaker name prefix. Render only dialogue content, with the approved avatar expression.
 9. Clicking Norm is the ONLY tutorial-dialogue timeout: a tutorial-only quip temporarily overrides the current displayed text for roughly 6 seconds, then restores the exact text variant, buttons, highlight, and expression. Timeout never advances the tutorial. A user step-completion event during the quip must still work.
-10. Exact generated CAPTURE endpoints: `MixBoard Input`; `Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device)`. PLAYBACK endpoints: `MixBoard Output`; `Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device)`.
-11. Renames change display names, never underlying endpoint identity. Require TWO distinct devices to be renamed and explicitly saved. Forward Source = FakeTech mic; Forward Destination = MixBoard Output. Return Source = MixBoard Input; Return Destination = FakeTech speakers. Matching must use stable identities, not editable display names.
+10. Exact generated CAPTURE endpoints: `MixBoard Mic Input`; `Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device)`. PLAYBACK endpoints: `Soundbar - BoomSlab 9001 (USB Audio Device)`; `MixBoard Music`; `MixBoard Game`; `MixBoard Chat`; `MixBoard Aux`; `MixBoard Output`; `Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device)`.
+11. Renames change display names, never underlying endpoint identity. Require TWO distinct devices to be renamed and explicitly saved. Forward Source = FakeTech mic; Forward Destination = MixBoard Output. Return Source = MixBoard Mic Input; Return Destination = FakeTech speakers. Matching must use stable identities, not editable display names.
 12. Require a new profile with confirmed rename, new hole with confirmed rename, Enable return channel ON, correct four assignments, Forward Prefer exclusive mode ON, successful Save, Start Routing click, user microphone acknowledgement, and Settings visit. Exclusive is a preference, not a guarantee; honor product's actual effective-configuration semantics without silently switching unrelated settings.
 13. Microphone test never accesses a real input or detects speech. N028 holds until user chooses `I said something` or `Testing 1, 2`. Both are acknowledgements, NOT evidence of microphone performance. Keep Norm's joke about hearing oneself while reinforcing real-world verification.
 14. Tutorial Settings keeps Personality, Animation and DFA visible but greyed out; append `(Disabled for tutorial)` to each section header. Replace Replay Tutorial with Skip Tutorial. Normal personality/status messages and controls resume on the next real launch.

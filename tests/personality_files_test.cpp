@@ -8,6 +8,29 @@
 #include <set>
 
 namespace presentation = audiohole::presentation;
+TEST(PersonalityMetadata, PlugBoardHasFourAuthoredResponsesPerActionAndPersonality) {
+    presentation::Messages messages(7);
+    ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
+    for (const auto* id : {"default", "uwu"}) {
+        for (int index = static_cast<int>(presentation::Message::PlugBoardSocketCreated);
+             index <= static_cast<int>(presentation::Message::PlugBoardWindowsMixerOpened);
+             ++index) {
+            const auto message = static_cast<presentation::Message>(index);
+            const auto responses = messages.variants(message, id);
+            ASSERT_EQ(responses.size(), 4u) << presentation::technical(message) << ": " << id;
+            std::set<std::string> identifiers;
+            for (const auto& response : responses) {
+                EXPECT_TRUE(identifiers.insert(response.id).second);
+                EXPECT_EQ(response.category, "plug_board");
+                EXPECT_FALSE(response.expression.empty());
+                EXPECT_EQ(response.fallback_expression, "idle");
+            }
+            const auto first = messages.show(message, id, 1);
+            EXPECT_EQ(messages.show(message, id, 1).response_id, first.response_id);
+            EXPECT_NE(messages.show(message, id, 2).response_id, first.response_id);
+        }
+    }
+}
 TEST(PersonalityMetadata, BotherPoolsHaveExactCategoryCountsAndSelectionMetadata) {
     presentation::Messages messages(7);
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());

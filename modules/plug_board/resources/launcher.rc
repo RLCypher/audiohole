@@ -1,0 +1,29 @@
+// Keep the original AudioHole artwork byte-for-byte. This is an application icon,
+// separate from the real Windows icons shown beside inspected audio applications.
+#include <windows.h>
+AUDIOHOLE_ICON ICON "audiohole.ico"
+1 RT_MANIFEST "launcher.manifest"
+
+// File properties identify the standalone handoff without a console command.
+1 VERSIONINFO
+ FILEVERSION 0,2,6,0
+ PRODUCTVERSION 0,2,6,0
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904b0"
+    BEGIN
+      VALUE "FileDescription", "AudioHole Plug Board standalone module\0"
+      VALUE "FileVersion", "0.2.6\0"
+      VALUE "ProductName", "AudioHole Plug Board\0"
+      VALUE "ProductVersion", "0.2.6\0"
+      VALUE "OriginalFilename", "AudioHole-PlugBoard.exe\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 1200
+  END
+END

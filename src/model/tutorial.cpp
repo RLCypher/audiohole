@@ -10,11 +10,11 @@ const Json& catalog() {
     return data;
 }
 const std::map<std::string, std::string> choices_next{
-    {"N001", "N002"},   {"N002", "N003"},   {"N003", "N004"},  {"N006", "N006A"},
-    {"N006A", "N007"},  {"N010", "N011"},   {"N012", "N013"},  {"N013", "N014"},
-    {"N025", "N026"},   {"N027B", "N027A"}, {"N027A", "N028"}, {"N030-A", "N031"},
-    {"N030-B", "N031"}, {"N031", "N032"},   {"N032", "N033"},  {"N034", "N035"},
-    {"N035", "N036"}};
+    {"N001", "N002"},   {"N002", "N003"},   {"N003", "N004"},   {"N006", "N006A"},
+    {"N006A", "N007"},  {"N010", "N011"},   {"N012", "N013"},   {"N013", "N014"},
+    {"N025", "N026"},   {"N027B", "N027A"}, {"N027A", "N028"},  {"N030-A", "N031"},
+    {"N030-B", "N031"}, {"N031", "N032"},   {"N032", "PB001"},  {"N034", "N035"},
+    {"N035", "N036"},   {"PB002", "PB003"}, {"PB003", "PB004"}, {"PB012", "PB013"}};
 const std::map<std::string, std::vector<std::string>> targets{
     {"N004", {"devices_tab"}},
     {"N005", {"scan_tab"}},
@@ -33,15 +33,26 @@ const std::map<std::string, std::vector<std::string>> targets{
     {"N024", {"profile_save"}},
     {"N026", {"start"}},
     {"N032", {"stop"}},
-    {"N033", {"settings_tab"}}};
+    {"N033", {"settings_tab"}},
+    {"PB001", {"plug_board_tab"}},
+    {"PB002", {"plug_columns"}},
+    {"PB003", {"plug_socket:system", "plug_endpoint:system"}},
+    {"PB004", {"plug_create"}},
+    {"PB007", {"plug_create"}},
+    {"PB013", {"settings_tab"}}};
 } // namespace
 std::vector<Endpoint> tutorial_devices() {
     std::vector<Endpoint> devices;
     for (const auto& [id, name, capture] : std::vector<std::tuple<std::string, std::string, bool>>{
-             {"tutorial-mixer-in", "MixBoard Input", true},
+             {"tutorial-mixer-in", "MixBoard Mic Input", true},
              {"tutorial-mic",
               "Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device)", true},
              {"tutorial-mixer-out", "MixBoard Output", false},
+             {"tutorial-boomslab", "Soundbar - BoomSlab 9001 (USB Audio Device)", false},
+             {"tutorial-music", "MixBoard Music", false},
+             {"tutorial-game", "MixBoard Game", false},
+             {"tutorial-chat", "MixBoard Chat", false},
+             {"tutorial-aux", "MixBoard Aux", false},
              {"tutorial-speakers",
               "Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device)", false}}) {
         Endpoint e;
@@ -66,14 +77,21 @@ Tutorial::Tutorial(bool replay) {
 }
 void Tutorial::enter(const std::string& beat) {
     beat_ = beat;
+    if (beat == "PB004" || beat == "PB007") {
+        plug_existing_.clear();
+        for (const auto& socket : plug_state_.sockets)
+            plug_existing_.insert(socket.id);
+    }
     reminder_.clear();
     overlay_.clear();
 }
 int Tutorial::expected_page() const {
-    return beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? 1
-           : beat_ >= "N005" && beat_ <= "N010"                    ? 2
-           : beat_ >= "N033"                                       ? 3
-                                                                   : 0;
+    if (beat_.starts_with("PB"))
+        return beat_ == "PB013" ? SettingsPage : PlugBoardPage;
+    return beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? DevicesPage
+           : beat_ >= "N005" && beat_ <= "N010"                    ? ScanningPage
+           : beat_ >= "N033"                                       ? SettingsPage
+                                                                   : ProfilesPage;
 }
 TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty) const {
     TutorialView out;
@@ -115,6 +133,23 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
             if (!renamed_.contains(id))
                 out.targets.push_back(std::string("device:") + id);
     }
+    if (plug_bridge_ && beat_ == "N034")
+        out.text = catalog().at("PB014").at("text").get<std::string>() + "\n\n" + out.text;
+    if (beat_ == "PB005" || beat_ == "PB008")
+        out.targets = {"plug_rename:" + (beat_ == "PB005" ? music_socket_ : game_socket_)};
+    if (beat_ == "PB006" || beat_ == "PB009")
+        out.targets = {"plug_endpoint:" + (beat_ == "PB006" ? music_socket_ : game_socket_)};
+    if (beat_ == "PB010" || beat_ == "PB011")
+        out.targets = {"plug_app:" +
+                           (beat_ == "PB010" ? plug_state_.game_app : plug_state_.music_app),
+                       "plug_socket:" + (beat_ == "PB010" ? game_socket_ : music_socket_)};
+    if (beat_ == "PB012")
+        out.targets = {"plug_endpoint:" + music_socket_, "plug_endpoint:" + game_socket_};
+    if (plug_recovery_) {
+        out.text = "Hey! We weren't done with that yet, put it back! Now management says I have to "
+                   "explain that part over again...";
+        out.expression = "surprised";
+    }
     if (beat_ == "N018A")
         out.targets.push_back("profile:" + profile_id_);
     if (beat_ == "N018B")
@@ -147,10 +182,11 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
             out.expression = reminder.at("expression").get<std::string>();
         }
         out.choices.clear();
-        out.targets = {guide_page == 0   ? "profiles_tab"
-                       : guide_page == 1 ? "devices_tab"
-                       : guide_page == 2 ? "scan_tab"
-                                         : "settings_tab"};
+        out.targets = {guide_page == ProfilesPage    ? "profiles_tab"
+                       : guide_page == PlugBoardPage ? "plug_board_tab"
+                       : guide_page == DevicesPage   ? "devices_tab"
+                       : guide_page == ScanningPage  ? "scan_tab"
+                                                     : "settings_tab"};
         out.sightseeing = true;
     }
     return out;
@@ -173,12 +209,17 @@ bool Tutorial::choose(const std::string& id) {
                                      [&](const auto& c) { return c.id == id; });
     if (choice == current.choices.end())
         return false;
+    if (beat_ == "PB012" && !plug_assignments_ready()) {
+        remind("PB-R08");
+        return false;
+    }
     const auto next = beat_ == "N028" ? (choice->label == "I said something" ? "N030-B" : "N030-A")
                                       : choices_next.at(beat_);
     if (beat_ == "N028")
         acknowledged_ = true;
     if (next == "N035") {
-        if (!saved_ || !routed_ || !acknowledged_ || !settings_ || renamed_.size() < 2)
+        if (!saved_ || !routed_ || !acknowledged_ || !settings_ || !plug_finished_ ||
+            renamed_.size() < 2)
             return false;
         complete_ = true;
     }
@@ -225,6 +266,81 @@ void Tutorial::tick(std::int64_t now) {
     if (!overlay_.empty() && now >= overlay_until_)
         overlay_.clear();
 }
+bool Tutorial::plug_assignments_ready() const {
+    const auto assigned = [&](const std::string& app, const std::string& socket) {
+        const auto found = plug_state_.assignments.find(app);
+        return !app.empty() && !socket.empty() && found != plug_state_.assignments.end() &&
+               found->second == socket;
+    };
+    const auto endpoint_matches = [&](const std::string& id, const char* endpoint) {
+        return std::any_of(
+            plug_state_.sockets.begin(), plug_state_.sockets.end(),
+            [&](const auto& socket) { return socket.id == id && socket.endpoint == endpoint; });
+    };
+    return assigned(plug_state_.game_app, game_socket_) &&
+           assigned(plug_state_.music_app, music_socket_) &&
+           endpoint_matches(game_socket_, "tutorial-game") &&
+           endpoint_matches(music_socket_, "tutorial-music");
+}
+void Tutorial::plug_board(const TutorialPlugBoard& state) {
+    const auto previous = std::move(plug_state_);
+    plug_state_ = state;
+    if (complete_ || !beat_.starts_with("PB") || beat_ == "PB013")
+        return;
+    const auto find = [&](const std::string& id) -> const TutorialSocket* {
+        const auto found = std::find_if(state.sockets.begin(), state.sockets.end(),
+                                        [&](const auto& socket) { return socket.id == id; });
+        return found == state.sockets.end() ? nullptr : &*found;
+    };
+    if (!music_socket_.empty() && !find(music_socket_)) {
+        music_socket_.clear();
+        game_socket_.clear();
+        enter("PB004");
+        plug_recovery_ = true;
+        return;
+    }
+    if (!game_socket_.empty() && !find(game_socket_)) {
+        game_socket_.clear();
+        enter("PB007");
+        plug_recovery_ = true;
+        return;
+    }
+    if (beat_ == "PB004" || beat_ == "PB007") {
+        for (const auto& socket : state.sockets) {
+            if (socket.id == "system" || plug_existing_.contains(socket.id))
+                continue;
+            const bool music = beat_ == "PB004";
+            (music ? music_socket_ : game_socket_) = socket.id;
+            plug_initial_name_ = socket.name;
+            plug_recovery_ = false;
+            enter(music ? "PB005" : "PB008");
+            return;
+        }
+    }
+    if (beat_ == "PB005" || beat_ == "PB008") {
+        const bool music = beat_ == "PB005";
+        const auto* socket = find(music ? music_socket_ : game_socket_);
+        const auto* music_socket = find(music_socket_);
+        if (socket && !socket->name.empty() && socket->name != plug_initial_name_ &&
+            (music || !music_socket || socket->name != music_socket->name))
+            enter(music ? "PB006" : "PB009");
+    } else if (beat_ == "PB006" || beat_ == "PB009") {
+        const bool music = beat_ == "PB006";
+        const auto* socket = find(music ? music_socket_ : game_socket_);
+        if (socket && socket->endpoint == (music ? "tutorial-music" : "tutorial-game"))
+            enter(music ? "PB007" : "PB010");
+    } else if (beat_ == "PB010" || beat_ == "PB011") {
+        const bool game = beat_ == "PB010";
+        const auto& app = game ? state.game_app : state.music_app;
+        const auto assigned = state.assignments.find(app);
+        if (assigned != state.assignments.end() &&
+            assigned->second == (game ? game_socket_ : music_socket_)) {
+            enter(game ? "PB011" : "PB012");
+        } else if (state.assignments != previous.assignments) {
+            remind("PB-R04");
+        }
+    }
+}
 void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& draft, int hole,
                      int page) {
     current_page_ = page;
@@ -242,7 +358,7 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
                 profile_id_.clear();
             enter(lost_profile ? "N017" : "N018");
             recovery_ = lost_profile ? "profile" : "hole";
-            sightseeing_page_ = page == 0 ? -1 : 0;
+            sightseeing_page_ = page == ProfilesPage ? -1 : ProfilesPage;
             return;
         }
     }
@@ -304,16 +420,21 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
             overlay_.clear();
     if (action == "navigation") {
         sightseeing_page_ = -1;
-        if (beat_ == "N004" && page == 1)
+        if (beat_ == "PB001" && page == PlugBoardPage)
+            enter("PB002");
+        else if (beat_ == "PB013" && page == SettingsPage) {
+            settings_ = plug_finished_ = plug_bridge_ = true;
+            enter("N034");
+        } else if (beat_ == "N004" && page == DevicesPage)
             enter("N005");
-        else if (beat_ == "N005" && page == 2)
+        else if (beat_ == "N005" && page == ScanningPage)
             enter("N006");
-        else if (beat_ == "N011" && page == 1)
+        else if (beat_ == "N011" && page == DevicesPage)
             enter("N012");
-        else if (beat_ == "N016" && page == 0) {
+        else if (beat_ == "N016" && page == ProfilesPage) {
             early_profiles_ = !s.profiles.empty();
             enter("N017");
-        } else if (beat_ == "N033" && page == 3) {
+        } else if (beat_ == "N033" && page == SettingsPage) {
             settings_ = true;
             enter("N034");
         } else {
@@ -336,7 +457,8 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         enter("N009");
         return;
     }
-    if (action == "scan_completed" && beat_ == "N009" && !s.scanning && s.endpoints.size() == 4) {
+    if (action == "scan_completed" && beat_ == "N009" && !s.scanning &&
+        s.endpoints.size() == tutorial_devices().size()) {
         enter("N010");
         return;
     }
@@ -355,6 +477,8 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
     if (action == "device_saved" && (beat_ == "N014" || beat_ == "N015")) {
         renamed_.clear();
         for (const auto& original : tutorial_devices()) {
+            if (original.id != "tutorial-mic" && original.id != "tutorial-speakers")
+                continue;
             const auto* current = endpoint(s, original.id);
             if (current && !current->display_name.empty() &&
                 current->display_name != original.display_name)

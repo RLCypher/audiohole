@@ -209,7 +209,7 @@ void Frame::scroll_tutorial_to(wxWindow& target, std::string_view region, int du
 bool Frame::advance_tutorial_scroll(std::int64_t now) {
     if (!tutorial_scroll_duration_)
         return false;
-    if (!IsShown() || IsIconized() || notebook_->GetSelection() != 0) {
+    if (!IsShown() || IsIconized() || notebook_->GetSelection() != ProfilesPage) {
         tutorial_scroll_duration_ = 0;
         return false;
     }
@@ -355,6 +355,8 @@ void Frame::render_tutorial() {
     int directed_row = -1;
     bool listbox_row = false;
     auto target = [&](const std::string& key) -> wxWindow* {
+        if (key.starts_with("plug_"))
+            return plug_tutorial_target(key);
         if (key.starts_with("profile:") || key.starts_with("hole:")) {
             const bool profile = key.starts_with("profile:");
             const auto id = key.substr(profile ? 8 : 5);
@@ -384,13 +386,13 @@ void Frame::render_tutorial() {
             return nullptr;
         }
         if (key == "devices_tab")
-            return navigation_[1];
+            return navigation_[DevicesPage];
         if (key == "scan_tab")
-            return navigation_[2];
+            return navigation_[ScanningPage];
         if (key == "profiles_tab")
-            return navigation_[0];
+            return navigation_[ProfilesPage];
         if (key == "settings_tab")
-            return navigation_[3];
+            return navigation_[SettingsPage];
         if (key == "scan_level")
             return scan_mode_;
         if (key == "scan_scope")
@@ -467,7 +469,15 @@ void Frame::render_tutorial() {
             continue;
         }
         auto bounds = field_screen_rect(*directed);
-        if (directed_row >= 0 && listbox_row) {
+        if (i < view.targets.size() && view.targets[i].starts_with("plug_app:")) {
+            const auto row =
+                plug_board_view_->application_screen_rect(view.targets[i].substr(9), step_changed);
+            if (!row) {
+                highlight->Hide();
+                continue;
+            }
+            bounds = *row;
+        } else if (directed_row >= 0 && listbox_row) {
             auto* list = static_cast<wxListBox*>(directed);
             if (step_changed)
                 list->SetFirstItem(directed_row);
@@ -769,22 +779,22 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         choice();
         check("N004");
-        select_page(1);
+        select_page(DevicesPage);
         check("N005");
-        select_page(2);
+        select_page(ScanningPage);
         check("N006");
         choice();
         choice();
         check("N007");
         const auto expected_scan_dialogue = commentary_copy_;
-        select_page(3);
+        select_page(SettingsPage);
         require(tutorial_choices_.empty() && tutorial_->view().sightseeing &&
                     tutorial_->view().targets == std::vector<std::string>{"scan_tab"} &&
                     tutorial_highlights_[0]->IsShownOnScreen(),
                 "Sightseeing did not replace replies/guidance with the required tab only");
         for (std::size_t i = 1; i < tutorial_highlights_.size(); ++i)
             require(!tutorial_highlights_[i]->IsShown(), "Sightseeing retained unrelated outlines");
-        select_page(2);
+        select_page(ScanningPage);
         check("N007");
         require(commentary_copy_ == expected_scan_dialogue && !tutorial_->view().sightseeing,
                 "Returning from sightseeing lost the saved tutorial step");
@@ -849,17 +859,17 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         controller_->advance(1);
         refresh();
         check("N010");
-        require(controller_->snapshot().endpoints.size() == 4,
-                "Tutorial did not discover exactly four endpoints");
+        require(controller_->snapshot().endpoints.size() == tutorial_devices().size(),
+                "Tutorial did not discover exactly nine endpoints");
         choice();
         check("N011");
-        select_page(1);
+        select_page(DevicesPage);
         check("N012");
         choice();
         choice();
         check("N014");
-        require(capture_devices_->GetCount() == 2 && playback_devices_->GetCount() == 2,
-                "Tutorial lists do not show two capture and two playback endpoints");
+        require(capture_devices_->GetCount() == 2 && playback_devices_->GetCount() == 7,
+                "Tutorial lists do not show two capture and seven playback endpoints");
         capture("device-selection");
         auto row_highlight = [&](DeviceList* list, const std::vector<std::string>& ids,
                                  const char* id) {
@@ -975,7 +985,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
                     "Tutorial context Rename did not save the device");
         }
         check("N016");
-        select_page(0);
+        select_page(ProfilesPage);
         check("N017");
         click(profile_new_);
         check("N018A");
@@ -1053,8 +1063,10 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         check("N032");
         choice();
-        check("N033");
-        select_page(3);
+        check("PB001");
+        plug_board_smoke(true);
+        capture("plug-board-configured");
+        select_page(SettingsPage);
         check("N034");
         require(!personality_choice_->IsEnabled() && !animation_loops_->IsEnabled() &&
                     !dfa_slider_->IsEnabled(),
