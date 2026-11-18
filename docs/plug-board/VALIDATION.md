@@ -65,3 +65,33 @@ compilation to finish.
 The earlier Automatic channel compatibility/labeling request remains a separate
 pending task. The audio engine, profile/device JSON schemas, unrelated layout
 and avatar playback behavior were not changed by this integration.
+
+## MSVC property-key include correction
+
+The first MSVC Debug build of `a2f56e6` failed in Windows SDK 10.0.26100.0's
+`functiondiscoverykeys_devpkey.h` while compiling `environment.cpp`. Its
+`DEFINE_PROPERTYKEY` prerequisite was missing, producing the C2440/C4430/C2374
+error cascade. MinGW's copy of that header includes the prerequisite itself,
+which concealed the problem in the original cross-build.
+
+Both `environment.cpp` and the GUID-definition translation unit `guids.cpp`
+now include `propsys.h` and `propkeydef.h` explicitly before the device-key
+catalog. The
+ordered include blocks are protected from automatic sorting; `initguid.h`
+continues to precede GUID/property-key definitions in `guids.cpp`.
+
+For local reproduction, Microsoft's actual `functiondiscoverykeys_devpkey.h`
+was substituted through an isolated include directory, without changing the
+installed toolchain or repository dependencies. The original two source files
+both failed at `DEFINE_PROPERTYKEY`; both compiled after the correction.
+`environment.cpp`, `guids.cpp`, `window_icon.cpp` and `shortcut_icon.cpp` also
+passed syntax checks with Microsoft's `propkeydef.h` and `propkey.h` in that
+directory. These headers came from Microsoft's public
+`win32metadata/generation/WinSDK/RecompiledIdlHeaders/um` snapshot; the device-key
+header SHA-256 was
+`bf53c0183cfac0ae543fcc97fd06165b7a59aac345e54320d1e38d3c27dcebcd`.
+
+The full MinGW Windows build, including AudioHole and the native evidence
+executable, linked successfully. The native adapter suite passed 23 tests under
+Wine, retaining its existing process-metadata skip. This supplemental
+reproduction does not replace the MSVC Debug/Release rebuild in GitHub Actions.

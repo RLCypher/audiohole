@@ -4,10 +4,17 @@
 #include <appmodel.h>
 #include <audioclient.h>
 #include <audiopolicy.h>
-#include <functiondiscoverykeys_devpkey.h>
 #include <mmdeviceapi.h>
 #include <propvarutil.h>
 #include <winternl.h>
+
+// Microsoft's device-key catalog needs PROPERTYKEY and DEFINE_PROPERTYKEY
+// first. MinGW supplies them transitively; keep these SDK prerequisites explicit.
+// clang-format off
+#include <propsys.h>
+#include <propkeydef.h>
+#include <functiondiscoverykeys_devpkey.h>
+// clang-format on
 
 #include <algorithm>
 #include <bit>

@@ -9,6 +9,8 @@
 #include <knownfolders.h>
 #include <audioclient.h>
 #include <audiopolicy.h>
+#include <propsys.h>
+#include <propkeydef.h>
 #include <functiondiscoverykeys_devpkey.h>
 #include <mmdeviceapi.h>
 #include <shobjidl.h>
