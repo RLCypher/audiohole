@@ -164,6 +164,7 @@ void Frame::build_plug_board() {
     }
     plug_board_ = std::make_unique<pb::Module>(std::move(options));
     pb::desktop::ViewOptions view;
+    view.require_distinct_socket_names = tutorial_ != nullptr;
     if (smoke_)
         view.menu = [this](const wxMenu&,
                            const std::vector<std::string>& choices) -> std::optional<std::size_t> {

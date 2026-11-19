@@ -2,12 +2,12 @@
 
 Tutorial replaces the former user-facing Preview environment. The approved
 owner script is [docs/tutorial/Norm-script.txt](docs/tutorial/Norm-script.txt),
-version 2.7. It is compiled into inert UTF-8 catalogue data by
+version 2.8, together with the Plug Board insert version 1.3. It is compiled into inert UTF-8 catalogue data by
 `scripts/GenerateTutorial.py`; `--check` verifies an exact reproducible build.
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
 rendered prefix. Existing welcome wording and the three choices stay intact.
 
-The generated catalogue is split by the six named lesson phases, the separate working-launch greetings,
+The generated catalogue is split by named lesson phases, including the pre-Plug Board transition, the separate working-launch greetings,
 recovery lines and avatar-click reactions. Each component keeps complete beat
 records in a separate UTF-8 literal, capped at 8,192 bytes to stay below MSVC's
 C2026 limit. Oversized components fail generation with the phase name. Components
@@ -92,7 +92,7 @@ the user; Return and unrelated overrides are not silently changed. Save is still
 explicit. Wrong assignments, premature Start, missing saves and unrelated
 navigation cannot complete an objective.
 
-The simulated scan runs for 20,000 ms and activation for 10,000 ms through the
+The simulated scan runs for 20,000 ms and activation for 8,000 ms through the
 simulation controller. Activation has no progress bar. Progress and CLI messages are explicitly fictional. Only a successful
 `scan_completed` or `simulated_routing_running` event advances the corresponding
 operation beat. Cancellation does not manufacture completion. The microphone
@@ -137,6 +137,9 @@ is no separate rendering or animation engine.
 
 ## Validation
 
+The current flow-corrected script update and its file-by-file verification record
+are in [docs/tutorial/Flow-update-validation.md](docs/tutorial/Flow-update-validation.md).
+
 Portable tests cover catalogue integrity, variant/choice routing, exact identities,
 independent exclusive preference, distinct saved renames, both microphone branches,
 operation completion/cancellation, overlay restoration, inactivity and explicit
@@ -148,7 +151,7 @@ click-through,
 DPI, assets, first-run/replay and filesystem-boundary checks remain required; a
 cross-build or Wine run does not replace MSVC/native Windows validation.
 
-Local validation for this increment: all 246 portable CTest cases passed, including
+Earlier increment validation: all 246 portable CTest cases passed, including
 avatar/scanner/engine/model and catalogue/asset integrity. After the final
 selection-guidance adjustment, all 23 tutorial/workflow tests passed again.
 The MinGW cross-build passed. Under Wine, fixture GUI, Test Mode, Tutorial,
@@ -180,6 +183,30 @@ The owner script in `docs/tutorial/PlugBoard-Norm-script.txt` supplies PB001–P
 and optional recovery lines. Its two sockets and two app assignments are
 verified against stable IDs in a memory-only simulated module. Six fictional
 apps start on BoomSlab 9001. The scan adds BoomSlab and MixBoard Music/Game/Chat/Aux,
-and renames the existing capture to MixBoard Mic Input. PB014 bridges into the
-existing first Settings beat without an additional Continue control. See
+and renames the existing capture to MixBoard Mic Input.
+
+N032's two choices select the complete N033 transition, whose two choices select
+the complete PB001 introduction. PB001 waits for confirmed Plug Board navigation.
+The course then follows PB002, PB003, PB004, PB006, PB007, PB009, PB010, PB011,
+PB012 and PB013. Socket names are confirmed in the existing creation popup;
+cancel or an invalid name creates no socket and cannot advance the lesson.
+PB005/PB008 and their separate rename requirements are retired. Arbitrary valid,
+distinct names work because endpoint and application requirements use socket IDs.
+
+PB013 allows exploration. Entering Settings rechecks both socket identities,
+their MixBoard Music/Game destinations, and the Spooty/Felony Jaywalking
+assignments. Invalid requirements return to their relevant control and block
+completion. A deleted socket uses the specific surprised PB-R09 line and its
+creation step, preserving the other socket's valid name, output and assignment.
+The replacement must be named, assigned its output and receive the affected app.
+Both sockets being deleted requires both to be restored. Wrong-tab recovery
+keeps the specific reaction while outlining the Plug Board tab.
+
+On valid Settings arrival, PB014, a blank line and N034 appear as one message
+with N034's talking expression and two choices. N033 has no Settings shortcut,
+and PB014 has no separate acknowledgement. A final recheck before N035 prevents
+completion if the practice setup changed after arrival. Avatar clicks temporarily
+replace the combined message and restore it exactly; they do not repeat the
+arrival greeting alongside the click reaction. Working-mode N037/N037A/N037B
+greetings remain independent of the tutorial. See
 [PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).

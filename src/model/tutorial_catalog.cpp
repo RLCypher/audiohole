@@ -13,7 +13,7 @@ std::string_view tutorial_catalog() {
       "Let’s do this",
       "Where’s the manual?"
     ],
-    "text": "Hey. I'm Norm. I'll show you how to get around AudioHole, make a connection, and generally avoid putting things where they don't belong. It's easier than it sounds. Mostly."
+    "text": "Hey, I'm Norm. I'll show you around AudioHole, help you make your first connection, and hopefully keep you from plugging things into places they have no business being. It's pretty straightforward once you get the hang of it. Famous last words, I know."
   },
   "N002": {
     "expression": "mischievous",
@@ -22,13 +22,13 @@ std::string_view tutorial_catalog() {
         "from": "N001",
         "label": "Let’s do this",
         "expression": "smug",
-        "text": "Excellent. I appreciate a person with misplaced confidence. Here's today's little science project: we're connecting a wireless USB headset to an external mixer. Normally those two don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions."
+        "text": "That's the spirit. Confidence first, understanding later. Today's little science project is this: we're connecting a wireless USB headset to an external mixer in preparation for a livestream. Normally those two USB devices don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions."
       },
       {
         "from": "N001",
         "label": "Where’s the manual?",
         "expression": "mischievous",
-        "text": "Oh, we have a manual. I use it to level a wobbly desk. Anyways, here's today's little science project: we're connecting a wireless USB headset to an external mixer. Normally those two don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions."
+        "text": "We have a manual. It's currently keeping my desk from wobbling, so you're stuck with me. Today's little science project is this: we're connecting a wireless USB headset to an external mixer in preparation for a livestream. Normally those two USB devices don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions."
       }
     ],
     "choices": [
@@ -43,13 +43,13 @@ std::string_view tutorial_catalog() {
         "from": "N002",
         "label": "Sounds questionable. I’m in.",
         "expression": "smug",
-        "text": "That's the spirit. A healthy disregard for how USB devices usually behave. One important detail before we start: we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so you can make a complete mess without getting an angry email from your sound card."
+        "text": "I like the attitude. A healthy disregard for how USB devices usually behave. One important detail before we start: we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so you can make a complete mess without getting an angry email from your sound card."
       },
       {
         "from": "N002",
         "label": "Is this actually possible?",
         "expression": "talking",
-        "text": "Yep. The headset and mixer don't need to know how to talk directly; AudioHole handles the connection between their Windows endpoints. Today, though, we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so feel free to experiment without putting your actual sound card through therapy."
+        "text": "Yep. The headset and mixer don't need to know how to talk directly. AudioHole handles the connection between their Windows endpoints. Today, though, we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so feel free to experiment without putting your actual sound card through therapy."
       }
     ],
     "choices": [
@@ -64,7 +64,7 @@ std::string_view tutorial_catalog() {
         "from": "N003",
         "label": "I love pretend science",
         "expression": "smug",
-        "text": "Excellent. Our budget is unlimited, provided you don't expect any of it to exist. First problem: we've got no devices to work with. Hard to make a connection with absolutely nothing. Head over to Devices and take a look."
+        "text": "Excellent. Our budget is unlimited, provided you don't expect any of it to exist. First problem, we've got absolutely no devices. Turns out connecting nothing to nothing isn't particularly useful. Open Devices and have a look."
       },
       {
         "from": "N003",
@@ -80,7 +80,7 @@ std::string_view tutorial_catalog() {
     "expression": "deadpan",
     "variants": [],
     "choices": [],
-    "text": "Beautiful. A whole lot of nothing. That's where scanned devices will show up. Let's go find some. Scanning tab, please."
+    "text": "Behold, a breathtaking collection of absolutely nothing. Once we've scanned some devices, they'll show up here. Head over to Scanning and we'll fix this tragic lack of stuff."
   },
   "N006": {
     "expression": "mischievous",
@@ -89,7 +89,7 @@ std::string_view tutorial_catalog() {
       "Plug ’em in",
       "What could go wrong?"
     ],
-    "text": "Time to plug a few imaginary devices into imaginary USB ports. I've got nine imaginary endpoints ready to go, and I assure you the cable management is immaculate."
+    "text": "Time to plug some imaginary hardware into imaginary USB ports. Nine endpoints, all ready to go. Best cable management I've ever done, and I didn't even have to crawl behind a desk."
   },
   "N006A": {
     "expression": "thinking",
@@ -119,7 +119,7 @@ std::string_view tutorial_catalog() {
         "from": "N006A",
         "label": "Go deep",
         "expression": "smug",
-        "text": "Excellent. Let's be nosy. Set Testing level to Deep or Advanced, and the scope to Full scan. That gives us the fullest picture of what the hardware can do. Since it's pretend hardware, I'm feeling unusually brave about it."
+        "text": "Good, let's get nosy. Set Testing level to Deep or Advanced, then set the scope to Full scan. We want to know what these things can actually do. Ordinarily I'd be a little more polite to somebody else's hardware, but none of this exists, so screw it."
       },
       {
         "from": "N006A",
@@ -134,7 +134,7 @@ std::string_view tutorial_catalog() {
     "expression": "working",
     "variants": [],
     "choices": [],
-    "text": "All set? Hit Start Scan. I'll go interrogate some fictional USB devices. Try not to look too impressed."
+    "text": "Alright, hit Start Scan. I'll go ask our fictional USB devices some deeply personal questions about sample rates. Try to look impressed."
   },
   "N009": {
     "expression": "working",
@@ -149,7 +149,7 @@ std::string_view tutorial_catalog() {
       "Show me the devices",
       "Did you actually scan anything?"
     ],
-    "text": "Well, would you look at that. Nine brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated."
+    "text": "Well, look at that. Nine imaginary endpoints and not a single electrical fire. A real Deep scan can take longer, by the way. Real hardware has the irritating habit of actually existing."
   })AHTUTORIAL",
     // 03 — GIVE THE DEVICES NAMES A HUMAN WOULD USE
     R"AHTUTORIAL(  "N011": {
@@ -186,13 +186,13 @@ std::string_view tutorial_catalog() {
         "from": "N012",
         "label": "Neat",
         "expression": "smug",
-        "text": "I know. Try not to get emotional. There's a whole pile of information here if you're the kind of person who thinks sample rates are a personality trait. No judgment. I've met worse people."
+        "text": "I know, it's beautiful. Try not to cry. There's a whole pile of device information here if you're the sort of person who has strong opinions about sample rates. I do, unfortunately. It's a condition."
       },
       {
         "from": "N012",
         "label": "Why two entries for one headset?",
         "expression": "talking",
-        "text": "One headset, two jobs: its microphone sends audio and its speakers receive it. Windows gives each job its own endpoint. And if you're the kind of person who thinks sample rates are a personality trait, there's a whole pile of device information here to enjoy. No judgment. I've met worse people."
+        "text": "One headset, two jobs. The mic sends audio in, the speakers play it back, and Windows lists them separately. If you open the details, there's a whole buffet of sample rates and formats, too. I have opinions about most of them. You have been warned."
       }
     ],
     "choices": [
@@ -207,7 +207,7 @@ std::string_view tutorial_catalog() {
         "from": "N013",
         "label": "Okay, nerd",
         "expression": "smug",
-        "text": "Guilty. I have opinions about buffer sizes too. It's a condition. Speaking of things I have opinions about, Windows named our fake headset something that looks like a printer having a stroke. Let's fix that. Pick two devices and give them names you'll actually recognize later. Whatever you want. I'm not your dad."
+        "text": "Guilty. I have opinions about buffer sizes too. Another unfortunate condition. Speaking of things I have opinions about, Windows named our fake headset something that looks like a printer having a stroke. Let's fix that. Pick two devices and give them names you'll actually recognize later. Whatever you want. I'm not your dad."
       },
       {
         "from": "N013",
@@ -222,7 +222,7 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "And remember to hit Save on each one. I know, I know, the button isn't decorative. Future-you will thank present-you when the names show up in the profile builder."
+    "text": "Make sure you hit Save on both. Yes, the button actually does something. Future-you will appreciate this when you're building profiles instead of trying to remember which numbered USB contraption is which."
   },
   "N016": {
     "expression": "happy",
@@ -235,43 +235,43 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Profiles are just saved setups. You can have one for everyday use, one for live streaming, one for turning a bluetooth speaker into an ad hoc PA system, one for whatever cursed collection of USB gadgets you're running next Tuesday. Really any configuration of devices you might want to quickly switch between depending on the situation or what you need to do at any given moment. Let's make one. Click Create Profile."
+    "text": "Profiles are saved setups you can switch between. Maybe you've got one for everyday use, another for streaming, and a third for turning a Bluetooth speaker into a deeply questionable PA system. Whatever weird pile of USB hardware Tuesday throws at you, you can keep a setup ready for it. Click Create Profile and we'll make our first one."
   },
   "N018A": {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, 'New Profile (7)' stops being helpful."
+    "text": "Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, \"New Profile (7)\" stops being helpful."
   },
   "N018": {
     "expression": "mischievous",
     "variants": [],
     "choices": [],
-    "text": "Excellent! Now for the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. A hole simply tells the profile what audio endpoints you want to connect together. Think of it like a wormhole for your audio, very sophisticated technology, very science, and simpler than it seems. You can have as many as you need in a single profile, but I wouldn't have more than 8, things might get a little weird. Because our little tutorial session is a simple connection between two devices, we'll only need one hole, go ahead and make it."
+    "text": "Now we get to the good stuff. A profile without any holes is basically a very organized empty box. Each hole connects audio endpoints, like a little wormhole for sound. Very science. You can build several into one profile, though I'd keep it to eight or fewer unless you enjoy making your computer question its life choices. We only need one today. Go ahead and create a hole."
   },
   "N018B": {
     "expression": "smug",
     "variants": [],
     "choices": [],
-    "text": "Same deal with the hole. Right-click, Rename, give it something descriptive. I know, naming things isn't exactly the exciting part of audio engineering, but a little organization now saves a whole lot of 'what the hell does this one do?' later. Good habits."
+    "text": "Same deal here. Right-click the hole and choose Rename. Give it something that tells you what it actually does. I know, naming things is about as exciting as labeling cables, but it beats opening six mystery holes later and wondering which one you were using."
   },
   "N019": {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Normally, a hole carries audio from a Source to a Destination. But we want to talk into the mixer AND hear audio coming back. So we're going both ways. Turn on Enable return channel. One hole, two directions. Efficient, really."
+    "text": "Normally, a hole takes audio from a Source and sends it to a Destination. Simple enough. But we want to speak into the mixer and hear the result back through the headset. Turn on Enable return channel and we'll give this thing a round trip ticket. One hole, two directions. Look at us being efficient."
   },
   "N020": {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Let's wire up the forward direction first. For the Source, choose the FakeTech headset microphone — whatever you renamed it to. That's where our imaginary voice starts its journey."
+    "text": "Let's wire up the forward direction first. For the Source, choose the FakeTech headset microphone, whatever you renamed it to. That's where our imaginary voice starts its journey."
   },
   "N021": {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "And send it to MixBoard Output. That's our mixer's receiving side in this exercise. The label's a little backwards if you're picturing the physical plugs, so trust the direction and the endpoint type, not your gut."
+    "text": "Now send it to MixBoard Output. That's the receiving endpoint on our pretend mixer. Yeah, the name sounds backwards if you're thinking about the physical jacks. Welcome to audio routing, where the labels occasionally exist to test your patience."
   },
   "N021A": {
     "expression": "suspicious",
@@ -283,13 +283,13 @@ std::string_view tutorial_catalog() {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Good. Now for the return trip. Set the Return Source to MixBoard Mic Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you."
+    "text": "Good. Now let's get the audio back out. Set Return Source to MixBoard Mic Input. Our pretend mixer has done whatever mystical knob-turning it needed to do, and now it has something to send us. I'll scroll down for you."
   },
   "N023": {
     "expression": "happy",
     "variants": [],
     "choices": [],
-    "text": "Destination: the FakeTech headset speakers, or their shiny new name. Congratulations, we've now invented a round trip. The airline industry could learn something."
+    "text": "Destination: the FakeTech headset speakers, or their shiny new name. Congratulations, we've now invented a round trip. The airline industry could learn a thing or two from us."
   },
   "N024": {
     "expression": "thinking",
@@ -304,7 +304,7 @@ std::string_view tutorial_catalog() {
       "Nice",
       "So the mixer is fake too?"
     ],
-    "text": "And saved. For this exercise, our imaginary mixer is set to send the sound back to our imaginary headphones so we can monitor ourselves. Very convenient. Very nonexistent."
+    "text": "Saved. Our pretend mixer can now send the pretend audio back to our pretend headphones for monitoring. It's a complete setup, and the best part is nobody had to buy another cable."
   },
   "N026": {
     "expression": "celebrating",
@@ -313,7 +313,7 @@ std::string_view tutorial_catalog() {
         "from": "N025",
         "label": "Nice",
         "expression": "smug",
-        "text": "Right? It's almost like we planned this. You did it! your first profile, your first hole, and both directions properly hooked up. I'm almost proud. Go ahead and hit Start Routing. Let's see what this magnificent work of fiction can do."
+        "text": "See? Almost looks like we knew what we were doing. You've built a profile and connected both directions of your first hole. I'm dangerously close to being proud. Hit Start Routing and let's fire up this magnificent work of fiction."
       },
       {
         "from": "N025",
@@ -347,13 +347,13 @@ std::string_view tutorial_catalog() {
         "from": "N027B",
         "label": "Is it supposed to do that?",
         "expression": "mischievous",
-        "text": "Oh, absolutely. Theatrics are a critical part of modern audio engineering. Kidding. Routing normally starts without all this dramatic buildup, I'm hamming it up for the tutorial. Give the imaginary machinery a little stage presence, you know?"
+        "text": "Naturally. Blinking lights are how computers tell us they're thinking very hard. I'm kidding, of course. Normally routing starts without a full theatrical production. I'm giving the imaginary machinery its moment in the spotlight."
       },
       {
         "from": "N027B",
         "label": "Should I be worried?",
         "expression": "deadpan",
-        "text": "Only about how much effort I'm putting into this bit. Kidding. Routing normally starts without the theatrical delay, I'm just hamming it up. You only get to make your first imaginary hole once. Might as well make an occasion of it."
+        "text": "Only about how committed I am to this stupid bit. Normally routing starts without all the drama. But you only get one first imaginary hole, and I decided it deserved an opening ceremony. You're welcome."
       }
     ],
     "choices": [
@@ -395,7 +395,7 @@ std::string_view tutorial_catalog() {
       "A timeless masterpiece",
       "You got me"
     ],
-    "text": "Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and checking the route is how you know the audio is going where intended. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters."
+    "text": "Testing, one, two. Bold. Original. They'll be talking about this performance for years. Now, could you hear yourself? I'd hope so. Your ears work even when the headset doesn't. In a real setup, you'd check that the sound actually came through the intended output. That's the habit I want you to take away from this."
   },
   "N030-B": {
     "expression": "mischievous",
@@ -404,7 +404,7 @@ std::string_view tutorial_catalog() {
       "Fair point",
       "You set me up"
     ],
-    "text": "And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. The important bit is you actually tried the mic check. Do that when you set up real routing, too."
+    "text": "And could you hear yourself? I'd certainly hope so. Turns out the human head comes with built-in monitoring. In a real setup, make sure you hear it from the intended output, not just your own mouth. You've got the right idea, though. Always test a new route before trusting it."
   },
   "N031": {
     "expression": "happy",
@@ -446,7 +446,7 @@ std::string_view tutorial_catalog() {
         "from": "N031",
         "label": "I think I’ve got it",
         "expression": "smug",
-        "text": "Good. That's the whole idea. And that button over there says Stop Routing. I have faith in your ability to work out what it does. We're not going to spend six slides on it."
+        "text": "Good. That's the whole idea. And that button up there says Stop Routing. I have faith in your ability to work out what it does. We're not going to spend six slides on it."
       },
       {
         "from": "N031",
@@ -460,7 +460,7 @@ std::string_view tutorial_catalog() {
       "Should I click Stop?"
     ]
   })AHTUTORIAL",
-    // 06 — ONE LAST THING: SETTINGS AND EXIT
+    // 05B — FROM DEVICES TO APPLICATIONS
     R"AHTUTORIAL(  "N033": {
     "expression": "mischievous",
     "variants": [
@@ -468,25 +468,29 @@ std::string_view tutorial_catalog() {
         "from": "N032",
         "label": "Seems self-explanatory",
         "expression": "smug",
-        "text": "I knew you had it in you. Oh, one last thing before I turn you loose... Settings. Come on, quick tour. I promise there's no quiz. Mostly because nobody approved the budget for one."
+        "text": "See? You're getting the hang of this. We've got our devices talking to each other, but there's still the question of which apps get to use them. Turns out Windows has some interesting ideas about organization, and I use that word generously."
       },
       {
         "from": "N032",
         "label": "Should I click Stop?",
-        "expression": "talking",
-        "text": "You can, but you don't need to for this exercise. The pretend connection won't follow you home. Oh, one last thing before I turn you loose... Settings. Come on, quick tour. I promise there's no quiz. Mostly because nobody approved the budget for one."
+        "expression": "mischievous",
+        "text": "You can, but you don't need to. The imaginary audio isn't going anywhere. Now, we've got our devices talking to each other, but there's still the matter of getting individual apps where we want them. Windows has a few ideas about that. Some of them are even good."
       }
     ],
-    "choices": []
-  },
-  "N034": {
+    "choices": [
+      "Sounds organized",
+      "How bad could it be?"
+    ]
+  })AHTUTORIAL",
+    // 06 — ONE LAST THING: SETTINGS AND EXIT
+    R"AHTUTORIAL(  "N034": {
     "expression": "talking",
     "variants": [],
     "choices": [
       "Got it",
       "What’s locked?"
     ],
-    "text": "This is where you can mess with AudioHole's looks, whether it starts with Windows, what it does when your PC boots, and a few other knobs worth fiddling with. Some of it's locked down while we're in the tutorial. Can't have you rearranging the stage while I'm standing on it."
+    "text": "This is where you can change how AudioHole looks, whether it starts with Windows, what happens when your PC boots, and a bunch of other things you'll probably regret fiddling with at three in the morning. Some controls are locked during the tutorial, mostly because I don't trust you not to replace me halfway through my own presentation."
   },
   "N035": {
     "expression": "happy",
@@ -495,13 +499,13 @@ std::string_view tutorial_catalog() {
         "from": "N034",
         "label": "Got it",
         "expression": "smug",
-        "text": "Excellent. We can now pretend I gave you a complete tour of Settings. And that's the tour. You made it all the way through without unplugging anything important. Granted, nothing was plugged in. Still counts."
+        "text": "Good enough for government work. We'll spare you the grand tour of every checkbox. That's the tutorial, and you made it through without unplugging a single important thing. Granted, none of it was plugged in. I'm counting it anyway."
       },
       {
         "from": "N034",
         "label": "What’s locked?",
         "expression": "talking",
-        "text": "Personality, Animation, and DFA are visible but disabled here. Can't have you replacing me halfway through my big moment. Anyway, that's the tour. You made it all the way through without unplugging anything important. Granted, nothing was plugged in. Still counts."
+        "text": "Personality, Animation, and DFA are visible, but locked while we're doing the tutorial. I'd rather you didn't replace the stage while I'm halfway through my big moment. Anyway, you made it to the end without unplugging anything important. Nothing was plugged in, but I think we both deserve credit."
       }
     ],
     "choices": [
@@ -516,13 +520,13 @@ std::string_view tutorial_catalog() {
         "from": "N035",
         "label": "Keep exploring",
         "expression": "smug",
-        "text": "That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side."
+        "text": "That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here. Your real setup is waiting on the other side."
       },
       {
         "from": "N035",
         "label": "Can I break anything?",
         "expression": "deadpan",
-        "text": "Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side."
+        "text": "Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. Hit End Tutorial and restart when you’re ready to start playing in the real world. Your imaginary devices stay here. Your real setup is waiting on the other side."
       }
     ],
     "choices": []
@@ -557,7 +561,7 @@ std::string_view tutorial_catalog() {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "Almost. We need the other end of that connection. Follow the highlighted selector — Source is where the audio comes from, Destination is where it's headed."
+    "text": "Almost. We need the other end of that connection. Follow the highlighted selector, Source is where the audio comes from, Destination is where it's headed."
   },
   "B003": {
     "expression": "deadpan",
@@ -605,7 +609,7 @@ std::string_view tutorial_catalog() {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "Fair enough, straight into the deep end. I'll pack up the imaginary hardware. Good luck out there — and remember, Source to Destination. That's most of it."
+    "text": "Fair enough, straight into the deep end. I'll pack up the imaginary hardware. Good luck out there, and remember, Source to Destination. That's most of it."
   },
   "B011": {
     "expression": "concerned",
@@ -648,7 +652,7 @@ std::string_view tutorial_catalog() {
     "expression": "smug",
     "variants": [],
     "choices": [],
-    "text": "Four endpoints, zero cables, and somehow I still feel like someone owes me overtime."
+    "text": "Nine endpoints, zero cables, and somehow I still feel like somebody owes me overtime."
   },
   "C006": {
     "expression": "deadpan",
@@ -676,10 +680,22 @@ std::string_view tutorial_catalog() {
   })AHTUTORIAL",
     // Plug Board introduction
     R"AHTUTORIAL(  "PB001": {
-    "expression": "talking",
-    "variants": [],
-    "choices": [],
-    "text": "We've connected devices. Now let's tell individual apps where to send their audio. Open Plug Board; I've got a small organizational problem for you."
+    "expression": "idle",
+    "variants": [
+      {
+        "from": "N033",
+        "label": "Sounds organized",
+        "expression": "talking",
+        "text": "Our devices are connected. Now comes the part where we stop every app from piling into the same output like it's Black Friday 1996, and Toys R Us only has one Tickle Me Elmo left. Open Plug Board. We're gonna bring a little civilization to this mess."
+      },
+      {
+        "from": "N033",
+        "label": "How bad could it be?",
+        "expression": "deadpan",
+        "text": "Ever see the footage of people fighting over Tickle Me Elmo dolls on Black Friday back in '96? Imagine that, except every app on your computer wants the same audio output. Yeah. Open Plug Board. We're gonna bring a little civilization to this mess."
+      }
+    ],
+    "choices": []
   },
   "PB002": {
     "expression": "thinking",
@@ -688,7 +704,7 @@ std::string_view tutorial_catalog() {
       "So they're categories?",
       "As many as I want?"
     ],
-    "text": "These columns are sockets. Each points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds."
+    "text": "Behold, the socket, everyone gets one for free, but we can have as many as we want because the budget is as imaginary as our USB devices. Each socket points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds, and you can even make multiple sockets play back to the same device if you want, very organized."
   },
   "PB003": {
     "expression": "idle",
@@ -697,13 +713,13 @@ std::string_view tutorial_catalog() {
         "from": "PB002",
         "label": "So they're categories?",
         "expression": "talking",
-        "text": "Exactly. Categories with an output device attached. I've lent you a few of my totally legit apps to try it out; they're all in System, currently using the BoomSlab 9001."
+        "text": "Exactly. Categories with an output device attached. Usually an app needs to be playing audio for it to show up here, but I've lent you a few of my totally legit apps to try it out. They're all in System, currently using the BoomSlab 9001 (The ultimate compact PC soundbar, with 23 distinct drivers, unmatched sub-bass response, and karate chop action!)."
       },
       {
         "from": "PB002",
         "label": "As many as I want?",
         "expression": "smug",
-        "text": "As many as you please. Whether you can organize that mess is another question. I've put my totally legit practice apps in System, pointing at our BoomSlab 9001."
+        "text": "As many as you please. Whether you can organize that mess is another question. Usually an app needs to be playing audio for it to show up here, but for this exercise I've put my totally legit practice apps in System, pointing at our BoomSlab 9001 (The ultimate compact PC soundbar, with 23 distinct drivers, unmatched sub-bass response, and karate chop action!)."
       }
     ],
     "choices": [
@@ -718,59 +734,47 @@ std::string_view tutorial_catalog() {
         "from": "PB003",
         "label": "Totally legit, huh?",
         "expression": "suspicious",
-        "text": "They passed every inspection I performed in my imagination. Anyway, make a new socket for music; let's give those suspiciously legal tunes their own destination."
+        "text": "Passed my rigorous inspection process, which consisted of looking at them and nodding. Anyway, make a new socket for music. The popup will ask you to name it. Pick something you'll recognize when your playlist starts misbehaving."
       },
       {
         "from": "PB003",
         "label": "Why System?",
         "expression": "talking",
-        "text": "System catches new apps until you assign them somewhere else. Let's create a new socket for music, so it doesn't all have to go through System."
+        "text": "System is the catch-all for apps you haven't assigned yet. Useful, but a little crowded. Create a socket for music and give it a name in the popup. We're getting those tunes their own place to live."
       }
     ],
     "choices": []
-  },
-  "PB005": {
-    "expression": "talking",
-    "variants": [],
-    "choices": [],
-    "text": "Give that socket a music-related name. Whatever makes sense to you; we're not grading the poetry."
   },
   "PB006": {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "Now set its output to MixBoard Music. That's the pretend mixer channel we'll use for music."
+    "text": "Nice. Now point that music socket at MixBoard Music. That's its pretend mixer channel. We've officially given the playlist its own lane."
   },
   "PB007": {
     "expression": "happy",
     "variants": [],
     "choices": [],
-    "text": "Good. Let's make a second socket for games, so the explosions don't have to share a channel with the playlist."
+    "text": "Alright, now make a second socket for games. Name it in the popup like you did with music. I prefer my explosions and my playlists on separate faders, personally."
   })AHTUTORIAL",
     // Plug Board assignment
-    R"AHTUTORIAL(  "PB008": {
-    "expression": "working",
-    "variants": [],
-    "choices": [],
-    "text": "Name this one for games. Again, any sensible label will do."
-  },
-  "PB009": {
+    R"AHTUTORIAL(  "PB009": {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "Give the game socket MixBoard Game as its destination. One channel for games, one for music. Even I can keep track of that."
+    "text": "Set the game socket's destination to MixBoard Game. Games on one channel, music on another. Beautiful. It's almost like we organized something on purpose."
   },
   "PB010": {
     "expression": "smug",
     "variants": [],
     "choices": [],
-    "text": "Find Felony Jaywalking LXVII in System and move it to your game socket. I still don't understand the hype. People act like it's the sixty-seventh coming."
+    "text": "Alright, find Felony Jaywalking LXVII in System and drag it into the game socket. Sixty-seven games in and they still can't release one on time. Delayed three times, costs a hundred bucks, doesn't even come on a disc anymore, and the download takes up an entire goddamn SSD. At this point, I'm pretty sure they're just selling you a license to buy more storage. Anyway, don't ask how I got this working on PC."
   },
   "PB011": {
     "expression": "deadpan",
     "variants": [],
     "choices": [],
-    "text": "There. Civilization survives. Now move Spooty into your music socket so it gets its own mixer channel."
+    "text": "Good. The crimes are contained. Now grab Spooty and move it into the music socket. We can let the music play without making it compete with the sound of somebody stealing a car."
   },
   "PB012": {
     "expression": "happy",
@@ -779,7 +783,7 @@ std::string_view tutorial_catalog() {
       "So I can balance them separately?",
       "And other apps work the same way?"
     ],
-    "text": "And there it is. Game and music now feed separate channels on our pretend mixing board, so you can control them independently from the external device."
+    "text": "There we go. Felony Jaywalking and Spooty are headed to different channels on our pretend mixer. You can turn the game down without murdering the music volume, or vice versa. A small victory for civilization."
   },
   "PB013": {
     "expression": "idle",
@@ -787,54 +791,54 @@ std::string_view tutorial_catalog() {
       {
         "from": "PB012",
         "label": "So I can balance them separately?",
-        "expression": "talking",
-        "text": "Exactly. Separate physical volume controls for games and music. Feel free to experiment, and meet me in Settings when you're done. One last thing to show you."
+        "expression": "happy",
+        "text": "Bingo. Music on one channel, games on another, each with its own volume control on the mixer. You can crank up your music without making the game louder, or turn down the game when some toddler starts screaming slurs at you. Go ahead and play around with the board if you like. When you're done rearranging the furniture, head over to Settings. One last stop before I turn you loose."
       },
       {
         "from": "PB012",
         "label": "And other apps work the same way?",
         "expression": "smug",
-        "text": "Yep. Move an app to a socket and it follows that socket's destination. Play around if you like; I'll be in Settings with one last thing to show you."
+        "text": "Pretty much. Grab an app, toss it into a socket, and its audio follows wherever that socket points. You can even have several sockets going to the same device if you want to organize things without needing a small warehouse full of sound cards. Go ahead and mess around with it. When you're satisfied with your handiwork, head over to Settings. We're almost done here."
       }
     ],
     "choices": []
   },
   "PB014": {
-    "expression": "idle",
+    "expression": "mischievous",
     "variants": [],
     "choices": [],
-    "text": "Ah, there you are. Last stop: Settings."
+    "text": "Ah, there you are. Finally satisfied with where you've been sticking things? Good. Last stop, Settings. Then I'll stop hovering over your shoulder like an overly invested driving instructor."
   })AHTUTORIAL",
     // Plug Board reactions
     R"AHTUTORIAL(  "PB-R01": {
     "expression": "concerned",
     "variants": [],
     "choices": [],
-    "text": "Looks like one of our practice apps wandered off. Let's restore the tutorial's fake app list before we continue."
+    "text": "Well, one of our fake apps has apparently escaped containment. Let's get it back into the practice list before we continue."
   },
   "PB-R02": {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "The socket exists; it still needs its destination. Check the output dropdown at the top."
+    "text": "You've built the socket, but it doesn't know where to send anything yet. Check the output dropdown at the top. Even imaginary audio needs directions."
   },
   "PB-R03": {
     "expression": "talking",
     "variants": [],
     "choices": [],
-    "text": "That name works. The device assignment is what matters here."
+    "text": "Works for me. Call it whatever you like. I'm more concerned with where the audio ends up than what you put on the label."
   },
   "PB-R04": {
     "expression": "concerned",
     "variants": [],
     "choices": [],
-    "text": "Close, but that one's headed to the wrong place. Give it another drag, or use its right-click menu."
+    "text": "Close, but you've sent that app to the wrong neighborhood. Drag it over to the right socket, or use the right-click menu if you're feeling civilized."
   },
   "PB-R05": {
     "expression": "deadpan",
     "variants": [],
     "choices": [],
-    "text": "No. It's a fake board with fake devices and apps. Your actual Windows audio setup is untouched."
+    "text": "Nope. Fake board, fake apps, fake devices. Your actual Windows setup is sitting comfortably at home, blissfully unaware of this nonsense."
   },
   "PB-R06": {
     "expression": "smug",
@@ -852,13 +856,19 @@ std::string_view tutorial_catalog() {
     "expression": "thinking",
     "variants": [],
     "choices": [],
-    "text": "Before we move on, Felony Jaywalking goes in Games and Spooty goes in Music. The labels can be yours; the destinations need to match."
+    "text": "Before we move on, Felony Jaywalking belongs in the socket going to MixBoard Game, and Spooty belongs in the one going to MixBoard Music. Call them whatever you like."
+  },
+  "PB-R09": {
+    "expression": "surprised",
+    "variants": [],
+    "choices": [],
+    "text": "Oh, come on. We were using that one! Make another socket for the same job, name it in the popup, and we'll put everything back where it belongs. Management's gonna make me do this whole bit again, aren't they?"
   })AHTUTORIAL"
     };
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(36006);
+        result.reserve(39033);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

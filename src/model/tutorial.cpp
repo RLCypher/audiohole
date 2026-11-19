@@ -13,8 +13,9 @@ const std::map<std::string, std::string> choices_next{
     {"N001", "N002"},   {"N002", "N003"},   {"N003", "N004"},   {"N006", "N006A"},
     {"N006A", "N007"},  {"N010", "N011"},   {"N012", "N013"},   {"N013", "N014"},
     {"N025", "N026"},   {"N027B", "N027A"}, {"N027A", "N028"},  {"N030-A", "N031"},
-    {"N030-B", "N031"}, {"N031", "N032"},   {"N032", "PB001"},  {"N034", "N035"},
-    {"N035", "N036"},   {"PB002", "PB003"}, {"PB003", "PB004"}, {"PB012", "PB013"}};
+    {"N030-B", "N031"}, {"N031", "N032"},   {"N032", "N033"},   {"N033", "PB001"},
+    {"N034", "N035"},   {"N035", "N036"},   {"PB002", "PB003"}, {"PB003", "PB004"},
+    {"PB012", "PB013"}};
 const std::map<std::string, std::vector<std::string>> targets{
     {"N004", {"devices_tab"}},
     {"N005", {"scan_tab"}},
@@ -33,7 +34,6 @@ const std::map<std::string, std::vector<std::string>> targets{
     {"N024", {"profile_save"}},
     {"N026", {"start"}},
     {"N032", {"stop"}},
-    {"N033", {"settings_tab"}},
     {"PB001", {"plug_board_tab"}},
     {"PB002", {"plug_columns"}},
     {"PB003", {"plug_socket:system", "plug_endpoint:system"}},
@@ -90,7 +90,7 @@ int Tutorial::expected_page() const {
         return beat_ == "PB013" ? SettingsPage : PlugBoardPage;
     return beat_ == "N004" || (beat_ >= "N011" && beat_ <= "N015") ? DevicesPage
            : beat_ >= "N005" && beat_ <= "N010"                    ? ScanningPage
-           : beat_ >= "N033"                                       ? SettingsPage
+           : beat_ >= "N034"                                       ? SettingsPage
                                                                    : ProfilesPage;
 }
 TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty) const {
@@ -133,10 +133,8 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
             if (!renamed_.contains(id))
                 out.targets.push_back(std::string("device:") + id);
     }
-    if (plug_bridge_ && beat_ == "N034")
+    if (plug_bridge_ && beat_ == "N034" && reminder_.empty() && overlay_.empty())
         out.text = catalog().at("PB014").at("text").get<std::string>() + "\n\n" + out.text;
-    if (beat_ == "PB005" || beat_ == "PB008")
-        out.targets = {"plug_rename:" + (beat_ == "PB005" ? music_socket_ : game_socket_)};
     if (beat_ == "PB006" || beat_ == "PB009")
         out.targets = {"plug_endpoint:" + (beat_ == "PB006" ? music_socket_ : game_socket_)};
     if (beat_ == "PB010" || beat_ == "PB011")
@@ -145,18 +143,13 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
                        "plug_socket:" + (beat_ == "PB010" ? game_socket_ : music_socket_)};
     if (beat_ == "PB012")
         out.targets = {"plug_endpoint:" + music_socket_, "plug_endpoint:" + game_socket_};
-    if (plug_recovery_) {
-        out.text = "Hey! We weren't done with that yet, put it back! Now management says I have to "
-                   "explain that part over again...";
-        out.expression = "surprised";
-    }
     if (beat_ == "N018A")
         out.targets.push_back("profile:" + profile_id_);
     if (beat_ == "N018B")
         out.targets.push_back("hole:" + hole_id_);
     if (beat_ == "N017" && early_profiles_ && reminder_.empty() && overlay_.empty())
-        out.text = "Looks like you got a little ahead of me, but management still wants me to walk "
-                   "you through this part to make sure you understand. " +
+        out.text = "Ah, you've already started without me. Love that initiative. Unfortunately, "
+                   "management still wants me to walk you through this bit, so humor me. " +
                    out.text;
     if (!complete_ && !recovery_.empty()) {
         out.text = "Hey! We weren't done with that yet, put it back! Now management says I have to "
@@ -177,7 +170,7 @@ TutorialView Tutorial::view(std::string_view selected_device, bool device_dirty)
             : sightseeing_page_;
     if (guide_page >= 0) {
         const auto& reminder = catalog().at("B001");
-        if (recovery_.empty() && reminder_ != "B009") {
+        if (recovery_.empty() && reminder_ != "B009" && !reminder_.starts_with("PB-R")) {
             out.text = reminder.at("text").get<std::string>();
             out.expression = reminder.at("expression").get<std::string>();
         }
@@ -209,8 +202,7 @@ bool Tutorial::choose(const std::string& id) {
                                      [&](const auto& c) { return c.id == id; });
     if (choice == current.choices.end())
         return false;
-    if (beat_ == "PB012" && !plug_assignments_ready()) {
-        remind("PB-R08");
+    if ((beat_ == "PB012" || beat_ == "N034") && !recover_plug_board()) {
         return false;
     }
     const auto next = beat_ == "N028" ? (choice->label == "I said something" ? "N030-B" : "N030-A")
@@ -266,21 +258,60 @@ void Tutorial::tick(std::int64_t now) {
     if (!overlay_.empty() && now >= overlay_until_)
         overlay_.clear();
 }
-bool Tutorial::plug_assignments_ready() const {
+std::string Tutorial::next_plug_requirement() const {
+    const auto find = [&](const std::string& id) -> const TutorialSocket* {
+        const auto found =
+            std::find_if(plug_state_.sockets.begin(), plug_state_.sockets.end(),
+                         [&](const auto& socket) { return !id.empty() && socket.id == id; });
+        return found == plug_state_.sockets.end() ? nullptr : &*found;
+    };
+    const auto* music = find(music_socket_);
+    const auto* game = find(game_socket_);
+    if (!music)
+        return "PB004";
+    if (!game)
+        return "PB007";
+    if (music->endpoint != "tutorial-music")
+        return "PB006";
+    if (game->endpoint != "tutorial-game")
+        return "PB009";
     const auto assigned = [&](const std::string& app, const std::string& socket) {
         const auto found = plug_state_.assignments.find(app);
         return !app.empty() && !socket.empty() && found != plug_state_.assignments.end() &&
                found->second == socket;
     };
-    const auto endpoint_matches = [&](const std::string& id, const char* endpoint) {
-        return std::any_of(
-            plug_state_.sockets.begin(), plug_state_.sockets.end(),
-            [&](const auto& socket) { return socket.id == id && socket.endpoint == endpoint; });
-    };
-    return assigned(plug_state_.game_app, game_socket_) &&
-           assigned(plug_state_.music_app, music_socket_) &&
-           endpoint_matches(game_socket_, "tutorial-game") &&
-           endpoint_matches(music_socket_, "tutorial-music");
+    if (!assigned(plug_state_.game_app, game_socket_))
+        return "PB010";
+    if (!assigned(plug_state_.music_app, music_socket_))
+        return "PB011";
+    return {};
+}
+bool Tutorial::recover_plug_board() {
+    const auto required = next_plug_requirement();
+    if (required.empty())
+        return true;
+    settings_ = plug_finished_ = plug_bridge_ = false;
+    enter(required);
+    if (required == "PB004" || required == "PB007") {
+        // Only discard an identity whose socket actually disappeared. A valid
+        // peer keeps its name, output and application assignment during recovery.
+        const auto missing = [&](const std::string& id) {
+            return std::none_of(plug_state_.sockets.begin(), plug_state_.sockets.end(),
+                                [&](const auto& socket) { return socket.id == id; });
+        };
+        if (missing(music_socket_))
+            music_socket_.clear();
+        if (missing(game_socket_))
+            game_socket_.clear();
+        remind("PB-R09");
+    } else if (required == "PB006" || required == "PB009") {
+        remind("PB-R02");
+    } else {
+        const bool missing_app =
+            (required == "PB010" ? plug_state_.game_app : plug_state_.music_app).empty();
+        remind(missing_app ? "PB-R01" : "PB-R08");
+    }
+    return false;
 }
 void Tutorial::plug_board(const TutorialPlugBoard& state) {
     const auto previous = std::move(plug_state_);
@@ -293,16 +324,11 @@ void Tutorial::plug_board(const TutorialPlugBoard& state) {
         return found == state.sockets.end() ? nullptr : &*found;
     };
     if (!music_socket_.empty() && !find(music_socket_)) {
-        music_socket_.clear();
-        game_socket_.clear();
-        enter("PB004");
-        plug_recovery_ = true;
+        recover_plug_board();
         return;
     }
     if (!game_socket_.empty() && !find(game_socket_)) {
-        game_socket_.clear();
-        enter("PB007");
-        plug_recovery_ = true;
+        recover_plug_board();
         return;
     }
     if (beat_ == "PB004" || beat_ == "PB007") {
@@ -310,32 +336,32 @@ void Tutorial::plug_board(const TutorialPlugBoard& state) {
             if (socket.id == "system" || plug_existing_.contains(socket.id))
                 continue;
             const bool music = beat_ == "PB004";
+            const auto* other = find(music ? game_socket_ : music_socket_);
+            // The real creation handler publishes a socket only after its
+            // naming popup commits. Blank or duplicate names cannot satisfy it.
+            if (socket.name.find_first_not_of(" \t\r\n") == std::string::npos ||
+                (other && socket.name == other->name))
+                continue;
             (music ? music_socket_ : game_socket_) = socket.id;
-            plug_initial_name_ = socket.name;
-            plug_recovery_ = false;
-            enter(music ? "PB005" : "PB008");
+            enter(music ? "PB006" : "PB009");
             return;
         }
     }
-    if (beat_ == "PB005" || beat_ == "PB008") {
-        const bool music = beat_ == "PB005";
-        const auto* socket = find(music ? music_socket_ : game_socket_);
-        const auto* music_socket = find(music_socket_);
-        if (socket && !socket->name.empty() && socket->name != plug_initial_name_ &&
-            (music || !music_socket || socket->name != music_socket->name))
-            enter(music ? "PB006" : "PB009");
-    } else if (beat_ == "PB006" || beat_ == "PB009") {
+    if (beat_ == "PB006" || beat_ == "PB009") {
         const bool music = beat_ == "PB006";
         const auto* socket = find(music ? music_socket_ : game_socket_);
-        if (socket && socket->endpoint == (music ? "tutorial-music" : "tutorial-game"))
-            enter(music ? "PB007" : "PB010");
+        if (socket && socket->endpoint == (music ? "tutorial-music" : "tutorial-game")) {
+            const auto next = next_plug_requirement();
+            enter(next.empty() ? "PB012" : next);
+        }
     } else if (beat_ == "PB010" || beat_ == "PB011") {
         const bool game = beat_ == "PB010";
         const auto& app = game ? state.game_app : state.music_app;
         const auto assigned = state.assignments.find(app);
         if (assigned != state.assignments.end() &&
             assigned->second == (game ? game_socket_ : music_socket_)) {
-            enter(game ? "PB011" : "PB012");
+            const auto next = next_plug_requirement();
+            enter(next.empty() ? "PB012" : next);
         } else if (state.assignments != previous.assignments) {
             remind("PB-R04");
         }
@@ -423,6 +449,8 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         if (beat_ == "PB001" && page == PlugBoardPage)
             enter("PB002");
         else if (beat_ == "PB013" && page == SettingsPage) {
+            if (!recover_plug_board())
+                return;
             settings_ = plug_finished_ = plug_bridge_ = true;
             enter("N034");
         } else if (beat_ == "N004" && page == DevicesPage)
@@ -434,16 +462,14 @@ void Tutorial::event(std::string_view action, const Snapshot& s, const Profile& 
         else if (beat_ == "N016" && page == ProfilesPage) {
             early_profiles_ = !s.profiles.empty();
             enter("N017");
-        } else if (beat_ == "N033" && page == SettingsPage) {
-            settings_ = true;
-            enter("N034");
         } else {
             const int expected = expected_page();
             sightseeing_page_ = !complete_ && page != expected ? expected : -1;
-            if (sightseeing_page_ >= 0)
+            if (sightseeing_page_ >= 0 && !reminder_.starts_with("PB-R"))
                 remind("B001");
             else {
-                reminder_.clear();
+                if (!reminder_.starts_with("PB-R"))
+                    reminder_.clear();
                 overlay_.clear();
             }
         }

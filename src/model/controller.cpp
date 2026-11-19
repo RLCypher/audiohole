@@ -10,6 +10,7 @@ namespace audiohole {
 namespace {
 // Logical fixture timing, chosen for observable UI transitions, not audio latency.
 constexpr int transition_duration_ms = 200;
+constexpr int tutorial_activation_duration_ms = 8000;
 constexpr int stop_duration_ms = 100;
 constexpr int beep_duration_ms = 1000;
 constexpr int scan_ms_per_percent = 30;
@@ -692,8 +693,9 @@ Result SimulatedController::activate(const std::string& id, bool arm_waiting) {
     state_.armed = true;
     state_.state = State::Starting;
     state_.paths.clear(); // A newly activated plan owns fresh simulated path lifetimes.
-    transition_ms_ =
-        state_.operating_mode == OperatingMode::Tutorial ? 10000 : transition_duration_ms;
+    transition_ms_ = state_.operating_mode == OperatingMode::Tutorial
+                         ? tutorial_activation_duration_ms
+                         : transition_duration_ms;
     refresh_paths();
     event("activated", "Activated profile: " + candidate->display_name);
     return result;
@@ -845,7 +847,9 @@ void SimulatedController::advance(int ms) {
         transition_ms_ = std::max(0, transition_ms_ - ms);
         if (state_.operating_mode == OperatingMode::Tutorial &&
             state_.tutorial_activation_percent >= 0 && state_.armed) {
-            state_.tutorial_activation_percent = 100 * (10000 - transition_ms_) / 10000;
+            state_.tutorial_activation_percent =
+                100 * (tutorial_activation_duration_ms - transition_ms_) /
+                tutorial_activation_duration_ms;
             ++state_.revision;
             if (before / 1000 != transition_ms_ / 1000)
                 event("tutorial-routing-progress",

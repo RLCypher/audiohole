@@ -29,7 +29,7 @@
     {
       "path": "include/audiohole/plug_board/view.hpp",
       "handover_sha256": "eebba82e0e4e7c9e2a250544e54670ce539fa9df45f1d12f45a3c87f7b67ba3c",
-      "integrated_sha256": "5429111c0bbf0a7779b192717ff2e916069e2a94525bf1738bd34b21c396867c"
+      "integrated_sha256": "126a0b3e3bf449f2f7053e553c390658bcf042003d18f0dfba393529c263a4dc"
     },
     {
       "path": "src/core/module.cpp",
@@ -84,7 +84,7 @@
     {
       "path": "src/wx/settings_drawer.cpp",
       "handover_sha256": "3947c21d79664fdc2dc93671a76a04e9e1191b1ab9f24f3087a8e82f53ba714f",
-      "integrated_sha256": "ffd980dc212cb24652e0850aacfdacedcd38206f2e64a75ef5404e6445a1eef2"
+      "integrated_sha256": "e381097a083a9ca78f597e43b2b596817e7ad399f9d5250e86d40fea56b83160"
     },
     {
       "path": "src/wx/socket_view.cpp",

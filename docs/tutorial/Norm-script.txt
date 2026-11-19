@@ -1,5 +1,5 @@
 AUDIOHOLE — NORM TUTORIAL DIALOGUE
-Version 2.7 — Focused guidance, smooth scrolling, restart, and working greetings
+Version 2.8 — Norm voice pass, focused guidance, and working greetings
 
 PURPOSE
 A guided, completely fictional sandbox exercise. This is the dialogue for the owner's original tutorial workflow, NOT a replacement curriculum. No real devices are scanned, no audio is routed, and no profile/device files are written. The only permitted persistent change is the tutorial-complete flag. All lines appear in the status/personality panel. Settings keeps Personality, Animation, and DFA fields visible but disabled (grayed out), with “(Disabled for tutorial)” appended to their section headers; Replay Tutorial becomes Skip Tutorial.
@@ -7,7 +7,7 @@ A guided, completely fictional sandbox exercise. This is the dialogue for the ow
 FORMAT AND EVENT CONTRACT
 Each beat has an ID, approved expression, activation cue and displayed dialogue. The prefix `NORM:` in this authoring file is a SCRIPT DESIGNATOR ONLY: never render a speaker label, `Norm:`, `NORM:`, or similar prefix in the application's dialogue panel. Display only the dialogue text. Fallback expression: idle.
 
-Every tutorial transition is triggered by a confirmed EVENT, not a dialogue-duration timer: a response-button click, specified GUI navigation/change/save, or a simulated operation's `completed` event. The two deliberate simulated operations have approximately 20-second Deep / Full scan and 10-second Start Routing durations. Their simulation controllers emit completion events after their respective progress sequences. The tutorial state machine subscribes to those events; it does not advance by waiting an arbitrary number of seconds, firing a generic dialogue timeout, or assuming a result. No other progression timers are allowed.
+Every tutorial transition is triggered by a confirmed EVENT, not a dialogue-duration timer: a response-button click, specified GUI navigation/change/save, or a simulated operation's `completed` event. The two deliberate simulated operations have approximately 20-second Deep / Full scan and 8-second Start Routing durations. Their simulation controllers emit completion events after their respective progress sequences. The tutorial state machine subscribes to those events; it does not advance by waiting an arbitrary number of seconds, firing a generic dialogue timeout, or assuming a result. No other progression timers are allowed.
 
 Each narration-only beat has TWO bespoke player-response buttons, vertically stacked directly at the avatar's feet in the status/personality panel, styled like dating-sim dialogue choices. They are distinct full-width options, not side-by-side buttons. Clicking one advances exactly once to the same next beat, selecting the COMPLETE next-beat dialogue variant that incorporates Norm's reaction. No intermediate comeback screen, reaction-only beat, 'Continue' button, or extra click. When the next state requires a GUI action, that action (not a response button) is the progression gate. Keep the existing welcome screen intact.
 
@@ -26,32 +26,32 @@ Norm is a competent, laid-back audio tech who finds the whole business faintly r
 
 N001 [happy]
 Cue: Tutorial begins, after the welcome screen.
-NORM: Hey. I'm Norm. I'll show you how to get around AudioHole, make a connection, and generally avoid putting things where they don't belong. It's easier than it sounds. Mostly.
+NORM: Hey, I'm Norm. I'll show you around AudioHole, help you make your first connection, and hopefully keep you from plugging things into places they have no business being. It's pretty straightforward once you get the hang of it. Famous last words, I know.
 UI: Show two response buttons: "Let’s do this" and "Where’s the manual?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N002 [mischievous]
 Cue: Introduce the pretend scenario.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N001 / Let’s do this [smug]
-  NORM: Excellent. I appreciate a person with misplaced confidence. Here's today's little science project: we're connecting a wireless USB headset to an external mixer. Normally those two don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions.
+  NORM: That's the spirit. Confidence first, understanding later. Today's little science project is this: we're connecting a wireless USB headset to an external mixer in preparation for a livestream. Normally those two USB devices don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions.
   Variant B — from N001 / Where’s the manual? [mischievous]
-  NORM: Oh, we have a manual. I use it to level a wobbly desk. Anyways, here's today's little science project: we're connecting a wireless USB headset to an external mixer. Normally those two don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions.
+  NORM: We have a manual. It's currently keeping my desk from wobbling, so you're stuck with me. Today's little science project is this: we're connecting a wireless USB headset to an external mixer in preparation for a livestream. Normally those two USB devices don't exactly shake hands. They're more the type to stand across the room and pretend they don't know each other. AudioHole is here to make introductions.
 UI: Show two response buttons: "Sounds questionable. I’m in." and "Is this actually possible?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N003 [deadpan]
 Cue: Establish sandbox rules before any actions.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N002 / Sounds questionable. I’m in. [smug]
-  NORM: That's the spirit. A healthy disregard for how USB devices usually behave. One important detail before we start: we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so you can make a complete mess without getting an angry email from your sound card.
+  NORM: I like the attitude. A healthy disregard for how USB devices usually behave. One important detail before we start: we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so you can make a complete mess without getting an angry email from your sound card.
   Variant B — from N002 / Is this actually possible? [talking]
-  NORM: Yep. The headset and mixer don't need to know how to talk directly; AudioHole handles the connection between their Windows endpoints. Today, though, we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so feel free to experiment without putting your actual sound card through therapy.
+  NORM: Yep. The headset and mixer don't need to know how to talk directly. AudioHole handles the connection between their Windows endpoints. Today, though, we're playing pretend. Fake devices, fake ports, fake audio. Nothing here touches your real setup, so feel free to experiment without putting your actual sound card through therapy.
 UI: Show two response buttons: "I love pretend science" and "So nothing gets touched?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N004 [thinking]
 Cue: Point out empty setup; highlight Devices tab.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N003 / I love pretend science [smug]
-  NORM: Excellent. Our budget is unlimited, provided you don't expect any of it to exist. First problem: we've got no devices to work with. Hard to make a connection with absolutely nothing. Head over to Devices and take a look.
+  NORM: Excellent. Our budget is unlimited, provided you don't expect any of it to exist. First problem, we've got absolutely no devices. Turns out connecting nothing to nothing isn't particularly useful. Open Devices and have a look.
   Variant B — from N003 / So nothing gets touched? [talking]
   NORM: Correct. Your real hardware, settings, and profiles stay exactly where we found them. First problem in our pretend setup: we've got no devices to work with. Hard to make a connection with absolutely nothing. Head over to Devices and take a look.
 
@@ -61,11 +61,11 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
 
 N005 [deadpan]
 Cue: Devices tab entered; show empty device list. Highlight Scanning / Diagnostics tab.
-NORM: Beautiful. A whole lot of nothing. That's where scanned devices will show up. Let's go find some. Scanning tab, please.
+NORM: Behold, a breathtaking collection of absolutely nothing. Once we've scanned some devices, they'll show up here. Head over to Scanning and we'll fix this tragic lack of stuff.
 
 N006 [mischievous]
 Cue: Scanning tab entered.
-NORM: Time to plug a few imaginary devices into imaginary USB ports. I've got nine imaginary endpoints ready to go, and I assure you the cable management is immaculate.
+NORM: Time to plug some imaginary hardware into imaginary USB ports. Nine endpoints, all ready to go. Best cable management I've ever done, and I didn't even have to crawl behind a desk.
 UI: Show two response buttons: "Plug ’em in" and "What could go wrong?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N006A [thinking]
@@ -81,13 +81,13 @@ N007 [talking]
 Cue: Highlight Testing level and Scope; require Deep / Advanced and Full scan.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N006A / Go deep [smug]
-  NORM: Excellent. Let's be nosy. Set Testing level to Deep or Advanced, and the scope to Full scan. That gives us the fullest picture of what the hardware can do. Since it's pretend hardware, I'm feeling unusually brave about it.
+  NORM: Good, let's get nosy. Set Testing level to Deep or Advanced, then set the scope to Full scan. We want to know what these things can actually do. Ordinarily I'd be a little more polite to somebody else's hardware, but none of this exists, so screw it.
   Variant B — from N006A / Why not Basic? [talking]
   NORM: Basic's great for finding what's connected, but it can miss capabilities that Windows doesn't volunteer. Deep does more digging. So set Testing level to Deep or Advanced and the scope to Full scan. If our imaginary devices object, I'll handle the paperwork.
 
 N008 [working]
 Cue: Both settings confirmed; highlight Start Scan. Start only on click.
-NORM: All set? Hit Start Scan. I'll go interrogate some fictional USB devices. Try not to look too impressed.
+NORM: Alright, hit Start Scan. I'll go ask our fictional USB devices some deeply personal questions about sample rates. Try to look impressed.
 
 N009 [working]
 Cue: Start Scan event begins simulated Deep / Full scan lasting approximately 20 seconds. Drive a progress bar and convincing CLI-style output. Emit scan_completed ONLY at successful simulated completion; N010 is entered from that event, never a dialogue timer. While running, keep N009 displayed (unless a temporary Norm-click overlay is active).
@@ -95,7 +95,7 @@ NORM: Scanning... checking formats, poking at sample rates, asking Windows nicel
 
 N010 [celebrating]
 Cue: Simulated scan completed; nine exact endpoints now in sandbox device list.
-NORM: Well, would you look at that. Nine brand-new imaginary endpoints, and not one of them caught fire. For the record, a real Deep scan might take a little longer. Real hardware has the nerve to be complicated.
+NORM: Well, look at that. Nine imaginary endpoints and not a single electrical fire. A real Deep scan can take longer, by the way. Real hardware has the irritating habit of actually existing.
 UI: Show two response buttons: "Show me the devices" and "Did you actually scan anything?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 ======================================================================
@@ -119,22 +119,22 @@ N013 [smug]
 Cue: Point out detailed device information; no extra interaction required.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N012 / Neat [smug]
-  NORM: I know. Try not to get emotional. There's a whole pile of information here if you're the kind of person who thinks sample rates are a personality trait. No judgment. I've met worse people.
+  NORM: I know, it's beautiful. Try not to cry. There's a whole pile of device information here if you're the sort of person who has strong opinions about sample rates. I do, unfortunately. It's a condition.
   Variant B — from N012 / Why two entries for one headset? [talking]
-  NORM: One headset, two jobs: its microphone sends audio and its speakers receive it. Windows gives each job its own endpoint. And if you're the kind of person who thinks sample rates are a personality trait, there's a whole pile of device information here to enjoy. No judgment. I've met worse people.
+  NORM: One headset, two jobs. The mic sends audio in, the speakers play it back, and Windows lists them separately. If you open the details, there's a whole buffet of sample rates and formats, too. I have opinions about most of them. You have been warned.
 UI: Show two response buttons: "Okay, nerd" and "I do like sample rates". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N014 [suspicious]
 Cue: Highlight FakeTech microphone and speaker names, then editable Display name fields.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N013 / Okay, nerd [smug]
-  NORM: Guilty. I have opinions about buffer sizes too. It's a condition. Speaking of things I have opinions about, Windows named our fake headset something that looks like a printer having a stroke. Let's fix that. Pick two devices and give them names you'll actually recognize later. Whatever you want. I'm not your dad.
+  NORM: Guilty. I have opinions about buffer sizes too. Another unfortunate condition. Speaking of things I have opinions about, Windows named our fake headset something that looks like a printer having a stroke. Let's fix that. Pick two devices and give them names you'll actually recognize later. Whatever you want. I'm not your dad.
   Variant B — from N013 / I do like sample rates [suspicious]
   NORM: Ah, one of my people. We'll get along fine. But first, Windows named our fake headset something that looks like a printer having a stroke. Let's fix that. Pick two devices and give them names you'll actually recognize later. Whatever you want. I'm not your dad.
 
 N015 [talking]
 Cue: Wait until two distinct device display names are changed and both explicitly saved. Highlight Save for unsaved changes.
-NORM: And remember to hit Save on each one. I know, I know, the button isn't decorative. Future-you will thank present-you when the names show up in the profile builder.
+NORM: Make sure you hit Save on both. Yes, the button actually does something. Future-you will appreciate this when you're building profiles instead of trying to remember which numbered USB contraption is which.
 
 N016 [happy]
 Cue: Two distinct rename-and-save actions confirmed; highlight Profiles tab.
@@ -146,33 +146,33 @@ NORM: Much better. Two devices, two names, no mysterious strings of numbers. Loo
 
 N017 [talking]
 Cue: Profiles tab entered; highlight Create Profile.
-NORM: Profiles are just saved setups. You can have one for everyday use, one for live streaming, one for turning a bluetooth speaker into an ad hoc PA system, one for whatever cursed collection of USB gadgets you're running next Tuesday. Really any configuration of devices you might want to quickly switch between depending on the situation or what you need to do at any given moment. Let's make one. Click Create Profile.
+NORM: Profiles are saved setups you can switch between. Maybe you've got one for everyday use, another for streaming, and a third for turning a Bluetooth speaker into a deeply questionable PA system. Whatever weird pile of USB hardware Tuesday throws at you, you can keep a setup ready for it. Click Create Profile and we'll make our first one.
 
 N018A [thinking]
 Cue: Profile created. Highlight the new profile with an AudioHole Pink border. Require user to right-click the profile, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
-NORM: Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, 'New Profile (7)' stops being helpful.
+NORM: Before we go poking holes in things, let's give this profile a proper name. Right-click it and select Rename. Something you'll recognize later, preferably. Trust me, once you've got a dozen of these things, "New Profile (7)" stops being helpful.
 Advancement: Confirmed profile rename. No dialogue buttons.
 
 N018 [mischievous]
 Cue: Profile renamed; highlight Create Hole.
-NORM: Excellent! Now for the fun part. Every profile needs a hole or two, otherwise it's just a very organized empty box. A hole simply tells the profile what audio endpoints you want to connect together. Think of it like a wormhole for your audio, very sophisticated technology, very science, and simpler than it seems. You can have as many as you need in a single profile, but I wouldn't have more than 8, things might get a little weird. Because our little tutorial session is a simple connection between two devices, we'll only need one hole, go ahead and make it.
+NORM: Now we get to the good stuff. A profile without any holes is basically a very organized empty box. Each hole connects audio endpoints, like a little wormhole for sound. Very science. You can build several into one profile, though I'd keep it to eight or fewer unless you enjoy making your computer question its life choices. We only need one today. Go ahead and create a hole.
 
 N018B [smug]
 Cue: Hole created. Highlight the new hole with an AudioHole Pink border. Require user to right-click the hole, select Rename, enter a new name different from its initial default, and confirm. Accept any valid name; do not prescribe it.
-NORM: Same deal with the hole. Right-click, Rename, give it something descriptive. I know, naming things isn't exactly the exciting part of audio engineering, but a little organization now saves a whole lot of 'what the hell does this one do?' later. Good habits.
+NORM: Same deal here. Right-click the hole and choose Rename. Give it something that tells you what it actually does. I know, naming things is about as exciting as labeling cables, but it beats opening six mystery holes later and wondering which one you were using.
 Advancement: Confirmed hole rename. No dialogue buttons.
 
 N019 [talking]
 Cue: Hole renamed; highlight Enable return channel, require ON.
-NORM: Normally, a hole carries audio from a Source to a Destination. But we want to talk into the mixer AND hear audio coming back. So we're going both ways. Turn on Enable return channel. One hole, two directions. Efficient, really.
+NORM: Normally, a hole takes audio from a Source and sends it to a Destination. Simple enough. But we want to speak into the mixer and hear the result back through the headset. Turn on Enable return channel and we'll give this thing a round trip ticket. One hole, two directions. Look at us being efficient.
 
 N020 [talking]
 Cue: Return enabled. Highlight Forward Source selector.
-NORM: Let's wire up the forward direction first. For the Source, choose the FakeTech headset microphone — whatever you renamed it to. That's where our imaginary voice starts its journey.
+NORM: Let's wire up the forward direction first. For the Source, choose the FakeTech headset microphone, whatever you renamed it to. That's where our imaginary voice starts its journey.
 
 N021 [thinking]
 Cue: Correct Forward Source chosen. Highlight Forward Destination selector.
-NORM: And send it to MixBoard Output. That's our mixer's receiving side in this exercise. The label's a little backwards if you're picturing the physical plugs, so trust the direction and the endpoint type, not your gut.
+NORM: Now send it to MixBoard Output. That's the receiving endpoint on our pretend mixer. Yeah, the name sounds backwards if you're thinking about the physical jacks. Welcome to audio routing, where the labels occasionally exist to test your patience.
 
 N021A [suspicious]
 Cue: Forward Source and Destination confirmed. Highlight the Forward direction’s Prefer exclusive mode checkbox; require ON before advancing. If hidden behind Advanced Tuning, reveal the section and activate only the necessary Forward exclusive preference through the actual supported configuration path; do not silently change unrelated overrides. Do not change Return direction's exclusive preference.
@@ -180,11 +180,11 @@ NORM: One more thing before we send this back the other way. Check Prefer exclus
 
 N022 [talking]
 Cue: Forward assignment and Prefer exclusive mode confirmed. Highlight Return Source selector.
-NORM: Good. Now for the return trip. Set the Return Source to MixBoard Mic Input. Pretend our mixer has done its wizardry and is ready to send something back. Let me scroll down for you.
+NORM: Good. Now let's get the audio back out. Set Return Source to MixBoard Mic Input. Our pretend mixer has done whatever mystical knob-turning it needed to do, and now it has something to send us. I'll scroll down for you.
 
 N023 [happy]
 Cue: Correct Return Source chosen. Highlight Return Destination selector.
-NORM: Destination: the FakeTech headset speakers, or their shiny new name. Congratulations, we've now invented a round trip. The airline industry could learn something.
+NORM: Destination: the FakeTech headset speakers, or their shiny new name. Congratulations, we've now invented a round trip. The airline industry could learn a thing or two from us.
 
 N024 [thinking]
 Cue: All four endpoints correctly assigned; highlight Notes optionally and Save prominently.
@@ -192,14 +192,14 @@ NORM: That's the whole connection. If you want to leave yourself a note, now's a
 
 N025 [smug]
 Cue: Profile/hole save confirmed.
-NORM: And saved. For this exercise, our imaginary mixer is set to send the sound back to our imaginary headphones so we can monitor ourselves. Very convenient. Very nonexistent.
+NORM: Saved. Our pretend mixer can now send the pretend audio back to our pretend headphones for monitoring. It's a complete setup, and the best part is nobody had to buy another cable.
 UI: Show two response buttons: "Nice" and "So the mixer is fake too?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N026 [celebrating]
 Cue: Immediately after confirmed Save; highlight Start Routing.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N025 / Nice [smug]
-  NORM: Right? It's almost like we planned this. You did it! your first profile, your first hole, and both directions properly hooked up. I'm almost proud. Go ahead and hit Start Routing. Let's see what this magnificent work of fiction can do.
+  NORM: See? Almost looks like we knew what we were doing. You've built a profile and connected both directions of your first hole. I'm dangerously close to being proud. Hit Start Routing and let's fire up this magnificent work of fiction.
   Variant B — from N025 / So the mixer is fake too? [happy]
   NORM: Every last imaginary knob. The setup is pretend, the steps are the real deal. And you've just saved your first profile and a two-way hole. I'm almost proud. Go ahead and hit Start Routing. Let's see what this magnificent work of fiction can do.
 
@@ -208,11 +208,11 @@ DIALOGUE VARIANTS (choose exactly one based on prior response; show as one compl
 ======================================================================
 
 N027 [working]
-Cue: Start Routing click starts an approximately 10-second exaggerated pretend activation sequence, without a progress bar; do not open real audio devices. On successful completion emit simulated_routing_running and enter N027B. No response buttons while pending; do not use a separate delay to advance dialogue.
+Cue: Start Routing click starts an approximately 8-second exaggerated pretend activation sequence, without a progress bar; do not open real audio devices. On successful completion emit simulated_routing_running and enter N027B. No response buttons while pending; do not use a separate delay to advance dialogue.
 NORM: Starting up... forwarding pretend audio, returning pretend audio, generally making a convincing show of competence...
 
 N027B [mischievous]
-Cue: Enter on simulated_routing_running completion event, after approximately 10 seconds of pretend startup. The overdramatic wait is now over; hold this message until a user choice, with NO extra timed theatrical pause. No real audio is opened.
+Cue: Enter on simulated_routing_running completion event, after approximately 8 seconds of pretend startup. The overdramatic wait is now over; hold this message until a user choice, with NO extra timed theatrical pause. No real audio is opened.
 NORM: Hmmm. Lights are blinking. Numbers are numbering. I'm going to need you to appreciate how very serious this procedure is.
 UI: Show two response buttons: "Is it supposed to do that?" and "Should I be worried?". Both immediately advance to the matching complete N027A dialogue variant; no intermediate reaction.
 
@@ -220,9 +220,9 @@ N027A [mischievous]
 Cue: N027B response selected and simulated status is Running. No required GUI interaction.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N027B / Is it supposed to do that? [mischievous]
-  NORM: Oh, absolutely. Theatrics are a critical part of modern audio engineering. Kidding. Routing normally starts without all this dramatic buildup, I'm hamming it up for the tutorial. Give the imaginary machinery a little stage presence, you know?
+  NORM: Naturally. Blinking lights are how computers tell us they're thinking very hard. I'm kidding, of course. Normally routing starts without a full theatrical production. I'm giving the imaginary machinery its moment in the spotlight.
   Variant B — from N027B / Should I be worried? [deadpan]
-  NORM: Only about how much effort I'm putting into this bit. Kidding. Routing normally starts without the theatrical delay, I'm just hamming it up. You only get to make your first imaginary hole once. Might as well make an occasion of it.
+  NORM: Only about how committed I am to this stupid bit. Normally routing starts without all the drama. But you only get one first imaginary hole, and I decided it deserved an opening ceremony. You're welcome.
 UI: Show two response buttons: "Oscar-worthy performance" and "You made me wait for THAT?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N028 [happy]
@@ -240,12 +240,12 @@ NORM: Nope, I mean actually say something. 'Testing, one, two' works. So does a 
 
 N030-A [deadpan]
 Cue: User selects "Testing 1, 2" in N028; immediately display this complete state. Do not imply audio was captured or assessed.
-NORM: Testing, one, two. A timeless classic. Truly courageous material. So, could you hear yourself? Of course you could — you usually can hear yourself talking, and checking the route is how you know the audio is going where intended. But hey, you remembered to do a mic check instead of just assuming everything worked. That part actually matters.
+NORM: Testing, one, two. Bold. Original. They'll be talking about this performance for years. Now, could you hear yourself? I'd hope so. Your ears work even when the headset doesn't. In a real setup, you'd check that the sound actually came through the intended output. That's the habit I want you to take away from this.
 UI: Show two response buttons: "A timeless masterpiece" and "You got me". Both advance directly to the matching full N031 dialogue variant; no intermediate reaction.
 
 N030-B [mischievous]
 Cue: User selects "I said something" in N028; immediately display this complete state. Do not imply audio was captured or assessed.
-NORM: And could you hear yourself? I should hope so. You can usually hear yourself speak without any audio equipment involved. We need to make sure the audio is going where you told it to, and the only surefire way to do it is a mic check. The important bit is you actually tried the mic check. Do that when you set up real routing, too.
+NORM: And could you hear yourself? I'd certainly hope so. Turns out the human head comes with built-in monitoring. In a real setup, make sure you hear it from the intended output, not just your own mouth. You've got the right idea, though. Always test a new route before trusting it.
 UI: Show two vertically stacked response buttons: "Fair point" and "You set me up". Both advance directly to the matching full N031 dialogue variant; no intermediate reaction.
 
 N031 [happy]
@@ -265,44 +265,55 @@ N032 [deadpan]
 Cue: Point to Stop Routing; don't require click unless the owner chooses to make it mandatory.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N031 / I think I’ve got it [smug]
-  NORM: Good. That's the whole idea. And that button over there says Stop Routing. I have faith in your ability to work out what it does. We're not going to spend six slides on it.
+  NORM: Good. That's the whole idea. And that button up there says Stop Routing. I have faith in your ability to work out what it does. We're not going to spend six slides on it.
   Variant B — from N031 / What if it doesn’t work for real? [talking]
   NORM: Then we'd check the actual devices, routing status, and levels. One problem at a time. Luckily, that's future-you's adventure. For now, see that Stop Routing button? I have faith in your ability to work out what it does. We're not going to spend six slides on it.
 UI: Show two response buttons: "Seems self-explanatory" and "Should I click Stop?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 ======================================================================
-06 — ONE LAST THING: SETTINGS AND EXIT
+05B — FROM DEVICES TO APPLICATIONS
 ======================================================================
 
 N033 [mischievous]
-Cue: Highlight Settings tab; require navigation.
-DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
+Cue: After N032 response selection. No required GUI interaction. Present two response buttons, with each choice determining the complete PB001 dialogue variant.
+
+DIALOGUE VARIANTS (choose exactly one based on prior response):
+
   Variant A — from N032 / Seems self-explanatory [smug]
-  NORM: I knew you had it in you. Oh, one last thing before I turn you loose... Settings. Come on, quick tour. I promise there's no quiz. Mostly because nobody approved the budget for one.
-  Variant B — from N032 / Should I click Stop? [talking]
-  NORM: You can, but you don't need to for this exercise. The pretend connection won't follow you home. Oh, one last thing before I turn you loose... Settings. Come on, quick tour. I promise there's no quiz. Mostly because nobody approved the budget for one.
+  NORM: See? You're getting the hang of this. We've got our devices talking to each other, but there's still the question of which apps get to use them. Turns out Windows has some interesting ideas about organization, and I use that word generously.
+
+  Variant B — from N032 / Should I click Stop? [mischievous]
+  NORM: You can, but you don't need to. The imaginary audio isn't going anywhere. Now, we've got our devices talking to each other, but there's still the matter of getting individual apps where we want them. Windows has a few ideas about that. Some of them are even good.
+
+UI: Show two response buttons: "Sounds organized" and "How bad could it be?"
+
+Advancement: Either response advances directly to the matching complete PB001 variant. No intermediate reaction or additional Continue button.
+
+======================================================================
+06 — ONE LAST THING: SETTINGS AND EXIT
+======================================================================
 
 N034 [talking]
-Cue: Settings tab entered; show restricted tutorial Settings panel, with Skip Tutorial in place of Replay Tutorial. Personality, Animation, and DFA fields stay visible but are grayed out, not interactive, with "(Disabled for tutorial)" appended to their section headers.
-NORM: This is where you can mess with AudioHole's looks, whether it starts with Windows, what it does when your PC boots, and a few other knobs worth fiddling with. Some of it's locked down while we're in the tutorial. Can't have you rearranging the stage while I'm standing on it.
-UI: Show two response buttons: "Got it" and "What’s locked?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
+Cue: Settings tab entered with the Plug Board prerequisites satisfied. Show the restricted tutorial Settings panel, with Skip Tutorial in place of Replay Tutorial. Personality, Animation, and DFA stay visible but disabled, with "(Disabled for tutorial)" appended to their section headers. PB014 and N034 are displayed as one complete message.
+NORM: This is where you can change how AudioHole looks, whether it starts with Windows, what happens when your PC boots, and a bunch of other things you'll probably regret fiddling with at three in the morning. Some controls are locked during the tutorial, mostly because I don't trust you not to replace me halfway through my own presentation.
+UI: Show two response buttons: "Got it" and "What’s locked?". On click, advance once and render the corresponding complete N035 variant. No separate PB014 acknowledgement or intermediate reaction.
 
 N035 [happy]
 Cue: Either N034 response selected and tutorial completion criteria met. Set tutorial-complete flag in background; persist no sandbox profiles/devices.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N034 / Got it [smug]
-  NORM: Excellent. We can now pretend I gave you a complete tour of Settings. And that's the tour. You made it all the way through without unplugging anything important. Granted, nothing was plugged in. Still counts.
+  NORM: Good enough for government work. We'll spare you the grand tour of every checkbox. That's the tutorial, and you made it through without unplugging a single important thing. Granted, none of it was plugged in. I'm counting it anyway.
   Variant B — from N034 / What’s locked? [talking]
-  NORM: Personality, Animation, and DFA are visible but disabled here. Can't have you replacing me halfway through my big moment. Anyway, that's the tour. You made it all the way through without unplugging anything important. Granted, nothing was plugged in. Still counts.
+  NORM: Personality, Animation, and DFA are visible, but locked while we're doing the tutorial. I'd rather you didn't replace the stage while I'm halfway through my big moment. Anyway, you made it to the end without unplugging anything important. Nothing was plugged in, but I think we both deserve credit.
 UI: Show two response buttons: "Keep exploring" and "Can I break anything?". On click, advance once and render the matching complete dialogue variant in the next beat; no intermediate reaction.
 
 N036 [smug]
 Cue: Final tutorial message; remain in sandbox until the user exits. Do not automatically swap to real devices. Show an "End tutorial" action at Norm's feet; tutorial is complete and the user can freely explore or exit.
 DIALOGUE VARIANTS (choose exactly one based on prior response; show as one complete message):
   Variant A — from N035 / Keep exploring [smug]
-  NORM: That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
+  NORM: That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here. Your real setup is waiting on the other side.
   Variant B — from N035 / Can I break anything? [deadpan]
-  NORM: Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. You can exit and restart now and start playing in the real world. Your imaginary devices stay here; your real setup is waiting on the other side.
+  NORM: Not your real setup. That's it, I've taught you everything you need to know, young grasshopper. Hit End Tutorial and restart when you’re ready to start playing in the real world. Your imaginary devices stay here. Your real setup is waiting on the other side.
 
 ======================================================================
 07 — RETURN TO THE REAL WORLD
@@ -330,7 +341,7 @@ NORM: Sightseeing? Fair enough. When you're ready, the highlighted bit is where 
 
 B002 [thinking]
 Cue: User selects the wrong device for a required route.
-NORM: Almost. We need the other end of that connection. Follow the highlighted selector — Source is where the audio comes from, Destination is where it's headed.
+NORM: Almost. We need the other end of that connection. Follow the highlighted selector, Source is where the audio comes from, Destination is where it's headed.
 
 B003 [deadpan]
 Cue: User changes a display name but hasn't saved it.
@@ -362,7 +373,7 @@ NORM: Sure. No rush. Look for the highlighted control, do the thing I just asked
 
 B010 [thinking]
 Cue: User clicks Skip Tutorial and confirms.
-NORM: Fair enough, straight into the deep end. I'll pack up the imaginary hardware. Good luck out there — and remember, Source to Destination. That's most of it.
+NORM: Fair enough, straight into the deep end. I'll pack up the imaginary hardware. Good luck out there, and remember, Source to Destination. That's most of it.
 
 B011 [concerned]
 Cue: User exits before completing the tutorial, without explicitly skipping.
@@ -396,7 +407,7 @@ NORM: I'm supervising. The imaginary computers are doing the imaginary work. Ver
 
 C005 [smug]
 Cue: Click Norm after the scan completes.
-NORM: Four endpoints, zero cables, and somehow I still feel like someone owes me overtime.
+NORM: Nine endpoints, zero cables, and somehow I still feel like somebody owes me overtime.
 
 C006 [deadpan]
 Cue: Click Norm during microphone check.
@@ -420,8 +431,8 @@ IMPLEMENTATION NOTES — NOT SPOKEN
 
 1. Tutorial is a self-contained in-memory sandbox. No production device enumeration, real audio streams, real routing, profile/device file reads or writes, or Windows audio settings changes. Only tutorial-complete flag may persist. Never conflate tutorial with ordinary Preview/Test Mode.
 2. Simulated Deep / Advanced Full scan runs for approximately 20 seconds, with convincing progress bar and CLI-style output. The scan controller emits `scan_completed`; only that event advances N009 → N010. Do not use a UI dialogue timeout for progression.
-3. Simulated Start Routing runs for approximately 10 seconds without a progress bar, with deliberately hammed-up progress animation. On finished simulated Running result, controller emits `simulated_routing_running` to advance N027 → N027B. N027B then waits indefinitely for a response choice (no additional scheduled wait); N027A immediately delivers the comeback and hamming-it-up admission.
-4. All other progression is event-based: button choice, confirmed tab navigation, required setting change, device rename-and-Save, profile creation, hole creation, endpoint selection, profile Save, and settings navigation. Nothing auto-advances when a line ends or after a generic delay. If a simulated operation fails/cancels, remain appropriately blocked with a retry path, not a fake completion.
+3. Simulated Start Routing runs for approximately 8 seconds without a progress bar, with deliberately hammed-up progress animation. On finished simulated Running result, controller emits `simulated_routing_running` to advance N027 → N027B. N027B then waits indefinitely for a response choice (no additional scheduled wait); N027A immediately delivers the comeback and hamming-it-up admission.
+4. All other progression is event-based: button choice, confirmed tab navigation, required setting change, device rename-and-Save, profile creation, hole creation, endpoint selection, profile Save, Plug Board socket creation with mandatory popup naming, app assignment, and Settings navigation with prerequisite revalidation. Nothing auto-advances when a line ends or after a generic delay. If a simulated operation fails/cancels, remain appropriately blocked with a retry path, not a fake completion.
 5. The normal system status messages that ordinarily appear in the personality/status window are NOT SHOWN during tutorial. Tutorial dialogue exclusively owns this surface. Diagnostic/progress data can be shown in the relevant scanner/routing panels, but ordinary runtime notifications must not displace or append to tutorial script. After leaving tutorial, restore normal status behavior.
 6. Directed controls use an **AudioHole Pink box** with the exact visual style of the personality frame (border color/weight/radius/glow as applicable). Track target location; do not intercept pointer events. Remove old highlights when the step changes.
 7. Two dialogue choices appear as **two vertically stacked buttons at the avatar's feet** in dating-sim dialogue-option format. They are never horizontal, never a generic Continue, and aren't stand-alone response screens. The selected button's flavor is baked into the next state's COMPLETE dialogue; both choices lead to the same underlying objective unless an explicit exception is authored. The two speech acknowledgments are EXACTLY `I said something` and `Testing 1, 2`.
@@ -429,7 +440,7 @@ IMPLEMENTATION NOTES — NOT SPOKEN
 9. Clicking Norm is the ONLY tutorial-dialogue timeout: a tutorial-only quip temporarily overrides the current displayed text for roughly 6 seconds, then restores the exact text variant, buttons, highlight, and expression. Timeout never advances the tutorial. A user step-completion event during the quip must still work.
 10. Exact generated CAPTURE endpoints: `MixBoard Mic Input`; `Microphone - FakeTech USB Audio Device 6675 (4-FakeTech USB Audio Device)`. PLAYBACK endpoints: `Soundbar - BoomSlab 9001 (USB Audio Device)`; `MixBoard Music`; `MixBoard Game`; `MixBoard Chat`; `MixBoard Aux`; `MixBoard Output`; `Speakers - FakeTech USB Audio Device 636B (3-FakeTech USB Audio Device)`.
 11. Renames change display names, never underlying endpoint identity. Require TWO distinct devices to be renamed and explicitly saved. Forward Source = FakeTech mic; Forward Destination = MixBoard Output. Return Source = MixBoard Mic Input; Return Destination = FakeTech speakers. Matching must use stable identities, not editable display names.
-12. Require a new profile with confirmed rename, new hole with confirmed rename, Enable return channel ON, correct four assignments, Forward Prefer exclusive mode ON, successful Save, Start Routing click, user microphone acknowledgement, and Settings visit. Exclusive is a preference, not a guarantee; honor product's actual effective-configuration semantics without silently switching unrelated settings.
+12. Require a new profile with confirmed rename, new hole with confirmed rename, Enable return channel ON, correct four assignments, Forward Prefer exclusive mode ON, successful Save, Start Routing click, user microphone acknowledgement, two named Plug Board sockets with correctly assigned endpoints and practice apps, and a Settings visit with all Plug Board prerequisites still valid. Exclusive is a preference, not a guarantee; honor product's actual effective-configuration semantics without silently switching unrelated settings.
 13. Microphone test never accesses a real input or detects speech. N028 holds until user chooses `I said something` or `Testing 1, 2`. Both are acknowledgements, NOT evidence of microphone performance. Keep Norm's joke about hearing oneself while reinforcing real-world verification.
 14. Tutorial Settings keeps Personality, Animation and DFA visible but greyed out; append `(Disabled for tutorial)` to each section header. Replace Replay Tutorial with Skip Tutorial. Normal personality/status messages and controls resume on the next real launch.
 15. Upon required Settings completion, persist only tutorial-complete flag and stay in sandbox for free exploration. Next launch is real mode. Closing early without Skip leaves tutorial incomplete; a confirmed Skip uses explicit skip/completion semantics and exits sandbox without leaking fake data.

@@ -105,30 +105,69 @@ void Frame::plug_board_smoke(bool lesson) {
     class NameAnswer final : public wxModalDialogHook {
       public:
         wxString answer;
+        int response = wxID_OK;
         bool asked = false;
+        bool rejected = false;
         int Enter(wxDialog* dialog) override {
             if (auto* edit = dynamic_cast<wxTextEntryDialog*>(dialog)) {
                 asked = true;
                 edit->SetValue(answer);
+                return response;
+            }
+            if (dialog->GetTitle() == "Socket name") {
+                rejected = true;
                 return wxID_OK;
             }
             return wxID_NONE;
         }
     };
-    const auto named_action = [&](const std::string& answer, const auto& action) {
+    const auto named_action = [&](const std::string& answer, const auto& action,
+                                  int response = wxID_OK) {
         NameAnswer hook;
         hook.answer = text(answer);
+        hook.response = response;
         hook.Register();
         action();
         hook.Unregister();
         require(hook.asked, "action bypassed the real name dialog");
         pump(settled, "name action completion");
+        return hook.rejected;
     };
     const auto create_socket = [&](const std::string& name) {
         plug_board_view_->set_drawer_open(true);
         pump([&] { return !plug_board_view_->layout_diagnostics().drawer_animating; },
              "settings drawer");
         const auto before = plug_board_->snapshot();
+        if (lesson) {
+            const auto current_beat = tutorial_->beat();
+            named_action(
+                "Unconfirmed name",
+                [&] { click(wxWindow::FindWindowByName("New socket", plug_board_view_)); },
+                wxID_CANCEL);
+            const auto cancelled = plug_board_->snapshot();
+            const auto* original = pb::find_board(*before->library, before->selected_board_id);
+            const auto* current = pb::find_board(*cancelled->library, cancelled->selected_board_id);
+            require(
+                original && current &&
+                    current->working.sockets.size() == original->working.sockets.size() &&
+                    tutorial_->beat() == current_beat,
+                "Cancelling the mandatory naming popup created a socket or advanced the lesson");
+            for (const auto& invalid :
+                 {std::string{}, original->working.sockets.back().display_name}) {
+                require(
+                    named_action(
+                        invalid,
+                        [&] { click(wxWindow::FindWindowByName("New socket", plug_board_view_)); }),
+                    "The tutorial naming popup accepted a blank or duplicate socket name");
+                const auto unchanged = plug_board_->snapshot();
+                const auto* current =
+                    pb::find_board(*unchanged->library, unchanged->selected_board_id);
+                require(current &&
+                            current->working.sockets.size() == original->working.sockets.size() &&
+                            tutorial_->beat() == current_beat,
+                        "Invalid popup input created a socket or advanced the lesson");
+            }
+        }
         named_action(name,
                      [&] { click(wxWindow::FindWindowByName("New socket", plug_board_view_)); });
         const auto state = plug_board_->snapshot();
@@ -192,17 +231,17 @@ void Frame::plug_board_smoke(bool lesson) {
             require(last_message_ == presentation::Message::PlugBoardSocketEndpointChanged,
                     "endpoint change did not select its personality response pool");
     };
-    const auto music = create_socket("New Music Socket");
-    beat("PB005");
-    rename_socket(music, "My playlist");
+    const auto music = create_socket(lesson ? "My playlist" : "New Music Socket");
+    if (!lesson)
+        rename_socket(music, "My playlist");
     beat("PB006");
     const auto music_endpoint =
         lesson ? "tutorial-music" : initial->inventory.endpoints.front().logical_id;
     endpoint_choice(music, music_endpoint);
     beat("PB007");
-    const auto game = create_socket("New Game Socket");
-    beat("PB008");
-    rename_socket(game, "Explosions");
+    const auto game = create_socket(lesson ? "Explosions" : "New Game Socket");
+    if (!lesson)
+        rename_socket(game, "Explosions");
     beat("PB009");
     const auto game_endpoint =
         lesson ? "tutorial-game" : initial->inventory.endpoints.back().logical_id;
@@ -268,6 +307,18 @@ void Frame::plug_board_smoke(bool lesson) {
         },
         "all six owner-supplied tutorial icons");
     if (lesson) {
+        choose_reply();
+        beat("PB013");
+        endpoint_choice(music, "tutorial-chat");
+        beat("PB013"); // Optional exploration may change the setup.
+        select_page(SettingsPage);
+        beat("PB006");
+        require(!tutorial_->complete() &&
+                    tutorial_->view().targets == std::vector<std::string>{"plug_board_tab"},
+                "Settings accepted an invalid practice output or lost the recovery tab");
+        select_page(PlugBoardPage);
+        endpoint_choice(music, music_endpoint);
+        beat("PB012");
         choose_reply();
         beat("PB013");
     } else {

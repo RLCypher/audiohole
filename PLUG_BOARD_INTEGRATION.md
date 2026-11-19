@@ -70,12 +70,19 @@ from live playback. One successful edit generates one response; unchanged
 refresh, discovery, policy retry and startup do not select new random chatter.
 Mixer commentary follows successful launch of the Windows mixer URI.
 
-The Norm-only tutorial inserts PB001–PB013 before its first Settings lesson.
-PB014's bridge is presented with that first Settings beat, requiring no extra
-Continue button. Choice branches select the next complete authored line.
-Progress requires committed creation, renaming, endpoint selection and app
-assignment using stable IDs. Socket names are user-chosen. Lost required
-sockets return to creation; incorrect assignments retain the relevant guidance.
+The Norm-only tutorial uses N033 as its pre-Plug Board transition, with both
+incoming N032 choices and both outgoing PB001 choices selecting complete authored
+lines. PB001 waits for actual tab activation. Socket creation includes confirmed
+popup naming; PB005/PB008's later rename steps are retired. Progress requires
+committed named creation, endpoint selection and app assignment using stable IDs.
+Socket names are user-chosen. PB-R09 returns a lost required socket to its own
+creation step and preserves the other socket. PB013 permits exploration, then
+revalidates both sockets, their outputs and their app assignments on Settings
+navigation. PB014's bridge and N034 appear as one message with N034's expression
+and choices. Completion rechecks the current practice setup before N035.
+Tutorial enables the view's optional distinct-name policy in the existing
+creation popup. Blank or duplicate confirmation submits no command; ordinary
+hosts retain the default naming behavior and the policy reducer is unchanged.
 Highlights use the actual drawer button, socket heading, endpoint control and
 virtual application row geometry. Optional exploration follows PB012.
 
@@ -108,6 +115,7 @@ The exact validation results are recorded in `docs/plug-board/VALIDATION.md`.
 Original handover source hashes and provenance are retained under
 `docs/plug-board`. Local adaptations are the embedding build switches,
 memory-only storage/backend guard, read-only System role refresh, simulated
-artwork injection, virtual-row geometry helpers and an icon test fixture that
+artwork injection, virtual-row geometry helpers, guided creation-name validation
+and an icon test fixture that
 reads the host executable instead of the standalone launcher; the tested module layout
 and policy reducer remain intact. No audio engine changes are included.

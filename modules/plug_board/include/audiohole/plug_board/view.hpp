@@ -43,6 +43,9 @@ struct ViewOptions {
     // Optional host URL launcher. The default opens Windows Settings through
     // the Shell; tests intercept the exact mixer URI without opening Settings.
     std::function<bool(const std::string&)> open_url;
+    // Guided creation confirms a nonblank name distinct from existing sockets
+    // in the same themed popup. Ordinary hosts retain the library's defaults.
+    bool require_distinct_socket_names = false;
 };
 
 struct SocketLayout {

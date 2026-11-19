@@ -4,6 +4,7 @@
 #include "gui/shell_actions.h"
 #include "model/first_run.h"
 #include <cmath>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <wx/dcbuffer.h>
 #include <wx/dcscreen.h>
@@ -760,7 +761,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
                     comment_surface_->GetScreenRect() == initial_card &&
                     agent_display_->GetScreenRect() == initial_avatar,
                 "First reply arrow persists or changes the card/avatar layout");
-        require(commentary_copy_.find("wobbly desk") != std::string::npos,
+        require(commentary_copy_.find("keeping my desk from wobbling") != std::string::npos,
                 "Tutorial choice selected the wrong complete variant");
         const auto image_deadline = avatar::monotonic_ms() + 8000;
         while ((!agent_display_->presentation().image ||
@@ -1021,7 +1022,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N022");
         settle_scroll("return", 2000, reverse_.source->GetParent());
         capture("return-centered");
-        require(commentary_copy_.find("Let me scroll down for you.") != std::string::npos,
+        require(commentary_copy_.find("I'll scroll down for you.") != std::string::npos,
                 "Return scroll introduction is missing its explanation");
         require(!reverse_.exclusive_preferred->GetValue(),
                 "Tutorial changed Return exclusive preference");
@@ -1036,7 +1037,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         check("N026");
         click(start_);
         check("N027");
-        controller_->advance(9999);
+        controller_->advance(7999);
         refresh();
         check("N027");
         require(wxWindow::FindWindowByName("Pretend routing activation progress", this) == nullptr,
@@ -1063,11 +1064,22 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         choice();
         check("N032");
         choice();
+        check("N033");
+        require(tutorial_choices_.size() == 2 &&
+                    tutorial_choices_[0]->GetLabel() == "Sounds organized" &&
+                    tutorial_choices_[1]->GetLabel() == "How bad could it be?",
+                "Plug Board transition did not retain its two authored choices");
+        choice();
         check("PB001");
         plug_board_smoke(true);
         capture("plug-board-configured");
         select_page(SettingsPage);
         check("N034");
+        const auto catalog = nlohmann::json::parse(tutorial_catalog());
+        require(commentary_copy_ == catalog.at("PB014").at("text").get<std::string>() + "\n\n" +
+                                        catalog.at("N034").at("text").get<std::string>() &&
+                    tutorial_->view().expression == "talking" && tutorial_choices_.size() == 2,
+                "Settings arrival was not one PB014/N034 message with N034's expression/choices");
         require(!personality_choice_->IsEnabled() && !animation_loops_->IsEnabled() &&
                     !dfa_slider_->IsEnabled(),
                 "Tutorial personality/animation/DFA controls remain interactive");
@@ -1202,7 +1214,7 @@ bool Frame::tutorial_smoke(const wxString& directory) {
             wxFileName::Mkdir(directory, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
             std::ofstream out(std::filesystem::path(directory.ToStdWstring()) / "smoke-result.txt");
             out << "PASS: actual tutorial controls, authored branches, identity-based renames and "
-                   "assignments, 20-second scan / 10-second activation completion events, "
+                   "assignments, 20-second scan / 8-second activation completion events, "
                    "microphone acknowledgement, pulsing replies without tooltips, first-reply "
                    "arrow, "
                    "pulsing/clipped row guidance with Low motion, safe animated-popup teardown, "

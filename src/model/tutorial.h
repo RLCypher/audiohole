@@ -65,9 +65,12 @@ class Tutorial {
     std::string recovery_, prerequisite_target_;
     TutorialPlugBoard plug_state_;
     std::set<std::string> plug_existing_;
-    std::string music_socket_, game_socket_, plug_initial_name_;
-    bool plug_finished_ = false, plug_bridge_ = false, plug_recovery_ = false;
-    bool plug_assignments_ready() const;
+    std::string music_socket_, game_socket_;
+    bool plug_finished_ = false, plug_bridge_ = false;
+    std::string next_plug_requirement() const;
+    // Revalidate current identities at completion gates; recover only the
+    // missing/changed objective, preserving the other committed practice socket.
+    bool recover_plug_board();
     int expected_page() const;
     bool saved_ = false, routed_ = false, acknowledged_ = false, settings_ = false,
          complete_ = false;

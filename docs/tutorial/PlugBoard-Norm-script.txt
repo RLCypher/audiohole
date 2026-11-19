@@ -1,17 +1,17 @@
 AUDIOHOLE — PLUG BOARD TUTORIAL INSERT (NORM)
-Version: 1.1 — Branches select the next dialogue variant
-Placement: Immediately before the existing Settings section of the main tutorial.
+Version: 1.3 — Name sockets during creation and corrected Settings bridge
+Placement: After N033 and before the existing Settings section of the main tutorial.
 Source: Plug Board Tutorial workflow(2).txt
 
 INTEGRATION NOTES
 - This is a script for the existing fictional tutorial sandbox, not a command to modify real Windows audio routing.
 - Preserve the existing welcome, earlier device/profile lessons, and Settings walkthrough. The tutorial's previously scanned BoomSlab 9001 is the default playback device at the start of this insert.
 - The practice application roster includes Spooty and Felony Jaywalking LXVII. All practice applications initially appear in the System socket. Other apps may be present; do not require specific unlisted ones.
-- MixBoard Music and MixBoard Game are available as previously scanned pretend playback endpoints. The tutorial may accept any name for the newly created Music and Game sockets; advance by socket identity and endpoint, not literal socket label.
+- MixBoard Music and MixBoard Game are available as previously scanned pretend playback endpoints. Creating a socket opens a required name-entry popup; the socket is not created until a valid name is confirmed. Accept any distinct user-selected names for the Music and Game sockets; track each by its newly created socket identity and assigned endpoint, never by literal label.
 - All assignments, endpoints, and mixing behavior in this walkthrough are simulated. No real applications, devices, Windows mixer preferences, or persistent user boards are changed.
 - Every beat has an expression, a cue, and authored dialogue. Use fallback expression: idle. Only advance after the required GUI interaction has completed and been verified. At choice beats, the selected button determines which variation of the NEXT scripted dialogue is displayed; never display a standalone choice reaction, require a separate Continue button, or insert another dialogue step.
 - The existing personality response catalog is not a substitute for this tutorial. Suppress unrelated random event chatter while guided tutorial dialogue is playing.
-- The System socket remains present and is not renamed or deleted. Do not require opening the settings drawer unless that is necessary to access socket creation in the implemented UI.
+- The System socket remains present and is not renamed or deleted. Do not require opening the settings drawer unless that is necessary to access socket creation in the implemented UI. Never request a separate rename action during the Plug Board lesson; naming is part of each socket-creation popup.
 - For all cues, identify the actual UI control rather than relying on an assumed button location; highlight the relevant tab, socket controls, endpoint dropdown, or app row as appropriate.
 - Treat successful simulated assignment separately from actual routing: never say real Windows playback was moved.
 
@@ -19,73 +19,74 @@ INTEGRATION NOTES
 PLUG BOARD — A LITTLE APPLICATION ORGANIZATION
 ======================================================================
 
-PB001 [talking]
-Cue: Begin this insert after the preceding tutorial section. Highlight the Plug Board tab; require the user to open it.
-NORM: We've connected devices. Now let's tell individual apps where to send their audio. Open Plug Board; I've got a small organizational problem for you.
+PB001 — CHOICE-DEPENDENT NEXT LINE
 
+Cue: Introduce Plug Board. Highlight the Plug Board tab and require the user to open it.
+
+Variant A — from N033 / Sounds organized [talking]
+NORM: Our devices are connected. Now comes the part where we stop every app from piling into the same output like it's Black Friday 1996, and Toys R Us only has one Tickle Me Elmo left. Open Plug Board. We're gonna bring a little civilization to this mess.
+
+Variant B — from N033 / How bad could it be? [deadpan]
+NORM: Ever see the footage of people fighting over Tickle Me Elmo dolls on Black Friday back in '96? Imagine that, except every app on your computer wants the same audio output. Yeah. Open Plug Board. We're gonna bring a little civilization to this mess.
+
+Advancement: On confirmed Plug Board tab activation, advance to PB002.
 PB002 [thinking]
 Cue: Plug Board tab opened; highlight the socket columns.
-NORM: These columns are sockets. Each points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds.
+NORM: Behold, the socket, everyone gets one for free, but we can have as many as we want because the budget is as imaginary as our USB devices. Each socket points to an audio output, and you plug apps into whichever one you like. There's no limit to how many apps a socket holds, and you can even make multiple sockets play back to the same device if you want, very organized.
 UI: Show two choice buttons: "So they're categories?" / "As many as I want?". The chosen button advances directly to PB003, selecting its corresponding dialogue variant; do not display a separate reaction or Continue control.
 
 PB003 — CHOICE-DEPENDENT NEXT LINE
 Cue: Show the fake-app entries in System; highlight System and its BoomSlab 9001 endpoint.
 IF PB002 CHOICE "So they're categories?" [talking]
-NORM: Exactly. Categories with an output device attached. I've lent you a few of my totally legit apps to try it out; they're all in System, currently using the BoomSlab 9001.
+NORM: Exactly. Categories with an output device attached. Usually an app needs to be playing audio for it to show up here, but I've lent you a few of my totally legit apps to try it out. They're all in System, currently using the BoomSlab 9001 (The ultimate compact PC soundbar, with 23 distinct drivers, unmatched sub-bass response, and karate chop action!).
 IF PB002 CHOICE "As many as I want?" [smug]
-NORM: As many as you please. Whether you can organize that mess is another question. I've put my totally legit practice apps in System, pointing at our BoomSlab 9001.
+NORM: As many as you please. Whether you can organize that mess is another question. Usually an app needs to be playing audio for it to show up here, but for this exercise I've put my totally legit practice apps in System, pointing at our BoomSlab 9001 (The ultimate compact PC soundbar, with 23 distinct drivers, unmatched sub-bass response, and karate chop action!).
 UI: Show two choice buttons: "Totally legit, huh?" / "Why System?". The chosen button advances directly to PB004, selecting its corresponding dialogue variant.
 
 PB004 — CHOICE-DEPENDENT NEXT LINE [working]
-Cue: Highlight the socket-creation control; require creation of one new socket after the line is displayed.
+Cue: Highlight the socket-creation control. Require the user to open the creation popup, enter any valid name for a music socket, and confirm creation. The popup's required naming field is part of socket creation, not a later rename step. Keep this beat active until the new socket exists, then advance directly to PB006.
 IF PB003 CHOICE "Totally legit, huh?" [suspicious]
-NORM: They passed every inspection I performed in my imagination. Anyway, make a new socket for music; let's give those suspiciously legal tunes their own destination.
+NORM: Passed my rigorous inspection process, which consisted of looking at them and nodding. Anyway, make a new socket for music. The popup will ask you to name it. Pick something you'll recognize when your playlist starts misbehaving.
 IF PB003 CHOICE "Why System?" [talking]
-NORM: System catches new apps until you assign them somewhere else. Let's create a new socket for music, so it doesn't all have to go through System.
-
-PB005 [talking]
-Cue: New socket successfully created; highlight its rename action or editable name; require the user to rename it to any chosen name for music.
-NORM: Give that socket a music-related name. Whatever makes sense to you; we're not grading the poetry.
+NORM: System is the catch-all for apps you haven't assigned yet. Useful, but a little crowded. Create a socket for music and give it a name in the popup. We're getting those tunes their own place to live.
 
 PB006 [thinking]
-Cue: Music socket renamed; highlight its playback endpoint dropdown; require selecting MixBoard Music.
-NORM: Now set its output to MixBoard Music. That's the pretend mixer channel we'll use for music.
+Cue: Music socket created with its name confirmed in the creation popup; highlight that socket's playback endpoint dropdown and require MixBoard Music. Do not gate on a rename event.
+NORM: Nice. Now point that music socket at MixBoard Music. That's its pretend mixer channel. We've officially given the playlist its own lane.
 
 PB007 [happy]
-Cue: Music socket assigned to MixBoard Music; require creation of another socket.
-NORM: Good. Let's make a second socket for games, so the explosions don't have to share a channel with the playlist.
-
-PB008 [working]
-Cue: Second socket created; highlight rename action; require any game-related name distinct from the music socket.
-NORM: Name this one for games. Again, any sensible label will do.
+Cue: Music socket assigned to MixBoard Music; highlight the socket-creation control. Require opening the creation popup, entering any valid name distinct from the music socket's name for a game socket, and confirming creation. Advance directly to PB009 when the new socket exists; do not request a separate rename.
+NORM: Alright, now make a second socket for games. Name it in the popup like you did with music. I prefer my explosions and my playlists on separate faders, personally.
 
 PB009 [talking]
-Cue: Game socket renamed; highlight endpoint dropdown; require selecting MixBoard Game.
-NORM: Give the game socket MixBoard Game as its destination. One channel for games, one for music. Even I can keep track of that.
+Cue: Game socket created with its name confirmed in the creation popup; highlight its playback endpoint dropdown and require selecting MixBoard Game. Do not gate on a rename event.
+NORM: Set the game socket's destination to MixBoard Game. Games on one channel, music on another. Beautiful. It's almost like we organized something on purpose.
 
 PB010 [smug]
 Cue: Game socket assigned to MixBoard Game; highlight Felony Jaywalking LXVII in System and the game socket; require moving that application to the game socket by drag-and-drop or its context menu.
-NORM: Find Felony Jaywalking LXVII in System and move it to your game socket. I still don't understand the hype. People act like it's the sixty-seventh coming.
+NORM: Alright, find Felony Jaywalking LXVII in System and drag it into the game socket. Sixty-seven games in and they still can't release one on time. Delayed three times, costs a hundred bucks, doesn't even come on a disc anymore, and the download takes up an entire goddamn SSD. At this point, I'm pretty sure they're just selling you a license to buy more storage. Anyway, don't ask how I got this working on PC.
 
 PB011 [deadpan]
 Cue: Felony Jaywalking LXVII is assigned to the game socket; highlight Spooty in System and the music socket; require moving Spooty to the music socket.
-NORM: There. Civilization survives. Now move Spooty into your music socket so it gets its own mixer channel.
+NORM: Good. The crimes are contained. Now grab Spooty and move it into the music socket. We can let the music play without making it compete with the sound of somebody stealing a car.
 
 PB012 [happy]
 Cue: Spooty is assigned to the music socket; highlight the two new sockets and their device dropdowns.
-NORM: And there it is. Game and music now feed separate channels on our pretend mixing board, so you can control them independently from the external device.
+NORM: There we go. Felony Jaywalking and Spooty are headed to different channels on our pretend mixer. You can turn the game down without murdering the music volume, or vice versa. A small victory for civilization.
 UI: Show two choice buttons: "So I can balance them separately?" / "And other apps work the same way?". The choice advances directly to PB013 and selects its corresponding dialogue variant; no standalone reaction or Continue control.
 
 PB013 — CHOICE-DEPENDENT NEXT LINE
-Cue: Tutorial's Plug Board task completed. Remove required-action highlights; allow optional sandbox exploration. Highlight Settings as the next destination; wait for the user to open it.
-IF PB012 CHOICE "So I can balance them separately?" [talking]
-NORM: Exactly. Separate physical volume controls for games and music. Feel free to experiment, and meet me in Settings when you're done. One last thing to show you.
+Cue: Tutorial's Plug Board tasks have been completed. Remove required-action highlights and allow optional sandbox exploration. Highlight Settings as the next destination. When Settings is opened, revalidate that both required socket identities still exist, point to MixBoard Music and MixBoard Game respectively, and have Spooty and Felony Jaywalking LXVII assigned to the corresponding sockets. If anything is missing or incorrect, use the applicable Plug Board recovery and do not enter Settings completion. Otherwise advance to the combined PB014 + N034 state.
+IF PB012 CHOICE "So I can balance them separately?" [happy]
+NORM: Bingo. Music on one channel, games on another, each with its own volume control on the mixer. You can crank up your music without making the game louder, or turn down the game when some toddler starts screaming slurs at you. Go ahead and play around with the board if you like. When you're done rearranging the furniture, head over to Settings. One last stop before I turn you loose.
 IF PB012 CHOICE "And other apps work the same way?" [smug]
-NORM: Yep. Move an app to a socket and it follows that socket's destination. Play around if you like; I'll be in Settings with one last thing to show you.
+NORM: Pretty much. Grab an app, toss it into a socket, and its audio follows wherever that socket points. You can even have several sockets going to the same device if you want to organize things without needing a small warehouse full of sound cards. Go ahead and mess around with it. When you're satisfied with your handiwork, head over to Settings. We're almost done here.
 
-PB014 [idle]
-Cue: User opens Settings after PB013. Resume the existing Settings tutorial sequence at its first Settings beat; do not replay its prior sections.
-NORM: Ah, there you are. Last stop: Settings.
+Advancement: On confirmed Settings tab activation with current Plug Board prerequisites valid, display PB014 and N034 as one combined message. Do not replay the earlier N033 or add an intermediate response button.
+
+PB014 [mischievous]
+Cue: User opens Settings from PB013 after the Plug Board prerequisites pass revalidation. Compose this arrival line, a blank line, and the complete N034 introduction as one displayed message using N034's [talking] expression. Do not show PB014 as a separate beat or require another button click.
+NORM: Ah, there you are. Finally satisfied with where you've been sticking things? Good. Last stop, Settings. Then I'll stop hovering over your shoulder like an overly invested driving instructor.
 
 ======================================================================
 OPTIONAL REACTIONS AND GUARDRAILS
@@ -93,23 +94,23 @@ OPTIONAL REACTIONS AND GUARDRAILS
 
 PB-R01 [concerned]
 Condition: Required app cannot currently be found in the fictional roster.
-NORM: Looks like one of our practice apps wandered off. Let's restore the tutorial's fake app list before we continue.
+NORM: Well, one of our fake apps has apparently escaped containment. Let's get it back into the practice list before we continue.
 
 PB-R02 [thinking]
 Condition: User creates the requested socket but has not assigned its required output yet.
-NORM: The socket exists; it still needs its destination. Check the output dropdown at the top.
+NORM: You've built the socket, but it doesn't know where to send anything yet. Check the output dropdown at the top. Even imaginary audio needs directions.
 
 PB-R03 [talking]
-Condition: User chooses a different socket name from the example.
-NORM: That name works. The device assignment is what matters here.
+Condition: User enters a valid, unexpected socket name in the creation popup. This is not an error and must not block progression.
+NORM: Works for me. Call it whatever you like. I'm more concerned with where the audio ends up than what you put on the label.
 
 PB-R04 [concerned]
 Condition: User moves an app to the wrong practice socket.
-NORM: Close, but that one's headed to the wrong place. Give it another drag, or use its right-click menu.
+NORM: Close, but you've sent that app to the wrong neighborhood. Drag it over to the right socket, or use the right-click menu if you're feeling civilized.
 
 PB-R05 [deadpan]
 Condition: User asks whether the exercise affects real hardware.
-NORM: No. It's a fake board with fake devices and apps. Your actual Windows audio setup is untouched.
+NORM: Nope. Fake board, fake apps, fake devices. Your actual Windows setup is sitting comfortably at home, blissfully unaware of this nonsense.
 
 PB-R06 [smug]
 Condition: User returns to the Plug Board during optional exploration.
@@ -121,17 +122,23 @@ NORM: Grab the app and drop it into the destination socket. Right-clicking it wo
 
 PB-R08 [thinking]
 Condition: User attempts to continue before both applications are correctly assigned.
-NORM: Before we move on, Felony Jaywalking goes in Games and Spooty goes in Music. The labels can be yours; the destinations need to match.
+NORM: Before we move on, Felony Jaywalking belongs in the socket going to MixBoard Game, and Spooty belongs in the one going to MixBoard Music. Call them whatever you like.
+
+PB-R09 [surprised]
+Condition: User deletes either tutorial-created Music or Game socket before completing the Plug Board lesson. This specific reaction takes precedence over the generic DEPENDENT OBJECT DELETED line. Do not count the deleted socket or its app assignment toward completion.
+NORM: Oh, come on. We were using that one! Make another socket for the same job, name it in the popup, and we'll put everything back where it belongs. Management's gonna make me do this whole bit again, aren't they?
+Recovery: Highlight socket creation and return to the corresponding creation step (PB004 for Music, PB007 for Game). Require the replacement socket's name to be confirmed in the creation popup, then reselect MixBoard Music or MixBoard Game as appropriate. Recheck and restore the affected app assignment before allowing PB012 or Settings progression. Leave the other intact socket and its valid configuration alone.
 
 IMPLEMENTATION CHECKLIST
-- PB001 requires Plug Board tab activation.
+- N032 choices select the complete N033 variant. N033 choices select the complete PB001 variant. PB001 requires Plug Board tab activation.
 - PB002 and PB003 present choices that determine PB003 and PB004 wording respectively; no intermediate reaction text.
-- PB004–PB009 create and configure two new sockets, without requiring exact names. Both PB004 variants require the same socket creation action.
+- PB004 requires creating the music socket AND entering its name in the mandatory creation popup; PB006 assigns MixBoard Music. PB007 requires creating the game socket AND entering its name in the popup; PB009 assigns MixBoard Game. No separate rename event, control, or instruction exists.
+- PB005 and PB008 are retired, not displayed. Preserve PB006/PB007/PB009 and later IDs to minimize runtime migration; transition PB004 -> PB006 and PB007 -> PB009.
+- Identify the two created sockets by their stable socket identities; do not reject an arbitrary valid name just because it is not literally Music or Games.
 - PB010 requires Felony Jaywalking LXVII assigned to the game socket.
 - PB011 requires Spooty assigned to the music socket.
 - PB012 presents the independent channel-volume concept and two choices; PB013 has two corresponding variants of the following dialogue.
-- PB013 allows optional exploration and waits for Settings navigation.
-- PB014 bridges into the existing Settings tutorial; do not duplicate or replace that section.
+- PB013 allows optional exploration. On Settings navigation, revalidate the required sockets, device outputs and app assignments, and invoke recovery if they were changed or deleted.
+- PB014 is the Settings-arrival line and must be composed with N034 as one message. N033 is exclusively the pre-Plug Board dialogue; no second N033 is permitted.
+- PB-R09 handles deletion of a required Plug Board socket: require recreation with popup naming, reassign its endpoint and affected app, and preserve the other valid socket. It overrides the generic dependent-object-deleted response for this case.
 - All beats use approved Norm states. Deadpan uses the static pose, not an animation loop.
-
-END OF PLUG BOARD INSERT

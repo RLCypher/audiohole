@@ -527,12 +527,30 @@ void PlugBoardView::Implementation::remove_board() {
         submit(DeleteBoard{id, replacement, true}, context);
 }
 void PlugBoardView::Implementation::new_socket() {
-    if (busy() || !board())
+    const auto* selected = board();
+    if (busy() || !selected)
         return;
+    // A modal popup can render a newer publication. Retain the original board
+    // for validation; submit still checks its revision before committing.
     const auto context = snapshot;
-    const auto id = board()->id;
-    if (const auto value = name("New socket", "New Socket"))
+    const auto id = selected->id;
+    if (const auto value =
+            name("New socket", options.require_distinct_socket_names ? "" : "New Socket")) {
+        if (options.require_distinct_socket_names) {
+            const bool blank = value->find_first_not_of(" \t\r\n") == std::string::npos;
+            const bool duplicate =
+                std::any_of(selected->working.sockets.begin(), selected->working.sockets.end(),
+                            [&](const auto& socket) { return socket.display_name == *value; });
+            if (blank || duplicate) {
+                show_message(&panel,
+                             blank ? "Enter a name for the new socket."
+                                   : "Choose a name different from the existing sockets.",
+                             "Socket name", wxOK | wxICON_INFORMATION, appearance);
+                return;
+            }
+        }
         submit(CreateSocket{id, *value}, context);
+    }
 }
 void PlugBoardView::Implementation::remove_socket() {
     const int selected = sockets->GetSelection();
