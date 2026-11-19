@@ -24,9 +24,9 @@ Engine 0.6 runtime; the tutorial remains an isolated in-memory simulator.
 }
 ```
 
-The [v4 timing amendment](docs/LATENCY_V4.md) adds independent processing intervals, queue/lead requests and worker settings.
+The [v4 timing amendment](../LATENCY_V4.md) adds independent processing intervals, queue/lead requests and worker settings.
 
-See [the complete example](docs/test-profile-example.json). Record version 4 is
+See [the complete example](../test-profile-example.json). Record version 4 is
 independent of the **aggregate transfer wrapper** used inside profile bundles:
 `audiohole-test-configuration`, `schema_version: 8`, `profiles: [...]`,
 `devices: []`. The wrapper can also carry `profile_record_extensions`, an opaque
@@ -135,7 +135,7 @@ Notes are multiline and Enter inserts a newline. All Profile-tab Apply buttons,
 including those beside Default device buffer, save the entire draft and apply
 it to routing. Applying the active profile waits for native cleanup before
 restarting with the accepted settings; Stop cancels that restart. See the
-[profile persistence and Apply audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
+[profile persistence and Apply audit](../PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
 
 ## Channel mapping
 
@@ -240,7 +240,7 @@ and explicit pointer selection remain available.
 Distribution root contains AudioHole.exe, README.txt and folders: bin/ (probe and
 first-run marker), assets/ (including avatar-assets.json), docs/ (handoff documents
 and build-info.json), licenses/ (third-party notices), personalities/ (packages).
-The welcome is controlled solely by bin/AudioHole.has-run; the legacy
+The welcome is controlled by AudioHole.has-run in the shared working data folder; the legacy
 show_preview_dialog preference no longer overrides that flag. Replay confirms,
 removes it and restarts. User Exit actions confirm with Exit/Cancel; controlled
 restart and unattended smoke shutdown do not ask twice. The bottom status bar

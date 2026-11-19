@@ -1,9 +1,10 @@
 # Building the AudioHole GUI evaluation
 
-Milestone 0.2 provides a native wxWidgets GUI backed by a deterministic, in-memory
-simulated controller. It never enumerates real endpoints, captures/renders audio,
-or writes production configuration. D-030, D-031, D-034, and all six owner decisions
-remain Open. See [MANUAL_GUI_CHECKLIST.md](MANUAL_GUI_CHECKLIST.md) for evaluation.
+The native wxWidgets application includes the engine 0.6 integration, Plug Board
+and an isolated fictional tutorial. Normal operation enumerates real endpoints
+and persists user configuration; tutorial and smoke modes remain isolated.
+See the [manual checklist](docs/specifications/MANUAL_GUI_CHECKLIST.md) and
+[documentation index](docs/README.md).
 
 ## Windows prerequisites
 
@@ -47,7 +48,7 @@ The shortest build/test commands are:
 ```
 
 These verify prerequisites, configure the existing preset, build, and run CTest
-with exit-code checks. `-Launch` opens the native simulated GUI;
+with exit-code checks. `-Launch` opens the native GUI;
 `-Package` stages only the CMake Runtime component and creates a revision-named
 ZIP in `build/packages`. Release is the preferred configuration for manual
 evaluation. Without those switches no package or additional launch is requested.
@@ -101,7 +102,7 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 2. Download **AudioHole-Windows-x64-release-&lt;full-tested-commit&gt;** under Artifacts.
 3. Extract the downloaded ZIP and open its single AudioHole package directory.
 4. Read `README.txt` and `build-info.json`, then double-click `audiohole.exe`.
-   Follow the included manual checklist; every device and operation is simulated.
+   Follow the included manual checklist. Tutorial uses fictional devices; normal operation uses real endpoints.
 
 Debug is uploaded separately for development investigations. Both packages are
 x64, use the static MSVC CRT, and require normal Windows system DLLs but no
@@ -219,10 +220,10 @@ ctest --test-dir build/model --output-on-failure
 Native Windows/MSVC validation must be recorded separately from Linux checks.
 A Windows-target cross-build does not execute Windows COM, confirm the MSVC
 manifest/CRT options, or establish successful Windows launch/test behavior.
-See the current Milestone 0 entry in [ROADMAP.md](ROADMAP.md) for actual results
+See the current Milestone 0 entry in [ROADMAP.md](docs/specifications/ROADMAP.md) for actual results
 and outstanding validation. Milestone 1 routing remains outside this milestone.
 
-Implementation changes must also pass the human readability and contract review in [ENGINEERING.md](ENGINEERING.md); build and test success alone does not establish milestone acceptance.
+Implementation changes must also pass the human readability and contract review in [ENGINEERING.md](docs/specifications/ENGINEERING.md); build and test success alone does not establish milestone acceptance.
 
 ## Approved presentation testing iteration
 
@@ -258,7 +259,7 @@ DEPENDENCIES.md). Offline builds may use
 `-DFETCHCONTENT_SOURCE_DIR_MINIZ=C:/path/to/miniz-3.1.0` after verifying its recorded
 archive hash. Model-only checks also build scanner contracts and background-service
 integration tests, but do not execute Windows hardware APIs. Read
-[SCANNER_TEST_MODE.md](SCANNER_TEST_MODE.md) before interpreting Deep evidence.
+[SCANNER_TEST_MODE.md](docs/specifications/SCANNER_TEST_MODE.md) before interpreting Deep evidence.
 
 
 ## Integrated engine and GUI smoke checks
@@ -271,3 +272,12 @@ contracts with explicit software-only adapters. Native CI runs every Gui.* test,
 including real Runtime/software-adapter Start/Stop and an actual restart child.
 The Runtime package includes the Miniaudio license and ENGINE_INTEGRATION.md.
 Native Windows/hardware validation is still required; Wine is supplemental.
+
+## Optional installer and source distribution
+
+See [installer documentation](docs/development/INSTALLER.md). Inno Setup 7.1.1
+builds an installer from the audited portable ZIP; it is not required to build or
+run the application. The Windows workflow tests installation/reinstallation and
+uninstall behavior, then uploads the matching source archive beside the binaries.
+See [source build instructions](docs/development/SOURCE.md) for offline dependency
+paths and [licensing](docs/legal/LICENSING.md) for distribution obligations.

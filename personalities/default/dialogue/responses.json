@@ -1230,7 +1230,7 @@
         "id": "default_bother_001",
         "category": "bother",
         "subcategory": "general",
-        "text": "Hello. Yes, the coffee is load-bearing.",
+        "text": "Morning. Or evening. I've been staring at this routing diagram long enough that the coffee has become structural support.",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1238,7 +1238,7 @@
         "id": "default_bother_002",
         "category": "bother",
         "subcategory": "general",
-        "text": "Can I help you, or are we testing the structural integrity of my patience?",
+        "text": "You need something, or are we finding out how many clicks it takes to make an audio engineer sigh audibly? Because we're making excellent progress.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1246,7 +1246,7 @@
         "id": "default_bother_003",
         "category": "bother",
         "subcategory": "general",
-        "text": "Still here. The headphones aren't a privacy policy.",
+        "text": "I'm still here. Those headphones aren't a privacy policy, by the way. I can see the terrible device names you're choosing.",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1254,7 +1254,7 @@
         "id": "default_bother_004",
         "category": "bother",
         "subcategory": "general",
-        "text": "That's a click. Very convincing. Got anything with a waveform?",
+        "text": "That's a click, alright. Nice crisp transient. Now, if we could get that kind of signal out of your microphone, we'd be in business.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1262,7 +1262,7 @@
         "id": "default_bother_005",
         "category": "bother",
         "subcategory": "general",
-        "text": "If you need a cable, ask. If you need emotional support, the case has wheels.",
+        "text": "If you need a cable, ask. If you need emotional support, I've got a flight case you can sit on and a surprisingly judgmental roll of gaffer tape.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1270,7 +1270,7 @@
         "id": "default_bother_006",
         "category": "bother",
         "subcategory": "general",
-        "text": "Repeated clicking does not qualify as a percussion performance.",
+        "text": "You know, repeated clicking technically counts as input. It still doesn't make this a percussion instrument.",
         "expression": "bored",
         "fallback_expression": "idle"
       },
@@ -1278,7 +1278,7 @@
         "id": "default_bother_007",
         "category": "bother",
         "subcategory": "general",
-        "text": "You've found the engineer. Management remains unavailable.",
+        "text": "You found the engineer. The complaints department is also the engineer. It's a lean operation.",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1286,7 +1286,7 @@
         "id": "default_bother_008",
         "category": "bother",
         "subcategory": "general",
-        "text": "I can hear you looking at the wrong output device.",
+        "text": "I can practically hear you selecting the wrong playback device. Don't ask me how. It's an occupational hazard.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1294,7 +1294,7 @@
         "id": "default_bother_009",
         "category": "bother",
         "subcategory": "general",
-        "text": "The coffee is hot, the routing is complicated, and somehow you're clicking me.",
+        "text": "Coffee's hot, routing's complicated, and apparently I'm the most interesting button on the screen. We're doing great.",
         "expression": "confused",
         "fallback_expression": "idle"
       },
@@ -1302,7 +1302,7 @@
         "id": "default_bother_010",
         "category": "bother",
         "subcategory": "general",
-        "text": "Fine. You have my attention. Please use it more efficiently than that buffer.",
+        "text": "Alright, you have my attention. Use it wisely. Unlike that 32-frame buffer you were considering.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1310,7 +1310,7 @@
         "id": "default_bother_011",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A smaller buffer can reduce buffering latency, but it gives the system less time to recover from scheduling delays.",
+        "text": "Smaller buffers can cut the delay between incoming and outgoing audio, which is great for monitoring. They also give Windows less time to do its job, and Windows is famously punctual. If you hear crackling or dropouts, try increasing the buffer a step before blaming the sound card.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1318,7 +1318,7 @@
         "id": "default_bother_012",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A larger buffer can reduce dropouts at the cost of more buffering latency. It doesn't repair a disconnected endpoint.",
+        "text": "A bigger buffer gives the engine more breathing room when your computer gets distracted. The tradeoff is extra delay, so your own voice might start sounding like a very rude echo. If an endpoint is disconnected, though, you could give it a buffer the size of Nebraska and it still wouldn't work.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1326,7 +1326,7 @@
         "id": "default_bother_013",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Capture is the source side; playback is the destination side. Device names don't always make that obvious.",
+        "text": "Capture means sound coming into AudioHole, and playback means sound going out. The names Windows gives those endpoints don't always make that clear. When you're unsure, follow the direction of the signal rather than whichever label sounds friendliest.",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1334,7 +1334,7 @@
         "id": "default_bother_014",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A shared sample rate does not prove two devices share a clock. Independent hardware can still drift.",
+        "text": "Two devices can both say 48 kHz and still disagree about how fast a second is. Each may have its own physical clock, and that tiny difference adds up. That's why long-running routes need to account for drift instead of assuming matching sample rates mean matching timing.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1342,7 +1342,7 @@
         "id": "default_bother_015",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Exclusive access can prevent another application from opening the same endpoint. Check who else is using it.",
+        "text": "Exclusive mode asks Windows to let one application have an endpoint to itself. That can help with certain formats and latency, but it may also stop other apps from using the device. If something suddenly goes silent, check who has the keys before assuming your speakers have died.",
         "expression": "concerned",
         "fallback_expression": "idle"
       },
@@ -1350,7 +1350,7 @@
         "id": "default_bother_016",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Silence is not proof of disconnection. The source may simply have nothing to say.",
+        "text": "Silence isn't automatically a broken connection. A source might be muted, idle, or simply have nothing playing. Before tearing apart a perfectly good route, make sure there's an actual signal going into it. I have lost entire afternoons to that mistake. Allegedly.",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1358,7 +1358,7 @@
         "id": "default_bother_017",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Source activity does not prove the destination is audible. Check its selection, mute state and volume too.",
+        "text": "A moving input level meter tells you there's activity at the source. It doesn't prove anything came out of the destination. Check the playback device, its mute state, its volume, and the actual sound you hear. Meters can look very confident while accomplishing absolutely nothing.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1366,7 +1366,7 @@
         "id": "default_bother_018",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A listed format is reported capability information. It is not the same as a successful stream test.",
+        "text": "A device reporting support for a format is making a pretty bold promise. Some drivers advertise things they can't actually open reliably. A real stream test matters more than a very impressive list of sample rates. Ask me how much I trust Bluetooth specifications.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1374,7 +1374,7 @@
         "id": "default_bother_019",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A duplex hole has two directions. Check both source and destination assignments when only one direction works.",
+        "text": "A return channel makes one hole handle two separate directions. Convenient, but it also gives you twice as many opportunities to pick the wrong endpoint. If you can hear them but they can't hear you, check each direction independently instead of randomly flipping everything at once.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1382,7 +1382,7 @@
         "id": "default_bother_020",
         "category": "bother",
         "subcategory": "tips",
-        "text": "This preview's Test Beep is silent simulation. Use a real Windows playback test when checking your physical speakers.",
+        "text": "Test Beep sends a tone through the selected playback endpoint so you can confirm where sound actually comes out. Check Level watches incoming signal on the selected capture endpoint, which is handy for spotting a dead or muted mic. Neither proves your whole route works end to end. Think of them as checking both ends of a cable before blaming the cable.",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1390,7 +1390,7 @@
         "id": "default_bother_021",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "Great Scott. Somebody gave the patch bay a flux capacitor.",
+        "text": "I once labeled a USB hub 'DO NOT TOUCH' and watched three people immediately unplug it. At this point I'm considering a second label that says 'free firmware update.'",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1398,7 +1398,7 @@
         "id": "default_bother_022",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "There are four lights. None of them is a clipping indicator.",
+        "text": "There are four lights. None of them tells me why you routed your microphone into your speakers. That's between you and the feedback loop.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1406,7 +1406,7 @@
         "id": "default_bother_023",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "The cake is a balanced output. Still a lie.",
+        "text": "The cake is a balanced output. Still a lie, and somehow it needs a proprietary adapter.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1414,7 +1414,7 @@
         "id": "default_bother_024",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "These go to eleven. My tolerance doesn't.",
+        "text": "These go to eleven. My tolerance tops out around four and a half, depending on how much coffee I've had.",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1422,7 +1422,7 @@
         "id": "default_bother_025",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "Have you tried turning the coffee off and on again? Don't. That's how we lose people.",
+        "text": "Somebody told me to turn the coffee off and on again. That's how you create a workplace incident. Hands off the coffee.",
         "expression": "concerned",
         "fallback_expression": "idle"
       },
@@ -1430,7 +1430,7 @@
         "id": "default_bother_026",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "The moon is a retired volume knob.",
+        "text": "I've got a theory that every studio has one cursed cable. It passes continuity, looks fine, and only crackles when a client is in the room. Mine has red tape on both ends. Nobody's allowed to throw it away.",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1438,7 +1438,7 @@
         "id": "default_bother_027",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Every seventh pigeon contains a tiny patch bay.",
+        "text": "Somebody in an audio forum swore their USB interface behaved better when the cable pointed north. I spent ten minutes figuring out which direction my desk faces before remembering I have a job to do.",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1446,7 +1446,7 @@
         "id": "default_bother_028",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Socks migrate through bass ports every Thursday.",
+        "text": "I maintain that moving a router six inches can fix speaker buzz. It shouldn't, most of the time. Unfortunately, I've seen enough ridiculous electromagnetic nonsense that I'm unwilling to bet lunch on it.",
         "expression": "confused",
         "fallback_expression": "idle"
       },
@@ -1454,7 +1454,7 @@
         "id": "default_bother_029",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Clouds are upholstered flight cases for exhausted thunderstorms.",
+        "text": "My personal theory is that cable ties become electrically conductive the moment you've finished making the rack look nice. That's when the mystery hum starts. The universe appreciates a tidy punchline.",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1462,8 +1462,48 @@
         "id": "default_bother_030",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "The first cable tie was elected mayor of Neptune.",
+        "text": "I once declared RGB control software the leading cause of unexplained computer suffering. Nobody could disprove it, and I got three perfectly good troubleshooting suggestions out of the argument.",
         "expression": "deadpan",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_031",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I'm convinced Windows quietly rotates the names of USB audio devices to see whether anyone is paying attention. I'd like to compare notes with whoever named 'Speakers (3)' and 'Speakers (3) (2).'",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_032",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "There's an old hardware-board argument about whether removing decorative cable braiding improves sound. My favorite part is that everybody argued about shielding and nobody owned a measurement microphone.",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_033",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I have a standing suspicion that the office microwave interferes with at least one audio device. The only way to test it involves explaining to accounting why I need seventeen frozen burritos.",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_034",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I've started keeping a private list of songs that instantly expose terrible speakers. Every time I add one, somebody accuses me of hating music. I only hate poorly designed tweeters.",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "default_bother_035",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "A repair-shop regular claimed renaming his USB interface 'Speakers (Real)' cured intermittent dropouts. I suspect the restart did the work, but the name has stayed. Respect the ritual.",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],

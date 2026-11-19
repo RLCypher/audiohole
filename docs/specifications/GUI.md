@@ -466,7 +466,7 @@ without changing timing, routing or an explicit channel map.
 
 The GUI assesses independent endpoint formats against the selected backend.
 A matching mono capture/stereo playback pair is a bridge candidate labeled
-`2 ch (dual mono)` while retaining native capture 1 ch and playback 2 ch details.
+`1 ch (dual mono)` while retaining native capture 1 ch and playback 2 ch details.
 Reported candidates are advisory, never saved intent or proof of running audio.
 Explicit channel maps stay authoritative. Remaining unknown format differences
 or unsupported backend representations receive specific explanations.
@@ -480,7 +480,7 @@ Candidate matching compares sample rate, encoding, PCM precision and supported
 channel counts, rather than requiring identical Windows descriptors. Channel
 masks, native descriptor tags, GUID spelling, alignment and byte-rate metadata
 remain endpoint details. Matching mono capture/stereo playback pairs label only
-the mono endpoint `2 ch (dual mono)`; the playback card retains its stereo
+the mono endpoint `1 ch (dual mono)`; the playback card retains its stereo
 candidate label. Explicit requirements and channel maps remain authoritative.
 
 Text values and hints are vertically centered in the unified single-line fields,
@@ -1757,7 +1757,7 @@ logical-pixel upper-right `AgentDisplay`. Preserve aspect ratio and alpha; cache
 scaled images, keep commentary to the left, and retain current window dimensions.
 All personalities display the logo for now. The component can replace its image
 later; animation, sprites, moods and speech bubbles are not implemented. See
-[branding architecture](assets/branding/README.md) for resource/ownership contracts.
+[branding architecture](../../assets/branding/README.md) for resource/ownership contracts.
 
 ### DFA precision and validation refinement
 
@@ -2025,14 +2025,13 @@ copy remain reachable at smaller display sizes through wrapping/scrolling. The
 introductory copy does not change engine capabilities. Tooltips identify the
 current development environments and unavailable streaming behavior.
 
-`AudioHole.has-run` lives beside the executable and is created only after an
-interactive launch is accepted. A missing marker forces the welcome even when
+`AudioHole.has-run` lives in the shared working data folder and is created after
+explicit tutorial completion or skipping. The old executable-side marker is imported once. A missing marker forces the welcome even when
 startup display is disabled or minimized. Cancel does not mark a first run.
 Replay Tutorial confirms, confirms any unsaved editor discard, removes the marker
-and restarts with the existing single-instance restart handshake. The guided
-script is still unwritten, so replay returns to the welcome and Preview option.
-A non-writable install directory reports marker errors; it does not request admin
-rights or silently store a second marker elsewhere. Smoke launches never read or
+and restarts with the existing single-instance restart handshake. Replay starts a fresh Norm tutorial.
+A non-writable data folder reports marker errors; it does not request admin
+rights or silently redirect state elsewhere. Smoke launches never read or
 write the installed marker. Resetting the marker leaves device/profile data alone.
 
 Device availability transitions select external Norm/UwU commentary; Vanilla
@@ -2235,7 +2234,7 @@ intent. Apply availability is shared, including disabled controls without a
 routing backend. Stop cancels a pending restart; backend failures retain the
 saved edits and remain visible. Incidental panel refreshes preserve pending
 text; invalid tuning blocks Save/navigation instead of restoring older values.
-See the [field mapping and audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
+See the [field mapping and audit](../PROFILE_PERSISTENCE_AUDIT_2026-11-15.md).
 
 ## Owner-authorized Plug Board tab
 

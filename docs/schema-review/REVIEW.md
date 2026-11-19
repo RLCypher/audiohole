@@ -8,12 +8,12 @@ past runtime behavior. No importer runs and no existing user files are changed.
 
 ## Evidence and current implementation
 
-Compared with [CONFIG_FORMAT](../../CONFIG_FORMAT.md) §§2–12, 16–23 and its
-reconciliation notes; [DEVICE_PROBING](../../DEVICE_PROBING.md) §§2–8, 10–13 and
-execution-boundary amendment; [PROFILES](../../PROFILES.md) directional settings,
-activation, inheritance, recovery and manual editing; [API](../../API.md)
-command serialization/state contracts; [ARCHITECTURE](../../ARCHITECTURE.md);
-[DECISIONS](../../DECISIONS.md) D-053 and O-001–O-006; and the actual
+Compared with [CONFIG_FORMAT](../specifications/CONFIG_FORMAT.md) §§2–12, 16–23 and its
+reconciliation notes; [DEVICE_PROBING](../specifications/DEVICE_PROBING.md) §§2–8, 10–13 and
+execution-boundary amendment; [PROFILES](../specifications/PROFILES.md) directional settings,
+activation, inheritance, recovery and manual editing; [API](../specifications/API.md)
+command serialization/state contracts; [ARCHITECTURE](../specifications/ARCHITECTURE.md);
+[DECISIONS](../specifications/DECISIONS.md) D-053 and O-001–O-006; and the actual
 `src/model/controller.h`, controller implementations, profile/device editors and
 scan controls. The current branch has a simulated scanner command interface
 `scan(enabled, advanced, scope, selected_device)`, progress and events. It has

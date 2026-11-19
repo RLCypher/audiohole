@@ -197,7 +197,14 @@ Result configure_windows_startup(bool enabled) {
     return {result == ERROR_SUCCESS || (!enabled && result == ERROR_FILE_NOT_FOUND),
             "Windows startup preference updated."};
 }
+std::filesystem::path preferences_root() {
+    return std::filesystem::path(wxStandardPaths::Get().GetUserLocalDataDir().ToStdWstring()) /
+           "PreviewBuild";
+}
 std::filesystem::path first_run_marker_path() {
+    return preferences_root() / "test" / "AudioHole.has-run";
+}
+std::filesystem::path legacy_first_run_marker_path() {
     return std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
                .parent_path() /
            "bin" / "AudioHole.has-run";

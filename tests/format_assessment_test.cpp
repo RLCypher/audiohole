@@ -25,13 +25,14 @@ TEST(FormatAssessment, MonoStereoCandidatePreservesNativeWidthsAndAllIntent) {
     EXPECT_EQ(result.candidates[0].source.channels, 1);
     EXPECT_EQ(result.candidates[0].destination.channels, 2);
     EXPECT_TRUE(result.candidates[0].dual_mono);
-    EXPECT_NE(result.candidates[0].label().find("2 ch (dual mono)"), std::string::npos);
+    EXPECT_NE(result.candidates[0].label().find("1 ch (dual mono)"), std::string::npos);
     EXPECT_EQ(d, original);
     EXPECT_TRUE(recommend(snapshot, d).compatible.empty()); // Engine preparation is unchanged.
 }
 TEST(FormatAssessment, ExplicitMapAndEndpointRequirementsRemainAuthoritative) {
     auto s = mono_pair();
     auto d = direction();
+    d.advanced_tuning = true;
     d.settings.preferences.channel_map = {{0, 0}};
     auto result = assess_formats(s, d, "wasapi");
     ASSERT_EQ(result.candidates.size(), 1u);
@@ -119,7 +120,7 @@ TEST(FormatAssessment, MultipleOtherwiseMatchingMonoFormatsHaveIndependentEndpoi
     const auto result = assess_formats(s, direction(), "wasapi");
     ASSERT_EQ(result.candidates.size(), 4u);
     for (const auto& candidate : result.candidates) {
-        EXPECT_NE(candidate.endpoint_label(true).find("2 ch (dual mono)"), std::string::npos);
+        EXPECT_NE(candidate.endpoint_label(true).find("1 ch (dual mono)"), std::string::npos);
         EXPECT_EQ(candidate.endpoint_label(false).find("dual mono"), std::string::npos);
         EXPECT_NE(candidate.endpoint_label(false).find("2 ch"), std::string::npos);
         EXPECT_EQ(candidate.source.channels, 1);
@@ -134,6 +135,12 @@ TEST(FormatAssessment, ChannelCountDifferencesAloneNeverHideMatchingPcmCandidate
             s.endpoints[0].capabilities[0].format.channels = capture;
             s.endpoints[1].capabilities[0].format.channels = playback;
             const auto result = assess_formats(s, direction(), "wasapi");
+            if (capture == 2 && playback == 1) {
+                EXPECT_TRUE(result.candidates.empty());
+                EXPECT_NE(result.explanation.find("stereo-to-mono mixing is unavailable"),
+                          std::string::npos);
+                continue;
+            }
             ASSERT_EQ(result.candidates.size(), 1u) << capture << " → " << playback;
             EXPECT_EQ(result.candidates[0].dual_mono, capture == 1 && playback >= 2);
             EXPECT_EQ(result.candidates[0].source.channels, capture);
@@ -148,4 +155,39 @@ TEST(FormatAssessment, PartialNativeMetadataUsesTheKnownSampleRepresentation) {
     ASSERT_EQ(assess_formats(s, direction(), "wasapi").candidates.size(), 1u);
     s.endpoints[0].capabilities[0].format.wave->valid_bits = 16;
     EXPECT_TRUE(assess_formats(s, direction(), "wasapi").candidates.empty());
+}
+
+TEST(FormatAssessment, InactiveRetainedRequirementsCannotFilterAutomaticCandidates) {
+    const auto s = mono_pair();
+    auto d = direction();
+    d.settings.preferences.common.channel_count = 8;
+    d.settings.preferences.common.sample_rate_hz = 192000;
+    d.settings.preferences.common.mode = "Exclusive";
+    d.settings.preferences.channel_map = {{7, 7}};
+    const auto original = d;
+    ASSERT_EQ(assess_formats(s, d, "wasapi").candidates.size(), 1u);
+    EXPECT_EQ(d, original);
+    d.advanced_tuning = true;
+    EXPECT_TRUE(assess_formats(s, d, "wasapi").candidates.empty());
+}
+TEST(FormatAssessment, MonoAndStereoOrdinaryLabelsAndExplicitStereoChannelSelection) {
+    auto s = mono_pair();
+    for (int width : {1, 2}) {
+        s.endpoints[0].capabilities[0].format.channels = width;
+        s.endpoints[1].capabilities[0].format.channels = width;
+        const auto result = assess_formats(s, direction(), "wasapi");
+        ASSERT_EQ(result.candidates.size(), 1u);
+        EXPECT_EQ(result.candidates[0].endpoint_label(true), result.candidates[0].source.label());
+        EXPECT_EQ(result.candidates[0].endpoint_label(false),
+                  result.candidates[0].destination.label());
+    }
+    s.endpoints[1].capabilities[0].format.channels = 1;
+    auto d = direction();
+    d.advanced_tuning = true;
+    d.settings.preferences.channel_map = {{1, 0}};
+    const auto result = assess_formats(s, d, "wasapi");
+    ASSERT_EQ(result.candidates.size(), 1u);
+    EXPECT_FALSE(result.candidates[0].dual_mono);
+    EXPECT_EQ(result.candidates[0].endpoint_label(false).find("(Mono)"), std::string::npos);
+    EXPECT_EQ(d.settings.preferences.channel_map, (std::vector<ChannelRoute>{{1, 0}}));
 }

@@ -1,6 +1,6 @@
 # Implementation and review standards
 
-These standards apply to all AudioHole implementation, including existing foundation code. Read them with [AGENTS.md](AGENTS.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [DECISIONS.md](DECISIONS.md).
+These standards apply to all AudioHole implementation, including existing foundation code. Read them with [AGENTS.md](../../AGENTS.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [DECISIONS.md](DECISIONS.md).
 
 ## Readability
 

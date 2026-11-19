@@ -137,6 +137,18 @@ void Frame::plug_board_smoke(bool lesson) {
         plug_board_view_->set_drawer_open(true);
         pump([&] { return !plug_board_view_->layout_diagnostics().drawer_animating; },
              "settings drawer");
+        auto* create_socket = wxWindow::FindWindowByName("New socket", plug_board_view_);
+        require(create_socket != nullptr, "socket creation control missing");
+        create_socket->SetFocus();
+        for (int refresh = 0; refresh < 4; ++refresh) {
+            plug_board_view_->set_drawer_open(true);
+            if (lesson)
+                render_tutorial();
+        }
+        require(wxWindow::FindFocus() == create_socket &&
+                    !plug_board_view_->layout_diagnostics().drawer_animating,
+                "repeated tutorial guidance stole Add socket focus or restarted its animation");
+
         const auto before = plug_board_->snapshot();
         if (lesson) {
             const auto current_beat = tutorial_->beat();

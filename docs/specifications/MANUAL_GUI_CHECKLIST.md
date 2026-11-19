@@ -4,7 +4,7 @@
 
 - Match otherwise-equal PCM formats with different Windows descriptor tags or
   channel masks. Both cards must show Candidate. For mono capture/stereo
-  playback, only the capture card says `2 ch (dual mono)`. Check several rates
+  playback, only the capture card says `1 ch (dual mono)`. Check several rates
   and sample representations; preserve explicit requirements and maps.
 - Open Settings Update in Dark, Light and Follow System. Verify current version,
   build ID, clickable GitHub URL, readable unshadowed text and Close/Escape.

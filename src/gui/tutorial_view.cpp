@@ -21,13 +21,32 @@ void prepare_tutorial_overlay(wxWindow& window) {
                       GetWindowLongPtrW(handle, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT |
                           WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
     SetLayeredWindowAttributes(handle, RGB(0, 0, 0), 255, LWA_COLORKEY);
+    SetWindowPos(handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
+// wxPopupWindow's ordinary Show raises/activates a desktop-owned popup. These
+// overlays instead belong to the host and must never become foreground windows.
+// Keep wx's visibility state, but use the native non-activating show operation.
+class TutorialOverlay : public wxPopupWindow {
+  public:
+    explicit TutorialOverlay(wxWindow* owner)
+        : wxPopupWindow(owner, wxBORDER_NONE | wxPU_CONTAINS_CONTROLS) {
+        prepare_tutorial_overlay(*this);
+    }
+    bool Show(bool show = true) override {
+        if (!wxWindowBase::Show(show))
+            return false;
+        const auto handle = static_cast<HWND>(GetHandle());
+        ShowWindow(handle, show ? SW_SHOWNOACTIVATE : SW_HIDE);
+        if (show)
+            SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        return true;
+    }
+};
 // A non-activating, click-through outline. Only its pink stroke is opaque;
 // native input goes to the real control below, including keyboard/accessibility.
-class TutorialOutline final : public wxPopupWindow {
+class TutorialOutline final : public TutorialOverlay {
   public:
-    explicit TutorialOutline(wxWindow* owner) : wxPopupWindow(owner, wxBORDER_NONE), pulse_(this) {
-        prepare_tutorial_overlay(*this);
+    explicit TutorialOutline(wxWindow* owner) : TutorialOverlay(owner), pulse_(this) {
         Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
             wxAutoBufferedPaintDC dc(this);
             dc.SetBackground(*wxBLACK_BRUSH);
@@ -63,6 +82,10 @@ class TutorialOutline final : public wxPopupWindow {
     wxRect bounds_;
     std::int64_t epoch_ = 0;
     void on_pulse(wxTimerEvent&) {
+        if (GetForegroundWindow() != static_cast<HWND>(GetParent()->GetHandle())) {
+            Hide();
+            return;
+        }
         update_bounds();
     }
     void on_show(wxShowEvent& event) {
@@ -87,11 +110,10 @@ class TutorialOutline final : public wxPopupWindow {
     }
 };
 // An overlay inside the first dialogue frame, never a sizer item or input target.
-class TutorialReplyArrow final : public wxPopupWindow {
+class TutorialReplyArrow final : public TutorialOverlay {
   public:
-    explicit TutorialReplyArrow(wxWindow* owner) : wxPopupWindow(owner, wxBORDER_NONE) {
+    explicit TutorialReplyArrow(wxWindow* owner) : TutorialOverlay(owner) {
         SetName("Tutorial reply guidance arrow");
-        prepare_tutorial_overlay(*this);
         Bind(wxEVT_PAINT, [this](wxPaintEvent&) {
             wxAutoBufferedPaintDC dc(this);
             dc.SetBackground(*wxBLACK_BRUSH);
@@ -228,6 +250,8 @@ bool Frame::advance_tutorial_scroll(std::int64_t now) {
 void Frame::render_tutorial() {
     if (!tutorial_ || !notebook_)
         return;
+    const bool overlays_visible = IsShown() && !IsIconized() && IsEnabled() &&
+                                  GetForegroundWindow() == static_cast<HWND>(GetHandle());
     tutorial_->event(dirty_ ? "observe_dirty" : "observe", controller_->snapshot(), draft_,
                      hole_index_, notebook_->GetSelection());
     const auto view = tutorial_->view(device_id_, device_dirty_);
@@ -284,7 +308,7 @@ void Frame::render_tutorial() {
         tutorial_choices_panel_->Layout();
         avatar_region_->Layout();
     }
-    if (view.beat == "N001" && !tutorial_choices_.empty() && IsShown() && !IsIconized() &&
+    if (view.beat == "N001" && !tutorial_choices_.empty() && overlays_visible &&
         comment_surface_->IsShownOnScreen()) {
         if (!tutorial_reply_arrow_)
             tutorial_reply_arrow_ = new TutorialReplyArrow(this);
@@ -305,7 +329,7 @@ void Frame::render_tutorial() {
         tutorial_reply_outlines_.push_back(new TutorialOutline(this));
     for (std::size_t i = 0; i < tutorial_reply_outlines_.size(); ++i) {
         auto* outline = static_cast<TutorialOutline*>(tutorial_reply_outlines_[i]);
-        if (farewell || i >= tutorial_choices_.size() || !IsShown() || IsIconized() ||
+        if (farewell || i >= tutorial_choices_.size() || !overlays_visible ||
             !tutorial_choices_[i]->IsShownOnScreen()) {
             outline->Hide();
             continue;
@@ -465,7 +489,7 @@ void Frame::render_tutorial() {
                     break;
                 }
         }
-        if (!directed || !IsShown() || IsIconized() || !directed->IsShownOnScreen()) {
+        if (!directed || !overlays_visible || !directed->IsShownOnScreen()) {
             highlight->Hide();
             continue;
         }
@@ -813,6 +837,30 @@ bool Frame::tutorial_smoke(const wxString& directory) {
         require((outline_style & (WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE)) ==
                     (WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE),
                 "Tutorial highlight can intercept input or activate itself");
+        require((outline_style & WS_EX_TOPMOST) == 0,
+                "Tutorial highlight remains globally topmost");
+        auto* other = new wxFrame(nullptr, wxID_ANY, "Tutorial foreground isolation check");
+        other->Show();
+        other->Raise();
+        SetForegroundWindow(static_cast<HWND>(other->GetHandle()));
+        wxYield();
+        require(GetForegroundWindow() != static_cast<HWND>(GetHandle()),
+                "Foreground isolation check did not activate its second window");
+        render_tutorial();
+        for (auto* outline : tutorial_highlights_)
+            require(!outline->IsShown(), "Background AudioHole retained a tutorial target outline");
+        for (auto* outline : tutorial_reply_outlines_)
+            require(!outline->IsShown(), "Background AudioHole retained a tutorial reply outline");
+        require(!tutorial_reply_arrow_ || !tutorial_reply_arrow_->IsShown(),
+                "Background AudioHole retained its reply arrow");
+        other->Destroy();
+        Raise();
+        SetForegroundWindow(static_cast<HWND>(GetHandle()));
+        wxYield();
+        render_tutorial();
+        require(tutorial_highlights_[0]->IsShownOnScreen(),
+                "Returning to AudioHole did not restore tutorial guidance");
+
         BOOL client_animation = TRUE;
         SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION, 0, &client_animation, 0);
         if (!preferences_->values().low_motion && client_animation != FALSE) {

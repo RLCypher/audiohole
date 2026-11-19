@@ -36,15 +36,15 @@ endif()
 install(TARGETS audiohole RUNTIME DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
   "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt" DESTINATION licenses COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/CONFIGURATION_BUNDLES.md"
-  "${PROJECT_SOURCE_DIR}/PROFILE_BUILDER.md"
-  "${PROJECT_SOURCE_DIR}/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/TUTORIAL.md" "${PROJECT_SOURCE_DIR}/ENGINE_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/CONFIGURATION_BUNDLES.md"
+  "${PROJECT_SOURCE_DIR}/docs/specifications/PROFILE_BUILDER.md"
+  "${PROJECT_SOURCE_DIR}/docs/specifications/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/TUTORIAL.md" "${PROJECT_SOURCE_DIR}/docs/specifications/ENGINE_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/PlugBoard-Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/NOTICE.txt"
   DESTINATION licenses RENAME PlugBoard-MaterialSymbols-NOTICE.txt COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/PLUG_BOARD_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/PLUG_BOARD_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/LICENSE.txt"
   DESTINATION licenses RENAME PlugBoard-MaterialSymbols-LICENSE.txt COMPONENT Runtime)
 add_custom_command(TARGET audiohole POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -92,3 +92,9 @@ add_custom_command(TARGET audiohole POST_BUILD COMMAND "${CMAKE_COMMAND}" -E cop
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-Regular.ttf" DESTINATION assets/ui COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/NOTICE.txt" DESTINATION licenses RENAME MaterialIcons-NOTICE.txt COMPONENT Runtime)
+
+install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION . COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/LICENSING.md"
+  "${PROJECT_SOURCE_DIR}/docs/development/SOURCE.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/InnoSetup-LICENSE.txt"
+  DESTINATION licenses COMPONENT Runtime)

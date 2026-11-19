@@ -1,130 +1,64 @@
 <p align="center">
-  <img src="assets/branding/audiohole-logo.png" width="224" alt="AudioHole logo: mint output and pink microphone surfaces joined by a wireframe audio conduit">
+  <img src="assets/branding/audiohole-logo.png" width="224" alt="AudioHole logo">
 </p>
 
-# audiohole
+# AudioHole
 
-AudioHole is an open-source Windows audio routing utility that connects audio devices through configurable simplex and duplex paths. Lightweight, portable, and built for people who just want their holes to work.
+Put your audio wherever you want.
 
-## Overview
+AudioHole is a Windows application for connecting existing capture and playback
+endpoints through saved routing profiles. A **hole** connects a source to a
+destination; duplex holes add an independent return path. **Plug Board** organizes
+application output assignments into reusable routing boards.
 
-AudioHole is designed to make routing audio between Windows devices simple, reliable, and transparent.
+[Build instructions](BUILDING.md) · [Documentation](docs/README.md) ·
+[Contributing](CONTRIBUTING.md) · [GPLv3](LICENSE)
 
-Whether you're connecting a microphone to a virtual audio device, routing audio between applications through existing endpoints, or managing a more complicated setup, AudioHole provides a straightforward way to connect sources and destinations without unnecessary complexity.
+## Get started
 
-No custom kernel drivers, complicated virtual mixers, or mysterious configuration files. Just connect the right devices and let AudioHole handle the routing.
+Download a successful Windows build from [GitHub Actions](https://github.com/RLCypher/audiohole/actions).
+Use the portable ZIP, or the optional installer for a conventional installation.
+Extract the portable package before running `AudioHole.exe`.
 
-## Features
+The guided tutorial uses fictional devices and applications, with Norm explaining
+each step. Normal operation uses your real Windows endpoints. Keep your playback
+volume comfortable while testing a new route.
 
-*Planned for v0.1. Not all features are implemented yet.*
+AudioHole is under active development. CI verifies software contracts and GUI
+flows; it does not establish compatibility or measured latency for every device.
 
-- **Simplex and duplex routing:** Create one-way or bidirectional connections between Windows audio endpoints.
-- **Multiple simultaneous connections:** Run several independent audio paths at once.
-- **Automatic device discovery:** Detect available audio devices and identify their capabilities.
-- **Persistent device assignments:** Remember devices and restore connections when they become available.
-- **Profiles:** Save, load, and switch between different routing configurations.
-- **Automatic recovery:** Handle device disconnections, reconnections, and interruptions.
-- **Flexible startup behavior:** Start routing manually, immediately, or after a configurable delay.
-- **System tray integration:** Keep AudioHole running without leaving the main window open.
-- **Signal activity monitoring:** Temporarily display source activity indicators for setup and troubleshooting.
-- **Test beep:** Send a short test signal to a selected destination to verify that audio reaches the intended device.
-- **Portable configuration:** Store settings and profiles in human-readable JSON files.
+## What is included
 
-## How It Works
+- Saved profiles with simplex and duplex routing, independent endpoint preferences
+  and optional advanced format, latency and buffering controls.
+- Device discovery, capability scanning and readable JSON configuration.
+- Plug Board application assignments, board libraries and profile associations.
+- Temporary source activity checks, destination test beeps, diagnostics and tray controls.
+- Light, Dark and Follow System themes, with optional Norm and Horu commentary.
 
-AudioHole connects existing Windows audio endpoints through configurable connections called **holes**.
+## Find your way around
 
-### Simplex Routing
+| Folder | Contents |
+| --- | --- |
+| [src](src) | Application, interface, controller and scanner code |
+| [engine](engine) | Audio engine module |
+| [modules](modules) | Plug Board module |
+| [personalities](personalities) | Editable personality packages |
+| [docs](docs/README.md) | User, design and validation documentation |
+| [tests](tests) | Automated checks |
+| [scripts](scripts) and [installer](installer) | Build, packaging and optional installer tools |
 
-A simplex hole carries audio in one direction.
+Developers should start with [BUILDING.md](BUILDING.md), [CONTRIBUTING.md](CONTRIBUTING.md)
+and [AGENTS.md](AGENTS.md). Detailed specifications live under
+[docs/specifications](docs/specifications/README.md).
 
-`Source → Destination`
+## License and contributions
 
-For example, audio captured from a microphone can be forwarded to another audio endpoint.
+First-party code is licensed under [GPLv3](LICENSE), **GPL-3.0-only**. Donations and
+commercial distribution are compatible with the license. Contributions use DCO
+sign-off; there is no broad relicensing CLA.
 
-### Duplex Routing
-
-A duplex hole contains two independently configurable directional paths.
-
-`Device A ⇄ Device B`
-
-Each direction can have its own source, destination, and audio settings.
-
-This allows bidirectional communication between devices without requiring two separately managed connections.
-
-### Multiple Holes
-
-AudioHole supports multiple independent connections running simultaneously, allowing more complex setups while keeping each audio path individually manageable.
-
-## Platform and Requirements
-
-- Windows 10 or Windows 11 (initial tested baseline planned: Windows 10 22H2 and supported Windows 11 releases; capabilities detected at runtime)
-- 64-bit (x64)
-- Native C++ application
-- CMake build system
-- Standard user permissions for normal operation
-- No custom kernel drivers required
-- No cloud services, accounts, or internet connection required for normal operation
-
-AudioHole works with existing Windows audio endpoints. It does not create virtual audio devices or replace device drivers.
-
-## Design Philosophy
-
-**Simple by design.** Audio routing shouldn't require learning an entire digital audio workstation.
-
-**Transparent configuration.** Settings should be human-readable, portable, and easy to back up or modify.
-
-**Reliable connections.** AudioHole should recover from interruptions without silently connecting the wrong devices.
-
-**User control.** Technically supported configurations should generally be allowed, with clear warnings about potential problems.
-
-**Minimal overhead.** Keep resource consumption and added audio latency as low as reasonably possible.
-
-## Project Status
-
-**Pre-alpha — Early development**
-
-AudioHole is currently under development. The initial focus is establishing a reliable Windows audio routing engine and building the application around it.
-
-There are no stable releases available yet.
-
-### Development Roadmap
-
-1. Establish the application architecture and build system.
-2. Implement basic simplex audio routing.
-3. Validate independent-clock synchronization, latency, backend comparison, and exclusive-mode behavior.
-4. Establish recovery and portable device identity, then expand to duplex and multiple holes.
-5. Add profiles and configurable startup behavior.
-6. Develop the graphical interface and system tray integration.
-7. Implement signal activity monitoring and output test beeps.
-8. Test performance, reliability, and compatibility across different hardware configurations.
-
-## Building
-
-The Milestone 0 foundation contains a Windows x64 developer executable, COM initialization support, and GoogleTest/CTest targets. It does not route audio yet.
-
-See [BUILDING.md](BUILDING.md) for prerequisites, Debug/Release build and test commands, dependency pins, and validation limitations.
-
-For a private CI evaluation build, open **Actions**, select a successful
-**Windows builds and evaluation packages** run, download its **release** artifact,
-extract it, and follow the included README. No development tools are required
-to launch that package. Milestone 0.2 packages `audiohole.exe`, a native GUI
-with deterministic simulated endpoints and routing behavior. No real audio is
-processed, Test Beep emits no sound, and edits last only for the current session.
-See [the GUI manual checklist](MANUAL_GUI_CHECKLIST.md) for evaluation workflows.
-The presentation testing iteration adds editable [personality files](personalities/README.md),
-a placebo DFA slider, scan callouts, clearer navigation, and Light/Dark/System palettes.
-
-## Contributing
-
-AudioHole is currently in early development. Contribution guidelines will be added as the project matures.
-
-See our [AI Disclosure](AI_DISCLOSURE.md) for the official statement on AI assistance and human responsibility.
-
-## License
-
-A license will be selected before the project's public release.
-
----
-
-*AudioHole: Because sometimes you just need to plug one thing into another.*
+Artwork and branding terms remain separately under review. See the
+[licensing details](docs/legal/LICENSING.md) for scope and third-party notices,
+[corresponding source](docs/development/SOURCE.md), and
+[AI disclosure](docs/specifications/AI_DISCLOSURE.md).

@@ -356,3 +356,49 @@ TEST_F(WorkflowRefinements, OnboardingOutcomeAndOneTimeGreetingPersistWithoutTou
     EXPECT_EQ(read(marker), malformed);
     EXPECT_EQ(read(root / "keep.json"), "retained preferences");
 }
+
+TEST_F(WorkflowRefinements, OnboardingMigrationPreservesStatusAndDoesNotUndoReplay) {
+    const auto legacy = root / "installed" / "bin" / "AudioHole.has-run";
+    const auto current = root / "data" / "test" / "AudioHole.has-run";
+    ASSERT_TRUE(mark_first_run(legacy, OnboardingOutcome::Skipped).ok);
+    const auto bytes = read(legacy);
+    ASSERT_TRUE(migrate_first_run_marker(legacy, current).ok);
+    EXPECT_EQ(read(current), bytes);
+    EXPECT_EQ(read(legacy), bytes);
+    OnboardingStatus status;
+    ASSERT_TRUE(read_onboarding_status(current, status).ok);
+    EXPECT_EQ(status.outcome, OnboardingOutcome::Skipped);
+    EXPECT_FALSE(status.greeting_shown);
+    ASSERT_TRUE(mark_onboarding_greeting_shown(current).ok);
+    ASSERT_TRUE(migrate_first_run_marker(legacy, current).ok);
+    ASSERT_TRUE(read_onboarding_status(current, status).ok);
+    EXPECT_TRUE(status.greeting_shown);
+    ASSERT_TRUE(reset_first_run(current).ok);
+    ASSERT_TRUE(migrate_first_run_marker(legacy, current).ok);
+    EXPECT_FALSE(std::filesystem::exists(current));
+}
+TEST_F(WorkflowRefinements, ExistingOnboardingWinsAndLegacyPresenceOnlyStillMigrates) {
+    const auto legacy = root / "old" / "AudioHole.has-run";
+    const auto current = root / "new" / "AudioHole.has-run";
+    ASSERT_TRUE(mark_first_run(legacy, OnboardingOutcome::Skipped).ok);
+    ASSERT_TRUE(mark_first_run(current, OnboardingOutcome::Completed).ok);
+    const auto bytes = read(current);
+    ASSERT_TRUE(migrate_first_run_marker(legacy, current).ok);
+    EXPECT_EQ(read(current), bytes);
+    std::filesystem::remove_all(root / "new");
+    std::ofstream(legacy) << "legacy marker";
+    ASSERT_TRUE(migrate_first_run_marker(legacy, current).ok);
+    OnboardingStatus status;
+    ASSERT_TRUE(read_onboarding_status(current, status).ok);
+    EXPECT_TRUE(status.greeting_shown);
+    EXPECT_EQ(status.outcome, OnboardingOutcome::None);
+}
+TEST_F(WorkflowRefinements, InvalidLegacyOnboardingCannotBecomeSuccessfulMigration) {
+    const auto legacy = root / "old" / "AudioHole.has-run";
+    const auto current = root / "new" / "AudioHole.has-run";
+    std::filesystem::create_directories(legacy.parent_path());
+    std::ofstream(legacy) << R"({"format":"wrong"})";
+    EXPECT_FALSE(migrate_first_run_marker(legacy, current).ok);
+    EXPECT_FALSE(std::filesystem::exists(current));
+    EXPECT_FALSE(std::filesystem::exists(current.parent_path() / "onboarding-migration.json"));
+}

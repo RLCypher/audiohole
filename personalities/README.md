@@ -71,8 +71,8 @@ supply an isolated per-package avatar registry mapping the stable ID to the owne
 `pack/manifest.json`, preserving manifests/assets byte-for-byte. Asset paths remain
 relative to that pack. Runtime stays shared outside packages; PR4's present common
 registry layout is inspected only, not changed. Coordinate migration with its owner.
-See [capability report](../AVATAR_CAPABILITY_REPORT.md) and
-[control handoff](../INTERNAL_CONTROL_CONTRACT.md).
+See [capability report](../docs/specifications/AVATAR_CAPABILITY_REPORT.md) and
+[control handoff](../docs/specifications/INTERNAL_CONTROL_CONTRACT.md).
 
 ## Response data
 
@@ -152,7 +152,7 @@ engine and the manifest's default style. Metadata exposes avatar_style and appro
 avatar_states; the engine still validates actual resources before display. Approved
 manifests/art were relocated unchanged. Avatar manifests have a separate2MiB bound.
 Earlier placeholder-only/no-playback notes above describe the pre-integration stage;
-see [current integration](../AVATAR_INTEGRATION.md). Optional/missing resources never
+see [current integration](../docs/specifications/AVATAR_INTEGRATION.md). Optional/missing resources never
 borrow another character, and a missing avatar does not disable valid dialogue.
 
 ## DFA expression assignments

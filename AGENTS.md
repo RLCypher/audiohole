@@ -33,18 +33,18 @@ The repository documentation is the authoritative design reference.
 
 | Document | Responsibility |
 |---|---|
-| `SPEC.md` | Product requirements and overall behavior |
-| `ARCHITECTURE.md` | Component boundaries and runtime architecture |
-| `DEPENDENCIES.md` | Dependency requirements and evaluation |
-| `DEVICE_PROBING.md` | Device discovery, scanning, and capability verification |
-| `CONFIG_FORMAT.md` | Configuration structure, portability, and serialization |
-| `PROFILES.md` | Profiles, holes, activation, recovery, and switching |
-| `API.md` | Internal and optional external control interfaces |
-| `GUI.md` | Graphical configuration and diagnostic interface |
-| `TRAY.md` | Background operation, tray controls, and notifications |
-| `DECISIONS.md` | Accepted, provisional, open, and deferred decisions |
-| `ROADMAP.md` | Development milestones and validation gates |
-| [AI_DISCLOSURE.md](AI_DISCLOSURE.md) | Official project disclosure of AI assistance |
+| `docs/specifications/SPEC.md` | Product requirements and overall behavior |
+| `docs/specifications/ARCHITECTURE.md` | Component boundaries and runtime architecture |
+| `docs/specifications/DEPENDENCIES.md` | Dependency requirements and evaluation |
+| `docs/specifications/DEVICE_PROBING.md` | Device discovery, scanning, and capability verification |
+| `docs/specifications/CONFIG_FORMAT.md` | Configuration structure, portability, and serialization |
+| `docs/specifications/PROFILES.md` | Profiles, holes, activation, recovery, and switching |
+| `docs/specifications/API.md` | Internal and optional external control interfaces |
+| `docs/specifications/GUI.md` | Graphical configuration and diagnostic interface |
+| `docs/specifications/TRAY.md` | Background operation, tray controls, and notifications |
+| `docs/specifications/DECISIONS.md` | Accepted, provisional, open, and deferred decisions |
+| `docs/specifications/ROADMAP.md` | Development milestones and validation gates |
+| [AI_DISCLOSURE.md](docs/specifications/AI_DISCLOSURE.md) | Official project disclosure of AI assistance |
 
 Do not attempt to infer a feature's complete behavior from this file alone.
 
@@ -57,7 +57,7 @@ Read the relevant detailed specification before modifying its implementation.
 When documents appear to conflict, use the following procedure:
 
 1. Identify the conflicting requirements.
-2. Check `DECISIONS.md` for an accepted or superseding decision.
+2. Check `docs/specifications/DECISIONS.md` for an accepted or superseding decision.
 3. Check the relevant detailed specification.
 4. Determine whether the conflict is an editorial inconsistency or a genuine design conflict.
 5. Resolve minor editorial inconsistencies without changing behavior.
@@ -67,7 +67,7 @@ When documents appear to conflict, use the following procedure:
 
 It does not silently override accepted product requirements.
 
-`DECISIONS.md` records deliberate design decisions.
+`docs/specifications/DECISIONS.md` records deliberate design decisions.
 
 Detailed specifications define the behavior of their respective subsystems.
 
@@ -77,7 +77,7 @@ The roadmap establishes implementation order, not permission to ignore requireme
 
 ## 4. Decision Authority
 
-Every significant technical decision must respect its status in `DECISIONS.md`.
+Every significant technical decision must respect its status in `docs/specifications/DECISIONS.md`.
 
 ### 4.1 Accepted
 
@@ -189,7 +189,7 @@ Do not introduce a second build system without an accepted architectural reason.
 
 ## 7. Architecture Boundaries
 
-Maintain the separation established in `ARCHITECTURE.md`.
+Maintain the separation established in `docs/specifications/ARCHITECTURE.md`.
 
 Primary responsibilities include:
 
@@ -288,7 +288,7 @@ Do not invent latency, CPU, stability, or device-capability results.
 
 All user-facing configuration must remain human-readable and manually editable.
 
-Follow `CONFIG_FORMAT.md`.
+Follow `docs/specifications/CONFIG_FORMAT.md`.
 
 ### 9.1 Canonical Format
 
@@ -363,7 +363,7 @@ Do not use transient Windows endpoint IDs as the sole portable identity.
 
 ### 10.2 Device Fingerprints
 
-Use available durable attributes according to `CONFIG_FORMAT.md` and `DEVICE_PROBING.md`.
+Use available durable attributes according to `docs/specifications/CONFIG_FORMAT.md` and `docs/specifications/DEVICE_PROBING.md`.
 
 Potential evidence includes:
 
@@ -405,7 +405,7 @@ Do not claim guaranteed matching when the hardware provides insufficient identif
 
 ## 11. Profiles and Holes
 
-Follow `PROFILES.md`.
+Follow `docs/specifications/PROFILES.md`.
 
 ### 11.1 Hole Definition
 
@@ -578,7 +578,7 @@ Routing-affecting edits to an active profile must be staged until Apply.
 
 ## 15. Device Scanning and Probing
 
-Follow `DEVICE_PROBING.md`.
+Follow `docs/specifications/DEVICE_PROBING.md`.
 
 ### 15.1 Easy Scan
 
@@ -674,7 +674,7 @@ Do not embed all recommendation logic inside GUI widgets.
 
 ## 17. GUI Requirements
 
-Follow `GUI.md`.
+Follow `docs/specifications/GUI.md`.
 
 ### 17.1 Primary Tabs
 
@@ -734,7 +734,7 @@ Closing the GUI must not stop routing.
 
 ## 18. Tray Requirements
 
-Follow `TRAY.md`.
+Follow `docs/specifications/TRAY.md`.
 
 ### 18.1 Persistent Operation
 
@@ -893,7 +893,7 @@ Never fabricate hardware results, measurements, or successful tests.
 
 ## 21. Optional External Control
 
-Follow `API.md`.
+Follow `docs/specifications/API.md`.
 
 ### 21.1 Shared Controller
 
@@ -925,7 +925,7 @@ Do not allow optional external-control features to delay essential routing funct
 
 ## 22. Dependencies
 
-Follow `DEPENDENCIES.md` and `DECISIONS.md`.
+Follow `docs/specifications/DEPENDENCIES.md` and `docs/specifications/DECISIONS.md`.
 
 ### 22.1 No Silent Dependency Selection
 
@@ -1050,7 +1050,7 @@ Review it against the accepted architecture and coding requirements first.
 
 ### 24.5 Decision Updates
 
-Use validated prototype findings to inform `DECISIONS.md`.
+Use validated prototype findings to inform `docs/specifications/DECISIONS.md`.
 
 ---
 
@@ -1064,27 +1064,27 @@ If implementation requires a change to established behavior, obtain approval and
 
 ### 25.2 Schema Changes
 
-Update `CONFIG_FORMAT.md` and migration tests.
+Update `docs/specifications/CONFIG_FORMAT.md` and migration tests.
 
 ### 25.3 API Changes
 
-Update `API.md`.
+Update `docs/specifications/API.md`.
 
 ### 25.4 GUI Changes
 
-Update `GUI.md`.
+Update `docs/specifications/GUI.md`.
 
 ### 25.5 Tray Changes
 
-Update `TRAY.md`.
+Update `docs/specifications/TRAY.md`.
 
 ### 25.6 Technical Decisions
 
-Update `DECISIONS.md` when a decision is accepted, revised, or superseded.
+Update `docs/specifications/DECISIONS.md` when a decision is accepted, revised, or superseded.
 
 ### 25.7 Milestones
 
-Update `ROADMAP.md` as implementation milestones are completed or reorganized.
+Update `docs/specifications/ROADMAP.md` as implementation milestones are completed or reorganized.
 
 ### 25.8 No Fictional Completion
 
@@ -1204,7 +1204,7 @@ The implementation should remain understandable to both its maintainers and its 
 
 ## Personality and User-Facing Copy
 
-Read `PERSONALITY.md` before writing user-facing copy. The application has one `interface.personality_mode` setting with one mutually exclusive selection. Standard IDs are `default` (Norm), `vanilla` (Vanilla — Strictly informational), and `uwu` (UwU). User-authored personality IDs are approved under PERSONALITY.md §17. Vanilla is the only compiled-in personality; Norm remains the default optional file. Do not implement a separate Vanilla boolean.
+Read `docs/specifications/PERSONALITY.md` before writing user-facing copy. The application has one `interface.personality_mode` setting with one mutually exclusive selection. Standard IDs are `default` (Norm), `vanilla` (Vanilla — Strictly informational), and `uwu` (UwU). User-authored personality IDs are approved under PERSONALITY.md §17. Vanilla is the only compiled-in personality; Norm remains the default optional file. Do not implement a separate Vanilla boolean.
 
 Use centralized, intentionally authored message variants, with neutral fallback; never rewrite user input, endpoint names, technical identifiers, paths, or structured diagnostics. Personality never overrides safety, transparency, accessibility, or functional requirements. Changing modes must not affect routing. The intentionally inert button labeled DFA and its 0.00 to 11.00 slider appear in Settings → Advanced for non-Vanilla personalities and are hidden in Vanilla. See PERSONALITY.md §17 for the approved special values. It must not invoke controller commands or change persistent state.
 
@@ -1212,7 +1212,7 @@ Use centralized, intentionally authored message variants, with neutral fallback;
 
 ## Temporary Signal Activity Monitoring Guardrail
 
-For v0.1, implement only **temporary source-side signal-presence observation** in setup/troubleshooting. This is not a calibrated level meter, mixer, or audio recorder. The separately specified user-triggered Test Beep is not part of passive signal observation. The indicator must be off by default and cease monitoring when its GUI panel closes. Use existing routed samples, with real-time-safe computation and throttled UI updates. Do not open duplicate capture streams, alter audio routing, or store samples. Silence is not disconnection; detected source samples are not proof of destination playback. See `GUI.md`, `ARCHITECTURE.md`, and `SPEC.md`.
+For v0.1, implement only **temporary source-side signal-presence observation** in setup/troubleshooting. This is not a calibrated level meter, mixer, or audio recorder. The separately specified user-triggered Test Beep is not part of passive signal observation. The indicator must be off by default and cease monitoring when its GUI panel closes. Use existing routed samples, with real-time-safe computation and throttled UI updates. Do not open duplicate capture streams, alter audio routing, or store samples. Silence is not disconnection; detected source samples are not proof of destination playback. See `docs/specifications/GUI.md`, `docs/specifications/ARCHITECTURE.md`, and `docs/specifications/SPEC.md`.
 
 
 ---
@@ -1221,17 +1221,17 @@ For v0.1, implement only **temporary source-side signal-presence observation** i
 
 Implement a clearly labeled **Test Beep** action for an explicitly selected **destination playback endpoint** in hole setup/troubleshooting. The purpose is only to answer: *Did the beep come out of the intended device?* Do not substitute the beep into an unrelated microphone/capture direction or broadcast to every output. A duplex hole must allow the user to select the destination direction being tested. If the selected endpoint cannot safely render a test signal, explain why and do not silently switch endpoints.
 
-The beep must be a brief, quiet, bounded signal (default approximately 1 kHz, -30 dBFS, one second) with short fades, an explicit click to start, a visible active indicator, and immediate cancellation on Stop, profile switch, device removal, or shutdown. Never persist an armed test. Use the existing playback pipeline when feasible; when routing is stopped, a temporary playback session may be used if supported. Resolve conflicts with exclusive-mode endpoints explicitly. Never disturb live routing, raise device volume, alter configuration, or claim a successful beep proves the full route works. Test-beep presentation follows `PERSONALITY.md`, but warnings and endpoint names remain precise.
+The beep must be a brief, quiet, bounded signal (default approximately 1 kHz, -30 dBFS, one second) with short fades, an explicit click to start, a visible active indicator, and immediate cancellation on Stop, profile switch, device removal, or shutdown. Never persist an armed test. Use the existing playback pipeline when feasible; when routing is stopped, a temporary playback session may be used if supported. Resolve conflicts with exclusive-mode endpoints explicitly. Never disturb live routing, raise device volume, alter configuration, or claim a successful beep proves the full route works. Test-beep presentation follows `docs/specifications/PERSONALITY.md`, but warnings and endpoint names remain precise.
 
 ## Personality coverage directive
 
-Implement `PERSONALITY.md` §16 as normative v0.1 UI copy coverage, not merely an optional tone example. Use a centralized, authored three-mode presentation catalog with the specified common events and tests. UwU is intentionally strongly flirtatious and innuendo-heavy in noncritical UI copy, with frequent deliberate R/L→W styling and kaomoji; preserve technical strings and safety clarity. Do not apply runtime mutation to arbitrary text. The approved §16.6 refinement permits controlled authored Norm/UwU commentary pools with transient repetition avoidance, optional weights, and reproducible injected/seeded tests. Vanilla and all technical/operational/warning/control/accessibility/recovery messages stay deterministic; polling or unchanged refreshes do not produce new commentary. Variation never changes commands, diagnostics, configuration, persistence, or DFA inertness.
+Implement `docs/specifications/PERSONALITY.md` §16 as normative v0.1 UI copy coverage, not merely an optional tone example. Use a centralized, authored three-mode presentation catalog with the specified common events and tests. UwU is intentionally strongly flirtatious and innuendo-heavy in noncritical UI copy, with frequent deliberate R/L→W styling and kaomoji; preserve technical strings and safety clarity. Do not apply runtime mutation to arbitrary text. The approved §16.6 refinement permits controlled authored Norm/UwU commentary pools with transient repetition avoidance, optional weights, and reproducible injected/seeded tests. Vanilla and all technical/operational/warning/control/accessibility/recovery messages stay deterministic; polling or unchanged refreshes do not produce new commentary. Variation never changes commands, diagnostics, configuration, persistence, or DFA inertness.
 
 ---
 
 ## Specification reconciliation guardrail
 
-Follow the owner-authorized reconciliation in `DECISIONS.md`. D-019's eight public states are canonical; resolving is internal to Starting. Capacity counts enabled holes in the armed plan, including waiting/recovering holes, and does not guarantee hardware performance.
+Follow the owner-authorized reconciliation in `docs/specifications/DECISIONS.md`. D-019's eight public states are canonical; resolving is internal to Starting. Capacity counts enabled holes in the armed plan, including waiting/recovering holes, and does not guarantee hardware performance.
 
 Native event-driven WASAPI and wxWidgets are leading candidates, not finalized selections. Toolchain/library approvals are provisional; no implementation or prototype is authorized by the documentation reconciliation itself. Public transport remains deferred until core routing is proven.
 
@@ -1249,7 +1249,7 @@ Keep preference, actual processing, observed health, and endpoint mode distinct.
 
 ## Mandatory implementation readability and documentation
 
-[ENGINEERING.md](ENGINEERING.md) is a mandatory implementation and review standard, effective retroactively for Milestones 0.0 and 0.1 and for all subsequent work. Use descriptive names, clear control flow, explicit ownership, cohesive functions, consistent formatting, and understandable errors. Avoid cryptic abbreviations, unexplained constants, and compressed or unnecessarily abstract code.
+[ENGINEERING.md](docs/specifications/ENGINEERING.md) is a mandatory implementation and review standard, effective retroactively for Milestones 0.0 and 0.1 and for all subsequent work. Use descriptive names, clear control flow, explicit ownership, cohesive functions, consistent formatting, and understandable errors. Avoid cryptic abbreviations, unexplained constants, and compressed or unnecessarily abstract code.
 
 Document significant interfaces and nontrivial behavior: intent, inputs/results, failures, side effects, ownership/lifetime, thread affinity, timing, invariants, constraints, and deliberate limitations. Explain non-obvious decisions and reference architecture/decision records where applicable. Keep comments accurate; specific actionable TODOs only. Avoid redundant line-by-line comments.
 
@@ -1375,9 +1375,29 @@ restart and software-adapter smoke checks; cross/Wine results are supplemental.
 The November 17 assignment authorizes embedding the supplied Plug Board 0.2.6
 module between Profiles and Devices, its tray/taskbar shortcut, authored response
 pools and fictional Norm tutorial insert. Read
-[PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md) before changing this
+[PLUG_BOARD_INTEGRATION.md](docs/specifications/PLUG_BOARD_INTEGRATION.md) before changing this
 integration. Preserve the module layout/policy contract, scanner identity
 authority, memory-only tutorial and asynchronous shutdown. No standalone
 launcher/probe binaries enter the host package. Native GUI smoke covers the
 actual embedded controls. The separate pending Automatic channel labeling
 request is outside this integration.
+
+## November 19 owner-authorized maintenance and installer batch
+
+The owner authorized all pending tutorial interaction, response-pool, shared
+onboarding storage, installer, GPLv3 documentation and Automatic channel
+assessment work. Detailed root documents now live under docs/specifications;
+use docs/README.md as the index. Read docs/development/INSTALLER.md for installer
+and data-deletion boundaries. This supersedes the old executable-side marker
+location: import it once into the existing working data root, preserving receipt
+state and Replay behavior. Smoke hosts remain memory-only.
+
+First-party code is GPL-3.0-only; assets remain separately deferred. Keep notices,
+DCO contribution guidance and matching corresponding source with binary artifacts.
+The installer consumes generated docs/build-info.json version metadata, preserves
+user data on replacement and asks before uninstall data removal. It is optional;
+ordinary application operation remains non-administrator and portable.
+
+Channel assessment retains native widths, excludes inactive overrides before
+filtering and preserves explicit maps. The engine still needs true stereo-to-mono
+mixing; do not advertise it or modify engine processing in this assessment batch.

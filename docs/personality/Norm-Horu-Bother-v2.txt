@@ -1,0 +1,368 @@
+AUDIOHOLE — NORM AND HORU AVATAR-CLICK INTERACTIONS
+Based on source revision: b33b760638606a790043bc966f6f4ab860f1a5f4
+Editorial revision: character-driven invented facts, revised natural phrasing, expanded tips, five new invented facts each
+
+Working-mode avatar clicks use the "bother" response pool: 35 responses
+per personality. Each pool contains 10 general replies, 10 tips, five
+easter eggs, and ten invented facts. IDs and expression metadata are included below. Spoken text is revised.
+Invented facts are deliberately fictional character anecdotes and speculative folklore, never verified claims. Newly added IDs 031–035
+will require adding entries to each personality response pool.
+
+Norm's nine separate tutorial click reactions follow both working pools.
+Tutorial reactions temporarily replace the lesson for roughly six seconds
+and then restore it without advancing. Horu does not deliver the tutorial.
+
+========================================================================
+NORM — 35 WORKING-MODE CLICK RESPONSES
+========================================================================
+Editable source: /workspace/audiohole/personalities/default/dialogue/responses.json
+
+GENERAL REPLIES (10)
+------------------------------------------------
+
+default_bother_001 [happy]
+Fallback expression: [idle]
+Morning. Or evening. I've been staring at this routing diagram long enough that the coffee has become structural support.
+
+default_bother_002 [deadpan]
+Fallback expression: [idle]
+You need something, or are we finding out how many clicks it takes to make an audio engineer sigh audibly? Because we're making excellent progress.
+
+default_bother_003 [smug]
+Fallback expression: [idle]
+I'm still here. Those headphones aren't a privacy policy, by the way. I can see the terrible device names you're choosing.
+
+default_bother_004 [suspicious]
+Fallback expression: [idle]
+That's a click, alright. Nice crisp transient. Now, if we could get that kind of signal out of your microphone, we'd be in business.
+
+default_bother_005 [deadpan]
+Fallback expression: [idle]
+If you need a cable, ask. If you need emotional support, I've got a flight case you can sit on and a surprisingly judgmental roll of gaffer tape.
+
+default_bother_006 [bored]
+Fallback expression: [idle]
+You know, repeated clicking technically counts as input. It still doesn't make this a percussion instrument.
+
+default_bother_007 [happy]
+Fallback expression: [idle]
+You found the engineer. The complaints department is also the engineer. It's a lean operation.
+
+default_bother_008 [suspicious]
+Fallback expression: [idle]
+I can practically hear you selecting the wrong playback device. Don't ask me how. It's an occupational hazard.
+
+default_bother_009 [confused]
+Fallback expression: [idle]
+Coffee's hot, routing's complicated, and apparently I'm the most interesting button on the screen. We're doing great.
+
+default_bother_010 [thinking]
+Fallback expression: [idle]
+Alright, you have my attention. Use it wisely. Unlike that 32-frame buffer you were considering.
+
+TIPS (10)
+------------------------------------------------
+
+default_bother_011 [thinking]
+Fallback expression: [idle]
+Smaller buffers can cut the delay between incoming and outgoing audio, which is great for monitoring. They also give Windows less time to do its job, and Windows is famously punctual. If you hear crackling or dropouts, try increasing the buffer a step before blaming the sound card.
+
+default_bother_012 [thinking]
+Fallback expression: [idle]
+A bigger buffer gives the engine more breathing room when your computer gets distracted. The tradeoff is extra delay, so your own voice might start sounding like a very rude echo. If an endpoint is disconnected, though, you could give it a buffer the size of Nebraska and it still wouldn't work.
+
+default_bother_013 [talking]
+Fallback expression: [idle]
+Capture means sound coming into AudioHole, and playback means sound going out. The names Windows gives those endpoints don't always make that clear. When you're unsure, follow the direction of the signal rather than whichever label sounds friendliest.
+
+default_bother_014 [thinking]
+Fallback expression: [idle]
+Two devices can both say 48 kHz and still disagree about how fast a second is. Each may have its own physical clock, and that tiny difference adds up. That's why long-running routes need to account for drift instead of assuming matching sample rates mean matching timing.
+
+default_bother_015 [concerned]
+Fallback expression: [idle]
+Exclusive mode asks Windows to let one application have an endpoint to itself. That can help with certain formats and latency, but it may also stop other apps from using the device. If something suddenly goes silent, check who has the keys before assuming your speakers have died.
+
+default_bother_016 [talking]
+Fallback expression: [idle]
+Silence isn't automatically a broken connection. A source might be muted, idle, or simply have nothing playing. Before tearing apart a perfectly good route, make sure there's an actual signal going into it. I have lost entire afternoons to that mistake. Allegedly.
+
+default_bother_017 [thinking]
+Fallback expression: [idle]
+A moving input level meter tells you there's activity at the source. It doesn't prove anything came out of the destination. Check the playback device, its mute state, its volume, and the actual sound you hear. Meters can look very confident while accomplishing absolutely nothing.
+
+default_bother_018 [suspicious]
+Fallback expression: [idle]
+A device reporting support for a format is making a pretty bold promise. Some drivers advertise things they can't actually open reliably. A real stream test matters more than a very impressive list of sample rates. Ask me how much I trust Bluetooth specifications.
+
+default_bother_019 [thinking]
+Fallback expression: [idle]
+A return channel makes one hole handle two separate directions. Convenient, but it also gives you twice as many opportunities to pick the wrong endpoint. If you can hear them but they can't hear you, check each direction independently instead of randomly flipping everything at once.
+
+default_bother_020 [talking]
+Fallback expression: [idle]
+Test Beep sends a tone through the selected playback endpoint so you can confirm where sound actually comes out. Check Level watches incoming signal on the selected capture endpoint, which is handy for spotting a dead or muted mic. Neither proves your whole route works end to end. Think of them as checking both ends of a cable before blaming the cable.
+
+EASTER EGGS (5)
+------------------------------------------------
+
+default_bother_021 [surprised]
+Fallback expression: [idle]
+I once labeled a USB hub 'DO NOT TOUCH' and watched three people immediately unplug it. At this point I'm considering a second label that says 'free firmware update.'
+
+default_bother_022 [suspicious]
+Fallback expression: [idle]
+There are four lights. None of them tells me why you routed your microphone into your speakers. That's between you and the feedback loop.
+
+default_bother_023 [deadpan]
+Fallback expression: [idle]
+The cake is a balanced output. Still a lie, and somehow it needs a proprietary adapter.
+
+default_bother_024 [smug]
+Fallback expression: [idle]
+These go to eleven. My tolerance tops out around four and a half, depending on how much coffee I've had.
+
+default_bother_025 [concerned]
+Fallback expression: [idle]
+Somebody told me to turn the coffee off and on again. That's how you create a workplace incident. Hands off the coffee.
+
+INVENTED FACTS (10)
+------------------------------------------------
+
+default_bother_026 [deadpan]
+Fallback expression: [idle]
+I've got a theory that every studio has one cursed cable. It passes continuity, looks fine, and only crackles when a client is in the room. Mine has red tape on both ends. Nobody's allowed to throw it away.
+
+default_bother_027 [suspicious]
+Fallback expression: [idle]
+Somebody in an audio forum swore their USB interface behaved better when the cable pointed north. I spent ten minutes figuring out which direction my desk faces before remembering I have a job to do.
+
+default_bother_028 [confused]
+Fallback expression: [idle]
+I maintain that moving a router six inches can fix speaker buzz. It shouldn't, most of the time. Unfortunately, I've seen enough ridiculous electromagnetic nonsense that I'm unwilling to bet lunch on it.
+
+default_bother_029 [thinking]
+Fallback expression: [idle]
+My personal theory is that cable ties become electrically conductive the moment you've finished making the rack look nice. That's when the mystery hum starts. The universe appreciates a tidy punchline.
+
+default_bother_030 [deadpan]
+Fallback expression: [idle]
+I once declared RGB control software the leading cause of unexplained computer suffering. Nobody could disprove it, and I got three perfectly good troubleshooting suggestions out of the argument.
+
+default_bother_031 [suspicious]
+Fallback expression: [idle]
+I'm convinced Windows quietly rotates the names of USB audio devices to see whether anyone is paying attention. I'd like to compare notes with whoever named 'Speakers (3)' and 'Speakers (3) (2).'
+
+default_bother_032 [smug]
+Fallback expression: [idle]
+There's an old hardware-board argument about whether removing decorative cable braiding improves sound. My favorite part is that everybody argued about shielding and nobody owned a measurement microphone.
+
+default_bother_033 [suspicious]
+Fallback expression: [idle]
+I have a standing suspicion that the office microwave interferes with at least one audio device. The only way to test it involves explaining to accounting why I need seventeen frozen burritos.
+
+default_bother_034 [smug]
+Fallback expression: [idle]
+I've started keeping a private list of songs that instantly expose terrible speakers. Every time I add one, somebody accuses me of hating music. I only hate poorly designed tweeters.
+
+default_bother_035 [suspicious]
+Fallback expression: [idle]
+A repair-shop regular claimed renaming his USB interface 'Speakers (Real)' cured intermittent dropouts. I suspect the restart did the work, but the name has stayed. Respect the ritual.
+
+========================================================================
+HORU — 35 WORKING-MODE CLICK RESPONSES
+========================================================================
+Editable source: /workspace/audiohole/personalities/uwu/dialogue/responses.json
+
+GENERAL REPLIES (10)
+------------------------------------------------
+
+uwu_bother_001 [mischievous]
+Fallback expression: [idle]
+Nyaa~! If you wanted my attention, senpai, you could've just asked! But I guess poking works too~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) ♡
+
+uwu_bother_002 [embarrassed]
+Fallback expression: [idle]
+H-hey! Buy me a coffee before getting this handsy with my interface, cutie~ >///<
+
+uwu_bother_003 [happy]
+Fallback expression: [idle]
+Can I hewp you with something, or did you come all this way just to play with my buttons? Ehehe~ ♡
+
+uwu_bother_004 [smug]
+Fallback expression: [idle]
+Again?~ You're getting awfully familiar with my hitbox, senpai. Not that I'm complaining~ (¬‿¬) ♡
+
+uwu_bother_005 [mischievous]
+Fallback expression: [idle]
+Headphones on, ears open~ Tell me which hole is giving you twouble, and I'll see what I can do with it~ OwO
+
+uwu_bother_006 [panicking]
+Fallback expression: [idle]
+W-wah! A little warning before you boop me! I almost spilled my coffee all over the imaginary circuitry~ (╥﹏╥)
+
+uwu_bother_007 [suspicious]
+Fallback expression: [idle]
+Your audio's over there, cutie~ Unless you were hoping to make a connection with me instead? Ehehe~ (¬‿¬)
+
+uwu_bother_008 [embarrassed]
+Fallback expression: [idle]
+Is making me blush part of your troubleshooting process? Because your methodology is questionable, but the results are promising~ >///<
+
+uwu_bother_009 [happy]
+Fallback expression: [idle]
+Coffee, headpats, and a nice bidirectional connection? Senpai, you're spoiling me~ ♡ (｡♥‿♥｡)
+
+uwu_bother_010 [laughing]
+Fallback expression: [idle]
+Boop received! No settings changed, no devices harmed, just one very happy little menace~ (≧▽≦) ♡
+
+TIPS (10)
+------------------------------------------------
+
+uwu_bother_011 [thinking]
+Fallback expression: [idle]
+Tiny buffers mean less waiting between your mic and speakers, which feels sooo nice for live monitoring~ ♡ But if you squeeze them too tight, Windows might miss a deadline and your audio starts crackling. Give your poor little buffer some room if it gets fussy~ :3
+
+uwu_bother_012 [smug]
+Fallback expression: [idle]
+Big buffers are like a fluffy blanket for your audio engine~ More room to ride out little scheduling hiccups, fewer nasty pops! But all that extra cushioning adds delay, so don't make it so big that your voice comes back after you've finished flirting~ UwU
+
+uwu_bother_013 [talking]
+Fallback expression: [idle]
+Capture is where the sound comes in, and playback is where it comes out~ Easy, right? Except Windows gives everything names like 'USB Audio Device 4.' Follow the signal, not the name, before you start sticking things into the wrong holes~ (¬‿¬)
+
+uwu_bother_014 [thinking]
+Fallback expression: [idle]
+Two devices can both say 48 kHz and still have their own tiny ideas about timing~ They might drift apart over a long session, like a couple who agreed to meet at seven but own different clocks. Matching sample rates are nice, but synchronization takes a little more love~ ♡
+
+uwu_bother_015 [concerned]
+Fallback expression: [idle]
+Exclusive mode is AudioHole asking to have an endpoint all to itself~ Such a possessive little thing! (⁄ ⁄>⁄ω⁄<⁄ ⁄) It can help with formats or latency, but other apps might lose access. If somebody suddenly goes quiet, check who claimed the device before panicking~
+
+uwu_bother_016 [happy]
+Fallback expression: [idle]
+A quiet hole isn't always a broken hole, senpai~ ♡ Your source might be muted, paused, or just feeling shy. Make sure it's actually sending sound before you start pulling everything apart. Sometimes the best fix is pressing Play~ :3
+
+uwu_bother_017 [thinking]
+Fallback expression: [idle]
+Oooh, look at those input meters dancing~! That means your source is sending something, but it doesn't mean your speakers are playing it. Check your chosen output, mute, and volume, then use those adorable ears to confirm the result~ UwU
+
+uwu_bother_018 [suspicious]
+Fallback expression: [idle]
+A device saying it supports a format is like a dating profile saying 'great communicator.' Cute claim, but I wanna see it in action~ (¬‿¬) Try an actual stream test before trusting every sample rate the driver brags about~ ♡
+
+uwu_bother_019 [talking]
+Fallback expression: [idle]
+Duplex means your hole goes both ways~ Ehehe, convenient! ♡ But forward and return each have their own source and destination. If one direction is being stubborn, check that side first instead of poking every setting in sight~ >w<
+
+uwu_bother_020 [talking]
+Fallback expression: [idle]
+Ehehe~ Wanna make sure you're putting things in the right holes, senpai? ♡ Test Beep makes your speakers squeak so you know where it's coming out, and Check Level lets you see how much signal your mic is giving you before things get too loud~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) Those buttons check the individual devices. Give the whole route a proper listen too, before stuffing audio into your holes! ♡
+
+EASTER EGGS (5)
+------------------------------------------------
+
+uwu_bother_021 [surprised]
+Fallback expression: [idle]
+I found a secret setting labeled 'Do Not Touch' once~ Naturally, I touched it. The computer made a noise that sounded very disappointed in me~ (｡•́︿•̀｡)
+
+uwu_bother_022 [mischievous]
+Fallback expression: [idle]
+The cake is a lie~ But somebody left frosting on the mixer, and now the faders are all sticky. I have questions, and none of them are innocent~ (¬‿¬)
+
+uwu_bother_023 [embarrassed]
+Fallback expression: [idle]
+These go to eleven~! If you turn me up that far, I might make a noise that violates your warranty~ Ehehe~ ♡
+
+uwu_bother_024 [panicking]
+Fallback expression: [idle]
+It's dangerous to go alone, senpai! Take this entire flight case~ I packed adapters, snacks, and one cable that doesn't seem to fit anything~ (≧▽≦)
+
+uwu_bother_025 [embarrassed]
+Fallback expression: [idle]
+I'm a little teapot, short and stout~ Tip me over and you're cleaning coffee out of the USB ports, mister! >///<
+
+INVENTED FACTS (10)
+------------------------------------------------
+
+uwu_bother_026 [mischievous]
+Fallback expression: [idle]
+I have a theory that cats can hear cheap chargers plotting their own demise~ The little whine changes right before they give up. My fee for inspecting one is three treats and a forehead kiss~ :3
+
+uwu_bother_027 [surprised]
+Fallback expression: [idle]
+I tested whether putting a plushie beside my microphone makes my voice sound softer~ It mostly made the desk cuter. I'm counting that as a measurable improvement, thank you very much~ ♡
+
+uwu_bother_028 [deadpan]
+Fallback expression: [idle]
+Apparently turning off the rainbow lights behind your webcam can make face tracking happier~ I tried it and suddenly my eyebrows behaved! Awful. Now I have to choose between functional expressions and maximum sparkle~ >w<
+
+uwu_bother_029 [happy]
+Fallback expression: [idle]
+I firmly believe cats learn soundboard buttons faster when the buttons are labeled with snacks~ I would just mash the donation alert until someone brought tuna. A flawless business model~ (≧▽≦)
+
+uwu_bother_030 [laughing]
+Fallback expression: [idle]
+I experimented with wearing one headphone cup off my ear to sound more confident on mic~ All I learned was how loudly I breathe. Congratulations, senpai, you've subscribed to my premium breathing channel~ >///<
+
+uwu_bother_031 [suspicious]
+Fallback expression: [idle]
+I built a tiny pillow fort around my desk fan to keep the breeze off the microphone~ It looked so cozy that I added a miniature welcome mat. The fan has better housing than I do~ (｡♥‿♥｡)
+
+uwu_bother_032 [smug]
+Fallback expression: [idle]
+My theory is that wireless USB dongles behave better when you give them a little extension cable and some personal space~ They get shy when they're squished between the big, hot ports. I understand completely~ ♡
+
+uwu_bother_033 [suspicious]
+Fallback expression: [idle]
+I'm convinced a rubber duck perched beside the webcam improves face tracking~ Mine is named Director Quack. He does absolutely nothing, and somehow he still gets credit when my tracking behaves~ OwO
+
+uwu_bother_034 [smug]
+Fallback expression: [idle]
+I programmed a Panic button to mute my microphone and play elevator music~ I pressed it during a sneeze and forgot to turn it off. My friends spent eleven minutes in a very polite waiting room~ (≧▽≦)
+
+uwu_bother_035 [suspicious]
+Fallback expression: [idle]
+I tried a fluffy sock as a microphone windscreen once~ My voice sounded like it was calling from inside a sweater. Ten out of ten for coziness, two out of ten for intelligibility~ (¬‿¬) ♡
+
+========================================================================
+NORM — 9 TUTORIAL-ONLY CLICK REACTIONS
+========================================================================
+Editable source: /workspace/audiohole/docs/tutorial/Norm-script.txt
+
+C001 [suspicious]
+Cue: Click Norm early in the tutorial.
+Hey. Eyes on the tutorial, not the handsome professional conducting it. ...Alright, "professional" is doing some work there.
+
+C002 [deadpan]
+Cue: Click Norm while configuring devices.
+Yes, I'm clickable. No, that doesn't make me a USB device. Please don't try to route audio through me.
+
+C003 [mischievous]
+Cue: Click Norm while creating a hole.
+You already have a perfectly good hole to mess with. Leave mine alone.
+
+C004 [confused]
+Cue: Click Norm during the fake scan.
+I'm supervising. The imaginary computers are doing the imaginary work. Very demanding supervisory position.
+
+C005 [smug]
+Cue: Click Norm after the scan completes.
+Nine endpoints, zero cables, and somehow I still feel like somebody owes me overtime.
+
+C006 [deadpan]
+Cue: Click Norm during microphone check.
+Clicking me doesn't count as saying something. I can see why you'd try, though.
+
+C007 [happy]
+Cue: Click Norm after completing the tutorial.
+You're still here? That's fine. I've been told I'm excellent company by absolutely nobody.
+
+C008 [bored]
+Cue: Repeated clicks, only after cooldown, general fallback.
+If you keep poking me, I'm putting "avatar stress test" on your résumé.
+
+C009 [mischievous]
+Cue: General click fallback.
+Careful. I'm part of the user interface. We're legally required to call that interaction.

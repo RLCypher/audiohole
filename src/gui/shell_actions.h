@@ -9,6 +9,8 @@
 #include <windows.h>
 
 namespace audiohole::gui {
+std::filesystem::path preferences_root();
+std::filesystem::path legacy_first_run_marker_path();
 // Private Windows shell shortcuts forward only these fixed actions to the
 // existing GUI. They are not a public routing API or persisted startup commands.
 enum class ShellAction : std::uint32_t { Open, Controls, Start, Stop, Close, Exit, PlugBoard };

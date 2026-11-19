@@ -1,7 +1,7 @@
 # Norm's tutorial
 
 Tutorial replaces the former user-facing Preview environment. The approved
-owner script is [docs/tutorial/Norm-script.txt](docs/tutorial/Norm-script.txt),
+owner script is [docs/tutorial/Norm-script.txt](../tutorial/Norm-script.txt),
 version 2.8, together with the Plug Board insert version 1.3. It is compiled into inert UTF-8 catalogue data by
 `scripts/GenerateTutorial.py`; `--check` verifies an exact reproducible build.
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
@@ -19,7 +19,7 @@ the byte limit and exact reconstructed JSON before the Windows build and in CTes
 
 On an unmarked launch, **It's my first time** opens Tutorial. **Show me them
 holes!** explicitly skips onboarding and opens the working environment. A valid
-`bin/AudioHole.has-run` suppresses welcome and opens the working environment on
+`%LOCALAPPDATA%/AudioHole/PreviewBuild/test/AudioHole.has-run` suppresses welcome and opens the working environment on
 subsequent launches. The old saved `preview_mode` preference no longer selects a
 user-facing environment. Replay resets the marker and restarts; its ephemeral
 restart argument selects the replay introduction. The developer-only legacy
@@ -138,7 +138,7 @@ is no separate rendering or animation engine.
 ## Validation
 
 The current flow-corrected script update and its file-by-file verification record
-are in [docs/tutorial/Flow-update-validation.md](docs/tutorial/Flow-update-validation.md).
+are in [docs/tutorial/Flow-update-validation.md](../tutorial/Flow-update-validation.md).
 
 Portable tests cover catalogue integrity, variant/choice routing, exact identities,
 independent exclusive preference, distinct saved renames, both microphone branches,
@@ -210,3 +210,17 @@ replace the combined message and restore it exactly; they do not repeat the
 arrival greeting alongside the click reaction. Working-mode N037/N037A/N037B
 greetings remain independent of the tutorial. See
 [PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).
+
+## Shared onboarding storage and overlay isolation
+
+The marker now shares the working data root with scan/device/profile and Plug Board
+files. Existing executable-side bin/AudioHole.has-run is imported once, preserving
+completion/skipping and the greeting receipt. The old installation is never written.
+onboarding-migration.json records that the legacy location was checked, preventing
+Replay from reimporting a retained old marker. An existing new marker wins. Invalid
+or inaccessible legacy data is reported, and migration remains retryable.
+
+Tutorial overlays are non-topmost, click-through owned windows and are hidden on
+host deactivation, minimization or modal UI. Guidance returns when the host is
+foreground again. Repeated Plug Board drawer-open guidance is idempotent and cannot
+restart the drawer animation or steal focus from Add socket.

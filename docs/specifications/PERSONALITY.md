@@ -406,7 +406,7 @@ or existing event uses Vanilla **for that event only**, retaining the selected
 personality elsewhere until its file is updated. File deletion/editing takes effect
 on explicit Reload (or next launch), not during telemetry or repaint. Vanilla is
 always available and cannot be replaced by a file. See the versioned format and
-limits in [personalities/README.md](personalities/README.md).
+limits in [personalities/README.md](../../personalities/README.md).
 
 Authored pools retain repetition avoidance, optional weighting, reproducible tests,
 and occurrence caching. Single-entry pools are valid. No new personality-controlled
@@ -523,7 +523,7 @@ This rename does not change any authored response, routing or persistence behavi
 DFA replies use the same schema-2 metadata path as Bother. Individual preferred
 expressions and semantic subcategories now accompany all general, threshold,
 reference and validation replies, replacing the blanket Norm deadpan/Horu
-mischievous assignments. See [the assignments](personalities/README.md#dfa-expression-assignments).
+mischievous assignments. See [the assignments](../../personalities/README.md#dfa-expression-assignments).
 Authored texts, IDs, weights, ordering, decimal thresholds and warning protection
 remain unchanged. The selected response supplies its expression; no second picker,
 runtime text inference or changes to routing/configuration are introduced.
@@ -558,3 +558,11 @@ Vanilla facts describe saved intent separately from actual playback. Unchanged
 publications and background discovery do not generate responses. Guided Norm
 tutorial copy takes precedence over these random pools. See
 [PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).
+
+## Expanded avatar-click pools
+
+The November 19 owner revision supplies 35 Bother responses per Norm/Horu pool:
+10 general, 10 tips, five easter eggs and 10 invented facts. The bounded catalog
+loader accepts at most 64 responses per pool (formerly 32), retaining all file,
+text, weight, nesting, identity and expression validation. The supplied copy is
+preserved at docs/personality/Norm-Horu-Bother-v2.txt.

@@ -646,7 +646,7 @@ std::string_view tutorial_catalog() {
     "expression": "confused",
     "variants": [],
     "choices": [],
-    "text": "I'm supervising. The imaginary computers are doing the imaginary work. Very demanding management position."
+    "text": "I'm supervising. The imaginary computers are doing the imaginary work. Very demanding supervisory position."
   },
   "C005": {
     "expression": "smug",
@@ -868,7 +868,7 @@ std::string_view tutorial_catalog() {
     // Join once on first control-thread use. The returned view has process lifetime.
     static const std::string data = [] {
         std::string result;
-        result.reserve(39033);
+        result.reserve(39034);
         result = "{\n";
         bool first = true;
         for (const auto phase : phases) {

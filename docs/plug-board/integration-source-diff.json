@@ -94,7 +94,7 @@
     {
       "path": "src/wx/view.cpp",
       "handover_sha256": "76a05d9182651c2f296042458be11c3e22d0beda020de1feeb0652f25858c004",
-      "integrated_sha256": "8ba2e0cbd845dd4bd72478e1c76b8c455a4ff6f1eb676f5bd295f5b9bae051db"
+      "integrated_sha256": "9618678b12d33ca5278874881652c469fa5653706d4ecd68d0c95d34df688aa5"
     },
     {
       "path": "tests/module_test.cpp",

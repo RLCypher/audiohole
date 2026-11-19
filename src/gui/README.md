@@ -25,10 +25,10 @@ exports identify the actual operating mode and unavailable hardware measurements
 
 Commands/results, immutable state, severity/events, unavailable telemetry and
 bounded pull subscriptions are documented in
-[INTERNAL_CONTROL_CONTRACT](../../INTERNAL_CONTROL_CONTRACT.md). The future engine
+[INTERNAL_CONTROL_CONTRACT](../../docs/specifications/INTERNAL_CONTROL_CONTRACT.md). The future engine
 must marshal completions without GUI/filesystem calls on audio threads. No real
 stream supervision, measured timing or production serializer is implemented.
-Avatar playback now uses PR6's shared Session/Panel through AvatarHost. [Persistence](../../PROVISIONAL_TEST_PERSISTENCE.md) explains provisional
+Avatar playback now uses PR6's shared Session/Panel through AvatarHost. [Persistence](../../docs/specifications/PROVISIONAL_TEST_PERSISTENCE.md) explains provisional
 Test JSON and its deliberate differences from unresolved production requirements.
 
 Application appearance uses palette.h, SurfacePanel, custom button painting,
@@ -66,8 +66,8 @@ configuration through a new controller. Unattended assertions/errors terminate
 with a failure instead of hanging on dialogs. BMP screenshots are review evidence,
 not automated visual assertions. Native Windows execution/DPI/restart/tray and
 extracted-package checks remain required; cross-compilation cannot establish them.
-See [implementation report](../../GUI_INTEGRATION_PREPARATION.md) and
-[manual checklist](../../MANUAL_GUI_CHECKLIST.md).
+See [implementation report](../../docs/specifications/GUI_INTEGRATION_PREPARATION.md) and
+[manual checklist](../../docs/specifications/MANUAL_GUI_CHECKLIST.md).
 
 
 Bother is an avatar-click easter egg only: no visible button, no redundant
@@ -80,14 +80,14 @@ new directions keep this button disabled. This does not activate a whole profile
 
 
 The operative avatar integration is documented in
-[AVATAR_INTEGRATION.md](../../AVATAR_INTEGRATION.md). The avatar is no longer the
+[AVATAR_INTEGRATION.md](../../docs/specifications/AVATAR_INTEGRATION.md). The avatar is no longer the
 static AgentDisplay; that class remains for branding. The independent animation
 timer does not advance controller time and stops when hidden/minimized. All owned
 assets/manifests are deployed inside the selected personality package.
 
 The two Devices lists, hidden-device behavior, evidence projections, scan scopes,
 limits, consent, storage and cancellation contracts are documented in
-[SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md).
+[SCANNER_TEST_MODE.md](../../docs/specifications/SCANNER_TEST_MODE.md).
 
 `DeviceList` uses accessible colored-dot cells and ellipsized device names; full
 names/status remain in hover help and Overview. `SecondsField` uses exact decimal

@@ -1380,7 +1380,7 @@ The MinGW validation tools and Wine are not application dependencies. Cross-buil
 MinGW runtime DLLs used only for the attempted Wine check do not describe the
 reference MSVC static-CRT deployment.
 
-Run the documented commands in [BUILDING.md](BUILDING.md) on Windows with
+Run the documented commands in [BUILDING.md](../../BUILDING.md) on Windows with
 Visual Studio 2022 and record the compiler/SDK versions, executable exit status,
 and five CTest results in both configurations before claiming native readiness.
 The COM helper supplies thread-bound initialization/cleanup for future WASAPI
@@ -1399,7 +1399,7 @@ launch/package helper, explicit CMake Runtime installation, and separate
 revision-identified Debug/Release Actions artifacts. Packages exclude tests and
 third-party source. CI tests the exact package outside the source/build tree
 and audits compiler-runtime imports before upload; Release is preferred for
-ordinary manual evaluation. See [BUILDING.md](BUILDING.md).
+ordinary manual evaluation. See [BUILDING.md](../../BUILDING.md).
 
 Validation must distinguish local script/fixture checks from native CI builds,
 package execution, and upload. GitHub API access in the current environment

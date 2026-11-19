@@ -218,5 +218,5 @@ The later owner-provided `feef4b0` art revision supersedes the earlier statement
 that operating art is unpruned. It removes neutral idle bookends while retaining
 699 operating PNGs with byte-preserved art and timing. Authored playback flags and
 application loop/count/hold behavior are unchanged. See
-[IDLE_PADDING_REMOVAL.md](assets/personalities/IDLE_PADDING_REMOVAL.md) and its
+[IDLE_PADDING_REMOVAL.md](../../assets/personalities/IDLE_PADDING_REMOVAL.md) and its
 before/after ledger for exact asset lineage. No additional pruning was performed.

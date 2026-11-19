@@ -7,8 +7,12 @@ struct OnboardingStatus {
     OnboardingOutcome outcome = OnboardingOutcome::None;
     bool greeting_shown = true;
 };
-// Control-thread filesystem operations. Marker lives in the application bin/ folder, not
-// in a registry key. Errors never silently redirect it to another directory.
+// Control-thread filesystem operations. Marker lives in the working data root.
+// Errors never silently redirect it to another directory.
+// Copies legacy status/receipt exactly once without requiring writes to Program
+// Files. A persistent migration receipt prevents Replay from importing it again.
+Result migrate_first_run_marker(const std::filesystem::path& legacy,
+                                const std::filesystem::path& current);
 Result first_run_needed(const std::filesystem::path& marker, bool& needed);
 Result mark_first_run(const std::filesystem::path& marker,
                       OnboardingOutcome = OnboardingOutcome::None);

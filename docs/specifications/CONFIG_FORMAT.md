@@ -1826,7 +1826,7 @@ Strict preservation is internal/experimental, not a required public v0.1 setting
 ### Approved personality data boundary
 
 Optional commentary files use the dedicated presentation-only format documented in
-[personalities/README.md](personalities/README.md). They do not replace portable
+[personalities/README.md](../../personalities/README.md). They do not replace portable
 profile/device JSON, machine-local bindings, or production settings. The companion
 `personalities/` directory is relative to the executable for this GUI testing build;
 this does not resolve O-006 storage roots for production routing configuration.
@@ -1850,7 +1850,7 @@ capability/engine DTOs. A future production provider also needs richer domain
 records. The GUI contains no JSON serialization logic.
 
 The supplied historical examples are reviewed in
-[docs/schema-review/REVIEW.md](docs/schema-review/REVIEW.md), with field dispositions,
+[docs/schema-review/REVIEW.md](../schema-review/REVIEW.md), with field dispositions,
 gaps, candidate core schemas/samples, compatibility plan and owner questions.
 Those files are a **proposal**, not approved production schemas. They do not alter
 the current Test provider, trigger an import or authorize destructive migrations.
@@ -1909,7 +1909,7 @@ choices; existing hidden/missing references remain preserved. Exact tuple/mode
 matching happens in the shared control model, with a separate minimal typed
 prepared request for a future engine. See
 [PROVISIONAL_TEST_PERSISTENCE.md](PROVISIONAL_TEST_PERSISTENCE.md#scanner-backed-configuration-increment)
-and [the Test example](docs/test-profile-example.json). Production O-004/O-006,
+and [the Test example](../test-profile-example.json). Production O-004/O-006,
 endpoint-specific negotiation and final file layout remain unresolved. No load-time
 or destructive production migration is introduced.
 

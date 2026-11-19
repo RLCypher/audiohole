@@ -8,7 +8,7 @@ sections below remain compatibility history. Bundle envelope version remains 1.
 The owner authorized real isolated Test persistence while production schemas remain
 Open (O-004/O-006). This provider is **not a production format, historical importer,
 or resolution of those decisions**. See the separate
-[historical schema review](docs/schema-review/REVIEW.md) for candidate production
+[historical schema review](../schema-review/REVIEW.md) for candidate production
 records and owner questions. Historical files are never automatically imported.
 
 ## Modes and roots
@@ -191,7 +191,7 @@ unknown channel masks use `{ "status": "unknown" }`; numeric zero remains distin
 Automatic's saved format is the last selected candidate/default, not a runtime
 negotiation or a guarantee: preparation resolves against current scanned evidence.
 No matching tuple leaves the draft saveable and the editor explains the gap.
-See [the sample](docs/test-profile-example.json) for the emitted relevance order.
+See [the sample](../test-profile-example.json) for the emitted relevance order.
 
 Versions 1, 2 and 3 load. Loading never rewrites a document. The first explicit
 save of a legacy document preserves its exact original bytes in

@@ -457,6 +457,11 @@ void PlugBoardView::Implementation::request_visible_icons() {
 }
 
 void PlugBoardView::Implementation::set_drawer(bool open) {
+    // Tutorial guidance is refreshed while the user is interacting. Repeated
+    // requests must neither restart the animation nor move focus off a button
+    // between mouse-down and mouse-up (which can swallow its first click).
+    if (drawer_open == open)
+        return;
     drawer_open = open;
     animation_target = open ? 1 : 0;
     if (reduced_motion || !visible) {

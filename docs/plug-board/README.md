@@ -1,6 +1,6 @@
 # Plug Board source and integration evidence
 
-The current host contract is [PLUG_BOARD_INTEGRATION.md](../../PLUG_BOARD_INTEGRATION.md).
+The current host contract is [PLUG_BOARD_INTEGRATION.md](../specifications/PLUG_BOARD_INTEGRATION.md).
 The source baseline is the existing `work` branch; the handover's host checkout
 was not substituted for AudioHole's current engine or GUI.
 

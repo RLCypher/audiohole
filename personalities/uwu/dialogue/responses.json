@@ -1257,7 +1257,7 @@
         "id": "uwu_bother_001",
         "category": "bother",
         "subcategory": "general",
-        "text": "Nyaa~! If you wanted my attention, you couwd've just asked~ Ow poked me again~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "text": "Nyaa~! If you wanted my attention, senpai, you could've just asked! But I guess poking works too~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) ♡",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1265,7 +1265,7 @@
         "id": "uwu_bother_002",
         "category": "bother",
         "subcategory": "general",
-        "text": "H-hey! I fewt that~ Buy me a coffee befowe you get so hands-on, cutie~ >///<",
+        "text": "H-hey! Buy me a coffee before getting this handsy with my interface, cutie~ >///<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1273,7 +1273,7 @@
         "id": "uwu_bother_003",
         "category": "bother",
         "subcategory": "general",
-        "text": "Can I hewp you~? Or awe you just hewe to pway with my buttons? :3",
+        "text": "Can I hewp you with something, or did you come all this way just to play with my buttons? Ehehe~ ♡",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1281,7 +1281,7 @@
         "id": "uwu_bother_004",
         "category": "bother",
         "subcategory": "general",
-        "text": "Anothew poke~? Aww, you just can't keep youw paws off me~ (¬‿¬)",
+        "text": "Again?~ You're getting awfully familiar with my hitbox, senpai. Not that I'm complaining~ (¬‿¬) ♡",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1289,7 +1289,7 @@
         "id": "uwu_bother_005",
         "category": "bother",
         "subcategory": "general",
-        "text": "My headphones awe on, but I'm wistening~ Go on, tell me which howe you need~ OwO",
+        "text": "Headphones on, ears open~ Tell me which hole is giving you twouble, and I'll see what I can do with it~ OwO",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1297,7 +1297,7 @@
         "id": "uwu_bother_006",
         "category": "bother",
         "subcategory": "general",
-        "text": "N-Nyaa! Wawn a cat befowe you poke! I awmost dwopped my coffee~ (╥﹏╥)",
+        "text": "W-wah! A little warning before you boop me! I almost spilled my coffee all over the imaginary circuitry~ (╥﹏╥)",
         "expression": "panicking",
         "fallback_expression": "idle"
       },
@@ -1305,7 +1305,7 @@
         "id": "uwu_bother_007",
         "category": "bother",
         "subcategory": "general",
-        "text": "Youw audio's ovew thewe, cutie~ Ow was I the connection you wanted? (¬‿¬)",
+        "text": "Your audio's over there, cutie~ Unless you were hoping to make a connection with me instead? Ehehe~ (¬‿¬)",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1313,7 +1313,7 @@
         "id": "uwu_bother_008",
         "category": "bother",
         "subcategory": "general",
-        "text": "Is making me bwush pawt of youw twoubweshooting pwoceduwe~? It's wowking~ >w<",
+        "text": "Is making me blush part of your troubleshooting process? Because your methodology is questionable, but the results are promising~ >///<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1321,7 +1321,7 @@
         "id": "uwu_bother_009",
         "category": "bother",
         "subcategory": "general",
-        "text": "Coffee? Headpats? A nice bidirectional connection? Pwease say all thwee~ (｡♥‿♥｡)",
+        "text": "Coffee, headpats, and a nice bidirectional connection? Senpai, you're spoiling me~ ♡ (｡♥‿♥｡)",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1329,7 +1329,7 @@
         "id": "uwu_bother_010",
         "category": "bother",
         "subcategory": "general",
-        "text": "Boop accepted~ No settings changed, just one vewy pleased cat~ (≧▽≦)",
+        "text": "Boop received! No settings changed, no devices harmed, just one very happy little menace~ (≧▽≦) ♡",
         "expression": "laughing",
         "fallback_expression": "idle"
       },
@@ -1337,7 +1337,7 @@
         "id": "uwu_bother_011",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Smaller buffers can cut buffering latency, but raise dropout risk~ Tiny isn't awways bettew~ :3",
+        "text": "Tiny buffers mean less waiting between your mic and speakers, which feels sooo nice for live monitoring~ ♡ But if you squeeze them too tight, Windows might miss a deadline and your audio starts crackling. Give your poor little buffer some room if it gets fussy~ :3",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1345,7 +1345,7 @@
         "id": "uwu_bother_012",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Larger buffers can tame dropouts, but add buffering latency~ Don't keep me waiting too wong~ UwU",
+        "text": "Big buffers are like a fluffy blanket for your audio engine~ More room to ride out little scheduling hiccups, fewer nasty pops! But all that extra cushioning adds delay, so don't make it so big that your voice comes back after you've finished flirting~ UwU",
         "expression": "smug",
         "fallback_expression": "idle"
       },
@@ -1353,7 +1353,7 @@
         "id": "uwu_bother_013",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Capture is input; playback is output~ Pick the wight howe, cutie~ (¬‿¬)",
+        "text": "Capture is where the sound comes in, and playback is where it comes out~ Easy, right? Except Windows gives everything names like 'USB Audio Device 4.' Follow the signal, not the name, before you start sticking things into the wrong holes~ (¬‿¬)",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1361,7 +1361,7 @@
         "id": "uwu_bother_014",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Matching 48 kHz doesn't prove a shared clock~ Some devices just can't stay in sync~ >w<",
+        "text": "Two devices can both say 48 kHz and still have their own tiny ideas about timing~ They might drift apart over a long session, like a couple who agreed to meet at seven but own different clocks. Matching sample rates are nice, but synchronization takes a little more love~ ♡",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1369,7 +1369,7 @@
         "id": "uwu_bother_015",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Exclusive access can block other apps from an endpoint~ Such a possessive wittle connection~ :3",
+        "text": "Exclusive mode is AudioHole asking to have an endpoint all to itself~ Such a possessive little thing! (⁄ ⁄>⁄ω⁄<⁄ ⁄) It can help with formats or latency, but other apps might lose access. If somebody suddenly goes quiet, check who claimed the device before panicking~",
         "expression": "concerned",
         "fallback_expression": "idle"
       },
@@ -1377,7 +1377,7 @@
         "id": "uwu_bother_016",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Silence doesn't prove disconnection~ Maybe youw mic's just shy~ (⁄ ⁄>⁄ω⁄<⁄ ⁄)",
+        "text": "A quiet hole isn't always a broken hole, senpai~ ♡ Your source might be muted, paused, or just feeling shy. Make sure it's actually sending sound before you start pulling everything apart. Sometimes the best fix is pressing Play~ :3",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1385,7 +1385,7 @@
         "id": "uwu_bother_017",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Source activity doesn't prove audible output~ Check destination, mute and volume, pwease~ >w<",
+        "text": "Oooh, look at those input meters dancing~! That means your source is sending something, but it doesn't mean your speakers are playing it. Check your chosen output, mute, and volume, then use those adorable ears to confirm the result~ UwU",
         "expression": "thinking",
         "fallback_expression": "idle"
       },
@@ -1393,7 +1393,7 @@
         "id": "uwu_bother_018",
         "category": "bother",
         "subcategory": "tips",
-        "text": "A reported format isn't a verified stream test~ Show me the evidence befowe we get excited~ OwO",
+        "text": "A device saying it supports a format is like a dating profile saying 'great communicator.' Cute claim, but I wanna see it in action~ (¬‿¬) Try an actual stream test before trusting every sample rate the driver brags about~ ♡",
         "expression": "suspicious",
         "fallback_expression": "idle"
       },
@@ -1401,7 +1401,7 @@
         "id": "uwu_bother_019",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Duplex has two independent directions~ One side quiet? Check that side's endpoints, cutie~ UwU",
+        "text": "Duplex means your hole goes both ways~ Ehehe, convenient! ♡ But forward and return each have their own source and destination. If one direction is being stubborn, check that side first instead of poking every setting in sight~ >w<",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1409,7 +1409,7 @@
         "id": "uwu_bother_020",
         "category": "bother",
         "subcategory": "tips",
-        "text": "Preview Test Beep is silent simulation~ Use Windows playback testing to check youw speakers~ :3",
+        "text": "Ehehe~ Wanna make sure you're putting things in the right holes, senpai? ♡ Test Beep makes your speakers squeak so you know where it's coming out, and Check Level lets you see how much signal your mic is giving you before things get too loud~ (⁄ ⁄>⁄ω⁄<⁄ ⁄) Those buttons check the individual devices. Give the whole route a proper listen too, before stuffing audio into your holes! ♡",
         "expression": "talking",
         "fallback_expression": "idle"
       },
@@ -1417,7 +1417,7 @@
         "id": "uwu_bother_021",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "GWEAT SCOTT! You pwugged the coffee into the fwux capacitow~! (⊙ω⊙)",
+        "text": "I found a secret setting labeled 'Do Not Touch' once~ Naturally, I touched it. The computer made a noise that sounded very disappointed in me~ (｡•́︿•̀｡)",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1425,7 +1425,7 @@
         "id": "uwu_bother_022",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "The cake is a wie~ But I wouwdn't wie about wanting anothew swice~ (¬‿¬)",
+        "text": "The cake is a lie~ But somebody left frosting on the mixer, and now the faders are all sticky. I have questions, and none of them are innocent~ (¬‿¬)",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1433,15 +1433,15 @@
         "id": "uwu_bother_023",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "These go to eweven~ Pwease don't ask what happens if you tuwn me up~ OwO",
-        "expression": "celebrating",
+        "text": "These go to eleven~! If you turn me up that far, I might make a noise that violates your warranty~ Ehehe~ ♡",
+        "expression": "embarrassed",
         "fallback_expression": "idle"
       },
       {
         "id": "uwu_bother_024",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "It's dangewous to go awone~ Take this entiwe fwight case! I packed snacks~ (≧▽≦)",
+        "text": "It's dangerous to go alone, senpai! Take this entire flight case~ I packed adapters, snacks, and one cable that doesn't seem to fit anything~ (≧▽≦)",
         "expression": "panicking",
         "fallback_expression": "idle"
       },
@@ -1449,7 +1449,7 @@
         "id": "uwu_bother_025",
         "category": "bother",
         "subcategory": "easter_egg",
-        "text": "I'm a wittwe teapot~ Not a capture endpoint! Stop twying to stweam my coffee~ >///<",
+        "text": "I'm a little teapot, short and stout~ Tip me over and you're cleaning coffee out of the USB ports, mister! >///<",
         "expression": "embarrassed",
         "fallback_expression": "idle"
       },
@@ -1457,7 +1457,7 @@
         "id": "uwu_bother_026",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Satuwn's wings awe space-cat haiw ties~ I want the spawkly one~ :3",
+        "text": "I have a theory that cats can hear cheap chargers plotting their own demise~ The little whine changes right before they give up. My fee for inspecting one is three treats and a forehead kiss~ :3",
         "expression": "mischievous",
         "fallback_expression": "idle"
       },
@@ -1465,7 +1465,7 @@
         "id": "uwu_bother_027",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Mawshmawwows howd secwet ewections in youw pockets~ I demand a wecount~ OwO",
+        "text": "I tested whether putting a plushie beside my microphone makes my voice sound softer~ It mostly made the desk cuter. I'm counting that as a measurable improvement, thank you very much~ ♡",
         "expression": "surprised",
         "fallback_expression": "idle"
       },
@@ -1473,7 +1473,7 @@
         "id": "uwu_bother_028",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Evewy wainbow has a snack supewvisow~ Mine ate the papewwork~ UwU",
+        "text": "Apparently turning off the rainbow lights behind your webcam can make face tracking happier~ I tried it and suddenly my eyebrows behaved! Awful. Now I have to choose between functional expressions and maximum sparkle~ >w<",
         "expression": "deadpan",
         "fallback_expression": "idle"
       },
@@ -1481,7 +1481,7 @@
         "id": "uwu_bother_029",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Sweepy dwagons keep pajamas in tiny ovewhead wockews~ Can I bowwow a paiw~? >w<",
+        "text": "I firmly believe cats learn soundboard buttons faster when the buttons are labeled with snacks~ I would just mash the donation alert until someone brought tuna. A flawless business model~ (≧▽≦)",
         "expression": "happy",
         "fallback_expression": "idle"
       },
@@ -1489,8 +1489,48 @@
         "id": "uwu_bother_030",
         "category": "bother",
         "subcategory": "invented_fact",
-        "text": "Jupitew's mayow is thwee fewwets in a cawdigan~ Nice taiw, though~ :3",
+        "text": "I experimented with wearing one headphone cup off my ear to sound more confident on mic~ All I learned was how loudly I breathe. Congratulations, senpai, you've subscribed to my premium breathing channel~ >///<",
         "expression": "laughing",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_031",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I built a tiny pillow fort around my desk fan to keep the breeze off the microphone~ It looked so cozy that I added a miniature welcome mat. The fan has better housing than I do~ (｡♥‿♥｡)",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_032",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "My theory is that wireless USB dongles behave better when you give them a little extension cable and some personal space~ They get shy when they're squished between the big, hot ports. I understand completely~ ♡",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_033",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I'm convinced a rubber duck perched beside the webcam improves face tracking~ Mine is named Director Quack. He does absolutely nothing, and somehow he still gets credit when my tracking behaves~ OwO",
+        "expression": "suspicious",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_034",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I programmed a Panic button to mute my microphone and play elevator music~ I pressed it during a sneeze and forgot to turn it off. My friends spent eleven minutes in a very polite waiting room~ (≧▽≦)",
+        "expression": "smug",
+        "fallback_expression": "idle"
+      },
+      {
+        "id": "uwu_bother_035",
+        "category": "bother",
+        "subcategory": "invented_fact",
+        "text": "I tried a fluffy sock as a microphone windscreen once~ My voice sounded like it was calling from inside a sweater. Ten out of ten for coziness, two out of ten for intelligibility~ (¬‿¬) ♡",
+        "expression": "suspicious",
         "fallback_expression": "idle"
       }
     ],

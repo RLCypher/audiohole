@@ -36,7 +36,7 @@ TEST(PersonalityMetadata, BotherPoolsHaveExactCategoryCountsAndSelectionMetadata
     ASSERT_TRUE(messages.load_directory(AUDIOHOLE_TEST_PERSONALITIES_DIR).empty());
     for (const auto& id : {"default", "uwu"}) {
         const auto pool = messages.variants(presentation::Message::Bother, id);
-        ASSERT_EQ(pool.size(), 30u);
+        ASSERT_EQ(pool.size(), 35u);
         std::map<std::string, int> counts;
         std::set<std::string> identifiers;
         for (const auto& response : pool) {
@@ -49,7 +49,7 @@ TEST(PersonalityMetadata, BotherPoolsHaveExactCategoryCountsAndSelectionMetadata
         EXPECT_EQ(counts["general"], 10);
         EXPECT_EQ(counts["tips"], 10);
         EXPECT_EQ(counts["easter_egg"], 5);
-        EXPECT_EQ(counts["invented_fact"], 5);
+        EXPECT_EQ(counts["invented_fact"], 10);
         const auto first = messages.show(presentation::Message::Bother, id, 1);
         const auto same = messages.show(presentation::Message::Bother, id, 1);
         const auto next = messages.show(presentation::Message::Bother, id, 2);

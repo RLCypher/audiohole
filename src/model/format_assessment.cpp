@@ -54,11 +54,11 @@ std::pair<int, int> pcm_precision(const Format& format) {
 std::string FormatCandidate::endpoint_label(bool capture) const {
     const auto& format = capture ? source : destination;
     auto caption = format.label();
-    if (dual_mono && format.channels == 1) {
+    if (dual_mono && capture && format.channels == 1) {
         constexpr std::string_view mono_width = " / 1 ch / ";
         const auto channel = caption.find(mono_width);
         if (channel != std::string::npos)
-            caption.replace(channel, mono_width.size(), " / 2 ch (dual mono) / ");
+            caption.replace(channel, mono_width.size(), " / 1 ch (dual mono) / ");
     }
     return caption;
 }
@@ -100,7 +100,10 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
         result.explanation = "Routing engine capabilities have not been reported yet.";
         return result;
     }
-    const auto& preferences = direction.settings.preferences;
+    // Retained editor values have no authority while Advanced tuning is off.
+    // Apply this before evidence filtering, so native mono candidates survive.
+    const auto preferences =
+        direction.advanced_tuning ? direction.settings.preferences : Preferences{};
     const auto sources =
         evidence(*source, inherit_preferences(preferences.common, preferences.source));
     const auto destinations =
@@ -112,7 +115,7 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
         return result;
     }
     bool engine_format = false, rate_pair = false, encoding_pair = false, precision_pair = false,
-         width_pair = false;
+         width_pair = false, needs_downmix = false;
     for (const auto& capture : sources)
         for (const auto& playback : destinations) {
             const auto& a = capture.format;
@@ -143,6 +146,13 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
                                        map.destination < 0 || map.destination >= b.channels;
                             }))
                 continue;
+            // Current engine default mapping takes channel zero for 2 -> 1.
+            // Do not describe that as a mono mix until the engine implements
+            // 0.5 * Left + 0.5 * Right. Explicit user maps remain authoritative.
+            if (a.channels == 2 && b.channels == 1 && preferences.channel_map.empty()) {
+                needs_downmix = true;
+                continue;
+            }
             if (std::none_of(result.candidates.begin(), result.candidates.end(),
                              [&](const auto& c) { return c.source == a && c.destination == b; }))
                 result.candidates.push_back(
@@ -165,6 +175,11 @@ FormatAssessment assess_formats(const Snapshot& snapshot, const Direction& direc
                                  "or valid-bit widths differ.";
         else if (!width_pair)
             result.explanation = "A reported channel count is outside the supported 1–256 range.";
+        else if (needs_downmix)
+            result.explanation =
+                "Automatic stereo-to-mono mixing is unavailable in this engine build. "
+                "Use a stereo playback endpoint or an explicit channel map to select a source "
+                "channel; a channel selection does not combine Left and Right.";
         else
             result.explanation =
                 "Explicit channel map exceeds the reported capture or playback channel count.";

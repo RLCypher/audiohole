@@ -403,7 +403,7 @@ NORM: You already have a perfectly good hole to mess with. Leave mine alone.
 
 C004 [confused]
 Cue: Click Norm during the fake scan.
-NORM: I'm supervising. The imaginary computers are doing the imaginary work. Very demanding management position.
+NORM: I'm supervising. The imaginary computers are doing the imaginary work. Very demanding supervisory position.
 
 C005 [smug]
 Cue: Click Norm after the scan completes.

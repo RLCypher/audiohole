@@ -2,7 +2,7 @@
 
 This increment integrates the scanner v0.4 source supplied in
 `AudioHole-GUI-Agent-Handover-v0.4.zip`. The original source manifest and hashes are
-recorded in [docs/scanner/imported-source.json](docs/scanner/imported-source.json).
+recorded in [docs/scanner/imported-source.json](../scanner/imported-source.json).
 The import was additive: root architecture/agent documents and historical hardware
 examples were not substituted for the application's current requirements.
 
@@ -108,7 +108,7 @@ the names/identity at the top of the canonical record:
 ```
 
 This is an excerpt, not a complete record. The full reference is
-[schemas/device-record-v2.schema.json](schemas/device-record-v2.schema.json).
+[schemas/device-record-v2.schema.json](../../schemas/device-record-v2.schema.json).
 Hiding does not change availability, delete evidence, alter live routes or change
 logical identity. Hidden devices are not offered in new hole/profile or Test Beep
 choices. A configured hidden/missing reference remains visible as field text and

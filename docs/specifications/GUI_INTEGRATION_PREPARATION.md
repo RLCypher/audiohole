@@ -33,7 +33,7 @@ commit; its final SHA is supplied in the delivery message. This report supersede
    Preview is silent simulation; Test rejects playback, no invented audio.
 7. **Simulation:** entire Simulate Errors group exists only in Preview, including
    existing directional failure/recovery behavior. No Test heading/gap/actions.
-8. **Bother:** Norm and Horu each have30 responses:10 general,10 factual tips,
+8. **Bother:** Norm and Horu each have 35 responses: 10 general, 10 tips,
    5 eggs,5 explicitly fictional facts. Existing Messages weighting/history retained.
    Avatar click or accessible Bother button uses350ms cooldown and warning guard;
    no DFA/controller/configuration side effects. Horu works without borrowed art.
@@ -47,7 +47,7 @@ commit; its final SHA is supplied in the delivery message. This report supersede
     resources, bounded validation, duplicate/path/link rejection; optional missing
     features disabled, invalid required resources reject whole package. GUI queries
     metadata/events/expressions/resolved avatar paths. Runtime remains shared and
-    external. See [package contract](personalities/README.md) and Visitor fixture.
+    external. See [package contract](../../personalities/README.md) and Visitor fixture.
 11. **Migration:** built-ins moved to owned folders preserving IDs and dialogue.
     Legacy flat v1/v2 files still load; v1 missing faces means no reaction. A missing
     selection uses a whole available package, never mixed resources. No valid
@@ -75,7 +75,7 @@ commit; its final SHA is supplied in the delivery message. This report supersede
     expiry; clear identity on switch and shut down/join correctly. Session acceptance
     is queued, not playback completion. No duplicated animation implementation.
 16. **Review/decisions:** no production schema approval inferred. Historical
-    [schema review](docs/schema-review/REVIEW.md) supplies full field mapping,
+    [schema review](../schema-review/REVIEW.md) supplies full field mapping,
     missing requirements, candidate versioned schemas/examples, safe migration plan
     and eight owner questions. O-004/O-005/O-006 remain open. These do not block the
     already authorized isolated Test provider or independent GUI milestone.
@@ -105,7 +105,7 @@ commit; its final SHA is supplied in the delivery message. This report supersede
 The visible Bother button is removed; Bother remains an avatar-click easter egg.
 Its redundant technical line and other empty message rows are hidden. Character
 headings show Horu/Norm, with Status for Vanilla, while selector names/IDs stay
-stable. Horu's supplied placeholder is packaged byte-for-byte, and her30 Bother
+stable. Horu's supplied placeholder is packaged byte-for-byte, and her 35 Bother
 responses are re-authored to match the existing voice while retaining IDs,
 weights, metadata and10/10/5/5 categories. Other dialogue/DFA text is unchanged.
 

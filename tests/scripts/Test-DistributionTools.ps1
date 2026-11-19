@@ -38,7 +38,11 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Cannot read expected source status' }
     $expectedDirty = -not [string]::IsNullOrWhiteSpace(($sourceStatus -join "`n"))
     if ($meta.configuration -ne 'Release' -or $meta.source_dirty -ne $expectedDirty -or $meta.commit -ne $expectedCommit) { throw 'Wrong metadata' }
-    Write-Host 'PASS: ZIP naming/content and explicit dirty-source metadata.'
+    if ($meta.format -ne 'audiohole-build-info' -or $meta.schema_version -ne 1 -or
+        $meta.product -ne 'AudioHole' -or $meta.version -notmatch '^\d+\.\d+\.\d+$' -or
+        $meta.build_number -lt 0 -or -not $meta.source_archive.EndsWith('.zip')) { throw 'Missing installer/source metadata' }
+    if (Compare-Object ($meta.runtime_files | Sort-Object) $names) { throw 'Runtime manifest differs from package' }
+    Write-Host 'PASS: ZIP naming/content, installer metadata and explicit dirty-source metadata.'
     try {
         & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
         throw 'Expected package overwrite rejection was missing'

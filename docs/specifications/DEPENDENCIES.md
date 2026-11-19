@@ -477,7 +477,7 @@ The reference build uses C++20, MSVC 2022/v143, a Windows SDK, and CMake/CTest
 3.25 or newer. These are build prerequisites, not bundled application libraries;
 their license terms remain those of the tool vendors. `ole32` is a Windows
 system library. The reference MSVC build uses a consistent static CRT across
-project and test targets. See [BUILDING.md](BUILDING.md) for source pins,
+project and test targets. See [BUILDING.md](../../BUILDING.md) for source pins,
 commands, offline-source handling, and limitations of reproducibility across
 different compiler/SDK installations.
 

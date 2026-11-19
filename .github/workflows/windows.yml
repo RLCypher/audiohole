@@ -53,6 +53,25 @@ jobs:
           if ($zip.Count -ne 1) { throw 'Expected exactly one package.' }
           ./scripts/Test-Package.ps1 -Archive $zip[0].FullName
           Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/artifact
+      - name: Build and test optional installer
+        shell: pwsh
+        run: |
+          $compiler = "$env:ProgramFiles/Inno Setup 7/ISCC.exe"
+          if (-not (Test-Path -LiteralPath $compiler) -or [version](Get-Item $compiler).VersionInfo.FileVersionRaw -lt [version]"7.1.1.0") {
+            $download = Join-Path $env:RUNNER_TEMP 'innosetup-7.1.1-x64.exe'
+            Invoke-WebRequest https://github.com/jrsoftware/issrc/releases/download/is-7_1_1/innosetup-7.1.1-x64.exe -OutFile $download
+            if ((Get-FileHash -LiteralPath $download -Algorithm SHA256).Hash -ne '8A5A6711C3766A6E5FB74F280BA0E3551E719CE94538D901FDBD1F8F9920B3F0') { throw 'Installer compiler integrity check failed' }
+            $compilerDirectory = Split-Path $compiler
+            $process = Start-Process $download -ArgumentList '/ALLUSERS', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$compilerDirectory`"" -Wait -PassThru
+            if ($process.ExitCode -ne 0) { throw 'Installer compiler setup failed' }
+          }
+          $zip = @(Get-ChildItem build/packages/*.zip)
+          ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler -OutputDirectory build/artifact
+          $setup = @(Get-ChildItem build/artifact/*Setup*.exe)
+          if ($setup.Count -ne 1) { throw 'Expected one installer' }
+          ./scripts/Test-Installer.ps1 -Installer $setup[0].FullName
+      - name: Package matching corresponding source
+        run: ./scripts/Source-Package.ps1
       - name: Upload tested package contents (downloaded as a ZIP)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -67,5 +86,13 @@ jobs:
         with:
           name: AudioHole-GUI-evidence-${{ matrix.configuration }}-${{ github.sha }}
           path: build/windows-msvc/gui-smoke/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload installer lifecycle logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AudioHole-installer-evidence-${{ matrix.configuration }}-${{ github.sha }}
+          path: build/installer-evidence/
           if-no-files-found: warn
           retention-days: 14

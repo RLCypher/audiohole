@@ -202,10 +202,7 @@ class App final : public wxApp {
                 return false;
             }
         }
-        auto root = smoke ? std::filesystem::path{}
-                          : std::filesystem::path(
-                                wxStandardPaths::Get().GetUserLocalDataDir().ToStdWstring()) /
-                                "PreviewBuild";
+        auto root = smoke ? std::filesystem::path{} : preferences_root();
         if (test_mode_smoke) {
             smoke_root_ = std::filesystem::temp_directory_path() /
                           ("AudioHole-mode-smoke-" + std::to_string(GetCurrentProcessId()) + "-" +
@@ -224,6 +221,11 @@ class App final : public wxApp {
         bool tutorial = tutorial_smoke;
         bool first_time = false;
         if (!smoke && !working_after_tutorial) {
+            const auto migrated =
+                migrate_first_run_marker(legacy_first_run_marker_path(), first_run_marker_path());
+            if (!migrated.ok)
+                themed_message_box(text(migrated.detail), "AudioHole onboarding migration",
+                                   wxOK | wxICON_WARNING);
             const auto checked = first_run_needed(first_run_marker_path(), first_time);
             if (!checked.ok) {
                 first_time = true;

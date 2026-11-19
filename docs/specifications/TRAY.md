@@ -1367,7 +1367,7 @@ amber, Failed red, and Starting/Stopping/Recovering blue, mapped from the existi
 authoritative aggregate state. Unknown is neutral; no health inference or new
 engine state is added. Canonical state text remains in the tooltip/menu. Cache by
 size/color and do not repaint an unchanged icon. All existing menu/lifecycle behavior
-is retained. See [branding architecture](assets/branding/README.md).
+is retained. See [branding architecture](../../assets/branding/README.md).
 
 ## Owner-requested taskbar controls
 

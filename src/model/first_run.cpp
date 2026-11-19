@@ -44,6 +44,44 @@ OnboardingStatus decode_status(const std::string& bytes) {
             json.at("greeting_shown").get<bool>()};
 }
 } // namespace
+Result migrate_first_run_marker(const std::filesystem::path& legacy,
+                                const std::filesystem::path& current) {
+    const auto receipt = current.parent_path() / "onboarding-migration.json";
+    try {
+        bool current_missing = false, receipt_missing = false, legacy_missing = false;
+        for (const auto& item :
+             {std::pair{current, &current_missing}, std::pair{receipt, &receipt_missing}}) {
+            const auto checked = first_run_needed(item.first, *item.second);
+            if (!checked.ok)
+                return checked;
+        }
+        if (!receipt_missing)
+            return {true, "Legacy onboarding migration already checked."};
+        if (current_missing) {
+            const auto checked = first_run_needed(legacy, legacy_missing);
+            if (!checked.ok)
+                return checked;
+            if (!legacy_missing) {
+                const auto bytes = marker_bytes(legacy);
+                (void)decode_status(bytes);
+                const auto written = replace_document(current, bytes, {});
+                if (!written.ok)
+                    return written;
+            }
+        }
+        // Written after the marker, so an interrupted copy remains retryable.
+        // Keep the old installation read-only; it may be in Program Files.
+        return replace_document(receipt,
+                                Json{{"format", "audiohole-onboarding-migration"},
+                                     {"schema_version", 1},
+                                     {"legacy_checked", true}}
+                                        .dump(2) +
+                                    "\n",
+                                {});
+    } catch (const std::exception& error) {
+        return {false, std::string("Cannot migrate onboarding state: ") + error.what()};
+    }
+}
 Result first_run_needed(const std::filesystem::path& marker, bool& needed) {
     try {
         if (std::filesystem::is_symlink(marker) ||
@@ -52,7 +90,7 @@ Result first_run_needed(const std::filesystem::path& marker, bool& needed) {
         needed = !std::filesystem::exists(marker);
         return {true, "First-run marker checked."};
     } catch (const std::exception&) {
-        return {false, "Cannot read the first-run marker in AudioHole/bin."};
+        return {false, "Cannot read onboarding state in the AudioHole data folder."};
     }
 }
 Result mark_first_run(const std::filesystem::path& marker, OnboardingOutcome outcome) {
@@ -63,7 +101,7 @@ Result mark_first_run(const std::filesystem::path& marker, OnboardingOutcome out
     const auto written = replace_document(
         marker, marker_document({outcome, outcome == OnboardingOutcome::None}).dump(2) + "\n", {});
     return written.ok ? written
-                      : Result{false, "Cannot save AudioHole.has-run in AudioHole/bin. Check "
+                      : Result{false, "Cannot save AudioHole.has-run in the data folder. Check "
                                       "folder permissions or external changes."};
 }
 Result read_onboarding_status(const std::filesystem::path& marker, OnboardingStatus& status) {
@@ -106,7 +144,7 @@ Result reset_first_run(const std::filesystem::path& marker) {
         return {true, "First-run marker removed; restart to replay the welcome/tutorial."};
     } catch (const std::exception&) {
         return {false,
-                "Cannot remove the first-run marker in AudioHole/bin. Check folder permissions."};
+                "Cannot remove onboarding state in the data folder. Check folder permissions."};
     }
 }
 } // namespace audiohole

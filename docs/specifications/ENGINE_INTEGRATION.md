@@ -1,22 +1,22 @@
 # Engine 0.6 integration
 
-The [processing and queue improvement audit](docs/AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md)
+The [processing and queue improvement audit](../AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md)
 documents optimized PCM/ring kernels, bounded Automatic queue recovery, idle
 service wakeups and diagnostic view caching. Explicit requests and the existing
 drift-correction algorithms remain authoritative.
 
-The [2026-11-15 engine audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md) amends
+The [2026-11-15 engine audit](../AUDIO_ENGINE_AUDIT_2026-11-15.md) amends
 Automatic mono mapping, scanner-assisted native format acquisition and Exclusive
 diagnostics. It changes no GUI/animation implementation or saved profile schema.
 
 Normal operation now uses the supplied engine behind ConfigurationController.
 Tutorial remains a separate in-memory simulator and never constructs the real
 engine, scanner, persistence or device-check providers. The original user data
-root is unchanged. The current timing amendment uses profile schema 4 / transfer schema 8; see [Profile v4 timing controls](docs/LATENCY_V4.md). Older records remain readable.
+root is unchanged. The current timing amendment uses profile schema 4 / transfer schema 8; see [Profile v4 timing controls](../LATENCY_V4.md). Older records remain readable.
 
 The source handoff archive SHA-256 is
 `516b3c5a68b597e1a782f038f72f8926648436dfb136a45e392a693fee420b3e`.
-Its hashes were checked before import. The original streaming baseline is retained; explicit timing and availability recovery are amended in [Profile v4 timing controls](docs/LATENCY_V4.md).
+Its hashes were checked before import. The original streaming baseline is retained; explicit timing and availability recovery are amended in [Profile v4 timing controls](../LATENCY_V4.md).
 current integration amendments below cover binding refresh, buffer requests and
 acquisition diagnostics. Integration fixes Windows SDK include dependencies,
 adjusts CMake/test-fixture paths, disables the standalone host, and assigns Runtime package
@@ -116,7 +116,7 @@ restart. This can briefly interrupt audio and does not provide seamless
 transactional profile switching. Applying only names/notes to a healthy route
 updates metadata without reopening its streams. Failed writes leave the working route intact;
 failed backend admission after restart retains saved edits and reports failure.
-See the [persistence audit](docs/PROFILE_PERSISTENCE_AUDIT_2026-11-15.md) for fields
+See the [persistence audit](../PROFILE_PERSISTENCE_AUDIT_2026-11-15.md) for fields
 and validation evidence.
 
 ## Validation boundary

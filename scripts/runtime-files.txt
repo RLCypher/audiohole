@@ -748,3 +748,7 @@ personalities/vanilla/avatar/pack/manifest.json
 personalities/vanilla/avatar/registry.json
 personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
+LICENSE
+docs/LICENSING.md
+docs/SOURCE.md
+licenses/InnoSetup-LICENSE.txt

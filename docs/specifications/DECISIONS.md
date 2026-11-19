@@ -1772,7 +1772,7 @@ index mapping and explicit-map behavior remains intact. This does not infer a
 multichannel downmix or alter saved profile fields. Native acquisition may use
 positive scanner tuples as bounded, revalidated hints for unspecified Exclusive
 format fields. Explicit requirements and access policies remain authoritative.
-See [the audit](docs/AUDIO_ENGINE_AUDIT_2026-11-15.md). No GUI or animation
+See [the audit](../AUDIO_ENGINE_AUDIT_2026-11-15.md). No GUI or animation
 implementation is changed. Custom-driver and global Windows-format-setting
 research selects no new architectural dependency; production decisions remain open.
 
@@ -1786,4 +1786,4 @@ restores the lifetime guard for the session. Explicit requests remain unchanged.
 The experimental DLL retains its original guard after stress testing found a
 reduction-induced underrun. No controller gains, ratio limits, SRC bypass policy,
 profile schema or permanent D-034/O-005 algorithm decision is selected here.
-See [evidence and thread contracts](docs/AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md).
+See [evidence and thread contracts](../AUDIO_OVERHEAD_IMPROVEMENTS_2026-11-15.md).

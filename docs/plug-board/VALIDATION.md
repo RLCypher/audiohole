@@ -165,3 +165,13 @@ verbose CTest reported a computed timeout of 90 seconds and the complete suite
 passed in 36.57 seconds: 23 tests passed, retaining the original Wine metadata
 skip. The Windows cross-build and whitespace checks also passed. Native
 Debug/Release completion is checked after publication using the schedule above.
+
+## November 19 maintenance supersedes the channel-label carry-over
+
+The separate assessment batch now labels native mono capture `1 ch (dual mono)`
+when the engine duplicates it into stereo. Automatic ignores inactive retained
+requirements before candidate filtering. Explicit maps and endpoint widths remain
+unchanged. Native 1->1 and 2->2 remain ordinary labels. Automatic 2->1 currently
+reports the missing true downmix rather than claiming that selecting Left alone
+combines stereo. Engine processing is unchanged; its owner must implement and
+verify `0.5 * Left + 0.5 * Right` before the playback `1 ch (Mono)` label is enabled.

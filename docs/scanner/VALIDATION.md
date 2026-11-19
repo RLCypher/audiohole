@@ -28,7 +28,7 @@ Cross-build install/import/branding inspection is useful evidence but cannot pro
 MSVC static CRT settings, native Windows launch, Windows shell caching behavior,
 Job Object behavior, WASAPI support or driver reliability. The native CI workflow
 retains its Debug/Release and extracted-package validation gates. See
-[SCANNER_TEST_MODE.md](../../SCANNER_TEST_MODE.md) and the manual checklist for the
+[SCANNER_TEST_MODE.md](../specifications/SCANNER_TEST_MODE.md) and the manual checklist for the
 remaining hardware/visual checks and the inherited Deep evidence limitation.
 
 
@@ -137,7 +137,7 @@ assessment remain outstanding. The older counts below describe prior revisions.
 
 The owner-authorized follow-up implements the active GUI backlog plus unlimited
 overall Deep time at zero and local recovery for invalid numeric input. See
-[GUI_REVISION_NOTES.md](../../GUI_REVISION_NOTES.md) for behavior, persistence and
+[GUI_REVISION_NOTES.md](../specifications/GUI_REVISION_NOTES.md) for behavior, persistence and
 interruption contracts. The uploaded 20-minute scan motivated removing full JSON
 rewrites from API-stage callbacks. A regression with 80 stage events retains all
 stages/external edits and bounds AtomicWriter calls to at most eight per attempt;

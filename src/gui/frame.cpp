@@ -343,6 +343,18 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
                 poll_avatar();
         },
         avatar_timer_.GetId());
+    Bind(wxEVT_ACTIVATE, [this](wxActivateEvent& event) {
+        if (!event.GetActive()) {
+            for (auto* outline : tutorial_highlights_)
+                outline->Hide();
+            for (auto* outline : tutorial_reply_outlines_)
+                outline->Hide();
+            if (tutorial_reply_arrow_)
+                tutorial_reply_arrow_->Hide();
+        } else
+            CallAfter([this] { render_tutorial(); });
+        event.Skip();
+    });
     Bind(wxEVT_SHOW, [this](wxShowEvent& event) {
         refresh_plug_board();
         if (event.IsShown() && !IsIconized()) {
