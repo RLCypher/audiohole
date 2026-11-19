@@ -89,6 +89,36 @@ begin
   end;
 end;
 
+function RegisteredUninstaller(Directory: String): String;
+var Location, Command, Name: String; ClosingQuote, I: Integer;
+begin
+  Result := '';
+  // Inno can allocate unins001.exe (or a later number) while an earlier
+  // uninstaller is finishing its self-cleanup. The registration is authoritative.
+  if not RegQueryStringValue(HKA, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\AudioHole_is1',
+    'InstallLocation', Location) then exit;
+  if CompareText(AddBackslash(ExpandFileName(Location)),
+    AddBackslash(ExpandFileName(Directory))) <> 0 then exit;
+  if not RegQueryStringValue(HKA, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\AudioHole_is1',
+    'UninstallString', Command) then exit;
+  Command := Trim(Command);
+  if Command = '' then exit;
+  if Command[1] = '"' then begin
+    Delete(Command, 1, 1);
+    ClosingQuote := Pos('"', Command);
+    if ClosingQuote = 0 then exit;
+    Command := Copy(Command, 1, ClosingQuote - 1);
+  end;
+  Name := Lowercase(ExtractFileName(Command));
+  if (Length(Name) <> 12) or (Copy(Name, 1, 5) <> 'unins') or
+    (Copy(Name, 9, 4) <> '.exe') then exit;
+  for I := 6 to 8 do
+    if (Name[I] < '0') or (Name[I] > '9') then exit;
+  if CompareText(AddBackslash(ExpandFileName(ExtractFileDir(Command))),
+    AddBackslash(ExpandFileName(Directory))) <> 0 then exit;
+  if FileExists(Command) and NotRedirected(Command) then Result := Command;
+end;
+
 procedure ReadExisting;
 var Valid: Boolean; Action: String;
 begin
@@ -104,6 +134,7 @@ begin
   if not Valid then ExistingPage.SubCaptionLabel.Caption :=
     'Installed version is unavailable. Reinstall will replace application files and preserve your data.';
   Log('AudioHole installed version: ' + OldVersion + '; action: ' + Action);
+  Log('AudioHole registered uninstaller: ' + RegisteredUninstaller(ExistingDirectory));
 end;
 
 procedure InitializeWizard;
@@ -153,8 +184,8 @@ begin
   if ApplicationRunning then begin
     MsgBox('Exit AudioHole, including its tray icon, before uninstalling.', mbInformation, MB_OK); exit;
   end;
-  Uninstaller := AddBackslash(ExistingDirectory) + 'unins000.exe';
-  if FileExists(Uninstaller) then begin
+  Uninstaller := RegisteredUninstaller(ExistingDirectory);
+  if Uninstaller <> '' then begin
     if not Exec(Uninstaller, '', ExistingDirectory, SW_SHOW, ewWaitUntilTerminated, Code) then begin
       MsgBox('The uninstaller could not be started.', mbError, MB_OK); exit;
     end;

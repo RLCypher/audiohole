@@ -12,6 +12,24 @@ $target = Join-Path $temporary 'AudioHole'
 $dataRoot = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'AudioHole'
 $existingData = Test-Path -LiteralPath $dataRoot
 $sentinel = Join-Path $dataRoot ('installer-test-' + [guid]::NewGuid() + '.json')
+function Get-InstalledUninstaller {
+    # Never cache the numbered filename across install/uninstall cycles. Inno
+    # may choose the next free number while a previous uninstaller cleans up.
+    $registration = Get-ItemProperty -LiteralPath 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\AudioHole_is1'
+    $expectedDirectory = [IO.Path]::GetFullPath($target).TrimEnd('\')
+    $registeredDirectory = [IO.Path]::GetFullPath([string]$registration.InstallLocation).TrimEnd('\')
+    if (-not $expectedDirectory.Equals($registeredDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Uninstaller registration points outside the test installation.'
+    }
+    $command = ([string]$registration.UninstallString).Trim()
+    $uninstallerPath = if ($command -match '^"([^"]+)"(?:\s.*)?$') { $Matches[1] } else { $command }
+    if ([IO.Path]::GetFileName($uninstallerPath) -notmatch '^unins[0-9]{3}\.exe$' -or
+        -not $expectedDirectory.Equals([IO.Path]::GetFullPath((Split-Path $uninstallerPath)), [StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath $uninstallerPath -PathType Leaf)) {
+        throw "Registered uninstaller is missing or outside the test installation: $uninstallerPath"
+    }
+    return $uninstallerPath
+}
 function Run-Setup([string]$Label) {
     $log = Join-Path $temporary "$Label.log"
     $process = Start-Process -FilePath $Installer -PassThru -ArgumentList @('/CURRENTUSER', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$target`"", "/LOG=`"$log`"")
@@ -21,6 +39,8 @@ function Run-Setup([string]$Label) {
         if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 | Write-Host }
         throw "Installer failed ($Label, $($process.ExitCode)); see $log"
     }
+    $uninstallerPath = Get-InstalledUninstaller
+    Write-Host "Installed uninstaller ($Label): $uninstallerPath"
     return Get-Content -LiteralPath $log -Raw
 }
 try {
@@ -53,16 +73,24 @@ try {
         if ((Get-Content (Join-Path $target 'custom.txt') -Raw).Trim() -ne 'user-added content') { throw 'Reinstallation lost unrelated files' }
         if ($case.old -ne 'invalid' -and (Test-Path (Join-Path $target 'docs/retired-installer-fixture.txt'))) { throw 'Retired owned file was not removed' }
     }
-    $uninstaller = Join-Path $target 'unins000.exe'
-    $process = Start-Process -FilePath $uninstaller -PassThru -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
+    $uninstaller = Get-InstalledUninstaller
+    $uninstallLog = Join-Path $temporary 'uninstall-keep.log'
+    $process = Start-Process -FilePath $uninstaller -PassThru -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$uninstallLog`"")
     if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Uninstall timed out' }
     $process.WaitForExit()
     if ($process.ExitCode -ne 0 -or (Test-Path (Join-Path $target 'AudioHole.exe'))) { throw 'Application uninstall failed' }
     if (-not (Test-Path -LiteralPath $sentinel)) { throw 'Default uninstall lost user data' }
     $null = Run-Setup 'reinstall-after-uninstall'
-    $arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
+    $uninstaller = Get-InstalledUninstaller
+    $log = Run-Setup 'verify-reinstalled-registration'
+    if (-not $log.Contains("AudioHole registered uninstaller: $uninstaller")) {
+        throw 'Installer did not resolve the current registered uninstaller.'
+    }
+    $uninstaller = Get-InstalledUninstaller
+    $uninstallLog = Join-Path $temporary 'uninstall-final.log'
+    $arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$uninstallLog`"")
     if (-not $existingData) { $arguments += '/PURGEDATA=1' }
-    $process = Start-Process -FilePath (Join-Path $target 'unins000.exe') -PassThru -ArgumentList $arguments
+    $process = Start-Process -FilePath $uninstaller -PassThru -ArgumentList $arguments
     if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Final uninstall timed out' }
     $process.WaitForExit()
     if ($process.ExitCode -ne 0) { throw 'Final uninstall failed' }

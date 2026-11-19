@@ -18,7 +18,9 @@ The existing-installation page offers Update/Reinstall, Uninstall and Cancel.
 An older portable copy with no file manifest must be removed manually; the
 installer will not guess which files it owns. Current portable copies can have
 their manifest-owned files removed while preserving data. Registered installations
-use their generated Windows uninstaller. Reinstallation replaces owned application
+use the uninstaller recorded in their Windows registration, validated against the
+selected installation directory. Inno may allocate unins001.exe or a later number
+while an earlier uninstaller finishes cleanup; no fixed filename is assumed. Reinstallation replaces owned application
 files and retires obsolete manifest entries while preserving unrelated files and
 all user data. Application files are never used as a place to save user state.
 Exit AudioHole through its tray/menu before replacement. A running AudioHole
@@ -48,5 +50,7 @@ CI builds Debug and Release installers after native tests and package validation
 then runs Test-Installer.ps1 against a temporary per-user destination. This checks
 fresh installation, higher/equal/lower/malformed version decisions, manifest file
 retirement, custom-file preservation, uninstall retention and an explicit purge
-when no preexisting user data exists. CI also supplies the matching corresponding
+when no preexisting user data exists. Every setup pass verifies its current
+registered uninstaller, and a further reinstall checks that the installer's own
+Uninstall action resolves the same path. Uninstall logs are retained as evidence. CI also supplies the matching corresponding
 source ZIP beside the runtime and installer; do not publish installers alone.

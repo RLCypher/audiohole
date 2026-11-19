@@ -60,3 +60,21 @@ which the upstream installer engine requires even for its 64-bit build; local
 installer execution is therefore unavailable. This is not native installation or
 hardware validation. Check the CI result for the published revision; do not infer
 native success solely from this local record.
+
+## Native installer correction
+
+The rerun of a0f69f9 completed MSVC Debug/Release builds, all native GUI/restart,
+engine/scanner/model checks and extracted-package validation. Installer compilation
+and initial installation/update/reinstall checks also passed. The final lifecycle
+check failed because it assumed unins000.exe after removal and reinstallation.
+The Debug setup log explicitly records unins001.dat and unins001.exe on that pass.
+
+Both the installer Uninstall action and the lifecycle test now resolve the current
+UninstallString from the matching installation's Windows registration. The path
+must refer to an existing numbered Inno uninstaller inside the selected directory;
+the installer also rejects redirected paths. The lifecycle test checks registration
+after every setup, exercises the installer's resolver on another reinstall and
+records both uninstall logs. A local PowerShell check passed for 000/001/123,
+spaces/quoted arguments, and rejection of wrong directories, wrong filenames and
+missing files. Native verification of this correction is performed by the next CI
+run; the evidence above does not claim that the corrected lifecycle has run yet.
