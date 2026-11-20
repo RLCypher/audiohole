@@ -43,6 +43,42 @@ function Run-Setup([string]$Label) {
     Write-Host "Installed uninstaller ($Label): $uninstallerPath"
     return Get-Content -LiteralPath $log -Raw
 }
+function Run-Uninstall([string]$Label, [switch]$PurgeData) {
+    $uninstallerPath = Get-InstalledUninstaller
+    $log = Join-Path $temporary "$Label.log"
+    $arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$log`"")
+    if ($PurgeData) { $arguments += '/PURGEDATA=1' }
+    $deadline = [DateTime]::UtcNow.AddSeconds(60)
+    $process = Start-Process -FilePath $uninstallerPath -PassThru -ArgumentList $arguments
+    if (-not $process.WaitForExit(60000)) { $process.Kill(); throw "Uninstall launcher timed out: $Label" }
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Uninstall launcher failed: $Label ($($process.ExitCode))" }
+    # Inno runs its actual uninstall in a temporary second process. Launcher
+    # exit alone does not prove that post-uninstall data removal has finished.
+    # Require the pinned engine's success/end records and an exclusive log open,
+    # which proves its writer has closed before checking state or copying logs.
+    while ([DateTime]::UtcNow -lt $deadline) {
+        $contents = $null
+        try {
+            $stream = [IO.File]::Open($log, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::None)
+            try {
+                $reader = [IO.StreamReader]::new($stream)
+                try { $contents = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            } finally { $stream.Dispose() }
+        } catch [IO.IOException] {
+            # The worker may not have created the log yet, or may still own it.
+        }
+        if ($null -ne $contents -and $contents.Contains('Log closed.')) {
+            if (-not $contents.Contains('Uninstallation process succeeded.')) {
+                Write-Host $contents
+                throw "Uninstallation did not succeed: $Label"
+            }
+            return
+        }
+        Start-Sleep -Milliseconds 100
+    }
+    throw "Uninstall worker did not finish within 60 seconds: $Label; see $log"
+}
 try {
     New-Item -ItemType Directory -Path $temporary -Force | Out-Null
     $null = Run-Setup 'fresh'
@@ -73,12 +109,8 @@ try {
         if ((Get-Content (Join-Path $target 'custom.txt') -Raw).Trim() -ne 'user-added content') { throw 'Reinstallation lost unrelated files' }
         if ($case.old -ne 'invalid' -and (Test-Path (Join-Path $target 'docs/retired-installer-fixture.txt'))) { throw 'Retired owned file was not removed' }
     }
-    $uninstaller = Get-InstalledUninstaller
-    $uninstallLog = Join-Path $temporary 'uninstall-keep.log'
-    $process = Start-Process -FilePath $uninstaller -PassThru -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$uninstallLog`"")
-    if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Uninstall timed out' }
-    $process.WaitForExit()
-    if ($process.ExitCode -ne 0 -or (Test-Path (Join-Path $target 'AudioHole.exe'))) { throw 'Application uninstall failed' }
+    Run-Uninstall 'uninstall-keep'
+    if (Test-Path (Join-Path $target 'AudioHole.exe')) { throw 'Application uninstall failed' }
     if (-not (Test-Path -LiteralPath $sentinel)) { throw 'Default uninstall lost user data' }
     $null = Run-Setup 'reinstall-after-uninstall'
     $uninstaller = Get-InstalledUninstaller
@@ -86,14 +118,8 @@ try {
     if (-not $log.Contains("AudioHole registered uninstaller: $uninstaller")) {
         throw 'Installer did not resolve the current registered uninstaller.'
     }
-    $uninstaller = Get-InstalledUninstaller
-    $uninstallLog = Join-Path $temporary 'uninstall-final.log'
-    $arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$uninstallLog`"")
-    if (-not $existingData) { $arguments += '/PURGEDATA=1' }
-    $process = Start-Process -FilePath $uninstaller -PassThru -ArgumentList $arguments
-    if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Final uninstall timed out' }
-    $process.WaitForExit()
-    if ($process.ExitCode -ne 0) { throw 'Final uninstall failed' }
+    Run-Uninstall 'uninstall-final' -PurgeData:(-not $existingData)
+    if (Test-Path (Join-Path $target 'AudioHole.exe')) { throw 'Final application uninstall failed' }
     if (-not $existingData -and (Test-Path -LiteralPath $dataRoot)) { throw 'Explicit purge retained the AudioHole data directory' }
     Write-Host 'PASS: fresh install, version decisions, owned-file retirement, data preservation and uninstall lifecycle.'
 } finally {
@@ -102,5 +128,10 @@ try {
         Get-ChildItem -LiteralPath $temporary -Filter '*.log' | Copy-Item -Destination $Evidence -Force
     }
     if (Test-Path -LiteralPath $sentinel) { Remove-Item -LiteralPath $sentinel -Force }
-    if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
+    # Cleanup must not replace a more useful uninstall/assertion failure. Logs
+    # have already been copied to evidence; an unfinished worker may retain one.
+    if (Test-Path -LiteralPath $temporary) {
+        try { Remove-Item -LiteralPath $temporary -Recurse -Force }
+        catch { Write-Warning "Installer test temporary files remain at ${temporary}: $($_.Exception.Message)" }
+    }
 }

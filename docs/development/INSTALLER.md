@@ -54,3 +54,9 @@ when no preexisting user data exists. Every setup pass verifies its current
 registered uninstaller, and a further reinstall checks that the installer's own
 Uninstall action resolves the same path. Uninstall logs are retained as evidence. CI also supplies the matching corresponding
 source ZIP beside the runtime and installer; do not publish installers alone.
+
+The lifecycle check waits for the temporary uninstall worker, not just its launcher.
+Within the same 60-second deadline it requires the pinned Inno engine's success and
+log-closed records and an exclusive read of the closed log. Data-removal assertions,
+reinstallation and log collection happen only after that completion. A failed
+worker still fails the check; temporary-file cleanup cannot mask that failure.

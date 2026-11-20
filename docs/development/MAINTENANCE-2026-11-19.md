@@ -78,3 +78,14 @@ records both uninstall logs. A local PowerShell check passed for 000/001/123,
 spaces/quoted arguments, and rejection of wrong directories, wrong filenames and
 missing files. Native verification of this correction is performed by the next CI
 run; the evidence above does not claim that the corrected lifecycle has run yet.
+
+The next native Debug run passed registered-uninstaller resolution, including the
+additional reinstall. It exposed a separate test wait bug: Inno's launcher exited
+while its temporary second-phase worker still held uninstall-final.log open.
+Finally-block cleanup then masked the earlier incomplete-uninstall check with a
+sharing-violation error. Run-Uninstall now waits within a 60-second deadline for
+actual worker success, a log-closed record and an exclusive log read before any
+state assertions or cleanup. Final removal of AudioHole.exe is also asserted.
+Cleanup errors are reported without replacing a primary failure. A local delayed-
+worker test verified that early launcher exit does not complete the check and that
+a failed worker is rejected. Native verification remains assigned to the next run.
