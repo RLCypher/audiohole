@@ -2,7 +2,15 @@ name: Windows builds and evaluation packages
 
 on:
   push:
+    paths-ignore:
+      - '.github/workflows/download-security.yml'
+      - 'scripts/Test-DownloadSecurity.ps1'
+      - 'docs/development/DOWNLOAD_SECURITY.md'
   pull_request:
+    paths-ignore:
+      - '.github/workflows/download-security.yml'
+      - 'scripts/Test-DownloadSecurity.ps1'
+      - 'docs/development/DOWNLOAD_SECURITY.md'
   workflow_dispatch:
 
 permissions:
