@@ -36,27 +36,14 @@ endif()
 install(TARGETS audiohole RUNTIME DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LICENSE.txt"
   "${PROJECT_SOURCE_DIR}/third_party/licenses/wxWidgets-LGPL.txt" DESTINATION licenses COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/CONFIGURATION_BUNDLES.md"
-  "${PROJECT_SOURCE_DIR}/docs/specifications/PROFILE_BUILDER.md"
-  "${PROJECT_SOURCE_DIR}/docs/specifications/MANUAL_GUI_CHECKLIST.md" DESTINATION docs COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/TUTORIAL.md" "${PROJECT_SOURCE_DIR}/docs/specifications/ENGINE_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/tutorial/PlugBoard-Norm-script.txt" DESTINATION docs/tutorial COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/NOTICE.txt"
   DESTINATION licenses RENAME PlugBoard-MaterialSymbols-NOTICE.txt COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/specifications/PLUG_BOARD_INTEGRATION.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/modules/plug_board/resources/socket-icons/LICENSE.txt"
   DESTINATION licenses RENAME PlugBoard-MaterialSymbols-LICENSE.txt COMPONENT Runtime)
 add_custom_command(TARGET audiohole POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
   "${PROJECT_SOURCE_DIR}/assets/tutorial" "$<TARGET_FILE_DIR:audiohole>/assets/tutorial")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/tutorial/" DESTINATION assets/tutorial COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/LATENCY_V4.md" DESTINATION docs COMPONENT Runtime)
-install(FILES
-  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/automatic.profile-v4.json"
-  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/stable.profile-v4.json"
-  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/inheritance.profile-v4.json"
-  "${PROJECT_SOURCE_DIR}/docs/examples/latency-v4/app-engine-settings.fragment.json"
-  DESTINATION docs/examples/latency-v4 COMPONENT Runtime)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/assets/tutorial/" DESTINATION assets/tutorial COMPONENT Runtime
+  PATTERN "provenance.json" EXCLUDE)
 
 add_custom_target(audiohole_personality_files ALL
   # Remove only obsolete source-owned flat catalogs from an incremental build's
@@ -66,25 +53,18 @@ add_custom_target(audiohole_personality_files ALL
   COMMENT "Stage editable personality files beside the GUI")
 add_dependencies(audiohole audiohole_personality_files audiohole-probe)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/personalities/" DESTINATION personalities COMPONENT Runtime
-  FILES_MATCHING PATTERN "*.json" PATTERN "*.png" PATTERN "README.md")
+  FILES_MATCHING PATTERN "*.json" PATTERN "*.png")
+install(FILES "${PROJECT_SOURCE_DIR}/personalities/tutorial/tutorial.txt"
+  DESTINATION personalities/tutorial COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/nlohmann-json-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
 
-# Original and ICO are embedded for offline/isolated launch; copies in the ZIP
-# make the canonical artwork and its provenance available to maintainers/users.
-install(FILES "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png"
-  "${PROJECT_SOURCE_DIR}/assets/branding/audiohole.ico"
-  DESTINATION assets/branding COMPONENT Runtime)
-
+# Branding and fallback artwork are embedded; retain source dependencies without
+# distributing redundant copies of the resources or their engineering evidence.
 set_source_files_properties(app.rc PROPERTIES OBJECT_DEPENDS
   "${PROJECT_SOURCE_DIR}/assets/branding/audiohole-logo.png;${PROJECT_SOURCE_DIR}/assets/branding/audiohole.ico")
 
-install(FILES "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png"
-  DESTINATION assets/presentation COMPONENT Runtime)
 set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS
   "${PROJECT_SOURCE_DIR}/assets/presentation/placeholder-avatar.png")
-
-install(FILES "${PROJECT_SOURCE_DIR}/assets/personalities/provenance/deployed-assets.json"
-  DESTINATION assets RENAME avatar-assets.json COMPONENT Runtime)
 
 # Apache-2.0 Material icon font, loaded privately for this process only.
 add_custom_command(TARGET audiohole POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_directory
@@ -93,10 +73,16 @@ install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-Regular.ttf" DESTIN
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/NOTICE.txt" DESTINATION licenses RENAME MaterialIcons-NOTICE.txt COMPONENT Runtime)
 
-install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION . COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/LICENSING.md"
-  "${PROJECT_SOURCE_DIR}/docs/development/SOURCE.md" DESTINATION docs COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.txt" DESTINATION . COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION licenses RENAME GPL-3.0.txt COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/assets.txt" DESTINATION licenses COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/development/SOURCE.md"
+  DESTINATION licenses RENAME SOURCE.txt COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/InnoSetup-LICENSE.txt"
   DESTINATION licenses COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/docs/guides/.gitkeep"
+install(FILES "${PROJECT_SOURCE_DIR}/docs/guides/AI-DISCLOSURE.txt"
+  "${PROJECT_SOURCE_DIR}/docs/guides/Advanced Buffer Tuning Guide.txt"
+  "${PROJECT_SOURCE_DIR}/docs/guides/AudioHole User Manual.txt"
+  "${PROJECT_SOURCE_DIR}/docs/guides/Speedrunning the Tutorial.txt"
+  "${PROJECT_SOURCE_DIR}/docs/guides/The AudioHole Manifesto.txt"
   DESTINATION "Guides and Manuals" COMPONENT Runtime)

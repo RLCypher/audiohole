@@ -1,7 +1,7 @@
 # Norm's tutorial
 
 Tutorial replaces the former user-facing Preview environment. The approved
-owner script is [docs/tutorial/Norm-script.txt](../tutorial/Norm-script.txt),
+owner script is [personalities/tutorial/tutorial.txt](../../personalities/tutorial/tutorial.txt),
 version 2.8, together with the Plug Board insert version 1.3. It is compiled into inert UTF-8 catalogue data by
 `scripts/GenerateTutorial.py`; `--check` verifies an exact reproducible build.
 Dialogue is not executable code, and `NORM:` is an authoring marker, never a
@@ -179,7 +179,7 @@ shadow, including the animation-count label, numeric field and arrows.
 
 ## Plug Board lesson insert
 
-The owner script in `docs/tutorial/PlugBoard-Norm-script.txt` supplies PB001–PB014
+The owner script in `personalities/tutorial/tutorial.txt` supplies PB001–PB014
 and optional recovery lines. Its two sockets and two app assignments are
 verified against stable IDs in a memory-only simulated module. Six fictional
 apps start on BoomSlab 9001. The scan adds BoomSlab and MixBoard Music/Game/Chat/Aux,

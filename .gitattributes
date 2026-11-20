@@ -9,3 +9,10 @@ docs/schema-review/legacy/*.json -text whitespace=blank-at-eol,blank-at-eof,spac
 # Preserve their LF bytes on Windows as well as in the repository.
 personalities/*/avatar/pack/manifest.json -text
 personalities/*/avatar/registry.json -text
+
+# Preserve supplied distribution documents verbatim on Windows checkouts.
+docs/distribution/*.txt -text -whitespace
+docs/guides/*.txt -text -whitespace
+docs/legal/*.txt -text -whitespace
+docs/specifications/AI_DISCLOSURE.md -text
+personalities/tutorial/*.txt -text

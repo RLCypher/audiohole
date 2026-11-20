@@ -583,7 +583,16 @@ void BoardSmokeDriver::tick(BoardFrame& frame) {
             require(board->working.sockets.front().id == "system" &&
                         board->working.sockets[2].id == socket_id,
                     "Keyboard socket reordering preserves System first", assertions);
-            check(view.inactive, true);
+            frame.view->set_drawer_open(false);
+            {
+                auto* rows = view.columns.front()->rows;
+                const auto heading =
+                    std::find_if(rows->entries.begin(), rows->entries.end(),
+                                 [](const auto& row) { return row.heading && row.section == 2; });
+                require(heading != rows->entries.end(),
+                        "Hidden inactive group has an actionable heading", assertions);
+                rows->activate(static_cast<std::size_t>(heading - rows->entries.begin()));
+            }
             ++stage;
             break;
         case 10:
@@ -596,8 +605,14 @@ void BoardSmokeDriver::tick(BoardFrame& frame) {
                                  [](const auto& row) { return row.heading && row.section == 2; });
                 require(heading != rows->entries.end(),
                         "Inactive group remains available with a count", assertions);
-                require(rows->GetAccessible()->DoDefaultAction(
-                            static_cast<int>(heading - rows->entries.begin()) + 1) == wxACC_OK,
+                require(!view.drawer_open && rows->expanded[2],
+                        "Inactive disclosure enables and expands rows without opening settings",
+                        assertions);
+                const auto heading_index =
+                    static_cast<std::size_t>(heading - rows->entries.begin());
+                rows->activate(heading_index);
+                require(rows->GetAccessible()->DoDefaultAction(static_cast<int>(heading_index) +
+                                                               1) == wxACC_OK,
                         "Accessible group action expands inactive sources", assertions);
                 std::set<std::string> rendered;
                 std::size_t count = 0;
@@ -610,6 +625,7 @@ void BoardSmokeDriver::tick(BoardFrame& frame) {
                         "Inactive expansion and observed-output placement render each app once",
                         assertions);
             }
+            frame.view->set_drawer_open(true);
             choose(view.recent, 2);
             ++stage;
             break;

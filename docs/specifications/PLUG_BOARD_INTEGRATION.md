@@ -119,3 +119,12 @@ artwork injection, virtual-row geometry helpers, guided creation-name validation
 and an icon test fixture that
 reads the host executable instead of the standalone launcher; the tested module layout
 and policy reducer remain intact. No audio engine changes are included.
+
+## Inactive-source disclosure
+
+Activating a socket's Inactive group expands that group directly. If inactive
+sources are hidden for the board, the action commits Show inactive sources while
+preserving the board's recent-activity interval. The settings drawer retains its
+current open/closed state and position. Once enabled, each socket's group can be
+collapsed or expanded independently. Mouse, keyboard, and accessibility actions
+use the same group activation path.

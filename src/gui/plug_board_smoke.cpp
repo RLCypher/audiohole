@@ -1,7 +1,9 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <wx/access.h>
 #include <wx/modalhook.h>
 #include <wx/textdlg.h>
+#include <wx/vlbox.h>
 
 namespace audiohole::gui {
 // Supplemental Windows integration evidence. Only smoke hosts call this; they
@@ -334,6 +336,84 @@ void Frame::plug_board_smoke(bool lesson) {
         choose_reply();
         beat("PB013");
     } else {
+        // Exercise the embedded group controls with the drawer closed. A hidden
+        // board preference must be enabled by the group itself, never by opening
+        // the drawer or changing an application's routing assignment.
+        const auto sockets = plug_board_view_->layout_diagnostics().sockets;
+        for (const auto& column : sockets) {
+            auto* setting = dynamic_cast<wxCheckBox*>(
+                wxWindow::FindWindowByName("Show inactive sources", plug_board_view_));
+            require(setting != nullptr, "inactive-source setting missing");
+            setting->SetValue(false);
+            wxCommandEvent disable(wxEVT_CHECKBOX, setting->GetId());
+            disable.SetEventObject(setting);
+            setting->GetEventHandler()->ProcessEvent(disable);
+            pump(
+                [&] {
+                    const auto state = plug_board_->snapshot();
+                    const auto* current = pb::find_board(*state->library, state->selected_board_id);
+                    return settled() && current && !current->working.settings.show_inactive_sources;
+                },
+                "inactive sources hidden before expanding a socket");
+            const auto before = plug_board_->snapshot();
+            const auto* previous = pb::find_board(*before->library, before->selected_board_id);
+            auto* rows = wxWindow::FindWindowById(column.applications_control_id, plug_board_view_);
+            auto* accessible = rows ? rows->GetAccessible() : nullptr;
+            require(accessible != nullptr, "application rows lack accessibility actions");
+            int children = 0;
+            require(accessible->GetChildCount(&children) == wxACC_OK, "cannot inspect groups");
+            int inactive = 0;
+            for (int child = 1; child <= children; ++child) {
+                wxString name;
+                if (accessible->GetName(child, &name) == wxACC_OK && name.StartsWith("Inactive ("))
+                    inactive = child;
+            }
+            require(inactive != 0, "inactive heading is missing from a socket");
+            auto* list = dynamic_cast<wxVListBox*>(rows);
+            require(list != nullptr, "socket applications are not a virtual list");
+            list->ScrollToRow(static_cast<std::size_t>(inactive - 1));
+            wxRect rectangle;
+            require(accessible->GetLocation(rectangle, inactive) == wxACC_OK,
+                    "inactive heading has no click geometry");
+            wxMouseEvent expand(wxEVT_LEFT_DOWN);
+            expand.SetPosition(rows->ScreenToClient(
+                rectangle.GetPosition() + wxPoint(rectangle.width / 2, rectangle.height / 2)));
+            rows->GetEventHandler()->ProcessEvent(expand);
+            pump(
+                [&] {
+                    const auto state = plug_board_->snapshot();
+                    const auto* current = pb::find_board(*state->library, state->selected_board_id);
+                    return settled() && current && current->working.settings.show_inactive_sources;
+                },
+                "inactive group enables and expands directly");
+            const auto after = plug_board_->snapshot();
+            const auto* current = pb::find_board(*after->library, after->selected_board_id);
+            const auto layout = plug_board_view_->layout_diagnostics();
+            require(!layout.drawer_open && !layout.drawer_animating,
+                    "inactive disclosure opened the closed settings drawer");
+            require(previous && current &&
+                        previous->working.application_assignments ==
+                            current->working.application_assignments &&
+                        previous->working.settings.recently_active_seconds ==
+                            current->working.settings.recently_active_seconds &&
+                        before->platform_metrics.policy_writes ==
+                            after->platform_metrics.policy_writes,
+                    "inactive disclosure changed assignments, policy, or the activity interval");
+            wxString name;
+            accessible->GetName(inactive, &name);
+            require(name.EndsWith("expanded"), "inactive heading did not expand after clicking");
+            wxKeyEvent collapse(wxEVT_KEY_DOWN);
+            collapse.m_keyCode = WXK_SPACE;
+            rows->GetEventHandler()->ProcessEvent(collapse);
+            accessible->GetName(inactive, &name);
+            require(name.EndsWith("collapsed"), "keyboard action did not collapse inactive group");
+            require(accessible->DoDefaultAction(inactive) == wxACC_OK,
+                    "accessible action could not expand inactive group");
+            accessible->GetName(inactive, &name);
+            require(name.EndsWith("expanded") &&
+                        !plug_board_view_->layout_diagnostics().drawer_open,
+                    "accessible expansion changed drawer state or failed to expand");
+        }
         const auto occurrence = occurrence_;
         refresh_plug_board();
         refresh_plug_board();

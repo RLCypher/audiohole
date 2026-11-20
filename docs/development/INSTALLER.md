@@ -2,9 +2,17 @@
 
 The distributed ZIP is a directly runnable portable application folder. Its main
 folder contains AudioHole.exe, the optional versioned AudioHole-Setup executable,
-a reserved Guides and Manuals folder, and the supporting runtime files. No guides
-are authored in this change; the zero-byte folder marker preserves that directory
-in GitHub's downloadable artifact. Installation is optional:
+a Guides and Manuals folder containing the user manual, quick-start and tuning
+guides, manifesto, and AI disclosure, and the supporting runtime files. These
+documents are included in both portable and installed copies. The owner-authored
+AudioHole License.txt is displayed by the installer and included beside the app;
+the complete GPLv3 text and original-asset policy are in licenses/GPL-3.0.txt and
+licenses/assets.txt. Third-party notices and licenses/SOURCE.txt are retained.
+Tutorial dialogue has one source at personalities/tutorial/tutorial.txt.
+Engineering specifications, validation evidence, redundant embedded artwork,
+and examples are excluded from the runtime payload. The docs folder contains only
+build-info.json, used by installer version checks and the owned-file manifest.
+Installation is optional:
 extract the complete ZIP and run AudioHole.exe to use it without installing.
 
 Build that folder with Inno Setup 7.1.1 and scripts/Build-Installer.ps1, using the

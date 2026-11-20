@@ -1,0 +1,158 @@
+Speedrunning the Tutorial
+The shortest complete walkthrough of AudioHole's guided lesson
+
+Follow these steps in order. When a reply is listed, choose that reply as soon
+as it appears. Perform the requested control action before moving on. This route
+completes the lesson; no optional exploration or extra configuration is needed.
+
+The tutorial uses a separate practice setup. Its devices, applications, and
+profiles do not replace your normal working configuration.
+
+Quick vocabulary
+----------------
+A profile saves a setup. A hole connects a capture Source to a playback
+Destination. Return adds a second connection inside the same hole. On Plug
+Board, a socket groups applications and points them at a playback device.
+
+We'll use the short names Mic, Speakers, Practice, Route, Music, and Games.
+Press F1 if you need the current instruction repeated.
+
+
+START AND SCAN
+==============
+
+1. At the welcome prompt, choose "It's my first time". If you are already using
+   AudioHole, Settings > Replay Tutorial opens a fresh tutorial session.
+
+2. Choose these opening replies in order:
+     "Let's do this"
+     "Sounds questionable. I'm in."
+     "I love pretend science"
+
+3. Open Devices when prompted, then Scanning / Diagnostics when prompted.
+
+4. Choose "Plug 'em in", then "Go deep".
+
+5. Set Testing level to Deep / Advanced.
+
+6. Set Scope to Full scan, then click Start scan. Wait for completion, about
+   20 seconds.
+
+7. Choose "Show me the devices", then open Devices.
+
+8. Choose "Neat", then "Okay, nerd".
+
+
+NAME THE TWO DEVICES
+===================
+
+9. In Capture devices, select:
+     Microphone - FakeTech USB Audio Device 6675
+     (4-FakeTech USB Audio Device)
+
+   Set Display name to Mic and click Save device. The two lines above describe
+   one device name. Leave MixBoard Mic Input unchanged.
+
+10. In Playback devices, select:
+      Speakers - FakeTech USB Audio Device 636B
+      (3-FakeTech USB Audio Device)
+
+    Set Display name to Speakers and click Save device.
+
+
+BUILD THE PROFILE
+=================
+
+11. Open Profiles.
+
+12. Click + beside Profiles to create a profile. Right-click the new profile,
+    choose Rename, enter Practice, and confirm.
+
+13. Click + beside Holes to create a hole. Right-click it, choose Rename,
+    enter Route, and confirm.
+
+14. Turn on Enable return channel.
+
+15. Under Forward, choose Source: Mic.
+
+16. Under Forward, choose Destination: MixBoard Output.
+
+17. Tick Exclusive mode preferred under Forward.
+
+18. Under Return, choose Source: MixBoard Mic Input.
+
+19. Under Return, choose Destination: Speakers.
+
+20. Click the profile's Save button.
+
+Your connections should now be:
+
+    Forward: Mic                -> MixBoard Output
+    Return:  MixBoard Mic Input  -> Speakers
+
+
+START ROUTING AND FINISH THE CHECK
+=================================
+
+21. Choose "Nice", then click Start Routing.
+
+22. Wait for routing startup to finish, about 8 seconds.
+
+23. Choose "Is it supposed to do that?", then "Oscar-worthy performance".
+
+24. At the mic-check instruction, say a short phrase and choose
+    "I said something".
+
+25. Choose the following replies as they appear:
+      "Fair point"
+      "I think I've got it"
+      "Seems self-explanatory"
+      "Sounds organized"
+
+
+PLUG BOARD
+==========
+
+26. Open Plug Board.
+
+27. Choose "So they're categories?", then "Totally legit, huh?".
+
+28. In the Routing Board Settings drawer, click + beside Sockets. Name the
+    new socket Music and confirm. Use the Sockets +, rather than the
+    Routing Board +.
+
+29. In the Music socket's playback dropdown, select MixBoard Music.
+
+30. Click + beside Sockets again. Name this socket Games and confirm.
+
+31. In the Games socket's playback dropdown, select MixBoard Game.
+
+32. Move Felony Jaywalking LXVII from System (Default) into Games. Drag and
+    drop it, or right-click the application and use Move to > Games.
+
+33. Move Spooty into Music in the same way.
+
+34. Choose "So I can balance them separately?".
+
+Your required Plug Board arrangement should now be:
+
+    Music -> MixBoard Music -> Spooty
+    Games -> MixBoard Game  -> Felony Jaywalking LXVII
+
+Leave these sockets, destinations, and app assignments in place through the
+next step. There is no additional board-saving task required for this lesson.
+
+
+FINISH
+======
+
+35. Open the main Settings tab.
+
+36. Choose "Got it". When the completion message appears, your tutorial
+    completion has been recorded.
+
+37. In Settings > Application and Tray, click End tutorial. Confirm with
+    End tutorial in the popup. AudioHole restarts into normal operation.
+
+You have completed the tutorial. Scan your real devices and create a working
+profile when you are ready to route your own audio.

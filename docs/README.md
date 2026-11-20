@@ -4,11 +4,12 @@ Start with the [project README](../README.md), [build instructions](../BUILDING.
 and [contribution guide](../CONTRIBUTING.md).
 
 - [Specifications](specifications/README.md): design, GUI, configuration and engine contracts.
-- [Guides and Manuals](guides/): reserved for future content.
+- [Guides and Manuals](guides/): [user guides, manifesto, and AI disclosure.
 - [Installer](development/INSTALLER.md): installation, update, removal and release notes.
 - [Maintenance batch and verification](development/MAINTENANCE-2026-11-19.md).
+- [Distribution cleanup and inactive-source disclosure](development/DISTRIBUTION-CLEANUP.md).
 - [Licensing](legal/LICENSING.md) and [corresponding source](development/SOURCE.md).
-- [Tutorial script](tutorial/Norm-script.txt) and [Plug Board lesson](tutorial/PlugBoard-Norm-script.txt).
+- [Consolidated tutorial script](../personalities/tutorial/tutorial.txt).
 - [Personality response revision](personality/Norm-Horu-Bother-v2.txt).
 - [Scanner validation](scanner/VALIDATION.md) and [Plug Board validation](plug-board/VALIDATION.md).
 

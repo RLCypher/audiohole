@@ -1,0 +1,604 @@
+AudioHole User Manual
+Put your audio wherever you want.
+
+
+TERMS YOU'LL SEE IN AUDIOHOLE
+===========================
+
+Endpoint
+An audio input or output that Windows makes available to applications. One
+physical device can provide several endpoints. A headset, for example, can have
+a microphone endpoint and a headphone endpoint.
+
+Capture / Source
+The endpoint audio comes FROM: a microphone, line input, or another recording
+endpoint. AudioHole calls this the Source of a route.
+
+Playback / Destination
+The endpoint audio goes TO: headphones, speakers, or another playback endpoint.
+AudioHole calls this the Destination of a route.
+
+Routing
+Passing audio from a source to a destination. Choosing devices prepares the
+connection; starting routing opens it and begins passing audio.
+
+Hole
+A connection between audio endpoints. Its Forward direction sends audio from
+one capture endpoint to one playback endpoint. A hole can also include a Return
+direction. Think of a hole as an audio cable you configure in software.
+
+Forward / Return
+Two separately configured directions within one hole. Return adds another
+source-to-destination connection; it does not automatically reverse Forward or
+choose its endpoints for you. A hole with both directions is also called duplex.
+
+Profile
+A saved setup containing one or more holes. You might keep different profiles
+for everyday listening, streaming, or a particular collection of connected gear.
+
+Active / Viewed profile
+Active identifies the profile selected for routing. Viewed identifies the
+profile open in the editor. Looking at another profile does not, by itself,
+replace the setup that is routing.
+
+Plug Board
+The tab for organizing APPLICATION audio. Profiles connect capture and playback
+endpoints; Plug Board assigns applications to playback destinations.
+
+Socket
+A named column on Plug Board. Choose a playback device for the socket, then put
+applications inside it to assign their audio to that device. Several apps can
+share a socket, and several sockets can point to the same device.
+
+Routing board
+A saved Plug Board arrangement containing sockets and application assignments.
+A routing board and an audio profile are separate setups that can be associated.
+
+System (Default)
+Plug Board's permanent first socket. It represents the system/default grouping
+for applications without another applicable socket assignment.
+
+Scan
+Collecting device information. A Basic scan reads Windows-reported capabilities;
+a Deep scan also tests device configurations. Scanning discovers and describes
+devices. Starting routing uses them to pass audio.
+
+Available / Candidate
+Available means the endpoint is present. Candidate describes a recommended
+format supported by the available device information. The status of an opened
+route tells you what is actually in use.
+
+Automatic / Inherit
+Automatic asks AudioHole to choose a suitable setting. Inherit uses the related
+shared setting rather than a separate endpoint override. Empty optional fields
+show these words as placeholders; typing replaces the placeholder, and clearing
+the field restores it.
+
+Ready
+A profile is armed and waiting for the devices needed to run. Ready is different
+from Stopped: Stop Routing cancels waiting as well as stopping active audio.
+
+Personality
+An optional presentation style for commentary and animated reactions in the
+status area. It does not change the meaning of technical messages or the way
+your audio connections are configured.
+
+
+1. OPENING AUDIOHOLE
+===================
+
+AudioHole runs on Windows 10 and Windows 11, on a 64-bit system.
+
+Portable use
+------------
+Extract the complete downloaded ZIP into a folder of your choice, then run
+AudioHole.exe. Keep its supporting folders beside it. You can move the complete
+application folder when AudioHole is closed.
+
+Your saved user data is kept separately from the application files. Moving only
+the application folder does not transfer your saved setup to another computer.
+See "Backing up and moving your setup" later in this guide.
+
+Optional installation
+---------------------
+Run the included AudioHole-Setup installer if you prefer a conventional Windows
+installation. The default destination is C:\Program Files\AudioHole. You can
+choose another location and select Desktop and Start menu shortcuts.
+
+If AudioHole is already installed, the installer offers Update or Reinstall,
+along with Uninstall and Cancel. A newer included version is offered as Update;
+the same or an older version is offered as Reinstall. Read the included release
+notes before continuing. At the end, choose Launch AudioHole or Exit.
+
+Uninstall asks whether to keep profiles, configurations, and settings. Keep them
+to retain your setup for another installation. Choosing to remove them deletes
+the saved AudioHole data for your Windows account.
+
+First launch
+------------
+Choose "It's my first time" to enter the guided tutorial. It uses practice
+devices and applications so you can learn the workflow independently of your
+working setup. You can also enter the application directly and use the steps
+below with your own devices.
+
+
+2. FINDING YOUR WAY AROUND
+=========================
+
+The header contains Start Routing, Stop Routing, Exit AudioHole, routing status,
+and the active and viewed profile names. The status area presents the current
+event and any selected personality commentary.
+
+The five tabs are:
+
+  Profiles               Build and run endpoint-to-endpoint connections.
+  Plug Board             Assign applications to playback devices.
+  Devices                Inspect, name, and manage saved endpoints.
+  Scanning / Diagnostics Discover devices and inspect technical information.
+  Settings               Choose appearance, startup, and presentation options.
+
+Scroll within a panel to reach controls below the visible area. Scrollable
+fields can scroll their own content; at their limits, scrolling continues in
+the containing panel. Drag panel dividers to adjust the space given to lists,
+notes, and diagnostics. Settings > Reset layout to default restores panel sizes
+without deleting profiles or other saved configuration.
+
+Closing the main window hides AudioHole to the notification area. Routing can
+continue while the window is hidden. Use Exit AudioHole when you want to stop
+audio routing and close the application completely.
+
+
+3. MAKING YOUR FIRST REAL CONNECTION
+===================================
+
+Start with a simple connection, such as a microphone to headphones. Use a modest
+listening volume, and avoid routing a microphone to nearby speakers where it
+could create feedback.
+
+1. Connect and turn on the devices you want to use.
+
+2. Open Scanning / Diagnostics. Select Basic / Easy and Full scan, then choose
+   Start scan. Wait for it to finish.
+
+3. Open Devices. Identify the required capture and playback endpoints. Rename
+   them if that will make them easier to recognize.
+
+4. Open Profiles. Click + beside Profiles to create a profile. Right-click its
+   name and choose Rename to give the setup a useful name.
+
+5. Click + beside Holes. Rename the hole if desired, and leave it Enabled.
+
+6. In Forward, select the capture device under Source and the playback device
+   under Destination. Leave Routing Engine on Automatic. Leave advanced tuning
+   off for an ordinary automatic setup.
+
+7. Click Save to write the profile, then Start Routing.
+
+8. Check the routing status and use the source. Audio should reach the selected
+   destination. Use Stop Routing when you are finished.
+
+Add more holes to include other connections in the same setup. Enable return
+channel only when you need a second, separately configured direction.
+
+
+4. DEVICES: FINDING, NAMING, AND CHECKING ENDPOINTS
+=================================================
+
+Capture devices and Playback devices are listed separately. Choose by endpoint
+role rather than the wording printed on the hardware: an interface can expose
+several differently named Windows inputs and outputs.
+
+Use Search devices to narrow the list. Select a device to view its Display name,
+notes, availability, and recorded information.
+
+Renaming and notes
+------------------
+Edit Display name, add Device Notes if useful, then choose Save device. You can
+also right-click a device and choose Rename to begin editing its name.
+
+The name is an AudioHole label. Renaming preserves device identity and profile
+references; it does not rename the physical hardware or change its Windows
+identity.
+
+Device information
+------------------
+The information selector provides an overview and more detailed views, including
+identity, reported formats, Deep evidence, driver information, scan history, and
+diagnostics. Use Overview for a summary and the other views for a specific
+question about a device.
+
+An available endpoint is present, but that alone does not mean it is currently
+passing audio. Check the profile's routing status for the live connection.
+
+Checking an endpoint
+--------------------
+Stop routing before running standalone endpoint checks.
+
+  Check level   Shows activity from the selected capture device. Speak or play
+                a signal into that input and watch the meter. This checks input
+                activity; it does not establish that a destination is audible.
+
+  Test beep     Plays a short, quiet test sound on the selected playback device.
+                Check the destination and your listening volume first.
+
+Use Cancel check or Cancel beep to end a check early. Changing targets or leaving
+the checking context ends the temporary check.
+
+Other device actions
+--------------------
+Right-click a device for Update device, Deep update device, Show in Explorer,
+and Hide device or Unhide device.
+
+Hiding keeps a device out of new endpoint choices while preserving existing
+references. Hidden entries remain accessible in the device lists.
+
+Reload saved devices rereads saved device records. Refresh availability checks
+the presence of known devices. Use a scan when you need to discover new devices
+or collect capability information.
+
+Clear device list removes saved device records, including their names, notes,
+scan information, and local bindings. It leaves profiles in place, but you may
+need to scan again and reassign their endpoints. Export or back up your records
+before clearing them if you want to keep that information.
+
+
+5. SCANNING AND DEVICE EVIDENCE
+==============================
+
+On Scanning / Diagnostics, choose a Testing level and Scope before Start scan.
+
+Testing level
+-------------
+Basic / Easy reads information reported by Windows. It is a useful starting
+point for discovering endpoints and their advertised formats.
+
+Deep / Advanced also performs bounded stream tests. Stop routing first, review
+the confirmation, and close other audio applications if they are using a device
+you intend to test exclusively.
+
+Scope
+-----
+Update (new devices) focuses capability testing on newly discovered devices
+while refreshing known device information.
+
+Full scan retests the available devices across the selected scan scope.
+
+You can also update one device from its right-click menu on the Devices tab.
+
+Progress and results
+--------------------
+Watch the progress display and diagnostic output. Cancel scan stops the current
+scan. The Devices tab provides the saved results and history afterward.
+
+Deep scan limits and test context lets you restrict the tests and their running
+time. Choose limits appropriate to the devices you want to investigate.
+
+Keep these three kinds of information distinct:
+
+  Reported formats  Capabilities Windows reports for an endpoint.
+  Deep evidence     Results from tested configurations.
+  Running format    What an active route actually opened.
+
+A difference in native channel counts does not by itself prevent a compatible
+connection. For example, AudioHole can open a mono capture endpoint and a stereo
+playback endpoint, copying the microphone to both playback channels. The capture
+format is labeled "1 ch (dual mono)" and the playback format remains "2 ch".
+
+
+6. PROFILES AND HOLES IN EVERYDAY USE
+====================================
+
+Use a profile for a setup you want to return to, such as a desk arrangement or a
+headset arrangement. Each enabled hole contributes its own connection.
+
+The + and - controls create and remove profiles or holes. Their right-click
+menus provide Rename, Duplicate, and Delete. A profile also offers Show in
+Explorer. Stop routing and cancel any pending activation before deleting a
+profile that is in use.
+
+Profile Notes and Hole notes can record what a setup is for or how equipment
+should be connected.
+
+Forward and Return
+------------------
+Each direction has its own Source, Destination, and Exclusive mode preferred
+choice. Enable return channel adds the second direction. Select both of its
+endpoints explicitly.
+
+For example, Forward could send a microphone to a mixer playback endpoint while
+Return sends a mixer capture endpoint to headphones. These are two connections
+inside one hole, not an automatic loop through the same pair of endpoints.
+
+Save, Apply, and Revert
+----------------------
+Save writes the edited profile to its JSON file. Saving a change does not, on
+its own, replace a running route's configuration.
+
+Apply saves the profile and applies its changes to active routing. AudioHole
+reopens or restarts streams when necessary, so audio can pause briefly during
+the change. Use Apply when you want the edited setup to take effect now.
+
+Revert discards unsaved editor changes and reloads the last saved profile.
+Changes already saved remain saved, even if you have not applied them to a
+running route.
+
+Check Active and Viewed before editing. To start a different setup explicitly,
+stop routing, select and save the desired profile, then choose Start Routing.
+
+Partial operation and reconnection
+---------------------------------
+A profile can run the holes whose required devices are available while waiting
+for other devices. A status such as "1/2 running" means one of two enabled holes
+is running. For a hole with a Return direction, both directions must be running
+for that hole to count as fully running.
+
+With Automatically start routing once devices become available enabled in
+Settings, an armed setup can bring its waiting connections online as their
+devices return. Use Stop Routing to cancel the armed state when you no longer
+want the setup to start or recover automatically.
+
+
+7. FORMAT AND ACCESS OPTIONS
+===========================
+
+Automatic is the usual starting point. You do not need to fill every field to
+build a working route.
+
+Advanced tuning
+---------------
+Expanding Advanced tuning shows its controls. Use advanced tuning separately
+determines whether those overrides are active. Turning it off retains the
+entered values while letting Automatic choose the effective configuration.
+
+Under Audio Format, Complete format preset can select a complete candidate
+format. Manual allows individual format choices. The fields cover sample rate,
+stream channels, endpoint channel overrides, sample format, and a channel map.
+
+Auto and Inherit are placeholders, not numbers you must erase before use. Type
+the value you need; clear it to restore automatic or inherited behavior.
+
+Source and destination channels can differ. An explicit channel map specifies
+which source channels feed which destination channels, using zero-based channel
+numbers. For example, "0:0,1:1" connects the first two source channels separately
+to the first two destination channels. Leave the map automatic when you want
+AudioHole's standard mapping.
+
+Reset Format clears the format overrides. Reset all advanced tuning settings
+resets the advanced choices for that direction. Use Save or Apply afterward.
+
+Access mode
+-----------
+Exclusive mode preferred requests exclusive access when suitable, allowing
+shared operation as a fallback. An explicit Shared or Exclusive Operating mode
+under advanced tuning takes precedence over that preference.
+
+Shared access allows the normal Windows audio-sharing path. Exclusive access
+can require other applications to release the device. Choose an explicit mode
+only when you need that access behavior.
+
+Buffer settings
+---------------
+Automatic buffer settings are usually good enough. For manual adjustment, see
+the separately provided Advanced Buffer Tuning Guide.txt.
+
+
+8. PLUG BOARD: ORGANIZING APPLICATION AUDIO
+==========================================
+
+Use Plug Board when you want different applications to use different playback
+devices. For example, assign a music player to one mixer endpoint and a game to
+another. Use Profiles when you need a capture-to-playback connection instead.
+
+Creating sockets and assigning apps
+----------------------------------
+1. Open Plug Board. Open an application and let it produce audio so it can be
+   discovered.
+
+2. Open the Routing Board Settings drawer. Click + beside Sockets and enter a
+   useful name, such as Music or Games.
+
+3. Select the socket's playback device using the dropdown at the top of its
+   column.
+
+4. Drag an application into that socket. Alternatively, right-click the app and
+   use Move to. You can move an application back to System (Default) the same way.
+
+5. Check the application's Playing information to confirm its observed output.
+
+Assignments are retained when an application becomes inactive or is relaunched.
+If an app is already playing through its previous output, stop and restart its
+playback or reopen the app so it picks up the selected output preference.
+
+The selected socket records where you want an app to play. Playing identifies
+the output observed for an active stream. Last seen describes prior activity;
+it does not mean the app is producing sound now. Make sure the target playback
+device is available.
+
+Managing sockets
+----------------
+System (Default) stays first and cannot be deleted. Other sockets can be renamed,
+recolored, given an icon, or deleted from their context menus. Reorder them in
+the Sockets list. Removing a socket returns its applications to the System
+grouping; review the confirmation before continuing.
+
+Show inactive sources and Recently active window control how recent and inactive
+applications are presented. Windows Mixer opens the Windows volume controls;
+you can also adjust volume on the destination hardware.
+
+Saving routing boards
+---------------------
+The Routing Board selector changes the current board. Use its + control to make
+a board, Rename to change its name, Save to record its current arrangement, and
+Save As to create a named copy. Working changes are retained as you make them.
+Use - to delete a board after reviewing the confirmation.
+
+Use as default chooses the default board. Associate with profile links a board
+to an audio profile selected in the Profile dropdown. Activating that profile
+selects its associated board. Merely viewing the profile in the editor does not
+activate it or switch its linked board.
+
+Plug Board's assignments are separate from Profile Save and Apply. Exiting
+AudioHole does not automatically clear the application's Windows output
+preferences.
+
+
+9. SETTINGS
+===========
+
+Appearance and notifications
+----------------------------
+Appearance offers Dark, Light, and Follow System. Tray notifications can show
+Important changes only, All routine events, or None.
+
+Start with Windows launches AudioHole when your Windows account signs in.
+Start minimized controls whether it initially appears in the notification area.
+These choices are separate from automatically starting audio routing. If you
+move a portable copy, turn Start with Windows off and back on from its new
+location to refresh the startup entry.
+
+Startup routing
+---------------
+Routing on startup offers Immediately, After Delay, and Manual. Choose Profile
+on startup to specify the saved setup. After Delay uses Routing activation delay
+(seconds).
+
+Preview startup runs or schedules the selected startup behavior in the current
+session; it can start real routing. Cancel pending activation cancels pending
+startup and stops routing.
+
+Automatically start routing once devices become available lets an armed setup
+wait for missing endpoints and resume eligible connections when they appear.
+Use Stop Routing whenever you want to cancel that waiting behavior.
+
+Scheduling and Priority apply to audio workers. Automatic is the recommended
+starting choice. If you change these preferences, stop and start routing to use
+the new choices.
+
+Personality and animation
+-------------------------
+Choose a presentation style in Personality. Commentary and visuals accompany
+technical status without changing the audio setup.
+
+Hold expressions between events keeps the last expression visible. Animation
+loop count selects how many times an animation plays. Loop until next event
+continues it until the next event. Low motion uses still expressions. System
+reduced-motion preferences are also respected.
+
+Reload personality files rereads the selected presentation resources. Load
+custom personality lets you choose a compatible personality file.
+
+Application actions
+-------------------
+Reset layout to default restores panel heights and widths.
+
+Replay Tutorial restarts AudioHole in the guided practice environment. During
+the tutorial, Restart Tutorial starts the lesson over.
+
+Restart AudioHole closes and relaunches the application. Save your changes
+before restarting.
+
+Update opens a window with the installed version and a link to AudioHole's
+GitHub page, where you can obtain a release.
+
+
+10. USING THE TUTORIAL
+=====================
+
+The tutorial introduces scanning, device names, profiles, holes, and Plug Board
+using a separate practice setup. Follow the highlighted control and choose a
+reply when one is offered. Press F1 to repeat the current instruction.
+
+If you visit another tab, the tutorial points you back toward the tab needed for
+the current lesson. Required actions must be completed before proceeding.
+
+Practice profiles and devices stay separate from your normal working data.
+Completing the tutorial records your progress without copying those practice
+objects into your real setup.
+
+Skip tutorial leaves the lesson early. End tutorial leaves a completed lesson.
+Confirming either action restarts AudioHole into normal use. Replay Tutorial in
+Settings lets you return later.
+
+For the shortest complete walkthrough, use the separate text document
+Speedrunning the Tutorial.
+
+
+11. READING STATUS AND DIAGNOSTICS
+================================
+
+Common routing states
+---------------------
+Stopped     No routing is armed. Start Routing begins the selected saved setup.
+Ready       The setup is armed and waiting for required devices.
+Starting    AudioHole is opening the selected connections.
+Running     The enabled connections are operating.
+Degraded    The setup is operating only in part; inspect its holes and directions.
+Recovering  AudioHole is trying to restore an interrupted connection.
+Failed      A connection could not open or continue; inspect its message.
+Stopping    AudioHole is closing the connections.
+
+Performance Diagnostics on Profiles shows per-direction status and observations.
+Use it to identify which part of a setup is running and which needs attention.
+
+Scanning / Diagnostics provides a searchable technical log. Use Search technical
+diagnostics and Diagnostic filter to narrow it. Copy visible diagnostics copies
+the displayed entries; Export visible diagnostics saves them. Export scan bundle
+saves scan information for sharing or support. Clear diagnostics log clears the
+displayed log, rather than your saved profiles.
+
+If you cannot hear a connection
+------------------------------
+1. Confirm that the intended profile is Active, its hole is Enabled, and the
+   required direction is running.
+2. Check the Source and Destination. Similar names can describe different
+   endpoints on the same device.
+3. Confirm that the source is producing audio and the destination is powered on,
+   audible, and not muted in Windows or on the hardware.
+4. If you edited a running profile, choose Apply to save and use the new setup.
+5. For an access error, check whether another application is using the endpoint
+   exclusively. Releasing it or choosing an appropriate access mode can help.
+6. Stop routing before using Check level or Test beep to check the endpoints
+   individually. Read the route's specific diagnostic message before changing
+   format requirements.
+
+For Plug Board, also compare the app's assigned socket with its Playing output.
+Restart the app's playback if it needs to pick up a changed output preference.
+
+
+12. BACKING UP AND MOVING YOUR SETUP
+===================================
+
+Profiles provides Export profiles, Import profiles, and Open Profiles Folder.
+Devices provides Export devices, Import devices, and Open Devices Folder. Save
+or revert pending edits before exporting or importing. Review import previews
+and confirmations before accepting changes.
+
+Exports are useful for transferring selected records. On another computer,
+connect the hardware, scan the local endpoints, and review the imported profile
+assignments before starting audio. Local device bindings can differ between
+computers even when you use the same saved names.
+
+AudioHole keeps user data under %LOCALAPPDATA%\AudioHole. To make a complete
+backup, close AudioHole and copy that folder. Keep the application files
+separately. A complete user-data backup includes saved settings, profiles,
+device information, tutorial progress, and Plug Board data.
+
+
+13. TRAY CONTROLS AND KEYBOARD SHORTCUTS
+=======================================
+
+Right-click the AudioHole notification-area icon to open AudioHole, go directly
+to Plug Board, start or stop routing, activate a profile, inspect direction
+states, hide the window, or exit. The taskbar icon's menu also provides the
+Plug Board shortcut.
+
+Useful keys:
+
+  Ctrl+S                   Save the viewed profile.
+  Ctrl+Tab                 Move to the next main tab.
+  Ctrl+Shift+Tab            Move to the previous main tab.
+  Shift+F10                 Open the selected item's context menu.
+  F1 during the tutorial   Repeat the current tutorial instruction.
+
+Use Stop Routing to end audio while keeping AudioHole open. Use Exit AudioHole
+to end routing and close it completely.

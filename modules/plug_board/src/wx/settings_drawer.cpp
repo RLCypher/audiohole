@@ -132,8 +132,9 @@ void PlugBoardView::Implementation::build_drawer() {
     line();
     inactive = new wxCheckBox(drawer, wxID_ANY, "Show inactive sources");
     inactive->SetName("Show inactive sources");
-    inactive->SetToolTip("Allow inactive rows to be expanded in every socket. Hidden inactive "
-                         "sources remain in the catalog and can retain assignments.");
+    inactive->SetToolTip(
+        "Allow inactive rows to be expanded in every socket. Expanding an "
+        "inactive group also enables this setting. Hidden sources retain assignments.");
     content->Add(inactive, 0, wxLEFT | wxRIGHT | wxBOTTOM, gap);
     label("Recently active window:");
     recent = choice(drawer, "Recently active window",

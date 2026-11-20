@@ -1,0 +1,356 @@
+﻿AudioHole Manual Buffer Tuning Guide
+====================================
+
+Manual buffer tuning is an advanced process. Under most usual conditions and use cases,
+buffer tuning is not necessary. AudioHole’s Automatic settings are the recommended
+starting point.
+
+Use manual tuning when a working route needs a different balance between latency and
+stability. Smaller queues leave less time to absorb late audio packets or delayed
+processing. The aim is the lowest delay that remains reliable during normal use, with a
+little margin above the failure point.
+
+Reasons to consider manual tuning
+---------------------------------
+
+- You can hear an objectionable delay while monitoring your voice, playing an
+  instrument, or using another timing-sensitive route.
+
+- A working route develops repeatable clicks, gaps, or FIFO underruns, and you need more
+  buffering margin.
+
+- Your devices support shorter processing intervals than the current route uses.
+
+- A route is stable when idle but needs a better latency/stability balance during
+  gaming, VR, streaming, or other representative system load.
+
+- You want separate, tested settings for different hardware combinations or uses.
+
+Reasons to leave settings on Automatic
+--------------------------------------
+
+- Routing already sounds clean and its delay is acceptable. Smaller numbers alone are
+  not an improvement.
+
+- You mainly use ordinary playback, video, or voice communication and have no noticeable
+  routing problem.
+
+- You want AudioHole to accommodate supported device periods and changing packet sizes
+  without maintaining manual values.
+
+- You regularly change devices, operating modes, formats, or drivers. Explicit settings
+  may need retesting after those changes.
+
+- Most of the delay comes from the mixer’s DSP, headset transport, or another hardware
+  stage. Buffer tuning affects only part of the complete path.
+
+- The problem is an unavailable device, Exclusive ownership refusal, unsupported format,
+  incorrect channel mapping, or a stream that never starts transferring audio. Resolve
+  that problem before tuning buffers.
+
+Understand the eight timing controls
+------------------------------------
+
+All values are in milliseconds. A device buffer is allocated capacity; an audio queue is
+occupied or targeted audio waiting to play. A 22-ms playback allocation can hold an
+11-ms playback queue. Reducing the allocation request does not necessarily reduce that
+queue or the processing interval. The routing FIFO is AudioHole’s first-in-first-out
+audio queue. An underrun means it cannot supply enough captured audio for a playback
+request; an overrun means new captured audio arrives without enough free queue space.
+
+Routing audio queue
+  What it controls: Target reserve of captured audio inside AudioHole, feeding playback.
+  Smaller targets reduce the reserve against capture jitter.
+  When blank: Automatic
+
+Playback audio queue
+  What it controls: AudioHole’s target playback lead in the destination’s buffer. In
+  Shared mode, this can be smaller than the allocation.
+  When blank: Automatic
+
+Default processing interval
+  What it controls: Default requested cadence for both endpoints, unless overridden
+  below.
+  When blank: Automatic
+
+Input processing interval
+  What it controls: Requested capture processing cadence.
+  When blank: Use default
+
+Output processing interval
+  What it controls: Requested playback processing cadence.
+  When blank: Use default
+
+Default device buffer
+  What it controls: Default capacity request for both endpoint buffers.
+  When blank: Automatic
+
+Input device buffer
+  What it controls: Capture buffer capacity request.
+  When blank: Use default
+
+Output device buffer
+  What it controls: Playback buffer capacity request.
+  When blank: Use default
+
+Use default means inherit the corresponding Default setting. If that Default setting is
+also blank, AudioHole chooses automatically for that endpoint. Routing audio queue and
+Playback audio queue have their own Automatic policies; they do not inherit the device-
+buffer values.
+
+Queue and interval fields accept positive fractional milliseconds. Device-buffer
+requests accept whole milliseconds from 1 to 100. Windows can round device allocations
+to supported sizes; check the actual allocation after opening.
+
+Prepare a working baseline
+--------------------------
+
+1. Duplicate or save a copy of the working profile so you can restore it.
+
+2. Choose the direction you want to tune. Change only that direction’s settings
+   initially; keep the other direction’s known working values.
+
+3. Enable Use advanced tuning for that direction. Clear the eight timing fields with
+   Reset Buffers, preserving the chosen devices, format, access mode, and channel map.
+   Review the other retained advanced fields too: enabling this switch also activates
+   format, access-mode, and channel-map overrides. Leave any overrides you do not intend
+   to use on Automatic.
+
+4. For the complete procedure below, use the WASAPI backend. Keep the backend, format,
+   access mode, Windows enhancements, volume, and hardware connections fixed while
+   comparing values. Leave application Engine scheduling on its working setting;
+   Automatic normally requests Pro Audio with Normal relative priority.
+
+5. Save the profile, fully Stop routing, wait for cleanup, and Start again. Timing edits
+   apply when streams reopen.
+
+6. Confirm continued frame progress and the actual access mode after startup completes.
+   Exclusive preference can fall back to Shared; compare runs that actually use the same
+   mode.
+
+Run the ordinary workload for a few minutes. In Signal Testing and Monitoring, or the
+build’s performance view, record the actual input/output periods, allocated buffers,
+playback lead, current routing target, observed FIFO occupancy, and underrun/overrun
+counts. Resolve startup failures before continuing.
+
+When timing is shown in frames, convert with milliseconds = 1000 × frames ÷ sample rate.
+At 48 kHz, 480 frames is 10 ms. Use the sample-rate domain belonging to the reported
+value; routing FIFO frames belong to the capture side.
+
+Tune Shared mode
+----------------
+
+Keep both device-buffer requests and their Default setting on Automatic during the first
+pass. Choose processing intervals first, because cadence changes how much queued audio
+is needed between processing opportunities.
+
+Choose processing intervals
+---------------------------
+
+Leave Default processing interval blank so the endpoints can use different values.
+Starting from the working periods, try a shorter Output processing interval, then a
+shorter Input processing interval, one at a time. Keep both audio queues on Automatic
+during this step.
+
+Use periods supported for the selected endpoint, format, and mode. Windows can restrict
+periods to particular frame multiples. A request of 1 ms is not universally supported.
+If legal periods are unknown, leave the interval Automatic and proceed to queue tuning.
+If Automatic already uses the lowest legal interval, leave it there and tune the queues.
+
+After each change, Save, Stop, Start, and inspect the actual period. An unsupported
+explicit interval should be corrected to a supported value or cleared. If a period
+change causes artifacts, restore the last working value.
+
+Reduce the playback audio queue
+-------------------------------
+
+With the periods fixed, start from the observed Automatic lead or a more conservative
+working value. The lead must fit within the actual playback allocation.
+
+For example, with a 10-ms output period and 22-ms allocation, a tuning sequence could be
+15 → 13 → 12 → 11 → 10.5 ms. These are test values for that example, not a requirement
+for every device. A lead around one output period plus a scheduling margin is a useful
+starting point; a lead shorter than the period is especially vulnerable to gaps between
+wakes.
+
+Save and reopen the streams for every step. Listen and watch the diagnostics. If output
+starts breaking up, return to the last clean value and add a small margin. Playback can
+run short even while AudioHole’s routing FIFO has data, so listen as well as checking
+FIFO underruns.
+
+Reduce the routing audio queue
+------------------------------
+
+Keep the periods and playback lead fixed. Start from the observed working target, or use
+a conservative preset. Reduce Routing audio queue in roughly 5-ms steps initially, then
+1–2-ms steps near the first failure.
+
+Use a short 30–60-second check to reject obviously unstable values, then several minutes
+around the promising values. Note counter increases during the run; reopening streams
+can reset counters.
+
+At the first repeatable crackle, gap, or FIFO underrun, restore the last clean target
+and add one or two small tuning steps. For example, if 16 ms passes the short check and
+14 ms underruns, test 18 ms under sustained load. That is an illustration of the method,
+not a guaranteed stable setting.
+
+An explicit target replaces the Automatic packet guard; AudioHole will not quietly
+enlarge that target to hide an overly aggressive request. The target is not a hard
+occupancy ceiling: packet arrivals naturally make the FIFO rise and fall around it.
+
+Adjust device buffers only if needed
+------------------------------------
+
+Leave Default device buffer, Input device buffer, and Output device buffer on Automatic
+unless you have a specific reason to alter capacity. In Shared mode, unused capacity
+does not itself add playback lead.
+
+A 1-ms capacity request may still produce a 22-ms allocation. That does not demonstrate
+that the request was ignored: the driver can impose a minimum or alignment. Explicit
+capacity requests can also change the Windows initialization path, so recheck the actual
+processing interval after editing them.
+
+If you do experiment, change one endpoint at a time, keep the playback lead within the
+resulting output capacity, and verify the actual allocation, period, and queue settings
+after reopening. Retest the route if cadence changes.
+
+Tune Exclusive mode
+-------------------
+
+First establish that Exclusive routing opens and continues transferring frames reliably.
+An ownership refusal or an opened stream with no continuing render progress needs
+startup troubleshooting, rather than a smaller routing queue.
+
+Exclusive event-driven playback uses complete native buffers. Its processing period,
+buffer duration, and playback lead are therefore coupled. Leave Playback audio queue
+Automatic while tuning Exclusive; an independent lead that conflicts with the full
+native packet is unsupported.
+
+Start with Automatic device buffers and supported endpoint periods. Change one
+endpoint’s period at a time. If you also supply an explicit buffer request, keep it
+consistent with that endpoint’s period; incompatible requests are rejected. Read the
+actual aligned allocation and period after every reopen. Once native streaming is
+reliable at the chosen periods, tune Routing audio queue using the same gradual
+procedure as Shared mode.
+
+Forced Exclusive must report failure if it cannot open. Exclusive-preferred may use
+Shared after a failed acquisition or startup attempt, so confirm the final mode before
+comparing results.
+
+Use the starting presets
+------------------------
+
+Load safe defaults supplies starting requests, using the available device evidence. It
+can leave a field Automatic when the required period or playback capacity is unknown.
+The following Shared-mode examples assume the chosen input and output processing
+intervals are both 10 ms, and playback capacity is sufficient:
+
+Responsive
+  Routing audio queue: 12 ms
+  Playback audio queue: 10.5 ms
+  Endpoint interval selection: Supported minimum periods
+
+Balanced
+  Routing audio queue: 21 ms
+  Playback audio queue: 11 ms
+  Endpoint interval selection: Supported minimum periods
+
+Stable
+  Routing audio queue: 35 ms
+  Playback audio queue: 15 ms
+  Endpoint interval selection: Supported default periods
+
+Conservative
+  Routing audio queue: 60 ms
+  Playback audio queue: 20 ms
+  Endpoint interval selection: Supported default periods
+
+Stable is a useful manual starting point when you want extra margin before reducing
+values. For these examples, leave Default processing interval and all three device-
+buffer fields blank; use the supported input/output interval values independently.
+Actual presets scale with endpoint periods, so their numbers may differ from the table.
+A period change later requires checking the queue settings again.
+
+Recognize what a failure means
+------------------------------
+
+FIFO underruns increase: Restore more routing reserve, check capture delivery gaps, or
+return to the last working cadence.
+
+Audible output gaps with no FIFO underruns: Restore playback lead or the previous output
+period. Also check driver, DSP, and wireless behavior.
+
+FIFO overruns or a persistently growing backlog: Check playback progress, capture
+batching, and the previous working settings before increasing a queue target.
+
+A smaller buffer request changes neither allocation nor latency: Check the driver-
+selected capacity, actual periods, playback lead, and FIFO occupancy. Capacity and
+occupied audio are different quantities.
+
+The route refuses to start: Check the reported format, access, period, or capacity
+requirement. A queue change does not resolve an ownership refusal.
+
+A stream becomes invalid after changing enhancements or Windows audio settings: Reopen
+the route after the reconfiguration, then establish a fresh baseline.
+
+Crackling persists at the old working settings: Check clipping, source audio, USB/driver
+problems, and headset transport as well as buffering.
+
+Recent standard-pipeline builds can lower an Automatic guard after a temporary large
+packet or render block expires from the recent history. The FIFO then drains gradually
+through the existing correction controller; a lower target does not mean occupancy
+immediately reaches it. An underrun after an automatic reduction can latch a
+conservative guard for that session. Explicit targets stay fixed, and the Experimental
+controller retains a different guard policy.
+
+Confirm the final settings
+--------------------------
+
+Validate the chosen settings for at least 20–30 minutes under representative use,
+including the full duplex profile and the applications you normally run. For important
+long sessions, test over a comparable duration. Check again after device, driver,
+format, backend, access-mode, or Windows processing changes.
+
+Record the profile, direction, backend, actual mode, requested values, actual
+periods/allocations, queue observations, test duration, counter changes, audible
+artifacts, and measured delay if available. Keep the previous reliable profile as a
+fallback.
+
+For latency comparisons, use the same physical route, measurement setup, placement, and
+levels, with repeated samples. Buffer allocations and queue targets are not a measured
+end-to-end delay. Mixer DSP and wireless buffering can limit the audible benefit even
+when AudioHole’s own queues are reduced.
+
+Backend compatibility
+---------------------
+
+The full independent period and playback-lead procedure uses native WASAPI. Miniaudio
+accepts an explicit routing queue and device-buffer requests, but the documented adapter
+rejects independent processing-interval and playback-lead overrides. Leave those
+unsupported fields Automatic when using Miniaudio. Keep the backend fixed during a
+tuning series.
+
+JSON field reference
+--------------------
+
+These paths sit below each direction’s settings.preferences. Blank values serialize as
+null. Source/destination processing-interval and device-buffer nulls inherit the
+corresponding common setting. A null queue_target_ms or destination.render_ahead_ms
+means Automatic. The direction’s advanced_tuning must be enabled for manual timing
+values to apply.
+
+Routing audio queue: queue_target_ms
+
+Playback audio queue: destination.render_ahead_ms
+
+Default processing interval: common.period_ms
+
+Input processing interval: source.period_ms
+
+Output processing interval: destination.period_ms
+
+Default device buffer: common.buffer_ms
+
+Input device buffer: source.buffer_ms
+
+Output device buffer: destination.buffer_ms

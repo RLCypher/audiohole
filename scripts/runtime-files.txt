@@ -1,40 +1,31 @@
+AudioHole License.txt
 AudioHole.exe
-assets/avatar-assets.json
-assets/branding/audiohole-logo.png
-assets/branding/audiohole.ico
-assets/presentation/placeholder-avatar.png
+Guides and Manuals/AI-DISCLOSURE.txt
+Guides and Manuals/Advanced Buffer Tuning Guide.txt
+Guides and Manuals/AudioHole User Manual.txt
+Guides and Manuals/Speedrunning the Tutorial.txt
+Guides and Manuals/The AudioHole Manifesto.txt
 assets/tutorial/apps/Bar simulator.png
 assets/tutorial/apps/Dissonance.png
 assets/tutorial/apps/Epic fail launcher.png
 assets/tutorial/apps/Felony Jaywalking.png
 assets/tutorial/apps/Internet Exploder.png
 assets/tutorial/apps/Spooty.png
-assets/tutorial/apps/provenance.json
 assets/ui/MaterialIcons-Regular.ttf
 bin/audiohole-probe.exe
-docs/CONFIGURATION_BUNDLES.md
-docs/ENGINE_INTEGRATION.md
-docs/LATENCY_V4.md
-docs/MANUAL_GUI_CHECKLIST.md
-docs/PLUG_BOARD_INTEGRATION.md
-docs/PROFILE_BUILDER.md
-docs/TUTORIAL.md
-docs/examples/latency-v4/app-engine-settings.fragment.json
-docs/examples/latency-v4/automatic.profile-v4.json
-docs/examples/latency-v4/inheritance.profile-v4.json
-docs/examples/latency-v4/stable.profile-v4.json
-docs/tutorial/Norm-script.txt
-docs/tutorial/PlugBoard-Norm-script.txt
+licenses/GPL-3.0.txt
+licenses/InnoSetup-LICENSE.txt
 licenses/MaterialIcons-LICENSE.txt
 licenses/MaterialIcons-NOTICE.txt
 licenses/PlugBoard-MaterialSymbols-LICENSE.txt
 licenses/PlugBoard-MaterialSymbols-NOTICE.txt
+licenses/SOURCE.txt
+licenses/assets.txt
 licenses/miniaudio-LICENSE.txt
 licenses/miniz-LICENSE.txt
 licenses/nlohmann-json-LICENSE.txt
 licenses/wxWidgets-LGPL.txt
 licenses/wxWidgets-LICENSE.txt
-personalities/README.md
 personalities/default/avatar/pack/Generated/chibi/angry.png
 personalities/default/avatar/pack/Generated/chibi/angry/0000.png
 personalities/default/avatar/pack/Generated/chibi/angry/0001.png
@@ -324,6 +315,7 @@ personalities/default/avatar/registry.json
 personalities/default/dialogue/responses.json
 personalities/default/personality.json
 personalities/default/preview/placeholder.png
+personalities/tutorial/tutorial.txt
 personalities/uwu/avatar/pack/Generated/chibi/angry.png
 personalities/uwu/avatar/pack/Generated/chibi/angry/0000.png
 personalities/uwu/avatar/pack/Generated/chibi/angry/0001.png
@@ -748,8 +740,3 @@ personalities/vanilla/avatar/pack/manifest.json
 personalities/vanilla/avatar/registry.json
 personalities/vanilla/personality.json
 personalities/vanilla/preview/logo.png
-LICENSE
-docs/LICENSING.md
-docs/SOURCE.md
-licenses/InnoSetup-LICENSE.txt
-Guides and Manuals/.gitkeep

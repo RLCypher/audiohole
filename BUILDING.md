@@ -103,7 +103,7 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 3. Extract the downloaded portable ZIP. Its main folder contains both `AudioHole.exe`
    and the optional `AudioHole-Setup` executable, with `Guides and Manuals` beside them.
 4. Read `README.txt` and `docs/build-info.json`, then open `AudioHole.exe`.
-   The `Guides and Manuals` folder is reserved for future content.
+   The `Guides and Manuals` folder includes the manual, quick-start and tuning guides, manifesto, and AI disclosure.
    Follow the included manual checklist. Tutorial uses fictional devices; normal operation uses real endpoints.
 
 Debug is uploaded separately for development investigations. Both packages are

@@ -329,7 +329,7 @@ I tried a fluffy sock as a microphone windscreen once~ My voice sounded like it 
 ========================================================================
 NORM — 9 TUTORIAL-ONLY CLICK REACTIONS
 ========================================================================
-Editable source: /workspace/audiohole/docs/tutorial/Norm-script.txt
+Editable source: /workspace/audiohole/personalities/tutorial/tutorial.txt
 
 C001 [suspicious]
 Cue: Click Norm early in the tutorial.

@@ -20,4 +20,4 @@ bytes. Host integration files and the final checks are described in
 The supplied Norm and Horu response documents are retained verbatim here. Their
 80 responses and packaged tutorial artwork hashes are checked by
 `scripts/CheckPlugBoardInputs.py`. The complete additional Norm tutorial script
-is in [docs/tutorial/PlugBoard-Norm-script.txt](../tutorial/PlugBoard-Norm-script.txt).
+is in [personalities/tutorial/tutorial.txt](../../personalities/tutorial/tutorial.txt).

@@ -1,0 +1,115 @@
+# AudioHole License
+
+**Your hardware. Your computer. Your audio. Your rules.**
+
+
+
+AudioHole was born out of years of fighting proprietary hardware limitations, begging manufacturers for features, and discovering that an alarming amount of useful technology already existed in scattered pieces.
+
+
+
+With that in mind, it would be a spectacular act of hypocrisy to build a solution to that problem, then lock the damn thing away.
+
+
+
+So AudioHole is free and open-source software, distributed under the **GNU General Public License, version 3 (GPLv3)**.
+
+
+
+You're welcome to use it, study how it works, modify it, and share it with others. Tear it apart, learn something, improve it, and put it back together. Vibe coding? Knock yourself out. Just be transparent about it, and for the love of God, make sure the damn thing actually works before you unleash it on somebody else's computer. If you come up with something better, fantastic. That's kind of the point.
+
+
+
+If you distribute a modified version, the GPLv3 requires you to preserve the applicable freedoms, provide the corresponding source code as required, and identify your modifications.
+
+
+
+The idea is simple. You get the freedom to improve AudioHole, and the people who receive your version get those same freedoms. Make your own, make it better, make sure the next guy can do the same.
+
+
+
+I'd love to see this project grow into something bigger than I originally imagined. There's a whole world of weird audio hardware out there, and I'm sure somebody will find a use case that makes me question my own sanity.
+
+
+
+**Make it work. Make it better. Keep it free.**
+
+
+
+## A Word About the Mascots and Branding
+
+
+
+Now, before somebody gets any bright ideas.
+
+
+
+The AudioHole name, original logo, mascots, and their associated character designs belong to AudioHole's creator. That's me, for the record. I made the little bastards, and I'm rather attached to them. Their inclusion in the project does not grant blanket permission to use them for unrelated commercial merchandise or to present another project as officially affiliated with AudioHole.
+
+
+
+The software is open source. The characters and branding are a separate matter.
+
+
+
+Those fall under what I'm unofficially calling the "OCDNS 1.0" policy. That's right, Original Character, Do Not Steal. A legally sophisticated doctrine developed through years of watching people put watermarks on furry reference sheets.
+
+Before anybody starts citing OCDNS 1.0 in court, please understand that it's a joke, not a substitute for actual copyright law.
+
+
+
+That being said... Non-commercial fanart? Wonderful. Memes? Encouraged. Deranged artistic interpretations of Norm and Horu? I knew what I was getting into when I put these two on the internet.
+
+
+
+And Rule 34 is a rule of nature. I'm under no illusions about where this is going.
+
+
+
+Just don't be a dick about it.
+
+
+
+If you're thinking about selling merchandise featuring the AudioHole logo, Norm, Horu, or their likenesses, get in touch with me first. I'd rather work something out than discover you've been selling unauthorized body pillows or AudioHole themed holes out of a warehouse in Nebraska.
+
+
+
+At the very least, have the decency to send me a sample or two. I want to see what kind of monster I've created. And if you somehow manage to manufacture the latter, I have several questions about your production methods.
+
+
+
+I genuinely enjoy seeing people get creative with things I've made. Please respect the work and the person behind it.
+
+
+
+## Warranty and Legal Terms
+
+
+
+AudioHole is provided without warranty under the terms of the GPLv3. Windows audio is a lawless frontier, and while every effort is made to keep things working, longcat is long, and unexpected behavior is unexpected. Somewhere out there, one of you magnificent lunatics is going to discover a combination of hardware, drivers, and Windows settings so profoundly cursed that it makes the entire development team question the existence of a benevolent God. And among all you madlads, there will always be a madder lad.
+
+
+
+The complete GPLv3 license is available in `licenses/GPL-3.0.txt`.
+
+
+
+### Artwork and Branding
+
+
+
+AudioHole's original branding, logos, mascot illustrations, and character designs are separate from the GPLv3-covered software where separately licensed. They remain the intellectual property of their respective rights holders, to the extent those rights exist and are held by them.
+
+
+
+You're welcome to create and share non-commercial fan works featuring Norm and Horu. Commercial merchandise featuring the original characters or branding, and uses implying official endorsement, require separate permission to the extent those uses involve rights reserved by their owners.
+
+The specific permissions and restrictions applicable to original creative assets are documented in /licenses/assets.txt
+
+
+
+This document explains AudioHole's licensing philosophy and branding intentions. It does not replace or modify the GPLv3 terms governing the software, revoke permissions previously granted under applicable open-source licenses, or restrict rights provided by GPLv3 for covered material.
+
+
+
+fnord

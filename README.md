@@ -19,7 +19,7 @@ application output assignments into reusable routing boards.
 Download a successful Windows build from [GitHub Actions](https://github.com/RLCypher/audiohole/actions).
 Extract the portable ZIP and run `AudioHole.exe` directly. The optional installer
 sits beside it if you prefer a conventional installation. The **Guides and Manuals**
-folder is reserved for future guides and manuals.
+folder includes the user manual, quick-start and tuning guides, manifesto, and AI disclosure.
 Matching source is available as a separate Source download on the same build page.
 
 The guided tutorial uses fictional devices and applications, with Norm explaining
@@ -60,7 +60,7 @@ First-party code is licensed under [GPLv3](LICENSE), **GPL-3.0-only**. Donations
 commercial distribution are compatible with the license. Contributions use DCO
 sign-off; there is no broad relicensing CLA.
 
-Artwork and branding terms remain separately under review. See the
+Original artwork and branding have [separate terms](docs/legal/assets.txt). See the
 [licensing details](docs/legal/LICENSING.md) for scope and third-party notices,
 [corresponding source](docs/development/SOURCE.md), and
 [AI disclosure](docs/specifications/AI_DISCLOSURE.md).

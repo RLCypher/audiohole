@@ -1,0 +1,100 @@
+AUDIOHOLE ORIGINAL ARTWORK AND BRANDING POLICY
+(Unofficially referred to as OCDNS v1.0)
+Copyright (C) 2026 RLCypher. All rights reserved except as expressly stated below.
+
+Version 1.0 — November 2026
+
+This policy covers original AudioHole creative assets owned by RLCypher, including
+original AudioHole logos, mascot artwork, and the original character designs of
+Norm and Horu, to the extent RLCypher owns the rights in those materials.
+
+It is a separate policy for creative assets. It does not replace, amend, or
+restrict the GNU General Public License version 3 (GPLv3) that applies to
+AudioHole software. Where a particular asset is also distributed under GPLv3
+or another license, that license's applicable permissions remain in force.
+Nothing here withdraws rights already granted under an applicable license.
+
+1. WHAT YOU MAY DO
+
+You have permission to make and share noncommercial fan works based on the
+covered characters and artwork. This includes drawings, illustrations,
+animations, cosplay, memes, and other creative reinterpretations, including
+adult-oriented fan works where lawful. You may post and share those works
+online without asking first, provided you follow the conditions below.
+
+This permission is nonexclusive, worldwide, royalty-free, and applies only to
+uses that are genuinely noncommercial. It does not transfer ownership of the
+original characters, designs, logos, or artwork. You own whatever original
+expression you contribute to your fan work, subject to the rights in the
+underlying material.
+
+If you can, credit "AudioHole / RLCypher" and make clear that your work is
+unofficial. A link to the project is appreciated, but is not required.
+
+2. WHAT NEEDS SEPARATE PERMISSION
+
+Please obtain permission before using covered original artwork, logos, or
+character designs on merchandise intended for sale, paid commissions,
+commercial advertising, sponsored promotions, or other commercial products.
+This includes products featuring Norm or Horu and merchandise using the
+AudioHole logo or branding.
+
+(Yes, paid commissions count as commercial activity, go to the dealers den
+at your local furcon and ask any suspiciously wealthy artist about their 
+opinions on the IRS. I don't make the rules on this stuff.)
+
+This policy does not grant permission to impersonate the project, claim an
+official partnership or endorsement, or present unofficial artwork or products
+as officially produced or approved by AudioHole.
+
+Permission for commercial uses may be requested through the project's
+published contact channels. No permission should be assumed from silence.
+
+3. SOFTWARE DISTRIBUTION AND THIRD-PARTY RIGHTS
+
+AudioHole's code is licensed separately under GPLv3. Follow the applicable
+software license when distributing AudioHole or modified versions.
+
+This policy is not intended to prohibit uses of artwork or other material that
+are already permitted under GPLv3, another applicable license, or by law.
+Rights such as fair use, permitted quotation, and other statutory exceptions
+remain unaffected. Where trademark rights apply, those rights are separate
+from the copyright license for software.
+
+Some files distributed with AudioHole may contain artwork or other content
+from third parties. Such materials belong to their respective rights holders
+and are governed by their own notices and licenses. This policy grants no
+rights in assets RLCypher does not own.
+
+4. REVIEWS, DEMONSTRATIONS, AND EDITORIAL COVERAGE
+
+Permission is granted to display AudioHole's original branding, logos, mascots, 
+and character artwork as they appear in the application, or as reasonably 
+necessary to identify and discuss AudioHole, in reviews, tutorials, 
+demonstrations, livestreams, and other editorial coverage.
+
+This permission includes independently monetized coverage, provided the material
+does not falsely imply official sponsorship or endorsement. 
+It does not authorize unrelated merchandise or standalone commercial 
+exploitation of the original creative assets.
+
+5. A NOTE FROM THE CREATOR
+
+Fanart is welcome. So are memes and the occasionally questionable artistic
+interpretation. I put Norm and Horu on the internet with my eyes open.
+Just don't be a dick about passing somebody else's work off as your own or
+selling character merchandise behind my back. If you've got an idea for a
+commercial project, ask. I'd much rather have a conversation than find out
+about an unauthorized body-pillow empire after the fact.
+
+And yes, samples are appreciated. That's a request, not a legal condition.
+
+6. THE SHORT VERSION
+
+Make things. Share things. Have fun with the characters.
+Respect the source, don't pretend to be official, and ask before commercial
+use of creative assets where the rights are reserved.
+
+This policy is a license for covered noncommercial fan works and a statement
+of reserved rights. It is not a new license for the AudioHole program.
+For the program's legal terms, see licenses/GPL-3.0.txt.

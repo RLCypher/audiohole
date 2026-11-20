@@ -400,8 +400,14 @@ void ApplicationRows::activate(std::size_t row) {
         return;
     }
     if (entry.section == 2 && !show_inactive) {
-        view.set_drawer(true);
-        view.inactive->SetFocus();
+        if (view.busy() || !view.board())
+            return;
+        // Expanding this group is an explicit request to show inactive sources.
+        // Commit the board preference without opening or moving the drawer;
+        // the next snapshot renders this socket's expanded rows.
+        expanded[2] = true;
+        view.submit(SetBoardSettings{view.board()->id, true,
+                                     view.board()->working.settings.recently_active_seconds});
         return;
     }
     expanded[static_cast<std::size_t>(entry.section)] =
@@ -428,8 +434,8 @@ wxString ApplicationRows::accessible_name(std::size_t row) const {
 }
 wxString ApplicationRows::accessible_help(std::size_t row) const {
     return row < entries.size() && entries[row].heading
-               ? wxString("Activate to expand or collapse this activity group. Inactive sources "
-                          "must also be enabled in Routing Board Settings.")
+               ? wxString("Activate to expand or collapse this activity group. Expanding "
+                          "inactive sources also enables them for this board.")
                : GetToolTipText();
 }
 wxCoord ApplicationRows::OnMeasureItem(std::size_t row) const {

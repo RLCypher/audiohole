@@ -37,7 +37,7 @@ conditional lines. N037/N037A/N037B match the baseline catalogue exactly.
 
 | Files | Purpose |
 |---|---|
-| `docs/tutorial/Norm-script.txt`, `docs/tutorial/PlugBoard-Norm-script.txt` | Supplied dialogue, cues, choices, expressions and corrected flow |
+| `personalities/tutorial/tutorial.txt` | Supplied dialogue, cues, choices, expressions and corrected flow |
 | `scripts/GenerateTutorial.py`, `src/model/tutorial_catalog.cpp` | Cross-file incoming variants, duplicate-ID rejection and regenerated data: 88 entries in 13 MSVC-safe phases |
 | `src/model/tutorial.h`, `src/model/tutorial.cpp` | Choice routing, identity-based creation/recovery, completion gates and Settings composition |
 | `src/model/controller.cpp` | One eight-second simulated-activation constant used for timing and progress |

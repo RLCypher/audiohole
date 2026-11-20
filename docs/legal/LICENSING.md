@@ -15,12 +15,16 @@ it cannot revoke compliant recipients' existing GPL rights.
 
 ## Artwork and branding
 
-The AudioHole logo, Norm and Horu artwork/animations and fictional application
-icons are **excluded from this code-license declaration**. Their licensing remains
-under review by the owner. Do not imply that this GPL declaration grants a new
-asset, trademark or endorsement license. Preserve existing asset provenance and
-third-party notices. Material Icons and Plug Board Material Symbols retain their
-existing Apache-2.0 terms. The DCO has its own verbatim-copy terms.
+Original AudioHole creative assets have separate owner-supplied terms in
+[assets.txt](assets.txt), distributed as `licenses/assets.txt`. Those terms apply
+only to rights owned by the creator and preserve rights already granted by an
+applicable license. The owner's [AudioHole License.txt](AudioHole%20License.txt)
+is shown by the installer and included beside AudioHole.exe. It explains the
+licensing philosophy without replacing or modifying the software's GPLv3 terms.
+The full GPLv3 text is distributed at `licenses/GPL-3.0.txt`.
+Preserve existing asset provenance and third-party notices. Material Icons and
+Plug Board Material Symbols retain their Apache-2.0 terms. The DCO has its own
+verbatim-copy terms.
 
 ## Dependencies and notices
 
@@ -47,11 +51,11 @@ Every published runtime/installer artifact must provide its matching source
 archive as a separate Source download on the same build page, without an
 additional charge. Source is not included inside the portable binary ZIP.
 The source archive contains the exact first-party tree and the pinned dependency source used by the
-build, including build scripts and license notices. See docs/SOURCE.md in the
+build, including build scripts and license notices. See licenses/SOURCE.txt in the
 package, or docs/development/SOURCE.md in the repository.
 The build-info.json commit, version, build and source archive name identify the
 matching source. Never substitute a newer branch tip for the source of an older
 binary. If redistributing modified binaries, supply corresponding modified source
 and preserve the GPL license and notices. Do not publish a binary artifact
-before its matching source download is available. Artwork terms remain separate and must be settled before a public
-release of those assets.
+before its matching source download is available. Artwork terms remain separate
+from the software license.

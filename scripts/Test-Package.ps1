@@ -27,11 +27,12 @@ try {
     }
     $metadata = Get-Content (Join-Path $root 'docs/build-info.json') -Raw | ConvertFrom-Json
     if ($metadata.commit -notmatch '^[0-9a-f]{40}$' -or $metadata.source_dirty) { throw 'Invalid or dirty package metadata.' }
-    # The embedded logo/icon must work even without the reference artwork copies.
-    # This disposable extraction is distinct from the ZIP uploaded as the artifact.
-    New-Item -ItemType Directory -Path (Join-Path $temporary 'reference-assets') | Out-Null
+    # Branding/fallback resources are embedded. The actual shipped package must
+    # launch without redundant reference copies or engineering artwork evidence.
     foreach ($folder in @('branding', 'presentation')) {
-        Move-Item -LiteralPath (Join-Path $root "assets/$folder") -Destination (Join-Path $temporary "reference-assets/$folder")
+        if (Test-Path -LiteralPath (Join-Path $root "assets/$folder")) {
+            throw "Package contains redundant embedded artwork copies: assets/$folder"
+        }
     }
     $exe = Join-Path $root 'AudioHole.exe'
     # The runner has VS installed: inspect imports so that cannot mask a missing

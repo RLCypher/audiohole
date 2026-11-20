@@ -31,6 +31,13 @@ try {
     $names = @(Get-ChildItem $root.FullName -Recurse -File -Force | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
     $expected = @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
+    $readmeHash = (Get-FileHash -LiteralPath (Join-Path $repo 'docs/distribution/README.txt') -Algorithm SHA256).Hash
+    if ((Get-FileHash -LiteralPath (Join-Path $root.FullName 'README.txt') -Algorithm SHA256).Hash -ne $readmeHash) {
+        throw 'Packaged README differs from the supplied document.'
+    }
+    if (Compare-Object @('docs/build-info.json') @($names | Where-Object { $_ -like 'docs/*' })) {
+        throw 'Runtime docs must contain only installer/build metadata.'
+    }
     $meta = Get-Content (Join-Path $root.FullName 'docs/build-info.json') -Raw | ConvertFrom-Json
     $expectedCommit = & git -C $repo rev-parse HEAD
     if ($LASTEXITCODE -ne 0) { throw 'Cannot read expected commit' }
@@ -94,9 +101,9 @@ $global:LASTEXITCODE = 0
         if ($_.Exception.Message -notmatch 'Package already exists') { throw }
         Write-Host 'PASS: existing ZIP preserved.'
     }
-    # A root-level document caused the regression: prove omissions are rejected
+    # A required guide must be present: prove omissions are rejected
     # with a useful filename, rather than weakening the allowlist to pass.
-    $installRules | Where-Object { $_ -notlike '*FILES "docs/CONFIGURATION_BUNDLES.md"*' } |
+    $installRules | Where-Object { $_ -notlike '*FILES "Guides and Manuals/AudioHole User Manual.txt"*' } |
         Set-Content "$fixture/source/CMakeLists.txt"
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Missing-document fixture configure failed' }
@@ -105,9 +112,9 @@ $global:LASTEXITCODE = 0
         throw 'Expected missing-runtime rejection was missing'
     } catch {
         if ($_.Exception.Message -notmatch 'Unexpected Runtime component' -or
-            $_.Exception.Message -notmatch 'Missing: docs/CONFIGURATION_BUNDLES.md') { throw }
+            $_.Exception.Message -notmatch 'Missing: Guides and Manuals/AudioHole User Manual.txt') { throw }
         if (@(Get-ChildItem "$fixture/missing" -Force).Count -ne 0) { throw 'Missing-file staging was not cleaned up' }
-        Write-Host 'PASS: missing handoff document reported; staging cleaned up.'
+        Write-Host 'PASS: missing user manual reported; staging cleaned up.'
     }
     $installRules | Set-Content "$fixture/source/CMakeLists.txt"
     'Unwanted test fixture' | Set-Content "$fixture/source/audiohole_tests.exe"

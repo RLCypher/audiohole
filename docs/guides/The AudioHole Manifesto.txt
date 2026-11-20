@@ -1,0 +1,50 @@
+The AudioHole Manifesto
+Put your audio wherever you want.
+
+Picture it. Late 2019. The Valve Index had descended from the heavens, arguably the latest and greatest piece of PC VR hardware to grace this blessed earth. Finger tracking! Fancy speakers that hovered beside your ears! Enough cable to justify drilling holes in the ceiling of mom's basement to rig up a pulley system! The future was here, strapped to my face, and it cost a magnificent amount of money.
+
+Mere months later, everybody would be holed up indoors thanks to a very unfortunate sneeze. But at that moment, the problem occupying my mind was far more immediate. I wanted to connect that technological marvel to a GoXLR.
+
+Two obscenely expensive pieces of hardware. One computer. A perfectly reasonable desire to make the sounds go where I wanted. Surely this was a solved problem.
+
+Oh, you sweet summer bastard.
+
+There I was, watching YouTube tutorials in which some poor soul performed a six-stage exorcism on the Windows sound panel. Set this as default. Unset that as default. Install a virtual cable. Restart Discord. Reassign the microphone. Pray the update fairy doesn't visit in the night. One wrong dropdown and your headset becomes a decorative plastic crown. Eventually audio emerges from something and everyone celebrates like a submarine crew hearing a ping from the surface.
+
+And the worst part? It almost worked. Just enough to keep hope alive. Just enough to convince a man that one more utility, one more menu, one more deranged little checkbox might finally tame the beast.
+
+So I did what any sensible, well-adjusted lunatic would do. I went begging.
+
+For years I haunted hardware manufacturers' Discord servers, filing feature requests with the persistence of a raccoon that had discovered the dumpster behind a seafood restaurant. Friendly suggestions became detailed explanations. Detailed explanations became diagrams. Diagrams became increasingly elaborate pleas to allow expensive hardware to perform a second party trick. I was practically offering free product development, complete with examples and a willingness to test whatever cursed firmware they sent my way. By the end, I practically had the entire damn software specification drafted.
+
+Eventually my patience wandered out into traffic and was killed by a delivery truck.
+
+Screw it, I'll do it myself.
+
+About a year ago, I actually did. I built an ugly little command-line proof of concept. Audio went in, audio came out, and the damned thing worked. Then a fresh Windows installation wiped the project off the face of the earth. No backup, the Windows reinstaller wasn't supposed to touch that drive. That's a level of demoralization normally reserved for people who discover their winning lottery ticket went through the wash. I put the whole thing down.
+
+But the original problem remained, and worse, I knew the solution was possible. I'd already heard it work. So I came back armed with source control, a stronger survival instinct, and an increasingly personal grudge against the sound settings menu.
+
+Here's the magnificent, infuriating secret. Most of the machinery was already out there. Libraries, utilities, clever experiments, and small miracles of code scattered across the internet like parts at a hamfest run by escaped laboratory technicians. People had solved pieces of the problem all over the place. What I wanted was to bring the useful pieces together, make them behave as a single contraption, and give the whole thing an interface that wouldn't make a normal human being flee the room.
+
+And I wanted it to have a little personality, right from the start. A piece of software can be useful and still have a pulse. Hell, it can even be funny, provided the buttons still work and the joke doesn't get between you and the job.
+
+That became AudioHole.
+
+The central doctrine fits on a beer coaster: audio should go where you tell it to go. Your microphone ought to be able to talk to your mixer. Your headset ought to cooperate with whatever oddball hardware you've collected. If you want a game in one output, music in another, and some deeply questionable voice-chat arrangement in a third, that should be your business. You paid for the computer. You paid for the hardware. You are the lunatic in charge of the cables.
+
+AudioHole forwards audio between devices. Plug Board lets you organize applications and send their audio to the outputs you choose. Two ideas that ought to have gotten along years ago, finally sharing a roof without requiring an interpreter and a ritual sacrifice.
+
+Sure, the plumbing underneath is a swamp. Clocks drift. Buffers sulk. Drivers report capabilities with the straight-faced confidence of a used-car salesman. Windows occasionally wakes up, cracks its knuckles, and chooses violence. That's why the deeper controls exist. People who want to fiddle with the machinery should be allowed to fiddle. Everyone else should be able to make a connection and return to whatever they were doing before their computer decided to become an audio engineering exam.
+
+And it should look decent while doing it. Run it from a folder. Install it if you prefer. Keep the configuration understandable. Put the everyday controls where people can find them. Give the advanced ones a proper home. The world has plenty of perfectly functional software that looks like a municipal sewage plant's emergency shutdown console. We can aspire to a little more dignity than that, even while naming the damn thing AudioHole.
+
+I didn't invent audio routing. Plenty of clever people laid the groundwork. This is what happens when one increasingly irritated hobbyist collects the pieces, bolts them together, and refuses to accept that usefulness requires ugliness or a graduate-level understanding of Windows audio plumbing.
+
+Maybe it saves somebody a Saturday of tutorial archaeology and troubleshooting. Maybe it helps a streamer cobble together a wonderfully stupid pile of hardware that no manufacturer ever intended to meet. Maybe it just keeps one more poor bastard from spending three hours wondering why Discord is talking to the wrong pair of headphones.
+
+I'll count every one of those as a victory.
+
+Plug it in. Route it. Get on with your life.
+
+Put your audio wherever you want.
