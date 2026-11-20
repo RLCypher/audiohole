@@ -17,8 +17,10 @@ application output assignments into reusable routing boards.
 ## Get started
 
 Download a successful Windows build from [GitHub Actions](https://github.com/RLCypher/audiohole/actions).
-Use the portable ZIP, or the optional installer for a conventional installation.
-Extract the portable package before running `AudioHole.exe`.
+Extract the portable ZIP and run `AudioHole.exe` directly. The optional installer
+sits beside it if you prefer a conventional installation. The **Guides and Manuals**
+folder is reserved for future guides and manuals.
+Matching source is available as a separate Source download on the same build page.
 
 The guided tutorial uses fictional devices and applications, with Norm explaining
 each step. Normal operation uses your real Windows endpoints. Keep your playback

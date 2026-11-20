@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$BuildDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/windows-msvc'),
-    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/artifact')
+    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/source')
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

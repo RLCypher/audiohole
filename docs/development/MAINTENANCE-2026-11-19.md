@@ -89,3 +89,25 @@ state assertions or cleanup. Final removal of AudioHole.exe is also asserted.
 Cleanup errors are reported without replacing a primary failure. A local delayed-
 worker test verified that early launcher exit does not complete the check and that
 a failed worker is rejected. Native verification remains assigned to the next run.
+
+## Portable download layout clarification
+
+The portable download now places AudioHole.exe and the optional versioned setup
+executable together in its main folder. Build-Installer.ps1 assembles this runnable
+folder by default, preserving an existing audited runtime only when its files and
+hashes match. Setup still embeds a separate runtime staging tree and cannot include
+itself. Normal direct launch remains independent of installation.
+
+The full corresponding source archive moves to a separate Source artifact on the
+same CI run, uploaded before the binary artifact. It is excluded from the portable
+ZIP. Test-PortableBundle.ps1 checks the final exact file list after source packaging,
+so misplaced setup, extra source archives and unexpected files block publication.
+The Guides and Manuals folder is reserved with a zero-byte marker; no guides or
+manuals are authored. The archive writer and uploader retain the marker so GitHub
+does not omit that folder.
+
+Local distribution fixtures passed for empty and pre-extracted output folders,
+installer/runtime colocation, nonrecursive payloads, separate-source exclusion,
+missing setup, mismatched existing builds and the existing packaging safeguards.
+All PowerShell scripts parsed successfully. Native checks and the actual uploaded
+ZIP layout are verified by the subsequent Windows workflow.

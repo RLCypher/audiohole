@@ -1,5 +1,5 @@
-# Packages an already-built CMake Runtime component; never walks/copies the build
-# tree. Unique staging is always removed, including rejected/failed installations.
+# Packages the runtime input used to assemble the final portable distribution.
+# Never walks/copies the build tree. Unique staging is always removed, including rejected/failed installations.
 # Source dirtiness is explicit metadata, not hidden behind an apparently clean SHA.
 [CmdletBinding()]
 param(
@@ -36,7 +36,7 @@ $stage = Join-Path $temporary $name
 try {
     & cmake --install $BuildDirectory --config $Configuration --prefix $stage --component Runtime
     if ($LASTEXITCODE -ne 0) { throw 'Runtime installation failed; build and test this configuration first.' }
-    $files = @(Get-ChildItem -LiteralPath $stage -File -Recurse)
+    $files = @(Get-ChildItem -LiteralPath $stage -File -Recurse -Force)
     # Explicit runtime allowlist: never copy a build tree, tests, or sources.
     $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt'))
     $relative = @($files | ForEach-Object { $_.FullName.Substring($stage.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
@@ -79,10 +79,11 @@ Source has uncommitted changes: $dirty
 CI: $runUrl
 
 Purpose: GUI, guided tutorial and isolated working-configuration evaluation, not a formal release.
-Code: GPL-3.0-only; see LICENSE and docs/LICENSING.md. Matching source: $($metadata.source_archive).
-Launch AudioHole.exe. First-time onboarding uses Norm's fictional in-memory tutorial. The working environment offers real Windows device scanning and isolated persistent configuration.
+Code: GPL-3.0-only; see LICENSE and docs/LICENSING.md. Matching source: $($metadata.source_archive), available as a separate Source download on the same CI run.
+Portable use: launch AudioHole.exe directly; installation is optional. The final portable bundle places the optional AudioHole-Setup executable in this same folder. Source code is distributed separately.
+First-time onboarding uses Norm's fictional in-memory tutorial. The working environment offers real Windows device scanning and isolated persistent configuration.
 Engine 0.6 provides real routing through native WASAPI, Miniaudio and Experimental adapters. Automatic initially selects an available native adapter. Explicit device checks use temporary shared-mode streams while routing is stopped. Device/profile bundle transfer and the engine handoff are described in docs/CONFIGURATION_BUNDLES.md.
-Use docs/MANUAL_GUI_CHECKLIST.md for evaluation workflows.
+Guides and Manuals is reserved for future guides. Use docs/MANUAL_GUI_CHECKLIST.md for development evaluation workflows.
 The Release package is preferred for ordinary manual testing.
 
 Requires Windows 10 22H2 or a supported Windows 11 x64 release.
@@ -100,14 +101,20 @@ Missing selections fall back to an entire available package; no valid packages d
 Follow System is the default. Windows-owned dialogs retain system styling.
 The welcome appears when onboarding state is absent from the shared user data folder. Replay Tutorial resets this marker and restarts.
 Interface and commentary wording preview the intended production experience.
-This package is for private evaluation. AudioHole's project license remains undecided.
+This package is for private evaluation. Code is GPL-3.0-only; artwork/branding terms remain separately under review.
 The test-only GoogleTest dependency is not part of this package.
 "@ | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8
     $rootFiles = @((Get-ChildItem -LiteralPath $stage -File).Name)
     if (Compare-Object @('AudioHole.exe', 'LICENSE', 'README.txt') ($rootFiles | Sort-Object)) {
         throw 'Distribution root must contain only AudioHole.exe, LICENSE and README.txt beside its folders.'
     }
-    Compress-Archive -LiteralPath $stage -DestinationPath $archive -CompressionLevel Optimal
+    # Compress-Archive omits hidden files on some hosts. The approved zero-byte
+    # folder marker must survive so GitHub can retain the reserved guides folder.
+    Push-Location $temporary
+    try {
+        & cmake -E tar cf $archive --format=zip $name
+        if ($LASTEXITCODE -ne 0) { throw 'Runtime archive creation failed.' }
+    } finally { Pop-Location }
     Write-Host "Created $archive"
 } finally {
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }

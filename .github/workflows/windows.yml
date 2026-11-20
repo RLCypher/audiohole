@@ -54,6 +54,7 @@ jobs:
           ./scripts/Test-Package.ps1 -Archive $zip[0].FullName
           Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/artifact
       - name: Build and test optional installer
+        id: portable
         shell: pwsh
         run: |
           $compiler = "$env:ProgramFiles/Inno Setup 7/ISCC.exe"
@@ -66,17 +67,33 @@ jobs:
             if ($process.ExitCode -ne 0) { throw 'Installer compiler setup failed' }
           }
           $zip = @(Get-ChildItem build/packages/*.zip)
-          ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler -OutputDirectory build/artifact
-          $setup = @(Get-ChildItem build/artifact/*Setup*.exe)
+          $folders = @(Get-ChildItem build/artifact -Directory)
+          if ($folders.Count -ne 1) { throw 'Expected one portable application folder' }
+          $portable = $folders[0].FullName
+          ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler -OutputDirectory $portable
+          $setup = @(Get-ChildItem -LiteralPath $portable -Filter 'AudioHole-Setup-*.exe' -File)
           if ($setup.Count -ne 1) { throw 'Expected one installer' }
           ./scripts/Test-Installer.ps1 -Installer $setup[0].FullName
+          "directory=$portable" >> $env:GITHUB_OUTPUT
       - name: Package matching corresponding source
         run: ./scripts/Source-Package.ps1
+      - name: Verify final portable download
+        run: ./scripts/Test-PortableBundle.ps1 -Directory "${{ steps.portable.outputs.directory }}"
+      - name: Upload matching source as a separate download
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: AudioHole-Source-${{ matrix.configuration }}-${{ github.sha }}
+          path: build/source/*.zip
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
       - name: Upload tested package contents (downloaded as a ZIP)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: AudioHole-Windows-x64-${{ matrix.configuration }}-${{ github.sha }}
-          path: build/artifact/
+          path: ${{ steps.portable.outputs.directory }}/
+          # The strict bundle audit includes the reserved folder's zero-byte marker.
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
           compression-level: 0

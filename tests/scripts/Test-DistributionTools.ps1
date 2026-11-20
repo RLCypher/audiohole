@@ -28,7 +28,7 @@ try {
     if ($zip.Count -ne 1) { throw 'Expected exactly one ZIP' }
     Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath "$fixture/extracted"
     $root = @(Get-ChildItem "$fixture/extracted" -Directory)[0]
-    $names = @(Get-ChildItem $root.FullName -Recurse -File | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
+    $names = @(Get-ChildItem $root.FullName -Recurse -File -Force | ForEach-Object { $_.FullName.Substring($root.FullName.Length + 1).Replace('\', '/') } | Sort-Object)
     $expected = @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     if (Compare-Object ($expected | Sort-Object) $names) { throw "Wrong contents: $names" }
     $meta = Get-Content (Join-Path $root.FullName 'docs/build-info.json') -Raw | ConvertFrom-Json
@@ -43,6 +43,50 @@ try {
         $meta.build_number -lt 0 -or -not $meta.source_archive.EndsWith('.zip')) { throw 'Missing installer/source metadata' }
     if (Compare-Object ($meta.runtime_files | Sort-Object) $names) { throw 'Runtime manifest differs from package' }
     Write-Host 'PASS: ZIP naming/content, installer metadata and explicit dirty-source metadata.'
+    # The final download must remain directly runnable, with its optional setup
+    # beside the application. A compiler fixture verifies payload separation
+    # without building or executing an installer on this host.
+    $compiler = Join-Path $fixture 'inert-compiler.ps1'
+    @'
+$payload = ($args | Where-Object { $_ -like '/DPayload=*' }).Substring(10)
+$output = ($args | Where-Object { $_ -like '/DOutput=*' }).Substring(9)
+$name = ($args | Where-Object { $_ -like '/DOutputName=*' }).Substring(13)
+if (@(Get-ChildItem -LiteralPath $payload -Filter '*Setup*.exe').Count) { throw 'Installer recursively included in its own payload' }
+if (-not (Test-Path -LiteralPath (Join-Path $payload 'AudioHole.exe'))) { throw 'Missing installer runtime payload' }
+'Inert setup fixture; never execute.' | Set-Content -LiteralPath (Join-Path $output "$name.exe")
+$global:LASTEXITCODE = 0
+'@ | Set-Content -LiteralPath $compiler
+    $bundle = Join-Path $fixture 'portable'
+    & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $bundle -Compiler $compiler
+    $setup = @(Get-ChildItem -LiteralPath $bundle -Filter 'AudioHole-Setup-*.exe')
+    if ($setup.Count -ne 1 -or -not (Test-Path -LiteralPath (Join-Path $bundle 'AudioHole.exe'))) { throw 'Portable application and installer were not colocated' }
+    & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
+    & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $root.FullName -Compiler $compiler
+    $source = Join-Path $bundle $meta.source_archive
+    'Inert source archive fixture' | Set-Content -LiteralPath $source
+    try {
+        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
+        throw 'Expected bundled source rejection was missing'
+    } catch {
+        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents' -or
+            -not $_.Exception.Message.Contains($meta.source_archive)) { throw }
+    }
+    Remove-Item -LiteralPath $source
+    Remove-Item -LiteralPath $setup[0].FullName
+    try {
+        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
+        throw 'Expected misplaced/missing installer rejection was missing'
+    } catch {
+        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents.*Missing: AudioHole-Setup-') { throw }
+    }
+    'Different build fixture' | Set-Content -LiteralPath (Join-Path $bundle 'AudioHole.exe')
+    try {
+        & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $bundle -Compiler $compiler
+        throw 'Expected mixed-build destination rejection was missing'
+    } catch {
+        if ($_.Exception.Message -notmatch 'Portable destination file differs.*AudioHole.exe') { throw }
+    }
+    Write-Host 'PASS: installer beside portable application, separate payload, source exclusion, missing-installer and mixed-build rejection.'
     try {
         & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
         throw 'Expected package overwrite rejection was missing'

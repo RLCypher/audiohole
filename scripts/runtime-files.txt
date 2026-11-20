@@ -752,3 +752,4 @@ LICENSE
 docs/LICENSING.md
 docs/SOURCE.md
 licenses/InnoSetup-LICENSE.txt
+Guides and Manuals/.gitkeep

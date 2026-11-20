@@ -1,7 +1,9 @@
 # Corresponding source
 
-AudioHole code is GPL-3.0-only. The matching source ZIP is distributed beside each
-CI binary/installer artifact. It includes the checked-out source, build scripts,
+AudioHole code is GPL-3.0-only. The matching source is a separate **AudioHole-Source**
+download on the same CI run as each binary artifact. The portable binary ZIP does
+not contain source code or a source archive. The separate source archive includes
+the checked-out source, build scripts,
 license notices and source copies of the pinned wxWidgets, nlohmann/json, miniz,
 miniaudio and GoogleTest dependencies. No signing keys or credentials are needed.
 

@@ -98,3 +98,5 @@ install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/LICENSING.md"
   "${PROJECT_SOURCE_DIR}/docs/development/SOURCE.md" DESTINATION docs COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/third_party/licenses/InnoSetup-LICENSE.txt"
   DESTINATION licenses COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/guides/.gitkeep"
+  DESTINATION "Guides and Manuals" COMPONENT Runtime)

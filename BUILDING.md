@@ -100,8 +100,10 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 1. Open the private repository's **Actions** tab and select a successful
    **Windows builds and evaluation packages** run for the intended revision.
 2. Download **AudioHole-Windows-x64-release-&lt;full-tested-commit&gt;** under Artifacts.
-3. Extract the downloaded ZIP and open its single AudioHole package directory.
-4. Read `README.txt` and `build-info.json`, then double-click `audiohole.exe`.
+3. Extract the downloaded portable ZIP. Its main folder contains both `AudioHole.exe`
+   and the optional `AudioHole-Setup` executable, with `Guides and Manuals` beside them.
+4. Read `README.txt` and `docs/build-info.json`, then open `AudioHole.exe`.
+   The `Guides and Manuals` folder is reserved for future content.
    Follow the included manual checklist. Tutorial uses fictional devices; normal operation uses real endpoints.
 
 Debug is uploaded separately for development investigations. Both packages are
@@ -278,6 +280,7 @@ Native Windows/hardware validation is still required; Wine is supplemental.
 See [installer documentation](docs/development/INSTALLER.md). Inno Setup 7.1.1
 builds an installer from the audited portable ZIP; it is not required to build or
 run the application. The Windows workflow tests installation/reinstallation and
-uninstall behavior, then uploads the matching source archive beside the binaries.
+uninstall behavior, then publishes the matching source as a separate Source download. The portable ZIP
+contains the app and optional installer together, without the source archive.
 See [source build instructions](docs/development/SOURCE.md) for offline dependency
 paths and [licensing](docs/legal/LICENSING.md) for distribution obligations.

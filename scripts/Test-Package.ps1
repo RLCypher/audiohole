@@ -1,4 +1,5 @@
-# Native Windows smoke test of the exact ZIP uploaded by CI, outside the checkout.
+# Native smoke of the audited runtime ZIP, before the optional installer is added
+# beside AudioHole.exe in the final portable bundle. Runs outside the checkout.
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$Archive)
 
@@ -13,7 +14,7 @@ try {
     $roots = @(Get-ChildItem -LiteralPath $temporary -Directory)
     if ($roots.Count -ne 1) { throw 'Expected one package root.' }
     $root = $roots[0].FullName
-    $files = @(Get-ChildItem -LiteralPath $root -File -Recurse)
+    $files = @(Get-ChildItem -LiteralPath $root -File -Recurse -Force)
     $expected = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     $relative = @($files | ForEach-Object { $_.FullName.Substring($root.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1).Replace('\', '/') })
     if (Compare-Object ($expected | Sort-Object) ($relative | Sort-Object)) {

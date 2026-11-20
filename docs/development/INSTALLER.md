@@ -1,9 +1,20 @@
 # Optional Windows installer
 
-The portable ZIP remains available. Build an optional installer from that exact
-audited ZIP using Inno Setup 7.1.1 and scripts/Build-Installer.ps1. The installer
-contains only the Runtime allowlist. It does not add a service, driver or startup
-entry, and launching after installation is optional.
+The distributed ZIP is a directly runnable portable application folder. Its main
+folder contains AudioHole.exe, the optional versioned AudioHole-Setup executable,
+a reserved Guides and Manuals folder, and the supporting runtime files. No guides
+are authored in this change; the zero-byte folder marker preserves that directory
+in GitHub's downloadable artifact. Installation is optional:
+extract the complete ZIP and run AudioHole.exe to use it without installing.
+
+Build that folder with Inno Setup 7.1.1 and scripts/Build-Installer.ps1, using the
+audited runtime ZIP produced by scripts/Package.ps1 as input. By default it writes
+build/portable. An empty output folder receives the runtime files; an existing
+output folder must match the input package byte for byte before setup is added.
+The installer embeds only the clean runtime input, so it cannot recursively embed
+itself. Test-PortableBundle.ps1 verifies that setup and AudioHole.exe are together
+and that the folder contains no source archive or unexpected files. The installer
+does not add a service, driver or startup entry. Launching after installation is optional.
 
 The default machine installation is C:\Program Files\AudioHole. A user-selected
 folder is supported. Existing registered installations are located using Windows'
@@ -53,7 +64,8 @@ retirement, custom-file preservation, uninstall retention and an explicit purge
 when no preexisting user data exists. Every setup pass verifies its current
 registered uninstaller, and a further reinstall checks that the installer's own
 Uninstall action resolves the same path. Uninstall logs are retained as evidence. CI also supplies the matching corresponding
-source ZIP beside the runtime and installer; do not publish installers alone.
+source as a separate Source artifact on the same CI run. The portable binary ZIP
+contains no source archive. Source upload must succeed before binary publication.
 
 The lifecycle check waits for the temporary uninstall worker, not just its launcher.
 Within the same 60-second deadline it requires the pinned Inno engine's success and
