@@ -1,112 +1,64 @@
-# audiohole
+# AudioHole
 
-AudioHole is an open-source Windows audio routing utility that connects audio devices through configurable simplex and duplex paths. Lightweight, portable, and built for people who just want their holes to work.
+**Put your audio wherever you want.**
 
-## Overview
+AudioHole is a free, open-source Windows audio routing application built around a simple idea: you paid for the hardware, so you ought to decide where the audio goes.
 
-AudioHole is designed to make routing audio between Windows devices simple, reliable, and transparent.
+Got a headset that refuses to cooperate with your mixer? A collection of perfectly good audio devices that act like they've never met? Games, music, and voice chat all fighting over the same output like it's the last parking space at Costco?
 
-Whether you're connecting a microphone to a virtual audio device, routing audio between applications through existing endpoints, or managing a more complicated setup, AudioHole provides a straightforward way to connect sources and destinations without unnecessary complexity.
+Yeah. We got tired of that too.
 
-No custom kernel drivers, complicated virtual mixers, or mysterious configuration files. Just connect the right devices and let AudioHole handle the routing.
+## Download AudioHole
 
-## Features
+**[Get AudioHole from GitHub Releases](https://github.com/RLCypher/audiohole/releases).**
 
-*Planned for v0.1. Not all features are implemented yet.*
+Pick your preferred flavor:
 
-- **Simplex and duplex routing:** Create one-way or bidirectional connections between Windows audio endpoints.
-- **Multiple simultaneous connections:** Run several independent audio paths at once.
-- **Automatic device discovery:** Detect available audio devices and identify their capabilities.
-- **Persistent device assignments:** Remember devices and restore connections when they become available.
-- **Profiles:** Save, load, and switch between different routing configurations.
-- **Automatic recovery:** Handle device disconnections, reconnections, and interruptions.
-- **Flexible startup behavior:** Start routing manually, immediately, or after a configurable delay.
-- **System tray integration:** Keep AudioHole running without leaving the main window open.
-- **Signal activity monitoring:** Temporarily display source activity indicators for setup and troubleshooting.
-- **Test beep:** Send a short test signal to a selected destination to verify that audio reaches the intended device.
-- **Portable configuration:** Store settings and profiles in human-readable JSON files.
+- **Portable ZIP:** Unzip it into a folder and run it. No installation, no ceremony.
+- **Windows installer:** For people who like their applications properly moved in, with their shoes by the door.
 
-## How It Works
+Both are included, both are ways get you AudioHole. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
 
-AudioHole connects existing Windows audio endpoints through configurable connections called **holes**.
+## What does it do?
 
-### Simplex Routing
+### AudioHole
 
-A simplex hole carries audio in one direction.
+**Device-agnostic audio forwarding.** Connect Windows capture and playback devices without worrying about whose logo is on the box. Your microphone doesn't need to know who manufactured your mixer, and frankly, neither should you.
 
-`Source → Destination`
+Set up a connection, tell the audio where to go, and let the software handle the introductions.
 
-For example, audio captured from a microphone can be forwarded to another audio endpoint.
+### Plug Board
 
-### Duplex Routing
+**Application audio routing.** Give your apps somewhere to put their noise. Organize games, music, voice chat, and other sound-making troublemakers into sockets, then point those sockets at the playback devices you want.
 
-A duplex hole contains two independently configurable directional paths.
+It's cable management for your applications, except you don't have to crawl behind a desk or find a flashlight with working batteries.
 
-`Device A ⇄ Device B`
+## Getting started
 
-Each direction can have its own source, destination, and audio settings.
+Run AudioHole and follow the interactive tutorial if you'd like someone to show you where everything goes. If you're the type who starts turning knobs before reading labels, there's also a full user manual and a buffer tuning guide for when you decide to get particularly intimate with your audio settings.
 
-This allows bidirectional communication between devices without requiring two separately managed connections.
+You may also encounter **Norm and Horu**, AudioHole's resident personalities. They offer helpful advice, unsolicited commentary, and varying degrees of professionalism. They're optional. Their opinions about that are their own.
 
-### Multiple Holes
-
-AudioHole supports multiple independent connections running simultaneously, allowing more complex setups while keeping each audio path individually manageable.
-
-## Platform and Requirements
+## Requirements
 
 - Windows 10 or Windows 11
-- 64-bit (x64)
-- Native C++ application
-- CMake build system
-- Standard user permissions for normal operation
-- No custom kernel drivers required
-- No cloud services, accounts, or internet connection required for normal operation
+- 64-bit (x64) computer
+- Compatible Windows audio devices
 
-AudioHole works with existing Windows audio endpoints. It does not create virtual audio devices or replace device drivers.
+AudioHole works with existing Windows audio endpoints. It does not install a custom virtual audio driver. Your existing devices provide the holes. We just help connect them.
 
-## Design Philosophy
+## Documentation and assorted reading material
 
-**Simple by design.** Audio routing shouldn't require learning an entire digital audio workstation.
+The download includes the guided tutorial, full user manual, and manual buffer tuning guide.
 
-**Transparent configuration.** Settings should be human-readable, portable, and easy to back up or modify.
-
-**Reliable connections.** AudioHole should recover from interruptions without silently connecting the wrong devices.
-
-**User control.** Technically supported configurations should generally be allowed, with clear warnings about potential problems.
-
-**Minimal overhead.** Keep resource consumption and added audio latency as low as reasonably possible.
-
-## Project Status
-
-**Pre-alpha — Early development**
-
-AudioHole is currently under development. The initial focus is establishing a reliable Windows audio routing engine and building the application around it.
-
-There are no stable releases available yet.
-
-### Development Roadmap
-
-1. Establish the application architecture and build system.
-2. Implement basic simplex audio routing.
-3. Add duplex routing and multiple simultaneous connections.
-4. Implement persistent device identification and automatic recovery.
-5. Add profiles and configurable startup behavior.
-6. Develop the graphical interface and system tray integration.
-7. Implement signal activity monitoring and output test beeps.
-8. Test performance, reliability, and compatibility across different hardware configurations.
-
-## Building
-
-Build instructions will be provided once the initial CMake project and required dependencies are established.
-
-## Contributing
-
-AudioHole is currently in early development. Contribution guidelines will be added as the project matures.
+Curious why someone spent this much effort making Windows audio behave? Read the [manifesto](MANIFESTO.md). Want to know how much AI helped build this contraption? There's an [AI disclosure](AI-DISCLOSURE.md) for that too.
 
 ## License
 
-A license will be selected before the project's public release.
+AudioHole's software is released under the **GNU General Public License, version 3 (GPLv3)**. The full legal text is in [LICENSE](LICENSE).
+
+Original mascots, logos, and certain other creative assets have separate terms described in [`licenses/assets.txt`](licenses/assets.txt). Third-party components retain their applicable notices and licenses.
 
 ---
 
-*AudioHole: Because sometimes you just need to plug one thing into another.*
+**Plug it in. Route it. Get on with your life.**
