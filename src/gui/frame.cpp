@@ -9,6 +9,7 @@
 #include "model/routing_service.h"
 #include "presentation/text_layout.h"
 #include <cstdio>
+#include <shobjidl.h>
 #include <wx/display.h>
 #include <wx/hyperlink.h>
 #include <wx/modalhook.h>
@@ -962,7 +963,8 @@ void Frame::refresh() {
         layout_header();
     }
     const auto errors = std::count_if(s.events.begin(), s.events.end(), [](const auto& event) {
-        return event.type == "error" || event.type == "scan-failed";
+        return event.type == "error" || event.type == "routing-failed" ||
+               event.type == "scan-failed";
     });
     const auto holes = draft_.holes.size();
     SetStatusText(text(std::string(tutorial_ ? "AudioHole (Tutorial Mode) | Simulated: "
@@ -1009,6 +1011,11 @@ void Frame::refresh() {
             seen_event_ = e.sequence;
             if (tutorial_)
                 continue;
+            // Keep the historical diagnostic, but don't show a failure popup or
+            // reaction after startup/recovery succeeded or the user stopped.
+            if (e.type == "routing-failed" && !has_routing_failure(s))
+                continue;
+            const bool error_notification = e.type == "error" || e.type == "routing-failed";
             bool routine = true;
             presentation::Message message = presentation::Message::Ready;
             if (e.type == "scan-start")
@@ -1051,9 +1058,9 @@ void Frame::refresh() {
             if (e.type == "scanner-action-failed" && !smoke_)
                 themed_message_box(text(e.detail), "Device / export operation", wxOK | wxICON_ERROR,
                                    this);
-            if (e.type == "error" || e.type == "scan-failed" || e.severity == Severity::Error ||
+            if (error_notification || e.type == "scan-failed" || e.severity == Severity::Error ||
                 e.severity == Severity::Critical) {
-                const bool major = e.type == "error" || e.severity == Severity::Critical;
+                const bool major = error_notification || e.severity == Severity::Critical;
                 if (major || !operational_warning_visible_) {
                     present(major ? presentation::Message::ErrorMajor
                                   : presentation::Message::ErrorMinor);
@@ -1063,11 +1070,11 @@ void Frame::refresh() {
             }
             if (!smoke_ && !tutorial_ && tray_->IsIconInstalled() &&
                 notifications_->GetSelection() != 2 &&
-                (e.type == "error" ||
+                (error_notification ||
                  (notifications_->GetSelection() == 1 &&
                   (e.type == "reconnected" || e.type == "disconnected" || e.type == "stopped")))) {
                 tray_->ShowBalloon(wxS("AudioHole"), text(e.detail),
-                                   e.type == "error" ? wxICON_WARNING : wxICON_INFORMATION, 3000);
+                                   error_notification ? wxICON_WARNING : wxICON_INFORMATION, 3000);
             }
         }
     const auto device_notices = device_events_.observe(s.endpoints);
@@ -1101,6 +1108,12 @@ bool Frame::smoke(const wxString& directory) {
                 throw std::runtime_error(detail);
         };
         require(GetTitle() == "AudioHole", "Window title must omit the build identifier");
+        PWSTR process_app_id = nullptr;
+        const auto app_id_result = GetCurrentProcessExplicitAppUserModelID(&process_app_id);
+        const std::wstring notification_name = process_app_id ? process_app_id : L"";
+        CoTaskMemFree(process_app_id);
+        require(SUCCEEDED(app_id_result) && notification_name == L"AudioHole",
+                "Windows notification/taskbar identity must be AudioHole");
         const auto check_centered_input = [](wxWindow* control) {
             // Collapsed panes can temporarily assign one-pixel native bounds.
             // Each direction is checked again with its tuning pane visible.

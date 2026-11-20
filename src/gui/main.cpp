@@ -173,8 +173,10 @@ class App final : public wxApp {
                                "AudioHole", wxOK | wxICON_ERROR);
             return false;
         }
+        // Process-local identity also applies to smoke hosts, so native checks
+        // can verify the same notification/taskbar name without publishing tasks.
+        (void)SetCurrentProcessExplicitAppUserModelID(shell_app_id);
         if (!smoke) {
-            (void)SetCurrentProcessExplicitAppUserModelID(shell_app_id);
             instance_ = std::make_unique<wxSingleInstanceChecker>("AudioHole-simulated-GUI-" +
                                                                   wxGetUserId());
             if (instance_->IsAnotherRunning()) {

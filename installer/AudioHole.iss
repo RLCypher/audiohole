@@ -39,8 +39,8 @@ Name: startmenuicon; Description: "Create a Start menu shortcut"
 Source: "{#Payload}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autodesktop}\AudioHole"; Filename: "{app}\AudioHole.exe"; Tasks: desktopicon
-Name: "{autoprograms}\AudioHole\AudioHole"; Filename: "{app}\AudioHole.exe"; Tasks: startmenuicon
+Name: "{autodesktop}\AudioHole"; Filename: "{app}\AudioHole.exe"; Tasks: desktopicon; AppUserModelID: "AudioHole"
+Name: "{autoprograms}\AudioHole\AudioHole"; Filename: "{app}\AudioHole.exe"; Tasks: startmenuicon; AppUserModelID: "AudioHole"
 Name: "{autoprograms}\AudioHole\Uninstall AudioHole"; Filename: "{uninstallexe}"; Tasks: startmenuicon
 
 [Run]

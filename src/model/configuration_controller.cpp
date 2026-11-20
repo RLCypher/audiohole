@@ -5,6 +5,18 @@
 
 namespace audiohole {
 namespace {
+std::string routing_failure_detail(const Snapshot& state) {
+    if (!has_routing_failure(state))
+        return {};
+    if (!state.routing_admission_issues.empty())
+        return routing_issues(state.routing_admission_issues);
+    std::string issues;
+    for (const auto& path : state.paths)
+        if (path.state == State::Failed && !path.detail.empty())
+            issues +=
+                path.hole_id + (path.reverse ? " / Return: " : " / Forward: ") + path.detail + "\n";
+    return issues.empty() ? "Routing failed. Stop, inspect the device status, then retry." : issues;
+}
 // Names/notes can be applied without releasing otherwise unchanged streams.
 // Retained tuning still participates: Apply must accept the complete intent.
 bool same_routing_settings(const Profile& a, const Profile& b) {
@@ -67,7 +79,8 @@ ConfigurationController::ConfigurationController(std::unique_ptr<ConfigurationPe
 }
 ConfigurationController::~ConfigurationController() = default;
 void ConfigurationController::event(std::string type, std::string detail) {
-    const auto severity = type == "error" || type == "scan-failed" ? Severity::Error
+    const auto severity = type == "error" || type == "routing-failed" || type == "scan-failed"
+                              ? Severity::Error
                           : type == "recovering" || type == "scanner-action-failed" ||
                                   type == "configuration-save-failed" || type == "action-rejected"
                               ? Severity::Warning
@@ -499,6 +512,7 @@ void ConfigurationController::poll_routing() {
     if (update.generation != routing_generation_ || update.pending)
         return;
     const auto previous = state_.state;
+    const auto previous_failure = routing_failure_detail(state_);
     state_.routing_pending = false;
     state_.routing_admission_issues = update.admission_issues;
     if (!update.admission_issues.empty()) {
@@ -506,8 +520,6 @@ void ConfigurationController::poll_routing() {
         state_.armed = false;
         state_.active_profile.clear();
         state_.routing_intent.reset();
-        if (previous != State::Failed)
-            event("error", routing_issues(update.admission_issues));
     } else if (update.state) {
         const auto& actual = *update.state;
         state_.routing_status = update.state;
@@ -534,22 +546,19 @@ void ConfigurationController::poll_routing() {
                          return p.state == State::Running || p.state == State::Ready;
                      }))
                 event("state", "Available holes are running; other holes are waiting for devices.");
-            else if (state_.state == State::Failed || state_.state == State::Degraded) {
-                std::string issues;
-                for (const auto& p : actual.paths)
-                    if (!p.issues.empty())
-                        issues += p.hole_id +
-                                  (p.direction == engine::DirectionId::Reverse ? " / Return: "
-                                                                               : " / Forward: ") +
-                                  routing_issues(p.issues) + "\n";
-                event("error", issues.empty()
-                                   ? "Routing failed. Stop, inspect the device status, then retry."
-                                   : issues);
-            } else if (state_.state == State::Ready)
+            else if (state_.state == State::Degraded && !has_routing_failure(state_))
+                event("state",
+                      "Routing has reduced progress; check the direction states for details.");
+            else if (state_.state == State::Ready)
                 event("routing-waiting",
                       "Waiting for this profile's required devices to become available.");
         }
     }
+    // Inspect path failures even when aggregate Degraded is unchanged: a sibling
+    // can move from Starting to Failed while another direction keeps running.
+    const auto failure = routing_failure_detail(state_);
+    if (!failure.empty() && failure != previous_failure)
+        event("routing-failed", failure);
     if (update.state && update.admission_issues.empty()) {
         const auto now = std::chrono::steady_clock::now();
         if (!update.state->paths.empty() &&

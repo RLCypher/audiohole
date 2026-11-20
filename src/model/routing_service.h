@@ -33,6 +33,9 @@ std::unique_ptr<RoutingService> make_routing_service(RuntimeFactory = {});
 engine::Result<engine::Profile> routing_profile(const Profile&);
 engine::BindingSnapshot routing_bindings(const Snapshot&);
 State routing_state(engine::State);
+// A partially started/recovering profile is not a failed start. Read the
+// authoritative current snapshot again before presenting a queued failure.
+bool has_routing_failure(const Snapshot&);
 std::string routing_issues(const std::vector<engine::Issue>&);
 // Actual configurations/counters and access receipts, never acoustic latency.
 std::string routing_progress(const Snapshot&);

@@ -27,6 +27,24 @@ Windows toast notifications supplement the tray by reporting meaningful events.
 
 The tray and notification system must not interrupt or interfere with real-time audio processing.
 
+### Windows notification identity and routing-failure checks
+
+The process AppUserModelID, Jump List and installer-created application shortcuts
+use `AudioHole`, so Windows identifies new notifications as AudioHole. This does
+not change the existing preferences or onboarding data locations.
+
+A profile can be Degraded while one direction is running and another is still
+starting or recovering. That aggregate state alone is not a failed start.
+Routing-failure events require a Failed profile or an explicitly Failed path.
+Failure changes are checked even if the aggregate state remains Degraded, so a
+real sibling failure is still reported once. Startup progress, waiting devices
+and unforced access fallback do not produce a failure notification by themselves.
+
+The GUI rechecks current routing health before presenting a queued
+`routing-failed` event as a notification or personality reaction. Historical
+diagnostics remain available after recovery or Stop; they do not trigger a stale
+failure alert. Unrelated operation errors remain independently eligible.
+
 ---
 
 ## 2. Design Principles

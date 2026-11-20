@@ -68,6 +68,7 @@ struct RoutingIntegration : testing::Test {
     }
     void TearDown() override {
         control->block_open = false;
+        control->hold_return_progress = false;
         control->block_cleanup = false;
         controller->stop();
         until(*controller, [&] {
@@ -104,6 +105,64 @@ TEST_F(RoutingIntegration, ActualRuntimeStartAndStopPreserveSavedIntentAndPublis
     control->block_cleanup = false;
     until(*controller, [&] { return controller->snapshot().state == State::Stopped; });
     EXPECT_EQ(control->releases, 2);
+}
+TEST_F(RoutingIntegration, AutomaticDualMonoStartupDoesNotReportAStillStartingSiblingAsFailed) {
+    control->capture_channels = 1;
+    control->hold_return_progress = true;
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Degraded; });
+    ASSERT_EQ(controller->snapshot().paths.size(), 2u);
+    EXPECT_EQ(controller->snapshot().paths[0].state, State::Running);
+    EXPECT_EQ(controller->snapshot().paths[1].state, State::Starting);
+    EXPECT_FALSE(has_routing_failure(controller->snapshot()));
+    const auto no_failure = [&] {
+        return std::none_of(controller->snapshot().events.begin(),
+                            controller->snapshot().events.end(),
+                            [](const auto& event) { return event.severity == Severity::Error; });
+    };
+    EXPECT_TRUE(no_failure());
+    control->hold_return_progress = false;
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    EXPECT_TRUE(no_failure());
+    for (const auto& path : controller->snapshot().routing_status->paths) {
+        ASSERT_TRUE(path.negotiated);
+        EXPECT_EQ(path.negotiated->source.client_format.channel_count, 1u);
+        EXPECT_EQ(path.negotiated->destination.client_format.channel_count, 2u);
+    }
+}
+TEST_F(RoutingIntegration, RealFailureIsReportedWhenAggregateRemainsPartiallyRunning) {
+    control->hold_return_progress = true;
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Degraded; });
+    EXPECT_FALSE(has_routing_failure(controller->snapshot()));
+    control->fail_return = true;
+    control->hold_return_progress = false;
+    until(*controller, [&] { return controller->snapshot().paths[1].state == State::Failed; });
+    EXPECT_EQ(controller->snapshot().state, State::Degraded);
+    EXPECT_TRUE(has_routing_failure(controller->snapshot()));
+    const auto failures = [&] {
+        return std::count_if(controller->snapshot().events.begin(),
+                             controller->snapshot().events.end(), [](const auto& event) {
+                                 return event.type == "routing-failed" &&
+                                        event.severity == Severity::Error &&
+                                        event.detail.find("TEST-EXCLUSIVE") != std::string::npos;
+                             });
+    };
+    EXPECT_EQ(failures(), 1);
+    const auto failure_revision = controller->snapshot().routing_status->revision;
+    until(*controller,
+          [&] { return controller->snapshot().routing_status->revision > failure_revision + 1; });
+    EXPECT_EQ(failures(), 1);
+    controller->stop();
+    until(*controller, [&] { return controller->snapshot().state == State::Stopped; });
+    EXPECT_FALSE(has_routing_failure(controller->snapshot()));
+    control->fail_return = false;
+    ASSERT_TRUE(controller->activate("engine-profile").ok);
+    until(*controller, [&] { return controller->snapshot().state == State::Running; });
+    // The GUI rechecks this live condition before showing queued routing errors.
+    // Diagnostics retain the old failure without a stale balloon or reaction.
+    EXPECT_FALSE(has_routing_failure(controller->snapshot()));
+    EXPECT_EQ(failures(), 1);
 }
 TEST(RoutingServiceIdle, StoppedSnapshotIsRetainedUntilTheNextCommand) {
     auto control = std::make_shared<testing_engine::Control>();

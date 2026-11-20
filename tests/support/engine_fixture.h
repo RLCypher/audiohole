@@ -9,8 +9,11 @@
 namespace audiohole::testing_engine {
 struct Control {
     std::atomic<int> opens{0}, releases{0};
-    std::atomic<bool> block_open{false}, block_cleanup{false}, cleaning{false};
-    bool fail_return = false, refuse_exclusive = false;
+    std::atomic<bool> block_open{false}, hold_return_progress{false}, block_cleanup{false},
+        cleaning{false};
+    int capture_channels = 2;
+    std::atomic<bool> fail_return{false};
+    bool refuse_exclusive = false;
 };
 class Session final : public engine::RouteSession {
   public:
@@ -22,11 +25,12 @@ class Session final : public engine::RouteSession {
     engine::NegotiatedRoute configuration() const override {
         engine::NegotiatedRoute result;
         result.backend = backend_;
-        auto stream = [&](const engine::EndpointRequirements& request) {
+        auto stream = [&](const engine::EndpointRequirements& request, bool capture) {
             engine::StreamConfiguration value;
-            value.client_format = {request.sample_rate_hz.value_or(48000),
-                                   request.channel_count.value_or(2),
-                                   request.sample_format.value_or(engine::SampleFormat::Float32)};
+            value.client_format = {
+                request.sample_rate_hz.value_or(48000),
+                request.channel_count.value_or(capture ? control_->capture_channels : 2),
+                request.sample_format.value_or(engine::SampleFormat::Float32)};
             value.mode = request.mode.value_or(route_.request.exclusive_mode_preferred
                                                    ? engine::AccessMode::Exclusive
                                                    : engine::AccessMode::Shared);
@@ -46,8 +50,8 @@ class Session final : public engine::RouteSession {
             value.period_frames = 240;
             return value;
         };
-        result.source = stream(route_.request.source);
-        result.destination = stream(route_.request.destination);
+        result.source = stream(route_.request.source, true);
+        result.destination = stream(route_.request.destination, false);
         result.processing = "Software fixture; no audio";
         result.selection_reason = "Explicit test adapter";
         return result;
@@ -58,6 +62,15 @@ class Session final : public engine::RouteSession {
     }
     engine::RouteObservation observe() override {
         engine::RouteObservation out;
+        if (route_.request.direction == engine::DirectionId::Reverse) {
+            if (control_->hold_return_progress)
+                return out;
+            if (control_->fail_return) {
+                out.issues.push_back({engine::ErrorCode::BackendFailure, "fixture/observe",
+                                      "Return stream failed", "TEST-EXCLUSIVE"});
+                return out;
+            }
+        }
         if (started_)
             frames_ += 480;
         out.captured_frames = out.rendered_frames = out.transferred_frames = frames_;

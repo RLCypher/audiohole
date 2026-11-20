@@ -349,6 +349,12 @@ State routing_state(engine::State state) {
     }
     return State::Failed;
 }
+bool has_routing_failure(const Snapshot& state) {
+    return state.state == State::Failed ||
+           (state.state == State::Degraded &&
+            std::any_of(state.paths.begin(), state.paths.end(),
+                        [](const auto& path) { return path.state == State::Failed; }));
+}
 std::string routing_issues(const std::vector<engine::Issue>& issues) {
     std::string out;
     for (const auto& issue : issues) {
