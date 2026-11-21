@@ -9,6 +9,8 @@
 #include <wx/wx.h>
 
 namespace audiohole::gui {
+// Test bitmap artifacts are opt-in. In-memory rendering/assertions still run.
+bool save_smoke_evidence(const wxBitmap&, const wxString&, wxBitmapType);
 // Keep Windows keyboard/accessibility behavior while painting matched selection
 // foregrounds and surfaces for lists and selection-only dropdowns.
 class ThemedChoice final : public wxChoice {

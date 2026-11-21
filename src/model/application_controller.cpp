@@ -510,6 +510,11 @@ void ApplicationController::clear_diagnostics() {
     backend_->clear_diagnostics();
     record("diagnostics.clear", {true, "Session diagnostics cleared"});
 }
+void ApplicationController::set_logging(bool enabled) {
+    require_owner();
+    backend_->set_logging(enabled);
+    record("diagnostics.logging", {true, enabled ? "Logging started" : "Logging stopped"});
+}
 void ApplicationController::scan(bool enabled, bool advanced, ScanScope scope,
                                  const std::string& selected, const ScanOptions& options) {
     require_owner();

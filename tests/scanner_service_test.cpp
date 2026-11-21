@@ -703,6 +703,7 @@ TEST_F(ScannerIntegration, ControllerKeepsScannerRecordsSeparateAndCorrelatesHid
 } // namespace
 TEST_F(ScannerIntegration, UnlimitedBatchRunsItsPlanAndExportsRawStagesAndMonotonicTimings) {
     auto worker = service();
+    worker->set_logging(true); // Raw stage journaling is now explicitly opt-in.
     ScanOptions options;
     options.consent = true;
     options.system_timeout_ms = 0;
@@ -1208,6 +1209,28 @@ TEST_F(ScannerIntegration, ReadyRoutingStartsOnRequiredDeviceReturnAndStopCancel
     EXPECT_EQ(controller.snapshot().state, State::Stopped);
     EXPECT_FALSE(controller.snapshot().armed);
     EXPECT_EQ(runtime->opens, 1);
+}
+
+} // namespace audiohole
+
+namespace audiohole {
+
+TEST_F(ScannerIntegration, DisabledLoggingStillScansAndPreservesDeviceResultsWithinSessionBudget) {
+    auto worker = std::make_unique<ScannerService>(
+        ScannerServiceOptions{portable, local, {}, "injected_test_fixture", "test", {16, 2048}},
+        ScannerFactories{[e = evidence] { return std::make_unique<Provider>(e); },
+                         [e = evidence] { return std::make_unique<Runner>(e); }});
+    const auto result = finish(*worker, worker->start_scan(false, ScanScope::Full, {}, {}));
+    EXPECT_EQ(result.result, "completed");
+    EXPECT_FALSE(store.inventory().devices.empty());
+    std::uintmax_t total = 0;
+    for (const auto& file : std::filesystem::recursive_directory_iterator(local / "sessions"))
+        if (file.is_regular_file())
+            total += file.file_size();
+    EXPECT_LE(total, 2048u);
+    const auto progress = scan::utf8_path(result.session_path) / "progress.jsonl";
+    if (std::filesystem::exists(progress))
+        EXPECT_EQ(std::filesystem::file_size(progress), 0u);
 }
 
 } // namespace audiohole

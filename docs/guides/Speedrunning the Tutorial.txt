@@ -21,7 +21,8 @@ Press F1 if you need the current instruction repeated.
 START AND SCAN
 ==============
 
-1. At the welcome prompt, choose "It's my first time". If you are already using
+1. If the license agreement appears, accept it and choose Start AudioHole.
+   At the welcome prompt, choose "It's my first time". If you are already using
    AudioHole, Settings > Replay Tutorial opens a fresh tutorial session.
 
 2. Choose these opening replies in order:

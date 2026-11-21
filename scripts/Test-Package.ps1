@@ -61,8 +61,11 @@ try {
         $process = Start-Process -FilePath $exe -WorkingDirectory $root -PassThru -ArgumentList @("--$mode", '--screenshot-dir', "`"$evidence`"")
         if (-not $process.WaitForExit(45000)) { throw "Extracted GUI $mode did not finish within 45 seconds." }
         $process.WaitForExit()
-        if ($process.ExitCode -ne 0) { throw "Extracted GUI $mode failed with exit code $($process.ExitCode)." }
         $result = Join-Path $evidence 'smoke-result.txt'
+        if ($process.ExitCode -ne 0) {
+            if (Test-Path -LiteralPath $result) { Get-Content -LiteralPath $result | Write-Host }
+            throw "Extracted GUI $mode failed with exit code $($process.ExitCode)."
+        }
         if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
             throw "Extracted GUI $mode did not produce successful smoke evidence."
         }

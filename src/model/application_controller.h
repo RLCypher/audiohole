@@ -136,6 +136,7 @@ class ApplicationController final : public Controller {
     Result beep(const std::string&) override;
     void cancel_beep() override;
     void clear_diagnostics() override;
+    void set_logging(bool) override;
     void scan(bool, bool = false, ScanScope = ScanScope::Update, const std::string& = {},
               const ScanOptions& = {}) override;
     Result scanner_action(const ScannerActionRequest&) override;

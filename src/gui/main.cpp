@@ -1,6 +1,7 @@
 #include "gui/controls.h"
 #include "gui/engine_smoke.h"
 #include "gui/frame.h"
+#include "gui/license_dialog.h"
 #include "gui/welcome.h"
 #include "model/configuration_controller.h"
 #include "model/first_run.h"
@@ -212,6 +213,36 @@ class App final : public wxApp {
             if (!std::filesystem::create_directory(smoke_root_))
                 return false;
             root = smoke_root_;
+        }
+        if (!smoke) {
+            const auto receipt = first_run_marker_path().parent_path() / "license-acceptance.json";
+            bool needed = true;
+            auto checked = license_acceptance_needed(receipt, needed);
+            if (!checked.ok) {
+                themed_message_box(text(checked.detail), "AudioHole license", wxOK | wxICON_ERROR);
+                return false;
+            }
+            if (needed) {
+                const auto executable = std::filesystem::path(
+                    wxStandardPaths::Get().GetExecutablePath().ToStdWstring());
+                if (!registered_installation(executable.parent_path())) {
+                    try {
+                        LicenseDialog dialog;
+                        if (dialog.ShowModal() != wxID_OK)
+                            return false;
+                    } catch (const std::exception& error) {
+                        themed_message_box(text(error.what()), "AudioHole license",
+                                           wxOK | wxICON_ERROR);
+                        return false;
+                    }
+                }
+                checked = accept_license(receipt);
+                if (!checked.ok) {
+                    themed_message_box(text(checked.detail), "AudioHole license",
+                                       wxOK | wxICON_ERROR);
+                    return false;
+                }
+            }
         }
         preferences_ = std::make_shared<BuildPreferences>(root, smoke);
         const auto preferences_result = preferences_->load();

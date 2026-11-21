@@ -74,7 +74,7 @@ close hides to tray, while **Exit AudioHole** stops and terminates the process.
 
 CTest covers real Windows COM lifetime, portable simulator/presentation logic,
 and native GUI smoke interactions. GUI smoke uses internal developer arguments
-`--smoke-test --screenshot-dir <path>` and exits with evidence. These are not a
+`--smoke-test --screenshot-dir <path>` and exits with a pass/fail result. Screenshots require `AUDIOHOLE_CAPTURE_EVIDENCE=1`. These are not a
 public product CLI. Tests require no administrator privileges or audio devices.
 Both presets fail if no tests are discovered.
 
@@ -99,9 +99,9 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 
 1. Open the private repository's **Actions** tab and select a successful
    **Windows builds and evaluation packages** run for the intended revision.
-2. Download **AudioHole-Windows-x64-release-&lt;full-tested-commit&gt;** under Artifacts.
+2. Download **AudioHole-v&lt;version&gt;-Windows-x64-release-&lt;short-commit&gt;** under Artifacts.
 3. Extract the downloaded portable ZIP. Its main folder contains both `AudioHole.exe`
-   and the optional `AudioHole-Setup` executable, with `Guides and Manuals` beside them.
+   and the optional `Install AudioHole v<version>.exe` executable, with `Guides and Manuals` beside them.
 4. Read `README.txt` and `docs/build-info.json`, then open `AudioHole.exe`.
    The `Guides and Manuals` folder includes the manual, quick-start and tuning guides, manifesto, and AI disclosure.
    Follow the included manual checklist. Tutorial uses fictional devices; normal operation uses real endpoints.

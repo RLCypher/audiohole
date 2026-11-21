@@ -11,6 +11,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
+. (Join-Path $PSScriptRoot 'Build-Names.ps1')
 $projectText = Get-Content -LiteralPath (Join-Path $repoRoot 'CMakeLists.txt') -Raw
 if ($projectText -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read the application version.' }
 $version = $Matches[1]
@@ -26,7 +27,9 @@ $status = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
 $suffix = if ($dirty) { '-dirty' } else { '' }
-$name = "AudioHole-Windows-x64-$Configuration-$($commit.Substring(0,12))$suffix"
+$displayVersion = Get-AudioHoleDisplayVersion $version
+$shortCommit = $commit.Substring(0,7)
+$name = "AudioHole-v$displayVersion-Windows-x64-$($Configuration.ToLowerInvariant())-$shortCommit$suffix"
 $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
 $archive = Join-Path $outputRoot "$name.zip"
@@ -67,7 +70,7 @@ try {
         executable = 'AudioHole.exe'
         actions_run = $runUrl
         packaged_at_utc = [DateTime]::UtcNow.ToString('o')
-        source_archive = "AudioHole-Source-$($commit.Substring(0,12))$suffix.zip"
+        source_archive = "AudioHole-v$displayVersion-Source-$shortCommit$suffix.zip"
         runtime_files = @($expected) + @('docs/build-info.json', 'README.txt')
     }
     New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
@@ -84,6 +87,10 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Runtime archive creation failed.' }
     } finally { Pop-Location }
     Write-Host "Created $archive"
+    if ($env:GITHUB_OUTPUT) {
+        "artifact_name=$name" >> $env:GITHUB_OUTPUT
+        "source_artifact_name=AudioHole-v$displayVersion-Source-$($Configuration.ToLowerInvariant())-$shortCommit$suffix" >> $env:GITHUB_OUTPUT
+    }
 } finally {
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
 }

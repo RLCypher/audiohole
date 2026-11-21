@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      capture_evidence:
+        description: Capture screenshots and upload evidence bundles
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -12,12 +17,23 @@ jobs:
   build-and-test:
     runs-on: windows-2022
     timeout-minutes: 45
+    env:
+      AUDIOHOLE_CAPTURE_EVIDENCE: ${{ inputs.capture_evidence && '1' || '0' }}
     strategy:
       fail-fast: false
       matrix:
         configuration: [debug, release]
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node.js 24)
+      - name: Read display version and commit
+        id: names
+        shell: pwsh
+        run: |
+          . ./scripts/Build-Names.ps1
+          $project = Get-Content ./CMakeLists.txt -Raw
+          if ($project -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read version' }
+          "version=$(Get-AudioHoleDisplayVersion $Matches[1])" >> $env:GITHUB_OUTPUT
+          "commit=$($env:GITHUB_SHA.Substring(0,7))" >> $env:GITHUB_OUTPUT
       - name: Verify Windows prerequisites (read-only)
         run: ./scripts/Verify-Environment.ps1
       - name: Test distribution-tool safeguards
@@ -41,6 +57,7 @@ jobs:
       - name: Test engine, scanner, model, COM and presentation contracts
         run: ctest --preset windows-${{ matrix.configuration }} -E '^Gui\.'
       - name: Package only the runtime component
+        id: package
         shell: pwsh
         run: |
           $configuration = '${{ matrix.configuration }}'
@@ -71,7 +88,7 @@ jobs:
           if ($folders.Count -ne 1) { throw 'Expected one portable application folder' }
           $portable = $folders[0].FullName
           ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler -OutputDirectory $portable
-          $setup = @(Get-ChildItem -LiteralPath $portable -Filter 'AudioHole-Setup-*.exe' -File)
+          $setup = @(Get-ChildItem -LiteralPath $portable -Filter 'Install AudioHole v*.exe' -File)
           if ($setup.Count -ne 1) { throw 'Expected one installer' }
           ./scripts/Test-Installer.ps1 -Installer $setup[0].FullName
           "directory=$portable" >> $env:GITHUB_OUTPUT
@@ -80,36 +97,35 @@ jobs:
       - name: Verify final portable download
         run: ./scripts/Test-PortableBundle.ps1 -Directory "${{ steps.portable.outputs.directory }}"
       - name: Upload matching source as a separate download
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: AudioHole-Source-${{ matrix.configuration }}-${{ github.sha }}
+          name: ${{ steps.package.outputs.source_artifact_name }}
           path: build/source/*.zip
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
       - name: Upload tested package contents (downloaded as a ZIP)
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: AudioHole-Windows-x64-${{ matrix.configuration }}-${{ github.sha }}
+          name: ${{ steps.package.outputs.artifact_name }}
           path: ${{ steps.portable.outputs.directory }}/
-          # The strict bundle audit includes the reserved folder's zero-byte marker.
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
       - name: Upload GUI smoke screenshots and evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ always() && inputs.capture_evidence == true }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: AudioHole-GUI-evidence-${{ matrix.configuration }}-${{ github.sha }}
+          name: AudioHole-v${{ steps.names.outputs.version }}-GUI-evidence-${{ matrix.configuration }}-${{ steps.names.outputs.commit }}
           path: build/windows-msvc/gui-smoke/
           if-no-files-found: warn
           retention-days: 14
       - name: Upload installer lifecycle logs
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ always() && inputs.capture_evidence == true }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: AudioHole-installer-evidence-${{ matrix.configuration }}-${{ github.sha }}
+          name: AudioHole-v${{ steps.names.outputs.version }}-installer-evidence-${{ matrix.configuration }}-${{ steps.names.outputs.commit }}
           path: build/installer-evidence/
           if-no-files-found: warn
           retention-days: 14

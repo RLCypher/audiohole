@@ -1,5 +1,6 @@
 #pragma once
 #include "model/controller.h"
+#include "model/scan_session_store.h"
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -14,6 +15,7 @@ struct ScannerServiceOptions {
     std::filesystem::path portable_root, local_root, probe_executable;
     std::string source = "real_windows_mmdevice_wasapi";
     std::string build_id = "unknown";
+    ScanSessionLimits session_limits;
 };
 struct ScannerFactories {
     std::function<std::unique_ptr<scanner::EndpointProvider>()> provider;
@@ -42,6 +44,7 @@ class ScannerService {
     std::uint64_t start_scan(bool deep, ScanScope, const std::string& logical_id,
                              const ScanOptions&);
     std::uint64_t action(const ScannerActionRequest&);
+    void set_logging(bool);
     void cancel();
     void shutdown();
     bool busy() const;

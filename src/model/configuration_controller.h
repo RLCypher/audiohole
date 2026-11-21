@@ -47,6 +47,7 @@ class ConfigurationController final : public Controller {
     }
     void audio_worker_policy(const std::string&, const std::string&) override;
     void clear_diagnostics() override;
+    void set_logging(bool) override;
     void scan(bool enabled, bool = false, ScanScope = ScanScope::Update, const std::string& = {},
               const ScanOptions& = {}) override;
     Result scanner_action(const ScannerActionRequest&) override;

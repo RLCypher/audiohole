@@ -320,8 +320,11 @@ std::vector<Endpoint> project(const scan::InventorySnapshot& inventory, const st
     }
     return result;
 }
-void write_json(const std::filesystem::path& path, const Json& document) {
-    scan::make_atomic_writer()->write(path, document.dump(2) + "\n", std::nullopt);
+std::string compact_detail(const std::string& text) {
+    auto end = std::min<std::size_t>(2048, text.size());
+    while (end < text.size() && (static_cast<unsigned char>(text[end]) & 0xc0) == 0x80)
+        --end;
+    return text.substr(0, end);
 }
 } // namespace
 
@@ -343,6 +346,10 @@ struct ScannerService::Impl {
     std::deque<ScannerUpdate> updates;
     std::stop_source cancellation;
     std::atomic<bool> busy = false;
+    std::atomic<bool> logging = false;
+    std::unique_ptr<ScanSessionStore> active_session;
+    bool retention_checked = false;
+    std::string retention_warning;
     bool stopping = false;
     std::uint64_t next_generation = 0;
     scan::InventorySnapshot inventory;
@@ -392,6 +399,21 @@ struct ScannerService::Impl {
         final.result = "completed";
         try {
             scan::DeviceStore store(options.portable_root, options.local_root);
+            if (!retention_checked) {
+                retention_checked = true;
+                try {
+                    const auto sessions = options.local_root / "sessions";
+                    if (std::filesystem::exists(sessions)) {
+                        ScanSessionStore previous(sessions, sessions / "no-active-scan",
+                                                  options.session_limits);
+                        if (previous.truncated())
+                            retention_warning =
+                                "Some archived scan diagnostics could not be removed.";
+                    }
+                } catch (const std::exception& error) {
+                    retention_warning = std::string("Scan-session cleanup: ") + error.what();
+                }
+            }
             if (job.stop.stop_requested())
                 final.result = "interrupted";
             else if (job.scan)
@@ -485,10 +507,11 @@ struct ScannerService::Impl {
         }
         if (job.scan && !final.session_path.empty()) {
             try {
-                write_json(scan::utf8_path(final.session_path) / "completion.json",
-                           {{"result", final.result},
-                            {"detail", final.detail},
-                            {"finished_utc", scan::utc_now()}});
+                write_session_json("completion.json",
+                                   {{"result", final.result},
+                                    {"detail", compact_detail(final.detail)},
+                                    {"finished_utc", scan::utc_now()}},
+                                   true);
             } catch (const std::exception& error) {
                 final.detail += "\nCould not save terminal evidence: " + std::string(error.what());
                 final.result = "failed";
@@ -496,6 +519,8 @@ struct ScannerService::Impl {
         }
         if (final.session_path.empty())
             final.session_path = scan::path_utf8(last_session);
+        if (!retention_warning.empty())
+            final.detail += "\n" + retention_warning;
         publish(std::move(final));
     }
     std::unique_ptr<scan::EndpointProvider> make_provider() {
@@ -504,6 +529,10 @@ struct ScannerService::Impl {
             throw std::runtime_error("Scanner provider is unavailable.");
         return provider;
     }
+    void write_session_json(const std::filesystem::path& relative, const Json& document,
+                            bool metadata = false) {
+        (void)active_session->write(relative, document.dump(2) + "\n", false, metadata, true);
+    }
     void run_scan(const Job& job, scan::DeviceStore& store, ScannerUpdate& final) {
         const auto directory = options.local_root / "sessions" /
                                scan::utf8_path(scan::safe_filename(scan::utc_now()) + "-" +
@@ -511,56 +540,54 @@ struct ScannerService::Impl {
         std::filesystem::create_directories(directory.parent_path());
         if (!std::filesystem::create_directory(directory))
             throw std::runtime_error("Could not create an isolated scan session directory.");
+        active_session = std::make_unique<ScanSessionStore>(directory.parent_path(), directory,
+                                                            options.session_limits);
         last_session = directory;
         final.session_path = scan::path_utf8(directory);
         const std::string scope = job.scope == ScanScope::Full       ? "full"
                                   : job.scope == ScanScope::Selected ? "device"
                                                                      : "update";
-        write_json(directory / "request.json",
-                   {{"source", options.source},
-                    {"scanner_version", "0.4.0"},
-                    {"build_id", options.build_id},
-                    {"scope", scope},
-                    {"depth", job.deep ? "deep" : "basic"},
-                    {"logical_id", job.logical_id},
-                    {"mode", job.options.mode},
-                    {"max_attempts", job.options.attempts},
-                    {"duration_ms", job.options.duration_ms},
-                    {"attempt_timeout_ms", job.options.attempt_timeout_ms},
-                    {"device_timeout_ms", job.options.device_timeout_ms},
-                    {"system_timeout_ms", job.options.system_timeout_ms},
-                    {"consent", job.options.consent},
-                    {"started_utc", scan::utc_now()},
-                    {"operating_context", job.options.operating_context}});
-        std::ofstream log(directory / "progress.jsonl", std::ios::binary);
-        if (!log)
-            throw std::runtime_error("Could not create the scan progress log.");
+        write_session_json("request.json",
+                           {{"source", options.source},
+                            {"scanner_version", "0.4.0"},
+                            {"build_id", options.build_id},
+                            {"scope", scope},
+                            {"depth", job.deep ? "deep" : "basic"},
+                            {"logical_id", job.logical_id},
+                            {"mode", job.options.mode},
+                            {"max_attempts", job.options.attempts},
+                            {"duration_ms", job.options.duration_ms},
+                            {"attempt_timeout_ms", job.options.attempt_timeout_ms},
+                            {"device_timeout_ms", job.options.device_timeout_ms},
+                            {"system_timeout_ms", job.options.system_timeout_ms},
+                            {"consent", job.options.consent},
+                            {"started_utc", scan::utc_now()},
+                            {"operating_context", job.options.operating_context}},
+                           true);
+        (void)active_session->write("progress.jsonl", "");
         std::uint64_t log_bytes = 0;
         bool truncated = false;
         const auto scan_started = std::chrono::steady_clock::now();
         presentation::ScanProgressText visible_progress;
         const auto progress = [&](const scan::Progress& progress) {
-            const Json data{{"elapsed_ms", std::chrono::duration_cast<std::chrono::milliseconds>(
-                                               std::chrono::steady_clock::now() - scan_started)
-                                               .count()},
-                            {"timestamp_utc", scan::utc_now()},
-                            {"phase", progress.phase},
-                            {"endpoint_id", progress.endpoint_id},
-                            {"completed", progress.completed},
-                            {"total", progress.total},
-                            {"details", progress.details}};
-            const auto bytes = data.dump() + "\n";
-            if (log_bytes + bytes.size() <= 64ULL * 1024 * 1024) {
-                log << bytes;
-                // Flush the append stream for process-crash diagnostics. This is
-                // not an fsync per API event; durable JSON start/finish checkpoints
-                // retain the recovery contract without thousands of full rewrites.
-                log.flush();
-                if (!log)
-                    throw std::runtime_error("Could not append scan stage journal");
-                log_bytes += bytes.size();
-            } else
-                truncated = true;
+            if (logging) {
+                const Json data{
+                    {"elapsed_ms", std::chrono::duration_cast<std::chrono::milliseconds>(
+                                       std::chrono::steady_clock::now() - scan_started)
+                                       .count()},
+                    {"timestamp_utc", scan::utc_now()},
+                    {"phase", progress.phase},
+                    {"endpoint_id", progress.endpoint_id},
+                    {"completed", progress.completed},
+                    {"total", progress.total},
+                    {"details", progress.details}};
+                const auto bytes = data.dump() + "\n";
+                if (log_bytes + bytes.size() <= 64ULL * 1024 * 1024 &&
+                    active_session->write("progress.jsonl", bytes, true))
+                    log_bytes += bytes.size();
+                else
+                    truncated = true;
+            }
             ScannerUpdate update;
             update.generation = job.generation;
             update.phase = progress.phase;
@@ -576,7 +603,7 @@ struct ScannerService::Impl {
         auto provider = make_provider();
         const auto basic =
             scan::run_scoped_basic(*provider, store, scope, job.logical_id, job.stop, progress);
-        write_json(directory / "basic.json", basic);
+        write_session_json("basic.json", basic);
         final.result = basic.scan.result;
         final.detail = "Basic: " + basic.scan.result + "; selected endpoint observations: " +
                        std::to_string(basic.selected_endpoint_ids.size()) +
@@ -615,7 +642,7 @@ struct ScannerService::Impl {
                 Json document = deep;
                 document["scope"] = scope;
                 document["requested_logical_id"] = job.logical_id;
-                write_json(directory / "deep.json", document);
+                write_session_json("deep.json", document);
                 final.result = deep.result == "completed" ? final.result : deep.result;
                 final.detail +=
                     "\nDeep: " + deep.result + "; targets: " + std::to_string(targets.size()) +
@@ -626,9 +653,6 @@ struct ScannerService::Impl {
         }
         if (job.stop.stop_requested())
             final.result = "interrupted";
-        log.flush();
-        if (!log)
-            throw std::runtime_error("Could not flush scan evidence.");
         const auto snapshot = store.inventory();
         Json index{{"valid", snapshot.complete},
                    {"source", options.source},
@@ -637,13 +661,8 @@ struct ScannerService::Impl {
         for (const auto& device : snapshot.devices) {
             const auto relative = std::filesystem::path("devices") /
                                   device.path.parent_path().filename() / device.path.filename();
-            const auto destination = directory / relative;
-            std::filesystem::create_directories(destination.parent_path());
-            std::ofstream file(destination, std::ios::binary);
-            file << device.original_bytes;
-            file.flush();
-            if (!file)
-                throw std::runtime_error("Could not snapshot a device record for analysis.");
+            if (!active_session->write(relative, device.original_bytes))
+                continue;
             auto archive_path = scan::path_utf8(relative);
             std::replace(archive_path.begin(), archive_path.end(), '\\', '/');
             index["devices"].push_back({{"logical_id", device.record.at("logical_id")},
@@ -699,13 +718,8 @@ struct ScannerService::Impl {
                         input.read(bytes.data(), static_cast<std::streamsize>(size));
                         if (!input || input.peek() != std::char_traits<char>::eof())
                             throw std::runtime_error("History changed or could not be read");
-                        const auto destination = directory / relative;
-                        std::filesystem::create_directories(destination.parent_path());
-                        std::ofstream output(destination, std::ios::binary);
-                        output << bytes;
-                        output.flush();
-                        if (!output)
-                            throw std::runtime_error("Cannot snapshot raw history");
+                        if (!active_session->write(relative, bytes))
+                            throw std::runtime_error("Scan-session storage budget reached");
                         history_bytes += size;
                         entry["status"] = "included";
                     } catch (const std::exception& error) {
@@ -714,17 +728,22 @@ struct ScannerService::Impl {
                 index["history_files"].push_back(std::move(entry));
             }
         }
-        write_json(directory / "inventory.json", index);
-        write_json(directory / "result.json",
-                   {{"result", final.result},
-                    {"detail", final.detail},
-                    {"finished_utc", scan::utc_now()},
-                    {"progress_log_truncated", truncated},
-                    {"note", "Real session evidence; no automated test-fixture renaming or record "
-                             "omission performed."}});
+        write_session_json("inventory.json", index);
+        truncated = truncated || active_session->truncated();
+        write_session_json(
+            "result.json",
+            {{"result", final.result},
+             {"detail", compact_detail(final.detail)},
+             {"finished_utc", scan::utc_now()},
+             {"progress_log_truncated", truncated},
+             {"session_storage_truncated", active_session->truncated()},
+             {"diagnostic_logging_enabled", logging.load()},
+             {"note", "Optional session diagnostics may be omitted at storage limits; saved "
+                      "device capabilities remain independent."}},
+            true);
         if (truncated)
-            final.detail +=
-                "\nProgress log reached its 64 MiB budget; truncation is recorded in result.json.";
+            final.detail += "\nOptional scan diagnostics reached the progress or session-storage "
+                            "budget; saved device results are preserved.";
     }
 };
 
@@ -775,6 +794,9 @@ std::uint64_t ScannerService::action(const ScannerActionRequest& request) {
     Impl::Job job;
     job.action = request;
     return impl_->submit(std::move(job));
+}
+void ScannerService::set_logging(bool enabled) {
+    impl_->logging = enabled;
 }
 void ScannerService::cancel() {
     std::stop_source source;

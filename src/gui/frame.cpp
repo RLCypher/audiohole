@@ -1,5 +1,6 @@
 #include "gui/frame.h"
 #include "gui/controls.h"
+#include "gui/license_dialog.h"
 #include "gui/native_theme.h"
 #include "gui/welcome.h"
 #include "model/application_controller.h"
@@ -519,6 +520,8 @@ void Frame::poll_avatar() {
         last_avatar_diagnostics_ = frame.diagnostics;
         ++avatar_log_revision_;
         for (const auto& line : frame.diagnostics) {
+            if (!controller_->snapshot().logging_enabled)
+                continue;
             avatar_diagnostics_.push_back("[avatar] " + line);
             if (avatar_diagnostics_.size() > 32)
                 avatar_diagnostics_.erase(avatar_diagnostics_.begin());
@@ -777,21 +780,23 @@ void Frame::refresh_performance() {
 void Frame::refresh_log() {
     const auto& s = controller_->snapshot();
     const auto query_text = log_search_->GetValue();
-    const auto sequence = s.events.empty() ? 0 : s.events.back().sequence;
+    const auto sequence = s.diagnostic_events.empty() ? 0 : s.diagnostic_events.back().sequence;
     const auto severity = severity_->GetSelection();
     if (log_severity_ == severity && log_query_ == query_text && log_event_sequence_ == sequence &&
-        log_event_count_ == s.events.size() && log_avatar_revision_ == avatar_log_revision_)
+        log_event_count_ == s.diagnostic_events.size() &&
+        log_avatar_revision_ == avatar_log_revision_)
         return;
     log_severity_ = severity;
     log_query_ = query_text;
     log_event_sequence_ = sequence;
-    log_event_count_ = s.events.size();
+    log_event_count_ = s.diagnostic_events.size();
     log_avatar_revision_ = avatar_log_revision_;
     const auto query = query_text.Lower();
     std::string logs;
-    for (const auto& e : s.events) {
-        if (severity == 1 && e.type != "error" && e.type != "scan-failed" &&
-            e.type != "scanner-action-failed" && e.type != "configuration-save-failed")
+    for (const auto& e : s.diagnostic_events) {
+        if (severity == 1 && e.type != "error" && e.type != "routing-failed" &&
+            e.type != "scan-failed" && e.type != "scanner-action-failed" &&
+            e.type != "configuration-save-failed")
             continue;
         if (severity == 2 && e.type != "state" && e.type != "activated" && e.type != "stopped")
             continue;
@@ -1005,6 +1010,7 @@ void Frame::refresh() {
         scan_state_->SetToolTip(scan_status);
         scan_state_->ShowPosition(0);
     }
+    logging_button_->SetLabel(s.logging_enabled ? "Stop Logging" : "Start Logging");
     refresh_log();
     for (const auto& e : s.events)
         if (e.sequence > seen_event_) {
@@ -1108,6 +1114,20 @@ bool Frame::smoke(const wxString& directory) {
                 throw std::runtime_error(detail);
         };
         require(GetTitle() == "AudioHole", "Window title must omit the build identifier");
+        smoke_license_dialog();
+        require(logging_button_ && logging_button_->GetLabel() == "Start Logging" &&
+                    !controller_->snapshot().logging_enabled,
+                "Diagnostic logging must start off");
+        wxCommandEvent logging(wxEVT_BUTTON, logging_button_->GetId());
+        logging.SetEventObject(logging_button_);
+        logging_button_->GetEventHandler()->ProcessEvent(logging);
+        require(controller_->snapshot().logging_enabled &&
+                    logging_button_->GetLabel() == "Stop Logging",
+                "Start Logging did not enable capture");
+        logging_button_->GetEventHandler()->ProcessEvent(logging);
+        require(!controller_->snapshot().logging_enabled &&
+                    logging_button_->GetLabel() == "Start Logging",
+                "Stop Logging did not disable capture");
         PWSTR process_app_id = nullptr;
         const auto app_id_result = GetCurrentProcessExplicitAppUserModelID(&process_app_id);
         const std::wstring notification_name = process_app_id ? process_app_id : L"";
@@ -2044,7 +2064,7 @@ bool Frame::smoke(const wxString& directory) {
                             destination.Blit(0, 0, bitmap.GetWidth(), bitmap.GetHeight(), &source,
                                              0, 0);
                             destination.SelectObject(wxNullBitmap);
-                            if (!bitmap.SaveFile(path, wxBITMAP_TYPE_BMP))
+                            if (!save_smoke_evidence(bitmap, path, wxBITMAP_TYPE_BMP))
                                 throw std::runtime_error(
                                     "Could not capture Update dialog evidence");
                         }
@@ -2344,7 +2364,7 @@ bool Frame::smoke(const wxString& directory) {
                 wxClientDC source(this);
                 destination.Blit(0, 0, GetClientSize().x, GetClientSize().y, &source, 0, 0);
                 destination.SelectObject(wxNullBitmap);
-                bitmap.SaveFile(directory + "/test-mode.bmp", wxBITMAP_TYPE_BMP);
+                save_smoke_evidence(bitmap, directory + "/test-mode.bmp", wxBITMAP_TYPE_BMP);
                 std::ofstream result(std::filesystem::path(directory.ToStdWstring()) /
                                      "smoke-result.txt");
                 result << "PASS: Test Mode isolation, real GUI configuration save/reload, "
@@ -3180,8 +3200,8 @@ bool Frame::smoke(const wxString& directory) {
                 dest.SelectObject(wxNullBitmap);
                 // Capture availability depends on the Windows desktop/session. This is evidence for
                 // human review, not a visual correctness assertion.
-                bitmap.SaveFile(directory + wxString::Format("/page-%zu.bmp", i),
-                                wxBITMAP_TYPE_BMP);
+                save_smoke_evidence(bitmap, directory + wxString::Format("/page-%zu.bmp", i),
+                                    wxBITMAP_TYPE_BMP);
             }
             auto capture_extra = [&](const wxString& name) {
                 Layout();
@@ -3192,7 +3212,7 @@ bool Frame::smoke(const wxString& directory) {
                 wxClientDC source(this);
                 destination.Blit(0, 0, GetClientSize().x, GetClientSize().y, &source, 0, 0);
                 destination.SelectObject(wxNullBitmap);
-                bitmap.SaveFile(directory + "/" + name + ".bmp", wxBITMAP_TYPE_BMP);
+                save_smoke_evidence(bitmap, directory + "/" + name + ".bmp", wxBITMAP_TYPE_BMP);
             };
             notebook_->SetSelection(ProfilesPage);
             for (unsigned section = 0; section < 3; ++section) {

@@ -1,6 +1,6 @@
 # Corresponding source
 
-AudioHole code is GPL-3.0-only. The matching source is a separate **AudioHole-Source**
+AudioHole code is GPL-3.0-only. The matching source is a separate **Source**
 download on the same CI run as each binary artifact. The portable binary ZIP does
 not contain source code or a source archive. The separate source archive includes
 the checked-out source, build scripts,

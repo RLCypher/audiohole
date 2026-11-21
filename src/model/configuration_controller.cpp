@@ -86,6 +86,11 @@ void ConfigurationController::event(std::string type, std::string detail) {
                               ? Severity::Warning
                               : Severity::Info;
     state_.events.push_back({++event_sequence_, std::move(type), std::move(detail), severity});
+    if (state_.logging_enabled || state_.events.back().type.starts_with("scan-")) {
+        state_.diagnostic_events.push_back(state_.events.back());
+        if (state_.diagnostic_events.size() > 500)
+            state_.diagnostic_events.erase(state_.diagnostic_events.begin());
+    }
     if (state_.events.size() > 500)
         state_.events.erase(state_.events.begin());
     ++state_.revision;
@@ -559,7 +564,7 @@ void ConfigurationController::poll_routing() {
     const auto failure = routing_failure_detail(state_);
     if (!failure.empty() && failure != previous_failure)
         event("routing-failed", failure);
-    if (update.state && update.admission_issues.empty()) {
+    if (state_.logging_enabled && update.state && update.admission_issues.empty()) {
         const auto now = std::chrono::steady_clock::now();
         if (!update.state->paths.empty() &&
             (previous != state_.state ||
@@ -700,7 +705,20 @@ void ConfigurationController::refresh_waiting_routes() {
         routed_inventory_revision_ = state_.scanner.inventory_revision;
 }
 void ConfigurationController::clear_diagnostics() {
+    state_.diagnostic_events.clear();
     state_.events.clear();
+    ++state_.revision;
+}
+void ConfigurationController::set_logging(bool enabled) {
+    if (state_.logging_enabled == enabled)
+        return;
+    if (enabled)
+        state_.logging_enabled = true;
+    event(enabled ? "logging-started" : "logging-stopped",
+          enabled ? "Diagnostic logging started." : "Diagnostic logging stopped.");
+    state_.logging_enabled = enabled;
+    if (scanner_)
+        scanner_->set_logging(enabled);
     ++state_.revision;
 }
 } // namespace audiohole

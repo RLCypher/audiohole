@@ -30,4 +30,5 @@ HRESULT publish_shell_tasks(bool routing_available);
 Result configure_windows_startup(bool enabled);
 Result show_in_explorer(const std::filesystem::path&);
 std::filesystem::path first_run_marker_path();
+bool registered_installation(const std::filesystem::path& directory);
 } // namespace audiohole::gui

@@ -3,6 +3,36 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 namespace audiohole {
+Result license_acceptance_needed(const std::filesystem::path& receipt, bool& needed) {
+    const auto checked = first_run_needed(receipt, needed);
+    if (!checked.ok || needed)
+        return checked;
+    try {
+        if (std::filesystem::file_size(receipt) > 4096)
+            throw std::runtime_error("License receipt is too large.");
+        std::ifstream input(receipt, std::ios::binary);
+        const auto json = nlohmann::json::parse(input);
+        if (json.at("format") != "audiohole-license-acceptance" || json.at("schema_version") != 1 ||
+            json.at("accepted") != true)
+            throw std::runtime_error("Invalid license acceptance receipt.");
+        return {true, "License acceptance checked."};
+    } catch (const std::exception& error) {
+        return {false, std::string("Cannot read license acceptance: ") + error.what()};
+    }
+}
+Result accept_license(const std::filesystem::path& receipt) {
+    bool needed = true;
+    const auto checked = license_acceptance_needed(receipt, needed);
+    if (!checked.ok || !needed)
+        return checked;
+    return replace_document(receipt,
+                            nlohmann::json{{"format", "audiohole-license-acceptance"},
+                                           {"schema_version", 1},
+                                           {"accepted", true}}
+                                    .dump(2) +
+                                "\n",
+                            {});
+}
 namespace {
 using Json = nlohmann::ordered_json;
 std::string outcome_name(OnboardingOutcome outcome) {

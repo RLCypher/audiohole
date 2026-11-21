@@ -79,6 +79,7 @@ function Run-Uninstall([string]$Label, [switch]$PurgeData) {
     }
     throw "Uninstall worker did not finish within 60 seconds: $Label; see $log"
 }
+$completed = $false
 try {
     New-Item -ItemType Directory -Path $temporary -Force | Out-Null
     $null = Run-Setup 'fresh'
@@ -122,10 +123,19 @@ try {
     if (Test-Path (Join-Path $target 'AudioHole.exe')) { throw 'Final application uninstall failed' }
     if (-not $existingData -and (Test-Path -LiteralPath $dataRoot)) { throw 'Explicit purge retained the AudioHole data directory' }
     Write-Host 'PASS: fresh install, version decisions, owned-file retirement, data preservation and uninstall lifecycle.'
+    $completed = $true
 } finally {
-    New-Item -ItemType Directory -Path $Evidence -Force | Out-Null
+    if (-not $completed -and (Test-Path -LiteralPath $temporary)) {
+        foreach ($log in Get-ChildItem -LiteralPath $temporary -Filter '*.log') {
+            Write-Host ("Installer test log: " + $log.Name)
+            Get-Content -LiteralPath $log.FullName -Tail 40 | Write-Host
+        }
+    }
     if (Test-Path -LiteralPath $temporary) {
-        Get-ChildItem -LiteralPath $temporary -Filter '*.log' | Copy-Item -Destination $Evidence -Force
+        if ($env:AUDIOHOLE_CAPTURE_EVIDENCE -eq '1') {
+            New-Item -ItemType Directory -Path $Evidence -Force | Out-Null
+            Get-ChildItem -LiteralPath $temporary -Filter '*.log' | Copy-Item -Destination $Evidence -Force
+        }
     }
     if (Test-Path -LiteralPath $sentinel) { Remove-Item -LiteralPath $sentinel -Force }
     # Cleanup must not replace a more useful uninstall/assertion failure. Logs

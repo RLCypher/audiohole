@@ -581,6 +581,11 @@ void SimulatedController::event(std::string type, std::string detail) {
                           : type == "recovering"                   ? Severity::Warning
                                                                    : Severity::Info;
     state_.events.push_back({++sequence_, std::move(type), std::move(detail), severity});
+    if (state_.logging_enabled || state_.events.back().type.starts_with("scan-")) {
+        state_.diagnostic_events.push_back(state_.events.back());
+        if (state_.diagnostic_events.size() > maximum_diagnostic_events)
+            state_.diagnostic_events.erase(state_.diagnostic_events.begin());
+    }
     if (state_.events.size() > maximum_diagnostic_events)
         state_.events.erase(state_.events.begin());
     ++state_.revision;
@@ -1017,10 +1022,21 @@ Result SimulatedController::beep(const std::string& id) {
     return {true, "Test Beep active for the selected destination."};
 }
 void SimulatedController::clear_diagnostics() {
+    state_.diagnostic_events.clear();
     state_.events.clear();
     ++state_.revision;
     // Do not reset sequence_ or emit a replacement event: clearing must leave an
     // empty log, and future events must remain newer than consumers' cursors.
+}
+void SimulatedController::set_logging(bool enabled) {
+    if (state_.logging_enabled == enabled)
+        return;
+    if (enabled)
+        state_.logging_enabled = true;
+    event(enabled ? "logging-started" : "logging-stopped",
+          enabled ? "Diagnostic logging started." : "Diagnostic logging stopped.");
+    state_.logging_enabled = enabled;
+    ++state_.revision;
 }
 void SimulatedController::cancel_beep() {
     if (!state_.beep_destination.empty())

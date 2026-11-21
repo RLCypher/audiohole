@@ -21,4 +21,7 @@ Result reset_first_run(const std::filesystem::path& marker);
 // Outcome/receipt writes use the same marker and atomic external-edit protection.
 Result read_onboarding_status(const std::filesystem::path&, OnboardingStatus&);
 Result mark_onboarding_greeting_shown(const std::filesystem::path&);
+// Independent of tutorial completion/replay. Acceptance is one-time per user.
+Result license_acceptance_needed(const std::filesystem::path&, bool& needed);
+Result accept_license(const std::filesystem::path&);
 } // namespace audiohole

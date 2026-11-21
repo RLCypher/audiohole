@@ -2,6 +2,12 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $repo 'scripts/Build-Names.ps1')
+if ((Get-AudioHoleDisplayVersion '0.1.0') -ne '0.1' -or
+    (Get-AudioHoleDisplayVersion '0.1.2') -ne '0.1.2' -or
+    (Get-AudioHoleInstallerName '0.1.0') -ne 'Install AudioHole v0.1') {
+    throw 'Versioned display names lost their version or nonzero patch number.'
+}
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('AudioHole-distribution-tests-' + [guid]::NewGuid())
 try {
     New-Item -ItemType Directory -Path "$fixture/source" -Force | Out-Null
@@ -45,6 +51,13 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Cannot read expected source status' }
     $expectedDirty = -not [string]::IsNullOrWhiteSpace(($sourceStatus -join "`n"))
     if ($meta.configuration -ne 'Release' -or $meta.source_dirty -ne $expectedDirty -or $meta.commit -ne $expectedCommit) { throw 'Wrong metadata' }
+    $displayVersion = Get-AudioHoleDisplayVersion $meta.version
+    $suffix = if ($expectedDirty) { '-dirty' } else { '' }
+    $expectedName = "AudioHole-v$displayVersion-Windows-x64-release-$($expectedCommit.Substring(0,7))$suffix"
+    if ($zip[0].BaseName -ne $expectedName -or $root.Name -ne $expectedName -or
+        $meta.source_archive -ne "AudioHole-v$displayVersion-Source-$($expectedCommit.Substring(0,7))$suffix.zip") {
+        throw 'Archive/folder names must use the display version and seven-character commit.'
+    }
     if ($meta.format -ne 'audiohole-build-info' -or $meta.schema_version -ne 1 -or
         $meta.product -ne 'AudioHole' -or $meta.version -notmatch '^\d+\.\d+\.\d+$' -or
         $meta.build_number -lt 0 -or -not $meta.source_archive.EndsWith('.zip')) { throw 'Missing installer/source metadata' }
@@ -58,14 +71,14 @@ try {
 $payload = ($args | Where-Object { $_ -like '/DPayload=*' }).Substring(10)
 $output = ($args | Where-Object { $_ -like '/DOutput=*' }).Substring(9)
 $name = ($args | Where-Object { $_ -like '/DOutputName=*' }).Substring(13)
-if (@(Get-ChildItem -LiteralPath $payload -Filter '*Setup*.exe').Count) { throw 'Installer recursively included in its own payload' }
+if (@(Get-ChildItem -LiteralPath $payload -Filter 'Install AudioHole v*.exe').Count) { throw 'Installer recursively included in its own payload' }
 if (-not (Test-Path -LiteralPath (Join-Path $payload 'AudioHole.exe'))) { throw 'Missing installer runtime payload' }
 'Inert setup fixture; never execute.' | Set-Content -LiteralPath (Join-Path $output "$name.exe")
 $global:LASTEXITCODE = 0
 '@ | Set-Content -LiteralPath $compiler
     $bundle = Join-Path $fixture 'portable'
     & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $bundle -Compiler $compiler
-    $setup = @(Get-ChildItem -LiteralPath $bundle -Filter 'AudioHole-Setup-*.exe')
+    $setup = @(Get-ChildItem -LiteralPath $bundle -Filter 'Install AudioHole v*.exe')
     if ($setup.Count -ne 1 -or -not (Test-Path -LiteralPath (Join-Path $bundle 'AudioHole.exe'))) { throw 'Portable application and installer were not colocated' }
     & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
     & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $root.FullName -Compiler $compiler
@@ -84,7 +97,7 @@ $global:LASTEXITCODE = 0
         & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
         throw 'Expected misplaced/missing installer rejection was missing'
     } catch {
-        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents.*Missing: AudioHole-Setup-') { throw }
+        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents.*Missing: Install AudioHole v') { throw }
     }
     'Different build fixture' | Set-Content -LiteralPath (Join-Path $bundle 'AudioHole.exe')
     try {

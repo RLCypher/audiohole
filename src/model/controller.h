@@ -141,6 +141,10 @@ struct Snapshot {
     std::string beep_destination;
     std::vector<PathStatus> paths;
     std::vector<Event> events;
+    // Operational events remain available for commands/tutorial/notifications.
+    // Diagnostic capture is separately bounded and opt-in; scan output is live.
+    bool logging_enabled = false;
+    std::vector<Event> diagnostic_events;
     std::uint64_t revision = 0;
     ScannerStatus scanner;
     // Real-engine copied observations; absent in Tutorial and legacy fixtures.
@@ -269,6 +273,7 @@ class Controller {
     // filtered entries. Preserves event sequence monotonicity and all routing,
     // profile, device, scan, startup and observation state; no disk files touched.
     virtual void clear_diagnostics() = 0;
+    virtual void set_logging(bool) = 0;
     // Simulated progress only. Advanced consent and scope are presentation concerns;
     // no fixture capability is promoted to experimental/verified hardware evidence.
     virtual void scan(bool enabled, bool advanced = false, ScanScope scope = ScanScope::Update,
@@ -306,6 +311,7 @@ class SimulatedController final : public Controller {
     Result beep(const std::string&) override;
     void cancel_beep() override;
     void clear_diagnostics() override;
+    void set_logging(bool) override;
     void scan(bool, bool advanced = false, ScanScope scope = ScanScope::Update,
               const std::string& selected_device = {}, const ScanOptions& options = {}) override;
     Result scanner_action(const ScannerActionRequest&) override;

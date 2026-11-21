@@ -12,6 +12,11 @@
 #include <wx/stdpaths.h>
 
 namespace audiohole::gui {
+bool save_smoke_evidence(const wxBitmap& bitmap, const wxString& path, wxBitmapType type) {
+    wxString enabled;
+    return !wxGetEnv("AUDIOHOLE_CAPTURE_EVIDENCE", &enabled) || enabled != "1" ||
+           bitmap.SaveFile(path, type);
+}
 namespace {
 bool can_scroll(wxWindow& control, const wxMouseEvent& event) {
     const bool horizontal = event.GetWheelAxis() == wxMOUSE_WHEEL_HORIZONTAL;
@@ -324,8 +329,9 @@ void theme_dialog(wxWindow* window, const std::string& appearance) {
     // Owned dialogs inherit the application's resolved appearance, rather than
     // consulting Windows again and ignoring an explicit Light/Dark preference.
     const auto* owner = window->GetParent();
-    const bool dark = !contrast && (appearance == "dark"    ? true
-                                    : appearance == "light" ? false
+    const bool dark = !contrast && (appearance == "dark"     ? true
+                                    : appearance == "light"  ? false
+                                    : appearance == "system" ? !light
                                     : owner && owner->GetBackgroundColour().IsOk()
                                         ? owner->GetBackgroundColour().GetLuminance() < 0.5
                                         : !light);

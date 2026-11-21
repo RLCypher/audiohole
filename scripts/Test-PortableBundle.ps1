@@ -3,6 +3,7 @@
 param([Parameter(Mandatory)][string]$Directory)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'Build-Names.ps1')
 $root = (Resolve-Path -LiteralPath $Directory).Path
 $metadata = Get-Content -LiteralPath (Join-Path $root 'docs/build-info.json') -Raw | ConvertFrom-Json
 if ($metadata.product -ne 'AudioHole' -or $metadata.commit -notmatch '^[0-9a-f]{40}$' -or
@@ -10,7 +11,7 @@ if ($metadata.product -ne 'AudioHole' -or $metadata.commit -notmatch '^[0-9a-f]{
     $metadata.configuration -notin @('Debug', 'Release') -or $metadata.build_number -lt 0) {
     throw 'Invalid portable bundle metadata.'
 }
-$installer = "AudioHole-Setup-$($metadata.version)-build$($metadata.build_number)-$($metadata.configuration)-$($metadata.commit.Substring(0,12)).exe"
+$installer = (Get-AudioHoleInstallerName $metadata.version) + '.exe'
 $runtime = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
 if (Compare-Object ($runtime | Sort-Object) ($metadata.runtime_files | Sort-Object)) {
     throw 'Portable runtime manifest differs from the approved runtime files.'

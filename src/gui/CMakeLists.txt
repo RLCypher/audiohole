@@ -10,7 +10,7 @@ if(Git_FOUND)
     set(audiohole_build_commit "unknown")
   endif()
 endif()
-add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
+add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp license_dialog.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_VERSION="${PROJECT_VERSION}")
@@ -86,3 +86,5 @@ install(FILES "${PROJECT_SOURCE_DIR}/docs/guides/AI-DISCLOSURE.txt"
   "${PROJECT_SOURCE_DIR}/docs/guides/Speedrunning the Tutorial.txt"
   "${PROJECT_SOURCE_DIR}/docs/guides/The AudioHole Manifesto.txt"
   DESTINATION "Guides and Manuals" COMPONENT Runtime)
+
+set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.txt")

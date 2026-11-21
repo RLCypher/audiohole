@@ -1,7 +1,7 @@
 # Optional Windows installer
 
 The distributed ZIP is a directly runnable portable application folder. Its main
-folder contains AudioHole.exe, the optional versioned AudioHole-Setup executable,
+folder contains AudioHole.exe, the optional Install AudioHole v<version>.exe executable,
 a Guides and Manuals folder containing the user manual, quick-start and tuning
 guides, manifesto, and AI disclosure, and the supporting runtime files. These
 documents are included in both portable and installed copies. The owner-authored
@@ -71,7 +71,7 @@ fresh installation, higher/equal/lower/malformed version decisions, manifest fil
 retirement, custom-file preservation, uninstall retention and an explicit purge
 when no preexisting user data exists. Every setup pass verifies its current
 registered uninstaller, and a further reinstall checks that the installer's own
-Uninstall action resolves the same path. Uninstall logs are retained as evidence. CI also supplies the matching corresponding
+Uninstall action resolves the same path. Uninstall diagnostics are kept as ordinary test logs; evidence copies are opt-in. CI also supplies the matching corresponding
 source as a separate Source artifact on the same CI run. The portable binary ZIP
 contains no source archive. Source upload must succeed before binary publication.
 
@@ -80,3 +80,10 @@ Within the same 60-second deadline it requires the pinned Inno engine's success 
 log-closed records and an exclusive read of the closed log. Data-removal assertions,
 reinstallation and log collection happen only after that completion. A failed
 worker still fails the check; temporary-file cleanup cannot mask that failure.
+
+The complete installer and uninstaller use Inno Setup modern dynamic styling,
+following Windows light/dark mode. Portable first use shows the same embedded
+agreement and records acceptance beside the tutorial flag. Registered installed
+copies have already presented this agreement through setup. Replay does not
+reset license acceptance. Artifact names use the display version and seven-character
+commit prefix; full version/commit metadata remains in docs/build-info.json.

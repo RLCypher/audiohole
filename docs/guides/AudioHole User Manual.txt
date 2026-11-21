@@ -101,7 +101,7 @@ See "Backing up and moving your setup" later in this guide.
 
 Optional installation
 ---------------------
-Run the included AudioHole-Setup installer if you prefer a conventional Windows
+Run the included Install AudioHole v0.1.exe installer if you prefer a conventional Windows
 installation. The default destination is C:\Program Files\AudioHole. You can
 choose another location and select Desktop and Start menu shortcuts.
 
@@ -116,6 +116,10 @@ the saved AudioHole data for your Windows account.
 
 First launch
 ------------
+On the first portable launch, read the license agreement, select "I accept the
+agreement", and choose Start AudioHole. Acceptance is remembered with your saved
+settings. The license window and installer follow Windows' light/dark theme.
+
 Choose "It's my first time" to enter the guided tutorial. It uses practice
 devices and applications so you can learn the workflow independently of your
 working setup. You can also enter the application directly and use the steps
@@ -540,7 +544,14 @@ Stopping    AudioHole is closing the connections.
 Performance Diagnostics on Profiles shows per-direction status and observations.
 Use it to identify which part of a setup is running and which needs attention.
 
-Scanning / Diagnostics provides a searchable technical log. Use Search technical
+Scanning / Diagnostics provides a searchable technical log. Start Logging enables
+diagnostic capture and changes to Stop Logging. Logging starts off. Stopping it
+retains the captured history; live scan output and saved device results continue.
+Detailed scan progress is saved while logging is enabled. Scan-session archives
+are limited to the newest 16 folders and 512 MB total, with the oldest completed
+sessions removed automatically. Device records and profiles are stored separately.
+
+The diagnostic view provides filters and search. Use Search technical
 diagnostics and Diagnostic filter to narrow it. Copy visible diagnostics copies
 the displayed entries; Export visible diagnostics saves them. Export scan bundle
 saves scan information for sharing or support. Clear diagnostics log clears the

@@ -709,7 +709,8 @@ bool Frame::tutorial_smoke(const wxString& directory) {
                              origin.y);
             destination.SelectObject(wxNullBitmap);
             // Desktop capture is review evidence, not a visual correctness assertion.
-            bitmap.SaveFile(directory + "/" + wxString::FromUTF8(name) + ".bmp", wxBITMAP_TYPE_BMP);
+            save_smoke_evidence(bitmap, directory + "/" + wxString::FromUTF8(name) + ".bmp",
+                                wxBITMAP_TYPE_BMP);
         };
         check("N001");
         require(personality_ == "default" && !show_onboarding_greeting(OnboardingOutcome::Skipped),

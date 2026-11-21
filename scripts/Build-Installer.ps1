@@ -9,6 +9,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
+. (Join-Path $PSScriptRoot 'Build-Names.ps1')
 if (-not (Test-Path -LiteralPath $Compiler -PathType Leaf)) { throw 'Install Inno Setup 7.1.1, or pass -Compiler.' }
 $temporary = Join-Path ([IO.Path]::GetTempPath()) ('AudioHole-installer-' + [guid]::NewGuid())
 try {
@@ -26,7 +27,7 @@ try {
         (Compare-Object ($meta.runtime_files | Sort-Object) $files)) { throw 'Installer payload differs from audited runtime manifest.' }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
     $output = [IO.Path]::GetFullPath($OutputDirectory)
-    $name = "AudioHole-Setup-$($meta.version)-build$($meta.build_number)-$($meta.configuration)-$($meta.commit.Substring(0,12))"
+    $name = Get-AudioHoleInstallerName $meta.version
     if (Test-Path -LiteralPath (Join-Path $output "$name.exe")) { throw 'Installer already exists.' }
     $existing = @(Get-ChildItem -LiteralPath $output -File -Recurse -Force)
     if ($existing.Count -eq 0) {

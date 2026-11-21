@@ -3,6 +3,7 @@
 #include "model/configuration_bundle.h"
 #include <wx/datetime.h>
 #include <wx/ffile.h>
+#include <wx/wrapsizer.h>
 
 namespace audiohole::gui {
 namespace {
@@ -223,7 +224,14 @@ void Frame::build_scan() {
                     event.GetSashPosition(), scan_output_split_->GetMinimumPaneSize(), maximum));
         });
     root->Add(scan_output_split_, 1, wxEXPAND | wxALL, FromDIP(4));
-    auto* export_row = new wxBoxSizer(wxHORIZONTAL);
+    auto* export_row = new wxWrapSizer(wxHORIZONTAL);
+    logging_button_ = button(page, export_row, "Start Logging", [this] {
+        controller_->set_logging(!controller_->snapshot().logging_enabled);
+        refresh();
+    });
+    logging_button_->SetName("Diagnostic logging");
+    logging_button_->SetToolTip("Capture diagnostic events until stopped. Live scan output remains "
+                                "visible when logging is off.");
     button(page, export_row, "Copy visible diagnostics", [this] {
         if (!wxTheClipboard->Open()) {
             show_result(

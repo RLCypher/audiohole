@@ -201,6 +201,24 @@ std::filesystem::path preferences_root() {
     return std::filesystem::path(wxStandardPaths::Get().GetUserLocalDataDir().ToStdWstring()) /
            "PreviewBuild";
 }
+bool registered_installation(const std::filesystem::path& directory) {
+    for (const auto hive : {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE})
+        for (const auto view : {RRF_SUBKEY_WOW6464KEY, RRF_SUBKEY_WOW6432KEY}) {
+            std::array<wchar_t, 32768> value{};
+            DWORD size = static_cast<DWORD>(sizeof(value));
+            if (RegGetValueW(
+                    hive, L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AudioHole_is1",
+                    L"InstallLocation", RRF_RT_REG_SZ | view, nullptr, value.data(),
+                    &size) == ERROR_SUCCESS) {
+                std::error_code error;
+                if (std::filesystem::equivalent(directory, std::filesystem::path(value.data()),
+                                                error) &&
+                    !error)
+                    return true;
+            }
+        }
+    return false;
+}
 std::filesystem::path first_run_marker_path() {
     return preferences_root() / "test" / "AudioHole.has-run";
 }

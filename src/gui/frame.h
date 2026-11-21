@@ -286,6 +286,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     wxStaticText* routing_engine_notice_{};
     wxChoice *personality_choice_{}, *scan_mode_{}, *scan_scope_{}, *severity_{}, *startup_{},
         *startup_target_{}, *notifications_{};
+    wxButton* logging_button_{};
     wxSpinCtrl* delay_{};
     wxGauge* scan_progress_{};
     wxButton* tutorial_end_{};
