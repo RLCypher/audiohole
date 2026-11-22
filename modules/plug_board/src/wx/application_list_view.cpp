@@ -105,7 +105,7 @@ class ExemptAppsDialog final : public wxDialog {
                 timer_.Stop();
                 if (result.ok)
                     original_ = pending_names_;
-                set_status(result.ok ? "Saved." : ui_text(result.message));
+                set_status(result.ok ? wxString("Saved.") : ui_text(result.message));
                 apply_->Enable();
                 common_->Enable();
                 names_->Enable();

@@ -1,6 +1,7 @@
 #include "audiohole/plug_board/application_list.hpp"
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <tuple>
 #include <wx/access.h>
 #include <wx/modalhook.h>
 #include <wx/textdlg.h>
@@ -96,6 +97,24 @@ void Frame::plug_board_clutter_smoke() {
         }
         return std::pair<wxVListBox*, std::size_t>{nullptr, 0};
     };
+    // Earlier disclosure checks deliberately leave activity sections collapsed.
+    // Expand the real Inactive headers before looking for their app groups.
+    for (const auto& column : plug_board_view_->layout_diagnostics().sockets) {
+        auto* rows = wxWindow::FindWindowById(column.applications_control_id, plug_board_view_);
+        auto* accessible = rows ? rows->GetAccessible() : nullptr;
+        int children = 0;
+        if (!accessible || accessible->GetChildCount(&children) != wxACC_OK)
+            continue;
+        for (int child = 1; child <= children; ++child) {
+            wxString name;
+            if (accessible->GetName(child, &name) == wxACC_OK && name.StartsWith("Inactive (") &&
+                name.EndsWith("collapsed")) {
+                require(accessible->DoDefaultAction(child) == wxACC_OK,
+                        "could not expand Inactive for grouped apps");
+                break;
+            }
+        }
+    }
     pump([&] { return bundle(3, false).first != nullptr; });
     auto [group_rows, group_row] = bundle(3, true);
     require(group_rows, "shared hosts lack a real expandable group");
@@ -221,7 +240,7 @@ void Frame::plug_board_clutter_smoke() {
                     frame->plug_board_->snapshot()->library->inactive_exempt_apps != initial)
                     throw std::runtime_error("Common process suggestions replaced custom names, "
                                              "duplicated or applied themselves");
-                field->ChangeValue(save ? "powershell" : "Do not save this");
+                field->ChangeValue(save ? "powershell, My PowerShell script" : "Do not save this");
                 if (save) {
                     wxCommandEvent apply(wxEVT_BUTTON, wxID_APPLY);
                     dialog->FindWindow(wxID_APPLY)->GetEventHandler()->ProcessEvent(apply);
@@ -249,7 +268,7 @@ void Frame::plug_board_clutter_smoke() {
         answer.Unregister();
         require(answer.seen, "Exempt apps did not open its actual popup");
         require(plug_board_->snapshot()->library->inactive_exempt_apps ==
-                    std::vector<std::string>{"powershell"},
+                    std::vector<std::string>{"powershell", "My PowerShell script"},
                 "Apply or unapplied Close changed the wrong list");
     }
     theme_choice_->SetSelection(original_theme);
