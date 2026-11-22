@@ -4,7 +4,7 @@
 
 AudioHole is a free, open-source Windows audio routing application built around a simple idea: you paid for the hardware, so you ought to decide where the audio goes.
 
-Got a headset that refuses to cooperate with your mixer? A collection of perfectly good audio devices that act like they've never met? Games, music, and voice chat all fighting over the same output like it's the last parking space at Costco?
+Got a headset that refuses to cooperate with your mixer? A collection of perfectly good audio devices that act like they've never met? Games, music, and voice chat all shouting over the same output like it's the last parking space at Costco?
 
 Yeah. We got tired of that too.
 
