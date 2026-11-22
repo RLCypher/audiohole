@@ -14,8 +14,8 @@ Yeah. We got tired of that too.
 
 Pick your preferred flavor:
 
-- **Portable ZIP:** Unzip it into a folder and run it. No installation, no ceremony.
 - **Windows installer:** For people who like their applications properly moved in, with their shoes by the door.
+- **Portable ZIP:** Unzip it into a folder and run it. No installation, no ceremony.
 
 Both get you AudioHole. Pick whichever suits your particular brand of laziness. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
 
@@ -28,7 +28,7 @@ SmartScreen is a legitimate Windows security feature, and I have no intention of
 
 AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
 
-The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare notes.
+The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare version numbers. I won't stand for wasting your precious bandwidth on telemetry data.
 
 ## What does it do?
 
