@@ -356,6 +356,9 @@ std::shared_ptr<const ModuleSnapshot> Module::snapshot() const {
 }
 std::future<CommandResult> Module::submit(Command command, std::optional<std::uint64_t> expected,
                                           std::optional<std::string> expected_board) {
+    const bool interrupts_policy = !std::holds_alternative<ClearInactiveApplications>(command) &&
+                                   !std::holds_alternative<SetInactiveExemptions>(command) &&
+                                   !std::holds_alternative<RenameApplication>(command);
     auto promise = std::make_shared<std::promise<CommandResult>>();
     auto future = promise->get_future();
     auto* state = implementation_.get();
@@ -370,7 +373,7 @@ std::future<CommandResult> Module::submit(Command command, std::optional<std::ui
                      promise->set_value(unavailable(
                          "unavailable", "Plug Board is stopping or its command queue is full."));
                  },
-                 true});
+                 interrupts_policy});
     return future;
 }
 void Module::set_visible(bool visible) {

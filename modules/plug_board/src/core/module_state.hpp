@@ -48,6 +48,7 @@ struct Module::Implementation {
         std::string attempted_fingerprint;
         std::string identity_signature;
         std::string icon_signature;
+        std::string provisional_key;
         std::uint64_t last_seek_generation = 0;
     };
     struct CachedImage {

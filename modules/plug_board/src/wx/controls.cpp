@@ -168,8 +168,8 @@ Appearance appearance_for_window(wxWindow* window) {
         return appearance_for("Follow System");
     return appearance_for(top->GetBackgroundColour().GetLuminance() < 0.5 ? "Dark" : "Light");
 }
-Button::Button(wxWindow* parent, const wxString& label, const wxString& help)
-    : wxButton(parent, wxID_ANY, label) {
+Button::Button(wxWindow* parent, const wxString& label, const wxString& help, wxWindowID id)
+    : wxButton(parent, id, label) {
     SetName(label);
     SetToolTip(help);
     SetMinSize(wxSize(-1, FromDIP(32)));

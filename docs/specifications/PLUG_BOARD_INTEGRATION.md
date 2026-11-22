@@ -128,3 +128,11 @@ preserving the board's recent-activity interval. The settings drawer retains its
 current open/closed state and position. Once enabled, each socket's group can be
 collapsed or expanded independently. Mouse, keyboard, and accessibility actions
 use the same group activation path.
+
+## Owner-authorized app-list controls
+
+[App-list behavior and verification](../development/PLUG-BOARD-APP-LIST.md) specifies
+inactive clearing/exemptions, expandable groups, editable labels, additive fields,
+and local reassociation of the same shared-host process across host restarts.
+These are presentation preferences: routing identities, saved assignments and
+native policy behavior remain independent of grouping, labels and visibility.

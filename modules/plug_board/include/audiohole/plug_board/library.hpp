@@ -67,7 +67,11 @@ struct ApplicationRecord {
     Document identity_extra = Document::object();
     std::vector<Document> alias_extras;
     Document extra = Document::object();
+    std::string detected_name;
+    std::string host_name;
+    bool inactive_hidden = false;
 };
+// Presentation fields never confer native routing authority.
 struct Library {
     std::uint64_t revision = 0;
     std::string default_board_id;
@@ -75,6 +79,7 @@ struct Library {
     std::vector<ApplicationRecord> applications;
     std::vector<RoutingBoard> boards;
     Document extra = Document::object();
+    std::vector<std::string> inactive_exempt_apps;
 };
 
 // Bounded, strict UTF-8 JSON with duplicate-key and semantic-reference checks.
@@ -169,11 +174,22 @@ struct RetryRouting {
     std::string application_id;
 };
 struct RefreshApplications {};
+struct RenameApplication {
+    std::string application_id, name;
+};
+struct SetInactiveExemptions {
+    std::vector<std::string> names;
+};
+// Service filters these IDs against current activity before preparing the edit.
+struct ClearInactiveApplications {
+    std::vector<std::string> application_ids;
+};
 
 using Command = std::variant<CreateBoard, DeleteBoard, SaveBoard, SaveBoardAs, RenameBoard,
                              SetDefaultBoard, LinkProfile, CreateSocket, DeleteSocket, RenameSocket,
                              ReorderSocket, SetSocketEndpoint, SetSocketAppearance, MoveApplication,
-                             SetBoardSettings, SelectBoard, RetryRouting, RefreshApplications>;
+                             SetBoardSettings, SelectBoard, RetryRouting, RefreshApplications,
+                             RenameApplication, SetInactiveExemptions, ClearInactiveApplications>;
 
 struct LibraryEdit {
     Library library;

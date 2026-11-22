@@ -76,6 +76,11 @@ void Frame::plug_board_smoke(bool lesson) {
         require(state->inventory.endpoints.empty() && state->applications.empty() &&
                     state->platform_metrics.policy_writes == 0,
                 "empty Test Mode exposed fake or real device/application fixtures");
+        auto* exempt = wxWindow::FindWindowByLabel("Exempt apps", plug_board_view_);
+        auto* clear = wxWindow::FindWindowByLabel("Clear inactive apps", plug_board_view_);
+        require(exempt && exempt->IsEnabled() && clear && !clear->IsEnabled() &&
+                    state->library->inactive_exempt_apps.empty(),
+                "empty Test Mode app-list controls or opt-in defaults are incorrect");
         select_page(original_page);
         pump([&] { return !plug_board_->snapshot()->visible; }, "hidden empty Test Mode board");
         return;
@@ -520,6 +525,9 @@ void Frame::plug_board_smoke(bool lesson) {
         apply_appearance();
         require(controller_->snapshot().revision == host_revision,
                 "Plug Board UI changed the profile editor or engine");
+        plug_board_clutter_smoke();
+        require(controller_->snapshot().revision == host_revision,
+                "App-list controls changed the profile editor or engine");
         select_page(original_page);
         pump(
             [&] {

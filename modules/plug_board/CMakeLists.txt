@@ -41,7 +41,7 @@ if(NOT TARGET nlohmann_json::nlohmann_json)
     FetchContent_MakeAvailable(nlohmann_json)
 endif()
 find_package(Threads REQUIRED)
-add_library(plug_board_model src/core/library.cpp src/core/storage.cpp src/core/diagnostics.cpp src/core/presentation.cpp
+add_library(plug_board_model src/core/application_list.cpp src/core/library.cpp src/core/storage.cpp src/core/diagnostics.cpp src/core/presentation.cpp
     src/core/module.cpp src/core/module_state.cpp src/core/module_persistence.cpp src/core/simulation.cpp)
 add_library(audiohole::plug_board_model ALIAS plug_board_model)
 target_link_libraries(plug_board_model PUBLIC plug_board_core nlohmann_json::nlohmann_json Threads::Threads)
@@ -69,7 +69,7 @@ if(PLUG_BOARD_BUILD_TESTS)
     # One invocation works both natively and with an explicitly supplied cross emulator.
     # It fails if no tests execute; a build alone is never recorded as a test run.
     add_test(NAME PlugBoard.Contracts COMMAND plug_board_tests)
-    add_executable(plug_board_model_tests tests/main.cpp tests/library_test.cpp tests/storage_test.cpp tests/module_test.cpp tests/presentation_test.cpp)
+    add_executable(plug_board_model_tests tests/main.cpp tests/application_list_test.cpp tests/library_test.cpp tests/storage_test.cpp tests/module_test.cpp tests/presentation_test.cpp)
     target_link_libraries(plug_board_model_tests PRIVATE plug_board_model GTest::gtest)
     plug_board_warnings(plug_board_model_tests)
     if(MINGW)
@@ -135,7 +135,7 @@ if(WIN32 AND PLUG_BOARD_BUILD_WINDOWS_BACKEND)
         # Embedding depends on this view and model, not the standalone frame or
         # its native host shim. Hosts supply inventory, profiles and visibility.
         add_library(plug_board_wx STATIC src/wx/controls.cpp src/wx/native_theme.cpp src/wx/dialogs.cpp src/wx/view.cpp
-            src/wx/socket_view.cpp src/wx/socket_style.cpp src/wx/settings_drawer.cpp)
+            src/wx/application_list_view.cpp src/wx/socket_view.cpp src/wx/socket_style.cpp src/wx/settings_drawer.cpp)
         add_library(audiohole::plug_board_wx ALIAS plug_board_wx)
         target_include_directories(plug_board_wx PUBLIC include PRIVATE src/wx)
         target_compile_definitions(plug_board_wx PUBLIC UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)

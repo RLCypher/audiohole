@@ -58,7 +58,7 @@ struct PlugBoardView::Implementation final : public wxEvtHandler {
     wxCheckBox *use_default{}, *associate{}, *inactive{};
     wxListBox* sockets{};
     wxButton *add_board{}, *delete_board{}, *save{}, *save_as{}, *rename_board{}, *add_socket{},
-        *delete_socket{}, *windows_mixer{};
+        *delete_socket{}, *windows_mixer{}, *clear_inactive_button{}, *exempt_apps{};
     std::vector<std::string> board_ids, profile_ids, socket_ids;
     std::vector<unsigned> recent_values{60, 300, 900, 1800, 3600, 86400};
     std::vector<std::future<CommandResult>> pending;
@@ -119,6 +119,10 @@ struct PlugBoardView::Implementation final : public wxEvtHandler {
     void rename_socket(const std::string&);
     void reorder_socket(std::size_t source, std::size_t destination);
     void finish_socket_drag(bool commit, const wxPoint& destination = wxDefaultPosition);
+    void exempt_apps_dialog();
+    void clear_inactive(const std::vector<std::string>& candidates = {});
+    void rename_app(const std::string&);
+    void group_menu(const std::vector<std::string>&, wxWindow&, wxPoint);
     void app_menu(const std::string&, wxWindow&, wxPoint);
     void socket_menu(const std::string&, wxWindow&, wxPoint);
     wxString drag_payload(const std::string&) const;
@@ -154,11 +158,15 @@ class ApplicationRows final : public wxVListBox {
         int section = 0;
         bool heading = false;
         std::string application_id;
+        std::string group_key{};
+        std::string group_name{};
+        bool member = false;
     };
     ApplicationRows(wxWindow*, PlugBoardView::Implementation&, std::string socket_id);
     ~ApplicationRows() override;
     void update(const std::array<std::vector<std::string>, 3>&, bool show_inactive);
     void activate(std::size_t);
+    bool is_expanded(std::size_t) const;
     wxString accessible_name(std::size_t) const;
     wxString accessible_help(std::size_t) const;
     // VirtualHitTest returns a row; wxWindow::HitTest returns a window region.
@@ -180,6 +188,10 @@ class ApplicationRows final : public wxVListBox {
     std::vector<Row> entries;
     std::array<std::size_t, 3> counts{};
     std::array<bool, 3> expanded{true, true, false};
+    std::set<std::string> expanded_bundles;
+    std::map<std::string, std::vector<std::string>> bundled;
+    void context_menu(std::size_t, wxPoint);
+    void rebuild();
 
   protected:
     void OnDrawItem(wxDC&, const wxRect&, std::size_t) const override;
@@ -192,6 +204,7 @@ class ApplicationRows final : public wxVListBox {
     std::string socket_id;
     std::array<std::vector<std::string>, 3> groups;
     bool show_inactive = false;
+    std::vector<std::string> grouping_names;
     wxPoint press;
     std::string pressed_application;
     wxFont detail_font;

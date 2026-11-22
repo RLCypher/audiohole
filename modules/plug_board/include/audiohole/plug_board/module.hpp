@@ -109,6 +109,8 @@ struct ApplicationView {
     ObservationState observed_routing = ObservationState::Unknown;
     LivePolicyReport policy;
     std::shared_ptr<const ApplicationImage> image;
+    std::string group_name;
+    bool hidden_inactive = false;
 };
 
 // Operation counts are distinct from measured process I/O. Native backends

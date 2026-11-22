@@ -1,3 +1,4 @@
+#include "audiohole/plug_board/application_list.hpp"
 #include "audiohole/plug_board/socket_styles.hpp"
 #include "native_theme.hpp"
 #include "socket_style.hpp"
@@ -54,6 +55,10 @@ class RowsAccessible final : public wxAccessible {
         *state = wxACC_STATE_SYSTEM_FOCUSABLE | wxACC_STATE_SYSTEM_SELECTABLE;
         if (child && rows.GetSelection() == child - 1)
             *state |= wxACC_STATE_SYSTEM_SELECTED;
+        if (child && rows.entries[static_cast<std::size_t>(child - 1)].heading)
+            *state |= rows.is_expanded(static_cast<std::size_t>(child - 1))
+                          ? wxACC_STATE_SYSTEM_EXPANDED
+                          : wxACC_STATE_SYSTEM_COLLAPSED;
         if (rows.HasFocus())
             *state |= wxACC_STATE_SYSTEM_FOCUSED;
         if (child && rows.GetItemRect(static_cast<std::size_t>(child - 1)).IsEmpty())
@@ -310,14 +315,18 @@ ApplicationRows::ApplicationRows(wxWindow* parent, PlugBoardView::Implementation
             row = hit ? static_cast<int>(*hit) : wxNOT_FOUND;
         } else if (row >= 0)
             point = GetItemRect(static_cast<std::size_t>(row)).GetBottomLeft();
-        if (row >= 0 && static_cast<std::size_t>(row) < entries.size() &&
-            !entries[static_cast<std::size_t>(row)].heading) {
+        if (row >= 0 && static_cast<std::size_t>(row) < entries.size()) {
             SetSelection(row);
-            view.app_menu(entries[static_cast<std::size_t>(row)].application_id, *this, point);
+            context_menu(static_cast<std::size_t>(row), point);
         }
     });
     Bind(wxEVT_KEY_DOWN, [this](wxKeyEvent& event) {
         const int row = GetSelection();
+        if (event.GetKeyCode() == WXK_F2 && row >= 0 &&
+            static_cast<std::size_t>(row) < entries.size() && !entries[row].heading) {
+            view.rename_app(entries[row].application_id);
+            return;
+        }
         if (event.GetKeyCode() == WXK_ESCAPE && HasCapture()) {
             pressed_application.clear();
             ReleaseMouse();
@@ -358,7 +367,12 @@ std::optional<std::size_t> ApplicationRows::row_at(const wxPoint& point) const {
 
 void ApplicationRows::update(const std::array<std::vector<std::string>, 3>& incoming,
                              bool inactive) {
-    if (incoming == groups && inactive == show_inactive && !entries.empty()) {
+    std::vector<std::string> names;
+    for (const auto& section : incoming)
+        for (const auto& id : section)
+            names.push_back(view.application(id)->group_name);
+    if (incoming == groups && names == grouping_names && inactive == show_inactive &&
+        !entries.empty()) {
         update_hover_hint(ScreenToClient(wxGetMousePosition()));
         RefreshAll();
         return;
@@ -369,16 +383,9 @@ void ApplicationRows::update(const std::array<std::vector<std::string>, 3>& inco
         selected = entries[static_cast<std::size_t>(GetSelection())].application_id;
     const auto top = GetVisibleBegin();
     groups = incoming;
+    grouping_names = std::move(names);
     show_inactive = inactive;
-    entries.clear();
-    for (int section = 0; section < 3; ++section) {
-        counts[static_cast<std::size_t>(section)] =
-            groups[static_cast<std::size_t>(section)].size();
-        entries.push_back({section, true, {}});
-        if (expanded[static_cast<std::size_t>(section)] && (section != 2 || show_inactive))
-            for (const auto& id : groups[static_cast<std::size_t>(section)])
-                entries.push_back({section, false, id});
-    }
+    rebuild();
     SetItemCount(entries.size());
     for (std::size_t row = 0; row < entries.size(); ++row)
         if (!selected.empty() && entries[row].application_id == selected)
@@ -387,6 +394,47 @@ void ApplicationRows::update(const std::array<std::vector<std::string>, 3>& inco
         ScrollToRow(top);
     update_hover_hint(ScreenToClient(wxGetMousePosition()));
     Refresh();
+}
+void ApplicationRows::rebuild() {
+    entries.clear();
+    bundled.clear();
+    for (int section = 0; section < 3; ++section) {
+        const auto& ids = groups[static_cast<std::size_t>(section)];
+        counts[static_cast<std::size_t>(section)] = ids.size();
+        entries.push_back({section, true, {}});
+        for (const auto& id : ids) {
+            const auto* app = view.application(id);
+            const auto key = std::to_string(section) + ":" + normalized_app_name(app->group_name);
+            bundled[key].push_back(id);
+        }
+        if (!expanded[static_cast<std::size_t>(section)] || (section == 2 && !show_inactive))
+            continue;
+        std::set<std::string> emitted;
+        for (const auto& id : ids) {
+            const auto* app = view.application(id);
+            const auto key = std::to_string(section) + ":" + normalized_app_name(app->group_name);
+            const auto& members = bundled.at(key);
+            if (members.size() == 1)
+                entries.push_back({section, false, id});
+            else if (emitted.insert(key).second) {
+                entries.push_back({section, true, {}, key, app->group_name});
+                if (expanded_bundles.contains(key))
+                    for (const auto& member : members)
+                        entries.push_back({section, false, member, key, {}, true});
+            }
+        }
+    }
+    // Do not retain expansion state for an unbounded stream of old identities.
+    std::erase_if(expanded_bundles, [&](const auto& key) { return !bundled.contains(key); });
+}
+void ApplicationRows::context_menu(std::size_t row, wxPoint point) {
+    if (row >= entries.size())
+        return;
+    const auto entry = entries[row];
+    if (!entry.heading)
+        view.app_menu(entry.application_id, *this, point);
+    else if (!entry.group_key.empty())
+        view.group_menu(bundled.at(entry.group_key), *this, point);
 }
 void ApplicationRows::update_hover_hint(const wxPoint& point) {
     // A publication can move an app beneath a stationary pointer. Re-evaluate
@@ -402,7 +450,18 @@ void ApplicationRows::activate(std::size_t row) {
         return;
     const auto entry = entries[row];
     if (!entry.heading) {
-        view.app_menu(entry.application_id, *this, GetItemRect(row).GetBottomLeft());
+        context_menu(row, GetItemRect(row).GetBottomLeft());
+        return;
+    }
+    if (!entry.group_key.empty()) {
+        if (expanded_bundles.contains(entry.group_key))
+            expanded_bundles.erase(entry.group_key);
+        else
+            expanded_bundles.insert(entry.group_key);
+        const auto copy = groups;
+        entries.clear();
+        update(copy, show_inactive);
+        view.request_visible_icons();
         return;
     }
     if (entry.section == 2 && !show_inactive) {
@@ -423,10 +482,22 @@ void ApplicationRows::activate(std::size_t row) {
     update(copy, show_inactive);
     view.request_visible_icons();
 }
+bool ApplicationRows::is_expanded(std::size_t row) const {
+    if (row >= entries.size() || !entries[row].heading)
+        return false;
+    const auto& entry = entries[row];
+    return entry.group_key.empty()
+               ? expanded[entry.section] && (entry.section != 2 || show_inactive)
+               : expanded_bundles.contains(entry.group_key);
+}
 wxString ApplicationRows::accessible_name(std::size_t row) const {
     if (row >= entries.size())
         return {};
     const auto& entry = entries[row];
+    if (entry.heading && !entry.group_key.empty())
+        return wxString::Format(
+            "%s (%zu instances), %s", ui_text(entry.group_name), bundled.at(entry.group_key).size(),
+            expanded_bundles.contains(entry.group_key) ? "expanded" : "collapsed");
     if (entry.heading)
         return wxString::Format("%s (%zu), %s", ui_text(section_names[entry.section]),
                                 counts[static_cast<std::size_t>(entry.section)],
@@ -439,6 +510,8 @@ wxString ApplicationRows::accessible_name(std::size_t row) const {
                : wxString("Unavailable application");
 }
 wxString ApplicationRows::accessible_help(std::size_t row) const {
+    if (row < entries.size() && !entries[row].group_key.empty() && entries[row].heading)
+        return "Activate to expand or collapse app instances. Right-click for Clear group.";
     return row < entries.size() && entries[row].heading
                ? wxString("Activate to expand or collapse this activity group. Expanding "
                           "inactive sources also enables them for this board.")
@@ -512,9 +585,14 @@ wxString ApplicationRows::hover_text(const wxPoint& point) const {
     const auto row = row_at(point);
     if (!row || entries[*row].heading)
         return {};
+    auto rectangle = GetItemRect(*row);
+    if (entries[*row].member) {
+        rectangle.x += FromDIP(8);
+        rectangle.width -= FromDIP(8);
+    }
     const auto* app = view.application(entries[*row].application_id);
     if (!app || app->activity != Activity::Active || !app->observation_fresh || !app->observation ||
-        !visual_layout(GetItemRect(*row)).detail.Contains(point))
+        !visual_layout(rectangle).detail.Contains(point))
         return drag_hint;
     wxString outputs;
     for (const auto& id : app->observation->active_endpoint_ids) {
@@ -557,6 +635,15 @@ void ApplicationRows::OnDrawItem(wxDC& dc, const wxRect& rectangle, std::size_t 
     const auto colors = item_colors(view.appearance, false);
     dc.SetTextForeground(colors.foreground);
     dc.SetFont(GetFont());
+    if (entry.heading && !entry.group_key.empty()) {
+        const auto title =
+            wxString::Format("%s %s (%zu instances)",
+                             expanded_bundles.contains(entry.group_key) ? L"\u25be" : L"\u25b8",
+                             ui_text(entry.group_name), bundled.at(entry.group_key).size());
+        dc.DrawText(clipped(dc, title, rectangle.width - inset * 2), rectangle.x + inset,
+                    rectangle.y + FromDIP(6));
+        return;
+    }
     if (entry.heading) {
         const bool open = expanded[static_cast<std::size_t>(entry.section)] &&
                           (entry.section != 2 || show_inactive);
@@ -570,8 +657,13 @@ void ApplicationRows::OnDrawItem(wxDC& dc, const wxRect& rectangle, std::size_t 
     const auto* app = view.application(entry.application_id);
     if (!app)
         return;
-    const auto status = status_visual(*app, visual_layout(rectangle).detail.width);
-    const auto geometry = visual_layout(rectangle, status.extent.y);
+    auto content = rectangle;
+    if (entry.member) {
+        content.x += FromDIP(8);
+        content.width -= FromDIP(8);
+    }
+    const auto status = status_visual(*app, visual_layout(content).detail.width);
+    const auto geometry = visual_layout(content, status.extent.y);
     dc.DrawBitmap(view.icon(app->id), geometry.icon.x, geometry.icon.y, true);
     dc.DrawText(clipped(dc, ui_text(app->display_name), geometry.name.width),
                 geometry.name.GetPosition());
@@ -696,7 +788,7 @@ void PlugBoardView::Implementation::app_menu(const std::string& id, wxWindow& ow
     std::vector<std::string> targets;
     wxMenu menu;
     auto* move = new wxMenu;
-    const int first = wxWindow::NewControlId(static_cast<int>(board()->working.sockets.size()));
+    const int first = wxWindow::NewControlId(static_cast<int>(board()->working.sockets.size() + 2));
     for (const auto& socket : board()->working.sockets) {
         const int command = first + static_cast<int>(labels.size());
         move->Append(
@@ -705,6 +797,15 @@ void PlugBoardView::Implementation::app_menu(const std::string& id, wxWindow& ow
         targets.push_back(socket.id);
     }
     menu.Append(new MenuItem(&menu, wxID_ANY, "Move to", move));
+    menu.AppendSeparator();
+    const auto rename_index = labels.size();
+    menu.Append(new MenuItem(&menu, first + static_cast<int>(labels.size()), "Rename"));
+    labels.push_back("Rename");
+    const auto clear_index = labels.size();
+    if (application(id)->activity == Activity::Inactive) {
+        menu.Append(new MenuItem(&menu, first + static_cast<int>(labels.size()), "Clear app"));
+        labels.push_back("Clear app");
+    }
     apply_menu_appearance(menu, appearance);
     ++interaction_depth;
     std::optional<std::size_t> selection;
@@ -716,9 +817,12 @@ void PlugBoardView::Implementation::app_menu(const std::string& id, wxWindow& ow
             selection = static_cast<std::size_t>(chosen - first);
     }
     --interaction_depth;
-    if (selection && *selection < labels.size()) {
+    if (selection && *selection < targets.size())
         submit(MoveApplication{board_id, id, targets[*selection]}, context);
-    }
+    else if (selection == rename_index)
+        rename_app(id);
+    else if (selection == clear_index && clear_index < labels.size())
+        clear_inactive({id});
     if (!interaction_depth && deferred_snapshot)
         render(std::exchange(deferred_snapshot, {}));
 }

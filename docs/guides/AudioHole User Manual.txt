@@ -429,6 +429,41 @@ Show inactive sources and Recently active window control how recent and inactive
 applications are presented. Windows Mixer opens the Windows volume controls;
 you can also adjust volume on the destination hardware.
 
+Keeping the app list tidy
+-------------------------
+Apps with the same detected name or a shared script host can appear in an
+expandable group with an instance count. Groups stay within their socket and
+activity section. Click the arrow to see the individual apps. Grouping changes
+the list's appearance; each app keeps its own identity and routing assignment.
+
+Right-click an app and choose Rename to give that entry a recognizable label.
+For example, give similarly named games or scripts different names. A nickname
+does not change the app's executable, merge it with another app, or move it to a
+different socket. Names are retained with their saved app entries.
+
+Clear inactive apps, below Windows Mixer, removes inactive entries from the
+visible list while remembering their socket assignments. Right-click an inactive
+app for Clear app, or an expandable app group for Clear group. Clear group clears
+its inactive members. Active and Recently Active entries remain visible. A
+cleared entry returns when it produces audio again, in its remembered socket.
+
+Exempt apps, beside Windows Mixer, opens a resizable list editor. Enter app names
+as they appear in AudioHole, separated by commas. Matching ignores letter case
+for English letters and accepts names with or without .exe; it matches whole
+names rather than fragments. Renamed entries use their displayed nicknames.
+
+Exemptions hide matching entries only from Inactive. An exempt app producing
+audio is still shown as Active, and Recently Active entries remain visible.
+Exemptions do not change routing, send apps to System, or remove assignments.
+
+Exempt common Windows processes appends suggested process names to the field,
+keeping your existing names and avoiding duplicates. Review or remove suggestions
+before choosing Apply. Apply saves the list and leaves the window open. Close
+leaves edits made since the last successful Apply unsaved. Remove a name and
+choose Apply to stop filtering it. The field starts with room for five rows,
+scrolls vertically, and grows or shrinks with the popup. The popup follows
+AudioHole's Light, Dark, or Follow System appearance.
+
 Saving routing boards
 ---------------------
 The Routing Board selector changes the current board. Use its + control to make
@@ -504,14 +539,20 @@ before restarting.
 About/Update shows the version, build identifier and Vintage date, with a link
 to AudioHole's GitHub page for downloads. View license opens the license agreement.
 
-Check for updates automatically is optional. When enabled, AudioHole checks for a
-newer release at startup, at most once a week. An update notice shows the current
+Check for updates automatically is off by default and requires your explicit
+opt-in. AudioHole makes no automatic internet requests unless this setting is
+enabled. When enabled, it connects only to AudioHole's GitHub to check for a newer
+release at startup, at most once every seven days. It does not check repeatedly
+while the app remains open; failed checks also count toward the weekly interval. An update notice shows the current
 version, the available version, and a brief changelog. Open Github opens the
 project's release page. Remind me later shows the notice again next start; Skip
 this one dismisses that version while allowing notices for later versions.
 
-Installed copies also offer Update AudioHole. This downloads and verifies the
-installer, stops routing, and closes AudioHole before starting installation.
+Installed copies also offer Update AudioHole. Choosing it makes a separate,
+user-requested download of the installer from GitHub. AudioHole verifies the
+download, stops routing, and closes before starting installation. This explicit
+download is separate from the weekly check. Open Github opens your browser;
+opening that link is also your choice.
 Save any edits you want to keep. Portable copies can download updates from GitHub.
 
 

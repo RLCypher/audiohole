@@ -752,5 +752,103 @@ TEST(PlugBoardDiagnostics, DefaultExportRedactsPathsAndRawIdsButPreservesNativeE
     EXPECT_NE(redacted.find("verified_full_image"), std::string::npos);
     EXPECT_NE(snapshot_document(snapshot, true).dump().find("Private"), std::string::npos);
 }
+TEST_F(PlugBoardModule, InactiveFiltersAndClearingKeepSavedRoutesAndActiveSourcesVisible) {
+    simulation->set_processes({{identity, process}});
+    start();
+    simulation->set_sessions(sessions(SessionState::Inactive));
+    module->set_inventory(inventory());
+    module->set_visible(true);
+    ASSERT_TRUE(await([](const auto& snapshot) { return snapshot.applications.size() == 1; }));
+    const auto id = app();
+    const auto socket = command(CreateSocket{board(), "Games"}).created_id;
+    ASSERT_TRUE(command(MoveApplication{board(), id, socket}).ok);
+    ASSERT_TRUE(await([](const auto& snapshot) {
+        return snapshot.applications[0].policy.state == PolicyState::Accepted;
+    }));
+    const auto calls = simulation->policy_calls();
+    ASSERT_TRUE(command(ClearInactiveApplications{{id}}).ok);
+    EXPECT_TRUE(module->snapshot()->applications[0].hidden_inactive);
+    EXPECT_EQ(module->snapshot()->applications[0].socket_id, socket);
+    ASSERT_TRUE(command(RenameApplication{id, "My game"}).ok);
+    EXPECT_EQ(module->snapshot()->applications[0].display_name, "My game");
+    EXPECT_EQ(module->snapshot()->applications[0].group_name, "Player");
+    ASSERT_TRUE(command(SetInactiveExemptions{{"my game.exe"}}).ok);
+    EXPECT_EQ(simulation->policy_calls(), calls);
+    simulation->set_sessions(sessions(SessionState::Active));
+    ASSERT_TRUE(await([](const auto& snapshot) {
+        return snapshot.applications[0].activity == Activity::Active;
+    }));
+    EXPECT_FALSE(module->snapshot()->applications[0].hidden_inactive);
+    EXPECT_FALSE(find_application(*module->snapshot()->library, id)->inactive_hidden);
+    ASSERT_TRUE(
+        command(ClearInactiveApplications{{id}}).ok); // A stale clear cannot hide an active source.
+    EXPECT_FALSE(find_application(*module->snapshot()->library, id)->inactive_hidden);
+    simulation->set_sessions(sessions(SessionState::Inactive));
+    ASSERT_TRUE(await([](const auto& snapshot) {
+        return snapshot.applications[0].activity == Activity::RecentlyActive;
+    }));
+    EXPECT_FALSE(module->snapshot()->applications[0].hidden_inactive);
+    EXPECT_EQ(module->snapshot()->applications[0].socket_id, socket);
+}
+TEST_F(PlugBoardModule, FailedAppListSavesDoNotChangeLabelsFiltersAssignmentsOrPolicy) {
+    start();
+    simulation->set_sessions(sessions(SessionState::Inactive));
+    module->set_inventory(inventory());
+    module->set_visible(true);
+    ASSERT_TRUE(await([](const auto& snapshot) { return snapshot.applications.size() == 1; }));
+    const auto id = app();
+    {
+        std::lock_guard lock(memory->mutex);
+        memory->fail = true;
+    }
+    EXPECT_FALSE(command(RenameApplication{id, "Not saved"}).ok);
+    EXPECT_EQ(module->snapshot()->applications[0].display_name, "Player");
+    EXPECT_FALSE(command(ClearInactiveApplications{{id}}).ok);
+    EXPECT_FALSE(module->snapshot()->applications[0].hidden_inactive);
+    EXPECT_FALSE(command(SetInactiveExemptions{{"Player"}}).ok);
+    EXPECT_TRUE(module->snapshot()->library->inactive_exempt_apps.empty());
+    EXPECT_EQ(module->snapshot()->applications[0].socket_id, "system");
+    EXPECT_EQ(simulation->policy_calls(), 0u);
+    {
+        std::lock_guard lock(memory->mutex);
+        memory->fail = false;
+    }
+}
+TEST_F(PlugBoardModule, ClearedRowsPersistAndUnchangedSharedHostDoesNotDuplicateAfterRestart) {
+    identity = {};
+    process.executable_path = "C:\\Windows\\powershell.exe";
+    auto observed = sessions(SessionState::Inactive);
+    for (auto& session : observed.sessions)
+        session.display_name = "powershell";
+    simulation->set_sessions(observed);
+    start();
+    module->set_inventory(inventory());
+    module->set_visible(true);
+    ASSERT_TRUE(await([](const auto& snapshot) { return snapshot.applications.size() == 1; }));
+    const auto id = app();
+    ASSERT_TRUE(command(RenameApplication{id, "Named script"}).ok);
+    ASSERT_TRUE(command(ClearInactiveApplications{{id}}).ok);
+    ASSERT_TRUE(module->begin_shutdown().get().ok);
+    module.reset();
+    start();
+    module->set_inventory(inventory());
+    module->set_visible(true);
+    ASSERT_TRUE(await([](const auto& snapshot) {
+        return snapshot.visible && !snapshot.applications.empty() &&
+               snapshot.applications[0].observation.has_value();
+    }));
+    ASSERT_EQ(module->snapshot()->applications.size(), 1u);
+    EXPECT_EQ(app(), id);
+    EXPECT_EQ(module->snapshot()->applications[0].display_name, "Named script");
+    EXPECT_TRUE(module->snapshot()->applications[0].hidden_inactive);
+    EXPECT_EQ(find_application(*module->snapshot()->library, id)->identity.kind,
+              IdentityKind::Unresolved);
+    // Another process lifetime is kept separate, even with the same PID/name.
+    for (auto& session : observed.sessions)
+        session.process->creation_time += 1;
+    simulation->set_sessions(observed);
+    ASSERT_TRUE(await([](const auto& snapshot) { return snapshot.applications.size() == 2; }));
+    EXPECT_EQ(simulation->policy_calls(), 0u);
+}
 } // namespace
 } // namespace audiohole::plug_board

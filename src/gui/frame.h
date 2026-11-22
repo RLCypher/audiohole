@@ -223,6 +223,7 @@ class Frame final : public wxFrame, private wxEventFilter {
     void prepare_plug_tutorial_apps();
     wxWindow* plug_tutorial_target(const std::string&);
     void plug_board_smoke(bool lesson);
+    void plug_board_clutter_smoke();
     wxPanel* avatar_region_{};
     wxBoxSizer* avatar_layout_{};
     wxPanel* tutorial_choices_panel_{};

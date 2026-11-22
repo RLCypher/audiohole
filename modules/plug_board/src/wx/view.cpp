@@ -234,7 +234,9 @@ void PlugBoardView::Implementation::render(std::shared_ptr<const ModuleSnapshot>
             const auto placement =
                 application_placement(current->working, app, snapshot->inventory);
             placements.emplace(app.id, placement);
-            groups[placement.socket_id][static_cast<std::size_t>(app.activity)].push_back(app.id);
+            if (!app.hidden_inactive)
+                groups[placement.socket_id][static_cast<std::size_t>(app.activity)].push_back(
+                    app.id);
         }
         for (auto& [id, sections] : groups)
             for (auto& section : sections)

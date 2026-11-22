@@ -159,7 +159,18 @@ void PlugBoardView::Implementation::build_drawer() {
     windows_mixer =
         button(drawer, "Windows Mixer",
                "Open the Windows volume mixer. Sometimes you need the original equipment.");
-    content->Add(windows_mixer, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+    auto* mixer_row = new wxBoxSizer(wxHORIZONTAL);
+    mixer_row->Add(windows_mixer, 1, wxRIGHT, panel.FromDIP(4));
+    exempt_apps =
+        button(drawer, "Exempt apps", "Apps on this list won't show as inactive on Plug Board");
+    mixer_row->Add(exempt_apps, 1);
+    content->Add(mixer_row, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+    clear_inactive_button =
+        button(drawer, "Clear inactive apps",
+               "Tidies your list, but the apps will still remember where they live.");
+    content->Add(clear_inactive_button, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+    clear_inactive_button->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { clear_inactive(); });
+    exempt_apps->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { exempt_apps_dialog(); });
     content->AddSpacer(gap);
     drawer->SetSizer(content);
     drawer->FitInside();
@@ -359,6 +370,13 @@ void PlugBoardView::Implementation::render_drawer() {
     rendering = true;
     const auto* current = board();
     const bool enabled = !busy() && current;
+    exempt_apps->Enable(enabled);
+    clear_inactive_button->Enable(enabled && snapshot &&
+                                  std::any_of(snapshot->applications.begin(),
+                                              snapshot->applications.end(), [](const auto& app) {
+                                                  return app.activity == Activity::Inactive &&
+                                                         !app.hidden_inactive;
+                                              }));
     std::string selected_profile;
     if (profiles->GetSelection() >= 0 &&
         static_cast<std::size_t>(profiles->GetSelection()) < profile_ids.size())

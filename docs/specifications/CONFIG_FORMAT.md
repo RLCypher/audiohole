@@ -2061,3 +2061,11 @@ false when absent. The sibling `updates.json` uses the versioned
 [Automatic updates](../development/AUTOMATIC-UPDATES.md) for fields, weekly policy,
 release validation, cache ownership and compatibility. This additive local state
 does not alter device/profile/Plug Board schemas or portable routing intent.
+
+### Owner-authorized Plug Board app-list fields
+
+The library's optional `inactive_exempt_apps` and application `detected_name`,
+`host_name`, and `inactive_hidden` fields are additive to Plug Board schema 1.
+Local history can retain a `provisional_key`; raw process identity remains outside
+portable intent. Defaults, limits, compatibility and conflict behavior are defined
+in [Plug Board app-list controls](../development/PLUG-BOARD-APP-LIST.md).

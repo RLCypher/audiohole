@@ -299,9 +299,11 @@ void Frame::refresh_plug_board() {
                     {item.id, item.display_name, item.endpoint.logical_device_id.value_or("")});
             practice.assignments = board->working.application_assignments;
             for (const auto& app : state->library->applications) {
-                if (app.display_name == "Spooty")
+                if (app.identity.kind == pb::IdentityKind::Win32Image &&
+                    app.identity.value == "C:\\Tutorial\\Spooty.exe")
                     practice.music_app = app.id;
-                if (app.display_name == "Felony Jaywalking LXVII")
+                if (app.identity.kind == pb::IdentityKind::Win32Image &&
+                    app.identity.value == "C:\\Tutorial\\Felony Jaywalking LXVII.exe")
                     practice.game_app = app.id;
             }
             tutorial_->plug_board(practice);

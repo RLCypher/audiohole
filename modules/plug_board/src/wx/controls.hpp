@@ -41,7 +41,7 @@ class MenuItem final : public wxMenuItem {
 
 class Button final : public wxButton {
   public:
-    Button(wxWindow*, const wxString& label, const wxString& help);
+    Button(wxWindow*, const wxString& label, const wxString& help, wxWindowID = wxID_ANY);
     bool MSWOnDraw(WXDRAWITEMSTRUCT*) override;
     bool high_contrast = false;
 };

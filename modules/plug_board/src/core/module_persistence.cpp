@@ -111,8 +111,10 @@ void Module::Implementation::rebuild_identity_index() {
     std::erase_if(images, [&](const auto& entry) { return !retained_ids.contains(entry.first); });
     std::erase_if(image_requests,
                   [&](const auto& entry) { return !retained_ids.contains(entry.first); });
-    std::erase_if(provisional_ids,
-                  [&](const auto& entry) { return !retained_ids.contains(entry.second); });
+    std::erase_if(provisional_ids, [&](const auto& entry) {
+        const auto* record = find_application(*library, entry.second);
+        return !record || record->identity.kind != IdentityKind::Unresolved;
+    });
     for (const auto& app : library->applications) {
         auto& runtime = applications[app.id];
         const auto signature = catalog_signature(app);
@@ -222,6 +224,20 @@ void Module::Implementation::load_local_state() {
                     if (!find_application(*library, item.key()))
                         continue;
                     auto& runtime = applications[item.key()];
+                    const auto provisional = item.value().value("provisional_key", std::string{});
+                    // Machine-local PID + creation-time keys reconnect the same
+                    // process only; they never grant a shared host routing trust.
+                    if (provisional.size() > 4096)
+                        throw std::runtime_error("Provisional identity is too long.");
+                    const auto* record = find_application(*library, item.key());
+                    if (record->identity.kind == IdentityKind::Unresolved &&
+                        provisional.starts_with("unresolved-owner:")) {
+                        const auto found = provisional_ids.find(provisional);
+                        if (found != provisional_ids.end() && found->second != item.key())
+                            throw std::runtime_error("Ambiguous provisional application history.");
+                        provisional_ids[provisional] = item.key();
+                        runtime.provisional_key = provisional;
+                    }
                     if (!item.value().at("last_active_utc_ms").is_null()) {
                         const auto stamp =
                             item.value().at("last_active_utc_ms").get<std::int64_t>();
@@ -287,7 +303,8 @@ void Module::Implementation::flush() {
                 {"last_active_windows_endpoints", app.history.last_active_windows_endpoints},
                 {"last_policy_state", policy_state_name(app.policy.state)},
                 {"last_policy_operation", app.policy.operation_id},
-                {"historical_receipt_only", true}};
+                {"historical_receipt_only", true},
+                {"provisional_key", app.provisional_key}};
         const Document document{{"format", "audiohole-plug-board-local"},
                                 {"schema_version", 1},
                                 {"saved_utc", utc_timestamp()},
@@ -337,7 +354,25 @@ CommandResult Module::Implementation::execute(const Command& command,
             result.code = "stale_revision";
             result.message = "The configuration changed; review the latest board and try again.";
         } else {
-            auto edit = prepare_edit(*library, selected, command, utc_timestamp());
+            auto effective = command;
+            if (auto* clear = std::get_if<ClearInactiveApplications>(&effective)) {
+                const auto now = Clock::now();
+                const auto* board = find_board(*library, selected);
+                std::erase_if(clear->application_ids, [&](const auto& id) {
+                    const auto found = applications.find(id);
+                    if (found == applications.end())
+                        return true;
+                    const auto& runtime = found->second;
+                    const bool active = visible && runtime.fresh && runtime.observation &&
+                                        !runtime.observation->active_endpoint_ids.empty();
+                    const bool recent =
+                        runtime.last_active_monotonic &&
+                        now - *runtime.last_active_monotonic <
+                            std::chrono::seconds(board->working.settings.recently_active_seconds);
+                    return active || recent;
+                });
+            }
+            auto edit = prepare_edit(*library, selected, effective, utc_timestamp());
             const bool needs_commit = edit.changed || catalog_dirty || !storage_result.ok;
             const auto persisted =
                 needs_commit ? commit(std::move(edit.library))
@@ -357,6 +392,10 @@ CommandResult Module::Implementation::execute(const Command& command,
                 result.message = "Working changes recorded. Windows preference and playback status "
                                  "are reported separately.";
                 rebuild_identity_index();
+                if (std::holds_alternative<ClearInactiveApplications>(command) ||
+                    std::holds_alternative<SetInactiveExemptions>(command) ||
+                    std::holds_alternative<RenameApplication>(command))
+                    result.message = "App list preferences saved. Routing assignments retained.";
                 if (std::holds_alternative<RefreshApplications>(command)) {
                     image_requests.clear();
                     capability = backend->capability();

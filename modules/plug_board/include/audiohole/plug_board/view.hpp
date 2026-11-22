@@ -97,6 +97,7 @@ class PlugBoardView final : public wxPanel {
     friend class ApplicationRows;
     friend class ApplicationDropTarget;
     friend class DrawerTab;
+    friend class ExemptAppsDialog;
     friend class BoardFrame;
     friend struct BoardSmokeDriver;
 };

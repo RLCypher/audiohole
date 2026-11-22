@@ -1,4 +1,5 @@
 #include "audiohole/plug_board/library.hpp"
+#include "audiohole/plug_board/application_list.hpp"
 #include "audiohole/plug_board/socket_styles.hpp"
 
 #include <algorithm>
@@ -289,10 +290,17 @@ void validate_library(const Library& library) {
     require(library.applications.size() <= 20000, "The application catalog exceeds its bound.");
     require(library.profile_associations.size() <= 20000,
             "Profile association count exceeds its bound.");
+    require(library.inactive_exempt_apps.size() <= 256, "Too many inactive app exemptions.");
+    for (const auto& name : library.inactive_exempt_apps)
+        valid_text(name, 256, "Exempt app name");
     std::set<std::string> applications, boards, identities;
     for (const auto& app : library.applications) {
         valid_text(app.id, 128, "Application record ID");
         valid_text(app.display_name, 256, "Application name");
+        if (!app.detected_name.empty())
+            valid_text(app.detected_name, 256, "Detected app name");
+        if (!app.host_name.empty())
+            valid_text(app.host_name, 256, "Host name");
         require(applications.insert(app.id).second, "Duplicate application record ID.");
         require(app.verified_aliases.size() <= 64, "Too many verified executable aliases.");
         auto unique_identity = [&](const ApplicationIdentity& identity) {
@@ -370,10 +378,14 @@ Library parse_library(const std::string& bytes) {
                 revision(document.at("schema_version")) == 1,
             "Unsupported Plug Board library format or version.");
     Library result;
+    if (document.contains("inactive_exempt_apps"))
+        result.inactive_exempt_apps =
+            document.at("inactive_exempt_apps").get<std::vector<std::string>>();
     result.revision = revision(document.at("revision"));
     result.default_board_id = document.at("default_board_id").get<std::string>();
-    result.extra = extra(document, {"format", "schema_version", "revision", "default_board_id",
-                                    "profile_associations", "applications", "boards"});
+    result.extra =
+        extra(document, {"format", "schema_version", "revision", "default_board_id",
+                         "profile_associations", "applications", "boards", "inactive_exempt_apps"});
     require(document.at("profile_associations").is_object(),
             "Profile associations must be an object.");
     for (auto entry = document.at("profile_associations").begin();
@@ -385,11 +397,15 @@ Library parse_library(const std::string& bytes) {
         ApplicationRecord app;
         app.id = item.at("id").get<std::string>();
         app.display_name = item.at("display_name").get<std::string>();
+        app.detected_name = item.value("detected_name", app.display_name);
+        app.host_name = item.value("host_name", std::string{});
+        app.inactive_hidden = item.value("inactive_hidden", false);
         app.identity = read_identity(item.at("identity"));
         app.identity_extra = identity_extra(item.at("identity"));
         app.policy_managed = item.at("policy_managed").get<bool>();
         app.extra =
-            extra(item, {"id", "display_name", "identity", "policy_managed", "verified_aliases"});
+            extra(item, {"id", "display_name", "identity", "policy_managed", "verified_aliases",
+                         "detected_name", "host_name", "inactive_hidden"});
         if (item.contains("verified_aliases")) {
             require(item.at("verified_aliases").is_array(), "Verified aliases must be an array.");
             for (const auto& alias : item.at("verified_aliases")) {
@@ -425,11 +441,15 @@ std::string serialize_library(const Library& library) {
     result["revision"] = library.revision;
     result["default_board_id"] = library.default_board_id;
     result["profile_associations"] = library.profile_associations;
+    result["inactive_exempt_apps"] = library.inactive_exempt_apps;
     result["applications"] = Document::array();
     for (const auto& app : library.applications) {
         auto item = app.extra;
         item["id"] = app.id;
         item["display_name"] = app.display_name;
+        item["detected_name"] = app.detected_name.empty() ? app.display_name : app.detected_name;
+        item["host_name"] = app.host_name;
+        item["inactive_hidden"] = app.inactive_hidden;
         item["identity"] = write_identity(app.identity, app.identity_extra);
         item["policy_managed"] = app.policy_managed;
         item["verified_aliases"] = Document::array();
@@ -556,6 +576,27 @@ LibraryEdit prepare_edit(const Library& original, const std::string& selected,
                          edit.library.profile_associations.at(operation.profile_id) ==
                              operation.board_id)
                     edit.library.profile_associations.erase(operation.profile_id);
+            } else if constexpr (std::is_same_v<T, RenameApplication>) {
+                auto found = std::find_if(
+                    edit.library.applications.begin(), edit.library.applications.end(),
+                    [&](const auto& app) { return app.id == operation.application_id; });
+                require(found != edit.library.applications.end(),
+                        "The application no longer exists.");
+                if (found->detected_name.empty())
+                    found->detected_name = found->display_name;
+                found->display_name = operation.name;
+            } else if constexpr (std::is_same_v<T, SetInactiveExemptions>) {
+                edit.library.inactive_exempt_apps = normalize_exemptions(operation.names);
+            } else if constexpr (std::is_same_v<T, ClearInactiveApplications>) {
+                require(operation.application_ids.size() <= 20000, "Too many apps to clear.");
+                const std::set<std::string> ids(operation.application_ids.begin(),
+                                                operation.application_ids.end());
+                edit.changed = false;
+                for (auto& app : edit.library.applications)
+                    if (ids.contains(app.id) && !app.inactive_hidden) {
+                        app.inactive_hidden = true;
+                        edit.changed = true;
+                    }
             } else if constexpr (std::is_same_v<T, SelectBoard>) {
                 board_or_throw(edit.library, operation.board_id);
                 edit.selected_board_id = operation.board_id;

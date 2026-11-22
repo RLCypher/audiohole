@@ -1,4 +1,5 @@
 #include "module_state.hpp"
+#include "audiohole/plug_board/application_list.hpp"
 
 #include <algorithm>
 #include <set>
@@ -54,6 +55,10 @@ void Module::Implementation::publish() {
     recent_due.reset();
     const auto now = Clock::now();
     const auto* board = library ? find_board(*library, selected) : nullptr;
+    std::set<std::string> exempt_names;
+    if (library)
+        for (const auto& name : library->inactive_exempt_apps)
+            exempt_names.insert(normalized_app_name(name));
     if (board)
         for (const auto& record : library->applications) {
             if (backend && backend->internal_application(record.identity))
@@ -62,6 +67,7 @@ void Module::Implementation::publish() {
             ApplicationView view;
             view.id = record.id;
             view.display_name = application_display_name(record.display_name);
+            view.group_name = application_group_name(record);
             view.socket_id = assigned_socket(board->working, record.id);
             view.observation = runtime.observation;
             view.observation_fresh = runtime.fresh && visible;
@@ -84,6 +90,10 @@ void Module::Implementation::publish() {
                         recent_due = due;
                 }
             }
+            view.hidden_inactive =
+                view.activity == Activity::Inactive &&
+                (record.inactive_hidden ||
+                 exempt_names.contains(normalized_app_name(record.display_name)));
             // Hidden history is never promoted to a live playback observation.
             if (!view.observation_fresh)
                 view.observed_routing =
@@ -327,15 +337,18 @@ std::string Module::Implementation::register_application(const ApplicationIdenti
         std::any_of(record.display_name.begin(), record.display_name.end(),
                     [](unsigned char byte) { return byte < 32; }))
         record.display_name = "Application name unavailable";
+    record.detected_name = record.display_name;
     auto candidate = *library;
     candidate.applications.push_back(record);
     ++candidate.revision;
     validate_library(candidate);
     library = std::make_shared<const Library>(std::move(candidate));
     applications[record.id].identity_signature = catalog_signature(record);
-    if (provisional)
+    if (provisional) {
         provisional_ids[provisional_key] = record.id;
-    else
+        applications[record.id].provisional_key = provisional_key;
+        history_dirty = true;
+    } else
         identity_index[key] = record.id;
     catalog_dirty = true;
     mark_flush();
@@ -349,11 +362,13 @@ void Module::Implementation::ingest(ObservationInbox inbox) {
         return;
     const auto now = Clock::now();
     const auto wall = utc_milliseconds(utc_timestamp()).value();
+    std::set<std::string> active_hints;
     for (auto& [key, hint] : inbox.active) {
         const auto id =
             register_application(hint.identity, hint.display_name, hint.observation_key);
         if (id.empty())
             continue;
+        active_hints.insert(id);
         auto& runtime = applications[id];
         if (!runtime.was_active || !runtime.last_active_monotonic) {
             runtime.history.last_active_utc_ms = hint.utc_ms;
@@ -396,6 +411,35 @@ void Module::Implementation::ingest(ObservationInbox inbox) {
                 record && observation.identity == record->identity)
                 group.identity = observation.identity;
         }
+    }
+    // Metadata and visibility receipts never change routing identity. A cleared
+    // row returns after actual activity, including a coalesced short-lived stream.
+    auto presentation = *library;
+    bool presentation_changed = false;
+    for (auto& record : presentation.applications) {
+        const auto current = combined.find(record.id);
+        if (current != combined.end()) {
+            const auto host = application_host_name(current->second);
+            if (!host.empty() && host != record.host_name) {
+                record.host_name = host;
+                presentation_changed = true;
+            }
+        }
+        const bool active =
+            active_hints.contains(record.id) ||
+            (current != combined.end() && !current->second.active_endpoint_ids.empty());
+        if (record.inactive_hidden && active) {
+            record.inactive_hidden = false;
+            presentation_changed = true;
+        }
+    }
+    if (presentation_changed) {
+        if (presentation.revision >= 9007199254740991ULL)
+            throw std::runtime_error("Plug Board library revision is exhausted.");
+        ++presentation.revision;
+        library = std::make_shared<const Library>(std::move(presentation));
+        catalog_dirty = true;
+        mark_flush();
     }
     for (auto& [id, observation] : combined) {
         std::sort(observation.active_endpoint_ids.begin(), observation.active_endpoint_ids.end());

@@ -1,5 +1,5 @@
 # About/Update identifies the executable independently of adjacent data files.
-add_executable(audiohole WIN32 update_dialog.cpp updates_view.cpp branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp license_dialog.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
+add_executable(audiohole WIN32 update_dialog.cpp updates_view.cpp branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp license_dialog.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp plug_board_clutter_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_short_commit}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_VERSION="${PROJECT_VERSION}")
