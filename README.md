@@ -10,14 +10,25 @@ Yeah. We got tired of that too.
 
 ## Download AudioHole
 
-**[Get AudioHole from GitHub Releases](https://github.com/RLCypher/audiohole/releases).**
+**Get AudioHole from GitHub Releases.**
 
 Pick your preferred flavor:
 
 - **Portable ZIP:** Unzip it into a folder and run it. No installation, no ceremony.
 - **Windows installer:** For people who like their applications properly moved in, with their shoes by the door.
 
-Both are included, both are ways get you AudioHole. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
+Both get you AudioHole. Pick whichever suits your particular brand of laziness. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
+
+## A Quick Note About Security
+
+AudioHole is currently distributed without a digital code signature. I don't intend to keep it that way forever. 
+In the mean time, Microsoft Defender SmartScreen may throw a warning in your face because Windows doesn't recognize the publisher or hasn't established sufficient trust in the application. This warning doesn't necessarily mean AudioHole is malicious, but you should always verify where your software comes from.
+
+SmartScreen is a legitimate Windows security feature, and I have no intention of asking you to disable it. I'm working toward getting AudioHole properly code-signed so Windows can recognize its publisher. Until then, Windows may remain understandably suspicious of my holes.
+
+AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
+
+The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week.
 
 ## What does it do?
 
@@ -51,13 +62,13 @@ AudioHole works with existing Windows audio endpoints. It does not install a cus
 
 The download includes the guided tutorial, full user manual, and manual buffer tuning guide.
 
-Curious why someone spent this much effort making Windows audio behave? Read the [manifesto](MANIFESTO.md). Want to know how much AI helped build this contraption? There's an [AI disclosure](AI-DISCLOSURE.md) for that too.
+Curious why someone spent this much effort making Windows audio behave? Read the manifesto. Want to know how much AI helped build this contraption? There's an AI disclosure for that too.
 
 ## License
 
-AudioHole's software is released under the **GNU General Public License, version 3 (GPLv3)**. The full legal text is in [LICENSE](LICENSE).
+AudioHole's software is released under the **GNU General Public License, version 3 (GPLv3)**. The full legal text is in LICENSE.
 
-Original mascots, logos, and certain other creative assets have separate terms described in [`licenses/assets.txt`](licenses/assets.txt). Third-party components retain their applicable notices and licenses.
+Original mascots, logos, and certain other creative assets have separate terms described in `licenses/assets.txt`. Third-party components retain their applicable notices and licenses.
 
 ---
 
