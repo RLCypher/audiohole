@@ -54,3 +54,9 @@ all three activity headings, an app, its playback line, empty list space and
 window leave. Existing keyboard/accessibility expansion and policy-isolation
 assertions remain. The standalone module smoke expectations also follow the new
 app-only tooltip behavior. Evidence artifacts remain opt-in.
+
+Native validation initially exposed an incorrect smoke-fixture assumption that
+System would retain apps after the earlier assignment checks. Observed-output
+placement may legitimately group every app under a matching custom socket.
+The paint/hover check now selects an actually populated active socket from the
+rendered layout, retains its required app/header count and runs every assertion.

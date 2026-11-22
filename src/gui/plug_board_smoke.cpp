@@ -424,14 +424,17 @@ void Frame::plug_board_smoke(bool lesson) {
             apply_appearance();
             require(plug_board_view_->GetBackgroundColour() == GetBackgroundColour(),
                     "embedded surface ignores host theme");
-            plug_board_view_->ensure_socket_visible("system");
             const auto sockets = plug_board_view_->layout_diagnostics().sockets;
-            const auto system =
-                std::find_if(sockets.begin(), sockets.end(),
-                             [](const auto& socket) { return socket.id == "system"; });
-            require(system != sockets.end(), "System rows are missing during theme checks");
+            // Observed-output placement can empty System when a custom socket
+            // matches Windows Default. Test actual rendered active app rows.
+            const auto populated =
+                std::find_if(sockets.begin(), sockets.end(), [](const auto& socket) {
+                    return socket.section_counts[0] > 0 && !socket.rendered_application_ids.empty();
+                });
+            require(populated != sockets.end(), "theme checks need a rendered active app socket");
+            plug_board_view_->ensure_socket_visible(populated->id);
             auto* rows = dynamic_cast<wxVListBox*>(
-                wxWindow::FindWindowById(system->applications_control_id, plug_board_view_));
+                wxWindow::FindWindowById(populated->applications_control_id, plug_board_view_));
             auto* accessible = rows ? rows->GetAccessible() : nullptr;
             require(accessible != nullptr, "row presentation checks lack accessible geometry");
             int children = 0;
