@@ -28,7 +28,7 @@ SmartScreen is a legitimate Windows security feature, and I have no intention of
 
 AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
 
-The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week.
+The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare notes.
 
 ## What does it do?
 
