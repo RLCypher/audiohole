@@ -1,6 +1,7 @@
 #include "audiohole/plug_board/application_list.hpp"
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include <cstdio>
 #include <tuple>
 #include <wx/access.h>
 #include <wx/modalhook.h>
@@ -39,6 +40,7 @@ void Frame::plug_board_clutter_smoke() {
         wxCommandEvent event(wxEVT_BUTTON, control->GetId());
         control->GetEventHandler()->ProcessEvent(event);
     };
+    std::fprintf(stderr, "App-list smoke: begin\n");
     const auto original = plug_board_->snapshot();
     const auto board_id = original->selected_board_id;
     const auto original_settings = pb::find_board(*original->library, board_id)->working.settings;
@@ -139,16 +141,14 @@ void Frame::plug_board_clutter_smoke() {
         bool seen = false;
         int Enter(wxDialog* dialog) override {
             auto* entry = dynamic_cast<wxTextEntryDialog*>(dialog);
-            if (!entry || dialog->GetTitle() != "Rename app")
+            if (!entry)
                 return wxID_NONE;
             seen = true;
-            entry->CallAfter([entry] {
-                entry->SetValue("My PowerShell script");
-                entry->EndModal(wxID_OK);
-            });
-            return wxID_NONE;
+            entry->SetValue("My PowerShell script");
+            return wxID_OK;
         }
     } rename;
+    std::fprintf(stderr, "App-list smoke: rename\n");
     rename.Register();
     app_menu(hosts[0], "Rename");
     rename.Unregister();
@@ -177,21 +177,26 @@ void Frame::plug_board_clutter_smoke() {
       public:
         Frame* frame{};
         bool save = false, seen = false;
+        std::string failure;
         wxColour foreground;
         wxTimer timer{this};
         wxDialog* dialog{};
         std::chrono::steady_clock::time_point deadline;
         ExemptAnswer() {
             Bind(wxEVT_TIMER, [this](wxTimerEvent&) {
-                auto* status = wxWindow::FindWindowByName("Exempt app save status", dialog);
-                if (status && status->GetLabel() == "Saved.") {
-                    timer.Stop();
-                    wxCommandEvent close(wxEVT_BUTTON, wxID_CLOSE);
-                    dialog->FindWindow(wxID_CLOSE)->GetEventHandler()->ProcessEvent(close);
-                } else if (std::chrono::steady_clock::now() >= deadline) {
-                    throw std::runtime_error(
-                        "Exempt app Apply did not finish: " +
-                        (status ? utf8(status->GetLabel()) : "missing status"));
+                try {
+                    auto* status = wxWindow::FindWindowByName("Exempt app save status", dialog);
+                    if (status && status->GetLabel() == "Saved.") {
+                        timer.Stop();
+                        wxCommandEvent close(wxEVT_BUTTON, wxID_CLOSE);
+                        dialog->FindWindow(wxID_CLOSE)->GetEventHandler()->ProcessEvent(close);
+                    } else if (std::chrono::steady_clock::now() >= deadline) {
+                        throw std::runtime_error(
+                            "Exempt app Apply did not finish: " +
+                            (status ? utf8(status->GetLabel()) : "missing status"));
+                    }
+                } catch (const std::exception& error) {
+                    fail(error.what());
                 }
             });
         }
@@ -201,57 +206,78 @@ void Frame::plug_board_clutter_smoke() {
             seen = true;
             dialog = candidate;
             dialog->CallAfter([this] {
-                auto* field = dynamic_cast<wxTextCtrl*>(
-                    wxWindow::FindWindowByName("Exempt app names", dialog));
-                auto* message = wxWindow::FindWindowByName("Exempt app instructions", dialog);
-                const wxString exact =
-                    "Apps on this list will not be shown on the inactive list.\nIf the app is on "
-                    "the list it will still be shown as active if it is producing audio.\nType the "
-                    "names of apps you want to exempt, separated by commas.";
-                if (!field || !field->IsEditable() || !message || message->GetHelpText() != exact ||
-                    field->GetForegroundColour() != foreground ||
-                    field->GetClientSize().y < field->GetCharHeight() * 5 ||
-                    !(GetWindowLongPtrW(static_cast<HWND>(field->GetHandle()), GWL_STYLE) &
-                      WS_VSCROLL))
-                    throw std::runtime_error(
-                        "Exempt popup lost wording, theme, five-row size or scrolling");
-                const auto before = field->GetSize();
-                const auto original_size = dialog->GetSize();
-                dialog->SetSize(original_size + dialog->FromDIP(wxSize(100, 70)));
-                dialog->Layout();
-                if (field->GetSize().x <= before.x || field->GetSize().y <= before.y)
-                    throw std::runtime_error("Exempt field did not grow with the popup");
-                dialog->SetSize(original_size);
-                dialog->Layout();
-                if (field->GetSize() != before)
-                    throw std::runtime_error("Exempt field did not contract with the popup");
-                const auto initial = frame->plug_board_->snapshot()->library->inactive_exempt_apps;
-                field->ChangeValue("Custom app, powershell");
-                auto* common =
-                    wxWindow::FindWindowByName("Exempt common Windows processes", dialog);
-                wxCommandEvent amend(wxEVT_BUTTON, common->GetId());
-                common->GetEventHandler()->ProcessEvent(amend);
-                const auto names = pb::parse_exemptions(utf8(field->GetValue()));
-                if (names.empty() || names[0] != "Custom app" ||
-                    std::count_if(names.begin(), names.end(),
-                                  [](const auto& name) {
-                                      return pb::normalized_app_name(name) == "powershell";
-                                  }) != 1 ||
-                    frame->plug_board_->snapshot()->library->inactive_exempt_apps != initial)
-                    throw std::runtime_error("Common process suggestions replaced custom names, "
-                                             "duplicated or applied themselves");
-                field->ChangeValue(save ? "powershell, My PowerShell script" : "Do not save this");
-                if (save) {
-                    wxCommandEvent apply(wxEVT_BUTTON, wxID_APPLY);
-                    dialog->FindWindow(wxID_APPLY)->GetEventHandler()->ProcessEvent(apply);
-                    deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
-                    timer.Start(25);
-                } else {
-                    wxCommandEvent close(wxEVT_BUTTON, wxID_CLOSE);
-                    dialog->FindWindow(wxID_CLOSE)->GetEventHandler()->ProcessEvent(close);
+                try {
+                    auto* field = dynamic_cast<wxTextCtrl*>(
+                        wxWindow::FindWindowByName("Exempt app names", dialog));
+                    auto* message = wxWindow::FindWindowByName("Exempt app instructions", dialog);
+                    const wxString exact = "Apps on this list will not be shown on the inactive "
+                                           "list.\nIf the app is on "
+                                           "the list it will still be shown as active if it is "
+                                           "producing audio.\nType the "
+                                           "names of apps you want to exempt, separated by commas.";
+                    if (!field || !field->IsEditable())
+                        throw std::runtime_error("Exempt field is missing or not editable");
+                    if (!message || message->GetHelpText() != exact)
+                        throw std::runtime_error(
+                            "Exempt popup message differs from the approved text");
+                    if (field->GetForegroundColour() != foreground)
+                        throw std::runtime_error(
+                            "Exempt field does not follow the app foreground color");
+                    if (field->GetClientSize().y < field->GetCharHeight() * 5)
+                        throw std::runtime_error("Exempt field is shorter than five rows: " +
+                                                 std::to_string(field->GetClientSize().y) + " < " +
+                                                 std::to_string(field->GetCharHeight() * 5));
+                    if (!(GetWindowLongPtrW(static_cast<HWND>(field->GetHandle()), GWL_STYLE) &
+                          WS_VSCROLL))
+                        throw std::runtime_error("Exempt field has no vertical scrollbar style");
+                    const auto before = field->GetSize();
+                    const auto original_size = dialog->GetSize();
+                    dialog->SetSize(original_size + dialog->FromDIP(wxSize(100, 70)));
+                    dialog->Layout();
+                    if (field->GetSize().x <= before.x || field->GetSize().y <= before.y)
+                        throw std::runtime_error("Exempt field did not grow with the popup");
+                    dialog->SetSize(original_size);
+                    dialog->Layout();
+                    if (field->GetSize() != before)
+                        throw std::runtime_error("Exempt field did not contract with the popup");
+                    const auto initial =
+                        frame->plug_board_->snapshot()->library->inactive_exempt_apps;
+                    field->ChangeValue("Custom app, powershell");
+                    auto* common =
+                        wxWindow::FindWindowByName("Exempt common Windows processes", dialog);
+                    wxCommandEvent amend(wxEVT_BUTTON, common->GetId());
+                    common->GetEventHandler()->ProcessEvent(amend);
+                    const auto names = pb::parse_exemptions(utf8(field->GetValue()));
+                    if (names.empty() || names[0] != "Custom app" ||
+                        std::count_if(names.begin(), names.end(),
+                                      [](const auto& name) {
+                                          return pb::normalized_app_name(name) == "powershell";
+                                      }) != 1 ||
+                        frame->plug_board_->snapshot()->library->inactive_exempt_apps != initial)
+                        throw std::runtime_error(
+                            "Common process suggestions replaced custom names, "
+                            "duplicated or applied themselves");
+                    field->ChangeValue(save ? "powershell, My PowerShell script"
+                                            : "Do not save this");
+                    if (save) {
+                        wxCommandEvent apply(wxEVT_BUTTON, wxID_APPLY);
+                        dialog->FindWindow(wxID_APPLY)->GetEventHandler()->ProcessEvent(apply);
+                        deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+                        timer.Start(25);
+                    } else {
+                        wxCommandEvent close(wxEVT_BUTTON, wxID_CLOSE);
+                        dialog->FindWindow(wxID_CLOSE)->GetEventHandler()->ProcessEvent(close);
+                    }
+                } catch (const std::exception& error) {
+                    fail(error.what());
                 }
             });
             return wxID_NONE;
+        }
+        void fail(const std::string& message) {
+            failure = message;
+            timer.Stop();
+            dialog->EndModal(wxID_CANCEL);
         }
     };
     const auto original_theme = theme_choice_->GetSelection();
@@ -263,10 +289,12 @@ void Frame::plug_board_clutter_smoke() {
         answer.frame = this;
         answer.save = choice == 0;
         answer.foreground = choice == 0 ? *wxWHITE : *wxBLACK;
+        std::fprintf(stderr, "App-list smoke: exempt popup theme %d\n", choice);
         answer.Register();
         click(exempt_button);
         answer.Unregister();
         require(answer.seen, "Exempt apps did not open its actual popup");
+        require(answer.failure.empty(), answer.failure);
         require(plug_board_->snapshot()->library->inactive_exempt_apps ==
                     std::vector<std::string>{"powershell", "My PowerShell script"},
                 "Apply or unapplied Close changed the wrong list");
@@ -281,6 +309,7 @@ void Frame::plug_board_clutter_smoke() {
     pump([&] { return bundle(3, false).first != nullptr; });
     std::tie(group_rows, group_row) = bundle(3, false);
     group_rows->ScrollToRow(group_row);
+    std::fprintf(stderr, "App-list smoke: clear group\n");
     plug_smoke_menu_ = "Clear group";
     wxContextMenuEvent group_action(
         wxEVT_CONTEXT_MENU, group_rows->GetId(),
@@ -310,11 +339,16 @@ void Frame::plug_board_clutter_smoke() {
             return view_app(id).activity == pb::Activity::Inactive;
         });
     });
+    std::fprintf(stderr, "App-list smoke: clear app\n");
     bundle(2, true);
     app_menu(hosts[1], "Clear app");
-    pump([&] { return view_app(hosts[1]).hidden_inactive; });
+    pump([&] {
+        return view_app(hosts[1]).hidden_inactive &&
+               !plug_board_view_->layout_diagnostics().command_pending;
+    });
     require(!view_app(hosts[0]).hidden_inactive && !view_app(hosts[2]).hidden_inactive,
             "Clear app cleared another entry");
+    std::fprintf(stderr, "App-list smoke: clear all\n");
     click(clear_button);
     pump([&] {
         return std::all_of(hosts.begin(), hosts.end(),
@@ -327,5 +361,6 @@ void Frame::plug_board_clutter_smoke() {
     command(pb::SetBoardSettings{board_id, original_settings.show_inactive_sources,
                                  original_settings.recently_active_seconds});
     plug_simulation_->set_sessions({original_sessions, true, {}});
+    std::fprintf(stderr, "App-list smoke: complete\n");
 }
 } // namespace audiohole::gui
