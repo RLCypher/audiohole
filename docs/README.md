@@ -9,6 +9,7 @@ and [contribution guide](../CONTRIBUTING.md).
 - [Maintenance batch and verification](development/MAINTENANCE-2026-11-19.md).
 - [Distribution cleanup and inactive-source disclosure](development/DISTRIBUTION-CLEANUP.md).
 - [Logging, storage limits, portable licensing and build maintenance](development/LOGGING-LICENSE-CI.md).
+- [About/Update, RTF licensing and separate downloads](development/ABOUT-AND-DOWNLOADS.md).
 - [Licensing](legal/LICENSING.md) and [corresponding source](development/SOURCE.md).
 - [Consolidated tutorial script](../personalities/tutorial/tutorial.txt).
 - [Personality response revision](personality/Norm-Horu-Bother-v2.txt).

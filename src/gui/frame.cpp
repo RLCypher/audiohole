@@ -2008,12 +2008,12 @@ bool Frame::smoke(const wxString& directory) {
             const auto previous_page = notebook_->GetSelection();
             notebook_->SetSelection(SettingsPage);
             settings->Layout();
-            auto* update = wxWindow::FindWindowByLabel("Update", appearance);
+            auto* update = wxWindow::FindWindowByLabel("About/Update", appearance);
             auto* restart = wxWindow::FindWindowByName("Restart AudioHole", appearance);
             require(update && restart && update->IsShownOnScreen() &&
                         update->GetContainingSizer() == restart->GetContainingSizer() &&
                         update->GetScreenRect().GetLeft() > restart->GetScreenRect().GetRight(),
-                    "Update must appear beside Restart AudioHole");
+                    "About/Update must appear beside Restart AudioHole");
             if (!(dfa_slider_->GetContainingSizer() == dfa_value_->GetContainingSizer() &&
                   field_screen_rect(*dfa_slider_).GetLeft() >
                       field_screen_rect(*dfa_stepper_).GetRight() &&
@@ -2033,27 +2033,56 @@ bool Frame::smoke(const wxString& directory) {
             }
             class UpdateDialogCheck final : public wxModalDialogHook {
               public:
-                bool seen = false;
+                bool seen = false, license_seen = false;
                 wxColour foreground;
                 wxString capture_path;
                 int Enter(wxDialog* dialog) override {
-                    if (dialog->GetTitle() != "AudioHole Update")
+                    if (dialog->GetName() == "AudioHole license viewer") {
+                        license_seen = true;
+                        auto* body = dynamic_cast<wxTextCtrl*>(
+                            wxWindow::FindWindowByName("AudioHole license agreement", dialog));
+                        wxTextAttr heading;
+                        if (!body || !body->IsRich() || body->IsEditable() ||
+                            !body->GetValue().Contains("TL;DR") ||
+                            !body->GetValue().Contains("fnord") || !body->GetStyle(0, heading) ||
+                            heading.GetFontWeight() != wxFONTWEIGHT_BOLD ||
+                            heading.GetTextColour() != foreground ||
+                            wxWindow::FindWindowByName("Accept license agreement", dialog) ||
+                            wxWindow::FindWindowByName("Start AudioHole", dialog) ||
+                            !dialog->FindWindow(wxID_CLOSE) || dialog->GetEscapeId() != wxID_CLOSE)
+                            throw std::runtime_error(
+                                "About license viewer lost RTF, read-only mode or theme");
+                        dialog->CallAfter([dialog] {
+                            wxCommandEvent close(wxEVT_BUTTON, wxID_CLOSE);
+                            dialog->FindWindow(wxID_CLOSE)->GetEventHandler()->ProcessEvent(close);
+                        });
+                        return wxID_NONE;
+                    }
+                    if (dialog->GetTitle() != "AudioHole About/Update")
                         return wxID_NONE;
                     seen = true;
                     auto* version = wxWindow::FindWindowByName("Current AudioHole version", dialog);
                     auto* link = dynamic_cast<wxHyperlinkCtrl*>(
                         wxWindow::FindWindowByName("AudioHole GitHub", dialog));
                     auto* close = dialog->FindWindow(wxID_CLOSE);
+                    auto* license = wxWindow::FindWindowByName("View AudioHole license", dialog);
                     if (!version || !version->GetLabel().Contains(text(AUDIOHOLE_VERSION)) ||
-                        !link || link->GetURL() != "https://github.com/RLCypher/audiohole" ||
-                        !close || close->GetLabel() != "Close" ||
-                        dialog->GetEscapeId() != wxID_CLOSE ||
+                        !version->GetLabel().Contains(wxS("Build: ") +
+                                                      text(AUDIOHOLE_BUILD_COMMIT)) ||
+                        !version->GetLabel().Contains(wxS("Vintage: ") +
+                                                      text(AUDIOHOLE_BUILD_VINTAGE)) ||
+                        !version->GetLabel().Contains("Project Codename: BLANCO") || !license ||
+                        license->GetLabel() != "View license" || !link ||
+                        link->GetURL() != "https://github.com/RLCypher/audiohole" || !close ||
+                        close->GetLabel() != "Close" || dialog->GetEscapeId() != wxID_CLOSE ||
                         version->GetForegroundColour() != foreground ||
                         close->GetForegroundColour() != foreground ||
                         link->GetNormalColour() != foreground)
                         throw std::runtime_error(
                             "Update dialog lost its version, link, Close action or theme");
-                    dialog->CallAfter([dialog, close, path = capture_path] {
+                    dialog->CallAfter([dialog, close, license, path = capture_path] {
+                        wxCommandEvent show_license(wxEVT_BUTTON, license->GetId());
+                        license->GetEventHandler()->ProcessEvent(show_license);
                         if (!path.empty()) {
                             wxFileName::Mkdir(wxFileName(path).GetPath(), wxS_DIR_DEFAULT,
                                               wxPATH_MKDIR_FULL);
@@ -2084,15 +2113,15 @@ bool Frame::smoke(const wxString& directory) {
                     directory.empty()
                         ? wxString{}
                         : directory + (choice == 0 ? "/update-dark.bmp" : "/update-light.bmp");
-                hook.seen = false;
+                hook.seen = hook.license_seen = false;
                 const auto before = controller_->snapshot().revision;
                 const auto draft_before = draft_;
                 hook.Register();
                 wxCommandEvent click(wxEVT_BUTTON, update->GetId());
                 update->GetEventHandler()->ProcessEvent(click);
                 hook.Unregister();
-                require(hook.seen && controller_->snapshot().revision == before &&
-                            draft_ == draft_before,
+                require(hook.seen && hook.license_seen &&
+                            controller_->snapshot().revision == before && draft_ == draft_before,
                         "Update failed to open its dialog or changed routing/editor state");
             }
             theme_choice_->SetSelection(appearance_before);

@@ -1,9 +1,8 @@
-# Build a portable folder with the optional installer beside AudioHole.exe.
-# The compiler consumes a separate audited runtime staging tree, never itself.
+# Build a standalone installer from an audited runtime staging tree.
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$Archive,
-    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/portable'),
+    [string]$OutputDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent) 'build/installer'),
     [string]$Compiler = "$env:ProgramFiles/Inno Setup 7/ISCC.exe"
 )
 Set-StrictMode -Version Latest
@@ -25,30 +24,21 @@ try {
     $allowed = @(Get-Content -LiteralPath (Join-Path $repo 'scripts/runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
     if ((Compare-Object ($allowed | Sort-Object) $files) -or
         (Compare-Object ($meta.runtime_files | Sort-Object) $files)) { throw 'Installer payload differs from audited runtime manifest.' }
+    $license = 'AudioHole License.rtf'
+    if ((Get-FileHash -LiteralPath (Join-Path $payload $license)).Hash -ne
+        (Get-FileHash -LiteralPath (Join-Path $repo "docs/legal/$license")).Hash) {
+        throw 'Installer agreement differs from the packaged license.'
+    }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
     $output = [IO.Path]::GetFullPath($OutputDirectory)
     $name = Get-AudioHoleInstallerName $meta.version
     if (Test-Path -LiteralPath (Join-Path $output "$name.exe")) { throw 'Installer already exists.' }
     $existing = @(Get-ChildItem -LiteralPath $output -File -Recurse -Force)
-    if ($existing.Count -eq 0) {
-        foreach ($entry in Get-ChildItem -LiteralPath $payload -Force) {
-            Copy-Item -LiteralPath $entry.FullName -Destination $output -Recurse -Force
-        }
-    } else {
-        # CI has already extracted and tested the runtime in this folder. Refuse
-        # to mix a different build or unrelated files into the portable bundle.
-        $prefixLength = $output.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1
-        $existingNames = @($existing | ForEach-Object { $_.FullName.Substring($prefixLength).Replace('\', '/') } | Sort-Object)
-        if (Compare-Object $files $existingNames) { throw 'Portable destination differs from the runtime package.' }
-        foreach ($relative in $files) {
-            $sourceHash = (Get-FileHash -LiteralPath (Join-Path $payload $relative) -Algorithm SHA256).Hash
-            $targetHash = (Get-FileHash -LiteralPath (Join-Path $output $relative) -Algorithm SHA256).Hash
-            if ($sourceHash -ne $targetHash) { throw "Portable destination file differs from the runtime package: $relative" }
-        }
-    }
+    if ($existing.Count) { throw 'Installer output directory must be empty and separate from portable files.' }
     & $Compiler "/DPayload=$payload" "/DOutput=$output" "/DOutputName=$name" "/DAppVersion=$($meta.version)" (Join-Path $repo 'installer/AudioHole.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed.' }
-    & (Join-Path $PSScriptRoot 'Test-PortableBundle.ps1') -Directory $output
+    $finished = @(Get-ChildItem -LiteralPath $output -File -Recurse -Force)
+    if ($finished.Count -ne 1 -or $finished[0].Name -ne "$name.exe") { throw 'Expected only the standalone installer in its output directory.' }
 } finally {
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
 }

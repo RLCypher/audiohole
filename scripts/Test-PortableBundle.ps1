@@ -1,4 +1,4 @@
-# Validate the final portable folder without executing its optional installer.
+# Validate the portable folder, including exclusion of installers and source.
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$Directory)
 Set-StrictMode -Version Latest
@@ -11,12 +11,11 @@ if ($metadata.product -ne 'AudioHole' -or $metadata.commit -notmatch '^[0-9a-f]{
     $metadata.configuration -notin @('Debug', 'Release') -or $metadata.build_number -lt 0) {
     throw 'Invalid portable bundle metadata.'
 }
-$installer = (Get-AudioHoleInstallerName $metadata.version) + '.exe'
 $runtime = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'runtime-files.txt')) + @('docs/build-info.json', 'README.txt')
 if (Compare-Object ($runtime | Sort-Object) ($metadata.runtime_files | Sort-Object)) {
     throw 'Portable runtime manifest differs from the approved runtime files.'
 }
-$expected = @($runtime) + @($installer)
+$expected = @($runtime)
 $prefixLength = $root.TrimEnd([IO.Path]::DirectorySeparatorChar).Length + 1
 $actual = @(Get-ChildItem -LiteralPath $root -File -Recurse -Force | ForEach-Object {
     $_.FullName.Substring($prefixLength).Replace('\', '/')
@@ -27,4 +26,4 @@ if ($difference.Count) {
     $unexpected = @($difference | Where-Object SideIndicator -eq '=>' | ForEach-Object InputObject)
     throw "Unexpected portable bundle contents. Missing: $($missing -join ', '); Unexpected: $($unexpected -join ', ')"
 }
-Write-Host 'PASS: portable AudioHole.exe and optional installer share the main folder; no source archive or unexpected files are bundled.'
+Write-Host 'PASS: portable runtime contains no installer, source archive or unexpected files.'

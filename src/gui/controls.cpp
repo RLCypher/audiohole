@@ -525,7 +525,8 @@ wxColour routing_colour(audiohole::State state) {
 // Keep entries aligned with the visible action labels; smoke checks cover every button.
 wxString button_help(const wxString& title) {
     static const std::pair<const char*, const char*> help[] = {
-        {"Update", "Show the current AudioHole version and a link to its GitHub page."},
+        {"About/Update", "Show AudioHole's version, Build, Vintage, license and GitHub link."},
+        {"View license", "Read the AudioHole license agreement."},
         {"Close", "Close this window."},
         {"Start Routing", "Validate and activate the profile currently open in the editor."},
         {"Stop Routing", "Stop every direction and cancel pending startup and recovery."},

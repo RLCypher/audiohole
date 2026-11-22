@@ -99,9 +99,11 @@ packaging, or smoke-test failure. Adding these steps is not evidence of a run.
 
 1. Open the private repository's **Actions** tab and select a successful
    **Windows builds and evaluation packages** run for the intended revision.
-2. Download **AudioHole-v&lt;version&gt;-Windows-x64-release-&lt;short-commit&gt;** under Artifacts.
-3. Extract the downloaded portable ZIP. Its main folder contains both `AudioHole.exe`
-   and the optional `Install AudioHole v<version>.exe` executable, with `Guides and Manuals` beside them.
+2. Download **02-ZIP-AudioHole-v&lt;version&gt;-Windows-x64-release-&lt;short-commit&gt;** under Artifacts.
+3. Extract the downloaded portable ZIP and run `AudioHole.exe`; `Guides and Manuals`
+   is beside it. The **01-Installer** download separately contains the optional
+   `Install AudioHole v<version>.exe`. **03-Debug** is portable; **04-Source** is the
+   single matching corresponding source archive.
 4. Read `README.txt` and `docs/build-info.json`, then open `AudioHole.exe`.
    The `Guides and Manuals` folder includes the manual, quick-start and tuning guides, manifesto, and AI disclosure.
    Follow the included manual checklist. Tutorial uses fictional devices; normal operation uses real endpoints.

@@ -101,7 +101,7 @@ See "Backing up and moving your setup" later in this guide.
 
 Optional installation
 ---------------------
-Run the included Install AudioHole v0.1.exe installer if you prefer a conventional Windows
+Download and run the separate Install AudioHole v0.1.exe installer if you prefer a conventional Windows
 installation. The default destination is C:\Program Files\AudioHole. You can
 choose another location and select Desktop and Start menu shortcuts.
 
@@ -501,8 +501,8 @@ the tutorial, Restart Tutorial starts the lesson over.
 Restart AudioHole closes and relaunches the application. Save your changes
 before restarting.
 
-Update opens a window with the installed version and a link to AudioHole's
-GitHub page, where you can obtain a release.
+About/Update shows the version, build identifier and Vintage date, with a link
+to AudioHole's GitHub page for downloads. View license opens the license agreement.
 
 
 10. USING THE TUTORIAL

@@ -1,19 +1,9 @@
-# The Update dialog identifies the executable, even if an older artifact is extracted
-# beside newer personality files. CI configures afresh for each checked-out revision.
-find_package(Git QUIET)
-set(audiohole_build_commit "unknown")
-if(Git_FOUND)
-  execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" OUTPUT_VARIABLE audiohole_build_commit
-    OUTPUT_STRIP_TRAILING_WHITESPACE RESULT_VARIABLE audiohole_git_result)
-  if(NOT audiohole_git_result EQUAL 0)
-    set(audiohole_build_commit "unknown")
-  endif()
-endif()
+# About/Update identifies the executable independently of adjacent data files.
 add_executable(audiohole WIN32 branding.cpp controls.cpp appearance.cpp app.rc welcome.cpp license_dialog.cpp main.cpp frame.cpp plug_board_view.cpp plug_board_smoke.cpp profile_view.cpp device_view.cpp diagnostic_view.cpp tutorial_view.cpp engine_smoke.cpp diagnostics_view.cpp settings_view.cpp tray.cpp shell_actions.cpp device_list.cpp seconds_field.cpp native_theme.cpp)
 target_include_directories(audiohole PRIVATE "${PROJECT_SOURCE_DIR}")
-target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_build_commit}")
+target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_COMMIT="${audiohole_short_commit}")
 target_compile_definitions(audiohole PRIVATE AUDIOHOLE_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(audiohole PRIVATE AUDIOHOLE_BUILD_VINTAGE="${audiohole_build_vintage}")
 # uuid precedes wx's transitive oleacc import library to avoid duplicate GUID
 # objects in MinGW; MSVC uses the same system GUID library.
 target_link_libraries(audiohole PRIVATE audiohole::avatar_wx audiohole_model audiohole_windows audiohole::plug_board_windows uuid audiohole::plug_board_wx wx::core wx::base uxtheme dwmapi advapi32 windowscodecs shlwapi propsys shell32)
@@ -73,7 +63,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-Regular.ttf" DESTIN
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/MaterialIcons-LICENSE.txt" DESTINATION licenses COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/assets/ui/NOTICE.txt" DESTINATION licenses RENAME MaterialIcons-NOTICE.txt COMPONENT Runtime)
 
-install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.txt" DESTINATION . COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.rtf" DESTINATION . COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION licenses RENAME GPL-3.0.txt COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/legal/assets.txt" DESTINATION licenses COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/docs/development/SOURCE.md"
@@ -87,4 +77,4 @@ install(FILES "${PROJECT_SOURCE_DIR}/docs/guides/AI-DISCLOSURE.txt"
   "${PROJECT_SOURCE_DIR}/docs/guides/The AudioHole Manifesto.txt"
   DESTINATION "Guides and Manuals" COMPONENT Runtime)
 
-set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.txt")
+set_property(SOURCE app.rc APPEND PROPERTY OBJECT_DEPENDS "${PROJECT_SOURCE_DIR}/docs/legal/AudioHole License.rtf")

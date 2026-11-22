@@ -1,4 +1,4 @@
-AudioHole License.txt
+AudioHole License.rtf
 AudioHole.exe
 Guides and Manuals/AI-DISCLOSURE.txt
 Guides and Manuals/Advanced Buffer Tuning Guide.txt

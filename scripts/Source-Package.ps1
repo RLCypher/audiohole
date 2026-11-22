@@ -16,6 +16,8 @@ if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$') { throw 'Cannot 
 $status = & git -C $repo status --porcelain
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
+$identity = Get-Content -LiteralPath (Join-Path $BuildDirectory 'build-identity.json') -Raw | ConvertFrom-Json
+if ($identity.commit -ne $commit) { throw 'Source build identity belongs to another commit.' }
 $suffix = if ($dirty) { '-dirty' } else { '' }
 $name = "AudioHole-v$displayVersion-Source-$($commit.Substring(0,7))$suffix"
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
@@ -41,7 +43,8 @@ try {
         New-Item -ItemType Directory -Path (Split-Path $target) -Force | Out-Null
         Copy-Item -LiteralPath $source -Destination $target -Recurse -Force
     }
-    [ordered]@{ product='AudioHole'; commit=$commit; source_dirty=$dirty } |
+    [ordered]@{ product='AudioHole'; commit=$commit; source_dirty=$dirty; version=$identity.version;
+        built_at_utc=$identity.built_at_utc; build_date_utc=$identity.build_date_utc; vintage=$identity.vintage } |
         ConvertTo-Json | Set-Content (Join-Path $stage 'source-build-info.json') -Encoding UTF8
     $archive = [IO.Path]::GetFullPath($archive)
     Push-Location $temporary

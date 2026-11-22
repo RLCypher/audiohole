@@ -3,7 +3,7 @@
 ## Runtime layout
 
 The portable folder keeps AudioHole.exe, its optional setup executable, the
-owner-supplied README.txt, and AudioHole License.txt together. The installer shows
+owner-supplied README.txt, and AudioHole License.rtf together. The installer shows
 that same owner-supplied agreement. Full software and asset terms remain separate
 at licenses/GPL-3.0.txt and licenses/assets.txt, alongside upstream notices and
 the corresponding-source instructions in licenses/SOURCE.txt.

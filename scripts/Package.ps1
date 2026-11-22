@@ -15,6 +15,17 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $projectText = Get-Content -LiteralPath (Join-Path $repoRoot 'CMakeLists.txt') -Raw
 if ($projectText -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read the application version.' }
 $version = $Matches[1]
+$identity = Get-Content -LiteralPath (Join-Path $BuildDirectory 'build-identity.json') -Raw | ConvertFrom-Json
+$builtAt = if ($identity.built_at_utc -is [DateTime]) {
+    # PowerShell 7.5+ converts ISO JSON timestamps to DateTime automatically.
+    [DateTimeOffset]::new($identity.built_at_utc.ToUniversalTime())
+} else {
+    [DateTimeOffset]::ParseExact($identity.built_at_utc, "yyyy-MM-dd'T'HH:mm:ss'Z'", [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::AssumeUniversal)
+}
+if ($identity.version -ne $version -or $identity.build_date_utc -ne $builtAt.ToString('yyyy-MM-dd') -or
+    $identity.vintage -ne $builtAt.ToString('MMMM d, yyyy', [Globalization.CultureInfo]::InvariantCulture)) {
+    throw 'Invalid compiled build identity or Vintage.'
+}
 $buildNumber = 0L
 if ($env:GITHUB_RUN_NUMBER) {
     if (-not [long]::TryParse($env:GITHUB_RUN_NUMBER, [ref]$buildNumber) -or $buildNumber -lt 1) {
@@ -23,6 +34,7 @@ if ($env:GITHUB_RUN_NUMBER) {
 }
 $commit = & git -C $repoRoot rev-parse HEAD
 if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$') { throw 'Cannot identify the source commit.' }
+if ($identity.commit -ne $commit) { throw 'Build identity belongs to another commit; reconfigure and rebuild.' }
 $status = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
@@ -70,6 +82,10 @@ try {
         executable = 'AudioHole.exe'
         actions_run = $runUrl
         packaged_at_utc = [DateTime]::UtcNow.ToString('o')
+        built_at_utc = $builtAt.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        build_date_utc = $identity.build_date_utc
+        vintage = $identity.vintage
+        project_codename = 'BLANCO'
         source_archive = "AudioHole-v$displayVersion-Source-$shortCommit$suffix.zip"
         runtime_files = @($expected) + @('docs/build-info.json', 'README.txt')
     }
@@ -77,8 +93,8 @@ try {
     $metadata | ConvertTo-Json | Set-Content (Join-Path $stage 'docs/build-info.json') -Encoding UTF8
     Copy-Item -LiteralPath (Join-Path $repoRoot 'docs/distribution/README.txt') -Destination (Join-Path $stage 'README.txt')
     $rootFiles = @((Get-ChildItem -LiteralPath $stage -File).Name)
-    if (Compare-Object @('AudioHole License.txt', 'AudioHole.exe', 'README.txt') ($rootFiles | Sort-Object)) {
-        throw 'Distribution root must contain only AudioHole.exe, AudioHole License.txt and README.txt beside its folders.'
+    if (Compare-Object @('AudioHole License.rtf', 'AudioHole.exe', 'README.txt') ($rootFiles | Sort-Object)) {
+        throw 'Distribution root must contain only AudioHole.exe, AudioHole License.rtf and README.txt beside its folders.'
     }
     # Archive the audited payload with CMake's ZIP writer.
     Push-Location $temporary
@@ -89,7 +105,6 @@ try {
     Write-Host "Created $archive"
     if ($env:GITHUB_OUTPUT) {
         "artifact_name=$name" >> $env:GITHUB_OUTPUT
-        "source_artifact_name=AudioHole-v$displayVersion-Source-$($Configuration.ToLowerInvariant())-$shortCommit$suffix" >> $env:GITHUB_OUTPUT
     }
 } finally {
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }

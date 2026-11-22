@@ -16,9 +16,9 @@ An application audio routing configurator that lets you organize applications an
 
 Getting Started
 
-AudioHole is designed to be portable. Simply extract the downloaded archive into a directory of your choice and run the application. No installation is required.
+AudioHole is designed to be portable. If you downloaded the portable version, simply extract the downloaded archive into a directory of your choice and run the application. No installation is required.
 
-If you prefer a traditional installation, an installer is also included in the download.
+If you prefer a traditional installation, an installer is available separately for download.
 
 An interactive guided tutorial is provided to help you get started, along with a full user manual for additional guidance, and a manual buffer tuning guide for advanced configuration.
 

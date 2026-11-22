@@ -1,7 +1,9 @@
 #include "gui/controls.h"
 #include "gui/frame.h"
+#include "gui/license_dialog.h"
 #include "model/first_run.h"
 #include "presentation/text_layout.h"
+#include <wx/display.h>
 #include <wx/hyperlink.h>
 #include <wx/wrapsizer.h>
 
@@ -13,24 +15,69 @@ void optional_note(wxStaticText* control, const wxString& message) {
 }
 } // namespace
 void Frame::show_update_information() {
-    wxDialog dialog(this, wxID_ANY, "AudioHole Update");
-    dialog.SetName("AudioHole update information");
+    wxDialog dialog(this, wxID_ANY, "AudioHole About/Update", wxDefaultPosition, wxDefaultSize,
+                    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    dialog.SetName("AudioHole about and update information");
     dialog.SetIcons(application_icons());
     auto* layout = new wxBoxSizer(wxVERTICAL);
-    label(&dialog, layout, wxS("Current version: ") + text(AUDIOHOLE_VERSION))
-        ->SetName("Current AudioHole version");
-    label(&dialog, layout, wxS("Build: ") + text(AUDIOHOLE_BUILD_COMMIT));
-    auto* link = new wxHyperlinkCtrl(&dialog, wxID_ANY, "https://github.com/RLCypher/audiohole",
+    auto* page = new wxScrolledWindow(&dialog);
+    page->SetScrollRate(0, FromDIP(16));
+    auto* content = new wxBoxSizer(wxVERTICAL);
+    const auto copy =
+        wxS("AudioHole\n\nVersion: ") + text(AUDIOHOLE_VERSION) + wxS("\nBuild: ") +
+        text(AUDIOHOLE_BUILD_COMMIT) + wxS("\n\nVintage: ") + text(AUDIOHOLE_BUILD_VINTAGE) +
+        wxS("\nProject Codename: BLANCO\n"
+            "Unaged. Unfiltered. Questionably refined.\n\n"
+            "Nose: Warm silicon and impending feature creep.\n"
+            "Palate: Bold WASAPI, crisp C++, and subtle notes of spaghetti.\n"
+            "Finish: Smooth routing with a lingering hint of Windows-induced bitterness.\n"
+            "Aging: Rested briefly in RAM before bottling. Consume before the next Windows "
+            "update.\n"
+            "Best enjoyed with low latency and lowered expectations. Please route responsibly\n\n"
+            "For updates, visit AudioHole on GitHub:");
+    auto* description = new wxStaticText(page, wxID_ANY, copy, wxDefaultPosition, wxDefaultSize,
+                                         wxST_NO_AUTORESIZE);
+    description->SetName("Current AudioHole version");
+    content->Add(description, 0, wxEXPAND | wxALL, FromDIP(12));
+    auto* link = new wxHyperlinkCtrl(page, wxID_ANY, "https://github.com/RLCypher/audiohole",
                                      "https://github.com/RLCypher/audiohole");
     link->SetName("AudioHole GitHub");
-    layout->Add(link, 0, wxALL, FromDIP(12));
+    content->Add(link, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(12));
+    page->SetSizer(content);
+    layout->Add(page, 1, wxEXPAND);
+    auto* actions = new wxBoxSizer(wxHORIZONTAL);
+    auto* license = new ActionButton(&dialog, "View license");
+    license->SetName("View AudioHole license");
+    license->Bind(wxEVT_BUTTON, [&dialog](wxCommandEvent&) {
+        LicenseDialog viewer(&dialog);
+        viewer.ShowModal();
+    });
     auto* close = new ActionButton(&dialog, "Close", 0, wxID_CLOSE);
     close->Bind(wxEVT_BUTTON, [&dialog](wxCommandEvent&) { dialog.EndModal(wxID_CLOSE); });
     close->SetDefault();
-    layout->Add(close, 0, wxALIGN_RIGHT | wxALL, FromDIP(8));
+    actions->AddStretchSpacer();
+    actions->Add(license, 0, wxALL, FromDIP(6));
+    actions->Add(close, 0, wxALL, FromDIP(6));
+    layout->Add(actions, 0, wxEXPAND | wxALL, FromDIP(6));
     dialog.SetEscapeId(wxID_CLOSE);
     dialog.SetAffirmativeId(wxID_CLOSE);
-    dialog.SetSizerAndFit(layout);
+    dialog.SetSizer(layout);
+    const wxDisplay display(static_cast<unsigned>(std::max(0, wxDisplay::GetFromWindow(this))));
+    const auto area = display.GetClientArea();
+    dialog.SetSize(wxSize(std::min(FromDIP(680), area.width - FromDIP(30)),
+                          std::min(FromDIP(560), area.height - FromDIP(30))));
+    dialog.SetMinSize(FromDIP(wxSize(320, 280)));
+    const auto wrap = [page, description, copy, this] {
+        description->SetLabel(copy);
+        description->Wrap(std::max(FromDIP(200), page->GetClientSize().x - FromDIP(24)));
+        page->FitInside();
+    };
+    page->Bind(wxEVT_SIZE, [wrap](wxSizeEvent& event) {
+        wrap();
+        event.Skip();
+    });
+    dialog.Layout();
+    wrap();
     theme_dialog(&dialog);
     link->SetNormalColour(dialog.GetForegroundColour());
     link->SetVisitedColour(dialog.GetForegroundColour());
@@ -325,7 +372,7 @@ void Frame::build_settings() {
     restart_button->SetToolTip(
         "Restart AudioHole after cleanly closing this session. Saved settings and data are "
         "preserved; unsaved edits require confirmation.");
-    button(appearance_box, restart_actions, "Update", [this] { show_update_information(); });
+    button(appearance_box, restart_actions, "About/Update", [this] { show_update_information(); });
     auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and Animation");
     auto* personality_box = personality_group->GetStaticBox();
     personality_box->SetName("Personality and Animation settings");

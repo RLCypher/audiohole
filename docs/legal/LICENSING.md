@@ -18,7 +18,7 @@ it cannot revoke compliant recipients' existing GPL rights.
 Original AudioHole creative assets have separate owner-supplied terms in
 [assets.txt](assets.txt), distributed as `licenses/assets.txt`. Those terms apply
 only to rights owned by the creator and preserve rights already granted by an
-applicable license. The owner's [AudioHole License.txt](AudioHole%20License.txt)
+applicable license. The owner's [AudioHole License.rtf](AudioHole%20License.rtf)
 is shown by the installer and included beside AudioHole.exe. It explains the
 licensing philosophy without replacing or modifying the software's GPLv3 terms.
 The full GPLv3 text is distributed at `licenses/GPL-3.0.txt`.

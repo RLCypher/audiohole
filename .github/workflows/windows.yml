@@ -14,7 +14,41 @@ permissions:
   contents: read
 
 jobs:
+  source:
+    name: Prepare matching source
+    runs-on: windows-2022
+    timeout-minutes: 20
+    outputs:
+      timestamp: ${{ steps.names.outputs.timestamp }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node.js 24)
+      - name: Read version and establish the build timestamp
+        id: names
+        shell: pwsh
+        run: |
+          . ./scripts/Build-Names.ps1
+          $project = Get-Content ./CMakeLists.txt -Raw
+          if ($project -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read version' }
+          "version=$(Get-AudioHoleDisplayVersion $Matches[1])" >> $env:GITHUB_OUTPUT
+          "commit=$($env:GITHUB_SHA.Substring(0,7))" >> $env:GITHUB_OUTPUT
+          "timestamp=$([DateTime]::UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"))" >> $env:GITHUB_OUTPUT
+      - name: Fetch pinned corresponding dependency sources
+        run: cmake --preset windows-msvc -DAUDIOHOLE_BUILD_TIMESTAMP=${{ steps.names.outputs.timestamp }}
+      - name: Package one matching source archive
+        run: ./scripts/Source-Package.ps1
+      # Source availability precedes binary publication; numeric display names
+      # keep the download list in the owner's requested presentation order.
+      - name: Upload matching source
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
+        with:
+          name: 04-Source-AudioHole-v${{ steps.names.outputs.version }}-${{ steps.names.outputs.commit }}
+          path: build/source/*.zip
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
   build-and-test:
+    needs: source
     runs-on: windows-2022
     timeout-minutes: 45
     env:
@@ -43,7 +77,7 @@ jobs:
       - name: Verify tutorial catalogue and MSVC literal sizes
         run: python scripts/GenerateTutorial.py --check
       - name: Configure Windows x64
-        run: cmake --preset windows-msvc
+        run: cmake --preset windows-msvc -DAUDIOHOLE_BUILD_TIMESTAMP=${{ needs.source.outputs.timestamp }}
       - name: Build
         run: cmake --build --preset windows-${{ matrix.configuration }} --parallel 2
       - name: Verify embedded branding resources
@@ -70,8 +104,9 @@ jobs:
           if ($zip.Count -ne 1) { throw 'Expected exactly one package.' }
           ./scripts/Test-Package.ps1 -Archive $zip[0].FullName
           Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath build/artifact
-      - name: Build and test optional installer
-        id: portable
+      - name: Build and test standalone Release installer
+        if: matrix.configuration == 'release'
+        id: installer
         shell: pwsh
         run: |
           $compiler = "$env:ProgramFiles/Inno Setup 7/ISCC.exe"
@@ -84,30 +119,31 @@ jobs:
             if ($process.ExitCode -ne 0) { throw 'Installer compiler setup failed' }
           }
           $zip = @(Get-ChildItem build/packages/*.zip)
-          $folders = @(Get-ChildItem build/artifact -Directory)
-          if ($folders.Count -ne 1) { throw 'Expected one portable application folder' }
-          $portable = $folders[0].FullName
-          ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler -OutputDirectory $portable
-          $setup = @(Get-ChildItem -LiteralPath $portable -Filter 'Install AudioHole v*.exe' -File)
+          ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler
+          $setup = @(Get-ChildItem -LiteralPath build/installer -Filter 'Install AudioHole v*.exe' -File)
           if ($setup.Count -ne 1) { throw 'Expected one installer' }
           ./scripts/Test-Installer.ps1 -Installer $setup[0].FullName
-          "directory=$portable" >> $env:GITHUB_OUTPUT
-      - name: Package matching corresponding source
-        run: ./scripts/Source-Package.ps1
-      - name: Verify final portable download
-        run: ./scripts/Test-PortableBundle.ps1 -Directory "${{ steps.portable.outputs.directory }}"
-      - name: Upload matching source as a separate download
+      - name: Verify installer-free portable download
+        id: portable
+        shell: pwsh
+        run: |
+          $folders = @(Get-ChildItem build/artifact -Directory)
+          if ($folders.Count -ne 1) { throw 'Expected one portable application folder' }
+          ./scripts/Test-PortableBundle.ps1 -Directory $folders[0].FullName
+          "directory=$($folders[0].FullName)" >> $env:GITHUB_OUTPUT
+      - name: Upload standalone Release installer
+        if: matrix.configuration == 'release'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: ${{ steps.package.outputs.source_artifact_name }}
-          path: build/source/*.zip
+          name: 01-Installer-AudioHole-v${{ steps.names.outputs.version }}-${{ steps.names.outputs.commit }}
+          path: build/installer/*.exe
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
-      - name: Upload tested package contents (downloaded as a ZIP)
+      - name: Upload tested portable ZIP
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: ${{ steps.package.outputs.artifact_name }}
+          name: ${{ matrix.configuration == 'release' && '02-ZIP' || '03-Debug' }}-${{ steps.package.outputs.artifact_name }}
           path: ${{ steps.portable.outputs.directory }}/
           include-hidden-files: true
           if-no-files-found: error

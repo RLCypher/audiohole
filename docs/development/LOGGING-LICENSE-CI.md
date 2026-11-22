@@ -29,7 +29,7 @@ options seam for deterministic tests without creating hundreds of megabytes.
 ## License and appearance
 
 The canonical owner agreement is embedded as RCDATA and remains the installer's
-LicenseFile and the distributed AudioHole License.txt. First portable launch shows
+LicenseFile and the distributed AudioHole License.rtf. First portable launch shows
 a scrollable agreement with the installer's English accept/decline wording and
 Start AudioHole. Decline, Cancel and close do not record acceptance or construct
 a routing controller. Acceptance is saved as license-acceptance.json beside the
@@ -52,7 +52,8 @@ versioned Source artifact, uploaded before binary publication.
 
 Pinned actions/checkout v7.0.1 and actions/upload-artifact v7.0.2 both declare
 node24. Their upstream action manifests and release SHAs were checked before
-updating the workflow. upload-artifact's archive behavior remains enabled.
+updating the workflow. See ABOUT-AND-DOWNLOADS.md for the subsequent four-download
+layout and shared build identity.
 
 Evidence capture/uploads are disabled on ordinary push/PR builds. An explicit
 workflow_dispatch capture_evidence input enables them. In-memory GUI rendering

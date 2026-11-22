@@ -14,4 +14,4 @@ AUDIOHOLE_LOGO_PNG RCDATA "assets/branding/audiohole-logo.png"
 #include "wx/msw/wx.rc"
 
 AUDIOHOLE_PLACEHOLDER_PNG RCDATA "assets/presentation/placeholder-avatar.png"
-AUDIOHOLE_LICENSE_TEXT RCDATA "docs/legal/AudioHole License.txt"
+AUDIOHOLE_LICENSE_RTF RCDATA "docs/legal/AudioHole License.rtf"

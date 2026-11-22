@@ -21,7 +21,11 @@ try {
     foreach ($relative in @(Get-Content (Join-Path $repo 'scripts/runtime-files.txt'))) {
         $path = Join-Path "$fixture/source" $relative
         New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
-        'Inert runtime fixture; not executable application content.' | Set-Content $path
+        if ($relative -eq 'AudioHole License.rtf') {
+            Copy-Item -LiteralPath (Join-Path $repo 'docs/legal/AudioHole License.rtf') -Destination $path
+        } else {
+            'Inert runtime fixture; not executable application content.' | Set-Content $path
+        }
         $separator = $relative.LastIndexOf('/')
         $destination = if ($separator -lt 0) { '.' } else { $relative.Substring(0, $separator) }
         $installRules += 'install(FILES "' + $relative + '" DESTINATION "' + $destination + '" COMPONENT Runtime)'
@@ -29,6 +33,11 @@ try {
     $installRules | Set-Content "$fixture/source/CMakeLists.txt"
     & cmake -S "$fixture/source" -B "$fixture/build"
     if ($LASTEXITCODE -ne 0) { throw 'Fixture configure failed' }
+    $project = Get-Content (Join-Path $repo 'CMakeLists.txt') -Raw
+    if ($project -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Missing version' }
+    $identity = @{version=$Matches[1]; commit=(& git -C $repo rev-parse HEAD); built_at_utc='2026-11-12T23:59:00Z'; build_date_utc='2026-11-12'; vintage='November 12, 2026'}
+    $identity | ConvertTo-Json | Set-Content "$fixture/build/build-identity.json"
+
     & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
     $zip = @(Get-ChildItem "$fixture/output/*.zip")
     if ($zip.Count -ne 1) { throw 'Expected exactly one ZIP' }
@@ -62,10 +71,14 @@ try {
         $meta.product -ne 'AudioHole' -or $meta.version -notmatch '^\d+\.\d+\.\d+$' -or
         $meta.build_number -lt 0 -or -not $meta.source_archive.EndsWith('.zip')) { throw 'Missing installer/source metadata' }
     if (Compare-Object ($meta.runtime_files | Sort-Object) $names) { throw 'Runtime manifest differs from package' }
+    if ($meta.built_at_utc -ne $identity.built_at_utc -or $meta.build_date_utc -ne $identity.build_date_utc -or
+        $meta.vintage -ne $identity.vintage -or $meta.project_codename -ne 'BLANCO') { throw 'Compiled Vintage was not preserved.' }
+    $licenseHash = (Get-FileHash (Join-Path $repo 'docs/legal/AudioHole License.rtf')).Hash
+    if ((Get-FileHash (Join-Path $root.FullName 'AudioHole License.rtf')).Hash -ne $licenseHash) { throw 'License differs from supplied RTF.' }
+
     Write-Host 'PASS: ZIP naming/content, installer metadata and explicit dirty-source metadata.'
-    # The final download must remain directly runnable, with its optional setup
-    # beside the application. A compiler fixture verifies payload separation
-    # without building or executing an installer on this host.
+    # The standalone installer consumes the runtime without copying itself or
+    # its files into the portable folder. Its output directory contains one EXE.
     $compiler = Join-Path $fixture 'inert-compiler.ps1'
     @'
 $payload = ($args | Where-Object { $_ -like '/DPayload=*' }).Substring(10)
@@ -76,37 +89,66 @@ if (-not (Test-Path -LiteralPath (Join-Path $payload 'AudioHole.exe'))) { throw 
 'Inert setup fixture; never execute.' | Set-Content -LiteralPath (Join-Path $output "$name.exe")
 $global:LASTEXITCODE = 0
 '@ | Set-Content -LiteralPath $compiler
-    $bundle = Join-Path $fixture 'portable'
-    & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $bundle -Compiler $compiler
-    $setup = @(Get-ChildItem -LiteralPath $bundle -Filter 'Install AudioHole v*.exe')
-    if ($setup.Count -ne 1 -or -not (Test-Path -LiteralPath (Join-Path $bundle 'AudioHole.exe'))) { throw 'Portable application and installer were not colocated' }
-    & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
-    & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $root.FullName -Compiler $compiler
-    $source = Join-Path $bundle $meta.source_archive
+    $installerDirectory = Join-Path $fixture 'installer'
+    & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $installerDirectory -Compiler $compiler
+    $setup = @(Get-ChildItem -LiteralPath $installerDirectory -File -Recurse)
+    if ($setup.Count -ne 1 -or $setup[0].Name -ne ((Get-AudioHoleInstallerName $meta.version) + '.exe')) { throw 'Installer output must contain only the setup EXE' }
+    & "$repo/scripts/Test-PortableBundle.ps1" -Directory $root.FullName
+    $source = Join-Path $root.FullName $meta.source_archive
     'Inert source archive fixture' | Set-Content -LiteralPath $source
     try {
-        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
+        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $root.FullName
         throw 'Expected bundled source rejection was missing'
     } catch {
         if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents' -or
             -not $_.Exception.Message.Contains($meta.source_archive)) { throw }
     }
     Remove-Item -LiteralPath $source
-    Remove-Item -LiteralPath $setup[0].FullName
+    $misplaced = Join-Path $root.FullName $setup[0].Name
+    Copy-Item -LiteralPath $setup[0].FullName -Destination $misplaced
     try {
-        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $bundle
-        throw 'Expected misplaced/missing installer rejection was missing'
+        & "$repo/scripts/Test-PortableBundle.ps1" -Directory $root.FullName
+        throw 'Expected bundled installer rejection was missing'
     } catch {
-        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents.*Missing: Install AudioHole v') { throw }
+        if ($_.Exception.Message -notmatch 'Unexpected portable bundle contents' -or
+            -not $_.Exception.Message.Contains($setup[0].Name)) { throw }
     }
-    'Different build fixture' | Set-Content -LiteralPath (Join-Path $bundle 'AudioHole.exe')
+    Remove-Item -LiteralPath $misplaced
     try {
-        & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $bundle -Compiler $compiler
-        throw 'Expected mixed-build destination rejection was missing'
+        & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $root.FullName -Compiler $compiler
+        throw 'Expected portable/installer destination separation was missing'
     } catch {
-        if ($_.Exception.Message -notmatch 'Portable destination file differs.*AudioHole.exe') { throw }
+        if ($_.Exception.Message -notmatch 'Installer output directory must be empty') { throw }
     }
-    Write-Host 'PASS: installer beside portable application, separate payload, source exclusion, missing-installer and mixed-build rejection.'
+    Write-Host 'PASS: standalone installer, portable installer/source exclusion and destination separation.'
+    $licensePath = Join-Path $root.FullName 'AudioHole License.rtf'
+    '{\rtf1 Wrong license fixture}' | Set-Content -LiteralPath $licensePath
+    $wrongLicense = Join-Path $fixture 'wrong-license.zip'
+    Push-Location $root.Parent.FullName
+    try {
+        & cmake -E tar cf $wrongLicense --format=zip $root.Name
+        if ($LASTEXITCODE -ne 0) { throw 'Wrong-license fixture archive failed' }
+    } finally { Pop-Location }
+    Copy-Item -LiteralPath (Join-Path $repo 'docs/legal/AudioHole License.rtf') -Destination $licensePath -Force
+    try {
+        & "$repo/scripts/Build-Installer.ps1" -Archive $wrongLicense -OutputDirectory "$fixture/wrong-installer" -Compiler $compiler
+        throw 'Expected mismatching license rejection was missing'
+    } catch {
+        if ($_.Exception.Message -notmatch 'Installer agreement differs') { throw }
+    }
+    foreach ($case in @('date', 'commit')) {
+        $invalid = $identity.Clone()
+        if ($case -eq 'date') { $invalid.vintage = 'Wrong date' } else { $invalid.commit = '0' * 40 }
+        $invalid | ConvertTo-Json | Set-Content "$fixture/build/build-identity.json"
+        try {
+            & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/stale-$case"
+            throw 'Expected inconsistent build identity rejection was missing'
+        } catch {
+            if ($_.Exception.Message -notmatch 'Invalid compiled build identity|Build identity belongs to another commit') { throw }
+        }
+    }
+    $identity | ConvertTo-Json | Set-Content "$fixture/build/build-identity.json"
+    Write-Host 'PASS: inconsistent Vintage, stale commit and mismatching installer agreement rejected.'
     try {
         & "$repo/scripts/Package.ps1" -Configuration Release -BuildDirectory "$fixture/build" -OutputDirectory "$fixture/output"
         throw 'Expected package overwrite rejection was missing'

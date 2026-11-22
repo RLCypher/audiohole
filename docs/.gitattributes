@@ -1,0 +1,3 @@
+# Preserve the owner-supplied distribution documents byte for byte.
+legal/*.rtf binary
+distribution/README.txt -text
