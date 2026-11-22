@@ -109,6 +109,10 @@ void PlugBoardView::Implementation::detach() {
         mailbox->latest.reset();
         mailbox->enabled = false;
     }
+    // DeletePendingEvents alone leaves this live handler on wxApp's ready list.
+    // The mailbox gate is closed above, so no worker can enqueue another event.
+    if (wxTheApp)
+        wxTheApp->RemovePendingEventHandler(this);
     DeletePendingEvents();
     if (module) {
         module->unsubscribe(subscription);

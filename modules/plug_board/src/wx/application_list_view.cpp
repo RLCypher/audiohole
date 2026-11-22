@@ -31,7 +31,6 @@ class ExemptAppsDialog final : public wxDialog {
         auto* layout = new wxBoxSizer(wxVERTICAL);
         auto* message = new wxStaticText(this, wxID_ANY, instructions);
         message->SetName("Exempt app instructions");
-        message->SetHelpText(instructions);
         message->Wrap(FromDIP(580));
         layout->Add(message, 0, wxEXPAND | wxALL, FromDIP(12));
         names_ = new wxTextCtrl(this, wxID_ANY, exemption_text(original_), wxDefaultPosition,

@@ -92,3 +92,10 @@ restart tests remain enabled. No screenshots/evidence are enabled by this batch.
 The user manual now describes these controls and explicitly documents opt-in
 GitHub-only weekly startup checks, reminder/skip behavior, and separately requested
 installer downloads. It preserves the guide's existing terminology and exclusions.
+
+Native validation corrections: the smoke check reads the visible static-text
+label and tolerates layout line wrapping, rather than using SetHelpText, which
+requires an installed help provider. View detachment closes the callback gate,
+unregisters the handler from wxApp's pending list, then deletes queued events;
+wx DeletePendingEvents alone does not perform that unregister operation. This
+prevents a stale ready-list entry during shutdown, including failed-test cleanup.

@@ -217,7 +217,14 @@ void Frame::plug_board_clutter_smoke() {
                                            "names of apps you want to exempt, separated by commas.";
                     if (!field || !field->IsEditable())
                         throw std::runtime_error("Exempt field is missing or not editable");
-                    if (!message || message->GetHelpText() != exact)
+                    const auto unwrap = [](wxString value) {
+                        value.Replace("\r", " ");
+                        value.Replace("\n", " ");
+                        while (value.Contains("  "))
+                            value.Replace("  ", " ");
+                        return value.Trim().Trim(false);
+                    };
+                    if (!message || unwrap(message->GetLabel()) != unwrap(exact))
                         throw std::runtime_error(
                             "Exempt popup message differs from the approved text");
                     if (field->GetForegroundColour() != foreground)
