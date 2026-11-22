@@ -1,0 +1,747 @@
+AUDIOHOLE HOVERTEXT CATALOG
+Based on source revision: 5df49c2 | Editorial pass: concise tooltips, environment-neutral wording, light personality
+
+Proposed revised wording, for review before integration. Personality is intentionally limited to nontechnical controls. {Braces} describe runtime values, not literal displayed text.
+Forward and Return share their tooltips. Shared button defaults may be replaced by control-specific entries.
+Includes normal operation, guided tutorial, and developer-only controls where present.
+Windows-provided title-bar and native file-dialog hints are not authored by AudioHole.
+Navigation tabs, Norm tutorial reply buttons (including the Norm End tutorial response) and the diagnostic log intentionally have no tooltips.
+
+SHARED BUTTON HELP
+==================
+
+1. About/Update
+Version, build, vintage, licenses, and other things we can prove.
+Source: src/gui/controls.cpp:526
+
+2. View license
+View AudioHole's license and third-party notices.
+Source: src/gui/controls.cpp:526
+
+3. Close
+Close this window. AudioHole isn't going anywhere.
+Source: src/gui/controls.cpp:526
+
+4. Start Routing
+Check the open profile and get the audio moving.
+Source: src/gui/controls.cpp:526
+
+5. Stop Routing
+Stop routing and cancel pending starts. Everybody out of the pool.
+Source: src/gui/controls.cpp:526
+
+6. Exit AudioHole
+Exit AudioHole completely. The window's Close button only sends it to the tray.
+Source: src/gui/controls.cpp:526
+
+7. Apply
+Save profile edits and apply them to routing. Active routing may restart.
+Source: src/gui/controls.cpp:526
+
+8. Revert
+Discard unsaved edits. Yesterday's decisions win.
+Source: src/gui/controls.cpp:526
+
+9. Export devices…
+Export device records and scan history as a ZIP. Windows bindings stay home.
+Source: src/gui/controls.cpp:526
+
+10. Import devices…
+Preview and import device records. Conflicts stay untouched; run Update to match devices on this PC.
+Source: src/gui/controls.cpp:526
+
+11. Export profiles…
+Export saved profiles and devices. Save edits first; startup permissions stay home.
+Source: src/gui/controls.cpp:526
+
+12. Import profiles…
+Preview and import profiles with their device records. Existing records won't be silently overwritten.
+Source: src/gui/controls.cpp:526
+
+13. Toggle availability
+Simulate this device connecting or disconnecting to check recovery.
+Source: src/gui/controls.cpp:526
+
+14. Start scan
+Start scanning the selected devices. Advanced tests require confirmation.
+Source: src/gui/controls.cpp:526
+
+15. Cancel scan
+Stop scanning. Existing device records survive the ordeal.
+Source: src/gui/controls.cpp:526
+
+16. Copy visible diagnostics
+Copy the diagnostic events currently visible in this view.
+Source: src/gui/controls.cpp:526
+
+17. Export visible diagnostics…
+Export the diagnostic events currently visible in this view.
+Source: src/gui/controls.cpp:526
+
+18. Clear diagnostics log
+Clear in-memory diagnostics, including hidden entries. Routing and files survive.
+Source: src/gui/controls.cpp:526
+
+19. Reload personality files
+Reload character dialogue. Fresh opinions, same audio routing.
+Source: src/gui/controls.cpp:526
+
+20. Load custom personality…
+Load a local personality JSON catalog. Invalid files won't replace the current one.
+Source: src/gui/controls.cpp:526
+
+21. Preview startup
+Try the configured startup behavior without changing Windows startup registration.
+Source: src/gui/controls.cpp:526
+
+22. Cancel pending activation
+Cancel the startup countdown. The suspense is over.
+Source: src/gui/controls.cpp:526
+
+23. Replay Tutorial
+Restart the guided tutorial. Your saved setup is safe from Norm.
+Source: src/gui/controls.cpp:526
+
+24. Skip tutorial
+Skip the tutorial and return to your regular programming.
+Source: src/gui/controls.cpp:526
+
+25. End tutorial
+Finish the tutorial and return to the real audio circus.
+Source: src/gui/controls.cpp:526
+
+26. DFA
+Working as intended.
+Source: src/gui/controls.cpp:526
+
+27. Forward failure
+Simulate a failure on the forward audio path.
+Source: src/gui/controls.cpp:526
+
+28. Return failure
+Simulate a return-path failure without interrupting the forward path.
+Source: src/gui/controls.cpp:526
+
+29. Recover
+Retry failed directions. Leave the ones behaving themselves alone.
+Source: src/gui/controls.cpp:526
+
+PROFILES: EDITING AND NAVIGATION
+================================
+
+30. Save
+Save profile changes without starting routing. Ctrl+S.
+Source: src/gui/profile_view.cpp:977
+
+31. Apply — engine unavailable
+The routing engine is unavailable. Save your edits for later.
+Source: src/gui/profile_view.cpp:982
+
+32. Open Profiles Folder
+Open saved profile JSON files in Explorer. Unsaved ideas aren't in there.
+Source: src/gui/profile_view.cpp:1003
+
+33. Profiles list
+Select a profile to edit. Right-click to rename, duplicate, or delete it.
+Source: src/gui/profile_view.cpp:1039
+
+34. New Profile (+)
+Create a new profile. Fresh start, fresh holes.
+Source: src/gui/profile_view.cpp:1043
+
+35. Delete profile (−)
+Delete the selected profile after confirmation. Stop it first if active or pending.
+Source: src/gui/profile_view.cpp:1054
+
+36. Profile Notes
+Notes for this profile. Resize the surrounding panels by dragging their dividers.
+Source: src/gui/profile_view.cpp:1066
+
+37. Add hole (+)
+Add another audio connection. There's room for one more.
+Source: src/gui/profile_view.cpp:1072
+
+38. Delete hole (−)
+Remove the selected hole after confirmation. Save to make it stick.
+Source: src/gui/profile_view.cpp:1074
+
+39. Holes list
+Select a hole. Right-click to rename, duplicate, or delete it.
+Source: src/gui/profile_view.cpp:1083
+
+40. Routing Engine
+Choose this hole's routing backend. No audio moves until you start it.
+Source: src/gui/profile_view.cpp:1135
+
+PROFILES: FORWARD AND RETURN CONTROLS
+=====================================
+
+41. Exclusive mode preferred
+Try exclusive access when using Automatic mode. Forced modes override this preference.
+Source: src/gui/profile_view.cpp:162
+
+42. Use advanced tuning
+Use this direction's saved advanced settings. Opening the panel alone changes nothing.
+Source: src/gui/profile_view.cpp:192
+
+43. Reset all advanced tuning settings
+Reset advanced format, timing, access, and clock settings. Keep the selected endpoints.
+Source: src/gui/profile_view.cpp:242
+
+44. Channel map
+Map source channels to output channels, like 1:3, 2:4. Automatic matches channel numbers.
+Source: src/gui/profile_view.cpp:312
+
+45. Reset Format
+Reset format and channel mapping to Automatic.
+Source: src/gui/profile_view.cpp:317
+
+46. Load safe defaults
+Fill timing and queue suggestions using scanner results. Unknown values remain Automatic.
+Source: src/gui/profile_view.cpp:435
+
+47. Copy buffer values
+Copy all eight timing and buffer settings, including Automatic and inherited values.
+Source: src/gui/profile_view.cpp:454
+
+48. Paste buffer values
+Paste eight timing and buffer settings here without changing other options.
+Source: src/gui/profile_view.cpp:485
+
+49. Reset Buffers
+Reset timing and buffer choices to Automatic or inherited values.
+Source: src/gui/profile_view.cpp:489
+
+50. Default device buffer
+Request 1–100 ms of device buffer capacity. Clear or enter 0 for Automatic. The driver may round up.
+Source: src/gui/profile_view.cpp:498
+
+51. Placebo clock device
+Reserved for future use. Currently a very convincing placebo.
+Source: src/gui/profile_view.cpp:513
+
+52. Reset Routing and Clock
+Reset routing mode and clock settings to Automatic.
+Source: src/gui/profile_view.cpp:520
+
+53. Complete format preset
+Choose a complete audio format, keep manually entered values, or use Automatic.
+Source: src/gui/profile_view.cpp:538
+
+54. Capture endpoint — initial help
+Choose a capture device. Type to search or use the arrow keys.
+Source: src/gui/profile_view.cpp:541
+
+55. Playback endpoint — initial help
+Choose the playback device for this direction.
+Source: src/gui/profile_view.cpp:543
+
+56. Operating mode
+Choose Automatic, Shared, or Exclusive access. Enable advanced tuning to apply it. Forced modes override preferences.
+Source: src/gui/profile_view.cpp:545
+
+57. Routing audio queue / Playback audio queue / Default processing interval
+Milliseconds, including decimals. Clear for Automatic.
+Source: src/gui/profile_view.cpp:330
+
+58. Input processing interval / Output processing interval
+Milliseconds, including decimals. Clear to inherit the default interval.
+Source: src/gui/profile_view.cpp:330
+
+59. Input device buffer / Output device buffer
+Whole milliseconds, 1–100. Clear to inherit the default device buffer.
+Source: src/gui/profile_view.cpp:330
+
+60. Capture/playback endpoint — selected device
+{Windows device name} | logical ID: {logical device ID}
+Source: src/gui/profile_view.cpp:1313
+
+61. Hole heading
+{full hole display name}
+Source: src/gui/profile_view.cpp:1673
+
+62. Profile edit status
+No profile selected
+OR
+{profile name} — Unsaved changes
+OR
+{profile name} — No pending edits
+Source: src/gui/frame.cpp:882
+
+63. Audio Format summary
+{complete format label}
+OR
+Auto / Inherit
+Source: src/gui/profile_view.cpp:1427
+
+64. Latency and Buffering summary
+{number} override
+OR
+{number} overrides
+Source: src/gui/profile_view.cpp:1427
+
+65. Routing and Clock summary
+Automatic
+OR
+{saved operating mode}
+Source: src/gui/profile_view.cpp:1427
+
+DEVICES
+=======
+
+66. Open Devices Folder
+Open saved device records in Explorer. Unsaved ones are still imaginary.
+Source: src/gui/device_view.cpp:50
+
+67. Capture/playback device lists — general help
+Green: available. Gray: unavailable. Yellow: unknown or needs attention. Red: unusable. Right-click for options.
+Source: src/gui/device_view.cpp:68
+
+68. Save device
+Save this device's name and notes. Its identity and profile references remain the same.
+Source: src/gui/device_view.cpp:139
+
+69. Clear device list…
+Delete scanner records and scan history after confirmation. Choose wisely.
+Source: src/gui/device_view.cpp:213
+
+70. Device list — empty area
+Right-click a device to rename, scan, hide, or unhide it.
+Source: src/gui/device_list.cpp:164
+
+71. Device row
+{status}: {display name}
+Status is Available, Unavailable, Error / attention, Unusable, or Unknown / not tested.
+Source: src/gui/device_list.cpp:164
+
+72. Reload saved devices
+Reload device file changes without scanning hardware.
+Source: src/gui/device_view.cpp:190
+
+73. Refresh availability
+Update known devices' availability without testing their formats.
+Source: src/gui/device_view.cpp:190
+
+74. Device detail — scanner record
+Saving updates the device name and notes, not its identity. Nice try.
+Source: src/gui/device_view.cpp:434
+
+75. Device detail — other record
+Changing the display name won't change this device's saved identity.
+Source: src/gui/device_view.cpp:434
+
+DEVICE CHECKS (DEVICES AND PROFILES)
+====================================
+
+76. Check level
+Check this capture device's input level briefly. Cancel to stop listening.
+Source: src/gui/diagnostic_view.cpp:22
+
+77. Test beep
+Play a quiet, one-second beep through this output. The world's smallest soundcheck.
+Source: src/gui/diagnostic_view.cpp:22
+
+78. Active Check level / Test beep / Cancel check / Cancel beep
+{current device-check diagnostic detail; includes endpoint, operation or backend error details}
+Source: src/gui/diagnostic_view.cpp:117
+
+SCANNING / DIAGNOSTICS
+======================
+
+79. Testing level
+Basic reads Windows-reported capabilities. Deep tests audio streams and may take longer.
+Source: src/gui/diagnostics_view.cpp:75
+
+80. Scope
+Update checks new devices and refreshes known ones. Full retests everything selected.
+Source: src/gui/diagnostics_view.cpp:78
+
+81. Deep scan: Operating mode
+Choose Shared, Exclusive, or both for Deep testing. Exclusive tests may interrupt other apps.
+Source: src/gui/diagnostics_view.cpp:110
+
+82. Configurations / device
+Number of format and mode combinations tested per device. More tests take longer.
+Source: src/gui/diagnostics_view.cpp:125
+
+83. Optional operating context
+Optional notes saved with the scan. Check them for private information before sharing.
+Source: src/gui/diagnostics_view.cpp:168
+
+84. Scan status divider
+Drag this divider to resize the scan status area.
+Source: src/gui/diagnostics_view.cpp:183
+
+85. Start Logging / Stop Logging
+Start or stop recording diagnostics. Live scan output stays visible.
+Source: src/gui/diagnostics_view.cpp:233
+
+86. Export scan bundle…
+Export the latest scan and device results as a ZIP. Existing files won't be overwritten.
+Source: src/gui/diagnostics_view.cpp:286
+
+87. Stream (sec.)
+Seconds to test each working format. Longer tests reveal more, but can't guarantee stability.
+Source: src/gui/diagnostics_view.cpp:143
+
+88. Attempt limit (sec.)
+Maximum seconds for each attempt, including setup and cleanup.
+Source: src/gui/diagnostics_view.cpp:143
+
+89. Device limit (sec.)
+Maximum seconds spent testing one device. Remaining formats are skipped when time runs out.
+Source: src/gui/diagnostics_view.cpp:143
+
+90. Scan limit (sec.)
+Total Deep scan time limit. Zero removes this overall limit, not per-device limits.
+Source: src/gui/diagnostics_view.cpp:143
+
+91. Current scan status
+{full current scan status}
+Includes depth, scope, result/phase, elapsed time and scanner detail when available.
+Other states include guided scan in progress and no scan in progress.
+Source: src/gui/frame.cpp:1010
+
+SETTINGS
+========
+
+92. Appearance
+Follow Windows appearance or choose Light or Dark. High-contrast settings take priority.
+Source: src/gui/settings_view.cpp:120
+
+93. Scheduling
+Audio worker scheduling. Takes effect on the next Start. Automatic uses Pro Audio MMCSS.
+Source: src/gui/settings_view.cpp:141
+
+94. Priority
+Audio worker priority. Takes effect on the next Start. Automatic uses Normal.
+Source: src/gui/settings_view.cpp:143
+
+95. Automatically start routing once devices become available
+Wait for missing devices after Start or startup activation. Stop cancels the wait.
+Source: src/gui/settings_view.cpp:220
+
+96. Automatically activate selected profiles while routing — switching supported
+Automatically switch to the selected saved profile while routing. Save edits separately.
+Source: src/gui/settings_view.cpp:222
+
+97. Automatically activate selected profiles while routing — switching unavailable
+Stop routing before activating another profile.
+Source: src/gui/settings_view.cpp:229
+
+98. Start minimized
+Start AudioHole minimized to the system tray.
+Source: src/gui/settings_view.cpp:279
+
+99. Reset layout to default
+Restore the default panel layout. Furniture back where we found it.
+Source: src/gui/settings_view.cpp:312
+
+100. Restart AudioHole / Restart Tutorial
+Restart AudioHole safely. Unsaved edits require confirmation.
+Source: src/gui/settings_view.cpp:372
+
+101. Low motion
+Reduce animation to a still frame. Windows reduced-motion settings take priority.
+Source: src/gui/settings_view.cpp:400
+
+102. Hold expressions between events
+Hold the final reaction frame until the next event, or briefly if disabled.
+Source: src/gui/settings_view.cpp:414
+
+103. Animation loop count
+Play each reaction 1–20 times. Idle and working animations use their own loops.
+Source: src/gui/settings_view.cpp:417
+
+104. Loop until next event
+Repeat reactions until the next event. Overrides loop count and frame hold.
+Source: src/gui/settings_view.cpp:419
+
+105. Personality
+Choose who's providing commentary. Your audio routing stays mercifully unchanged.
+Source: src/gui/settings_view.cpp:482
+
+106. DFA
+Working as intended.
+Source: src/gui/settings_view.cpp:489
+
+107. DFA slider
+Adjust DFA to taste. Results may vary in ways nobody can explain.
+Source: src/gui/settings_view.cpp:516
+
+108. DFA numeric field
+Dial in your preferred level of tomfoolery.
+Source: src/gui/settings_view.cpp:518
+
+109. DFA stepper
+Raise or lower DFA by 0.01.
+Source: src/gui/settings_view.cpp:521
+
+110. DFA numeric field — after malformed input
+Yeah, no, it only goes to 11.
+Source: src/gui/settings_view.cpp:711
+
+PLUG BOARD
+==========
+
+111. Routing Board dropdown
+Choose a saved routing board. Manual selection lasts until another profile activates.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:92
+
+112. New board (+)
+Create a routing board with its own System socket. Clean slate.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:97
+
+113. Delete board (−)
+Delete this board after confirmation. The last one has tenure.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:98
+
+114. Save
+Save a checkpoint of this board. Working changes are already saved.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:101
+
+115. Save As
+Duplicate this board with new board and socket IDs.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:104
+
+116. Rename board
+Rename this routing board. A little rebranding never hurt.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:107
+
+117. Use as default
+Make this the default board. There can be only one.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:120
+
+118. Associate with profile
+Associate this board with a profile for automatic selection when it activates.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:125
+
+119. Profile dropdown
+Choose which profile to associate. This won't activate that profile.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:128
+
+120. Show inactive sources
+Show expandable inactive apps. Hidden apps keep their socket assignments.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:135
+
+121. Recently active window
+How long an app stays in Recently Active after it stops making audio.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:140
+
+122. Sockets list
+Drag to reorder sockets. System stays first. F2 renames; Delete removes.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:149
+
+123. New socket (+)
+Create a new socket. Give your apps somewhere to go.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:153
+
+124. Delete socket (−)
+Delete this socket. Its apps get sent back to System.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:155
+
+125. Windows Mixer
+Open the Windows volume mixer. Sometimes you need the original equipment.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:163
+
+126. Routing Board Settings tab
+Show or hide board settings without changing your scroll position.
+Source: modules/plug_board/src/wx/settings_drawer.cpp:611
+
+127. Socket heading
+Right-click to rename, recolor, change icon, or delete.
+Source: modules/plug_board/src/wx/socket_view.cpp:146
+
+128. Socket playback dropdown
+Choose this socket's playback device. Changes are saved before Windows routing updates.
+Source: modules/plug_board/src/wx/socket_view.cpp:151
+
+129. Application rows, group headings and empty application-list space
+Drag an app to another socket. Relocation without the moving boxes.
+Source: modules/plug_board/src/wx/socket_view.cpp:257
+
+130. Active application playback-status line
+{full actual playback endpoint name}
+Multiple endpoint names are shown on separate lines. Appears over the status line only when the active observation is fresh.
+Source: modules/plug_board/src/wx/socket_view.cpp:509
+
+PLUG BOARD DIALOGS
+==================
+
+131. File type filter
+Choose which file types are shown.
+Source: modules/plug_board/src/wx/dialogs.cpp:28
+
+132. Single-choice picker
+Select one item, then choose OK or double-click it.
+Source: modules/plug_board/src/wx/dialogs.cpp:106
+
+WELCOME SCREEN
+==============
+
+133. Welcome artwork — missing image
+Norm's artwork is missing. The personalities folder may have wandered off.
+Source: src/gui/welcome.cpp:24
+
+134. It's my first time
+Take the guided tour and do a practice exercise. Your actual setup is safe.
+Source: src/gui/welcome.cpp:59
+
+135. Show me them holes!
+Open your real devices and saved profiles. Show time!
+Source: src/gui/welcome.cpp:59
+
+136. I'm not ready yet
+Close AudioHole. No holes were harmed.
+Source: src/gui/welcome.cpp:59
+
+MAIN STATUS, ICONS AND TRAY
+===========================
+
+137. Routing status dot
+Routing status: {routing state}
+Source: src/gui/appearance.cpp:162
+
+138. Header routing status
+{full current header status text, including active and viewed profiles}
+Source: src/gui/frame.cpp:652
+
+139. Technical message in personality/status panel
+{full current technical/operational message, including any reported error detail}
+Source: src/gui/frame.cpp:657
+
+140. Microphone/playback heading icons
+{heading text}: Source (Capture), Destination (Playback), Capture devices, or Playback devices
+Source: src/gui/controls.cpp:500
+
+141. System tray icon
+AudioHole — {routing state} | {active profile ID}
+OR
+AudioHole — {routing state} | No active profile
+If the engine is unavailable, show that status instead of a routing state.
+Source: src/gui/tray.cpp:11
+
+CONTEXT-MENU HELP (STATUS DESCRIPTIONS, NOT TOOLTIP BALLOONS)
+=============================================================
+
+142. Profile → Rename…
+Rename this profile without interrupting active routing.
+Source: src/gui/profile_view.cpp:710
+
+143. Profile → Duplicate
+Make a separate copy of this profile. In case one wasn't enough.
+Source: src/gui/profile_view.cpp:712
+
+144. Profile → Show in Explorer
+Show this profile's saved JSON in Explorer.
+Source: src/gui/profile_view.cpp:714
+
+145. Profile → Delete
+Delete this saved profile.
+Source: src/gui/profile_view.cpp:726
+
+146. Hole → Rename…
+Rename this hole without interrupting active routing.
+Source: src/gui/profile_view.cpp:796
+
+147. Hole → Duplicate
+Copy this hole's devices and settings. Double trouble.
+Source: src/gui/profile_view.cpp:798
+
+148. Hole → Delete
+Remove this hole from the profile.
+Source: src/gui/profile_view.cpp:801
+
+149. Device → Rename…
+Rename this device without changing its Windows name or saved identity.
+Source: src/gui/device_view.cpp:338
+
+150. Device → Show in Explorer
+Show this device's saved JSON in Explorer.
+Source: src/gui/device_view.cpp:344
+
+WINDOWS TASKBAR JUMP LIST DESCRIPTIONS
+======================================
+
+151. Plug Board
+Open Plug Board. Put those apps in their places.
+Source: src/gui/shell_actions.cpp:26
+
+152. Open AudioHole
+Bring AudioHole back to the foreground. We missed you.
+Source: src/gui/shell_actions.cpp:26
+
+153. AudioHole controls…
+Open the full tray menu, including profiles and direction states.
+Source: src/gui/shell_actions.cpp:26
+
+154. Start Routing
+Start the selected profile in the running session.
+Source: src/gui/shell_actions.cpp:26
+
+155. Stop Routing
+Stop routing in the running session.
+Source: src/gui/shell_actions.cpp:26
+
+156. Close window
+Hide the window in the tray. AudioHole keeps working.
+Source: src/gui/shell_actions.cpp:26
+
+157. Exit AudioHole
+Stop and exit AudioHole completely.
+Source: src/gui/shell_actions.cpp:26
+
+OVERRIDDEN HELPER TEXT (NOT CURRENTLY DISPLAYED)
+================================================
+
+158. Load safe defaults — earlier assignment, immediately replaced
+Starting requests for this direction, validated on Start. Unknown or incompatible device periods remain Auto/Inherit; presets are not measured stability guarantees.
+Source: src/gui/profile_view.cpp:432
+
+159. SecondsField helper — overridden on all current scan controls
+Seconds, up to three decimal places. Arrows adjust by 0.001 s. Range: {minimum}–{maximum} s.
+Current ranges: Stream 0.25–30; Attempt limit 1.25–120; Device limit 1–600; Scan limit 0–3600.
+Source: src/gui/seconds_field.cpp:19
+
+SHARED DEFAULTS OVERRIDDEN OR NOT CURRENTLY ASSIGNED
+====================================================
+
+160. New
+Create a new profile without changing active routing.
+Source: src/gui/controls.cpp:526
+
+161. Duplicate
+Copy this profile with new profile and hole identities.
+Source: src/gui/controls.cpp:526
+
+162. Delete
+Delete the selected profile after confirmation. Active profiles cannot be deleted.
+Source: src/gui/controls.cpp:526
+
+163. + Add Hole
+Add a connection to this profile. Another hole, another possibility.
+Source: src/gui/controls.cpp:526
+
+164. Remove selected hole
+Remove this connection after confirmation. Apply to update active routing.
+Source: src/gui/controls.cpp:526
+
+165. Save
+Save editor changes without changing the active routing plan.
+Source: src/gui/controls.cpp:526
+
+166. Reset to Automatic
+Reset this direction's format, channel mapping, access mode and buffer to Automatic. Endpoint assignments and the other direction stay unchanged. Save / Apply keeps the change.
+Source: src/gui/controls.cpp:526
+
+167. Save device
+Update the display name and notes. Windows name and logical identity remain unchanged.
+Source: src/gui/controls.cpp:526
+
+168. Test beep
+Test only the explicitly selected playback destination.
+Source: src/gui/controls.cpp:526
+
+169. Cancel beep
+Stop the output test. That's enough beeping.
+Source: src/gui/controls.cpp:526

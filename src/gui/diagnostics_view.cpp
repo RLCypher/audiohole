@@ -73,11 +73,9 @@ void Frame::build_scan() {
     for (auto* choice : {scan_mode_, scan_scope_})
         choice->SetMinSize(wxSize(dropdown_width, -1));
     scan_mode_->SetToolTip(
-        "Basic reads Windows-reported capabilities without experimental streams. Deep adds bounded "
-        "stream tests with explicit consent. Tutorial simulates both.");
+        "Basic reads Windows-reported capabilities. Deep tests audio streams and may take longer.");
     scan_scope_->SetToolTip(
-        "Update tests only newly discovered devices and refreshes known metadata. Full retests "
-        "all. Per-device scans are available by right-clicking a device on Devices.");
+        "Update checks new devices and refreshes known ones. Full retests everything selected.");
     scan_mode_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         present(presentation::Message::ScanLevelChanged);
         if (tutorial_ && scan_mode_->GetSelection() == 1 && scan_scope_->GetSelection() == 1)
@@ -107,8 +105,8 @@ void Frame::build_scan() {
     deep->SetName("Deep scan limits");
     auto* limits = new wxBoxSizer(wxVERTICAL);
     deep_mode_ = choices(pane, limits, "Operating mode", {"shared", "exclusive", "both"});
-    deep_mode_->SetToolTip("Select shared, exclusive, or both for bounded Deep tests; exclusive "
-                           "tests can conflict with other applications.");
+    deep_mode_->SetToolTip("Choose Shared, Exclusive, or both for Deep testing. Exclusive tests "
+                           "may interrupt other apps.");
     auto* budgets = new wxGridSizer(1, 5, FromDIP(8), FromDIP(8));
     auto* attempts_column = new wxBoxSizer(wxVERTICAL);
     auto title = [pane](wxSizer* column, const wxString& caption) {
@@ -123,8 +121,7 @@ void Frame::build_scan() {
     deep_attempts_->SetName("Configurations per device");
     deep_attempts_->SetValue(8);
     deep_attempts_->SetToolTip(
-        "How many distinct format/mode combinations to test on each device. "
-        "More configurations broaden coverage and increase scan time; these are not retries.");
+        "Number of format and mode combinations tested per device. More tests take longer.");
     attempts_column->Add(deep_attempts_, 0, wxALL | wxEXPAND, 3);
     budgets->Add(attempts_column, 1, wxEXPAND);
     auto seconds = [&](const char* caption, unsigned minimum, unsigned maximum, unsigned initial) {
@@ -142,16 +139,13 @@ void Frame::build_scan() {
     deep_device_timeout_ = seconds("Device limit (sec.)", 1000, 600000, 120000);
     deep_system_timeout_ = seconds("Scan limit (sec.)\n0 = unlimited", 0, 3600000, 600000);
     const std::array<std::pair<SecondsField*, const char*>, 4> descriptions{
-        {{deep_duration_, "How long each accepted configuration processes audio buffers. Longer "
-                          "tests observe more activity but do not prove long-term stability."},
-         {deep_attempt_timeout_,
-          "Maximum worker time for one configuration, including stream setup, processing and "
-          "cleanup. Reporting/checkpoint time is separate."},
-         {deep_device_timeout_, "Total Deep test budget for one device. When used up, remaining "
-                                "configurations are left untested and scanning moves on safely."},
+        {{deep_duration_, "Seconds to test each working format. Longer tests reveal more, but "
+                          "can't guarantee stability."},
+         {deep_attempt_timeout_, "Maximum seconds for each attempt, including setup and cleanup."},
+         {deep_device_timeout_, "Maximum seconds spent testing one device. Remaining formats are "
+                                "skipped when time runs out."},
          {deep_system_timeout_,
-          "Overall Deep scan budget across all selected devices. Zero disables this deadline; "
-          "individual attempt/device limits and Cancel remain active."}}};
+          "Total Deep scan time limit. Zero removes this overall limit, not per-device limits."}}};
     for (const auto& [control, description] : descriptions) {
         control->SetToolTip(description);
         for (auto* child : control->GetChildren())
@@ -165,8 +159,8 @@ void Frame::build_scan() {
     scan_context_ = field(pane, limits,
                           "Optional operating context (other apps, device setup, observed issue)");
     scan_context_->SetMaxLength(8192);
-    scan_context_->SetToolTip("Stored with this scan request for later analysis; maximum 8192 "
-                              "UTF-8 bytes. Review before sharing a bundle.");
+    scan_context_->SetToolTip(
+        "Optional notes saved with the scan. Check them for private information before sharing.");
     pane->SetSizer(limits);
     root->Add(deep, 0, wxEXPAND | wxALL, 3);
     deep->Show(controller_->snapshot().operating_mode == OperatingMode::Test);
@@ -180,8 +174,7 @@ void Frame::build_scan() {
     scan_output_split_ = new wxSplitterWindow(
         page, wxID_ANY, wxDefaultPosition, FromDIP(wxSize(400, 240)), wxSP_LIVE_UPDATE | wxSP_3D);
     scan_output_split_->SetName("Resize scan status height");
-    scan_output_split_->SetToolTip(
-        "Drag the divider below the status to resize it. Long status text can also scroll.");
+    scan_output_split_->SetToolTip("Drag this divider to resize the scan status area.");
     scan_output_split_->SetSashGravity(0);
     scan_output_split_->SetMinimumPaneSize(FromDIP(48));
     scan_output_split_->SetMinSize(FromDIP(wxSize(0, 120)));
@@ -230,8 +223,8 @@ void Frame::build_scan() {
         refresh();
     });
     logging_button_->SetName("Diagnostic logging");
-    logging_button_->SetToolTip("Capture diagnostic events until stopped. Live scan output remains "
-                                "visible when logging is off.");
+    logging_button_->SetToolTip(
+        "Start or stop recording diagnostics. Live scan output stays visible.");
     button(page, export_row, "Copy visible diagnostics", [this] {
         if (!wxTheClipboard->Open()) {
             show_result(
@@ -283,8 +276,8 @@ void Frame::build_scan() {
         request.output = std::filesystem::path(dialog.GetPath().ToStdWstring());
         scanner_action(request);
     });
-    bundle->SetToolTip("Export the last scan's request, progress, results and device records to a "
-                       "new archive. Existing files are never overwritten.");
+    bundle->SetToolTip(
+        "Export the latest scan and device results as a ZIP. Existing files won't be overwritten.");
     scanner_actions_.push_back(bundle);
     root->Add(export_row);
     page->SetSizer(root);

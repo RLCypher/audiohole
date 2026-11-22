@@ -88,23 +88,23 @@ void PlugBoardView::Implementation::build_drawer() {
     auto* title = label("Routing Board Settings");
     title->SetFont(title->GetFont().Bold());
     label("Routing Board:");
-    boards =
-        choice(drawer, "Routing Board",
-               "Selecting a board applies its saved working routing intentions to known "
-               "applications. Manual selection lasts until the next committed profile activation.");
+    boards = choice(
+        drawer, "Routing Board",
+        "Choose a saved routing board. Manual selection lasts until another profile activates.");
     content->Add(boards, 0, wxEXPAND | wxALL, gap);
     auto* actions = new wxBoxSizer(wxHORIZONTAL);
-    add_board = button(drawer, "+", "Create a new board with System (Default).", "New board");
-    delete_board = button(drawer, L"\u2212",
-                          "Delete this board after confirmation. The last board is protected.",
-                          "Delete board");
+    add_board =
+        button(drawer, "+", "Create a routing board with its own System socket. Clean slate.",
+               "New board");
+    delete_board =
+        button(drawer, L"\u2212", "Delete this board after confirmation. The last one has tenure.",
+               "Delete board");
     save = button(drawer, "Save",
-                  "Save the current working configuration as this board's checkpoint. Working "
-                  "edits are already persisted.");
-    save_as = button(drawer, "Save As",
-                     "Copy the current working board with new board and socket IDs. Application "
-                     "identities remain shared.");
-    rename_board = button(drawer, "Rename", "Rename this routing board.", "Rename board");
+                  "Save a checkpoint of this board. Working changes are already saved.");
+    save_as = button(drawer, "Save As", "Duplicate this board with new board and socket IDs.");
+    rename_board =
+        button(drawer, "Rename", "Rename this routing board. A little rebranding never hurt.",
+               "Rename board");
     for (auto* control : {add_board, delete_board, save, save_as, rename_board}) {
         control->SetMinSize(
             panel.FromDIP(wxSize(control == add_board || control == delete_board ? 28
@@ -117,42 +117,38 @@ void PlugBoardView::Implementation::build_drawer() {
     line();
     use_default = new wxCheckBox(drawer, wxID_ANY, "Use as default");
     use_default->SetName("Use as default");
-    use_default->SetToolTip(
-        "One board is always the default. Select this on another board to change it.");
+    use_default->SetToolTip("Make this the default board. There can be only one.");
     content->Add(use_default, 0, wxLEFT | wxRIGHT | wxBOTTOM, gap);
     associate = new wxCheckBox(drawer, wxID_ANY, "Associate with profile");
     associate->SetName("Associate with profile");
-    associate->SetToolTip("Link this board to the selected host profile. Only a committed host "
-                          "activation selects a linked board.");
+    associate->SetToolTip(
+        "Associate this board with a profile for automatic selection when it activates.");
     content->Add(associate, 0, wxLEFT | wxRIGHT, gap);
     profiles = choice(drawer, "Profile",
-                      "Host profiles supplied through the module API. Selecting a profile here "
-                      "edits its association; it does not activate the profile.");
+                      "Choose which profile to associate. This won't activate that profile.");
     content->Add(profiles, 0, wxEXPAND | wxALL, gap);
     line();
     inactive = new wxCheckBox(drawer, wxID_ANY, "Show inactive sources");
     inactive->SetName("Show inactive sources");
     inactive->SetToolTip(
-        "Allow inactive rows to be expanded in every socket. Expanding an "
-        "inactive group also enables this setting. Hidden sources retain assignments.");
+        "Show expandable inactive apps. Hidden apps keep their socket assignments.");
     content->Add(inactive, 0, wxLEFT | wxRIGHT | wxBOTTOM, gap);
     label("Recently active window:");
     recent = choice(drawer, "Recently active window",
-                    "Time since the last observed active session. Activity while discovery is "
-                    "hidden cannot be reconstructed.");
+                    "How long an app stays in Recently Active after it stops making audio.");
     content->Add(recent, 0, wxEXPAND | wxALL, gap);
     line();
     label("Sockets");
     auto* socket_row = new wxBoxSizer(wxHORIZONTAL);
     sockets = new ListBox(drawer, wxID_ANY, panel.FromDIP(wxSize(220, 160)));
     sockets->SetName("Sockets");
-    sockets->SetToolTip("Drag to reorder sockets. System remains first. F2 renames; Alt+Up and "
-                        "Alt+Down reorder; Delete removes with confirmation.");
+    sockets->SetToolTip("Drag to reorder sockets. System stays first. F2 renames; Delete removes.");
     socket_row->Add(sockets, 1, wxEXPAND | wxRIGHT, panel.FromDIP(5));
     auto* socket_actions = new wxBoxSizer(wxVERTICAL);
-    add_socket = button(drawer, "+", "Create a socket.", "New socket");
+    add_socket =
+        button(drawer, "+", "Create a new socket. Give your apps somewhere to go.", "New socket");
     delete_socket =
-        button(drawer, L"\u2212", "Remove this socket after moving its applications to System.",
+        button(drawer, L"\u2212", "Delete this socket. Its apps get sent back to System.",
                "Delete socket");
     for (auto* control : {add_socket, delete_socket}) {
         control->SetMinSize(panel.FromDIP(wxSize(30, 32)));
@@ -160,7 +156,9 @@ void PlugBoardView::Implementation::build_drawer() {
     }
     socket_row->Add(socket_actions);
     content->Add(socket_row, 0, wxEXPAND | wxALL, gap);
-    windows_mixer = button(drawer, "Windows Mixer", "Open the Windows volume mixer.");
+    windows_mixer =
+        button(drawer, "Windows Mixer",
+               "Open the Windows volume mixer. Sometimes you need the original equipment.");
     content->Add(windows_mixer, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
     content->AddSpacer(gap);
     drawer->SetSizer(content);
@@ -608,8 +606,7 @@ DrawerTab::DrawerTab(wxWindow* parent, std::function<void()> action)
                 wxBORDER_SIMPLE | wxWANTS_CHARS),
       toggle(std::move(action)) {
     SetName("Routing Board Settings toggle");
-    SetToolTip("Expand or collapse Routing Board Settings. The window size and socket scroll "
-               "position stay the same.");
+    SetToolTip("Show or hide board settings without changing your scroll position.");
     SetBackgroundStyle(wxBG_STYLE_PAINT);
     SetAccessible(new TabAccessible(this));
     Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { toggle(); });

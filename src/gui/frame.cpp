@@ -1002,8 +1002,7 @@ void Frame::refresh() {
                                          .count()));
         scan_status += "\n" + text(s.scanner.detail);
     } else
-        scan_status = s.scanning ? (tutorial_ ? "Fictional tutorial scan in progress"
-                                              : "Preview scan in progress")
+        scan_status = s.scanning ? (tutorial_ ? "Guided scan in progress" : "Scan in progress")
                                  : "No scan in progress";
     if (scan_state_->GetValue() != scan_status) {
         scan_state_->ChangeValue(scan_status);

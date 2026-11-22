@@ -47,8 +47,8 @@ void Frame::build_devices() {
     devices_folder_ =
         button(page, bundles, "Open Devices Folder", [this] { open_data_folder(false); });
     devices_folder_->SetName("Open Devices Folder");
-    devices_folder_->SetToolTip("Open the Test scanner devices folder, including capture/playback "
-                                "JSON records. Preview devices are session-only.");
+    devices_folder_->SetToolTip(
+        "Open saved device records in Explorer. Unsaved ones are still imaginary.");
     layout->Add(bundles, 0, wxEXPAND);
     device_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                            wxSP_LIVE_UPDATE | wxSP_3D);
@@ -65,9 +65,8 @@ void Frame::build_devices() {
         material_heading(card, content, text(title), capture);
         box = new DeviceList(card);
         box->SetName(text(title));
-        box->SetToolTip(
-            "Status dots: green available; gray unavailable; yellow attention or unknown; red "
-            "explicitly unusable. Right-click for Rename, scans and Hide / Unhide.");
+        box->SetToolTip("Green: available. Gray: unavailable. Yellow: unknown or needs attention. "
+                        "Red: unusable. Right-click for options.");
         content->Add(box, 1, wxEXPAND | wxALL, 3);
         card->set_content_sizer(content);
         left->Add(card, 1, wxEXPAND | wxALL, 3);
@@ -136,8 +135,8 @@ void Frame::build_devices() {
             refresh();
         }
     });
-    device_save_->SetToolTip("Save the display name and notes. The JSON filename follows the name; "
-                             "logical identity and existing profile references stay unchanged.");
+    device_save_->SetToolTip(
+        "Save this device's name and notes. Its identity and profile references remain the same.");
     right->Add(name_row, 0, wxEXPAND);
     device_detail_ =
         label(details, right, "Select a device. Right-click its list entry to scan it.");
@@ -187,11 +186,10 @@ void Frame::build_devices() {
             request.kind = kind;
             scanner_action(request);
         });
-        action->SetToolTip(item.second == ScannerActionKind::Reload
-                               ? "Reload external device JSON edits and filename changes without "
-                                 "querying hardware."
-                               : "Refresh known device availability without capability tests or "
-                                 "creating new records.");
+        action->SetToolTip(
+            item.second == ScannerActionKind::Reload
+                ? "Reload device file changes without scanning hardware."
+                : "Update known devices' availability without testing their formats.");
         scanner_actions_.push_back(action);
     }
     auto* clear = button(details, maintenance, "Clear device list…", [this] {
@@ -210,8 +208,7 @@ void Frame::build_devices() {
         device_dirty_ = false;
         scanner_action(request);
     });
-    clear->SetToolTip("Delete scanner records and scan history in the isolated Test data roots, "
-                      "after confirmation. Available only while the scanner is idle.");
+    clear->SetToolTip("Delete scanner records and scan history after confirmation. Choose wisely.");
     scanner_actions_.push_back(clear);
     right->Add(maintenance, 0, wxEXPAND);
     auto* toggle = button(details, right, "Toggle availability", [this] {
@@ -336,13 +333,12 @@ std::unique_ptr<wxMenu> Frame::device_menu(const std::string& id) {
     const int update = wxWindow::NewControlId(), deep = wxWindow::NewControlId(),
               hide = wxWindow::NewControlId();
     menu->Append(wxID_EDIT, wxS("Rename…"),
-                 "Rename and save this device, preserving its Windows name and logical identity.");
+                 "Rename this device without changing its Windows name or saved identity.");
     menu->AppendSeparator();
     menu->Append(update, "Update device");
     menu->Append(deep, "Deep update device");
     const auto reveal = wxWindow::NewControlId();
-    menu->Append(reveal, "Show in Explorer",
-                 "Open the folder and select this device's saved JSON.");
+    menu->Append(reveal, "Show in Explorer", "Show this device's saved JSON in Explorer.");
     menu->Enable(reveal, bool(device->inspection));
     menu->Bind(
         wxEVT_MENU,
@@ -429,8 +425,8 @@ void Frame::load_device() {
         return;
     }
     device_detail_->SetLabel(
-        e->inspection ? "Save changes the filename and notes while preserving device identity."
-                      : "Saved logical identity is independent of the display name.");
+        e->inspection ? "Saving updates the device name and notes, not its identity. Nice try."
+                      : "Changing the display name won't change this device's saved identity.");
     device_detail_->SetToolTip(device_detail_->GetLabel());
     std::string details;
     if (e->inspection)

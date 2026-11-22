@@ -323,7 +323,8 @@ void BoardSmokeDriver::verify_statuses(BoardFrame& frame) {
             "Hovering the playback status exposes the complete actual device name", assertions);
     hover.SetPosition(center(geometry.name));
     rows->GetEventHandler()->ProcessEvent(hover);
-    require(rows->GetToolTipText() == "Drag to assign to a new socket",
+    require(rows->GetToolTipText() ==
+                "Drag an app to another socket. Relocation without the moving boxes.",
             "Hovering the app name retains the concise drag hint", assertions);
     choose(frame.appearance_choice, 2);
     view.ensure_socket_visible(column->id);
@@ -411,9 +412,11 @@ void BoardSmokeDriver::tick(BoardFrame& frame) {
             require(current->simulated, "Board smoke explicitly uses simulation", assertions);
             require(board->working.sockets.size() == 1 && view.columns.size() == 1,
                     "First run contains only System", assertions);
-            require(view.columns.front()->rows->GetToolTipText() ==
-                        "Drag to assign to a new socket",
-                    "Application hover text is the requested single-line drag hint", assertions);
+            wxMouseEvent heading_hover(wxEVT_MOTION);
+            heading_hover.SetPosition(center(view.columns.front()->rows->GetItemRect(0)));
+            view.columns.front()->rows->GetEventHandler()->ProcessEvent(heading_hover);
+            require(view.columns.front()->rows->GetToolTipText().empty(),
+                    "Activity headers have no application tooltip", assertions);
             const auto system = view.columns.front()->inspect();
             require(system.section_counts[0] == 2 && system.section_counts[2] == 1 &&
                         system.rendered_application_ids.size() == 2,

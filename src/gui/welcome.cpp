@@ -22,7 +22,7 @@ WelcomeDialog::WelcomeDialog(bool first_time, const std::string& appearance)
         has_norm_image_ = norm->has_image();
     } catch (const std::exception&) {
         norm->SetToolTip(
-            "Norm artwork is unavailable; restore the companion personalities folder.");
+            "Norm's artwork is missing. The personalities folder may have wandered off.");
     }
     content->Add(norm, 0, wxEXPAND | wxALL, FromDIP(12));
     const auto copy = wxString::FromUTF8(R"(Welcome to AudioHole!
@@ -57,11 +57,10 @@ It's easier than it looks. Usually.)");
           std::pair{wxID_CANCEL, "I'm not ready yet"}}) {
         auto* button = new ActionButton(this, option.second, 0, option.first);
         button->SetToolTip(
-            option.first == wxID_YES ? "Learn with Norm in a fictional tutorial. Your real devices "
-                                       "and profiles stay untouched."
-            : option.first == wxID_NO
-                ? "Open your saved working environment with real device scanning and audio routing."
-                : "Close AudioHole without starting a session.");
+            option.first == wxID_YES
+                ? "Take the guided tour and do a practice exercise. Your actual setup is safe."
+            : option.first == wxID_NO ? "Open your real devices and saved profiles. Show time!"
+                                      : "Close AudioHole. No holes were harmed.");
         actions->Add(button, 0, wxALL, FromDIP(5));
         button->Bind(wxEVT_BUTTON, [this, id = option.first](wxCommandEvent&) { EndModal(id); });
         if (option.first == (first_time ? wxID_YES : wxID_NO))

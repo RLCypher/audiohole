@@ -424,6 +424,94 @@ void Frame::plug_board_smoke(bool lesson) {
             apply_appearance();
             require(plug_board_view_->GetBackgroundColour() == GetBackgroundColour(),
                     "embedded surface ignores host theme");
+            plug_board_view_->ensure_socket_visible("system");
+            const auto sockets = plug_board_view_->layout_diagnostics().sockets;
+            const auto system =
+                std::find_if(sockets.begin(), sockets.end(),
+                             [](const auto& socket) { return socket.id == "system"; });
+            require(system != sockets.end(), "System rows are missing during theme checks");
+            auto* rows = dynamic_cast<wxVListBox*>(
+                wxWindow::FindWindowById(system->applications_control_id, plug_board_view_));
+            auto* accessible = rows ? rows->GetAccessible() : nullptr;
+            require(accessible != nullptr, "row presentation checks lack accessible geometry");
+            int children = 0;
+            require(accessible->GetChildCount(&children) == wxACC_OK && children >= 4,
+                    "row presentation checks need headings and an app");
+            const auto hover = [&](const wxPoint& point) {
+                wxMouseEvent event(wxEVT_MOTION);
+                event.SetPosition(point);
+                rows->GetEventHandler()->ProcessEvent(event);
+            };
+            const auto background = [&](std::size_t row) {
+                rows->ScrollToRow(row);
+                RedrawWindow(static_cast<HWND>(rows->GetHandle()), nullptr, nullptr,
+                             RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW);
+                const auto rect = rows->GetItemRect(row);
+                const wxPoint point(rect.GetRight() - FromDIP(2), rect.y + rect.height / 2);
+                wxColour color;
+                wxClientDC dc(rows);
+                require(rows->GetClientRect().Contains(point) && dc.GetPixel(point, &color),
+                        "cannot sample the visible native row background");
+                return color;
+            };
+            bool checked_app = false;
+            unsigned checked_headings = 0;
+            const int selection = rows->GetSelection();
+            for (int child = 1; child <= children; ++child) {
+                wxString name;
+                accessible->GetName(child, &name);
+                const bool heading = name.StartsWith("Active (") ||
+                                     name.StartsWith("Recently Active (") ||
+                                     name.StartsWith("Inactive (");
+                if (!heading && checked_app)
+                    continue;
+                const auto row = static_cast<std::size_t>(child - 1);
+                rows->SetSelection(wxNOT_FOUND);
+                const auto normal = background(row);
+                rows->SetSelection(child - 1);
+                require(background(row) == normal,
+                        "selecting a Plug Board heading/app changed its background fill");
+                long state = 0;
+                require(accessible->GetState(child, &state) == wxACC_OK &&
+                            (state & wxACC_STATE_SYSTEM_SELECTED),
+                        "removing the fill lost the keyboard/accessibility selection target");
+                const auto rect = rows->GetItemRect(row);
+                hover(wxPoint(rect.x + FromDIP(3), rect.y + rect.height / 2));
+                if (heading) {
+                    ++checked_headings;
+                    require(rows->GetToolTip() == nullptr,
+                            "activity dropdown acquired an app tooltip");
+                } else {
+                    checked_app = true;
+                    require(
+                        rows->GetToolTipText() ==
+                            "Drag an app to another socket. Relocation without the moving boxes.",
+                        "the app row lost its revised drag tooltip");
+                    const auto playing = name.Find(", Playing: ");
+                    require(playing != wxNOT_FOUND, "active app fixture lacks playback status");
+                    hover(wxPoint(rect.GetRight() - FromDIP(12), rect.GetBottom() - FromDIP(12)));
+                    require(rows->GetToolTipText() ==
+                                name.Mid(static_cast<std::size_t>(playing) + 11),
+                            "playback hover did not retain the full actual output name");
+                }
+            }
+            require(checked_app && checked_headings == 3,
+                    "not all activity headers/app were exercised");
+            rows->SetSelection(wxNOT_FOUND);
+            require(accessible->DoDefaultAction(1) == wxACC_OK,
+                    "could not collapse Active to expose empty list space");
+            const auto last = rows->GetItemRect(rows->GetItemCount() - 1);
+            const wxPoint empty(last.x + FromDIP(3), last.GetBottom() + FromDIP(5));
+            require(rows->GetClientRect().Contains(empty), "empty-space fixture is not visible");
+            hover(empty);
+            require(rows->GetToolTip() == nullptr, "empty list space retained an app tooltip");
+            wxMouseEvent leave(wxEVT_LEAVE_WINDOW);
+            rows->GetEventHandler()->ProcessEvent(leave);
+            require(rows->GetToolTip() == nullptr,
+                    "leaving app rows reinstated a container tooltip");
+            require(accessible->DoDefaultAction(1) == wxACC_OK,
+                    "could not restore Active after the empty-space check");
+            rows->SetSelection(selection);
         }
         theme_choice_->SetSelection(original);
         apply_appearance();

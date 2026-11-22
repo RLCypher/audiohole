@@ -525,24 +525,23 @@ wxColour routing_colour(audiohole::State state) {
 // Keep entries aligned with the visible action labels; smoke checks cover every button.
 wxString button_help(const wxString& title) {
     static const std::pair<const char*, const char*> help[] = {
-        {"About/Update", "Show AudioHole's version, Build, Vintage, license and GitHub link."},
-        {"View license", "Read the AudioHole license agreement."},
-        {"Close", "Close this window."},
-        {"Start Routing", "Validate and activate the profile currently open in the editor."},
-        {"Stop Routing", "Stop every direction and cancel pending startup and recovery."},
+        {"About/Update", "Version, build, vintage, licenses, and other things we can prove."},
+        {"View license", "View AudioHole's license and third-party notices."},
+        {"Close", "Close this window. AudioHole isn't going anywhere."},
+        {"Start Routing", "Check the open profile and get the audio moving."},
+        {"Stop Routing", "Stop routing and cancel pending starts. Everybody out of the pool."},
         {"Exit AudioHole",
-         "Stop routing and exit completely. Closing the window instead hides it to the tray."},
+         "Exit AudioHole completely. The window's Close button only sends it to the tray."},
         {"New", "Create a new profile without changing active routing."},
         {"Duplicate", "Copy this profile with new profile and hole identities."},
         {"Delete",
          "Delete the selected profile after confirmation. Active profiles cannot be deleted."},
-        {"+ Add Hole", "Add a directional connection to this profile's editor."},
+        {"+ Add Hole", "Add a connection to this profile. Another hole, another possibility."},
         {"Remove selected hole",
          "Remove this connection after confirmation. Apply to update active routing."},
         {"Save", "Save editor changes without changing the active routing plan."},
-        {"Apply", "Validate and save the entire edited profile, then apply it to routing. Restart "
-                  "the active profile when needed."},
-        {"Revert", "Discard unsaved edits and reload the saved profile after confirmation."},
+        {"Apply", "Save profile edits and apply them to routing. Active routing may restart."},
+        {"Revert", "Discard unsaved edits. Yesterday's decisions win."},
         {"Reset to Automatic",
          "Reset this direction's format, channel mapping, access mode and buffer to Automatic. "
          "Endpoint assignments and the other direction stay unchanged. Save / Apply keeps the "
@@ -550,49 +549,38 @@ wxString button_help(const wxString& title) {
         {"Save device",
          "Update the display name and notes. Windows name and logical identity remain unchanged."},
         {"Export devices…",
-         "Export saved device records, identities, notes, capabilities and available probe "
-         "histories as a portable ZIP. Local Windows bindings are excluded."},
-        {"Import devices…",
-         "Preview a device bundle before adding records. Conflicting identities or filenames are "
-         "not overwritten; imported devices need an Update scan to resolve local bindings."},
+         "Export device records and scan history as a ZIP. Windows bindings stay home."},
+        {"Import devices…", "Preview and import device records. Conflicts stay untouched; run "
+                            "Update to match devices on this PC."},
         {"Export profiles…",
-         "Export all saved profiles and hole settings with their referenced device records. Save "
-         "pending edits first; no runtime or startup authorization is exported."},
-        {"Import profiles…",
-         "Preview profiles and referenced devices before importing. Stable IDs, notes and settings "
-         "are retained; conflicting existing records are never silently replaced."},
+         "Export saved profiles and devices. Save edits first; startup permissions stay home."},
+        {"Import profiles…", "Preview and import profiles with their device records. Existing "
+                             "records won't be silently overwritten."},
         {"Toggle availability",
-         "Change device availability in this evaluation scenario to exercise reconnection."},
-        {"Start scan", "Scan the selected scope. Advanced testing requests confirmation first."},
-        {"Cancel scan", "Cancel the current scan while retaining existing device records."},
-        {"Copy visible diagnostics",
-         "Copy the currently filtered technical events to the clipboard."},
+         "Simulate this device connecting or disconnecting to check recovery."},
+        {"Start scan", "Start scanning the selected devices. Advanced tests require confirmation."},
+        {"Cancel scan", "Stop scanning. Existing device records survive the ordeal."},
+        {"Copy visible diagnostics", "Copy the diagnostic events currently visible in this view."},
         {"Export visible diagnostics…",
-         "Save the currently filtered technical events to a text file."},
+         "Export the diagnostic events currently visible in this view."},
         {"Clear diagnostics log",
-         "Clear all in-memory diagnostic events, including filtered entries. Routing, profiles and "
-         "settings are unchanged; no files are deleted."},
+         "Clear in-memory diagnostics, including hidden entries. Routing and files survive."},
         {"Reload personality files",
-         "Reload optional commentary from the personalities folder beside this executable."},
-        {"Load custom personality…", "Validate and select a local JSON commentary catalog. Invalid "
-                                     "files leave a complete available package selected."},
+         "Reload character dialogue. Fresh opinions, same audio routing."},
+        {"Load custom personality…",
+         "Load a local personality JSON catalog. Invalid files won't replace the current one."},
         {"Preview startup",
-         "Exercise immediate or delayed profile activation without registering Windows startup."},
-        {"Cancel pending activation",
-         "Cancel the startup countdown and disarm pending activation."},
-        {"Replay Tutorial", "Restart the welcome/tutorial after confirmation; your "
-                            "saved configuration is preserved."},
-        {"Skip tutorial", "Skip the remaining lesson and restart AudioHole after confirmation."},
-        {"End tutorial",
-         "End the fictional tutorial and restart AudioHole in your saved working environment."},
+         "Try the configured startup behavior without changing Windows startup registration."},
+        {"Cancel pending activation", "Cancel the startup countdown. The suspense is over."},
+        {"Replay Tutorial", "Restart the guided tutorial. Your saved setup is safe from Norm."},
+        {"Skip tutorial", "Skip the tutorial and return to your regular programming."},
+        {"End tutorial", "Finish the tutorial and return to the real audio circus."},
         {"DFA", "Working as intended."},
-        {"Test beep", "Test only the explicitly selected playback destination. Cancel stops the "
-                      "test immediately."},
-        {"Cancel beep", "End the current destination test."},
-        {"Forward failure", "Exercise a forward-direction failure in this evaluation scenario."},
-        {"Return failure",
-         "Exercise a return-direction failure while preserving the forward direction."},
-        {"Recover", "Retry unavailable directions without restarting healthy paths."},
+        {"Test beep", "Test only the explicitly selected playback destination."},
+        {"Cancel beep", "Stop the output test. That's enough beeping."},
+        {"Forward failure", "Simulate a failure on the forward audio path."},
+        {"Return failure", "Simulate a return-path failure without interrupting the forward path."},
+        {"Recover", "Retry failed directions. Leave the ones behaving themselves alone."},
     };
     for (const auto& [label, explanation] : help)
         if (title == wxString::FromUTF8(label))

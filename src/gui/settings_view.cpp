@@ -117,8 +117,8 @@ void Frame::build_settings() {
     theme_choice_->SetSelection(preferences_->values().appearance == "dark"    ? 0
                                 : preferences_->values().appearance == "light" ? 1
                                                                                : 2);
-    theme_choice_->SetToolTip("Follow Windows app appearance, or save a Light/Dark preference. "
-                              "Windows high contrast takes precedence.");
+    theme_choice_->SetToolTip(
+        "Follow Windows appearance or choose Light or Dark. High-contrast settings take priority.");
     auto* workers_panel = new wxPanel(appearance_box);
     auto* workers_row = new wxBoxSizer(wxHORIZONTAL);
     workers_panel->SetSizer(workers_row);
@@ -139,9 +139,9 @@ void Frame::build_settings() {
                            : worker_preferences.audio_thread_priority == "high" ? 2
                                                                                 : 0);
     scheduling->SetToolTip(
-        "Audio workers only; applies on the next Start. Automatic requests Pro Audio MMCSS.");
+        "Audio worker scheduling. Takes effect on the next Start. Automatic uses Pro Audio MMCSS.");
     priority->SetToolTip(
-        "Audio worker MMCSS priority; applies on the next Start. Automatic requests Normal.");
+        "Audio worker priority. Takes effect on the next Start. Automatic uses Normal.");
     auto save_workers = [this, scheduling, priority](wxCommandEvent&) {
         auto next = preferences_->values();
         next.scheduling_task = scheduling->GetSelection() == 1   ? "audio"
@@ -217,16 +217,15 @@ void Frame::build_settings() {
                                           "Automatically activate selected profiles while routing");
     wait->SetValue(preferences_->values().automatically_wait_for_devices);
     switch_profile->SetValue(preferences_->values().activate_selected_profile);
-    wait->SetToolTip("After Start or configured startup activation, wait for missing devices. Stop "
-                     "cancels waiting.");
+    wait->SetToolTip(
+        "Wait for missing devices after Start or startup activation. Stop cancels the wait.");
     switch_profile->SetToolTip(
-        "Selecting a saved profile switches routing while a session is armed. Edits still require "
-        "Save/Apply; a waiting replacement asks for confirmation.");
+        "Automatically switch to the selected saved profile while routing. Save edits separately.");
     startup_group->Add(wait, 0, wxALL, FromDIP(4));
     startup_group->Add(switch_profile, 0, wxALL, FromDIP(4));
     if (controller_->snapshot().capabilities.real_engine) {
         switch_profile->Disable();
-        switch_profile->SetToolTip("Stop routing before selecting and starting another profile.");
+        switch_profile->SetToolTip("Stop routing before activating another profile.");
     }
     auto save_routing_policy = [this, wait, switch_profile](wxCommandEvent&) {
         auto next = preferences_->values();
@@ -276,8 +275,7 @@ void Frame::build_settings() {
     auto* minimized = new wxCheckBox(appearance_box, wxID_ANY, "Start minimized");
     launch->SetValue(preferences_->values().start_with_windows);
     minimized->SetValue(preferences_->values().start_minimized);
-    minimized->SetToolTip("Launch minimized using the saved Preview/Test environment, without the "
-                          "environment prompt.");
+    minimized->SetToolTip("Start AudioHole minimized to the system tray.");
     windows_startup->Add(launch, 0, wxALL, FromDIP(4));
     windows_startup->Add(minimized, 0, wxALL, FromDIP(4));
     appearance_group->Add(windows_startup, 0, wxEXPAND);
@@ -309,7 +307,7 @@ void Frame::build_settings() {
     appearance_group->Add(application_actions, 0, wxEXPAND);
     auto* reset = button(appearance_box, application_actions, "Reset layout to default",
                          [this] { reset_layout(); });
-    reset->SetToolTip("Restore panel widths and heights throughout AudioHole to their defaults.");
+    reset->SetToolTip("Restore the default panel layout. Furniture back where we found it.");
     auto* tutorial_action = button(
         appearance_box, application_actions, tutorial_ ? "Skip tutorial" : "Replay Tutorial",
         [this] {
@@ -369,9 +367,7 @@ void Frame::build_settings() {
                 show_result({false, "Restart is unavailable for this host."});
         });
     restart_button->SetName(tutorial_ ? "Restart Tutorial" : "Restart AudioHole");
-    restart_button->SetToolTip(
-        "Restart AudioHole after cleanly closing this session. Saved settings and data are "
-        "preserved; unsaved edits require confirmation.");
+    restart_button->SetToolTip("Restart AudioHole safely. Unsaved edits require confirmation.");
     button(appearance_box, restart_actions, "About/Update", [this] { show_update_information(); });
     auto* personality_group = new wxStaticBoxSizer(wxVERTICAL, page, "Personality and Animation");
     auto* personality_box = personality_group->GetStaticBox();
@@ -398,7 +394,7 @@ void Frame::build_settings() {
     low_motion_ = new wxCheckBox(personality_box, wxID_ANY, "Low motion");
     low_motion_->SetValue(preferences_->values().low_motion);
     low_motion_->SetToolTip(
-        "Show the first animation frame. Windows reduced-motion settings also take precedence.");
+        "Reduce animation to a still frame. Windows reduced-motion settings take priority.");
     playback->Add(low_motion_, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     low_motion_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
         auto next = preferences_->values();
@@ -412,13 +408,11 @@ void Frame::build_settings() {
     });
     personality_group->Add(playback, 0, wxEXPAND);
     hold_expressions_->SetToolTip(
-        "Hold the last frame after the final repeat. Otherwise hold it for two extra seconds. "
-        "Warnings, new events and inactivity sleep can interrupt.");
-    animation_loops_->SetToolTip("Total plays per reaction, 1–20; 1 plays once. Baseline "
-                                 "idle/working animations keep their authored looping behavior.");
-    loop_until_event_->SetToolTip("Repeat the reaction until another event. Overrides loop count "
-                                  "and final-frame hold; warnings, identity changes and inactivity "
-                                  "sleep still take priority. Reduced motion remains static.");
+        "Hold the final reaction frame until the next event, or briefly if disabled.");
+    animation_loops_->SetToolTip(
+        "Play each reaction 1–20 times. Idle and working animations use their own loops.");
+    loop_until_event_->SetToolTip(
+        "Repeat reactions until the next event. Overrides loop count and frame hold.");
     auto sync_playback = [this] {
         const auto& values = preferences_->values();
         hold_expressions_->SetValue(values.hold_expressions);
@@ -479,8 +473,8 @@ void Frame::build_settings() {
         static_cast<wxScrolledWindow*>(notebook_->GetPage(SettingsPage))->FitInside();
     });
     personality_group->Add(catalogs, 0, wxEXPAND);
-    personality_choice_->SetToolTip("Choose optional commentary. Vanilla keeps facts only; "
-                                    "switching personality never changes routing.");
+    personality_choice_->SetToolTip(
+        "Choose who's providing commentary. Your audio routing stays mercifully unchanged.");
     root->Add(personality_group, 0, wxEXPAND | wxALL, FromDIP(4));
     auto* advanced = new wxStaticBoxSizer(wxVERTICAL, page, "Advanced");
     auto* box = advanced->GetStaticBox();
@@ -513,13 +507,9 @@ void Frame::build_settings() {
     numeric->Add(dfa_stepper_, 0, wxALIGN_CENTER_VERTICAL);
     numeric->Add(dfa_slider_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(8));
     advanced->Add(numeric, 0, wxEXPAND | wxALL, FromDIP(4));
-    dfa_slider_->SetToolTip(
-        "Fiddle with this if you think it'll help. We're not making any promises.");
-    dfa_value_->SetToolTip("Type your preferred amount of nonsense. Use a decimal point; extra "
-                           "digits round half-up on "
-                           "Enter; raw values must be between 0 and 11.");
-    dfa_stepper_->SetToolTip(
-        "Nudge the nonsense by 0.01. Values outside 0.00 to 11.00 are rejected, not clamped.");
+    dfa_slider_->SetToolTip("Adjust DFA to taste. Results may vary in ways nobody can explain.");
+    dfa_value_->SetToolTip("Dial in your preferred level of tomfoolery.");
+    dfa_stepper_->SetToolTip("Raise or lower DFA by 0.01.");
     dfa_controls_ = {dfa_, slider_label, dfa_slider_, dfa_value_, dfa_stepper_};
     // Tracking updates the visible number only. A release/keyboard settlement
     // selects at most one acknowledgment, never one per drag tick.
@@ -708,8 +698,7 @@ void Frame::commit_dfa_text() {
     else if (input.status == presentation::DfaInputStatus::AboveMaximum)
         present_dfa(presentation::Message::DfaAboveMaximum);
     else
-        dfa_value_->SetToolTip(
-            "Type your preferred nonsense from 0.00 to 11.00. Extra digits round half-up.");
+        dfa_value_->SetToolTip("Yeah, no, it only goes to 11.");
 }
 void Frame::adjust_dfa(int delta) {
     if (messages_.variants(presentation::Message::Dfa, personality_).empty())

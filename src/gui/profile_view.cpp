@@ -159,8 +159,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     endpoints->Add(playback, 1, wxEXPAND | wxALL, FromDIP(5));
     w.group->Add(endpoints, 0, wxEXPAND);
     w.exclusive_preferred = new wxCheckBox(box, wxID_ANY, "Exclusive mode preferred");
-    w.exclusive_preferred->SetToolTip("Prefer exclusive access in Automatic mode for this "
-                                      "direction. A forced mode takes precedence.");
+    w.exclusive_preferred->SetToolTip(
+        "Try exclusive access when using Automatic mode. Forced modes override this preference.");
     w.group->Add(w.exclusive_preferred, 0, wxALL, FromDIP(4));
     w.exclusive_preferred->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
         if (!loading_) {
@@ -190,7 +190,7 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.advanced_tuning = new wxCheckBox(pane, wxID_ANY, "Use advanced tuning");
     w.advanced_tuning->SetName(title + " use advanced tuning");
     w.advanced_tuning->SetToolTip(
-        "Use saved tuning for this direction. Opening the panel only changes visibility.");
+        "Use this direction's saved advanced settings. Opening the panel alone changes nothing.");
     auto* tuning_header = new wxBoxSizer(wxHORIZONTAL);
     tuning_header->Add(w.advanced_tuning, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
     tuning_header->AddStretchSpacer();
@@ -239,8 +239,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     };
     auto* reset_all = button(pane, tuning_header, "Reset all advanced tuning settings",
                              [changed_settings] { changed_settings(3); });
-    reset_all->SetToolTip("Reset this direction's format, timing, access-mode and clock "
-                          "preferences. Endpoint assignments stay selected.");
+    reset_all->SetToolTip(
+        "Reset advanced format, timing, access, and clock settings. Keep the selected endpoints.");
     constexpr const char* sections[]{"Audio Format", "Latency and Buffering", "Routing and Clock"};
     std::array<wxBoxSizer*, 3> contents{};
     for (unsigned i = 0; i < 3; ++i) {
@@ -309,12 +309,12 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.representation->SetMinSize(wxSize(1, -1));
     map_grid->Add(sample, 1, wxEXPAND);
     w.channel_map = scalar(box, map_grid, "Channel map (source:destination)", false);
-    w.channel_map->SetToolTip("One-based channel indexes, for example 1:3, 2:4. Auto maps matching "
-                              "indexes; extra outputs are silent.");
+    w.channel_map->SetToolTip("Map source channels to output channels, like 1:3, 2:4. Automatic "
+                              "matches channel numbers.");
     format_layout->Add(map_grid, 0, wxEXPAND);
     button(box, format_layout, "Reset Format", [changed_settings] {
         changed_settings(0);
-    })->SetToolTip("Restore Automatic format and channel mapping in this direction.");
+    })->SetToolTip("Reset format and channel mapping to Automatic.");
     box = w.sections[1]->GetPane();
     auto* timing_layout = contents[1];
     auto* timing_grid = new wxGridSizer(0, 4, FromDIP(6), FromDIP(8));
@@ -328,10 +328,10 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             w.timings[i]->Bind(wxEVT_TEXT_ENTER,
                                [this](wxCommandEvent&) { queue_field_save(false); });
             w.timings[i]->SetToolTip(
-                i >= 6   ? "Whole milliseconds, 1–100. Clear to inherit the default device buffer."
-                : i >= 4 ? "Positive milliseconds; fractions allowed. Clear to inherit the default "
-                           "processing interval."
-                         : "Positive milliseconds; fractions allowed. Clear for Automatic.");
+                i >= 6 ? "Whole milliseconds, 1–100. Clear to inherit the default device buffer."
+                : i >= 4
+                    ? "Milliseconds, including decimals. Clear to inherit the default interval."
+                    : "Milliseconds, including decimals. Clear for Automatic.");
             continue;
         }
         auto* column = new wxBoxSizer(wxVERTICAL);
@@ -432,9 +432,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     defaults->SetToolTip(
         "Starting requests for this direction, validated on Start. Unknown or incompatible device "
         "periods remain Auto/Inherit; presets are not measured stability guarantees.");
-    defaults->SetToolTip("Uses matching scanner evidence for processing intervals and queue "
-                         "sizing. Unknown periods stay Auto. Playback lead stays Auto until "
-                         "capacity is confirmed; no device allocation is guessed.");
+    defaults->SetToolTip("Fill timing and queue suggestions using scanner results. Unknown values "
+                         "remain Automatic.");
     auto* copy = button(box, buffer_actions, "Copy buffer values", [this, &w] {
         Preferences p;
         if (!read_preferences(w, p)) {
@@ -451,7 +450,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         if (!ok)
             show_result({false, "Could not copy buffer values."});
     });
-    copy->SetToolTip("Copy only these eight timing/buffer values, including Auto/Inherit choices.");
+    copy->SetToolTip(
+        "Copy all eight timing and buffer settings, including Automatic and inherited values.");
     auto* paste = button(box, buffer_actions, "Paste buffer values", [this, &w] {
         wxTextDataObject data;
         if (!wxTheClipboard->Open()) {
@@ -482,11 +482,11 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         dirty_ = true;
         refresh();
     });
-    paste->SetToolTip("Paste only the eight timing/buffer values into this direction. Other "
-                      "settings stay selected.");
+    paste->SetToolTip(
+        "Paste eight timing and buffer settings here without changing other options.");
     button(box, buffer_actions, "Reset Buffers", [changed_settings] {
         changed_settings(1);
-    })->SetToolTip("Restore Automatic/inherited timing values in this direction.");
+    })->SetToolTip("Reset timing and buffer choices to Automatic or inherited values.");
     timing_layout->Add(buffer_actions, 0, wxEXPAND);
     label(box, timing_layout,
           "All values in milliseconds (ms). Auto chooses automatically; Inherit uses the default. "
@@ -495,9 +495,8 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
         ->Wrap(FromDIP(520));
     w.buffer_state = label(box, timing_layout, "");
     w.buffer_state->SetMinSize(wxSize(1, -1));
-    w.buffer->SetToolTip(
-        "Requested endpoint capacity in whole milliseconds, 1–100; clear or enter 0 for Automatic. "
-        "Drivers may round capacity upward. This does not set queue occupancy or playback lead.");
+    w.buffer->SetToolTip("Request 1–100 ms of device buffer capacity. Clear or enter 0 for "
+                         "Automatic. The driver may round up.");
     box = w.sections[2]->GetPane();
     auto* routing = contents[2];
     auto* routing_grid = new wxGridSizer(1, 2, FromDIP(8), FromDIP(8));
@@ -510,14 +509,13 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
     w.clock->SetMinSize(
         wxSize(1, std::max(w.mode->GetBestSize().y, w.clock->GetCharHeight() + FromDIP(12))));
     w.mode->SetMinSize(wxSize(1, -1));
-    w.clock->SetToolTip(
-        "Saved for future compatibility. Currently has no effect on routing or latency.");
+    w.clock->SetToolTip("Reserved for future use. Currently a very convincing placebo.");
     routing_grid->Add(mode_column, 1, wxEXPAND);
     routing_grid->Add(clock_column, 1, wxEXPAND);
     routing->Add(routing_grid, 0, wxEXPAND);
     button(box, routing, "Reset Routing and Clock", [changed_settings] {
         changed_settings(2);
-    })->SetToolTip("Restore Automatic routing mode and clock metadata in this direction.");
+    })->SetToolTip("Reset routing mode and clock settings to Automatic.");
     w.clock->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {
         if (!loading_) {
             capture_draft();
@@ -536,16 +534,11 @@ void Frame::build_direction(wxWindow* parent, wxSizer* sizer, DirectionWidgets& 
             e.Skip();
         });
     w.format->SetToolTip(
-        "Choose Automatic, retain typed format values with Manual, or select a "
-        "complete format candidate. Timing and explicit channel maps stay selected.");
-    w.source->SetToolTip("Choose a listed capture endpoint for this direction. Use arrow keys or "
-                         "type a name to select a matching list item.");
-    w.destination->SetToolTip("Choose the playback endpoint for this direction. The Windows name "
-                              "is shown for the selected device.");
-    w.mode->SetToolTip(
-        "Save an access-mode choice for this direction. Use advanced tuning must be "
-        "enabled for it to apply. Forced modes take precedence over Exclusive mode "
-        "preferred. Automatic prefers exclusive access when checked, otherwise shared access.");
+        "Choose a complete audio format, keep manually entered values, or use Automatic.");
+    w.source->SetToolTip("Choose a capture device. Type to search or use the arrow keys.");
+    w.destination->SetToolTip("Choose the playback device for this direction.");
+    w.mode->SetToolTip("Choose Automatic, Shared, or Exclusive access. Enable advanced tuning to "
+                       "apply it. Forced modes override preferences.");
     w.representation->Bind(wxEVT_CHOICE, [this, &w](wxCommandEvent&) {
         if (!loading_) {
             dirty_ = true;
@@ -708,11 +701,11 @@ void Frame::apply_buffer(DirectionWidgets& widgets) {
 std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
     auto menu = std::make_unique<wxMenu>();
     menu->Append(wxID_EDIT, wxS("Rename…"),
-                 "Rename and save the profile without changing active routing.");
-    menu->Append(wxID_DUPLICATE, "Duplicate", "Create a separate copy of the saved profile.");
+                 "Rename this profile without interrupting active routing.");
+    menu->Append(wxID_DUPLICATE, "Duplicate",
+                 "Make a separate copy of this profile. In case one wasn't enough.");
     const auto reveal = wxWindow::NewControlId();
-    menu->Append(reveal, "Show in Explorer",
-                 "Open the folder and select this profile's saved JSON.");
+    menu->Append(reveal, "Show in Explorer", "Show this profile's saved JSON in Explorer.");
     menu->Enable(reveal, controller_->snapshot().operating_mode == OperatingMode::Test);
     menu->Bind(
         wxEVT_MENU,
@@ -723,7 +716,7 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
         },
         reveal);
     menu->AppendSeparator();
-    menu->Append(wxID_DELETE, "Delete", "Delete this saved profile after confirmation.");
+    menu->Append(wxID_DELETE, "Delete", "Delete this saved profile.");
     const auto& snapshot = controller_->snapshot();
     menu->Enable(wxID_DELETE, !(snapshot.armed && id == snapshot.active_profile) &&
                                   id != snapshot.pending_profile);
@@ -794,11 +787,11 @@ std::unique_ptr<wxMenu> Frame::profile_menu(const std::string& id) {
 std::unique_ptr<wxMenu> Frame::hole_menu(const std::string& id) {
     auto menu = std::make_unique<wxMenu>();
     menu->Append(wxID_EDIT, wxS("Rename…"),
-                 "Rename and save this hole without changing active routing.");
+                 "Rename this hole without interrupting active routing.");
     menu->Append(wxID_DUPLICATE, "Duplicate",
-                 "Copy this hole's endpoints and directional settings.");
+                 "Copy this hole's devices and settings. Double trouble.");
     menu->AppendSeparator();
-    menu->Append(wxID_DELETE, "Delete", "Remove this hole from staged changes after confirmation.");
+    menu->Append(wxID_DELETE, "Delete", "Remove this hole from the profile.");
     const auto choose = [this, id] {
         capture_draft();
         const auto found = std::find_if(draft_.holes.begin(), draft_.holes.end(),
@@ -974,13 +967,11 @@ void Frame::build_profiles() {
     auto* saves = new wxBoxSizer(wxHORIZONTAL);
     profile_save_ = button(profile_actions_, saves, "Save", [this] { save(false); });
     profile_save_->SetFont(profile_save_->GetFont().Bold());
-    profile_save_->SetToolTip(
-        "Save the current profile's staged changes without activating routing. Ctrl+S.");
+    profile_save_->SetToolTip("Save profile changes without starting routing. Ctrl+S.");
     profile_apply_ = button(profile_actions_, saves, "Apply", [this] { save(true); });
     if (controller_->snapshot().operating_mode == OperatingMode::Test &&
         !controller_->snapshot().capabilities.real_engine)
-        profile_apply_->SetToolTip("Live routing is unavailable in Test Mode. Use Save to persist "
-                                   "profile preferences without claiming engine application.");
+        profile_apply_->SetToolTip("The routing engine is unavailable. Save your edits for later.");
     profile_revert_ = button(profile_actions_, saves, "Revert", [this] {
         if (discard())
             select_profile(viewed_);
@@ -1000,8 +991,8 @@ void Frame::build_profiles() {
     profiles_folder_ =
         button(page, bundles, "Open Profiles Folder", [this] { open_data_folder(true); });
     profiles_folder_->SetName("Open Profiles Folder");
-    profiles_folder_->SetToolTip("Open the profiles folder containing one named JSON per profile. "
-                                 "Preview profiles are session-only.");
+    profiles_folder_->SetToolTip(
+        "Open saved profile JSON files in Explorer. Unsaved ideas aren't in there.");
     page_layout->Add(bundles, 0, wxEXPAND);
     profile_columns_ = new wxSplitterWindow(page, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                             wxSP_LIVE_UPDATE | wxSP_3D);
@@ -1036,25 +1027,24 @@ void Frame::build_profiles() {
                                nullptr, wxLB_SINGLE | wxLB_NEEDED_SB | wxLB_OWNERDRAW);
     profiles_->SetName("Profiles");
     profiles_->SetMinSize(wxSize(0, profiles_->GetCharHeight() + FromDIP(8)));
-    profiles_->SetToolTip("Open a profile for editing. Right-click or Shift+F10 for Rename, "
-                          "Duplicate and Delete. Drag pane dividers to resize.");
+    profiles_->SetToolTip(
+        "Select a profile to edit. Right-click to rename, duplicate, or delete it.");
     profile_heading->AddStretchSpacer();
-    profile_new_ =
-        add_control(profile_panel, profile_heading, "New Profile", "Create a new profile.", [this] {
-            if (!discard())
-                return;
-            const auto id = controller_->create_profile("New Profile");
-            if (id.empty())
-                show_result({false, controller_->last_edit_error()});
-            else {
-                select_profile(id);
-                tutorial_event("profile_created");
-            }
-        });
+    profile_new_ = add_control(profile_panel, profile_heading, "New Profile",
+                               "Create a new profile. Fresh start, fresh holes.", [this] {
+                                   if (!discard())
+                                       return;
+                                   const auto id = controller_->create_profile("New Profile");
+                                   if (id.empty())
+                                       show_result({false, controller_->last_edit_error()});
+                                   else {
+                                       select_profile(id);
+                                       tutorial_event("profile_created");
+                                   }
+                               });
     profile_remove_ = add_control(
         profile_panel, profile_heading, "Delete profile",
-        "Delete the selected saved profile after confirmation. Active or pending profiles must be "
-        "stopped first.",
+        "Delete the selected profile after confirmation. Stop it first if active or pending.",
         [this] { delete_selection(true); }, wxS("−"));
     profile_layout->Add(profile_heading, 0, wxEXPAND);
     profile_layout->Add(profiles_, 1, wxEXPAND | wxALL, 3);
@@ -1063,24 +1053,25 @@ void Frame::build_profiles() {
                                     wxTE_MULTILINE | wxTE_WORDWRAP);
     profile_notes_->SetName("Profile notes");
     profile_notes_->SetMinSize(wxSize(0, profile_notes_->GetCharHeight() + FromDIP(8)));
-    profile_notes_->SetToolTip("Notes for the selected profile. Drag the dividers above/below to "
-                               "resize. Save keeps staged edits.");
+    profile_notes_->SetToolTip(
+        "Notes for this profile. Resize the surrounding panels by dragging their dividers.");
     notes_layout->Add(profile_notes_, 1, wxEXPAND | wxALL, 3);
     auto* hole_heading = new wxBoxSizer(wxHORIZONTAL);
     label(holes_panel, hole_heading, "Holes");
     hole_heading->AddStretchSpacer();
     hole_new_ = add_control(holes_panel, hole_heading, "Add hole",
-                            "Add a hole to this profile's staged changes.", [this] { add_hole(); });
+                            "Add another audio connection. There's room for one more.",
+                            [this] { add_hole(); });
     hole_remove_ = add_control(
         holes_panel, hole_heading, "Delete hole",
-        "Remove the selected hole after confirmation. Save keeps the staged removal.",
+        "Remove the selected hole after confirmation. Save to make it stick.",
         [this] { delete_selection(false); }, wxS("−"));
     holes_layout->Add(hole_heading, 0, wxEXPAND);
     holes_ = new ThemedList(holes_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
                             wxLB_SINGLE | wxLB_NEEDED_SB | wxLB_OWNERDRAW);
     holes_->SetName("Holes");
     holes_->SetMinSize(wxSize(0, holes_->GetCharHeight() + FromDIP(8)));
-    holes_->SetToolTip("Choose a hole. Right-click or Shift+F10 for Rename, Duplicate and Delete.");
+    holes_->SetToolTip("Select a hole. Right-click to rename, duplicate, or delete it.");
     holes_layout->Add(holes_, 1, wxEXPAND | wxALL, 3);
     profile_panel->SetSizer(profile_layout);
     notes_panel->SetSizer(notes_layout);
@@ -1132,8 +1123,8 @@ void Frame::build_profiles() {
     hole_notes_->SetMinSize(wxSize(0, hole_notes_->GetCharHeight() * 3 + FromDIP(8)));
     routing_engine_ = choices(editor, right, "Routing Engine",
                               {"Automatic", "WASAPI", "Miniaudio", "Experimental"});
-    routing_engine_->SetToolTip("Save the routing backend request for this hole. Selecting an "
-                                "engine does not start routing.");
+    routing_engine_->SetToolTip(
+        "Choose this hole's routing backend. No audio moves until you start it.");
     routing_engine_notice_ = label(editor, right, "");
     routing_engine_notice_->SetMinSize(wxSize(0, -1));
     routing_engine_->Bind(wxEVT_CHOICE, [this](wxCommandEvent&) {

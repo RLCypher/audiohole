@@ -19,10 +19,10 @@ void Frame::build_device_check(wxWindow* parent, wxSizer* layout, DiagnosticWidg
     widgets.action->SetMinSize(size);
     widgets.action->SetMaxSize(wxSize(size.x, -1));
     widgets.action->SetSize(size);
-    widgets.action->SetToolTip(capture ? "Temporarily check this capture endpoint's peak input "
-                                         "level. Cancel releases the stream."
-                                       : "Play a quiet, one-second test beep on this playback "
-                                         "endpoint. Cancel requests stream cleanup.");
+    widgets.action->SetToolTip(
+        capture ? "Check this capture device's input level briefly. Cancel to stop listening."
+                : "Play a quiet, one-second beep through this output. The world's smallest "
+                  "soundcheck.");
     widgets.meter = new wxGauge(widgets.panel, wxID_ANY, 100);
     widgets.meter->SetName(name + " input level");
     widgets.meter->SetMinSize(FromDIP(wxSize(1, 12)));

@@ -10,8 +10,8 @@ Tray::Tray(Frame& frame) : frame_(frame) {
 void Tray::update(const audiohole::Snapshot& s) {
     const std::string tip =
         std::string("AudioHole — ") +
-        (s.capabilities.routing ? audiohole::name(s.state) : "Test Mode; engine unavailable") +
-        " | " + (s.active_profile.empty() ? "No active profile" : s.active_profile);
+        (s.capabilities.routing ? audiohole::name(s.state) : "Engine unavailable") + " | " +
+        (s.active_profile.empty() ? "No active profile" : s.active_profile);
     // The tray host can be on a different monitor; use the window's effective DPI
     // as a practical size hint and let Explorer select its final notification size.
     const int size = GetSystemMetricsForDpi(SM_CXSMICON, static_cast<UINT>(frame_.GetDPI().x));

@@ -142,15 +142,13 @@ SocketColumn::SocketColumn(wxWindow* parent, PlugBoardView::Implementation& stat
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE), id(socket.id),
       view(state) {
     SetName(ui_text(socket.display_name + " socket"));
-    heading =
-        view.button(this, ui_text(socket.display_name),
-                    "Right-click for Rename, Delete, Recolor and Icon. System cannot be deleted.",
-                    ui_text("Socket heading " + id));
+    heading = view.button(this, ui_text(socket.display_name),
+                          "Right-click to rename, recolor, change icon, or delete.",
+                          ui_text("Socket heading " + id));
     heading->SetMinSize(wxSize(-1, FromDIP(32)));
-    endpoint =
-        view.choice(this, ui_text("Playback output " + id),
-                    "Select a playback output for this socket. Changes are saved before Windows "
-                    "preferences are changed. The mouse wheel cannot change this value.");
+    endpoint = view.choice(
+        this, ui_text("Playback output " + id),
+        "Choose this socket's playback device. Changes are saved before Windows routing updates.");
     rows = new ApplicationRows(this, view, id);
     auto* content = new wxBoxSizer(wxVERTICAL);
     content->Add(heading, 0, wxEXPAND | wxALL, FromDIP(5));
@@ -254,7 +252,6 @@ ApplicationRows::ApplicationRows(wxWindow* parent, PlugBoardView::Implementation
     : wxVListBox(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE), view(state),
       socket_id(std::move(socket)) {
     SetName(ui_text("Applications in " + socket_id));
-    SetToolTip("Drag to assign to a new socket");
     SetAccessible(new RowsAccessible(this));
     refresh_metrics();
     Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& event) {
@@ -279,18 +276,16 @@ ApplicationRows::ApplicationRows(wxWindow* parent, PlugBoardView::Implementation
             !view.busy() &&
             (std::abs(event.GetX() - press.x) > wxSystemSettings::GetMetric(wxSYS_DRAG_X, this) ||
              std::abs(event.GetY() - press.y) > wxSystemSettings::GetMetric(wxSYS_DRAG_Y, this))) {
+            UnsetToolTip();
             const auto id = std::exchange(pressed_application, {});
             view.begin_drag(id, *this);
         }
-        if (!event.Dragging()) {
-            const auto hint = hover_text(event.GetPosition());
-            if (GetToolTipText() != hint)
-                SetToolTip(hint);
-        }
+        if (!event.Dragging())
+            update_hover_hint(event.GetPosition());
         event.Skip();
     });
     Bind(wxEVT_LEAVE_WINDOW, [this](wxMouseEvent& event) {
-        SetToolTip("Drag to assign to a new socket");
+        UnsetToolTip();
         event.Skip();
     });
     Bind(wxEVT_LEFT_UP, [this](wxMouseEvent& event) {
@@ -364,6 +359,7 @@ std::optional<std::size_t> ApplicationRows::row_at(const wxPoint& point) const {
 void ApplicationRows::update(const std::array<std::vector<std::string>, 3>& incoming,
                              bool inactive) {
     if (incoming == groups && inactive == show_inactive && !entries.empty()) {
+        update_hover_hint(ScreenToClient(wxGetMousePosition()));
         RefreshAll();
         return;
     }
@@ -389,7 +385,17 @@ void ApplicationRows::update(const std::array<std::vector<std::string>, 3>& inco
             SetSelection(static_cast<int>(row));
     if (top < entries.size())
         ScrollToRow(top);
+    update_hover_hint(ScreenToClient(wxGetMousePosition()));
     Refresh();
+}
+void ApplicationRows::update_hover_hint(const wxPoint& point) {
+    // A publication can move an app beneath a stationary pointer. Re-evaluate
+    // without restarting unchanged tips or leaving one on a heading/empty row.
+    const auto hint = IsShownOnScreen() ? hover_text(point) : wxString{};
+    if (hint.empty())
+        UnsetToolTip();
+    else if (GetToolTipText() != hint)
+        SetToolTip(hint);
 }
 void ApplicationRows::activate(std::size_t row) {
     if (row >= entries.size())
@@ -436,7 +442,7 @@ wxString ApplicationRows::accessible_help(std::size_t row) const {
     return row < entries.size() && entries[row].heading
                ? wxString("Activate to expand or collapse this activity group. Expanding "
                           "inactive sources also enables them for this board.")
-               : GetToolTipText();
+               : wxString("Drag an app to another socket. Relocation without the moving boxes.");
 }
 wxCoord ApplicationRows::OnMeasureItem(std::size_t row) const {
     return row < entries.size() && entries[row].heading ? FromDIP(30) : row_height;
@@ -501,10 +507,11 @@ ApplicationRows::StatusVisual ApplicationRows::status_visual(const ApplicationVi
     return {full, font, dc.GetTextExtent(full)};
 }
 wxString ApplicationRows::hover_text(const wxPoint& point) const {
-    constexpr auto drag_hint = "Drag to assign to a new socket";
+    constexpr auto drag_hint =
+        "Drag an app to another socket. Relocation without the moving boxes.";
     const auto row = row_at(point);
     if (!row || entries[*row].heading)
-        return drag_hint;
+        return {};
     const auto* app = view.application(entries[*row].application_id);
     if (!app || app->activity != Activity::Active || !app->observation_fresh || !app->observation ||
         !visual_layout(GetItemRect(*row)).detail.Contains(point))
@@ -535,9 +542,9 @@ std::string ApplicationRows::detail_text(const ApplicationView& app) const {
 }
 void ApplicationRows::OnDrawBackground(wxDC& dc, const wxRect& rectangle, std::size_t row) const {
     const bool heading_row = row < entries.size() && entries[row].heading;
-    const auto color = IsSelected(row) ? item_colors(view.appearance, true).background
-                       : heading_row   ? view.appearance.surface
-                                       : view.appearance.input;
+    // Selection remains the keyboard/context-menu target, not a route state.
+    // Activity headings and app rows retain their ordinary surface when selected.
+    const auto color = heading_row ? view.appearance.surface : view.appearance.input;
     dc.SetPen(*wxTRANSPARENT_PEN);
     dc.SetBrush(wxBrush(color));
     dc.DrawRectangle(rectangle);
@@ -547,7 +554,7 @@ void ApplicationRows::OnDrawItem(wxDC& dc, const wxRect& rectangle, std::size_t 
         return;
     const auto& entry = entries[row];
     const int inset = FromDIP(7);
-    const auto colors = item_colors(view.appearance, IsSelected(row));
+    const auto colors = item_colors(view.appearance, false);
     dc.SetTextForeground(colors.foreground);
     dc.SetFont(GetFont());
     if (entry.heading) {
@@ -569,7 +576,7 @@ void ApplicationRows::OnDrawItem(wxDC& dc, const wxRect& rectangle, std::size_t 
     dc.DrawText(clipped(dc, ui_text(app->display_name), geometry.name.width),
                 geometry.name.GetPosition());
     dc.SetFont(status.font);
-    dc.SetTextForeground(IsSelected(row) ? colors.foreground : view.appearance.muted);
+    dc.SetTextForeground(view.appearance.muted);
     dc.DrawText(status.text, geometry.detail.GetPosition());
 }
 

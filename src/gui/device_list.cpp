@@ -159,7 +159,7 @@ DeviceList::DeviceList(wxWindow* parent)
         const auto tip =
             row >= 0 ? GetTextValue(static_cast<unsigned>(row), 0) + ": " +
                            GetTextValue(static_cast<unsigned>(row), 1)
-                     : wxString("Right-click a device for Rename, scans and Hide / Unhide.");
+                     : wxString("Right-click a device to rename, scan, hide, or unhide it.");
         if (!client->GetToolTip() || client->GetToolTip()->GetTip() != tip)
             client->SetToolTip(tip);
         event.Skip();

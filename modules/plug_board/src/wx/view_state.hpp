@@ -187,6 +187,7 @@ class ApplicationRows final : public wxVListBox {
     wxCoord OnMeasureItem(std::size_t) const override;
 
   private:
+    void update_hover_hint(const wxPoint&);
     PlugBoardView::Implementation& view;
     std::string socket_id;
     std::array<std::vector<std::string>, 3> groups;

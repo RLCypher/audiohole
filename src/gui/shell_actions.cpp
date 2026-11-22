@@ -24,16 +24,17 @@ struct ShellTask {
     ShellAction action;
 };
 constexpr std::array tasks{
-    ShellTask{L"Plug Board", L"plug-board", L"Open the AudioHole Plug Board tab.",
+    ShellTask{L"Plug Board", L"plug-board", L"Open Plug Board. Put those apps in their places.",
               ShellAction::PlugBoard},
-    ShellTask{L"Open AudioHole", L"open", L"Show the running AudioHole window.", ShellAction::Open},
+    ShellTask{L"Open AudioHole", L"open", L"Bring AudioHole back to the foreground. We missed you.",
+              ShellAction::Open},
     ShellTask{L"AudioHole controls…", L"controls",
               L"Open the full tray menu, including profiles and direction states.",
               ShellAction::Controls},
     ShellTask{L"Start Routing", L"start", L"Start the selected profile in the running session.",
               ShellAction::Start},
     ShellTask{L"Stop Routing", L"stop", L"Stop routing in the running session.", ShellAction::Stop},
-    ShellTask{L"Close window", L"close", L"Hide the window to the tray; keep AudioHole running.",
+    ShellTask{L"Close window", L"close", L"Hide the window in the tray. AudioHole keeps working.",
               ShellAction::Close},
     ShellTask{L"Exit AudioHole", L"exit", L"Stop and exit AudioHole completely.",
               ShellAction::Exit}};
