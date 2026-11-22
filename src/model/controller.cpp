@@ -581,7 +581,9 @@ void SimulatedController::event(std::string type, std::string detail) {
                           : type == "recovering"                   ? Severity::Warning
                                                                    : Severity::Info;
     state_.events.push_back({++sequence_, std::move(type), std::move(detail), severity});
-    if (state_.logging_enabled || state_.events.back().type.starts_with("scan-")) {
+    if (state_.logging_enabled || severity >= Severity::Error ||
+        state_.events.back().type.ends_with("-failed") ||
+        state_.events.back().type.starts_with("scan-")) {
         state_.diagnostic_events.push_back(state_.events.back());
         if (state_.diagnostic_events.size() > maximum_diagnostic_events)
             state_.diagnostic_events.erase(state_.diagnostic_events.begin());

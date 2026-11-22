@@ -8,6 +8,7 @@
 #include "platform/windows/diagnostics.h"
 #include <cstdio>
 #include <cstdlib>
+#include <shellapi.h>
 #include <shobjidl.h>
 #include <string_view>
 #include <wx/stdpaths.h>
@@ -312,15 +313,21 @@ class App final : public wxApp {
                 smoke ? nullptr : audiohole::windows::make_diagnostic_service(),
                 smoke ? nullptr : make_routing_service());
         }
-        auto* frame = new Frame(std::move(controller), smoke, preferences_, [this] {
-            restart_requested_ = true;
-            auto* frame = static_cast<Frame*>(GetTopWindow());
-            restart_working_ = frame->tutorial_exit_requested();
-            bool needed = false;
-            restart_replay_ = !restart_working_ && !smoke_ &&
-                              first_run_needed(first_run_marker_path(), needed).ok && needed;
-            frame->exit();
-        });
+        auto* frame = new Frame(
+            std::move(controller), smoke, preferences_,
+            [this] {
+                restart_requested_ = true;
+                auto* frame = static_cast<Frame*>(GetTopWindow());
+                restart_working_ = frame->tutorial_exit_requested();
+                bool needed = false;
+                restart_replay_ = !restart_working_ && !smoke_ &&
+                                  first_run_needed(first_run_marker_path(), needed).ok && needed;
+                frame->exit();
+            },
+            [this](std::shared_ptr<windows::DownloadedInstaller> installer) {
+                pending_installer_ = std::move(installer);
+                static_cast<Frame*>(GetTopWindow())->exit();
+            });
         SetTopWindow(frame);
         frame->Show();
         if (tutorial && replay_tutorial)
@@ -347,6 +354,8 @@ class App final : public wxApp {
                                        wxOK | wxICON_WARNING, frame);
             }
         }
+        if (!smoke && !tutorial)
+            frame->start_auto_updates();
         if (shell_action == ShellAction::PlugBoard)
             frame->CallAfter([frame] { frame->perform_shell_action(ShellAction::PlugBoard); });
         if (shell_action == ShellAction::Controls)
@@ -379,6 +388,35 @@ class App final : public wxApp {
     }
     int OnRun() override {
         wxApp::OnRun();
+        if (pending_installer_) {
+            instance_.reset();
+            // ShellExecute uses the GUI STA; release it after the handoff.
+            const auto directory =
+                std::filesystem::path(wxStandardPaths::Get().GetExecutablePath().ToStdWstring())
+                    .parent_path();
+            const auto kind = installation_kind(directory);
+            auto parameters =
+                L"/UPDATEPARENT=" + std::to_wstring(GetCurrentProcessId()) + L" /DIR=" +
+                quote_argument(directory.wstring()) +
+                (kind == InstallationKind::AllUsers ? L" /ALLUSERS" : L" /CURRENTUSER");
+            SHELLEXECUTEINFOW launch{};
+            launch.cbSize = sizeof(launch);
+            launch.fMask = SEE_MASK_NOCLOSEPROCESS;
+            launch.lpVerb = L"open";
+            launch.lpFile = pending_installer_->path().c_str();
+            launch.lpParameters = parameters.c_str();
+            launch.nShow = SW_SHOWNORMAL;
+            if (kind != InstallationKind::Portable && ShellExecuteExW(&launch)) {
+                pending_installer_->retain_for_installer();
+                if (launch.hProcess)
+                    CloseHandle(launch.hProcess);
+                return result_;
+            }
+            themed_message_box("The installer was not started. AudioHole will reopen; your saved "
+                               "files are preserved.",
+                               "AudioHole update", wxOK | wxICON_INFORMATION);
+            restart_requested_ = true;
+        }
         if (restart_requested_) {
             // All frames/timers have closed. Release the guard and COM before
             // launching; the child still waits for this process to exit fully.
@@ -404,6 +442,7 @@ class App final : public wxApp {
     wxString screenshot_dir_;
     std::filesystem::path smoke_root_;
     std::shared_ptr<BuildPreferences> preferences_;
+    std::shared_ptr<windows::DownloadedInstaller> pending_installer_;
 };
 
 } // namespace audiohole::gui

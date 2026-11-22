@@ -9,6 +9,7 @@ and [contribution guide](../CONTRIBUTING.md).
 - [Maintenance batch and verification](development/MAINTENANCE-2026-11-19.md).
 - [Distribution cleanup and inactive-source disclosure](development/DISTRIBUTION-CLEANUP.md).
 - [Logging, storage limits, portable licensing and build maintenance](development/LOGGING-LICENSE-CI.md).
+- [Automatic updates, installer handoff and error visibility](development/AUTOMATIC-UPDATES.md).
 - [About/Update, RTF licensing and separate downloads](development/ABOUT-AND-DOWNLOADS.md).
 - [Revised hovertext, Plug Board rows and license refresh](development/HOVERTEXT-AND-PLUG-BOARD.md).
 - [Licensing](legal/LICENSING.md) and [corresponding source](development/SOURCE.md).

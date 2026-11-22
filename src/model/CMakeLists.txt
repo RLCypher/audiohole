@@ -2,6 +2,7 @@ add_library(audiohole_model STATIC ../presentation/scan_text.cpp ../presentation
 target_link_libraries(audiohole_model PUBLIC audiohole::avatar audiohole_scanner audiohole::engine PRIVATE audiohole_scanner_export audiohole_zip nlohmann_json::nlohmann_json)
 target_include_directories(audiohole_model PUBLIC "${PROJECT_SOURCE_DIR}/src")
 target_sources(audiohole_model PRIVATE format_assessment.cpp)
+target_sources(audiohole_model PRIVATE update_policy.cpp)
 if(MSVC)
   target_compile_options(audiohole_model PRIVATE /W4 /permissive- /utf-8)
 else()

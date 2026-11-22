@@ -2,6 +2,7 @@
 #include "gui/controls.h"
 #include "gui/license_dialog.h"
 #include "gui/native_theme.h"
+#include "gui/update_dialog.h"
 #include "gui/welcome.h"
 #include "model/application_controller.h"
 #include "model/configuration_bundle.h"
@@ -18,11 +19,13 @@
 
 namespace audiohole::gui {
 Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
-             std::shared_ptr<BuildPreferences> preferences, std::function<void()> restart)
+             std::shared_ptr<BuildPreferences> preferences, std::function<void()> restart,
+             std::function<void(std::shared_ptr<windows::DownloadedInstaller>)> install_update)
     : wxFrame(nullptr, wxID_ANY, wxS("AudioHole"), wxDefaultPosition, wxSize(1000, 1000)),
       controller_(std::make_unique<ApplicationController>(std::move(controller))),
-      preferences_(std::move(preferences)), restart_(std::move(restart)), timer_(this),
-      avatar_timer_(this), tuning_timer_(this), smoke_(smoke) {
+      preferences_(std::move(preferences)), restart_(std::move(restart)),
+      install_update_(std::move(install_update)), timer_(this), avatar_timer_(this),
+      tuning_timer_(this), smoke_(smoke) {
     if (!preferences_) {
         preferences_ = std::make_shared<BuildPreferences>(std::filesystem::path{}, true);
         preferences_->load();
@@ -273,6 +276,7 @@ Frame::Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
                 (void)controller_->scanner_action(request);
             }
             refresh();
+            poll_updates();
             if (closing_ && !controller_->snapshot().routing_pending &&
                 controller_->snapshot().state == State::Stopped)
                 finish_exit();
@@ -448,6 +452,8 @@ void Frame::exit() {
     if (closing_)
         return;
     closing_ = true;
+    if (updates_)
+        updates_->cancel();
     if (plug_board_) {
         plug_board_view_->set_host_visible(false);
         plug_board_view_->detach_module();
@@ -794,9 +800,7 @@ void Frame::refresh_log() {
     const auto query = query_text.Lower();
     std::string logs;
     for (const auto& e : s.diagnostic_events) {
-        if (severity == 1 && e.type != "error" && e.type != "routing-failed" &&
-            e.type != "scan-failed" && e.type != "scanner-action-failed" &&
-            e.type != "configuration-save-failed")
+        if (severity == 1 && e.severity < Severity::Error && !e.type.ends_with("-failed"))
             continue;
         if (severity == 2 && e.type != "state" && e.type != "activated" && e.type != "stopped")
             continue;
@@ -807,6 +811,10 @@ void Frame::refresh_log() {
     }
     if (severity == 0)
         for (const auto& line : avatar_diagnostics_)
+            if (query.empty() || text(line).Lower().Contains(query))
+                logs += line + "\n";
+    if (severity != 2)
+        for (const auto& line : update_errors_)
             if (query.empty() || text(line).Lower().Contains(query))
                 logs += line + "\n";
     if (logs != last_log_) {
@@ -1197,6 +1205,21 @@ bool Frame::smoke(const wxString& directory) {
                     "Welcome button labels/launch targets changed");
         }
         apply_appearance(); // The separate welcome follows Windows' dialog theme.
+        {
+            auto* check = dynamic_cast<wxCheckBox*>(
+                wxWindow::FindWindowByLabel("Check for updates automatically", this));
+            require(check && !check->GetValue() && check->GetToolTip() &&
+                        check->GetToolTip()->GetTip() ==
+                            "We'll let you know if anything new comes to this mess.",
+                    "Automatic update opt-in or hovertext is incorrect");
+            for (bool enabled : {true, false}) {
+                check->SetValue(enabled);
+                wxCommandEvent event(wxEVT_CHECKBOX, check->GetId());
+                check->GetEventHandler()->ProcessEvent(event);
+                require(preferences_->values().check_updates_automatically == enabled && !updates_,
+                        "Update opt-in failed to persist or started a smoke network request");
+            }
+        }
         require(theme_choice_->GetSelection() == 2 && preferences_->values().appearance == "system",
                 "Fresh appearance must follow the Windows system theme");
         require(startup_->IsEnabled() && startup_target_->IsEnabled(),
@@ -2119,6 +2142,7 @@ bool Frame::smoke(const wxString& directory) {
                 wxCommandEvent click(wxEVT_BUTTON, update->GetId());
                 update->GetEventHandler()->ProcessEvent(click);
                 hook.Unregister();
+                smoke_update_dialog(this);
                 require(hook.seen && hook.license_seen &&
                             controller_->snapshot().revision == before && draft_ == draft_before,
                         "Update failed to open its dialog or changed routing/editor state");

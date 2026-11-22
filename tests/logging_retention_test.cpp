@@ -116,4 +116,19 @@ TEST(DiagnosticCapture, DefaultOffPreservesOperationalEventsAndAlwaysShowsScanOu
     EXPECT_TRUE(controller.snapshot().diagnostic_events.empty());
     EXPECT_TRUE(controller.snapshot().events.empty());
 }
+TEST(DiagnosticCapture, ErrorsRemainVisibleWithLoggingOff) {
+    SimulatedController controller;
+    ASSERT_TRUE(controller.activate("profile-simplex").ok);
+    controller.advance(300);
+    ASSERT_FALSE(controller.snapshot().paths.empty());
+    const auto hole = controller.snapshot().paths.front().hole_id;
+    controller.fail_path(hole, false);
+    EXPECT_FALSE(controller.snapshot().logging_enabled);
+    ASSERT_FALSE(controller.snapshot().diagnostic_events.empty());
+    const auto& error = controller.snapshot().diagnostic_events.back();
+    EXPECT_GE(error.severity, Severity::Error);
+    EXPECT_FALSE(error.detail.empty());
+    for (const auto& event : controller.snapshot().diagnostic_events)
+        EXPECT_TRUE(event.severity >= Severity::Error || event.type.ends_with("-failed"));
+}
 } // namespace audiohole

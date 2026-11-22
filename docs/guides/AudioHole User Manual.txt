@@ -504,6 +504,16 @@ before restarting.
 About/Update shows the version, build identifier and Vintage date, with a link
 to AudioHole's GitHub page for downloads. View license opens the license agreement.
 
+Check for updates automatically is optional. When enabled, AudioHole checks for a
+newer release at startup, at most once a week. An update notice shows the current
+version, the available version, and a brief changelog. Open Github opens the
+project's release page. Remind me later shows the notice again next start; Skip
+this one dismisses that version while allowing notices for later versions.
+
+Installed copies also offer Update AudioHole. This downloads and verifies the
+installer, stops routing, and closes AudioHole before starting installation.
+Save any edits you want to keep. Portable copies can download updates from GitHub.
+
 
 10. USING THE TUTORIAL
 =====================
@@ -546,7 +556,8 @@ Use it to identify which part of a setup is running and which needs attention.
 
 Scanning / Diagnostics provides a searchable technical log. Start Logging enables
 diagnostic capture and changes to Stop Logging. Logging starts off. Stopping it
-retains the captured history; live scan output and saved device results continue.
+retains the captured history; error messages, live scan output, and saved device
+results continue.
 Detailed scan progress is saved while logging is enabled. Scan-session archives
 are limited to the newest 16 folders and 512 MB total, with the oldest completed
 sessions removed automatically. Device records and profiles are stored separately.

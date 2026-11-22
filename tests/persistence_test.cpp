@@ -262,6 +262,9 @@ TEST_F(PersistenceTest, ExternalEditsCauseConflictAndLeaveVisibleSavedRecordsUnc
     auto edited = *profile(controller.snapshot(), "profile-1");
     edited.notes = "Should not commit";
     EXPECT_FALSE(controller.save(edited, false).ok);
+    EXPECT_FALSE(controller.snapshot().logging_enabled);
+    ASSERT_FALSE(controller.snapshot().diagnostic_events.empty());
+    EXPECT_EQ(controller.snapshot().diagnostic_events.back().type, "configuration-save-failed");
     EXPECT_EQ(read(), external);
     EXPECT_EQ(profile(controller.snapshot(), "profile-1")->notes, "Keep this note.");
     EXPECT_TRUE(controller.create_profile("Should fail").empty());

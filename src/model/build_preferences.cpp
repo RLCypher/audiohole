@@ -108,6 +108,8 @@ Result BuildPreferences::load() {
             values.low_motion = document.value("low_motion", false);
             values.start_with_windows = document.value("start_with_windows", false);
             values.start_minimized = document.value("start_minimized", false);
+            values.check_updates_automatically =
+                document.value("check_updates_automatically", false);
             values.loop_until_event = document.value("loop_until_event", false);
             values.animation_loops = optional_integer(document, "animation_loops", 1);
             values.personality_id = document.value("personality_id", std::string("default"));
@@ -159,6 +161,7 @@ Result BuildPreferences::update(const PreviewPreferences& values) {
         document["low_motion"] = values.low_motion;
         document["start_with_windows"] = values.start_with_windows;
         document["start_minimized"] = values.start_minimized;
+        document["check_updates_automatically"] = values.check_updates_automatically;
         document["loop_until_event"] = values.loop_until_event;
         document["animation_loops"] = values.animation_loops;
         document["personality_id"] = values.personality_id;

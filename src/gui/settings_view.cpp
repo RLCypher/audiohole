@@ -303,6 +303,25 @@ void Frame::build_settings() {
     };
     launch->Bind(wxEVT_CHECKBOX, save_launch);
     minimized->Bind(wxEVT_CHECKBOX, save_launch);
+    auto* automatic_updates =
+        new wxCheckBox(appearance_box, wxID_ANY, "Check for updates automatically");
+    automatic_updates->SetValue(preferences_->values().check_updates_automatically);
+    automatic_updates->SetToolTip("We'll let you know if anything new comes to this mess.");
+    automatic_updates->Enable(!tutorial_);
+    appearance_group->Add(automatic_updates, 0, wxALL, FromDIP(4));
+    automatic_updates->Bind(wxEVT_CHECKBOX, [this, automatic_updates](wxCommandEvent&) {
+        auto next = preferences_->values();
+        next.check_updates_automatically = automatic_updates->GetValue();
+        const auto result = preferences_->update(next);
+        if (!result.ok) {
+            automatic_updates->SetValue(preferences_->values().check_updates_automatically);
+            show_result(result);
+        }
+        if (result.ok && !next.check_updates_automatically && updates_) {
+            update_download_cancelled_ = true;
+            updates_->cancel();
+        }
+    });
     auto* application_actions = new wxWrapSizer(wxHORIZONTAL);
     appearance_group->Add(application_actions, 0, wxEXPAND);
     auto* reset = button(appearance_box, application_actions, "Reset layout to default",

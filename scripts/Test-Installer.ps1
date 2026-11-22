@@ -30,9 +30,11 @@ function Get-InstalledUninstaller {
     }
     return $uninstallerPath
 }
-function Run-Setup([string]$Label) {
+function Run-Setup([string]$Label, [int]$ParentId = 0) {
     $log = Join-Path $temporary "$Label.log"
-    $process = Start-Process -FilePath $Installer -PassThru -ArgumentList @('/CURRENTUSER', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$target`"", "/LOG=`"$log`"")
+    $arguments = @('/CURRENTUSER', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$target`"", "/LOG=`"$log`"")
+    if ($ParentId -gt 0) { $arguments += "/UPDATEPARENT=$ParentId" }
+    $process = Start-Process -FilePath $Installer -PassThru -ArgumentList $arguments
     if (-not $process.WaitForExit(120000)) { $process.Kill(); throw "Installer timed out: $Label" }
     $process.WaitForExit()
     if ($process.ExitCode -ne 0) {
@@ -83,6 +85,30 @@ $completed = $false
 try {
     New-Item -ItemType Directory -Path $temporary -Force | Out-Null
     $null = Run-Setup 'fresh'
+    # A harmless parent waits until setup announces its parent wait. Setup must
+    # then observe its exit before normal installation; no AudioHole is launched.
+    $parentScript = Join-Path $temporary 'parent-fixture.ps1'
+    @'
+param([string]$Log)
+$deadline = [DateTime]::UtcNow.AddSeconds(30)
+while ([DateTime]::UtcNow -lt $deadline) {
+    $contents = if (Test-Path -LiteralPath $Log) { Get-Content -LiteralPath $Log -Raw -ErrorAction SilentlyContinue } else { '' }
+    if ($contents -and $contents.Contains('AudioHole update parent wait:')) { exit 0 }
+    Start-Sleep -Milliseconds 100
+}
+exit 1
+'@ | Set-Content -LiteralPath $parentScript
+    $handoffLog = Join-Path $temporary 'update-handoff.log'
+    $parent = Start-Process -FilePath (Join-Path $PSHOME 'pwsh.exe') -PassThru -ArgumentList "-NoLogo -NoProfile -File `"$parentScript`" -Log `"$handoffLog`""
+    try {
+        $handoff = Run-Setup 'update-handoff' $parent.Id
+        $parent.WaitForExit()
+        if ($parent.ExitCode -ne 0 -or -not $handoff.Contains('AudioHole update parent exited.')) {
+            throw 'Installer did not complete the automatic-update parent-exit handoff.'
+        }
+    } finally {
+        if (-not $parent.HasExited) { $parent.Kill() }
+    }
     $metadataFile = Join-Path $target 'docs/build-info.json'
     $meta = Get-Content -LiteralPath $metadataFile -Raw | ConvertFrom-Json
     if ($meta.product -ne 'AudioHole') { throw 'Wrong installed metadata' }

@@ -2052,3 +2052,12 @@ The embedded module retains its supplied version-1 portable board library,
 checked JSON replacement and separate machine-local state. Existing profile
 and device schemas remain unchanged. The host storage location and tutorial
 isolation are documented in [PLUG_BOARD_INTEGRATION.md](PLUG_BOARD_INTEGRATION.md).
+
+### Owner-authorized automatic update state
+
+The optional preferences.json boolean `check_updates_automatically` defaults to
+false when absent. The sibling `updates.json` uses the versioned
+`audiohole-update-state` format (schema 1); see
+[Automatic updates](../development/AUTOMATIC-UPDATES.md) for fields, weekly policy,
+release validation, cache ownership and compatibility. This additive local state
+does not alter device/profile/Plug Board schemas or portable routing intent.

@@ -246,6 +246,7 @@ void Frame::build_scan() {
     button(page, export_row, "Clear diagnostics log", [this] {
         controller_->clear_diagnostics();
         avatar_diagnostics_.clear();
+        update_errors_.clear();
         ++avatar_log_revision_;
         refresh();
         present(presentation::Message::DiagnosticsCleared);

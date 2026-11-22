@@ -12,6 +12,7 @@
 #include "model/format_assessment.h"
 #include "model/tutorial.h"
 #include "platform/windows/com_apartment.h"
+#include "platform/windows/update_service.h"
 #include "presentation/avatar_host.h"
 #include "presentation/device_events.h"
 #include "presentation/messages.h"
@@ -105,10 +106,13 @@ struct DirectionWidgets {
 class Frame final : public wxFrame, private wxEventFilter {
   public:
     // Takes exclusive controller ownership. All widgets and commands are GUI-thread only.
-    explicit Frame(std::unique_ptr<audiohole::Controller> controller, bool smoke,
-                   std::shared_ptr<BuildPreferences> preferences = {},
-                   std::function<void()> restart = {});
+    explicit Frame(
+        std::unique_ptr<audiohole::Controller> controller, bool smoke,
+        std::shared_ptr<BuildPreferences> preferences = {}, std::function<void()> restart = {},
+        std::function<void(std::shared_ptr<windows::DownloadedInstaller>)> install_update = {});
     ~Frame() override {
+        if (updates_)
+            updates_->cancel();
         if (plug_board_view_)
             plug_board_view_->detach_module();
         if (plug_board_)
@@ -130,6 +134,7 @@ class Frame final : public wxFrame, private wxEventFilter {
         Raise();
         SetFocus();
     }
+    void start_auto_updates();
     void request_exit();
     void exit();
     bool tutorial_exit_requested() const {
@@ -169,6 +174,15 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::unique_ptr<audiohole::Controller> controller_;
     std::shared_ptr<BuildPreferences> preferences_;
     std::function<void()> restart_;
+    std::function<void(std::shared_ptr<windows::DownloadedInstaller>)> install_update_;
+    std::unique_ptr<updates::Store> update_store_;
+    std::unique_ptr<windows::UpdateService> updates_;
+    wxDialog* update_progress_ = nullptr;
+    bool update_offer_pending_ = false, update_download_cancelled_ = false;
+    std::vector<std::string> update_errors_;
+    void poll_updates();
+    void offer_update();
+    void update_error(const std::string&);
     bool tutorial_exit_requested_ = false;
     // Disposable native-smoke override; empty in every interactive host.
     std::filesystem::path tutorial_marker_override_;

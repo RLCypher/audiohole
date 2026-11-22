@@ -60,6 +60,36 @@ var
 function GetFileAttributesW(Name: String): LongWord;
   external 'GetFileAttributesW@kernel32.dll stdcall';
 
+function OpenProcess(Access: LongWord; Inherit: Boolean; ProcessId: LongWord): THandle;
+  external 'OpenProcess@kernel32.dll stdcall';
+function WaitForSingleObject(Handle: THandle; Milliseconds: LongWord): LongWord;
+  external 'WaitForSingleObject@kernel32.dll stdcall';
+function CloseHandle(Handle: THandle): Boolean;
+  external 'CloseHandle@kernel32.dll stdcall';
+
+function InitializeSetup: Boolean;
+var ParentId: Integer; Parent: THandle; Parameter: String;
+begin
+  Result := True;
+  Parameter := ExpandConstant('{param:UPDATEPARENT|}');
+  if Parameter = '' then exit;
+  ParentId := StrToIntDef(Parameter, 0);
+  Result := False;
+  if ParentId <= 0 then exit;
+  Log('AudioHole update parent wait: ' + Parameter);
+  Parent := OpenProcess($100000, False, ParentId);
+  if Parent = 0 then begin
+    // ERROR_INVALID_PARAMETER means the launcher has already exited.
+    Result := DLLGetLastError = 87;
+  end else begin
+    Result := WaitForSingleObject(Parent, 60000) = 0;
+    CloseHandle(Parent);
+  end;
+  if Result then Log('AudioHole update parent exited.');
+  if not Result then
+    MsgBox('AudioHole has not exited yet. Close AudioHole and run the installer again.', mbError, MB_OK);
+end;
+
 function NotRedirected(Path: String): Boolean;
 var Attributes: LongWord;
 begin
