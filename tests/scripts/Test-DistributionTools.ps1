@@ -5,7 +5,7 @@ $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $repo 'scripts/Build-Names.ps1')
 if ((Get-AudioHoleDisplayVersion '0.1.0') -ne '0.1' -or
     (Get-AudioHoleDisplayVersion '0.1.2') -ne '0.1.2' -or
-    (Get-AudioHoleInstallerName '0.1.0') -ne 'Install AudioHole v0.1') {
+    (Get-AudioHoleDownloadName -Kind Installer -Version '0.1.0' -Commit ('a' * 40)) -ne 'AudioHole Installer v0.1-aaaaaaa') {
     throw 'Versioned display names lost their version or nonzero patch number.'
 }
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('AudioHole-distribution-tests-' + [guid]::NewGuid())
@@ -62,11 +62,15 @@ try {
     if ($meta.configuration -ne 'Release' -or $meta.source_dirty -ne $expectedDirty -or $meta.commit -ne $expectedCommit) { throw 'Wrong metadata' }
     $displayVersion = Get-AudioHoleDisplayVersion $meta.version
     $suffix = if ($expectedDirty) { '-dirty' } else { '' }
-    $expectedName = "AudioHole-v$displayVersion-Windows-x64-release-$($expectedCommit.Substring(0,7))$suffix"
+    $expectedName = "AudioHole Portable v$displayVersion-$($expectedCommit.Substring(0,7))$suffix"
     if ($zip[0].BaseName -ne $expectedName -or $root.Name -ne $expectedName -or
-        $meta.source_archive -ne "AudioHole-v$displayVersion-Source-$($expectedCommit.Substring(0,7))$suffix.zip") {
+        $meta.source_archive -ne "AudioHole ZIP-source v$displayVersion-$($expectedCommit.Substring(0,7))$suffix.zip") {
         throw 'Archive/folder names must use the display version and seven-character commit.'
     }
+    if ($meta.release_repository -ne 'RLCypher/audiohole' -or $meta.release_tag -ne ('v' + $meta.version) -or
+        $meta.installer_file -ne "AudioHole Installer v$displayVersion-$($expectedCommit.Substring(0,7))$suffix.exe" -or
+        $meta.portable_archive -ne ($expectedName + '.zip') -or
+        $meta.debug_archive -ne "AudioHole ZIP-debug v$displayVersion-$($expectedCommit.Substring(0,7))$suffix.zip") { throw 'Release/update metadata differs from download names.' }
     if ($meta.format -ne 'audiohole-build-info' -or $meta.schema_version -ne 1 -or
         $meta.product -ne 'AudioHole' -or $meta.version -notmatch '^\d+\.\d+\.\d+$' -or
         $meta.build_number -lt 0 -or -not $meta.source_archive.EndsWith('.zip')) { throw 'Missing installer/source metadata' }
@@ -84,7 +88,7 @@ try {
 $payload = ($args | Where-Object { $_ -like '/DPayload=*' }).Substring(10)
 $output = ($args | Where-Object { $_ -like '/DOutput=*' }).Substring(9)
 $name = ($args | Where-Object { $_ -like '/DOutputName=*' }).Substring(13)
-if (@(Get-ChildItem -LiteralPath $payload -Filter 'Install AudioHole v*.exe').Count) { throw 'Installer recursively included in its own payload' }
+if (@(Get-ChildItem -LiteralPath $payload -Filter 'AudioHole Installer v*.exe').Count) { throw 'Installer recursively included in its own payload' }
 if (-not (Test-Path -LiteralPath (Join-Path $payload 'AudioHole.exe'))) { throw 'Missing installer runtime payload' }
 'Inert setup fixture; never execute.' | Set-Content -LiteralPath (Join-Path $output "$name.exe")
 $global:LASTEXITCODE = 0
@@ -92,7 +96,7 @@ $global:LASTEXITCODE = 0
     $installerDirectory = Join-Path $fixture 'installer'
     & "$repo/scripts/Build-Installer.ps1" -Archive $zip[0].FullName -OutputDirectory $installerDirectory -Compiler $compiler
     $setup = @(Get-ChildItem -LiteralPath $installerDirectory -File -Recurse)
-    if ($setup.Count -ne 1 -or $setup[0].Name -ne ((Get-AudioHoleInstallerName $meta.version) + '.exe')) { throw 'Installer output must contain only the setup EXE' }
+    if ($setup.Count -ne 1 -or $setup[0].Name -ne ((Get-AudioHoleDownloadName -Kind Installer -Version $meta.version -Commit $meta.commit -Dirty:$meta.source_dirty) + '.exe')) { throw 'Installer output must contain only the setup EXE' }
     & "$repo/scripts/Test-PortableBundle.ps1" -Directory $root.FullName
     $source = Join-Path $root.FullName $meta.source_archive
     'Inert source archive fixture' | Set-Content -LiteralPath $source

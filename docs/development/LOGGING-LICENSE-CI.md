@@ -40,7 +40,7 @@ the agreement through setup, so it avoids a redundant popup.
 The standalone portable license dialog resolves Windows appearance directly.
 Inno Setup uses modern dynamic styling for its complete wizard, custom pages,
 message dialogs and uninstaller. High contrast retains native accessibility
-behavior. The installer display filename is Install AudioHole v0.1.exe for 0.1.0;
+behavior. The installer display filename is AudioHole Installer v0.1-<short-commit>.exe for 0.1.0;
 nonzero patch numbers remain visible for subsequent versions.
 
 ## Builds and evidence

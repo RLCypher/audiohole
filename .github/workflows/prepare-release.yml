@@ -1,0 +1,55 @@
+name: Prepare unpublished release draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful main-branch Windows build run ID for this exact commit
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audiohole-release-draft
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN_ID: ${{ inputs.build_run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node.js 24)
+      - name: Verify successful matching native build
+        run: python3 scripts/PrepareRelease.py check-run --run-id "$SOURCE_RUN_ID"
+      - name: Download the original four files without unwrapping their ZIPs
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2 (Node.js 24)
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.build_run_id }}
+          pattern: AudioHole *
+          path: build/release-input
+          merge-multiple: true
+          skip-decompress: true
+      - name: Audit downloads and prepare checksums
+        run: python3 scripts/PrepareRelease.py prepare --run-id "$SOURCE_RUN_ID"
+      - name: Create or finish the unpublished draft
+        run: python3 scripts/PrepareRelease.py draft
+      - name: Align work with the tested release when it can fast-forward
+        shell: bash
+        run: |
+          comparison=$(gh api "repos/$GITHUB_REPOSITORY/compare/work...$GITHUB_SHA" --jq .status)
+          if [ "$comparison" = ahead ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/work" \
+              -f sha="$GITHUB_SHA" -F force=false
+          else
+            echo "Work is identical or has independent changes; preserving it."
+          fi

@@ -44,6 +44,7 @@ endif()
 # free Python check. Regenerating icons alone additionally needs Pillow.
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
+  add_test(NAME Release.Preparation COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/scripts/test_release_preparation.py")
   add_test(NAME Tutorial.CatalogIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/GenerateTutorial.py" --check)
   add_test(NAME PlugBoard.InputIntegrity COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/CheckPlugBoardInputs.py")
   add_test(NAME Branding.AssetIntegrity

@@ -31,7 +31,7 @@ try {
     }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
     $output = [IO.Path]::GetFullPath($OutputDirectory)
-    $name = Get-AudioHoleInstallerName $meta.version
+    $name = Get-AudioHoleDownloadName -Kind Installer -Version $meta.version -Commit $meta.commit -Dirty:$meta.source_dirty
     if (Test-Path -LiteralPath (Join-Path $output "$name.exe")) { throw 'Installer already exists.' }
     $existing = @(Get-ChildItem -LiteralPath $output -File -Recurse -Force)
     if ($existing.Count) { throw 'Installer output directory must be empty and separate from portable files.' }

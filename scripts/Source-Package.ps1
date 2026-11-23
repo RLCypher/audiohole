@@ -10,7 +10,7 @@ $repo = Split-Path $PSScriptRoot -Parent
 . (Join-Path $PSScriptRoot 'Build-Names.ps1')
 $projectText = Get-Content -LiteralPath (Join-Path $repo 'CMakeLists.txt') -Raw
 if ($projectText -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read the application version.' }
-$displayVersion = Get-AudioHoleDisplayVersion $Matches[1]
+$version = $Matches[1]
 $commit = & git -C $repo rev-parse HEAD
 if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$') { throw 'Cannot identify source.' }
 $status = & git -C $repo status --porcelain
@@ -18,8 +18,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
 $identity = Get-Content -LiteralPath (Join-Path $BuildDirectory 'build-identity.json') -Raw | ConvertFrom-Json
 if ($identity.commit -ne $commit) { throw 'Source build identity belongs to another commit.' }
-$suffix = if ($dirty) { '-dirty' } else { '' }
-$name = "AudioHole-v$displayVersion-Source-$($commit.Substring(0,7))$suffix"
+$name = Get-AudioHoleDownloadName -Kind Source -Version $version -Commit $commit -Dirty:$dirty
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 $archive = Join-Path $OutputDirectory "$name.zip"
 if (Test-Path -LiteralPath $archive) { throw "Source archive already exists: $archive" }

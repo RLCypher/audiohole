@@ -38,10 +38,8 @@ if ($identity.commit -ne $commit) { throw 'Build identity belongs to another com
 $status = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect source status.' }
 $dirty = -not [string]::IsNullOrWhiteSpace(($status -join "`n"))
-$suffix = if ($dirty) { '-dirty' } else { '' }
-$displayVersion = Get-AudioHoleDisplayVersion $version
-$shortCommit = $commit.Substring(0,7)
-$name = "AudioHole-v$displayVersion-Windows-x64-$($Configuration.ToLowerInvariant())-$shortCommit$suffix"
+$kind = if ($Configuration -eq 'Release') { 'Portable' } else { 'Debug' }
+$name = Get-AudioHoleDownloadName -Kind $kind -Version $version -Commit $commit -Dirty:$dirty
 $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
 $archive = Join-Path $outputRoot "$name.zip"
@@ -86,7 +84,12 @@ try {
         build_date_utc = $identity.build_date_utc
         vintage = $identity.vintage
         project_codename = 'BLANCO'
-        source_archive = "AudioHole-v$displayVersion-Source-$shortCommit$suffix.zip"
+        release_repository = 'RLCypher/audiohole'
+        release_tag = "v$version"
+        installer_file = (Get-AudioHoleDownloadName -Kind Installer -Version $version -Commit $commit -Dirty:$dirty) + '.exe'
+        portable_archive = (Get-AudioHoleDownloadName -Kind Portable -Version $version -Commit $commit -Dirty:$dirty) + '.zip'
+        debug_archive = (Get-AudioHoleDownloadName -Kind Debug -Version $version -Commit $commit -Dirty:$dirty) + '.zip'
+        source_archive = (Get-AudioHoleDownloadName -Kind Source -Version $version -Commit $commit -Dirty:$dirty) + '.zip'
         runtime_files = @($expected) + @('docs/build-info.json', 'README.txt')
     }
     New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null

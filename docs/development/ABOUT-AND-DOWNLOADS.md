@@ -41,21 +41,26 @@ inconsistent date/label rather than distributing conflicting About metadata.
 
 ## Download layout
 
-Artifact names have numeric prefixes for this presentation order:
+Download filenames sort in the requested order without numeric prefixes:
 
-1. 01-Installer: Release setup executable only.
-2. 02-ZIP: tested Release portable contents, without setup or source.
-3. 03-Debug: tested Debug portable contents, without setup or source.
-4. 04-Source: one matching archive including pinned dependency sources.
+1. AudioHole Installer v<display-version>-<short-commit>.exe: Release setup only.
+2. AudioHole Portable v<display-version>-<short-commit>.zip: tested Release runtime.
+3. AudioHole ZIP-debug v<display-version>-<short-commit>.zip: tested Debug runtime.
+4. AudioHole ZIP-source v<display-version>-<short-commit>.zip: matching source.
 
-The source preparation job configures the pinned dependencies and publishes
-corresponding source before either binary job is allowed to publish. This
-preserves source availability while presenting Source last. Debug and Release
-still execute native GUI and full contract suites. Only Release builds and tests
-the installer. Build-Installer.ps1 writes a separate empty destination and refuses
-a packaged RTF that differs from its compiler agreement. GitHub's artifact ZIP
-wrapper contains only setup for the Installer download. Portable ZIPs are ready
-to extract and run, and include the RTF, new README and all existing guides.
+The source job publishes corresponding source before either binary job can
+publish. All four uploads use archive:false, so the installer is a bare EXE and
+each ZIP downloads directly without another ZIP wrapper. Debug and Release run
+the native GUI/full contract suites; only Release builds/tests setup. The same
+filenames appear in additive build-info.json fields installer_file,
+portable_archive, debug_archive and source_archive, beside release_repository
+and release_tag. Full version and commit remain authoritative.
+
+The manual Prepare unpublished release draft workflow consumes a successful
+native main-branch run at the exact checked-out commit. It checks matching clean
+source/Debug/Release metadata and Vintage, ZIP manifests, dependency sources and
+installer type, then adds SHA256SUMS.txt and release-info.json. It creates only a
+draft and verifies GitHub asset digests; it never publishes or changes visibility.
 
 ## Validation contracts
 

@@ -1,66 +1,75 @@
-<p align="center">
-  <img src="assets/branding/audiohole-logo.png" width="224" alt="AudioHole logo">
-</p>
-
 # AudioHole
 
-Put your audio wherever you want.
+**Put your audio wherever you want.**
 
-AudioHole is a Windows application for connecting existing capture and playback
-endpoints through saved routing profiles. A **hole** connects a source to a
-destination; duplex holes add an independent return path. **Plug Board** organizes
-application output assignments into reusable routing boards.
+AudioHole is a free, open-source Windows audio routing application built around a simple idea: you paid for the hardware, so you ought to decide where the audio goes.
 
-[Build instructions](BUILDING.md) · [Documentation](docs/README.md) ·
-[Contributing](CONTRIBUTING.md) · [GPLv3](LICENSE)
+Got a headset that refuses to cooperate with your mixer? A collection of perfectly good audio devices that act like they've never met? Games, music, and voice chat all shouting over the same output like it's the last parking space at Costco?
 
-## Get started
+Yeah. We got tired of that too.
 
-Download a successful Windows build from [GitHub Actions](https://github.com/RLCypher/audiohole/actions).
-Extract the portable ZIP and run `AudioHole.exe` directly. The optional installer
-sits beside it if you prefer a conventional installation. The **Guides and Manuals**
-folder includes the user manual, quick-start and tuning guides, manifesto, and AI disclosure.
-Matching source is available as a separate Source download on the same build page.
+## Download AudioHole
 
-The guided tutorial uses fictional devices and applications, with Norm explaining
-each step. Normal operation uses your real Windows endpoints. Keep your playback
-volume comfortable while testing a new route.
+**Get AudioHole from GitHub Releases.**
 
-AudioHole is under active development. CI verifies software contracts and GUI
-flows; it does not establish compatibility or measured latency for every device.
+Pick your preferred flavor:
 
-## What is included
+- **[Windows installer](https://github.com/RLCypher/audiohole/releases/tag/v0.1.0):** For people who like their applications properly moved in, with their shoes by the door.
+- **[Portable ZIP](https://github.com/RLCypher/audiohole/releases/tag/v0.1.0):** Unzip it into a folder and run it. No installation, no ceremony.
 
-- Saved profiles with simplex and duplex routing, independent endpoint preferences
-  and optional advanced format, latency and buffering controls.
-- Device discovery, capability scanning and readable JSON configuration.
-- Plug Board application assignments, board libraries and profile associations.
-- Temporary source activity checks, destination test beeps, diagnostics and tray controls.
-- Light, Dark and Follow System themes, with optional Norm and Horu commentary.
+Both get you AudioHole. Pick whichever suits your particular brand of laziness. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
 
-## Find your way around
+## A Quick Note About Security
 
-| Folder | Contents |
-| --- | --- |
-| [src](src) | Application, interface, controller and scanner code |
-| [engine](engine) | Audio engine module |
-| [modules](modules) | Plug Board module |
-| [personalities](personalities) | Editable personality packages |
-| [docs](docs/README.md) | User, design and validation documentation |
-| [tests](tests) | Automated checks |
-| [scripts](scripts) and [installer](installer) | Build, packaging and optional installer tools |
+AudioHole is currently distributed without a digital code signature. I don't intend to keep it that way forever. 
+In the mean time, Microsoft Defender SmartScreen may throw a warning in your face because Windows doesn't recognize the publisher or hasn't established sufficient trust in the application. This warning doesn't necessarily mean AudioHole is malicious, but you should always verify where your software comes from.
 
-Developers should start with [BUILDING.md](BUILDING.md), [CONTRIBUTING.md](CONTRIBUTING.md)
-and [AGENTS.md](AGENTS.md). Detailed specifications live under
-[docs/specifications](docs/specifications/README.md).
+SmartScreen is a legitimate Windows security feature, and I have no intention of asking you to disable it. I'm working toward getting AudioHole properly code-signed so Windows can recognize its publisher. Until then, Windows may remain understandably suspicious of my holes.
 
-## License and contributions
+AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
 
-First-party code is licensed under [GPLv3](LICENSE), **GPL-3.0-only**. Donations and
-commercial distribution are compatible with the license. Contributions use DCO
-sign-off; there is no broad relicensing CLA.
+The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare version numbers. I won't stand for wasting your precious bandwidth on telemetry data.
 
-Original artwork and branding have [separate terms](docs/legal/assets.txt). See the
-[licensing details](docs/legal/LICENSING.md) for scope and third-party notices,
-[corresponding source](docs/development/SOURCE.md), and
-[AI disclosure](docs/specifications/AI_DISCLOSURE.md).
+## What does it do?
+
+### AudioHole
+
+**Device-agnostic audio forwarding.** Connect Windows capture and playback devices without worrying about whose logo is on the box. Your microphone doesn't need to know who manufactured your mixer, and frankly, neither should you.
+
+Set up a connection, tell the audio where to go, and let the software handle the introductions.
+
+### Plug Board
+
+**Application audio routing.** Give your apps somewhere to put their noise. Organize games, music, voice chat, and other sound-making troublemakers into sockets, then point those sockets at the playback devices you want.
+
+It's cable management for your applications, except you don't have to crawl behind a desk or find a flashlight with working batteries.
+
+## Getting started
+
+Run AudioHole and follow the interactive tutorial if you'd like someone to show you where everything goes. If you're the type who starts turning knobs before reading labels, there's also a full user manual and a buffer tuning guide for when you decide to get particularly intimate with your audio settings.
+
+You may also encounter **Norm and Horu**, AudioHole's resident personalities. They offer helpful advice, unsolicited commentary, and varying degrees of professionalism. They're optional. Their opinions about that are their own.
+
+## Requirements
+
+- Windows 10 or Windows 11
+- 64-bit (x64) computer
+- Compatible Windows audio devices
+
+AudioHole works with existing Windows audio endpoints. It does not install a custom virtual audio driver. Your existing devices provide the holes. We just help connect them.
+
+## Documentation and assorted reading material
+
+The download includes the guided tutorial, full user manual, and manual buffer tuning guide.
+
+Curious why someone spent this much effort making Windows audio behave? Read the manifesto. Want to know how much AI helped build this contraption? There's an AI disclosure for that too.
+
+## License
+
+AudioHole's software is released under the **GNU General Public License, version 3 (GPLv3)**. The full legal text is in LICENSE.
+
+Original mascots, logos, and certain other creative assets have separate terms described in `licenses/assets.txt`. Third-party components retain their applicable notices and licenses.
+
+---
+
+**Plug it in. Route it. Get on with your life.**

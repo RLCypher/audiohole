@@ -74,6 +74,31 @@ TEST(UpdatePolicy, BoundsChangelogWithoutBreakingUtf8) {
     EXPECT_EQ(release.notes, std::string(1999, 'x') + "\n…");
     EXPECT_NO_THROW(Json(release.notes).dump());
 }
+TEST(UpdatePolicy, RecognizesVersionedCommitInstallerNamesAndGitHubNormalization) {
+    for (const auto* name :
+         {"AudioHole Installer v0.1.1-34aca5b.exe", "AudioHole.Installer.v0.1.1-34aca5b.exe",
+          "Install AudioHole v0.1.1.exe", "Install.AudioHole.v0.1.1.exe"}) {
+        auto json = release_document();
+        json["assets"][0]["name"] = name;
+        EXPECT_TRUE(parse_release(json.dump()).installer) << name;
+    }
+    for (const auto* name :
+         {"AudioHole Installer v0.1-34aca5b.exe", "AudioHole.Installer.v0.1.0-34aca5b.exe"}) {
+        auto json = release_document();
+        json["tag_name"] = "v0.1.0";
+        json["assets"][0]["name"] = name;
+        EXPECT_TRUE(parse_release(json.dump()).installer) << name;
+    }
+    for (const auto* name :
+         {"AudioHole Installer v0.1.2-34aca5b.exe", "AudioHole Installer v0.1.1-34aca5b-dirty.exe",
+          "AudioHole Installer v0.1.1-34aca5.exe", "AudioHole Installer v0.1.1-34aca5bg.exe",
+          "AudioHole Installer v0.1.1-zzzzzzz.exe", "AudioHole ZIP-debug v0.1.1-34aca5b.zip",
+          "AudioHole Portable v0.1.1-34aca5b.zip", "AudioHole ZIP-source v0.1.1-34aca5b.zip"}) {
+        auto json = release_document();
+        json["assets"][0]["name"] = name;
+        EXPECT_FALSE(parse_release(json.dump()).installer) << name;
+    }
+}
 class UpdateState : public testing::Test {
   protected:
     std::filesystem::path root =

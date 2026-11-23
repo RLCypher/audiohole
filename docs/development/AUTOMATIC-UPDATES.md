@@ -35,8 +35,10 @@ The existing About/Update identity and owner-approved BLANCO text are unchanged.
 ## Installer contract and ownership
 
 Publish a stable tag vX.Y[.Z], release notes, and the Release setup executable as
-a direct release asset, named Install AudioHole vX.Y[.Z].exe. GitHub's dotted
-space normalization is also accepted. CI workflow artifacts are not public release
+a direct release asset, named AudioHole Installer vX.Y[.Z]-<7-character-commit>.exe.
+The displayed version must match the release tag, including its numeric patch.
+GitHub's dotted space normalization and the older Install AudioHole vX.Y[.Z].exe
+names remain accepted; dirty, Debug, portable and source names are rejected. CI workflow artifacts are not public release
 assets and do not trigger notifications. Matching corresponding source must
 remain available with releases. The asset must carry GitHub's SHA-256 digest;
 without a valid digest/size/trusted repository download URL, browser updating

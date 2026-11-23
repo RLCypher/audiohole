@@ -19,6 +19,27 @@ bool safe_installer(const Installer& asset) {
            std::all_of(asset.sha256.begin(), asset.sha256.end(),
                        [](char c) { return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'); });
 }
+// Match the release version before accepting a setup asset. GitHub normalizes
+// spaces in uploaded names to dots. Retain the older setup naming contract so
+// existing releases remain usable; development/dirty and non-installer files
+// must never become an automatic installer candidate.
+bool installer_name_matches(std::string name, const Version& version) {
+    std::replace(name.begin(), name.end(), ' ', '.');
+    for (const auto& spelling : {version.display(), "v" + version.normalized()}) {
+        if (name == "Install.AudioHole." + spelling + ".exe")
+            return true;
+        const auto prefix = "AudioHole.Installer." + spelling + "-";
+        if (!name.starts_with(prefix) || !name.ends_with(".exe"))
+            continue;
+        const auto commit =
+            std::string_view(name).substr(prefix.size(), name.size() - prefix.size() - 4);
+        if (commit.size() == 7 && std::all_of(commit.begin(), commit.end(), [](char c) {
+                return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f');
+            }))
+            return true;
+    }
+    return false;
+}
 std::string brief_notes(std::string text) {
     constexpr std::size_t limit = 2000;
     if (text.size() > limit) {
@@ -119,16 +140,13 @@ Release parse_release(std::string_view bytes) {
                                     ? json.at("body").get<std::string>()
                                     : std::string{}),
                     {}};
-    const std::string expected = "Install AudioHole " + version->display() + ".exe";
-    auto dotted = expected;
-    std::replace(dotted.begin(), dotted.end(), ' ', '.');
     if (json.contains("assets")) {
         const auto& assets = json.at("assets");
         if (!assets.is_array() || assets.size() > 128)
             throw std::runtime_error("Invalid release assets.");
         for (const auto& asset : assets) {
             const auto name = asset.value("name", std::string{});
-            if (name != expected && name != dotted)
+            if (!installer_name_matches(name, *version))
                 continue;
             if (!asset.contains("digest") || !asset.at("digest").is_string())
                 continue;

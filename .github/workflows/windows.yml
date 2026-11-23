@@ -36,13 +36,13 @@ jobs:
         run: cmake --preset windows-msvc -DAUDIOHOLE_BUILD_TIMESTAMP=${{ steps.names.outputs.timestamp }}
       - name: Package one matching source archive
         run: ./scripts/Source-Package.ps1
-      # Source availability precedes binary publication; numeric display names
-      # keep the download list in the owner's requested presentation order.
+      # Source availability precedes binary publication. The filenames sort as
+      # Installer, Portable, ZIP-debug and ZIP-source without numeric prefixes.
       - name: Upload matching source
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: 04-Source-AudioHole-v${{ steps.names.outputs.version }}-${{ steps.names.outputs.commit }}
           path: build/source/*.zip
+          archive: false
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
@@ -120,7 +120,7 @@ jobs:
           }
           $zip = @(Get-ChildItem build/packages/*.zip)
           ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler
-          $setup = @(Get-ChildItem -LiteralPath build/installer -Filter 'Install AudioHole v*.exe' -File)
+          $setup = @(Get-ChildItem -LiteralPath build/installer -Filter 'AudioHole Installer v*.exe' -File)
           if ($setup.Count -ne 1) { throw 'Expected one installer' }
           ./scripts/Test-Installer.ps1 -Installer $setup[0].FullName
       - name: Verify installer-free portable download
@@ -135,17 +135,16 @@ jobs:
         if: matrix.configuration == 'release'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: 01-Installer-AudioHole-v${{ steps.names.outputs.version }}-${{ steps.names.outputs.commit }}
           path: build/installer/*.exe
+          archive: false
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
       - name: Upload tested portable ZIP
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2 (Node.js 24)
         with:
-          name: ${{ matrix.configuration == 'release' && '02-ZIP' || '03-Debug' }}-${{ steps.package.outputs.artifact_name }}
-          path: ${{ steps.portable.outputs.directory }}/
-          include-hidden-files: true
+          path: build/packages/*.zip
+          archive: false
           if-no-files-found: error
           retention-days: 14
           compression-level: 0

@@ -1,12 +1,13 @@
 # Optional Windows installer
 
-Downloads are presented as: 01 Installer (Release), 02 ZIP (Release portable),
-03 Debug (portable), and 04 Source (one matching archive). The portable folders
-contain AudioHole.exe, the owner-supplied AudioHole License.rtf and README.txt,
-Guides and Manuals, licenses and required runtime resources. No installer or
-source archive is included in either portable download. The installer artifact
-contains only Install AudioHole v<version>.exe; GitHub Actions wraps this separate
-artifact in a ZIP for download. No Debug installer is built or published.
+Downloads are presented as AudioHole Installer, AudioHole Portable, AudioHole
+ZIP-debug and AudioHole ZIP-source, followed by the display version and seven-character
+commit. For example: AudioHole Installer v0.1-34aca5b.exe. The standalone Release
+installer is downloaded directly as an EXE, using upload-artifact v7's archive:false
+mode. The other three downloads are the original ZIP files, with no outer wrapper.
+No Debug installer is built. Portable folders contain AudioHole.exe, the supplied
+AudioHole License.rtf and README.txt, Guides and Manuals, licenses and runtime
+resources. Neither installer nor source is bundled inside portable downloads.
 
 The owner-authored RTF is embedded unchanged in the application, displayed by
 Inno Setup, and installed beside AudioHole.exe. Both document replacements retain
