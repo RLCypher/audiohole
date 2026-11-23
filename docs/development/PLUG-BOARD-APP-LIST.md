@@ -99,3 +99,10 @@ requires an installed help provider. View detachment closes the callback gate,
 unregisters the handler from wxApp's pending list, then deletes queued events;
 wx DeletePendingEvents alone does not perform that unregister operation. This
 prevents a stale ready-list entry during shutdown, including failed-test cleanup.
+
+Release preparation also exposed a smoke synchronization race: service activity
+could become Inactive before the GUI mailbox rendered that publication. The
+fixture now waits for the view's read-only rendered_publication diagnostic before
+opening a menu, and targets the center of the visible row rectangle. Clear app
+still must exist on the real inactive-row menu and clear only that app; no menu
+or activity assertions are removed and normal UI behavior is unchanged.

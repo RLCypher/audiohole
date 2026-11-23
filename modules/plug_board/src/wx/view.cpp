@@ -502,6 +502,7 @@ void PlugBoardView::Implementation::ensure_socket_visible(const std::string& id)
 
 ViewLayout PlugBoardView::Implementation::inspect() const {
     ViewLayout result;
+    result.rendered_publication = snapshot ? snapshot->publication : 0;
     result.drawer_open = drawer_open;
     result.drawer_animating = animation_running;
     result.dragging = drag_active;

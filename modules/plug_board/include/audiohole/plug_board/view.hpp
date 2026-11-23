@@ -7,6 +7,7 @@
 #include <wx/panel.h>
 
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -58,6 +59,9 @@ struct SocketLayout {
     std::size_t first_visible_row = 0;
 };
 struct ViewLayout {
+    // Last snapshot rendered on the GUI thread. Diagnostics can wait for a
+    // service publication without mistaking service completion for a repaint.
+    std::uint64_t rendered_publication = 0;
     bool drawer_open = false;
     bool drawer_animating = false;
     bool dragging = false;

@@ -22,11 +22,20 @@ void Frame::plug_board_clutter_smoke() {
         do {
             wxYield();
             refresh_plug_board();
-            if (ready())
-                return;
+            if (ready()) {
+                // Model publication and the view's coalesced mailbox are
+                // independent. A completed service transition alone can leave
+                // the actual context menu describing the preceding activity.
+                const auto publication = plug_board_->snapshot()->publication;
+                if (plug_board_view_->layout_diagnostics().rendered_publication >= publication)
+                    return;
+            }
             wxMilliSleep(5);
         } while (std::chrono::steady_clock::now() < deadline);
-        throw std::runtime_error("Plug Board app-list fixture timed out");
+        throw std::runtime_error(
+            "Plug Board app-list fixture timed out (rendered publication " +
+            std::to_string(plug_board_view_->layout_diagnostics().rendered_publication) +
+            ", service publication " + std::to_string(plug_board_->snapshot()->publication) + ")");
     };
     const auto command = [&](pb::Command value) {
         auto future = plug_board_->submit(std::move(value));
@@ -132,7 +141,8 @@ void Frame::plug_board_clutter_smoke() {
         require(rows, "app row is not rendered");
         plug_smoke_menu_ = action;
         wxContextMenuEvent event(wxEVT_CONTEXT_MENU, rows->GetId(),
-                                 rect->GetPosition() + wxPoint(8, 8));
+                                 rect->GetPosition() +
+                                     wxPoint(rect->GetWidth() / 2, rect->GetHeight() / 2));
         rows->GetEventHandler()->ProcessEvent(event);
         require(!plug_smoke_menu_, "context action was not constructed");
     };
