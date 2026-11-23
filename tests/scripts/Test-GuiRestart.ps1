@@ -15,10 +15,21 @@ try {
     if (-not (Test-Path $childIdFile)) { throw 'Restart did not launch a child process.' }
     $childPid = [int]((Get-Content -LiteralPath $childIdFile -Raw).Trim())
     $child = Get-Process -Id $childPid -ErrorAction SilentlyContinue
-    if ($child -and -not $child.WaitForExit(45000)) { throw 'Restarted GUI did not finish its smoke checks.' }
+    $childExit = $null
+    if ($child) {
+        if (-not $child.WaitForExit(45000)) { throw 'Restarted GUI did not finish its smoke checks.' }
+        $child.WaitForExit()
+        $childExit = $child.ExitCode
+    }
     $result = Join-Path $run 'smoke-result.txt'
-    if (-not (Test-Path $result) -or (Get-Content $result -Raw) -notmatch '^PASS:') {
-        throw 'Restarted GUI did not produce successful smoke evidence.'
+    $report = if (Test-Path -LiteralPath $result) {
+        Get-Content -LiteralPath $result -Raw
+    } else { '(smoke-result.txt was not written)' }
+    # A restarted GUI has its own native process handles, so its stderr is not
+    # necessarily inherited by CTest. Keep the actual failed assertion in the
+    # ordinary test log even when optional evidence uploads are disabled.
+    if (($null -ne $childExit -and $childExit -ne 0) -or $report -notmatch '^PASS:') {
+        throw "Restarted GUI failed (child exit: $childExit): $report"
     }
     Write-Host 'PASS: inherited parent-process handshake and restarted GUI smoke.'
 } finally {
