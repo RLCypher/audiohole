@@ -99,3 +99,15 @@ Debug and Release jobs. The application verifies full-range ink, not just the
 heading. Setup resolves its dynamic style at process startup and retains it for
 that process. The header and welcome/finish artwork use the original transparent
 AudioHole PNG; square controls preserve its aspect ratio without stock artwork.
+
+Windows CI first compiles the actual installer script against an inert text-only
+payload and runs the license theme checks in a separate disposable runner. This
+preflight must pass before the long Debug/Release builds start; its fixture is
+never uploaded or released. The Release job still compiles and tests the full
+audited application installer after its native application/package checks.
+Both jobs obtain the same hash-pinned compiler through Install-InnoCompiler.ps1.
+The theme harness changes high contrast only when the requested state differs;
+reapplying an unchanged state can asynchronously restore the prior Windows theme
+and overwrite the next test's light/dark preference. Failure logs include requested
+and observed registry values and native theme/ink records rather than a full
+installer file log embedded in one exception.

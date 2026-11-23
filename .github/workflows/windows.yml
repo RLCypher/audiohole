@@ -14,6 +14,32 @@ permissions:
   contents: read
 
 jobs:
+  installer-preflight:
+    name: Check installer compilation and license themes
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node.js 24)
+      - name: Compile the actual installer against an inert fixture and check its license
+        shell: pwsh
+        run: |
+          $compiler = ./scripts/Install-InnoCompiler.ps1
+          $temporary = Join-Path $env:RUNNER_TEMP ('AudioHole-installer-preflight-' + [guid]::NewGuid())
+          $payload = Join-Path $temporary 'payload'
+          $output = Join-Path $temporary 'output'
+          $target = Join-Path $temporary 'installed-fixture'
+          try {
+            New-Item -ItemType Directory -Path $payload, $output -Force | Out-Null
+            'Compiler/theme fixture only; never a release payload.' | Set-Content (Join-Path $payload 'fixture.txt')
+            $project = Get-Content ./CMakeLists.txt -Raw
+            if ($project -notmatch 'project\(AudioHole VERSION (\d+\.\d+\.\d+) ') { throw 'Cannot read version.' }
+            & $compiler "/DPayload=$payload" "/DOutput=$output" '/DOutputName=AudioHole-installer-preflight' "/DAppVersion=$($Matches[1])" ./installer/AudioHole.iss
+            if ($LASTEXITCODE -ne 0) { throw 'Installer preflight compilation failed.' }
+            ./tests/scripts/Test-LicenseThemes.ps1 -Installer (Join-Path $output 'AudioHole-installer-preflight.exe') -Target $target
+          } finally {
+            if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
+          }
+
   source:
     name: Prepare matching source
     runs-on: windows-2022
@@ -48,7 +74,7 @@ jobs:
           compression-level: 0
 
   build-and-test:
-    needs: source
+    needs: [source, installer-preflight]
     runs-on: windows-2022
     timeout-minutes: 45
     env:
@@ -109,15 +135,7 @@ jobs:
         id: installer
         shell: pwsh
         run: |
-          $compiler = "$env:ProgramFiles/Inno Setup 7/ISCC.exe"
-          if (-not (Test-Path -LiteralPath $compiler) -or [version](Get-Item $compiler).VersionInfo.FileVersionRaw -lt [version]"7.1.1.0") {
-            $download = Join-Path $env:RUNNER_TEMP 'innosetup-7.1.1-x64.exe'
-            Invoke-WebRequest https://github.com/jrsoftware/issrc/releases/download/is-7_1_1/innosetup-7.1.1-x64.exe -OutFile $download
-            if ((Get-FileHash -LiteralPath $download -Algorithm SHA256).Hash -ne '8A5A6711C3766A6E5FB74F280BA0E3551E719CE94538D901FDBD1F8F9920B3F0') { throw 'Installer compiler integrity check failed' }
-            $compilerDirectory = Split-Path $compiler
-            $process = Start-Process $download -ArgumentList '/ALLUSERS', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$compilerDirectory`"" -Wait -PassThru
-            if ($process.ExitCode -ne 0) { throw 'Installer compiler setup failed' }
-          }
+          $compiler = ./scripts/Install-InnoCompiler.ps1
           $zip = @(Get-ChildItem build/packages/*.zip)
           ./scripts/Build-Installer.ps1 -Archive $zip[0].FullName -Compiler $compiler
           $setup = @(Get-ChildItem -LiteralPath build/installer -Filter 'AudioHole Installer v*.exe' -File)

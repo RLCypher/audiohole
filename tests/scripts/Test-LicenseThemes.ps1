@@ -25,6 +25,9 @@ public static class AudioHoleLicenseAppearance {
         return value;
     }
     public static void Set(HighContrast value, bool enabled) {
+        // Reapplying an unchanged high-contrast state can make Windows restore
+        // its previous theme asynchronously, overwriting AppsUseLightTheme.
+        if (((Read().Flags & 1U) != 0) == enabled) return;
         value.Flags = enabled ? value.Flags | 1U : value.Flags & ~1U;
         if (!Parameters(0x43, value.Size, ref value, 2))
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -45,6 +48,8 @@ try {
     foreach ($mode in @('light', 'dark', 'high-contrast')) {
         [AudioHoleLicenseAppearance]::Set($contrast, ($mode -eq 'high-contrast'))
         New-ItemProperty -LiteralPath $personalize -Name AppsUseLightTheme -PropertyType DWord -Value ([int]($mode -ne 'dark')) -Force | Out-Null
+        $requestedLight = (Get-ItemProperty -LiteralPath $personalize).AppsUseLightTheme
+        Write-Host "License theme requested: $mode; AppsUseLightTheme=$requestedLight"
         $output = Join-Path $temporary "$mode-output.txt"
         $errors = Join-Path $temporary "$mode-errors.txt"
         if ($PSCmdlet.ParameterSetName -eq 'Installer') {
@@ -56,7 +61,7 @@ try {
             $program = $Executable
         }
         $process = Start-Process -FilePath $program -PassThru -ArgumentList $arguments -RedirectStandardOutput $output -RedirectStandardError $errors
-        if (-not $process.WaitForExit(90000)) { $process.Kill(); throw "License $mode check timed out." }
+        if (-not $process.WaitForExit(90000)) { $process.Kill(); $process.WaitForExit(); throw "License $mode check timed out." }
         $process.WaitForExit()
         if ($process.ExitCode -ne 0) {
             Get-ChildItem -LiteralPath $temporary -File | ForEach-Object { Get-Content -LiteralPath $_.FullName | Write-Host }
@@ -67,7 +72,9 @@ try {
             $expectedDark = [int]($mode -eq 'dark')
             $expectedContrast = [int]($mode -eq 'high-contrast')
             if (-not $text.Contains("PASS: complete license ink and RTF formatting; dark=$expectedDark; high-contrast=$expectedContrast;")) {
-                throw "Installer did not verify the complete agreement in $mode mode: $text"
+                $observedLight = (Get-ItemProperty -LiteralPath $personalize).AppsUseLightTheme
+                $records = @($text -split '\r?\n' | Where-Object { $_ -match 'license ink|License system appearance|Windows version' }) -join '; '
+                throw "Installer did not verify $mode mode; registry before=$requestedLight, after=$observedLight; $records"
             }
         } elseif ((Get-Content -LiteralPath $output -Raw) -notmatch 'PASS: complete portable license ink and RTF formatting') {
             throw "Application did not verify the complete agreement in $mode mode."

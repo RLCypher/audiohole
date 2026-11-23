@@ -31,9 +31,12 @@ begin
 end;
 
 procedure CheckLicenseColors;
-var Format: TLicenseCharFormat; Ink: LongWord; Memo: TRichEditViewer;
+var Format: TLicenseCharFormat; Ink, SystemLight: LongWord; Memo: TRichEditViewer;
 begin
   Memo := WizardForm.LicenseMemo;
+  if RegQueryDWordValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
+    'AppsUseLightTheme', SystemLight) then
+    Log('License system appearance: AppsUseLightTheme=' + IntToStr(SystemLight));
   if IsDarkInstallMode and not HighContrastActive then Ink := $FFFFFF
   else Ink := LicenseSystemColor(8);
   Memo.SelStart := 0;
