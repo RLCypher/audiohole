@@ -52,6 +52,16 @@ updating; installed copies can download and launch the verified installer.
 This initial release is unsigned while Microsoft identity validation is pending.
 Preparing a draft neither bypasses validation nor claims a code signature.
 
+## README download links
+
+The Keep README downloads on the latest release workflow runs after release
+publication or edits, and can also be run manually. It resolves GitHub's latest
+published stable release and updates only the Windows installer and Portable ZIP
+URLs on main. Version/commit filenames remain intact; the owner's copy and images
+are preserved. Missing, ambiguous or invalid assets prevent any README write.
+The bot makes a documentation-only commit without starting another application
+build. Draft and prerelease downloads never become the README's latest links.
+
 ## Local checks
 
 Run tests/scripts/Test-DistributionTools.ps1 with PowerShell and CMake to verify
