@@ -15,8 +15,8 @@ Yeah. We got tired of that too.
 
 Pick your preferred flavor:
 
-- **[Windows installer](https://github.com/RLCypher/audiohole/releases/download/v0.1.0/AudioHole.Installer.v0.1-c2c6aca.exe):** For people who like their applications properly moved in, with their shoes by the door.
-- **[Portable ZIP](https://github.com/RLCypher/audiohole/releases/download/v0.1.0/AudioHole.Portable.v0.1-c2c6aca.zip):** Unzip it into a folder and run it. No installation, no ceremony.
+- **[Windows installer](https://github.com/RLCypher/audiohole/releases/download/v0.1.1/AudioHole.Installer.v0.1.1-da18bc2.exe):** For people who like their applications properly moved in, with their shoes by the door.
+- **[Portable ZIP](https://github.com/RLCypher/audiohole/releases/download/v0.1.1/AudioHole.Portable.v0.1.1-da18bc2.zip):** Unzip it into a folder and run it. No installation, no ceremony.
 
 Both get you AudioHole. Pick whichever suits your particular brand of laziness. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
 
