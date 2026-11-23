@@ -22,7 +22,9 @@ SetupArchitecture=x64
 MinVersion=10.0
 SetupIconFile=..\assets\branding\audiohole.ico
 WizardImageFile=..\assets\branding\audiohole-logo.png
+WizardImageFileDynamicDark=..\assets\branding\audiohole-logo.png
 WizardSmallImageFile=..\assets\branding\audiohole-logo.png
+WizardSmallImageFileDynamicDark=..\assets\branding\audiohole-logo.png
 UninstallDisplayIcon={app}\AudioHole.exe
 LicenseFile=..\docs\legal\AudioHole License.rtf
 InfoBeforeFile=ReleaseNotes.txt
@@ -173,6 +175,8 @@ end;
 procedure InitializeWizard;
 var Location: String;
 begin
+  { Inno copies only Bitmap to the finish page; explicitly copy the PNG too. }
+  WizardForm.WizardBitmapImage2.PngImage.Assign(WizardForm.WizardBitmapImage.PngImage);
   { Fit the original square logo inside the tall welcome/finish artwork area. }
   WizardForm.WizardBitmapImage.Top := WizardForm.WizardBitmapImage.Top +
     (WizardForm.WizardBitmapImage.Height - WizardForm.WizardBitmapImage.Width) div 2;
@@ -183,7 +187,17 @@ begin
   WizardForm.WizardBitmapImage2.Height := WizardForm.WizardBitmapImage2.Width;
   WizardForm.WizardBitmapImage2.Anchors := [akLeft, akTop];
   ApplyLicenseColors;
-  if ExpandConstant('{param:LICENSECOLORS|0}') = '1' then CheckLicenseColors;
+  if ExpandConstant('{param:LICENSECOLORS|0}') = '1' then begin
+    CheckLicenseColors;
+    if (WizardForm.WizardBitmapImage.PngImage.Width <> 512) or
+      (WizardForm.WizardBitmapImage.PngImage.Height <> 512) or
+      (WizardForm.WizardBitmapImage2.PngImage.Width <> 512) or
+      (WizardForm.WizardBitmapImage2.PngImage.Height <> 512) or
+      (WizardForm.WizardSmallBitmapImage.PngImage.Width <> 512) or
+      (WizardForm.WizardSmallBitmapImage.PngImage.Height <> 512) then
+      RaiseException('Installer is not displaying the official AudioHole PNG artwork.');
+    Log('PASS: official AudioHole PNG artwork on welcome, finish and header.');
+  end;
   OldFiles := TStringList.Create;
   if RegQueryStringValue(HKA, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\AudioHole_is1',
     'InstallLocation', Location) and DirExists(Location) then WizardForm.DirEdit.Text := Location;

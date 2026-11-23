@@ -1,5 +1,3 @@
-AudioHole v0.1.1
-
-License agreements are readable in light and dark modes, and setup uses the AudioHole logo.
-Settings > About/Update now includes Check for updates and a link for reporting issues.
-Profiles, configurations, and settings are preserved during update.
+Updated to v0.1.1. Changes include:
+Added a "Check for updates" button in the About/Updates section of settings to manually trigger an update check.
+Also, the license text should be a bit more readable in dark mode now.

@@ -1,0 +1,56 @@
+name: Refresh unpublished installer presentation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audiohole-release-draft
+  cancel-in-progress: false
+
+jobs:
+  installer:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2022
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 (Node.js 24)
+        with:
+          fetch-depth: 0
+      - name: Verify and download the existing unpublished release
+        run: python scripts/RefreshDraftInstaller.py fetch
+      - name: Verify official branding and rebuild only the installer
+        shell: pwsh
+        run: |
+          python scripts/branding/verify_assets.py
+          if ($LASTEXITCODE -ne 0) { throw 'Canonical branding validation failed.' }
+          $compiler = ./scripts/Install-InnoCompiler.ps1
+          $context = Get-Content build/installer-refresh/context.json -Raw | ConvertFrom-Json
+          ./scripts/Build-Installer.ps1 -Archive $context.portable -OutputDirectory build/installer-refresh/setup -Compiler $compiler
+          $installer = @(Get-ChildItem build/installer-refresh/setup/*.exe)
+          if ($installer.Count -ne 1) { throw 'Expected exactly one refreshed installer.' }
+          $target = Join-Path $env:RUNNER_TEMP ('AudioHole-installer-refresh-' + [guid]::NewGuid())
+          try {
+            ./tests/scripts/Test-LicenseThemes.ps1 -Installer $installer[0].FullName -Target $target
+          } finally {
+            if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
+          }
+      - name: Refresh corresponding installer source and checksums
+        run: python scripts/RefreshDraftInstaller.py prepare
+      - name: Update only unpublished installer/source assets and verify hashes
+        run: python scripts/RefreshDraftInstaller.py upload
+      - name: Align work when it can fast-forward
+        shell: pwsh
+        run: |
+          $comparison = gh api "repos/$env:GITHUB_REPOSITORY/compare/work...$env:GITHUB_SHA" --jq .status
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot compare work with the installer refresh.' }
+          if ($comparison -eq 'ahead') {
+            gh api --method PATCH "repos/$env:GITHUB_REPOSITORY/git/refs/heads/work" -f "sha=$env:GITHUB_SHA" -F force=false
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot fast-forward work.' }
+          }

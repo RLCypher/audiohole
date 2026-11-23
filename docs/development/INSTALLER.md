@@ -111,3 +111,16 @@ reapplying an unchanged state can asynchronously restore the prior Windows theme
 and overwrite the next test's light/dark preference. Failure logs include requested
 and observed registry values and native theme/ink records rather than a full
 installer file log embedded in one exception.
+
+For installer-only notes/artwork updates, the manual Refresh unpublished installer
+presentation workflow reuses the already tested portable/Debug downloads. It
+refuses published releases, application/build-source changes and concurrent asset
+changes. Only setup and its corresponding source/checksum assets are refreshed;
+the owner-authored release copy and main README are preserved. The source ZIP and
+release-info.json retain the application commit and record installer_commit,
+installer_actions_run_id and hashes of the exact committed installer/tooling
+overlay. This distinguishes the unchanged application build from the regenerated
+installer without inventing a new application build or Vintage. The same strict
+archive audits still apply. Focused Windows light/dark/high-contrast checks verify
+the actual original 512x512 PNG on the welcome, finish and header controls; no
+C++ compilation or full application smoke suite runs for this path.
