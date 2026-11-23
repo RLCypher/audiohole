@@ -88,3 +88,14 @@ agreement and records acceptance beside the tutorial flag. Registered installed
 copies have already presented this agreement through setup. Replay does not
 reset license acceptance. Artifact names use the display version and seven-character
 commit prefix; full version/commit metadata remains in docs/build-info.json.
+
+In v0.1.1, LicenseColors.iss applies only CFM_COLOR to the complete loaded RTF
+range. Explicit black document ink no longer overrides the dark wizard palette;
+high contrast uses Windows' text color. No RTF bytes, fonts, bold or paragraphs
+are changed. Native Test-LicenseThemes.ps1 checks actual complete-range ink and
+mixed typography in light/dark/high-contrast modes, restoring Windows settings.
+The same script exercises the isolated portable license smoke in both native
+Debug and Release jobs. The application verifies full-range ink, not just the
+heading. Setup resolves its dynamic style at process startup and retains it for
+that process. The header and welcome/finish artwork use the original transparent
+AudioHole PNG; square controls preserve its aspect ratio without stock artwork.

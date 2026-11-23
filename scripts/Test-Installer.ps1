@@ -85,6 +85,7 @@ $completed = $false
 try {
     New-Item -ItemType Directory -Path $temporary -Force | Out-Null
     $null = Run-Setup 'fresh'
+    & (Join-Path (Split-Path $PSScriptRoot -Parent) 'tests/scripts/Test-LicenseThemes.ps1') -Installer $Installer -Target $target
     # A harmless parent waits until setup announces its parent wait. Setup must
     # then observe its exit before normal installation; no AudioHole is launched.
     $parentScript = Join-Path $temporary 'parent-fixture.ps1'

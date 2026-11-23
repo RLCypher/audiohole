@@ -1,1 +1,5 @@
-Initial release of AudioHole
+AudioHole v0.1.1
+
+License agreements are readable in light and dark modes, and setup uses the AudioHole logo.
+Settings > About/Update now includes Check for updates and a link for reporting issues.
+Profiles, configurations, and settings are preserved during update.

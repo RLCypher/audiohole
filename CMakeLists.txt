@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(AudioHole VERSION 0.1.0 LANGUAGES C CXX)
+project(AudioHole VERSION 0.1.1 LANGUAGES C CXX)
 include(cmake/BuildIdentity.cmake)
 
 option(AUDIOHOLE_MODEL_ONLY "Build portable simulator tests only (no application)" OFF)

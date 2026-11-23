@@ -36,8 +36,8 @@ pinned dependency sources and build instructions needed for corresponding source
    commit. Independent development is preserved and no force push is used.
    The workflow token avoids starting a duplicate build for that branch sync.
 
-The draft uses v0.1.0 as its tag and AudioHole v0.1 as its title. The README links
-lead to that release's downloads. The release page becomes available to everyone
+The draft uses the project version as its tag and title: v0.1.1 / AudioHole v0.1.1
+for this patch release. The owner edits the main README separately. The release page becomes available to everyone
 only when the repository is public and the release has been published.
 
 Publication is a separate owner action. Review the draft and assets first;

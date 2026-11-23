@@ -48,6 +48,19 @@ void load_license(wxTextCtrl& control) {
     control.ShowPosition(0);
 }
 } // namespace
+bool license_ink_is_readable(wxTextCtrl& control, const wxColour& foreground) {
+    const auto window = static_cast<HWND>(control.GetHandle());
+    CHARRANGE saved{}, all{0, -1};
+    SendMessageW(window, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(&saved));
+    SendMessageW(window, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(&all));
+    CHARFORMAT2W format{};
+    format.cbSize = sizeof(format);
+    SendMessageW(window, EM_GETCHARFORMAT, SCF_SELECTION, reinterpret_cast<LPARAM>(&format));
+    SendMessageW(window, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(&saved));
+    return (format.dwMask & CFM_COLOR) && !(format.dwEffects & CFE_AUTOCOLOR) &&
+           format.crTextColor == RGB(foreground.Red(), foreground.Green(), foreground.Blue()) &&
+           foreground != control.GetBackgroundColour();
+}
 LicenseDialog::LicenseDialog(wxWindow* parent)
     : wxDialog(parent, wxID_ANY, "AudioHole License Agreement", wxDefaultPosition, wxDefaultSize,
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER) {
@@ -108,7 +121,14 @@ LicenseDialog::LicenseDialog(wxWindow* parent)
     theme_dialog(this, acceptance_required ? "system" : "");
     // Preserve all typography and paragraphs while overriding document ink for
     // legibility in the current theme, including Windows high contrast.
-    if (!agreement->SetStyle(0, agreement->GetLastPosition(), wxTextAttr(GetForegroundColour())))
+    CHARFORMAT2W ink{};
+    ink.cbSize = sizeof(ink);
+    ink.dwMask = CFM_COLOR;
+    const auto foreground = GetForegroundColour();
+    ink.crTextColor = RGB(foreground.Red(), foreground.Green(), foreground.Blue());
+    if (!SendMessageW(static_cast<HWND>(agreement->GetHandle()), EM_SETCHARFORMAT, SCF_ALL,
+                      reinterpret_cast<LPARAM>(&ink)) ||
+        !license_ink_is_readable(*agreement, GetForegroundColour()))
         throw std::runtime_error("Cannot apply readable theme colors to the AudioHole license.");
     if (parent)
         CentreOnParent();
@@ -139,7 +159,8 @@ void smoke_license_dialog() {
             if (!body->IsRich() || body->IsEditable() || !body->GetValue().Contains("TL;DR") ||
                 !body->GetValue().Contains("fnord") || body->GetValue().Contains("{\\rtf1") ||
                 !body->GetStyle(0, heading) || heading.GetFontWeight() != wxFONTWEIGHT_BOLD ||
-                heading.GetTextColour() != dialog->GetForegroundColour())
+                heading.GetTextColour() != dialog->GetForegroundColour() ||
+                !license_ink_is_readable(*body, dialog->GetForegroundColour()))
                 throw std::runtime_error("License RTF formatting or theme ink was not rendered.");
             yes->SetValue(true);
             no->SetValue(false);

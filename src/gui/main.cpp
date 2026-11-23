@@ -98,13 +98,15 @@ class App final : public wxApp {
         SetAppName("AudioHole");
         bool smoke = false, test_mode_smoke = false, tutorial_smoke = false,
              replay_tutorial = false, engine_smoke = false, restart_smoke = false,
-             working_after_tutorial = false;
+             working_after_tutorial = false, license_smoke = false;
         wxString screenshot_dir;
         HANDLE restart_parent = nullptr;
         std::optional<ShellAction> shell_action;
         for (int i = 1; i < argc; ++i) {
             if (wxString(argv[i]) == "--smoke-test")
                 smoke = true;
+            else if (wxString(argv[i]) == "--license-smoke")
+                smoke = license_smoke = true;
             else if (wxString(argv[i]) == "--engine-smoke")
                 smoke = engine_smoke = true;
             else if (wxString(argv[i]) == "--restart-smoke")
@@ -130,6 +132,29 @@ class App final : public wxApp {
                 restart_parent = reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(value));
             } else
                 return false;
+        }
+        if (license_smoke) {
+            // Isolated rendering check: no preferences, receipt, network,
+            // instance guard, routing controller or tray is created.
+            smoke_ = true;
+            apartment_ = std::make_unique<audiohole::windows::ComApartment>(
+                audiohole::windows::ApartmentModel::single_threaded);
+            if (!apartment_->initialized())
+                return false;
+            auto* host = new wxFrame(nullptr, wxID_ANY, "AudioHole license smoke");
+            SetTopWindow(host);
+            CallAfter([this, host] {
+                try {
+                    smoke_license_dialog();
+                    std::fprintf(stdout,
+                                 "PASS: complete portable license ink and RTF formatting.\n");
+                } catch (const std::exception& error) {
+                    std::fprintf(stderr, "FAIL: license rendering: %s\n", error.what());
+                    result_ = 1;
+                }
+                host->Destroy();
+            });
+            return true;
         }
         if (shell_action) {
             if (smoke || restart_parent)

@@ -2058,6 +2058,22 @@ without enabling unavailable backend operations.
 Packages place only AudioHole.exe and README.txt at the root beside folders.
 Helpers and AudioHole.has-run are in bin/; avatar-assets.json is in assets/;
 third-party notices are in licenses/; documents and build-info.json are in docs/.
+
+### v0.1.1 About/Update and license refinement
+
+Settings → About/Update preserves the compiled identity and approved BLANCO copy.
+It adds Check for updates, which immediately uses the asynchronous updater even
+with automatic checks disabled or a recent previous check. Successful current or
+older release results show exactly "Sorry boss, nothing new yet." with an "Ok"
+button that closes the popup. Errors have a separate actionable failure dialog.
+Below the repository link, show "Got issues? Bug reports? Tell me about them."
+and a link to https://github.com/RLCypher/audiohole/issues. The owner supplied these
+exact strings. Tutorial and smoke hosts perform no real network request.
+
+The complete license, including body text, must be readable in light and dark
+modes in the installer, Release portable and Debug builds, while preserving the
+canonical RTF bytes and typography. Windows high-contrast colors take precedence.
+The installer uses the existing AudioHole logo without changing its proportions.
 A present marker suppresses the welcome regardless of deprecated dialog settings.
 Replay deletes it and restarts after confirmation. Exit uses Exit/Cancel. Fresh
 appearance follows Windows; dropdown wheel gestures scroll pages without selecting.

@@ -2056,6 +2056,7 @@ bool Frame::smoke(const wxString& directory) {
             class UpdateDialogCheck final : public wxModalDialogHook {
               public:
                 bool seen = false, license_seen = false;
+                std::function<void(wxDialog*)> check_manual;
                 wxColour foreground;
                 wxString capture_path;
                 int Enter(wxDialog* dialog) override {
@@ -2069,6 +2070,7 @@ bool Frame::smoke(const wxString& directory) {
                             !body->GetValue().Contains("fnord") || !body->GetStyle(0, heading) ||
                             heading.GetFontWeight() != wxFONTWEIGHT_BOLD ||
                             heading.GetTextColour() != foreground ||
+                            !license_ink_is_readable(*body, foreground) ||
                             wxWindow::FindWindowByName("Accept license agreement", dialog) ||
                             wxWindow::FindWindowByName("Start AudioHole", dialog) ||
                             !dialog->FindWindow(wxID_CLOSE) || dialog->GetEscapeId() != wxID_CLOSE)
@@ -2088,6 +2090,11 @@ bool Frame::smoke(const wxString& directory) {
                         wxWindow::FindWindowByName("AudioHole GitHub", dialog));
                     auto* close = dialog->FindWindow(wxID_CLOSE);
                     auto* license = wxWindow::FindWindowByName("View AudioHole license", dialog);
+                    auto* issues = dynamic_cast<wxHyperlinkCtrl*>(
+                        wxWindow::FindWindowByName("AudioHole GitHub issues", dialog));
+                    auto* issues_note =
+                        wxWindow::FindWindowByName("AudioHole issue reporting", dialog);
+                    auto* check = wxWindow::FindWindowByName("Check for updates", dialog);
                     if (!version || !version->GetLabel().Contains(text(AUDIOHOLE_VERSION)) ||
                         !version->GetLabel().Contains(wxS("Build: ") +
                                                       text(AUDIOHOLE_BUILD_COMMIT)) ||
@@ -2099,12 +2106,20 @@ bool Frame::smoke(const wxString& directory) {
                         close->GetLabel() != "Close" || dialog->GetEscapeId() != wxID_CLOSE ||
                         version->GetForegroundColour() != foreground ||
                         close->GetForegroundColour() != foreground ||
-                        link->GetNormalColour() != foreground)
+                        link->GetNormalColour() != foreground || !check || !check->IsEnabled() ||
+                        check->GetLabel() != "Check for updates" || !issues || !issues_note ||
+                        issues_note->GetLabel() != "Got issues? Bug reports? Tell me about them." ||
+                        issues->GetURL() != "https://github.com/RLCypher/audiohole/issues" ||
+                        issues->GetNormalColour() != foreground ||
+                        issues_note->GetPosition().y <= link->GetPosition().y ||
+                        issues->GetPosition().y <= issues_note->GetPosition().y)
                         throw std::runtime_error(
                             "Update dialog lost its version, link, Close action or theme");
-                    dialog->CallAfter([dialog, close, license, path = capture_path] {
+                    dialog->CallAfter([dialog, close, license, verify_manual = check_manual,
+                                       path = capture_path] {
                         wxCommandEvent show_license(wxEVT_BUTTON, license->GetId());
                         license->GetEventHandler()->ProcessEvent(show_license);
+                        verify_manual(dialog);
                         if (!path.empty()) {
                             wxFileName::Mkdir(wxFileName(path).GetPath(), wxS_DIR_DEFAULT,
                                               wxPATH_MKDIR_FULL);
@@ -2125,6 +2140,7 @@ bool Frame::smoke(const wxString& directory) {
                     return wxID_NONE;
                 }
             } hook;
+            hook.check_manual = [this](wxDialog* dialog) { smoke_manual_update_check(dialog); };
             const auto appearance_before = theme_choice_->GetSelection();
             for (int choice : {0, 1}) {
                 theme_choice_->SetSelection(choice);

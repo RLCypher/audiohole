@@ -42,6 +42,7 @@
 #include <wx/splitter.h>
 #include <wx/taskbar.h>
 #include <wx/tglbtn.h>
+#include <wx/weakref.h>
 #include <wx/wx.h>
 
 namespace audiohole::gui {
@@ -179,9 +180,16 @@ class Frame final : public wxFrame, private wxEventFilter {
     std::unique_ptr<windows::UpdateService> updates_;
     wxDialog* update_progress_ = nullptr;
     bool update_offer_pending_ = false, update_download_cancelled_ = false;
+    bool manual_update_pending_ = false;
+    // The About dialog may close while its worker is running. Never retain a
+    // raw pointer to that dialog or its Check for updates button.
+    wxWeakRef<wxWindow> manual_update_parent_, manual_update_button_;
     std::vector<std::string> update_errors_;
+    bool prepare_updates();
+    void check_updates_now(wxWindow* parent, wxWindow* button);
+    void smoke_manual_update_check(wxDialog* about);
     void poll_updates();
-    void offer_update();
+    void offer_update(bool manual = false, wxWindow* parent = nullptr);
     void update_error(const std::string&);
     bool tutorial_exit_requested_ = false;
     // Disposable native-smoke override; empty in every interactive host.

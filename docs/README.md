@@ -6,6 +6,7 @@ and [contribution guide](../CONTRIBUTING.md).
 - [Specifications](specifications/README.md): design, GUI, configuration and engine contracts.
 - [Guides and Manuals](guides/): user guides, manifesto, and AI disclosure.
 - [Installer](development/INSTALLER.md): installation, update, removal and release notes.
+- [v0.1.1 maintenance](development/TODO.md): requested fixes and their validation criteria.
 - [Maintenance batch and verification](development/MAINTENANCE-2026-11-19.md).
 - [Distribution cleanup and inactive-source disclosure](development/DISTRIBUTION-CLEANUP.md).
 - [Logging, storage limits, portable licensing and build maintenance](development/LOGGING-LICENSE-CI.md).

@@ -43,9 +43,25 @@ void Frame::show_update_information() {
                                      "https://github.com/RLCypher/audiohole");
     link->SetName("AudioHole GitHub");
     content->Add(link, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(12));
+    auto* issues_note =
+        new wxStaticText(page, wxID_ANY, "Got issues? Bug reports? Tell me about them.");
+    issues_note->SetName("AudioHole issue reporting");
+    content->Add(issues_note, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(12));
+    auto* issues =
+        new wxHyperlinkCtrl(page, wxID_ANY, "https://github.com/RLCypher/audiohole/issues",
+                            "https://github.com/RLCypher/audiohole/issues");
+    issues->SetName("AudioHole GitHub issues");
+    content->Add(issues, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(12));
     page->SetSizer(content);
     layout->Add(page, 1, wxEXPAND);
-    auto* actions = new wxBoxSizer(wxHORIZONTAL);
+    auto* actions = new wxWrapSizer(wxHORIZONTAL);
+    auto* check = new ActionButton(&dialog, "Check for updates");
+    check->SetName("Check for updates");
+    check->Enable(!tutorial_ && !manual_update_pending_ && !update_offer_pending_ &&
+                  (!updates_ || !updates_->busy()));
+    manual_update_button_ = check;
+    check->Bind(wxEVT_BUTTON,
+                [this, &dialog, check](wxCommandEvent&) { check_updates_now(&dialog, check); });
     auto* license = new ActionButton(&dialog, "View license");
     license->SetName("View AudioHole license");
     license->Bind(wxEVT_BUTTON, [&dialog](wxCommandEvent&) {
@@ -55,7 +71,7 @@ void Frame::show_update_information() {
     auto* close = new ActionButton(&dialog, "Close", 0, wxID_CLOSE);
     close->Bind(wxEVT_BUTTON, [&dialog](wxCommandEvent&) { dialog.EndModal(wxID_CLOSE); });
     close->SetDefault();
-    actions->AddStretchSpacer();
+    actions->Add(check, 0, wxALL, FromDIP(6));
     actions->Add(license, 0, wxALL, FromDIP(6));
     actions->Add(close, 0, wxALL, FromDIP(6));
     layout->Add(actions, 0, wxEXPAND | wxALL, FromDIP(6));
@@ -67,9 +83,11 @@ void Frame::show_update_information() {
     dialog.SetSize(wxSize(std::min(FromDIP(680), area.width - FromDIP(30)),
                           std::min(FromDIP(560), area.height - FromDIP(30))));
     dialog.SetMinSize(FromDIP(wxSize(320, 280)));
-    const auto wrap = [page, description, copy, this] {
+    const auto wrap = [page, description, issues_note, copy, this] {
         description->SetLabel(copy);
         description->Wrap(std::max(FromDIP(200), page->GetClientSize().x - FromDIP(24)));
+        issues_note->SetLabel("Got issues? Bug reports? Tell me about them.");
+        issues_note->Wrap(std::max(FromDIP(200), page->GetClientSize().x - FromDIP(24)));
         page->FitInside();
     };
     page->Bind(wxEVT_SIZE, [wrap](wxSizeEvent& event) {
@@ -79,9 +97,11 @@ void Frame::show_update_information() {
     dialog.Layout();
     wrap();
     theme_dialog(&dialog);
-    link->SetNormalColour(dialog.GetForegroundColour());
-    link->SetVisitedColour(dialog.GetForegroundColour());
-    link->SetHoverColour(dialog.GetForegroundColour());
+    for (auto* hyperlink : {link, issues}) {
+        hyperlink->SetNormalColour(dialog.GetForegroundColour());
+        hyperlink->SetVisitedColour(dialog.GetForegroundColour());
+        hyperlink->SetHoverColour(dialog.GetForegroundColour());
+    }
     dialog.CentreOnParent();
     dialog.ShowModal();
 }
@@ -317,7 +337,7 @@ void Frame::build_settings() {
             automatic_updates->SetValue(preferences_->values().check_updates_automatically);
             show_result(result);
         }
-        if (result.ok && !next.check_updates_automatically && updates_) {
+        if (result.ok && !next.check_updates_automatically && updates_ && !manual_update_pending_) {
             update_download_cancelled_ = true;
             updates_->cancel();
         }

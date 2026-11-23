@@ -21,6 +21,8 @@ OutputBaseFilename={#OutputName}
 SetupArchitecture=x64
 MinVersion=10.0
 SetupIconFile=..\assets\branding\audiohole.ico
+WizardImageFile=..\assets\branding\audiohole-logo.png
+WizardSmallImageFile=..\assets\branding\audiohole-logo.png
 UninstallDisplayIcon={app}\AudioHole.exe
 LicenseFile=..\docs\legal\AudioHole License.rtf
 InfoBeforeFile=ReleaseNotes.txt
@@ -51,6 +53,7 @@ ButtonFinish=Exit
 
 [Code]
 #include "BuildInfo.iss"
+#include "LicenseColors.iss"
 var
   ExistingPage: TInputOptionWizardPage;
   OldFiles: TStringList;
@@ -170,6 +173,17 @@ end;
 procedure InitializeWizard;
 var Location: String;
 begin
+  { Fit the original square logo inside the tall welcome/finish artwork area. }
+  WizardForm.WizardBitmapImage.Top := WizardForm.WizardBitmapImage.Top +
+    (WizardForm.WizardBitmapImage.Height - WizardForm.WizardBitmapImage.Width) div 2;
+  WizardForm.WizardBitmapImage.Height := WizardForm.WizardBitmapImage.Width;
+  WizardForm.WizardBitmapImage.Anchors := [akLeft, akTop];
+  WizardForm.WizardBitmapImage2.Top := WizardForm.WizardBitmapImage2.Top +
+    (WizardForm.WizardBitmapImage2.Height - WizardForm.WizardBitmapImage2.Width) div 2;
+  WizardForm.WizardBitmapImage2.Height := WizardForm.WizardBitmapImage2.Width;
+  WizardForm.WizardBitmapImage2.Anchors := [akLeft, akTop];
+  ApplyLicenseColors;
+  if ExpandConstant('{param:LICENSECOLORS|0}') = '1' then CheckLicenseColors;
   OldFiles := TStringList.Create;
   if RegQueryStringValue(HKA, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\AudioHole_is1',
     'InstallLocation', Location) and DirExists(Location) then WizardForm.DirEdit.Text := Location;
@@ -179,6 +193,11 @@ begin
   ExistingPage.Add('Uninstall AudioHole');
   ExistingPage.Add('Cancel');
   ExistingPage.SelectedValueIndex := 0;
+end;
+
+procedure CurPageChanged(PageID: Integer);
+begin
+  if PageID = wpLicense then ApplyLicenseColors;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;

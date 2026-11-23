@@ -5,6 +5,15 @@ and new configurations. Its hovertext is: "We'll let you know if anything new
 comes to this mess." Enabling takes effect on the next normal app startup.
 Tutorial and every smoke host perform no real update request or installer launch.
 
+Settings → About/Update also offers Check for updates. It immediately uses the
+same asynchronous, validated transport, without enabling automatic checks or
+waiting for the weekly interval. A manual request can offer a previously skipped
+newer version. The button is disabled while checking and restored on completion;
+closing About/Update safely leaves the worker owned by the main frame. A successful
+check with no newer release shows exactly "Sorry boss, nothing new yet." with an
+"Ok" button that closes it. Errors are logged and shown separately, never as a
+successful no-update result. Tutorial cannot issue a manual network request.
+
 A GUI-owned policy store lives at updates.json beside preferences.json in the
 shared local data root. Its format is audiohole-update-state, schema_version 1:
 last_checked_unix is a nonnegative UTC Unix timestamp, skipped_version is an empty

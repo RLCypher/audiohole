@@ -1,9 +1,18 @@
 #include "gui/update_dialog.h"
 #include "gui/branding.h"
 #include "gui/controls.h"
+#include <wx/generic/msgdlgg.h>
 #include <wx/modalhook.h>
 #include <wx/wrapsizer.h>
 namespace audiohole::gui {
+void show_no_update_dialog(wxWindow* parent) {
+    wxGenericMessageDialog dialog(parent, "Sorry boss, nothing new yet.", "AudioHole update",
+                                  wxOK | wxICON_INFORMATION);
+    dialog.SetName("AudioHole no update available");
+    dialog.SetOKLabel("Ok");
+    theme_dialog(&dialog);
+    dialog.ShowModal();
+}
 UpdateDialog::UpdateDialog(wxWindow* parent, const updates::Release& release,
                            const std::string& current, bool installed)
     : wxDialog(parent, wxID_ANY, "AudioHole update", wxDefaultPosition, wxDefaultSize,

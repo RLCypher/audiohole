@@ -10,4 +10,7 @@ class UpdateDialog final : public wxDialog {
     UpdateChoice choice() const;
 };
 void smoke_update_dialog(wxWindow* parent);
+// A successful manual check with no newer release. The explicit owner wording
+// and Ok label are shared by every personality; errors use a separate dialog.
+void show_no_update_dialog(wxWindow* parent);
 } // namespace audiohole::gui
