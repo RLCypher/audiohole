@@ -1,6 +1,7 @@
 # AudioHole
 
-**Put your audio wherever you want.**
+
+**Put your audio wherever you want.**<img width="256" height="256" align="right" alt="AudioHole Logo" src="https://github.com/user-attachments/assets/e5cc7552-10a6-443c-bf9d-05164f2e098e" />
 
 AudioHole is a free, open-source Windows audio routing application built around a simple idea: you paid for the hardware, so you ought to decide where the audio goes.
 
@@ -19,26 +20,17 @@ Pick your preferred flavor:
 
 Both get you AudioHole. Pick whichever suits your particular brand of laziness. An interactive guided tutorial, a full user manual, and an advanced manual buffer tuning guide are provided to help you make sense of your new plumbing.
 
-## A Quick Note About Security
-
-AudioHole is currently distributed without a digital code signature. I don't intend to keep it that way forever. 
-In the mean time, Microsoft Defender SmartScreen may throw a warning in your face because Windows doesn't recognize the publisher or hasn't established sufficient trust in the application. This warning doesn't necessarily mean AudioHole is malicious, but you should always verify where your software comes from.
-
-SmartScreen is a legitimate Windows security feature, and I have no intention of asking you to disable it. I'm working toward getting AudioHole properly code-signed so Windows can recognize its publisher. Until then, Windows may remain understandably suspicious of my holes.
-
-AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
-
-The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare version numbers. I won't stand for wasting your precious bandwidth on telemetry data.
-
 ## What does it do?
 
 ### AudioHole
+<img width="741" height="746" alt="AudioHole Screenshot" src="https://github.com/user-attachments/assets/45dd6db1-8f31-4066-b8c1-8623a72a91eb" />
 
 **Device-agnostic audio forwarding.** Connect Windows capture and playback devices without worrying about whose logo is on the box. Your microphone doesn't need to know who manufactured your mixer, and frankly, neither should you.
 
 Set up a connection, tell the audio where to go, and let the software handle the introductions.
 
 ### Plug Board
+<img width="741" height="746" alt="PlugBoard Screenshot" src="https://github.com/user-attachments/assets/c858a7c6-524f-4e92-8ef4-a634bac8f7e7" />
 
 **Application audio routing.** Give your apps somewhere to put their noise. Organize games, music, voice chat, and other sound-making troublemakers into sockets, then point those sockets at the playback devices you want.
 
@@ -49,6 +41,17 @@ It's cable management for your applications, except you don't have to crawl behi
 Run AudioHole and follow the interactive tutorial if you'd like someone to show you where everything goes. If you're the type who starts turning knobs before reading labels, there's also a full user manual and a buffer tuning guide for when you decide to get particularly intimate with your audio settings.
 
 You may also encounter **Norm and Horu**, AudioHole's resident personalities. They offer helpful advice, unsolicited commentary, and varying degrees of professionalism. They're optional. Their opinions about that are their own.
+
+## A Quick Note About Security
+
+AudioHole is currently distributed without a digital code signature. I don't intend to keep it that way forever. 
+In the mean time, Microsoft Defender SmartScreen may throw a warning in your face because Windows doesn't recognize the publisher or hasn't established sufficient trust in the application. This warning doesn't necessarily mean AudioHole is malicious, but you should always verify where your software comes from.
+
+SmartScreen is a legitimate Windows security feature, and I have no intention of asking you to disable it. I'm working toward getting AudioHole properly code-signed so Windows can recognize its publisher. Until then, Windows may remain understandably suspicious of my holes.
+
+AudioHole does not require an internet connection to do its job. Diagnostic logging, when enabled, stays on your computer. Nothing gets automatically uploaded, those logs only go somewhere else if you decide to Ctrl-C, Ctrl-V them into the wild.
+
+The only time AudioHole reaches out to the internet is when you enable "Automatically check for updates", and even then, no more than once a week, and only back to the AudioHole GitHub to compare version numbers. I won't stand for wasting your precious bandwidth on telemetry data.
 
 ## Requirements
 
