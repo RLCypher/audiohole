@@ -1,6 +1,6 @@
-; SPDX-License-Identifier: GPL-3.0-only
-; Change rendered ink only. The canonical RTF and its other character/paragraph
-; formatting remain intact. CHARFORMATW has the same 92-byte ABI on x86/x64.
+// SPDX-License-Identifier: GPL-3.0-only
+// Change rendered ink only. The canonical RTF and its other character/paragraph
+// formatting remain intact. CHARFORMATW has the same 92-byte ABI on x86/x64.
 type
   TLicenseCharFormat = record
     Size, Mask, Effects: LongWord;
