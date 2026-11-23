@@ -76,6 +76,14 @@ agreement that differs from the installer compiler's source.
 Native Windows and Inno execution are performed by CI; cross-builds only compile
 the native assertions.
 
+The v0.1.1 asynchronous-check fixture pumps GUI events while waiting for its
+worker. Its focused About/Update block pauses the independent controller polling
+timer and restores its original interval on exit. This isolates the presentation
+commands from unrelated scanner/routing publications in Test Mode; the unchanged
+strict revision and editor comparisons still detect any controller mutation by
+the dialog. Failure logs report both dialog flags, before/after revisions and
+whether the draft changed. Normal application polling is unaffected.
+
 Pre-publication checks passed: 306 portable/model tests, the Windows x64 GUI
 cross-build, distribution-tool regressions and a real 744-file runtime package.
 The runtime audit confirms both uploaded document hashes and installer exclusion.

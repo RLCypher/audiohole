@@ -2141,6 +2141,24 @@ bool Frame::smoke(const wxString& directory) {
                 }
             } hook;
             hook.check_manual = [this](wxDialog* dialog) { smoke_manual_update_check(dialog); };
+            // This assertion isolates presentation/update commands from the
+            // controller. The fixture worker pumps GUI events to prove it is
+            // asynchronous; a normal 100 ms backend tick can independently
+            // publish scanner/routing observations and advance Test's revision.
+            // Keep the strict revision/editor checks while suppressing only
+            // that unrelated clock during this focused native smoke block.
+            struct PauseControllerPolling {
+                wxTimer& timer;
+                int interval;
+                explicit PauseControllerPolling(wxTimer& value)
+                    : timer(value), interval(value.IsRunning() ? value.GetInterval() : 0) {
+                    timer.Stop();
+                }
+                ~PauseControllerPolling() {
+                    if (interval > 0)
+                        timer.Start(interval);
+                }
+            } pause_polling(timer_);
             const auto appearance_before = theme_choice_->GetSelection();
             for (int choice : {0, 1}) {
                 theme_choice_->SetSelection(choice);
@@ -2159,9 +2177,14 @@ bool Frame::smoke(const wxString& directory) {
                 update->GetEventHandler()->ProcessEvent(click);
                 hook.Unregister();
                 smoke_update_dialog(this);
-                require(hook.seen && hook.license_seen &&
-                            controller_->snapshot().revision == before && draft_ == draft_before,
-                        "Update failed to open its dialog or changed routing/editor state");
+                if (!hook.seen || !hook.license_seen ||
+                    controller_->snapshot().revision != before || draft_ != draft_before)
+                    throw std::runtime_error(
+                        "About/Update changed its controller/editor invariant: about=" +
+                        std::to_string(hook.seen) + ", license=" +
+                        std::to_string(hook.license_seen) + ", revision=" + std::to_string(before) +
+                        " -> " + std::to_string(controller_->snapshot().revision) +
+                        ", draft unchanged=" + std::to_string(draft_ == draft_before));
             }
             theme_choice_->SetSelection(appearance_before);
             wxCommandEvent restore_theme(wxEVT_CHOICE, theme_choice_->GetId());
