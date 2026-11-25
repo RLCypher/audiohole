@@ -1,0 +1,5 @@
+# Downloaded source, build outputs and scratch stay local to this research task.
+/work/
+/source-index.txt
+/upstream/*
+!/upstream/SNAPSHOT.json
