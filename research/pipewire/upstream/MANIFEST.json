@@ -1,0 +1,409 @@
+{
+  "retrieved_date": "2026-10-25",
+  "pipewire_tag": "1.4.9",
+  "pipewire_commit": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+  "method": "GitHub connector fetch_file; selected files only, not a clone",
+  "entries": [
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "COPYING",
+      "local_path": "pipewire/COPYING",
+      "git_blob_sha": "aa100ce9c02238111b56e394ad5a13311e23a521",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/COPYING"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "LICENSE",
+      "local_path": "pipewire/LICENSE",
+      "git_blob_sha": "f4c692d0c7cec93ea559edc403fe528b7635ef48",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/LICENSE"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "doc/dox/internals/audio.dox",
+      "local_path": "pipewire/doc/dox/internals/audio.dox",
+      "git_blob_sha": "b39e869e68bf5defdb3104f41e4220c897aa3a9e",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/doc/dox/internals/audio.dox"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "doc/dox/internals/design.dox",
+      "local_path": "pipewire/doc/dox/internals/design.dox",
+      "git_blob_sha": "147336083ef8415480f19fb213db9f3f844d8bbb",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/doc/dox/internals/design.dox"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "doc/dox/internals/scheduling.dox",
+      "local_path": "pipewire/doc/dox/internals/scheduling.dox",
+      "git_blob_sha": "989aa0306beb79dac9faeff085a1fd48c8829186",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/doc/dox/internals/scheduling.dox"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/node/io.h",
+      "local_path": "pipewire/spa/include/spa/node/io.h",
+      "git_blob_sha": "c1c725ebf3d5c5cef40ceb4e9fc8e0af5f32c4d7",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/node/io.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/node/keys.h",
+      "local_path": "pipewire/spa/include/spa/node/keys.h",
+      "git_blob_sha": "fea7b7895a5f7a9bda03c86641fd2c43c511d97a",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/node/keys.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/param/latency-utils.h",
+      "local_path": "pipewire/spa/include/spa/param/latency-utils.h",
+      "git_blob_sha": "45f817ebbeb95ff1b74629079cf2f9729c9578f6",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/param/latency-utils.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/param/latency.h",
+      "local_path": "pipewire/spa/include/spa/param/latency.h",
+      "git_blob_sha": "4087941ca544766a48eeacecf3d51ad89fb28090",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/param/latency.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/utils/atomic.h",
+      "local_path": "pipewire/spa/include/spa/utils/atomic.h",
+      "git_blob_sha": "549420b89a95254914322cad59c952c7e8e6ed07",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/utils/atomic.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/utils/defs.h",
+      "local_path": "pipewire/spa/include/spa/utils/defs.h",
+      "git_blob_sha": "1c1a73abfbd54cac906100710f76056a420f68f9",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/utils/defs.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/utils/dll.h",
+      "local_path": "pipewire/spa/include/spa/utils/dll.h",
+      "git_blob_sha": "7b8fd207eb58126cdfeada932229bd9e0ac5d1f0",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/utils/dll.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/utils/keys.h",
+      "local_path": "pipewire/spa/include/spa/utils/keys.h",
+      "git_blob_sha": "12a8cfabdec166b98ffef4da71b9ccdc1ba1e48d",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/utils/keys.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/include/spa/utils/ringbuffer.h",
+      "local_path": "pipewire/spa/include/spa/utils/ringbuffer.h",
+      "git_blob_sha": "e8c5d6250ed6463ccc575f3612accf7e0de3d108",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/include/spa/utils/ringbuffer.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/acp/alsa-util.c",
+      "local_path": "pipewire/spa/plugins/alsa/acp/alsa-util.c",
+      "git_blob_sha": "96d6020cd60a7a01327b92d67562a249952183cc",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/acp/alsa-util.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/alsa-pcm-sink.c",
+      "local_path": "pipewire/spa/plugins/alsa/alsa-pcm-sink.c",
+      "git_blob_sha": "6c340cc6fbd61fb421d2797c4ea85907abb5ff3d",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/alsa-pcm-sink.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/alsa-pcm-source.c",
+      "local_path": "pipewire/spa/plugins/alsa/alsa-pcm-source.c",
+      "git_blob_sha": "a86e8aa0e91ff9eb91418137b63c9f48c90e2960",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/alsa-pcm-source.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/alsa-pcm.c",
+      "local_path": "pipewire/spa/plugins/alsa/alsa-pcm.c",
+      "git_blob_sha": "1bb31e7a324f03ce7043a662e89d6c76c2580ffe",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/alsa-pcm.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/alsa-pcm.h",
+      "local_path": "pipewire/spa/plugins/alsa/alsa-pcm.h",
+      "git_blob_sha": "6f2876fbc3efbb439d7074067c2f89a32ca57f90",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/alsa-pcm.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/alsa/meson.build",
+      "local_path": "pipewire/spa/plugins/alsa/meson.build",
+      "git_blob_sha": "4282e0bbfe3a731f0e97746ec33f8dfee633deb1",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/alsa/meson.build"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/audioadapter.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/audioadapter.c",
+      "git_blob_sha": "b4535dd76551c311dc04819366a0fb2de93de842",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/audioadapter.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/audioconvert.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/audioconvert.c",
+      "git_blob_sha": "3aaaa7a9427d2f83d5e66d87c33d0c3288b70ca1",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/audioconvert.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/resample-native-c.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/resample-native-c.c",
+      "git_blob_sha": "7f4a86299bbb0cc0f281550544eb45b624e2dc1e",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/resample-native-c.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/resample-native-impl.h",
+      "local_path": "pipewire/spa/plugins/audioconvert/resample-native-impl.h",
+      "git_blob_sha": "ec962f3f8a778ffe50bbfbcf9606dc5cc553c11d",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/resample-native-impl.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/resample-native-sse.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/resample-native-sse.c",
+      "git_blob_sha": "241d2b1e024d0709d11e32c4471e23c965b0c118",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/resample-native-sse.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/resample-native.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/resample-native.c",
+      "git_blob_sha": "b9e0751e3f31d4bcd6e07fe11a992a23ff5bd55b",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/resample-native.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/resample.h",
+      "local_path": "pipewire/spa/plugins/audioconvert/resample.h",
+      "git_blob_sha": "5308fa828744d200e51032fa3476bc8b0711f6c0",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/resample.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/test-resample-delay.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/test-resample-delay.c",
+      "git_blob_sha": "91a04a5ac544af3a67c2ac1ec85714910e64ea2f",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/test-resample-delay.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "spa/plugins/audioconvert/test-resample.c",
+      "local_path": "pipewire/spa/plugins/audioconvert/test-resample.c",
+      "git_blob_sha": "1d77a3b23fa4b8f15095c2144cbf787c91505056",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/spa/plugins/audioconvert/test-resample.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/daemon/pipewire.conf.in",
+      "local_path": "pipewire/src/daemon/pipewire.conf.in",
+      "git_blob_sha": "14f7c6ea0d5930550c69bf3803ec51b7a7c33811",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/daemon/pipewire.conf.in"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/modules/module-loopback.c",
+      "local_path": "pipewire/src/modules/module-loopback.c",
+      "git_blob_sha": "f4b068be71b0d79dec7e8582514562d2fed33edd",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/modules/module-loopback.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/modules/module-rt.c",
+      "local_path": "pipewire/src/modules/module-rt.c",
+      "git_blob_sha": "b2d0739cf827958ab90f50b321611b87999cca9b",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/modules/module-rt.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/buffers.c",
+      "local_path": "pipewire/src/pipewire/buffers.c",
+      "git_blob_sha": "e73adaaec2d8bbfd512e436ae6a8a7db157bba7a",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/buffers.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/context.c",
+      "local_path": "pipewire/src/pipewire/context.c",
+      "git_blob_sha": "e81de9126341ed5674849964f0cd4aa890d3fdf1",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/context.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/data-loop.c",
+      "local_path": "pipewire/src/pipewire/data-loop.c",
+      "git_blob_sha": "3cee8a2e732c369d14f0ab2b3399b8290612bc7f",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/data-loop.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/impl-link.c",
+      "local_path": "pipewire/src/pipewire/impl-link.c",
+      "git_blob_sha": "a9de783e35568342d37f9aac1481b9ec37d11f2c",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/impl-link.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/impl-node.c",
+      "local_path": "pipewire/src/pipewire/impl-node.c",
+      "git_blob_sha": "59a34475c160ca6c8cf9a1820a17b11286ebfca6",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/impl-node.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/impl-port.c",
+      "local_path": "pipewire/src/pipewire/impl-port.c",
+      "git_blob_sha": "4356604afcdc2f021f64b828deedafeb7ae40b19",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/impl-port.c"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/private.h",
+      "local_path": "pipewire/src/pipewire/private.h",
+      "git_blob_sha": "cddd3b8200a6aff5b1f4baf9445357e560c37cb9",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/private.h"
+    },
+    {
+      "repository": "PipeWire/pipewire",
+      "ref": "fd60e04525f3a04d90bf50085222e0cc9139b4a4",
+      "path": "src/pipewire/settings.c",
+      "local_path": "pipewire/src/pipewire/settings.c",
+      "git_blob_sha": "597e686a9853a4ea08d040e522f032bfa161eb99",
+      "url": "https://github.com/PipeWire/pipewire/blob/fd60e04525f3a04d90bf50085222e0cc9139b4a4/src/pipewire/settings.c"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclock-getposition.md",
+      "local_path": "windows/clock-position.md",
+      "git_blob_sha": "7505a98d3e855cb7dc9ad9cbba51d2363748ef07",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclock-getposition.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/7505a98d3e855cb7dc9ad9cbba51d2363748ef07"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclock-getfrequency.md",
+      "local_path": "windows/clock-frequency.md",
+      "git_blob_sha": "145da16089e753484ecb73c8de7855369087008b",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclock-getfrequency.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/145da16089e753484ecb73c8de7855369087008b"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudiocaptureclient-getbuffer.md",
+      "local_path": "windows/capture-buffer.md",
+      "git_blob_sha": "4a167250d427df523d58df3d27407d66e61d4f1d",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudiocaptureclient-getbuffer.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/4a167250d427df523d58df3d27407d66e61d4f1d"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclient-getcurrentpadding.md",
+      "local_path": "windows/padding.md",
+      "git_blob_sha": "ae9ccfe77db0749eef23c67255e679fdfe3dbcb6",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclient-getcurrentpadding.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/ae9ccfe77db0749eef23c67255e679fdfe3dbcb6"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclient3-getsharedmodeengineperiod.md",
+      "local_path": "windows/shared-period.md",
+      "git_blob_sha": "7bfe717ebc5ad958041a37ebfe9adae5dccab0be",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclient3-getsharedmodeengineperiod.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/7bfe717ebc5ad958041a37ebfe9adae5dccab0be"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclient3-initializesharedaudiostream.md",
+      "local_path": "windows/shared-init.md",
+      "git_blob_sha": "1871ab65e1f7d5128cf6fd04d07b29cee388ac6f",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclient3-initializesharedaudiostream.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/1871ab65e1f7d5128cf6fd04d07b29cee388ac6f"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclient-initialize.md",
+      "local_path": "windows/audio-init.md",
+      "git_blob_sha": "5cd1348dd4f65abd4403fc8bdda18352c9fbd126",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclient-initialize.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/5cd1348dd4f65abd4403fc8bdda18352c9fbd126"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/avrt/nf-avrt-avsetmmthreadcharacteristicsw.md",
+      "local_path": "windows/mmcss.md",
+      "git_blob_sha": "90edefb9bab5460393874476b7d1a376dcb13dba",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/avrt/nf-avrt-avsetmmthreadcharacteristicsw.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/90edefb9bab5460393874476b7d1a376dcb13dba"
+    },
+    {
+      "repository": "MicrosoftDocs/sdk-api",
+      "ref": "docs (moving branch at retrieval)",
+      "path": "sdk-api-src/content/audioclient/nf-audioclient-iaudioclockadjustment-setsamplerate.md",
+      "local_path": "windows/audio-adjust.md",
+      "git_blob_sha": "d6c14de4962aa8d23d4d713256021c4c3756788d",
+      "url": "https://github.com/MicrosoftDocs/sdk-api/blob/docs/sdk-api-src/content/audioclient/nf-audioclient-iaudioclockadjustment-setsamplerate.md",
+      "blob_url": "https://api.github.com/repos/MicrosoftDocs/sdk-api/git/blobs/d6c14de4962aa8d23d4d713256021c4c3756788d"
+    }
+  ]
+}
